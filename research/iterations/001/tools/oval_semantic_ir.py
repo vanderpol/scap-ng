@@ -127,6 +127,8 @@ def dependency_kind(node, source: str) -> str:
         return "set_object_reference"
     if name == "filter" and source == "text":
         return "set_filter_state"
+    if name == "var_ref" and source == "text":
+        return "variable_reference"
     return f"{name}:{source}"
 
 
@@ -138,6 +140,8 @@ def collect_refs(source_id: str, e, known_ids: set[str]):
         for attr_name, v in n.attrib.items():
             value = v.strip()
             attr = local(attr_name)
+            if attr == "id":
+                continue
             if value in known_ids:
                 refs.add(value)
                 edges.append({

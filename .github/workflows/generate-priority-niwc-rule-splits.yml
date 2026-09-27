@@ -34,8 +34,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install XML dependency
-        run: python -m pip install --disable-pip-version-check lxml
+      - name: Install research-tool dependencies
+        run: python -m pip install --disable-pip-version-check lxml PyYAML
 
       - name: Validate vendored SCAP 1.4 schema set
         run: |
@@ -75,6 +75,39 @@ jobs:
           python scap-ng/research/iterations/001/tools/analyze_oval_ir_corpus.py \
             scap-ng/research/iterations/001/generated/niwc-rule-splits \
             --output scap-ng/research/iterations/001/generated/niwc-rule-splits/corpus-semantic-inventory.json
+
+      - name: Normalize flagship audit syscall cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="scap-ng/research/iterations/001/generated"
+          norm="$root/native-normalizations"
+          rm -rf "$norm"
+          mkdir -p "$norm/rhel9-sv-258179" "$norm/oracle-linux9-sv-271536"
+
+          python scap-ng/research/iterations/001/tools/normalize_audit_syscall_matrix.py \
+            "$root/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258179r1155601_rule/oval-ir.json" \
+            "$root/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258179r1155601_rule/provenance.json" \
+            --output "$norm/rhel9-sv-258179/native-semantic.json"
+
+          python scap-ng/research/iterations/001/tools/normalize_audit_syscall_matrix.py \
+            "$root/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271536r1092492_rule/oval-ir.json" \
+            "$root/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271536r1092492_rule/provenance.json" \
+            --output "$norm/oracle-linux9-sv-271536/native-semantic.json"
+
+          for case in rhel9-sv-258179 oracle-linux9-sv-271536; do
+            python scap-ng/research/iterations/001/tools/render_native_semantics.py \
+              "$norm/$case/native-semantic.json" --style original \
+              --output "$norm/$case/original-ng.yaml"
+            python scap-ng/research/iterations/001/tools/render_native_semantics.py \
+              "$norm/$case/native-semantic.json" --style ansible-inspired \
+              --output "$norm/$case/ansible-inspired.yaml"
+          done
+
+          python scap-ng/research/iterations/001/tools/compare_native_semantics.py \
+            "$norm/rhel9-sv-258179/native-semantic.json" \
+            "$norm/oracle-linux9-sv-271536/native-semantic.json" \
+            --output "$norm/rhel9-oracle9-xattr-reuse.json"
 
       - name: Commit reproducible generated research corpus
         working-directory: scap-ng

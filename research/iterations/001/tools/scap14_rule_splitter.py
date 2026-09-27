@@ -164,6 +164,8 @@ class OvalComponent:
             return "set_object_reference"
         if name == "filter" and source == "text":
             return "set_filter_state"
+        if name == "var_ref" and source == "text":
+            return "variable_reference"
         return f"{name}:{source}"
 
     def references_from(self, source_id: str, element):
@@ -174,6 +176,8 @@ class OvalComponent:
             for attr_name, value in node.attrib.items():
                 v = value.strip()
                 attr = local(attr_name)
+                if attr == "id":
+                    continue
                 if v in self.by_id:
                     refs.add(v)
                     edges.append({
