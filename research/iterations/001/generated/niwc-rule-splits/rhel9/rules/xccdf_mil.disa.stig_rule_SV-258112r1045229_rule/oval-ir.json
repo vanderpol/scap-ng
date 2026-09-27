@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "at least 8 characters must change when passwords are changed",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23036300"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230363",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must require the change of at least 8 characters when passwords are changed."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230363",
             "kind": "definition_ref",
@@ -84,16 +49,44 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "4"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "at least 8 characters must change when passwords are changed",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23036300"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230363",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must require the change of at least 8 characters when passwords are changed."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:230363",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:23036300"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
@@ -102,17 +95,24 @@
       "to": "oval:mil.disa.stig.defs:def:230363"
     },
     {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:230363",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:23036300"
+    },
+    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23036300",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23036300"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:23036300",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:23036300"
     },
     {
@@ -221,22 +221,33 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23036301"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23036302"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/security/pwquality.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*difok\\s*=\\s*(-?\\d*)\\s*(?:#.*)?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23036300",
+      "id": "oval:mil.disa.stig.ind:obj:23036301",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
@@ -295,33 +306,22 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/security/pwquality.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*difok\\s*=\\s*(-?\\d*)\\s*(?:#.*)?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23036301"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23036302"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23036301",
+      "id": "oval:mil.disa.stig.ind:obj:23036300",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
@@ -353,11 +353,12 @@
       "oval:mil.disa.stig.defs:def:230363"
     ]
   },
-  "semantic_ir_sha256": "d104c61119121fb7db6c694b9b2a430876656e9fff3c1894243d4c1acc4a3c8f",
+  "semantic_ir_sha256": "35922d64d9ae61f430849e470bc60010df189bebd2e797438de4c9bfb05fb846",
   "source": {
     "bytes": 4491,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258112r1045229_rule/oval.xml",
-    "sha256": "4ca8169c4a1a017f882a7aa498b7b6a8b563bd9e84e6acee2ed8807ef4a7f181"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258112r1045229_rule/provenance.json",
+    "sha256": "a9341f90f51de13dc555c64cdfcc14bed33837acdbf230d6afccdf7b1ed9c7f8"
   },
   "states": [
     {
@@ -446,5 +447,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:258112",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:258112",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:258112",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:258112",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml",
+      "datastream_sha256": "bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "zip_sha256": "70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-258112r1045229_rule",
+    "title": "RHEL 9 must require the change of at least eight characters when passwords are changed."
+  }
 }

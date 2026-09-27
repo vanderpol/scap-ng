@@ -32,17 +32,17 @@
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23023200" version="2" check_existence="none_exist" check="all" comment="No active password hash in /etc/shadow has a prefix other than '$6$'.">
           <object object_ref="oval:mil.disa.stig.ind:obj:23023201"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23023201" version="1" comment="Filter out acceptable shadow password entries.">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23023200" version="1" comment="Extract password hashes from /etc/shadow.">
+          <filepath datatype="string">/etc/shadow</filepath>
+          <pattern operation="pattern match">^[^:]+:([^:]*):</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23023201" version="1" comment="Filter out acceptable shadow password entries.">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
             <object_reference>oval:mil.disa.stig.ind:obj:23023200</object_reference>
             <filter action="exclude">oval:mil.disa.stig.ind:ste:23023200</filter>
             <filter action="exclude">oval:mil.disa.stig.ind:ste:23023201</filter>
           </set>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23023200" version="1" comment="Extract password hashes from /etc/shadow.">
-          <filepath datatype="string">/etc/shadow</filepath>
-          <pattern operation="pattern match">^[^:]+:([^:]*):</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23023201" version="2" comment="Exclude hashes with leading '$6$'.">
           <subexpression datatype="string" operation="pattern match">^[$][6][$]</subexpression>

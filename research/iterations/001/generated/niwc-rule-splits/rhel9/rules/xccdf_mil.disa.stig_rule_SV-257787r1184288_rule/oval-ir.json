@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/grub2.cfg:superusers exists and has a name.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25778700"
+          },
+          {
+            "comment": "/boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25778701"
+          }
+        ],
+        "comment": "Verify a BIOS GRUB superuser password is configured.",
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:257787",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must require a boot loader superuser password."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "3"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:257787",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/grub2.cfg:superusers exists and has a name.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25778700"
-          },
-          {
-            "comment": "/boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25778701"
-          }
-        ],
-        "comment": "Verify a BIOS GRUB superuser password is configured.",
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:257787",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must require a boot loader superuser password."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "3"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257787",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:257787"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -115,32 +108,39 @@
       "to": "oval:mil.disa.stig.ind:tst:25778701"
     },
     {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25778701",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:25778701"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.ind:tst:25778701",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.ind:ste:25778701"
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257787",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:257787"
     },
     {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25778700",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25778700"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:25778700",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:25778700"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25778701",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25778701"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.ind:tst:25778701",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.ind:ste:25778701"
     }
   ],
   "dependency_integrity": {
@@ -236,43 +236,6 @@
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/grub2.cfg"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*set\\s+superusers\\s*=\\s*\"(\\S+)\"\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "/etc/grub2.cfg:superusers",
-      "id": "oval:mil.disa.stig.ind:obj:25778700",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "3"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/boot/grub2/user.cfg"
         },
         {
@@ -300,6 +263,43 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/grub2.cfg"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*set\\s+superusers\\s*=\\s*\"(\\S+)\"\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "/etc/grub2.cfg:superusers",
+      "id": "oval:mil.disa.stig.ind:obj:25778700",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "3"
     }
   ],
   "parser_contract": {
@@ -330,33 +330,14 @@
       "oval:mil.disa.stig.defs:def:257787"
     ]
   },
-  "semantic_ir_sha256": "ae7b7baeb80c635fd70ef7dc0fac6b0f30347acb2d136b02d6a612038a7f64a2",
+  "semantic_ir_sha256": "145d05c467fa56e8203bca879082f17bd77d447c0764a8a35744f86162c7b36e",
   "source": {
     "bytes": 5289,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257787r1184288_rule/oval.xml",
-    "sha256": "9169a43a356c634d1d1ee70e5764e01fadd3aeb152ae81737f889a636941e792"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257787r1184288_rule/provenance.json",
+    "sha256": "5ed4bb62280a927cd63993f5bb37c3b398a2f0dbd988022bd8c4c4fa10c1f040"
   },
   "states": [
-    {
-      "comment": "GRUB superuser password",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "subexpression",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^grub\\.pbkdf2\\.sha512\\."
-        }
-      ],
-      "id": "oval:mil.disa.stig.ind:ste:25778701",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "textfilecontent54_state",
-      "version": "2"
-    },
     {
       "comment": "GRUB superuser name",
       "entities": [
@@ -376,36 +357,29 @@
       "operator": "AND",
       "type": "textfilecontent54_state",
       "version": "1"
+    },
+    {
+      "comment": "GRUB superuser password",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "subexpression",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^grub\\.pbkdf2\\.sha512\\."
+        }
+      ],
+      "id": "oval:mil.disa.stig.ind:ste:25778701",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "textfilecontent54_state",
+      "version": "2"
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "/boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.",
-      "id": "oval:mil.disa.stig.ind:tst:25778701",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25778701"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25778701"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.ind:ste:25778701"
-          },
-          "state_ref": "oval:mil.disa.stig.ind:ste:25778701"
-        }
-      ],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -432,6 +406,33 @@
       ],
       "type": "textfilecontent54_test",
       "version": "2"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "/boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.",
+      "id": "oval:mil.disa.stig.ind:tst:25778701",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25778701"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25778701"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.ind:ste:25778701"
+          },
+          "state_ref": "oval:mil.disa.stig.ind:ste:25778701"
+        }
+      ],
+      "type": "textfilecontent54_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
@@ -470,5 +471,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:257787",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:257787",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:257787",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:257787",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml",
+      "datastream_sha256": "bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "zip_sha256": "70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-257787r1184288_rule",
+    "title": "RHEL 9 must require a boot loader superuser password."
+  }
 }

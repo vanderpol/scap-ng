@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "dconf user database(s) exist",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25802600"
-          },
-          {
-            "comment": "/org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories exists",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25802601"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258026",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must prevent a user from overriding the session lock-delay setting for the graphical user interface."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258026",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "dconf user database(s) exist",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25802600"
+          },
+          {
+            "comment": "/org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories exists",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25802601"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258026",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must prevent a user from overriding the session lock-delay setting for the graphical user interface."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258026",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258026"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,24 +115,17 @@
       "to": "oval:mil.disa.stig.ind:tst:25802601"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258026",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258026"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25802601",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25802601"
     },
     {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25802600",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25802600"
     },
     {
@@ -139,7 +139,7 @@
       "attribute": "object_ref",
       "element": "object_component",
       "from": "oval:mil.disa.stig.defs:var:25802600",
-      "kind": "object_reference",
+      "kind": "object_component",
       "to": "oval:mil.disa.stig.ind:obj:25802600"
     }
   ],
@@ -239,40 +239,6 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/dconf/profile/user"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^system-db:(\\S+)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "dconf user databases",
-      "id": "oval:mil.disa.stig.ind:obj:25802600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
           "attributes": {
             "var_check": "at least one",
             "var_ref": "oval:mil.disa.stig.defs:var:25802600"
@@ -315,6 +281,40 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/dconf/profile/user"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^system-db:(\\S+)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "dconf user databases",
+      "id": "oval:mil.disa.stig.ind:obj:25802600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
     }
   ],
   "parser_contract": {
@@ -346,11 +346,12 @@
       "oval:mil.disa.stig.defs:def:258026"
     ]
   },
-  "semantic_ir_sha256": "2166baf9c5a9f6c5458c21467dd44c8724eba6c7a9fd77eed694bebd22fbdc9f",
+  "semantic_ir_sha256": "ead053c6558d4f2e5ea93fb7274c609efc0fbf8a0e0dc2491b7f03c0cc32bcf0",
   "source": {
     "bytes": 4608,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258026r1045103_rule/oval.xml",
-    "sha256": "c1895869893d57a19d1250ba8242c6a766fda97f5780b6a43f8d9a4efda86f33"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258026r1045103_rule/provenance.json",
+    "sha256": "83b449c79f21c0257db468f0166b8fa8be53f6876630d0b4ef7879875dcab278"
   },
   "states": [],
   "tests": [
@@ -512,5 +513,42 @@
       "type": "local_variable",
       "version": "2"
     }
-  ]
+  ],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:258026",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:258026",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:258026",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:258026",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml",
+      "datastream_sha256": "bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "zip_sha256": "70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-258026r1045103_rule",
+    "title": "RHEL 9 must prevent a user from overriding the session lock-delay setting for the graphical user interface."
+  }
 }

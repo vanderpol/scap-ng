@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "/etc/ssh/sshd_config:PermitRootLogin == no",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23029600"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230296",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must not permit direct logons to the root account using remote access via SSH."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230296",
             "kind": "definition_ref",
@@ -84,16 +49,44 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "/etc/ssh/sshd_config:PermitRootLogin == no",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23029600"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230296",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must not permit direct logons to the root account using remote access via SSH."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:230296",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:23029600"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
@@ -102,17 +95,24 @@
       "to": "oval:mil.disa.stig.defs:def:230296"
     },
     {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:230296",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:23029600"
+    },
+    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23029600",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23029602"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:23029600",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:20000017"
     },
     {
@@ -264,6 +264,29 @@
     {
       "children": [
         {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23029600"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23029601"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
+        }
+      ],
+      "comment": "all sshd_config and sshd_config.d/* files",
+      "id": "oval:mil.disa.stig.ind:obj:23029602",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -294,29 +317,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23029600"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23029601"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
-        }
-      ],
-      "comment": "all sshd_config and sshd_config.d/* files",
-      "id": "oval:mil.disa.stig.ind:obj:23029602",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
     }
   ],
   "parser_contract": {
@@ -345,11 +345,12 @@
       "oval:mil.disa.stig.defs:def:230296"
     ]
   },
-  "semantic_ir_sha256": "30e48618fcbc4e21f2102e55d984701d71edfd9f4d4cf024580d0bf09132ccfe",
+  "semantic_ir_sha256": "6824b6dbf494f81633c6551552c5a77b4c57ee141197502bf1d9f527d6a7343e",
   "source": {
     "bytes": 4149,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271708r1092594_rule/oval.xml",
-    "sha256": "f382b37062982c871701b8c8fc7322a0d9cb54508c0dfca4f06cde3955116522"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271708r1092594_rule/provenance.json",
+    "sha256": "b80ccf1ea6f0d4821d59fba1b6c89fb979546e1675b4ff3840044118016f8df8"
   },
   "states": [
     {
@@ -438,5 +439,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271708",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271708",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271708",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271708",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+      "datastream_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-271708r1092594_rule",
+    "title": "OL 9 must not permit direct logons to the root account using remote access via SSH."
+  }
 }

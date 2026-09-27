@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Minimum PIN length is 6 or greater",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25340100"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:253401",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Windows must be configured to require a minimum pin length of six characters or greater."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "3"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:253401",
             "kind": "definition_ref",
@@ -84,16 +49,44 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Minimum PIN length is 6 or greater",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25340100"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:253401",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Windows must be configured to require a minimum pin length of six characters or greater."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "3"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:253401",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.win:tst:25340100"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
@@ -102,25 +95,25 @@
       "to": "oval:mil.disa.stig.defs:def:253401"
     },
     {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:253401",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.win:tst:25340100"
+    },
+    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.win:tst:25340100",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.win:obj:25340100"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.win:tst:25340100",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.win:ste:25340100"
-    },
-    {
-      "attribute": "var_ref",
-      "element": "key",
-      "from": "oval:mil.disa.stig.win:obj:25340102",
-      "kind": "variable_reference",
-      "to": "oval:mil.disa.stig.defs:var:25340100"
     },
     {
       "attribute": null,
@@ -137,10 +130,17 @@
       "to": "oval:mil.disa.stig.win:obj:25340102"
     },
     {
+      "attribute": "var_ref",
+      "element": "key",
+      "from": "oval:mil.disa.stig.win:obj:25340102",
+      "kind": "variable_reference",
+      "to": "oval:mil.disa.stig.defs:var:25340100"
+    },
+    {
       "attribute": "object_ref",
       "element": "object_component",
       "from": "oval:mil.disa.stig.defs:var:25340100",
-      "kind": "object_reference",
+      "kind": "object_component",
       "to": "oval:mil.disa.stig.win:obj:25340103"
     }
   ],
@@ -243,38 +243,25 @@
     {
       "children": [
         {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "hive",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "HKEY_LOCAL_MACHINE"
-        },
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "(?i)SYSTEM\\\\CurrentControlSet\\\\Control\\\\CloudDomainJoin\\\\TenantInfo\\\\[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-        },
-        {
-          "attributes": {
-            "nil": "true"
-          },
-          "kind": "element",
-          "name": "name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.win:obj:25340101"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.win:obj:25340102"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
         }
       ],
-      "comment": "Registry object for the Tenant ID of the account currently in use",
-      "id": "oval:mil.disa.stig.win:obj:25340103",
+      "comment": "Registry entries for MinimumPINLength",
+      "id": "oval:mil.disa.stig.win:obj:25340100",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "4"
+      "version": "2"
     },
     {
       "children": [
@@ -352,25 +339,38 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.win:obj:25340101"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.win:obj:25340102"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "hive",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "HKEY_LOCAL_MACHINE"
+        },
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "key",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "(?i)SYSTEM\\\\CurrentControlSet\\\\Control\\\\CloudDomainJoin\\\\TenantInfo\\\\[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+        },
+        {
+          "attributes": {
+            "nil": "true"
+          },
+          "kind": "element",
+          "name": "name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
         }
       ],
-      "comment": "Registry entries for MinimumPINLength",
-      "id": "oval:mil.disa.stig.win:obj:25340100",
+      "comment": "Registry object for the Tenant ID of the account currently in use",
+      "id": "oval:mil.disa.stig.win:obj:25340103",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "2"
+      "version": "4"
     }
   ],
   "parser_contract": {
@@ -405,11 +405,12 @@
       "oval:mil.disa.stig.defs:def:253401"
     ]
   },
-  "semantic_ir_sha256": "5f20e6511259402514e5405a41bc6d092616f18c72061a526344e0beb5c46324",
+  "semantic_ir_sha256": "6934c983a39d14cda4896c3c20c72fa34691f318e55f62c140a91cddb297afcf",
   "source": {
     "bytes": 5212,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253401r1210296_rule/oval.xml",
-    "sha256": "1deed5a915384956ff64d96962523828b98dcebced4d5f28592105268f1f7848"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253401r1210296_rule/provenance.json",
+    "sha256": "6aaeb8c841f1f0b5cad1f3541e0778fbfcb4a5d96935de7005d372e438bc93f5"
   },
   "states": [
     {
@@ -609,5 +610,42 @@
       "type": "local_variable",
       "version": "2"
     }
-  ]
+  ],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.windows11:def:253401",
+        "exports": [],
+        "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.windows11:def:253401",
+        "oval_component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.windows11:def:253401",
+        "exports": [],
+        "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.windows11:def:253401",
+        "oval_component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+      "datastream_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+      "zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-253401r1210296_rule",
+    "title": "Windows 11 must be configured to require a minimum PIN length of six characters or greater."
+  }
 }

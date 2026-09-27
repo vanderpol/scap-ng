@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "debug-shell.service LoadState is masked if it exists.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23053200"
-          },
-          {
-            "comment": "debug-shell.service UnitFileState is masked if it exists.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23053201"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230532",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The debug-shell systemd service must be disabled on the operating system."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "6"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230532",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "debug-shell.service LoadState is masked if it exists.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23053200"
+          },
+          {
+            "comment": "debug-shell.service UnitFileState is masked if it exists.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23053201"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230532",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The debug-shell systemd service must be disabled on the operating system."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "6"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271742",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230532"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,38 +115,31 @@
       "to": "oval:mil.disa.stig.linux:tst:23053201"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271742",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230532"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.linux:tst:23053201",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.linux:obj:23053201"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.linux:tst:23053201",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.linux:ste:20000005"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.linux:tst:23053200",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.linux:obj:23053200"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.linux:tst:23053200",
-      "kind": "state_reference",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.linux:ste:20000005"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.linux:tst:23053201",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.linux:obj:23053201"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.linux:tst:23053201",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.linux:ste:20000005"
     }
   ],
@@ -230,11 +230,11 @@
           "kind": "element",
           "name": "property",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "LoadState"
+          "value": "UnitFileState"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23053200",
+      "id": "oval:mil.disa.stig.linux:obj:23053201",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
       "type": "systemdunitproperty_object",
       "version": "1"
@@ -251,11 +251,11 @@
           "kind": "element",
           "name": "property",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "UnitFileState"
+          "value": "LoadState"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23053201",
+      "id": "oval:mil.disa.stig.linux:obj:23053200",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
       "type": "systemdunitproperty_object",
       "version": "1"
@@ -288,11 +288,12 @@
       "oval:mil.disa.stig.defs:def:230532"
     ]
   },
-  "semantic_ir_sha256": "f014b288c70ec57e10b1ec8850b4734e163be5b8d3fe5db661a7302ef7dd22b0",
+  "semantic_ir_sha256": "be4b18c86c6b076e10cd637c4aab9a7f4a83d2bf8e4b371340939344d67976ee",
   "source": {
     "bytes": 3824,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271742r1091938_rule/oval.xml",
-    "sha256": "62dd8bece0cb205db57bd9087b32855dd48d389b1c53a0050b82dd0ff7cc9b88"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271742r1091938_rule/provenance.json",
+    "sha256": "254d465a919e53ab41bc08b4f0fab650f92a1147d1bd76559f6c5e7ebf5d96a5"
   },
   "states": [
     {
@@ -313,33 +314,6 @@
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "any_exist",
-      "comment": "debug-shell.service UnitFileState is masked if it exists.",
-      "id": "oval:mil.disa.stig.linux:tst:23053201",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23053201"
-          },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23053201"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.linux:ste:20000005"
-          },
-          "state_ref": "oval:mil.disa.stig.linux:ste:20000005"
-        }
-      ],
-      "type": "systemdunitproperty_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "any_exist",
@@ -366,6 +340,33 @@
       ],
       "type": "systemdunitproperty_test",
       "version": "2"
+    },
+    {
+      "check": "all",
+      "check_existence": "any_exist",
+      "comment": "debug-shell.service UnitFileState is masked if it exists.",
+      "id": "oval:mil.disa.stig.linux:tst:23053201",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.linux:obj:23053201"
+          },
+          "object_ref": "oval:mil.disa.stig.linux:obj:23053201"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.linux:ste:20000005"
+          },
+          "state_ref": "oval:mil.disa.stig.linux:ste:20000005"
+        }
+      ],
+      "type": "systemdunitproperty_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
@@ -404,5 +405,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271742",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271742",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271742",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271742",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+      "datastream_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-271742r1091938_rule",
+    "title": "OL 9 debug-shell systemd service must be disabled."
+  }
 }

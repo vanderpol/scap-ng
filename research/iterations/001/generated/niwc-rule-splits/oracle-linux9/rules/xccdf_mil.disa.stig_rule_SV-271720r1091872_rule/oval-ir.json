@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Check to see if PermitUserEnvironment is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:27172000"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:271720",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must not allow users to override SSH environment variables."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:271720",
             "kind": "definition_ref",
@@ -84,16 +49,44 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Check to see if PermitUserEnvironment is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:27172000"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:271720",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must not allow users to override SSH environment variables."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:271720",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:27172000"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
@@ -102,17 +95,24 @@
       "to": "oval:mil.disa.stig.defs:def:271720"
     },
     {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:271720",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:27172000"
+    },
+    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:27172000",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:27172000"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:27172000",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:20000017"
     },
     {
@@ -228,6 +228,29 @@
     {
       "children": [
         {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:27172001"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:27172002"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:27172000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -310,29 +333,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:27172001"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:27172002"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:27172000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -361,11 +361,12 @@
       "oval:mil.disa.stig.defs:def:271720"
     ]
   },
-  "semantic_ir_sha256": "a4b64fda125961bc0e0e459098a990a2539bbe3059f0bbe77b2846be5be8c2cd",
+  "semantic_ir_sha256": "7fa3ed53f66362932b8bb72890576a87584ceb1bf337b4062971ab038e692daa",
   "source": {
     "bytes": 3964,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271720r1091872_rule/oval.xml",
-    "sha256": "2f0c00638aafb6e9b5e2de36ef4ae36d74567da3b8e731373c7f14b1a6b94004"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271720r1091872_rule/provenance.json",
+    "sha256": "35ed3c5f3d834776abb3253ec4f19ad6c5e17a055ee37e5b1f4b14b88e629ef6"
   },
   "states": [
     {
@@ -454,5 +455,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271720",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271720",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271720",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271720",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+      "datastream_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-271720r1091872_rule",
+    "title": "OL 9 must not allow users to override SSH environment variables."
+  }
 }

@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "dconf user database(s) exist",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25802600"
-          },
-          {
-            "comment": "/org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories exists",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25802000"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258020",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must prevent a user from overriding the disabling of the graphical user smart card removal action."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258020",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "dconf user database(s) exist",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25802600"
+          },
+          {
+            "comment": "/org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories exists",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25802000"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258020",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must prevent a user from overriding the disabling of the graphical user smart card removal action."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271684",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258020"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,25 +115,18 @@
       "to": "oval:mil.disa.stig.ind:tst:25802600"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271684",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258020"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25802000",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25802000"
     },
     {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25802600",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25802600"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25802000",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:25802000"
     },
     {
       "attribute": "var_ref",
@@ -139,7 +139,7 @@
       "attribute": "object_ref",
       "element": "object_component",
       "from": "oval:mil.disa.stig.defs:var:25802600",
-      "kind": "object_reference",
+      "kind": "object_component",
       "to": "oval:mil.disa.stig.ind:obj:25802600"
     }
   ],
@@ -239,6 +239,40 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/dconf/profile/user"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^system-db:(\\S+)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "dconf user databases",
+      "id": "oval:mil.disa.stig.ind:obj:25802600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "var_check": "at least one",
             "var_ref": "oval:mil.disa.stig.defs:var:25802600"
@@ -281,40 +315,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/dconf/profile/user"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^system-db:(\\S+)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "dconf user databases",
-      "id": "oval:mil.disa.stig.ind:obj:25802600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
     }
   ],
   "parser_contract": {
@@ -346,34 +346,15 @@
       "oval:mil.disa.stig.defs:def:258020"
     ]
   },
-  "semantic_ir_sha256": "ea4dd36f879d3b2f2012e80646be2b53e6ef0485ea0ae8dc03e64206da596e80",
+  "semantic_ir_sha256": "e2ce76676d41fe260fbe18e379c65100a8299a6158647c854295bec89057a78f",
   "source": {
     "bytes": 4809,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271684r1091764_rule/oval.xml",
-    "sha256": "04569297f15399fc568eacaf95a651a7f7486ede80c29aec3a7c5a2510cf490a"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271684r1091764_rule/provenance.json",
+    "sha256": "1ee693ff6632b951853a902ac90f8df4a150b5a7596dbdd8f0c31099762afdd0"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "dconf user database(s) exist",
-      "id": "oval:mil.disa.stig.ind:tst:25802600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25802600"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25802600"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -386,6 +367,26 @@
             "object_ref": "oval:mil.disa.stig.ind:obj:25802000"
           },
           "object_ref": "oval:mil.disa.stig.ind:obj:25802000"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "dconf user database(s) exist",
+      "id": "oval:mil.disa.stig.ind:tst:25802600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25802600"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25802600"
         }
       ],
       "other": [],
@@ -512,5 +513,42 @@
       "type": "local_variable",
       "version": "2"
     }
-  ]
+  ],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271684",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271684",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271684",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271684",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+      "datastream_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-271684r1091764_rule",
+    "title": "OL 9 must prevent a user from overriding the disabling of the graphical user smart card removal action."
+  }
 }

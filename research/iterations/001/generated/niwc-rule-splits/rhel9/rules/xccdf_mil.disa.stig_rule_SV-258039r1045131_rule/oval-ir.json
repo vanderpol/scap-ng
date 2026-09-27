@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "/etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23050700"
-          },
-          {
-            "comment": "/etc/modprobe.d contains a file that contains 'blacklist bluetooth'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23050701"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230507",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system Bluetooth must be disabled."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230507",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "/etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23050700"
+          },
+          {
+            "comment": "/etc/modprobe.d contains a file that contains 'blacklist bluetooth'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23050701"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230507",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system Bluetooth must be disabled."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258039",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230507"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,24 +115,17 @@
       "to": "oval:mil.disa.stig.ind:tst:23050701"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258039",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230507"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23050701",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23050701"
     },
     {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23050700",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23050700"
     }
   ],
@@ -230,7 +230,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*install[ \\t]+bluetooth[ \\t]+/bin/false[ \\t]*$"
+          "value": "^[ \\t]*blacklist[ \\t]+bluetooth[ \\t]*$"
         },
         {
           "attributes": {
@@ -244,7 +244,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23050700",
+      "id": "oval:mil.disa.stig.ind:obj:23050701",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -273,7 +273,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*blacklist[ \\t]+bluetooth[ \\t]*$"
+          "value": "^[ \\t]*install[ \\t]+bluetooth[ \\t]+/bin/false[ \\t]*$"
         },
         {
           "attributes": {
@@ -287,7 +287,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23050701",
+      "id": "oval:mil.disa.stig.ind:obj:23050700",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -317,11 +317,12 @@
       "oval:mil.disa.stig.defs:def:230507"
     ]
   },
-  "semantic_ir_sha256": "62ca807fc283e4747615346c20e150af780e9db2bd188089bcb1cfaaa2b441f6",
+  "semantic_ir_sha256": "2fe7b7d32e8f3ef90b266e6b5fe39304e4e7e639278e8886ae9200d1892eeb7e",
   "source": {
     "bytes": 4134,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258039r1045131_rule/oval.xml",
-    "sha256": "e58cb1c8d9116ddd928228acc89d7296d10ee8f2bf0f5ead9314559caac47d39"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258039r1045131_rule/provenance.json",
+    "sha256": "a7766463b349cb4067365af9e37ee8a0345df784478c63a5a76538b21c119687"
   },
   "states": [],
   "tests": [
@@ -402,5 +403,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:258039",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:258039",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:258039",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:258039",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml",
+      "datastream_sha256": "bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "zip_sha256": "70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-258039r1045131_rule",
+    "title": "RHEL 9 Bluetooth must be disabled."
+  }
 }

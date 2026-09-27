@@ -4,17 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:253478" version="3" class="compliance">
-          <metadata>
-            <title>Zone information must be preserved when saving attachments.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25347800" comment="'Do not preserve zone information in file attachments' is set to 'Not Configured' or 'Disabled'"/>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25347801" comment="For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured' or 'Disabled'"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.windows11:def:253478" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.windows11:def:253478" version="2" class="compliance">
           <metadata>
             <title>WN11-UC-000020 - Zone information must be preserved when saving attachments.</title>
             <affected family="windows">
@@ -26,6 +16,16 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253478"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:253478" version="3" class="compliance">
+          <metadata>
+            <title>Zone information must be preserved when saving attachments.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25347800" comment="'Do not preserve zone information in file attachments' is set to 'Not Configured' or 'Disabled'"/>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25347801" comment="For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured' or 'Disabled'"/>
+          </criteria>
+        </definition>
         </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25347801" version="2" check_existence="any_exist" check="all" comment="For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured' or 'Disabled'">
           <object object_ref="oval:mil.disa.stig.win:obj:25347801"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000002"/>
@@ -34,29 +34,29 @@
           <object object_ref="oval:mil.disa.stig.win:obj:25347800"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000023"/>
         </ntuser_test>
-        </tests><objects><ntuser_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25347800" version="1">
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25347801" version="1">
+          <hive>HKEY_CURRENT_USER</hive>
+          <key>Software\Microsoft\Windows\CurrentVersion\Policies\Attachments</key>
+          <name>SaveZoneInformation</name>
+        </registry_object>
+        <ntuser_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25347800" version="1">
           <key>Software\Microsoft\Windows\CurrentVersion\Policies\Attachments</key>
           <name>SaveZoneInformation</name>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.win:ste:20000026</filter>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.win:ste:20000027</filter>
         </ntuser_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25347801" version="1">
-          <hive>HKEY_CURRENT_USER</hive>
-          <key>Software\Microsoft\Windows\CurrentVersion\Policies\Attachments</key>
-          <name>SaveZoneInformation</name>
-        </registry_object>
-        </objects><states><ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000026" version="1">
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000002" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">2</value>
+        </registry_state>
+        <ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000026" version="1">
           <enabled datatype="boolean">false</enabled>
+        </ntuser_state>
+        <ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000027" version="1">
+          <days_since_modified datatype="int" operation="greater than">35</days_since_modified>
         </ntuser_state>
         <ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000023" version="1">
           <type>reg_dword</type>
           <value datatype="int">2</value>
         </ntuser_state>
-        <ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000027" version="1">
-          <days_since_modified datatype="int" operation="greater than">35</days_since_modified>
-        </ntuser_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000002" version="1">
-          <type>reg_dword</type>
-          <value datatype="int">2</value>
-        </registry_state>
         </states></oval_definitions>

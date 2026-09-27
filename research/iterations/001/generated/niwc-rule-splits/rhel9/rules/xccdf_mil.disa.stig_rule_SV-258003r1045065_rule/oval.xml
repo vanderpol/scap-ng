@@ -35,18 +35,24 @@ Satisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00227</description>
           <object object_ref="oval:mil.disa.stig.ind:obj:24452800"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000017"/>
         </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25798801" version="1" check_existence="at_least_one_exists" check="at least one" comment="sshd_config includes sshd_config.d">
-          <object object_ref="oval:mil.disa.stig.ind:obj:25798800"/>
-          <state state_ref="oval:mil.disa.stig.ind:ste:25798801"/>
-        </textfilecontent54_test>
         <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:24452801" version="1" check="all" comment="/etc/ssh/sshd_config: GSSAPIAuthentication is set to no">
           <object object_ref="oval:mil.disa.stig.ind:obj:24452801"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000017"/>
+        </textfilecontent54_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25798801" version="1" check_existence="at_least_one_exists" check="at least one" comment="sshd_config includes sshd_config.d">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25798800"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:25798801"/>
         </textfilecontent54_test>
         </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:24452800" version="1">
           <behaviors ignore_case="true"/>
           <path>/etc/ssh/sshd_config.d</path>
           <filename operation="pattern match">^.+\.conf$</filename>
+          <pattern operation="pattern match">^\s*(?i)GSSAPIAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:24452801" version="1">
+          <behaviors ignore_case="true"/>
+          <filepath>/etc/ssh/sshd_config</filepath>
           <pattern operation="pattern match">^\s*(?i)GSSAPIAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
@@ -56,16 +62,10 @@ Satisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00227</description>
           <pattern operation="pattern match">^\s*include\s+(.*)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:24452801" version="1">
-          <behaviors ignore_case="true"/>
-          <filepath>/etc/ssh/sshd_config</filepath>
-          <pattern operation="pattern match">^\s*(?i)GSSAPIAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25798801" version="1">
-          <subexpression datatype="string" operation="equals">/etc/ssh/sshd_config.d/*.conf</subexpression>
-        </textfilecontent54_state>
-        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000017" version="1">
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000017" version="1">
           <subexpression datatype="string" operation="pattern match">^(no|"no")$</subexpression>
+        </textfilecontent54_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25798801" version="1">
+          <subexpression datatype="string" operation="equals">/etc/ssh/sshd_config.d/*.conf</subexpression>
         </textfilecontent54_state>
         </states></oval_definitions>

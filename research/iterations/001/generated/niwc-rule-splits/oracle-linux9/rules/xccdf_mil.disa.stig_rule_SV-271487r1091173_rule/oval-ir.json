@@ -117,37 +117,23 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25798101",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:25798105"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25798100",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25798102"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:25798100",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:25798100"
     },
     {
-      "attribute": null,
-      "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:25798105",
-      "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:25798103"
-    },
-    {
-      "attribute": null,
-      "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:25798105",
-      "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:25798104"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25798101",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25798105"
     },
     {
       "attribute": null,
@@ -162,6 +148,20 @@
       "from": "oval:mil.disa.stig.ind:obj:25798102",
       "kind": "set_object_reference",
       "to": "oval:mil.disa.stig.ind:obj:25798101"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.ind:obj:25798105",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:25798103"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.ind:obj:25798105",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:25798104"
     }
   ],
   "dependency_integrity": {
@@ -257,18 +257,9 @@
       "children": [
         {
           "kind": "element",
-          "name": "path",
+          "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config.d"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": ".+"
+          "value": "/etc/ssh/sshd_config"
         },
         {
           "attributes": {
@@ -290,8 +281,8 @@
           "value": "1"
         }
       ],
-      "comment": "Pull value of /etc/ssh/sshd_config.d:banner",
-      "id": "oval:mil.disa.stig.ind:obj:25798104",
+      "comment": "Pull value of /etc/ssh/sshd_config:banner",
+      "id": "oval:mil.disa.stig.ind:obj:25798103",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -299,42 +290,22 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config.d"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": ".+"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*(?i)banner(?-i)[ \\t\\\"]+([\\w\\/]+)[\\\"\\s]*(?:|(?:#.*))?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25798100"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25798101"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
         }
       ],
-      "comment": "Pull value of /etc/ssh/sshd_config.d:banner",
-      "id": "oval:mil.disa.stig.ind:obj:25798101",
+      "comment": "all sshd_config and sshd_config.d/* files",
+      "id": "oval:mil.disa.stig.ind:obj:25798102",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -399,22 +370,42 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25798100"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25798101"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config.d"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": ".+"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*(?i)banner(?-i)[ \\t\\\"]+([\\w\\/]+)[\\\"\\s]*(?:|(?:#.*))?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
         }
       ],
-      "comment": "all sshd_config and sshd_config.d/* files",
-      "id": "oval:mil.disa.stig.ind:obj:25798102",
+      "comment": "Pull value of /etc/ssh/sshd_config.d:banner",
+      "id": "oval:mil.disa.stig.ind:obj:25798101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -423,9 +414,18 @@
       "children": [
         {
           "kind": "element",
-          "name": "filepath",
+          "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
+          "value": "/etc/ssh/sshd_config.d"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": ".+"
         },
         {
           "attributes": {
@@ -447,8 +447,8 @@
           "value": "1"
         }
       ],
-      "comment": "Pull value of /etc/ssh/sshd_config:banner",
-      "id": "oval:mil.disa.stig.ind:obj:25798103",
+      "comment": "Pull value of /etc/ssh/sshd_config.d:banner",
+      "id": "oval:mil.disa.stig.ind:obj:25798104",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -490,11 +490,12 @@
       "oval:mil.disa.stig.defs:def:257981"
     ]
   },
-  "semantic_ir_sha256": "8675d628de0881b9d345b5bb218e437a091e69d629f3734d88b4dddff6606d3f",
+  "semantic_ir_sha256": "6cc395456c18af8353b1768004b12ea3c2731305f49f6e25ec292aa57c3a3ac8",
   "source": {
     "bytes": 6391,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271487r1091173_rule/oval.xml",
-    "sha256": "80625c2af16a3be55d87450737b9aa0ba8e1c9bdf5706e7c9259f7e3871e4a9c"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271487r1091173_rule/provenance.json",
+    "sha256": "97753a0d7be6009d7ca14ab66d26c619a0e4dabff4dfef643322bc52813f4cfd"
   },
   "states": [
     {
@@ -521,26 +522,6 @@
   "tests": [
     {
       "check": "all",
-      "check_existence": "none_exist",
-      "comment": "/etc/ssh/sshd_config:banner == none",
-      "id": "oval:mil.disa.stig.ind:tst:25798101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25798105"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25798105"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
       "check_existence": "at_least_one_exists",
       "comment": "/etc/ssh/sshd_config:banner == /etc/issue",
       "id": "oval:mil.disa.stig.ind:tst:25798100",
@@ -565,6 +546,26 @@
       ],
       "type": "textfilecontent54_test",
       "version": "3"
+    },
+    {
+      "check": "all",
+      "check_existence": "none_exist",
+      "comment": "/etc/ssh/sshd_config:banner == none",
+      "id": "oval:mil.disa.stig.ind:tst:25798101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25798105"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25798105"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
@@ -603,5 +604,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271487",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271487",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271487",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271487",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+      "datastream_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-271487r1091173_rule",
+    "title": "OL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote access to the system via a SSH logon."
+  }
 }

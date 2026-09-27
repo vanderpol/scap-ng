@@ -61,28 +61,28 @@
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:navy.navwar.niwcatlantic.scc.linux:tst:25813101",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:navy.navwar.niwcatlantic.scc.linux:obj:25813101"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:navy.navwar.niwcatlantic.scc.linux:tst:25813101",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:navy.navwar.niwcatlantic.scc.linux:ste:25813101"
     },
     {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:navy.navwar.niwcatlantic.scc.linux:tst:25813102",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:navy.navwar.niwcatlantic.scc.linux:obj:25813102"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:navy.navwar.niwcatlantic.scc.linux:tst:25813102",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:navy.navwar.niwcatlantic.scc.linux:ste:25813102"
     }
   ],
@@ -181,7 +181,7 @@
           "kind": "element",
           "name": "command",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "openssl x509 -in /etc/sssd/pki/sssd_auth_ca_db.pem -checkend 0"
+          "value": "openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem"
         },
         {
           "attributes": {
@@ -190,11 +190,11 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "expire"
+          "value": "Issuer:"
         }
       ],
-      "comment": "Check that the root certicate is date/time valid",
-      "id": "oval:navy.navwar.niwcatlantic.scc.linux:obj:25813102",
+      "comment": "Check that the system has a valid DOD root CA installed",
+      "id": "oval:navy.navwar.niwcatlantic.scc.linux:obj:25813101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "shellcommand_object",
       "version": "13"
@@ -211,7 +211,7 @@
           "kind": "element",
           "name": "command",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem"
+          "value": "openssl x509 -in /etc/sssd/pki/sssd_auth_ca_db.pem -checkend 0"
         },
         {
           "attributes": {
@@ -220,11 +220,11 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "Issuer:"
+          "value": "expire"
         }
       ],
-      "comment": "Check that the system has a valid DOD root CA installed",
-      "id": "oval:navy.navwar.niwcatlantic.scc.linux:obj:25813101",
+      "comment": "Check that the root certicate is date/time valid",
+      "id": "oval:navy.navwar.niwcatlantic.scc.linux:obj:25813102",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "shellcommand_object",
       "version": "13"
@@ -255,42 +255,14 @@
       "oval:navy.navwar.niwcatlantic.scc.linux:ste:25813102"
     ]
   },
-  "semantic_ir_sha256": "784d1cb48b6e9c2ca57d2c2442942928aec360aabf221c12f2f0b2b04e2d8fbb",
+  "semantic_ir_sha256": "d229cf5fc11ade7ddb4c626fce690f8220cf17b2d4195597e1ef31cd5bb3c7b8",
   "source": {
     "bytes": 6706,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258131r1134927_rule/oval.xml",
-    "sha256": "2e3110a50276eef2acb598a358f98b4e166381a5a2ecd697c2197daa4f6fa2af"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258131r1134927_rule/provenance.json",
+    "sha256": "5f108f1d9d1d596deae23877d4be0097b1f86fa6295054db6ad1f1bc29ff41f3"
   },
   "states": [
-    {
-      "comment": "Verify that the Issuer is a DOD Root CA",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "exit_status",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "0"
-        },
-        {
-          "attributes": {
-            "check_existence": "at_least_one_exists",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "stdout_line",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "CN\\s*=\\s*DoD\\s+Root\\s+CA"
-        }
-      ],
-      "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:25813101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "shellcommand_state",
-      "version": "13"
-    },
     {
       "comment": "Verify that the root cert is date/time valid",
       "entities": [
@@ -315,6 +287,35 @@
         }
       ],
       "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:25813102",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "shellcommand_state",
+      "version": "13"
+    },
+    {
+      "comment": "Verify that the Issuer is a DOD Root CA",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "exit_status",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "0"
+        },
+        {
+          "attributes": {
+            "check_existence": "at_least_one_exists",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "stdout_line",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "CN\\s*=\\s*DoD\\s+Root\\s+CA"
+        }
+      ],
+      "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:25813101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "shellcommand_state",
@@ -413,5 +414,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:navy.navwar.niwcatlantic.scc.linux:def:258131",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml",
+        "match_count": 1,
+        "name": "oval:navy.navwar.niwcatlantic.scc.linux:def:258131",
+        "oval_component": "scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:navy.navwar.niwcatlantic.scc.linux:def:258131",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml",
+        "match_count": 1,
+        "name": "oval:navy.navwar.niwcatlantic.scc.linux:def:258131",
+        "oval_component": "scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml",
+      "datastream_sha256": "bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "zip_sha256": "70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-258131r1134927_rule",
+    "title": "RHEL 9, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor."
+  }
 }

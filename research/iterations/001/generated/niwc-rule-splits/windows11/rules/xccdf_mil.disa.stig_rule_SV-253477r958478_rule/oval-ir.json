@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "'Turn off toast notifications on the lock screen' is set to 'Enabled'.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25347700"
+          },
+          {
+            "comment": "For the current user, 'Turn off toast notifications on the lock screen' is set to 'Enabled'.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25347701"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:253477",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Toast notifications to the lock screen must be turned off."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:253477",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "'Turn off toast notifications on the lock screen' is set to 'Enabled'.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25347700"
-          },
-          {
-            "comment": "For the current user, 'Turn off toast notifications on the lock screen' is set to 'Enabled'.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25347701"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:253477",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Toast notifications to the lock screen must be turned off."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows11:def:253477",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253477"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -115,32 +108,39 @@
       "to": "oval:mil.disa.stig.win:tst:25347701"
     },
     {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:25347701",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.win:obj:25347701"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:25347701",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.win:ste:20000001"
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows11:def:253477",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253477"
     },
     {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.win:tst:25347700",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.win:obj:25347700"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.win:tst:25347700",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.win:ste:20000022"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.win:tst:25347701",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.win:obj:25347701"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.win:tst:25347701",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.win:ste:20000001"
     },
     {
       "attribute": null,
@@ -251,6 +251,33 @@
       "children": [
         {
           "kind": "element",
+          "name": "hive",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "HKEY_CURRENT_USER"
+        },
+        {
+          "kind": "element",
+          "name": "key",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "Software\\Policies\\Microsoft\\Windows\\CurrentVersion\\PushNotifications"
+        },
+        {
+          "kind": "element",
+          "name": "name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "NoToastApplicationNotificationOnLockScreen"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.win:obj:25347701",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "registry_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "key",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
           "value": "Software\\Policies\\Microsoft\\Windows\\CurrentVersion\\PushNotifications"
@@ -278,33 +305,6 @@
       "id": "oval:mil.disa.stig.win:obj:25347700",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "ntuser_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "hive",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "HKEY_CURRENT_USER"
-        },
-        {
-          "kind": "element",
-          "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "Software\\Policies\\Microsoft\\Windows\\CurrentVersion\\PushNotifications"
-        },
-        {
-          "kind": "element",
-          "name": "name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "NoToastApplicationNotificationOnLockScreen"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:25347701",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "registry_object",
       "version": "1"
     }
   ],
@@ -341,57 +341,14 @@
       "oval:mil.disa.stig.defs:def:253477"
     ]
   },
-  "semantic_ir_sha256": "75c44857b6665790dc5632ccde85f1e874f76bbefa61c32548fd9f01f28e32f4",
+  "semantic_ir_sha256": "e5e3d52d09cb6fed0a6f969e891c832260ef88f4dc35992900cb2ad6fcf7fe6c",
   "source": {
     "bytes": 4704,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253477r958478_rule/oval.xml",
-    "sha256": "4e8e87512603bdf173981361d05a565a6eeb9068cc199b218724b2ee55c4ce0c"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253477r958478_rule/provenance.json",
+    "sha256": "15ab9ee10cb9610ae69ace1ec216aea63d0c133105cc7cf31a65f92eed4d71c6"
   },
   "states": [
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "boolean"
-          },
-          "kind": "element",
-          "name": "enabled",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "false"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000026",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "ntuser_state",
-      "version": "1"
-    },
-    {
-      "comment": null,
-      "entities": [
-        {
-          "kind": "element",
-          "name": "type",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "reg_dword"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "1"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000022",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "ntuser_state",
-      "version": "1"
-    },
     {
       "comment": null,
       "entities": [
@@ -431,6 +388,50 @@
           "value": "1"
         }
       ],
+      "id": "oval:mil.disa.stig.win:ste:20000022",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "ntuser_state",
+      "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "boolean"
+          },
+          "kind": "element",
+          "name": "enabled",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "false"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000026",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "ntuser_state",
+      "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "kind": "element",
+          "name": "type",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "reg_dword"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "1"
+        }
+      ],
       "id": "oval:mil.disa.stig.win:ste:20000001",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
@@ -439,33 +440,6 @@
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "For the current user, 'Turn off toast notifications on the lock screen' is set to 'Enabled'",
-      "id": "oval:mil.disa.stig.win:tst:25347701",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:25347701"
-          },
-          "object_ref": "oval:mil.disa.stig.win:obj:25347701"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.win:ste:20000001"
-          },
-          "state_ref": "oval:mil.disa.stig.win:ste:20000001"
-        }
-      ],
-      "type": "registry_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -492,6 +466,33 @@
       ],
       "type": "ntuser_test",
       "version": "2"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "For the current user, 'Turn off toast notifications on the lock screen' is set to 'Enabled'",
+      "id": "oval:mil.disa.stig.win:tst:25347701",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.win:obj:25347701"
+          },
+          "object_ref": "oval:mil.disa.stig.win:obj:25347701"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.win:ste:20000001"
+          },
+          "state_ref": "oval:mil.disa.stig.win:ste:20000001"
+        }
+      ],
+      "type": "registry_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
@@ -530,5 +531,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.windows11:def:253477",
+        "exports": [],
+        "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.windows11:def:253477",
+        "oval_component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.windows11:def:253477",
+        "exports": [],
+        "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.windows11:def:253477",
+        "oval_component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+      "datastream_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+      "zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-253477r958478_rule",
+    "title": "Toast notifications to the lock screen must be turned off."
+  }
 }

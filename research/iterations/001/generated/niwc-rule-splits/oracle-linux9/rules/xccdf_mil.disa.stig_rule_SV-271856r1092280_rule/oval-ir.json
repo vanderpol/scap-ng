@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "DefaultNetstreamDriver == gtls",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25814800"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:271856",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must encrypt via the gtls driver the transfer of audit records offloaded onto a different system or media from the system being audited via rsyslog."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:271856",
             "kind": "definition_ref",
@@ -84,16 +49,44 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "DefaultNetstreamDriver == gtls",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25814800"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:271856",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must encrypt via the gtls driver the transfer of audit records offloaded onto a different system or media from the system being audited via rsyslog."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:271856",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:25814800"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
@@ -102,17 +95,24 @@
       "to": "oval:mil.disa.stig.defs:def:271856"
     },
     {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:271856",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:25814800"
+    },
+    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25814800",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25814800"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:25814800",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:25814800"
     },
     {
@@ -254,6 +254,51 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
         },
         {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/rsyslog.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\$DefaultNetstreamDriver\\s+(\\S+)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "rsyslog.conf: DefaultNetstreamDriver",
+      "id": "oval:mil.disa.stig.ind:obj:25814801",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "ignore_case": "true"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
           "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -293,51 +338,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "ignore_case": "true"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\$DefaultNetstreamDriver\\s+(\\S+)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "rsyslog.conf: DefaultNetstreamDriver",
-      "id": "oval:mil.disa.stig.ind:obj:25814801",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -366,11 +366,12 @@
       "oval:mil.disa.stig.defs:def:271856"
     ]
   },
-  "semantic_ir_sha256": "3f0253c7252dbdf77faee64e837752935c9d18f678d2c8cd9c11ec4327a2c493",
+  "semantic_ir_sha256": "819b0632d10a4d478a471b8520f9025959885818fce33f8c4cba9c74793dee88",
   "source": {
     "bytes": 4676,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271856r1092280_rule/oval.xml",
-    "sha256": "377e68128b942e034375ee770ea50cfdca20ed187c608b5202ec12171e13f384"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271856r1092280_rule/provenance.json",
+    "sha256": "b92143570fe71130b731d618bd0e8e590f2fe6f47e7e7400e002a65f17740540"
   },
   "states": [
     {
@@ -459,5 +460,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271856",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271856",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:271856",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:271856",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+      "datastream_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-271856r1092280_rule",
+    "title": "OL 9 must encrypt via the gtls driver the transfer of audit records offloaded onto a different system or media from the system being audited via rsyslog."
+  }
 }

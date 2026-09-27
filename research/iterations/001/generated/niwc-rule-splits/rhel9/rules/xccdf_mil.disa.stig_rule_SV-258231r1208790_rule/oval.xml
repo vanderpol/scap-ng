@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258231" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230232" version="2" class="compliance">
+          <metadata>
+            <title>The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23023200" comment="No active password hash in /etc/shadow has a prefix other than '$6$'."/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:258231" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-671015 - RHEL 9 must employ FIPS 140-3 approved cryptographic hashing algorithms for all stored passwords.</title>
             <affected family="unix">
@@ -20,29 +29,20 @@ Satisfies: SRG-OS-000073-GPOS-00041, SRG-OS-000120-GPOS-00061</description>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230232"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:230232" version="2" class="compliance">
-          <metadata>
-            <title>The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23023200" comment="No active password hash in /etc/shadow has a prefix other than '$6$'."/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23023200" version="2" check_existence="none_exist" check="all" comment="No active password hash in /etc/shadow has a prefix other than '$6$'.">
           <object object_ref="oval:mil.disa.stig.ind:obj:23023201"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23023200" version="1" comment="Extract password hashes from /etc/shadow.">
-          <filepath datatype="string">/etc/shadow</filepath>
-          <pattern operation="pattern match">^[^:]+:([^:]*):</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23023201" version="1" comment="Filter out acceptable shadow password entries.">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23023201" version="1" comment="Filter out acceptable shadow password entries.">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
             <object_reference>oval:mil.disa.stig.ind:obj:23023200</object_reference>
             <filter action="exclude">oval:mil.disa.stig.ind:ste:23023200</filter>
             <filter action="exclude">oval:mil.disa.stig.ind:ste:23023201</filter>
           </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23023200" version="1" comment="Extract password hashes from /etc/shadow.">
+          <filepath datatype="string">/etc/shadow</filepath>
+          <pattern operation="pattern match">^[^:]+:([^:]*):</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23023200" version="1" comment="Exclude inactive/locked hashes (with leading '!' or '*').">
           <subexpression datatype="string" operation="pattern match">^[!*]</subexpression>

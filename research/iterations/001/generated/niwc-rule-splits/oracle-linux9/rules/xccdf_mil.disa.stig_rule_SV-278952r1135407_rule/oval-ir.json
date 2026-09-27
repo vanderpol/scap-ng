@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Audit modifications to /etc/cron.d",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:27487000"
-          },
-          {
-            "comment": "Audit modifications to /var/spool/cron",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:27487001"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:274870",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must audit any script or executable called by cron as root or by any privileged user."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:274870",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Audit modifications to /etc/cron.d",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:27487000"
+          },
+          {
+            "comment": "Audit modifications to /var/spool/cron",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:27487001"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:274870",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must audit any script or executable called by cron as root or by any privileged user."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:278952",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:274870"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,25 +115,18 @@
       "to": "oval:mil.disa.stig.ind:tst:27487001"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:278952",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:274870"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:27487000",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:27487000"
     },
     {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:27487001",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:27487001"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:27487000",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:27487000"
     }
   ],
   "dependency_integrity": {
@@ -223,7 +223,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-w\\s+/etc/cron\\.d(\\s+-p\\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\\s+(-k\\s+|-F\\s+key=)\\w+)?\\s*$"
+          "value": "^\\s*-w\\s+/var/spool/cron(\\s+-p\\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\\s+(-k\\s+|-F\\s+key=)\\w+)?\\s*$"
         },
         {
           "attributes": {
@@ -237,7 +237,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:27487000",
+      "id": "oval:mil.disa.stig.ind:obj:27487001",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -257,7 +257,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-w\\s+/var/spool/cron(\\s+-p\\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\\s+(-k\\s+|-F\\s+key=)\\w+)?\\s*$"
+          "value": "^\\s*-w\\s+/etc/cron\\.d(\\s+-p\\s*([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*))?(\\s+(-k\\s+|-F\\s+key=)\\w+)?\\s*$"
         },
         {
           "attributes": {
@@ -271,7 +271,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:27487001",
+      "id": "oval:mil.disa.stig.ind:obj:27487000",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -301,34 +301,15 @@
       "oval:mil.disa.stig.defs:def:274870"
     ]
   },
-  "semantic_ir_sha256": "6ab52a683048b0e0e54606cd5b04784c92d1f6a279a61c97d6744c9640d537e5",
+  "semantic_ir_sha256": "2d44b51f8de82033e84f9f9cf563d4b0353a3440c16ef7c83ebc6b533a2a3d6a",
   "source": {
     "bytes": 3637,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-278952r1135407_rule/oval.xml",
-    "sha256": "d7862215aad0b4730075e973f6dc4e4ed4533aa509048293f46f5b0c37b93dc5"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-278952r1135407_rule/provenance.json",
+    "sha256": "d97856df4c419a316de8094f67b6a6ac522b687738101c04e3f872947073ae44"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "Audit modifications to /var/spool/cron",
-      "id": "oval:mil.disa.stig.ind:tst:27487001",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:27487001"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:27487001"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -341,6 +322,26 @@
             "object_ref": "oval:mil.disa.stig.ind:obj:27487000"
           },
           "object_ref": "oval:mil.disa.stig.ind:obj:27487000"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "Audit modifications to /var/spool/cron",
+      "id": "oval:mil.disa.stig.ind:tst:27487001",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:27487001"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:27487001"
         }
       ],
       "other": [],
@@ -386,5 +387,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:278952",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:278952",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.ol9os:def:278952",
+        "exports": [],
+        "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.ol9os:def:278952",
+        "oval_component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+      "datastream_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-278952r1135407_rule",
+    "title": "OL 9 must audit any script or executable called by cron as root or by any privileged user."
+  }
 }

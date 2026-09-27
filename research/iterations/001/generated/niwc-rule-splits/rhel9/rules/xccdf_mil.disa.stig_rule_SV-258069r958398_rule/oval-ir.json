@@ -118,43 +118,29 @@
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23034601",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23034603"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:23034601",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:23034600"
     },
     {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23034600",
-      "kind": "object_reference",
+      "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23034600"
     },
     {
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:23034600",
-      "kind": "state_reference",
+      "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:23034600"
-    },
-    {
-      "attribute": null,
-      "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:23034603",
-      "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:23034604"
-    },
-    {
-      "attribute": null,
-      "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:23034603",
-      "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:23034605"
     },
     {
       "attribute": null,
@@ -169,6 +155,20 @@
       "from": "oval:mil.disa.stig.ind:obj:23034600",
       "kind": "set_object_reference",
       "to": "oval:mil.disa.stig.ind:obj:23034602"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.ind:obj:23034603",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:23034604"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.ind:obj:23034603",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:23034605"
     }
   ],
   "dependency_integrity": {
@@ -297,22 +297,65 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/security/limits.d"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": ".*\\.conf$"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*[^#*\\s]+\\s+(?:(?:hard)|(?:-))\\s+maxlogins\\s+(\\d+)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "non-default maxlogins in /etc/security/limits.d/*.conf",
+      "id": "oval:mil.disa.stig.ind:obj:23034605",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "children": [
             {
               "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23034604"
+              "object_ref": "oval:mil.disa.stig.ind:obj:23034601"
             },
             {
               "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23034605"
+              "object_ref": "oval:mil.disa.stig.ind:obj:23034602"
             }
           ],
           "kind": "set",
           "operator": "UNION"
         }
       ],
-      "comment": "all non-default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf",
-      "id": "oval:mil.disa.stig.ind:obj:23034603",
+      "comment": "all default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf",
+      "id": "oval:mil.disa.stig.ind:obj:23034600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -397,65 +440,22 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/security/limits.d"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": ".*\\.conf$"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*[^#*\\s]+\\s+(?:(?:hard)|(?:-))\\s+maxlogins\\s+(\\d+)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "non-default maxlogins in /etc/security/limits.d/*.conf",
-      "id": "oval:mil.disa.stig.ind:obj:23034605",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
           "children": [
             {
               "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23034601"
+              "object_ref": "oval:mil.disa.stig.ind:obj:23034604"
             },
             {
               "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23034602"
+              "object_ref": "oval:mil.disa.stig.ind:obj:23034605"
             }
           ],
           "kind": "set",
           "operator": "UNION"
         }
       ],
-      "comment": "all default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf",
-      "id": "oval:mil.disa.stig.ind:obj:23034600",
+      "comment": "all non-default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf",
+      "id": "oval:mil.disa.stig.ind:obj:23034603",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -498,11 +498,12 @@
       "oval:mil.disa.stig.defs:def:230346"
     ]
   },
-  "semantic_ir_sha256": "e0cecd00f37d6424d85f69bb148fc2b5960ebe0bfc897ac42ceef51b55e2a3c1",
+  "semantic_ir_sha256": "3e62e43dac3c700a599f2ccc52a967113e540d010f04fd62e31f943692220d6c",
   "source": {
     "bytes": 6912,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258069r958398_rule/oval.xml",
-    "sha256": "6a1d5cf3bd08a2f0df40870c7934c3bb989bfa9e0da318d0ccb76fd0f196c2d4"
+    "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258069r958398_rule/provenance.json",
+    "sha256": "6e988784a83e6b425ab8dc9f1104992aed672f124307529fc7c032ee00298bb4"
   },
   "states": [
     {
@@ -618,5 +619,42 @@
     ]
   },
   "variable_resolution": {},
-  "variables": []
+  "variables": [],
+  "xccdf_context": {
+    "check_exports": [],
+    "checks": [
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:258069",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:258069",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      {
+        "definition_id": "oval:mil.disa.stig.rhel9os:def:258069",
+        "exports": [],
+        "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "match_count": 1,
+        "name": "oval:mil.disa.stig.rhel9os:def:258069",
+        "oval_component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+        "status": "resolved",
+        "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      }
+    ],
+    "component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml",
+    "published_source": {
+      "datastream_member": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml",
+      "datastream_sha256": "bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+      "zip_sha256": "70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-258069r958398_rule",
+    "title": "RHEL 9 must limit the number of concurrent sessions to ten for all accounts and/or account types."
+  }
 }

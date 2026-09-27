@@ -4,7 +4,20 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258148" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258148" version="2" class="compliance">
+          <metadata>
+            <title>The operating system must encrypt via the gtls driver the transfer of audit records offloaded onto a different system or media from the system being audited via rsyslog.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criteria operator="OR">
+              <criterion test_ref="oval:mil.disa.stig.ind:tst:25814800" comment="DefaultNetstreamDriver == gtls (legacy syntax)"/>
+              <criterion test_ref="oval:mil.disa.stig.ind:tst:25814801" comment="StreamDriver == gtls (advanced syntax)"/>
+            </criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25814802" comment="StreamDriver is not set in a module block"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:258148" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-652050 - RHEL 9 must encrypt via the gtls driver the transfer of audit records offloaded onto a different system or media from the system being audited via rsyslog.</title>
             <affected family="unix">
@@ -22,19 +35,6 @@ Satisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224</description>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258148"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:258148" version="2" class="compliance">
-          <metadata>
-            <title>The operating system must encrypt via the gtls driver the transfer of audit records offloaded onto a different system or media from the system being audited via rsyslog.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criteria operator="OR">
-              <criterion test_ref="oval:mil.disa.stig.ind:tst:25814800" comment="DefaultNetstreamDriver == gtls (legacy syntax)"/>
-              <criterion test_ref="oval:mil.disa.stig.ind:tst:25814801" comment="StreamDriver == gtls (advanced syntax)"/>
-            </criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25814802" comment="StreamDriver is not set in a module block"/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25814800" version="1" check_existence="at_least_one_exists" check="all" comment="DefaultNetstreamDriver == gtls">
           <object object_ref="oval:mil.disa.stig.ind:obj:25814800"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25814800"/>
@@ -48,17 +48,16 @@ Satisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224</description>
           <object object_ref="oval:mil.disa.stig.ind:obj:20000005"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25814802"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814802" version="1" comment="rsyslog.d/*.conf: DefaultNetstreamDriver">
-          <behaviors ignore_case="true"/>
-          <path>/etc/rsyslog.d</path>
-          <filename operation="pattern match">^.*\.conf$</filename>
-          <pattern operation="pattern match">^\$DefaultNetstreamDriver\s+(\S+)\s*$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814800" version="1" comment="DefaultNetstreamDriver">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:25814801</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:25814802</object_reference>
+          </set>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000003" version="3" comment="rsyslog.conf: action for all messages">
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000006" version="1" comment="rsyslog.conf: module blocks">
           <behaviors ignore_case="true"/>
           <filepath datatype="string">/etc/rsyslog.conf</filepath>
-          <pattern operation="pattern match">^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)</pattern>
+          <pattern operation="pattern match">^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000004" version="3" comment="rsyslog.d/*.conf: action for all messages">
@@ -74,10 +73,29 @@ Satisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224</description>
           <pattern operation="pattern match">^\$DefaultNetstreamDriver\s+(\S+)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000006" version="1" comment="rsyslog.conf: module blocks">
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000002" version="1" comment="rsyslog: action for all messages">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:20000003</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:20000004</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000005" version="1" comment="rsyslog: module blocks">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:20000006</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:20000007</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814802" version="1" comment="rsyslog.d/*.conf: DefaultNetstreamDriver">
+          <behaviors ignore_case="true"/>
+          <path>/etc/rsyslog.d</path>
+          <filename operation="pattern match">^.*\.conf$</filename>
+          <pattern operation="pattern match">^\$DefaultNetstreamDriver\s+(\S+)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000003" version="3" comment="rsyslog.conf: action for all messages">
           <behaviors ignore_case="true"/>
           <filepath datatype="string">/etc/rsyslog.conf</filepath>
-          <pattern operation="pattern match">^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)</pattern>
+          <pattern operation="pattern match">^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000007" version="1" comment="rsyslog.d/*.conf: module blocks">
@@ -87,34 +105,16 @@ Satisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224</description>
           <pattern operation="pattern match">^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000002" version="1" comment="rsyslog: action for all messages">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:20000003</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:20000004</object_reference>
-          </set>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814800" version="1" comment="DefaultNetstreamDriver">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:25814801</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:25814802</object_reference>
-          </set>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000005" version="1" comment="rsyslog: module blocks">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:20000006</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:20000007</object_reference>
-          </set>
-        </textfilecontent54_object>
-        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25814801" version="1">
-          <subexpression datatype="string" operation="pattern match">(?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\s*=\s*"gtls"</subexpression>
-        </textfilecontent54_state>
-        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25814802" version="1">
-          <subexpression datatype="string" operation="pattern match">(?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\b</subexpression>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000027" version="2">
+          <subexpression datatype="string" operation="pattern match">(?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"</subexpression>
         </textfilecontent54_state>
         <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25814800" version="1">
           <subexpression datatype="string" operation="equals">gtls</subexpression>
         </textfilecontent54_state>
-        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000027" version="2">
-          <subexpression datatype="string" operation="pattern match">(?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"</subexpression>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25814802" version="1">
+          <subexpression datatype="string" operation="pattern match">(?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\b</subexpression>
+        </textfilecontent54_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25814801" version="1">
+          <subexpression datatype="string" operation="pattern match">(?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\s*=\s*"gtls"</subexpression>
         </textfilecontent54_state>
         </states></oval_definitions>
