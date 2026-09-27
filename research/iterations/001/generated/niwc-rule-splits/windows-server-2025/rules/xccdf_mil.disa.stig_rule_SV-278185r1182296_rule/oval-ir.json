@@ -1,6 +1,87 @@
 {
   "definitions": [
     {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "children": [
+              {
+                "comment": "System is a domain-joined member server",
+                "definition_ref": "oval:mil.disa.stig.win:def:100004",
+                "kind": "definition_ref",
+                "negate": false
+              },
+              {
+                "comment": "Deny log on as a batch job - Domain Admins",
+                "kind": "test_ref",
+                "negate": false,
+                "test_ref": "oval:mil.disa.stig.win:tst:25349202"
+              },
+              {
+                "comment": "Deny log on as a batch job - Enterprise Admins",
+                "kind": "test_ref",
+                "negate": false,
+                "test_ref": "oval:mil.disa.stig.win:tst:25349203"
+              },
+              {
+                "comment": "Deny log on as a batch job - Guests",
+                "kind": "test_ref",
+                "negate": false,
+                "test_ref": "oval:mil.disa.stig.win:tst:25443601"
+              }
+            ],
+            "comment": null,
+            "kind": "boolean",
+            "negate": false,
+            "operator": "AND"
+          },
+          {
+            "children": [
+              {
+                "comment": "System is a standalone server",
+                "definition_ref": "oval:mil.disa.stig.win:def:100003",
+                "kind": "definition_ref",
+                "negate": false
+              },
+              {
+                "comment": "Deny log on as a batch job - Guests",
+                "kind": "test_ref",
+                "negate": false,
+                "test_ref": "oval:mil.disa.stig.win:tst:25443601"
+              }
+            ],
+            "comment": null,
+            "kind": "boolean",
+            "negate": false,
+            "operator": "AND"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "OR"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:254436",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Windows Deny log on as a batch job user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and from unauthenticated access on all systems."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "6"
+    },
+    {
       "class": "inventory",
       "criteria": {
         "children": [
@@ -100,87 +181,6 @@
       "version": "1"
     },
     {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "children": [
-              {
-                "comment": "System is a domain-joined member server",
-                "definition_ref": "oval:mil.disa.stig.win:def:100004",
-                "kind": "definition_ref",
-                "negate": false
-              },
-              {
-                "comment": "Deny log on as a batch job - Domain Admins",
-                "kind": "test_ref",
-                "negate": false,
-                "test_ref": "oval:mil.disa.stig.win:tst:25349202"
-              },
-              {
-                "comment": "Deny log on as a batch job - Enterprise Admins",
-                "kind": "test_ref",
-                "negate": false,
-                "test_ref": "oval:mil.disa.stig.win:tst:25349203"
-              },
-              {
-                "comment": "Deny log on as a batch job - Guests",
-                "kind": "test_ref",
-                "negate": false,
-                "test_ref": "oval:mil.disa.stig.win:tst:25443601"
-              }
-            ],
-            "comment": null,
-            "kind": "boolean",
-            "negate": false,
-            "operator": "AND"
-          },
-          {
-            "children": [
-              {
-                "comment": "System is a standalone server",
-                "definition_ref": "oval:mil.disa.stig.win:def:100003",
-                "kind": "definition_ref",
-                "negate": false
-              },
-              {
-                "comment": "Deny log on as a batch job - Guests",
-                "kind": "test_ref",
-                "negate": false,
-                "test_ref": "oval:mil.disa.stig.win:tst:25443601"
-              }
-            ],
-            "comment": null,
-            "kind": "boolean",
-            "negate": false,
-            "operator": "AND"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "OR"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:254436",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Windows Deny log on as a batch job user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and from unauthenticated access on all systems."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "6"
-    },
-    {
       "class": "inventory",
       "criteria": {
         "children": [
@@ -232,41 +232,6 @@
   ],
   "dependency_edges": [
     {
-      "attribute": "id",
-      "element": "definition",
-      "from": "oval:mil.disa.stig.win:def:100003",
-      "kind": "definition:id",
-      "to": "oval:mil.disa.stig.win:def:100003"
-    },
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.win:def:100003",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.win:tst:10000300"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows2025:def:278185",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:254436"
-    },
-    {
-      "attribute": "id",
-      "element": "definition",
-      "from": "oval:mil.disa.stig.windows2025:def:278185",
-      "kind": "definition:id",
-      "to": "oval:mil.disa.stig.windows2025:def:278185"
-    },
-    {
-      "attribute": "id",
-      "element": "definition",
-      "from": "oval:mil.disa.stig.defs:def:254436",
-      "kind": "definition:id",
-      "to": "oval:mil.disa.stig.defs:def:254436"
-    },
-    {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.defs:def:254436",
@@ -302,11 +267,18 @@
       "to": "oval:mil.disa.stig.win:tst:25443601"
     },
     {
-      "attribute": "id",
-      "element": "definition",
-      "from": "oval:mil.disa.stig.win:def:100004",
-      "kind": "definition:id",
-      "to": "oval:mil.disa.stig.win:def:100004"
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.win:def:100003",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.win:tst:10000300"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows2025:def:278185",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:254436"
     },
     {
       "attribute": "test_ref",
@@ -318,6 +290,20 @@
     {
       "attribute": "object_ref",
       "element": "object",
+      "from": "oval:mil.disa.stig.win:tst:10000300",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.win:obj:10000100"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.win:tst:10000300",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.win:ste:10000300"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
       "from": "oval:mil.disa.stig.win:tst:25349202",
       "kind": "object_reference",
       "to": "oval:mil.disa.stig.win:obj:25349200"
@@ -328,13 +314,6 @@
       "from": "oval:mil.disa.stig.win:tst:25349202",
       "kind": "state_reference",
       "to": "oval:mil.disa.stig.win:ste:20000040"
-    },
-    {
-      "attribute": "id",
-      "element": "userright_test",
-      "from": "oval:mil.disa.stig.win:tst:25349202",
-      "kind": "userright_test:id",
-      "to": "oval:mil.disa.stig.win:tst:25349202"
     },
     {
       "attribute": "object_ref",
@@ -351,13 +330,6 @@
       "to": "oval:mil.disa.stig.win:ste:10000400"
     },
     {
-      "attribute": "id",
-      "element": "wmi57_test",
-      "from": "oval:mil.disa.stig.win:tst:10000400",
-      "kind": "wmi57_test:id",
-      "to": "oval:mil.disa.stig.win:tst:10000400"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.win:tst:25349203",
@@ -372,34 +344,6 @@
       "to": "oval:mil.disa.stig.win:ste:20000041"
     },
     {
-      "attribute": "id",
-      "element": "userright_test",
-      "from": "oval:mil.disa.stig.win:tst:25349203",
-      "kind": "userright_test:id",
-      "to": "oval:mil.disa.stig.win:tst:25349203"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:10000300",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.win:obj:10000100"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:10000300",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.win:ste:10000300"
-    },
-    {
-      "attribute": "id",
-      "element": "wmi57_test",
-      "from": "oval:mil.disa.stig.win:tst:10000300",
-      "kind": "wmi57_test:id",
-      "to": "oval:mil.disa.stig.win:tst:10000300"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.win:tst:25443601",
@@ -412,67 +356,11 @@
       "from": "oval:mil.disa.stig.win:tst:25443601",
       "kind": "state_reference",
       "to": "oval:mil.disa.stig.win:ste:20000033"
-    },
-    {
-      "attribute": "id",
-      "element": "userright_test",
-      "from": "oval:mil.disa.stig.win:tst:25443601",
-      "kind": "userright_test:id",
-      "to": "oval:mil.disa.stig.win:tst:25443601"
-    },
-    {
-      "attribute": "id",
-      "element": "userright_object",
-      "from": "oval:mil.disa.stig.win:obj:25349200",
-      "kind": "userright_object:id",
-      "to": "oval:mil.disa.stig.win:obj:25349200"
-    },
-    {
-      "attribute": "id",
-      "element": "wmi57_object",
-      "from": "oval:mil.disa.stig.win:obj:10000100",
-      "kind": "wmi57_object:id",
-      "to": "oval:mil.disa.stig.win:obj:10000100"
-    },
-    {
-      "attribute": "id",
-      "element": "userright_state",
-      "from": "oval:mil.disa.stig.win:ste:20000041",
-      "kind": "userright_state:id",
-      "to": "oval:mil.disa.stig.win:ste:20000041"
-    },
-    {
-      "attribute": "id",
-      "element": "userright_state",
-      "from": "oval:mil.disa.stig.win:ste:20000040",
-      "kind": "userright_state:id",
-      "to": "oval:mil.disa.stig.win:ste:20000040"
-    },
-    {
-      "attribute": "id",
-      "element": "userright_state",
-      "from": "oval:mil.disa.stig.win:ste:20000033",
-      "kind": "userright_state:id",
-      "to": "oval:mil.disa.stig.win:ste:20000033"
-    },
-    {
-      "attribute": "id",
-      "element": "wmi57_state",
-      "from": "oval:mil.disa.stig.win:ste:10000300",
-      "kind": "wmi57_state:id",
-      "to": "oval:mil.disa.stig.win:ste:10000300"
-    },
-    {
-      "attribute": "id",
-      "element": "wmi57_state",
-      "from": "oval:mil.disa.stig.win:ste:10000400",
-      "kind": "wmi57_state:id",
-      "to": "oval:mil.disa.stig.win:ste:10000400"
     }
   ],
   "dependency_integrity": {
     "all_resolved_edge_targets_present": true,
-    "edge_count": 34,
+    "edge_count": 18,
     "missing_edge_targets": []
   },
   "features": {
@@ -606,7 +494,6 @@
   },
   "reference_graph": {
     "oval:mil.disa.stig.defs:def:254436": [
-      "oval:mil.disa.stig.defs:def:254436",
       "oval:mil.disa.stig.win:def:100003",
       "oval:mil.disa.stig.win:def:100004",
       "oval:mil.disa.stig.win:tst:25349202",
@@ -614,90 +501,49 @@
       "oval:mil.disa.stig.win:tst:25443601"
     ],
     "oval:mil.disa.stig.win:def:100003": [
-      "oval:mil.disa.stig.win:def:100003",
       "oval:mil.disa.stig.win:tst:10000300"
     ],
     "oval:mil.disa.stig.win:def:100004": [
-      "oval:mil.disa.stig.win:def:100004",
       "oval:mil.disa.stig.win:tst:10000400"
     ],
-    "oval:mil.disa.stig.win:obj:10000100": [
-      "oval:mil.disa.stig.win:obj:10000100"
-    ],
-    "oval:mil.disa.stig.win:obj:25349200": [
-      "oval:mil.disa.stig.win:obj:25349200"
-    ],
-    "oval:mil.disa.stig.win:ste:10000300": [
-      "oval:mil.disa.stig.win:ste:10000300"
-    ],
-    "oval:mil.disa.stig.win:ste:10000400": [
-      "oval:mil.disa.stig.win:ste:10000400"
-    ],
-    "oval:mil.disa.stig.win:ste:20000033": [
-      "oval:mil.disa.stig.win:ste:20000033"
-    ],
-    "oval:mil.disa.stig.win:ste:20000040": [
-      "oval:mil.disa.stig.win:ste:20000040"
-    ],
-    "oval:mil.disa.stig.win:ste:20000041": [
-      "oval:mil.disa.stig.win:ste:20000041"
-    ],
+    "oval:mil.disa.stig.win:obj:10000100": [],
+    "oval:mil.disa.stig.win:obj:25349200": [],
+    "oval:mil.disa.stig.win:ste:10000300": [],
+    "oval:mil.disa.stig.win:ste:10000400": [],
+    "oval:mil.disa.stig.win:ste:20000033": [],
+    "oval:mil.disa.stig.win:ste:20000040": [],
+    "oval:mil.disa.stig.win:ste:20000041": [],
     "oval:mil.disa.stig.win:tst:10000300": [
       "oval:mil.disa.stig.win:obj:10000100",
-      "oval:mil.disa.stig.win:ste:10000300",
-      "oval:mil.disa.stig.win:tst:10000300"
+      "oval:mil.disa.stig.win:ste:10000300"
     ],
     "oval:mil.disa.stig.win:tst:10000400": [
       "oval:mil.disa.stig.win:obj:10000100",
-      "oval:mil.disa.stig.win:ste:10000400",
-      "oval:mil.disa.stig.win:tst:10000400"
+      "oval:mil.disa.stig.win:ste:10000400"
     ],
     "oval:mil.disa.stig.win:tst:25349202": [
       "oval:mil.disa.stig.win:obj:25349200",
-      "oval:mil.disa.stig.win:ste:20000040",
-      "oval:mil.disa.stig.win:tst:25349202"
+      "oval:mil.disa.stig.win:ste:20000040"
     ],
     "oval:mil.disa.stig.win:tst:25349203": [
       "oval:mil.disa.stig.win:obj:25349200",
-      "oval:mil.disa.stig.win:ste:20000041",
-      "oval:mil.disa.stig.win:tst:25349203"
+      "oval:mil.disa.stig.win:ste:20000041"
     ],
     "oval:mil.disa.stig.win:tst:25443601": [
       "oval:mil.disa.stig.win:obj:25349200",
-      "oval:mil.disa.stig.win:ste:20000033",
-      "oval:mil.disa.stig.win:tst:25443601"
+      "oval:mil.disa.stig.win:ste:20000033"
     ],
     "oval:mil.disa.stig.windows2025:def:278185": [
-      "oval:mil.disa.stig.defs:def:254436",
-      "oval:mil.disa.stig.windows2025:def:278185"
+      "oval:mil.disa.stig.defs:def:254436"
     ]
   },
-  "semantic_ir_sha256": "cda3be9b87c9d922c7125a8c30f51d9c19fc8ed1b81898ab48d8bedd71ccabe9",
+  "semantic_ir_sha256": "2be19b43020fb2f901715046fffab454221d892306e3aa13e2a043d8c408fe57",
   "source": {
     "bytes": 8088,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278185r1182296_rule/oval.xml",
-    "sha256": "03761243c2e20531bbed72947de427a00177fef98a4e3323d54520eff591cd1f"
+    "sha256": "f58317278adf67e2b608f831ffdf20b6c75c7c7aba3a2d109bbf577dde0b073b"
   },
   "states": [
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "trustee_name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "^(?i)(.+\\\\)?Enterprise Admins$"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000041",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "userright_state",
-      "version": "1"
-    },
     {
       "comment": null,
       "entities": [
@@ -737,33 +583,22 @@
       "version": "1"
     },
     {
-      "comment": "Standalone Server",
+      "comment": null,
       "entities": [
         {
           "attributes": {
-            "datatype": "record",
-            "operation": "equals"
+            "operation": "pattern match"
           },
-          "children": [
-            {
-              "attributes": {
-                "name": "domainrole"
-              },
-              "kind": "element",
-              "name": "field",
-              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-              "value": "2"
-            }
-          ],
           "kind": "element",
-          "name": "result",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+          "name": "trustee_name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "^(?i)(.+\\\\)?Enterprise Admins$"
         }
       ],
-      "id": "oval:mil.disa.stig.win:ste:10000300",
+      "id": "oval:mil.disa.stig.win:ste:20000041",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
-      "type": "wmi57_state",
+      "type": "userright_state",
       "version": "1"
     },
     {
@@ -795,9 +630,66 @@
       "operator": "AND",
       "type": "wmi57_state",
       "version": "1"
+    },
+    {
+      "comment": "Standalone Server",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "record",
+            "operation": "equals"
+          },
+          "children": [
+            {
+              "attributes": {
+                "name": "domainrole"
+              },
+              "kind": "element",
+              "name": "field",
+              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+              "value": "2"
+            }
+          ],
+          "kind": "element",
+          "name": "result",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:10000300",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "wmi57_state",
+      "version": "1"
     }
   ],
   "tests": [
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "The system is a Windows Standalone Server",
+      "id": "oval:mil.disa.stig.win:tst:10000300",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.win:obj:10000100"
+          },
+          "object_ref": "oval:mil.disa.stig.win:obj:10000100"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.win:ste:10000300"
+          },
+          "state_ref": "oval:mil.disa.stig.win:ste:10000300"
+        }
+      ],
+      "type": "wmi57_test",
+      "version": "1"
+    },
     {
       "check": "at least one",
       "check_existence": "at_least_one_exists",
@@ -877,33 +769,6 @@
         }
       ],
       "type": "userright_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "The system is a Windows Standalone Server",
-      "id": "oval:mil.disa.stig.win:tst:10000300",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:10000100"
-          },
-          "object_ref": "oval:mil.disa.stig.win:obj:10000100"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.win:ste:10000300"
-          },
-          "state_ref": "oval:mil.disa.stig.win:ste:10000300"
-        }
-      ],
-      "type": "wmi57_test",
       "version": "1"
     },
     {

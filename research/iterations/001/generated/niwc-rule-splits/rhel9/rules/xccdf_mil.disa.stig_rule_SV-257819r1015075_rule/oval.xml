@@ -16,28 +16,23 @@
             <criterion test_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781904" comment="Confirm Red Hat package-signing 'auxiliary' key fingerprint matches vendor values."/>
           </criteria>
         </definition>
-        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781902" check_existence="at_least_one_exists" check="at least one" version="13" comment="Confirm Red Hat package-signing key (auxillary) is installed on the system.">
+        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781901" check_existence="at_least_one_exists" check="at least one" version="13" comment="Confirm Red Hat package-signing key (release) is installed on the system.">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781901"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781901"/>
+        </independent-def:shellcommand_test>
+        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781902" check_existence="at_least_one_exists" check="at least one" version="13" comment="Confirm Red Hat package-signing key (auxillary) is installed on the system.">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781902"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781902"/>
-        </independent-def:shellcommand_test>
-        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781904" check_existence="at_least_one_exists" check="at least one" version="13" comment="Confirm Red Hat package-signing 'auxiliary' key fingerprint matches vendor values.">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781904"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781904"/>
         </independent-def:shellcommand_test>
         <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781903" check_existence="at_least_one_exists" check="at least one" version="13" comment="Confirm Red Hat package-signing 'release' key fingerprint matches vendor values.">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781903"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781903"/>
         </independent-def:shellcommand_test>
-        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781901" check_existence="at_least_one_exists" check="at least one" version="13" comment="Confirm Red Hat package-signing key (release) is installed on the system.">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781901"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781901"/>
+        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781904" check_existence="at_least_one_exists" check="at least one" version="13" comment="Confirm Red Hat package-signing 'auxiliary' key fingerprint matches vendor values.">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781904"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781904"/>
         </independent-def:shellcommand_test>
-        </tests><objects><independent-def:shellcommand_object version="13" id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781901" comment="Retrieve package-signing release key name.">
-          <independent-def:shell>bash</independent-def:shell>
-          <independent-def:command>rpm -q --queryformat "%{SUMMARY}\n" gpg-pubkey | grep -i "red hat"</independent-def:command>
-          <independent-def:pattern>release key</independent-def:pattern>
-        </independent-def:shellcommand_object>
-        <independent-def:shellcommand_object version="13" id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781902" comment="Retrieve package-signing auxillary key name.">
+        </tests><objects><independent-def:shellcommand_object version="13" id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781902" comment="Retrieve package-signing auxillary key name.">
           <independent-def:shell>bash</independent-def:shell>
           <independent-def:command>rpm -q --queryformat "%{SUMMARY}\n" gpg-pubkey | grep -i "red hat"</independent-def:command>
           <independent-def:pattern>auxiliary key</independent-def:pattern>
@@ -47,12 +42,20 @@
           <independent-def:command>gpg -q --keyid-format short --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release | grep -P 'release key' -B 1</independent-def:command>
           <independent-def:pattern operation="pattern match">Key fingerprint\s*=\s*(.*)</independent-def:pattern>
         </independent-def:shellcommand_object>
+        <independent-def:shellcommand_object version="13" id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781901" comment="Retrieve package-signing release key name.">
+          <independent-def:shell>bash</independent-def:shell>
+          <independent-def:command>rpm -q --queryformat "%{SUMMARY}\n" gpg-pubkey | grep -i "red hat"</independent-def:command>
+          <independent-def:pattern>release key</independent-def:pattern>
+        </independent-def:shellcommand_object>
         <independent-def:shellcommand_object version="13" id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781904" comment="Retrieve package-signing 'auxiliary' key fingerprint.">
           <independent-def:shell>bash</independent-def:shell>
           <independent-def:command>gpg -q --keyid-format short --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release | grep -P 'auxiliary key' -B 1</independent-def:command>
           <independent-def:pattern operation="pattern match">Key fingerprint\s*=\s*(.*)</independent-def:pattern>
         </independent-def:shellcommand_object>
-        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781902" version="13" comment="Confirm correct auxilary key.">
+        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781901" version="13" comment="Confirm correct release key.">
+          <independent-def:stdout_line operation="pattern match">release key 2</independent-def:stdout_line>
+        </independent-def:shellcommand_state>
+        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781902" version="13" comment="Confirm correct auxilary key.">
           <independent-def:stdout_line operation="pattern match">auxiliary key 3</independent-def:stdout_line>
         </independent-def:shellcommand_state>
         <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781903" version="13" comment="Confirm 'release' key finger print.">
@@ -60,8 +63,5 @@
         </independent-def:shellcommand_state>
         <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781904" version="13" comment="Confirm 'auxiliary' key fingerprint.">
           <independent-def:subexpression operation="pattern match">^7E46\s+2425\s+8C40\s+6535\s+D56D\s+6F13\s+5054\s+E4A4\s+5A63\s+40B3$</independent-def:subexpression>
-        </independent-def:shellcommand_state>
-        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781901" version="13" comment="Confirm correct release key.">
-          <independent-def:stdout_line operation="pattern match">release key 2</independent-def:stdout_line>
         </independent-def:shellcommand_state>
         </states></oval_definitions>

@@ -34,8 +34,11 @@
           <object object_ref="oval:mil.disa.stig.unix:obj:20000018"/>
           <state state_ref="oval:mil.disa.stig.unix:ste:20000016"/>
         </password_test>
-        </tests><objects><password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000016" version="1" comment="Users with an username">
-          <username datatype="string" operation="pattern match">[\w]+</username>
+        </tests><objects><password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000017" version="1" comment="only non-system users (uid&gt;999) home-dirs">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="COMPLEMENT">
+            <object_reference>oval:mil.disa.stig.unix:obj:20000016</object_reference>
+            <filter>oval:mil.disa.stig.unix:ste:20000017</filter>
+          </set>
         </password_object>
         <password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000018" version="1" comment="only root users (uid=0) home-dirs">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="COMPLEMENT">
@@ -43,19 +46,16 @@
             <filter>oval:mil.disa.stig.unix:ste:20000018</filter>
           </set>
         </password_object>
-        <password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000017" version="1" comment="only non-system users (uid&gt;999) home-dirs">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="COMPLEMENT">
-            <object_reference>oval:mil.disa.stig.unix:obj:20000016</object_reference>
-            <filter>oval:mil.disa.stig.unix:ste:20000017</filter>
-          </set>
+        <password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000016" version="1" comment="Users with an username">
+          <username datatype="string" operation="pattern match">[\w]+</username>
         </password_object>
-        </objects><states><password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000018" version="1" comment="only uids &gt; 0">
-          <user_id entity_check="all" datatype="int" operation="greater than">0</user_id>
+        </objects><states><password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000016" version="1" comment="only users with the home directory defined">
+          <home_dir datatype="string" operation="pattern match">.+</home_dir>
         </password_state>
         <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000017" version="1" comment="only uids &lt; 1000">
           <user_id entity_check="all" datatype="int" operation="less than">1000</user_id>
         </password_state>
-        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000016" version="1" comment="only users with the home directory defined">
-          <home_dir datatype="string" operation="pattern match">.+</home_dir>
+        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000018" version="1" comment="only uids &gt; 0">
+          <user_id entity_check="all" datatype="int" operation="greater than">0</user_id>
         </password_state>
         </states></oval_definitions>

@@ -1,0 +1,533 @@
+{
+  "format": "scap-ng-native-normalization-0.1",
+  "migration_status": "requires_review",
+  "normalization_evidence": {
+    "all_patterns_resolved": true,
+    "complete_cartesian_matrix": false,
+    "duplicate_source_conditions": [
+      {
+        "cell": {
+          "architecture": "b32",
+          "subject": "root",
+          "syscall": "lsetxattr"
+        },
+        "count": 2,
+        "source_checks": [
+          "oval:mil.disa.stig.ind:tst:25303502",
+          "oval:mil.disa.stig.ind:tst:25303503"
+        ]
+      },
+      {
+        "cell": {
+          "architecture": "b32",
+          "subject": "root",
+          "syscall": "removexattr"
+        },
+        "count": 2,
+        "source_checks": [
+          "oval:mil.disa.stig.ind:tst:25303802",
+          "oval:mil.disa.stig.ind:tst:25303803"
+        ]
+      }
+    ],
+    "extra_cartesian_cells": [],
+    "missing_cartesian_cells": [
+      {
+        "architecture": "b64",
+        "subject": "root",
+        "syscall": "lsetxattr"
+      },
+      {
+        "architecture": "b64",
+        "subject": "root",
+        "syscall": "removexattr"
+      }
+    ],
+    "note": "Faithful native representation preserves the unique conditions actually enforced by source OVAL. Missing matrix cells are not invented. Differential execution and policy review are required.",
+    "reachable_test_count": 24,
+    "review_candidate_matrix": {
+      "architectures": [
+        "b32",
+        "b64"
+      ],
+      "cell_count": 24,
+      "subjects": [
+        "interactive_users",
+        "root"
+      ],
+      "syscalls": [
+        "fremovexattr",
+        "fsetxattr",
+        "lremovexattr",
+        "lsetxattr",
+        "removexattr",
+        "setxattr"
+      ]
+    },
+    "unique_semantic_cell_count": 22
+  },
+  "normalizer": "linux_audit_xattr_syscall_matrix",
+  "semantic": {
+    "assertion": {
+      "predicate": "covered_by_audit_rule",
+      "quantifier": "every"
+    },
+    "capability": "linux.audit.configured_rules",
+    "required_coverage": {
+      "action_equivalent_to": [
+        "always,exit",
+        "exit,always"
+      ],
+      "cell_count": 22,
+      "cells": [
+        {
+          "architecture": "b32",
+          "subject": "interactive_users",
+          "syscall": "fremovexattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "root",
+          "syscall": "fremovexattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "interactive_users",
+          "syscall": "fremovexattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "root",
+          "syscall": "fremovexattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "interactive_users",
+          "syscall": "fsetxattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "root",
+          "syscall": "fsetxattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "interactive_users",
+          "syscall": "fsetxattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "root",
+          "syscall": "fsetxattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "interactive_users",
+          "syscall": "lremovexattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "root",
+          "syscall": "lremovexattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "interactive_users",
+          "syscall": "lremovexattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "root",
+          "syscall": "lremovexattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "interactive_users",
+          "syscall": "lsetxattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "root",
+          "syscall": "lsetxattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "interactive_users",
+          "syscall": "lsetxattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "interactive_users",
+          "syscall": "removexattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "root",
+          "syscall": "removexattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "interactive_users",
+          "syscall": "removexattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "interactive_users",
+          "syscall": "setxattr"
+        },
+        {
+          "architecture": "b32",
+          "subject": "root",
+          "syscall": "setxattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "interactive_users",
+          "syscall": "setxattr"
+        },
+        {
+          "architecture": "b64",
+          "subject": "root",
+          "syscall": "setxattr"
+        }
+      ],
+      "subjects": [
+        {
+          "all": [
+            {
+              "field": "auid",
+              "op": "ge",
+              "value": 1000
+            },
+            {
+              "field": "auid",
+              "op": "not_in",
+              "value": [
+                -1,
+                4294967295,
+                "unset"
+              ]
+            }
+          ],
+          "name": "interactive_users"
+        },
+        {
+          "field": "auid",
+          "name": "root",
+          "op": "eq",
+          "value": 0
+        }
+      ]
+    },
+    "source": {
+      "path": "/etc/audit/audit.rules",
+      "type": "audit_rules_file"
+    }
+  },
+  "semantic_fingerprint_sha256": "0f34fddeace27334af90bf5bb9e3dc26fc1800847d86b5cde6a119f4329f9421",
+  "source": {
+    "definition_id": "oval:mil.disa.stig.ol9os:def:271536",
+    "oval_ir_sha256": "2d08114ebe18d53d005e4348309c3e6a530307b51774afd18f74b611291d571f",
+    "published_source": {
+      "datastream_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+      "datastream_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+      "repository": "niwc-atlantic/scap-content-library",
+      "repository_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "zip_filename": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+      "zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d"
+    },
+    "rule_id": "xccdf_mil.disa.stig_rule_SV-271536r1092492_rule",
+    "title": "OL 9 must audit all uses of the setxattr, fsetxattr, lsetxattr, removexattr, fremovexattr, and lremovexattr system calls."
+  },
+  "source_checks": [
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "interactive_users",
+        "syscall": "setxattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:23041300",
+      "pattern_sha256": "34cb5db67c47077ecb737fdf6396f05f92e0fbb92604a3d342d3641dbee397cd",
+      "test_id": "oval:mil.disa.stig.ind:tst:23041300"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "interactive_users",
+        "syscall": "setxattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:23041301",
+      "pattern_sha256": "96d9e2314d697ec4d320a26e867e765fb2717e43a45a0cc7f70cc28408fa8ce8",
+      "test_id": "oval:mil.disa.stig.ind:tst:23041301"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "root",
+        "syscall": "setxattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:23041302",
+      "pattern_sha256": "bc8aab41c9a1869afbf23315ba2942ebee9883fe7a08c358f7b8c9365dac4d2d",
+      "test_id": "oval:mil.disa.stig.ind:tst:23041302"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "root",
+        "syscall": "setxattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:23041303",
+      "pattern_sha256": "0d6d0b322341419fe5850eeb89e0c754c0f8f149eaa5a98a5eac278fd07d538c",
+      "test_id": "oval:mil.disa.stig.ind:tst:23041303"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "interactive_users",
+        "syscall": "fsetxattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303400",
+      "pattern_sha256": "90aee03ac983bc34a5aede293184b522b64b636d03d6eeb0bc7c5df613392901",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303400"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "interactive_users",
+        "syscall": "fsetxattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303401",
+      "pattern_sha256": "2dc115ab8e8b71c84948809faf30ddc88a073899828080d26542708f8e51c68c",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303401"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "root",
+        "syscall": "fsetxattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303402",
+      "pattern_sha256": "1b9b755424d381cbac69e5d7a673358021399d0d7dfd5c468b6903acb18e1381",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303402"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "root",
+        "syscall": "fsetxattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303403",
+      "pattern_sha256": "2167423b4f18bedee48c30e2bfcf5b1051b24b57681217bf8b1860802b299bcc",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303403"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "interactive_users",
+        "syscall": "lsetxattr"
+      },
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303500",
+      "pattern_sha256": "89f56fb6d7e012aaae88e1459a8572805085b849c3c30171b377388fd5dfff87",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303500"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "interactive_users",
+        "syscall": "lsetxattr"
+      },
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303501",
+      "pattern_sha256": "b7a4f99ca8c01e3e1daf60046f87479056dd6314a1ceaa2938d1ceb113df0a11",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303501"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "root",
+        "syscall": "lsetxattr"
+      },
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303502",
+      "pattern_sha256": "b31cf8546b7bcca9ca33c256626febd5b88d3aac0019848daaf763e678bfc8ec",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303502"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "root",
+        "syscall": "lsetxattr"
+      },
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303503",
+      "pattern_sha256": "b31cf8546b7bcca9ca33c256626febd5b88d3aac0019848daaf763e678bfc8ec",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303503"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "interactive_users",
+        "syscall": "fremovexattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303600",
+      "pattern_sha256": "83f9fe593a9fc9aad82fb22944b197f4b8bb10863c11c5245d5c159d57139229",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303600"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "interactive_users",
+        "syscall": "fremovexattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303601",
+      "pattern_sha256": "96f255b920b8be85e51472afb1af927d6af1173d219d88d341f88cfb389d02a9",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303601"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "root",
+        "syscall": "fremovexattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303602",
+      "pattern_sha256": "bf7cbce9a527ac834c4d5819f5703bc1a8dd4cf0b9570a89d0f78601d44a8b17",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303602"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "root",
+        "syscall": "fremovexattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303603",
+      "pattern_sha256": "546fe5f40548d4a45c1b94c14782951f919749bf4af7209a69eabef6fbb4bad3",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303603"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "interactive_users",
+        "syscall": "lremovexattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303700",
+      "pattern_sha256": "abb8ac1768ae1b2df0fac42ddf93f4e1a55bb780c42f715297ff289de13a7ccd",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303700"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "interactive_users",
+        "syscall": "lremovexattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303701",
+      "pattern_sha256": "8307c6ae60e1a85ab098b3f4c995175ad060f819c413a866e0616012459c3037",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303701"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "root",
+        "syscall": "lremovexattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303702",
+      "pattern_sha256": "dd241edd302301d0e72578b03a3cead3ad9205847ded6619f2f5d9ddc5e56950",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303702"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "root",
+        "syscall": "lremovexattr"
+      },
+      "check": "all",
+      "check_existence": "all_exist",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303703",
+      "pattern_sha256": "d18b563c61c956a835df2108b7cc18989faf7ea02c55b93e36d9c3f367213f6c",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303703"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "interactive_users",
+        "syscall": "removexattr"
+      },
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303800",
+      "pattern_sha256": "16416f304bc3091c7faf9350cd72f5d16ab84aaa2f59e50f7baca32959ec6ffb",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303800"
+    },
+    {
+      "cell": {
+        "architecture": "b64",
+        "subject": "interactive_users",
+        "syscall": "removexattr"
+      },
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303801",
+      "pattern_sha256": "916fe7890a68e07ad834e97c288184580a00f2b0451415588ad7f60ea7d8e31d",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303801"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "root",
+        "syscall": "removexattr"
+      },
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303802",
+      "pattern_sha256": "e8892c136d9723d93b4bc547a6c87282e1f49b26b3fce55f1aab9023039dc060",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303802"
+    },
+    {
+      "cell": {
+        "architecture": "b32",
+        "subject": "root",
+        "syscall": "removexattr"
+      },
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object_id": "oval:mil.disa.stig.ind:obj:25303803",
+      "pattern_sha256": "e8892c136d9723d93b4bc547a6c87282e1f49b26b3fce55f1aab9023039dc060",
+      "test_id": "oval:mil.disa.stig.ind:tst:25303803"
+    }
+  ]
+}

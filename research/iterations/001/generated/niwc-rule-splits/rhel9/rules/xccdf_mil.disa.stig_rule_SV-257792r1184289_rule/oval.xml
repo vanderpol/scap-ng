@@ -4,17 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:230278" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must disable virtual syscalls.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23027800"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23027801"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:257792" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257792" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-212035 - RHEL 9 must disable virtual system calls.</title>
             <affected family="unix">
@@ -30,23 +20,33 @@ Satisfies: SRG-OS-000480-GPOS-00227, SRG-OS-000134-GPOS-00068</description>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230278"/>
           </criteria>
         </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23027800" version="1" check="all" comment="BLS options contain vsyscall=none">
-          <object object_ref="oval:mil.disa.stig.ind:obj:25779300"/>
-          <state state_ref="oval:mil.disa.stig.ind:ste:23027800"/>
-        </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23027801" version="1" check="all" comment="The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain vsyscall=none">
+        <definition id="oval:mil.disa.stig.defs:def:230278" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must disable virtual syscalls.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23027800"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23027801"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23027801" version="1" check="all" comment="The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain vsyscall=none">
           <object object_ref="oval:mil.disa.stig.ind:obj:25779301"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23027800"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25779300" version="1" comment="BLS options">
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23027800" version="1" check="all" comment="BLS options contain vsyscall=none">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25779300"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23027800"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25779301" version="1" comment="/etc/default/grub GRUB_CMDLINE_LINUX">
+          <filepath>/etc/default/grub</filepath>
+          <pattern operation="pattern match">^GRUB_CMDLINE_LINUX="(.*)"</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25779300" version="1" comment="BLS options">
           <path>/boot/loader/entries</path>
           <filename operation="pattern match">^.*\.conf$</filename>
           <pattern operation="pattern match">^options\s+(.*)$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25779301" version="1" comment="/etc/default/grub GRUB_CMDLINE_LINUX">
-          <filepath>/etc/default/grub</filepath>
-          <pattern operation="pattern match">^GRUB_CMDLINE_LINUX="(.*)"</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23027800" version="1">

@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.windows11:def:253285" version="3" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253285" version="2" class="compliance">
+          <metadata>
+            <title>The Windows PowerShell 2.0 feature must be disabled on the system.</title>
+            <description/>
+          </metadata>
+          <criteria operator="AND" comment="Determine if Windows PowerShell 2.0 feature is disabled">
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25328500" comment="Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_OptionalFeature is at InstallState 2"/>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25328501" comment="Check the WMI Objects to see if the Windows PowerShell 2.0 Engine Win32_OptionalFeature is at InstallState 2"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows11:def:253285" version="3" class="compliance">
           <metadata>
             <title>WN11-00-000155 - The Windows PowerShell 2.0 feature must be disabled on the system.</title>
             <affected family="windows">
@@ -16,16 +26,6 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253285"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:253285" version="2" class="compliance">
-          <metadata>
-            <title>The Windows PowerShell 2.0 feature must be disabled on the system.</title>
-            <description/>
-          </metadata>
-          <criteria operator="AND" comment="Determine if Windows PowerShell 2.0 feature is disabled">
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25328500" comment="Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_OptionalFeature is at InstallState 2"/>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25328501" comment="Check the WMI Objects to see if the Windows PowerShell 2.0 Engine Win32_OptionalFeature is at InstallState 2"/>
-          </criteria>
-        </definition>
         </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328500" version="1" check_existence="all_exist" check="all" comment="Windows PowerShell 2.0 optional feature is disabled">
           <object object_ref="oval:mil.disa.stig.win:obj:25328500"/>
           <state state_ref="oval:mil.disa.stig.win:ste:25328500"/>
@@ -34,13 +34,13 @@
           <object object_ref="oval:mil.disa.stig.win:obj:25328501"/>
           <state state_ref="oval:mil.disa.stig.win:ste:25328500"/>
         </wmi57_test>
-        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328501" version="1" comment="Windows PowerShell 2.0 Engine Win32_OptionalFeature object">
-          <namespace datatype="string">root\cimv2</namespace>
-          <wql datatype="string" operation="equals">SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2'</wql>
-        </wmi57_object>
-        <wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328500" version="1" comment="Windows PowerShell 2.0 Win32_OptionalFeature object">
+        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328500" version="1" comment="Windows PowerShell 2.0 Win32_OptionalFeature object">
           <namespace datatype="string">root\cimv2</namespace>
           <wql datatype="string" operation="equals">SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2Root'</wql>
+        </wmi57_object>
+        <wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328501" version="1" comment="Windows PowerShell 2.0 Engine Win32_OptionalFeature object">
+          <namespace datatype="string">root\cimv2</namespace>
+          <wql datatype="string" operation="equals">SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2'</wql>
         </wmi57_object>
         </objects><states><wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25328500" version="3" comment="Check Windows PowerShell 2.0 Win32_OptionalFeature object InstallState is equal to 2">
           <result datatype="record" operation="equals">
