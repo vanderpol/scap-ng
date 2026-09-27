@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "DNS setting exists in NetworkManager.conf and is default or none",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25794900"
-          },
-          {
-            "comment": "DNS setting exists in NetworkManager.conf main section",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25794901"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:257949",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must configure a DNS processing mode set be Network Manager."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:257949",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "DNS setting exists in NetworkManager.conf and is default or none",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25794900"
+          },
+          {
+            "comment": "DNS setting exists in NetworkManager.conf main section",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25794901"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:257949",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must configure a DNS processing mode set be Network Manager."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257949",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:257949"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -106,13 +113,6 @@
       "from": "oval:mil.disa.stig.defs:def:257949",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25794901"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257949",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:257949"
     },
     {
       "attribute": "object_ref",
@@ -260,7 +260,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\[main\\]((?:\\r?\\n(?:[^[\\r\\n].*)?)*)"
+          "value": "^dns=(\\S*)\\s*$"
         },
         {
           "attributes": {
@@ -273,8 +273,8 @@
           "value": "1"
         }
       ],
-      "comment": "NetworkManager.conf main section",
-      "id": "oval:mil.disa.stig.ind:obj:25794901",
+      "comment": "NetworkManager.conf dns setting",
+      "id": "oval:mil.disa.stig.ind:obj:25794900",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -294,7 +294,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^dns=(\\S*)\\s*$"
+          "value": "^\\[main\\]((?:\\r?\\n(?:[^[\\r\\n].*)?)*)"
         },
         {
           "attributes": {
@@ -307,8 +307,8 @@
           "value": "1"
         }
       ],
-      "comment": "NetworkManager.conf dns setting",
-      "id": "oval:mil.disa.stig.ind:obj:25794900",
+      "comment": "NetworkManager.conf main section",
+      "id": "oval:mil.disa.stig.ind:obj:25794901",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -346,34 +346,14 @@
       "oval:mil.disa.stig.defs:def:257949"
     ]
   },
-  "semantic_ir_sha256": "cc681abbd053d86ece7994b89b022a8c5c120a7b00e3d7f30ee5f6e91555c469",
+  "semantic_ir_sha256": "5598555ae2fcd9d06e1c757b603a31e9b5e5ac523df03777fb295b540d298e1d",
   "source": {
     "bytes": 4986,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257949r1134947_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257949r1134947_rule/provenance.json",
-    "sha256": "006f6222bfa2a60cd0c391b3a1d02a69f7b59c9b34009a88351f1d80f5b2b1a0"
+    "sha256": "5acf4ed730578248e5bff3088c2a914b72f34ac27d8e611176a9c6e6305d2c51"
   },
   "states": [
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "equals"
-          },
-          "kind": "element",
-          "name": "subexpression",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "none"
-        }
-      ],
-      "id": "oval:mil.disa.stig.ind:ste:25794901",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "textfilecontent54_state",
-      "version": "1"
-    },
     {
       "comment": null,
       "entities": [
@@ -389,6 +369,26 @@
         }
       ],
       "id": "oval:mil.disa.stig.ind:ste:25794900",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "textfilecontent54_state",
+      "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "equals"
+          },
+          "kind": "element",
+          "name": "subexpression",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "none"
+        }
+      ],
+      "id": "oval:mil.disa.stig.ind:ste:25794901",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",
@@ -504,6 +504,7 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {},
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -532,6 +533,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "'NOPASSWD' does not exist in /etc/sudoers",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23027100"
-          },
-          {
-            "comment": "'NOPASSWD' does not exist in /etc/sudoers.d",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23027101"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230271",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must require users to provide a password for privilege escalation."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230271",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "'NOPASSWD' does not exist in /etc/sudoers",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23027100"
+          },
+          {
+            "comment": "'NOPASSWD' does not exist in /etc/sudoers.d",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23027101"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230271",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must require users to provide a password for privilege escalation."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271725",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230271"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,11 @@
       "to": "oval:mil.disa.stig.ind:tst:23027101"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271725",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230271"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:23027100",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:23027100"
     },
     {
       "attribute": "object_ref",
@@ -120,13 +127,6 @@
       "from": "oval:mil.disa.stig.ind:tst:23027101",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23027101"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23027100",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23027100"
     }
   ],
   "dependency_integrity": {
@@ -218,6 +218,48 @@
       "children": [
         {
           "attributes": {
+            "ignore_case": "true"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/sudoers"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^(?!#).*\\s+NOPASSWD.*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:23027100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
             "ignore_case": "true",
             "recurse_direction": "down"
           },
@@ -265,48 +307,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "ignore_case": "true"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        },
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/sudoers"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^(?!#).*\\s+NOPASSWD.*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23027100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -333,35 +333,15 @@
       "oval:mil.disa.stig.defs:def:230271"
     ]
   },
-  "semantic_ir_sha256": "944db7699b375e6deec716fe06bb7f4f994bf42147521d6bf330ffb8400b8b6c",
+  "semantic_ir_sha256": "468a2b7cdadb56246330fe61340af247dafb49244859f9b53b18e330f732fea1",
   "source": {
     "bytes": 3596,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271725r1155318_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271725r1155318_rule/provenance.json",
-    "sha256": "5127bf84ce0418af807238b96adcab15becab6695fdef90a626d534ab814d345"
+    "sha256": "c5d04e278c3325520371ff6befa0f24ffb1da640c13dc175d0c41f7ed9910ac1"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "none_exist",
-      "comment": "'NOPASSWD' does not exist in /etc/sudoers.d",
-      "id": "oval:mil.disa.stig.ind:tst:23027101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23027101"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23027101"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "none_exist",
@@ -381,9 +361,30 @@
       "states": [],
       "type": "textfilecontent54_test",
       "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "none_exist",
+      "comment": "'NOPASSWD' does not exist in /etc/sudoers.d",
+      "id": "oval:mil.disa.stig.ind:tst:23027101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:23027101"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:23027101"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {},
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -412,6 +413,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

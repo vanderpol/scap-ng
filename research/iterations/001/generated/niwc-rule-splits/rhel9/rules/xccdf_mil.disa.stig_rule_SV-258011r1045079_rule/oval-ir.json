@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "sshd_config X11UseLocalhost is set to 'yes'.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23055600"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230556",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system SSH daemon must prevent remote hosts from connecting to the proxy display."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230556",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "sshd_config X11UseLocalhost is set to 'yes'.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23055600"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230556",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system SSH daemon must prevent remote hosts from connecting to the proxy display."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258011",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230556"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:230556",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23055600"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258011",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230556"
     },
     {
       "attribute": "object_ref",
@@ -228,6 +228,66 @@
     {
       "children": [
         {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23055601"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23055602"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
+        }
+      ],
+      "comment": "sshd_config X11UseLocalhost",
+      "id": "oval:mil.disa.stig.ind:obj:23055600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*(?i)X11useLocalhost(?-i)[ \\t]+([\\w\\\"]+)[\\s]*(?:|(?:#.*))?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "sshd_config X11UseLocalhost",
+      "id": "oval:mil.disa.stig.ind:obj:23055601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "4"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "max_depth": "-1",
             "recurse_direction": "down"
@@ -275,66 +335,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "4"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*(?i)X11useLocalhost(?-i)[ \\t]+([\\w\\\"]+)[\\s]*(?:|(?:#.*))?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "sshd_config X11UseLocalhost",
-      "id": "oval:mil.disa.stig.ind:obj:23055601",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "4"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23055601"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23055602"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
-        }
-      ],
-      "comment": "sshd_config X11UseLocalhost",
-      "id": "oval:mil.disa.stig.ind:obj:23055600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
     }
   ],
   "parser_contract": {
@@ -363,12 +363,12 @@
       "oval:mil.disa.stig.defs:def:230556"
     ]
   },
-  "semantic_ir_sha256": "19bf1bb4a5c51979db0312e9bcbf49d58525065da939b3331ed5ca002cdd193e",
+  "semantic_ir_sha256": "5a4609f319050228e1dfb5c5428531229b3289ec93321e33ed2fc4fc3b40a201",
   "source": {
     "bytes": 4275,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258011r1045079_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258011r1045079_rule/provenance.json",
-    "sha256": "df8f123cb04a38910b353dbd22297b072f64aa08cda96831795362a12b52ac67"
+    "sha256": "791d92365bc662f90de9db2bc4f6ddc14e32dba540d8f66b63ba747e191a5cc1"
   },
   "states": [
     {
@@ -422,6 +422,7 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {},
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -450,6 +451,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

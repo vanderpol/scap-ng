@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:258029" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must disable the ability of a user to restart the system from the login screen.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25802900" comment="dconf disable-restart-buttons true"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:258029" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258029" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-271095 - RHEL 9 must disable the ability of a user to restart the system from the login screen.</title>
             <affected family="unix">
@@ -25,28 +16,37 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258029"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:258029" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must disable the ability of a user to restart the system from the login screen.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25802900" comment="dconf disable-restart-buttons true"/>
+          </criteria>
+        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25802900" version="1" check_existence="at_least_one_exists" check="at least one" comment="dconf disable-restart-buttons true">
           <object object_ref="oval:mil.disa.stig.ind:obj:25802900"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25802900"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25802900" version="1" comment="dconf org/gnome/login-screen sections">
-          <path datatype="string" var_ref="oval:mil.disa.stig.defs:var:23035100" var_check="at least one"/>
-          <filename datatype="string" operation="pattern match">.*</filename>
-          <pattern operation="pattern match">^\[org/gnome/login-screen](?:\r?\n(?:[^[\r\n].*)?)*</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23035100" version="2" comment="dconf database directories">
+        </tests><objects><file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23035100" version="2" comment="dconf database directories">
           <behaviors max_depth="1" recurse_direction="down"/>
           <path>/etc/dconf/db</path>
           <filename xsi:nil="true"/>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.unix:ste:23035100</filter>
         </file_object>
-        </objects><states><file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23035100" version="1" comment="dconf database directories">
-          <path operation="pattern match">^/etc/dconf/db/.*\.d$</path>
-        </file_state>
-        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25802900" version="3">
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25802900" version="1" comment="dconf org/gnome/login-screen sections">
+          <path datatype="string" var_ref="oval:mil.disa.stig.defs:var:23035100" var_check="at least one"/>
+          <filename datatype="string" operation="pattern match">.*</filename>
+          <pattern operation="pattern match">^\[org/gnome/login-screen](?:\r?\n(?:[^[\r\n].*)?)*</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25802900" version="3">
           <text datatype="string" operation="pattern match">\ndisable-restart-buttons=(true|'true')\s*(\n|$)</text>
         </textfilecontent54_state>
+        <file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23035100" version="1" comment="dconf database directories">
+          <path operation="pattern match">^/etc/dconf/db/.*\.d$</path>
+        </file_state>
         </states><variables><local_variable id="oval:mil.disa.stig.defs:var:23035100" version="1" datatype="string" comment="dconf database directories">
           <object_component object_ref="oval:mil.disa.stig.unix:obj:23035100" item_field="path"/>
         </local_variable>

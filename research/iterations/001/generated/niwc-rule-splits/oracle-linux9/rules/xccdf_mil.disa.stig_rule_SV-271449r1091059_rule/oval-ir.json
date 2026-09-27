@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23050700"
+          },
+          {
+            "comment": "/etc/modprobe.d contains a file that contains 'blacklist bluetooth'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23050701"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230507",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system Bluetooth must be disabled."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230507",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23050700"
-          },
-          {
-            "comment": "/etc/modprobe.d contains a file that contains 'blacklist bluetooth'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23050701"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230507",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system Bluetooth must be disabled."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271449",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230507"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:230507",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23050701"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271449",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230507"
     },
     {
       "attribute": "object_ref",
@@ -230,7 +230,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*blacklist[ \\t]+bluetooth[ \\t]*$"
+          "value": "^[ \\t]*install[ \\t]+bluetooth[ \\t]+/bin/false[ \\t]*$"
         },
         {
           "attributes": {
@@ -244,7 +244,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23050701",
+      "id": "oval:mil.disa.stig.ind:obj:23050700",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -273,7 +273,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*install[ \\t]+bluetooth[ \\t]+/bin/false[ \\t]*$"
+          "value": "^[ \\t]*blacklist[ \\t]+bluetooth[ \\t]*$"
         },
         {
           "attributes": {
@@ -287,7 +287,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23050700",
+      "id": "oval:mil.disa.stig.ind:obj:23050701",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -317,12 +317,12 @@
       "oval:mil.disa.stig.defs:def:230507"
     ]
   },
-  "semantic_ir_sha256": "2536bec5224de6ba8dd12feb4c2f6c3b7576b727f2c0eec21239a5ba28cf90f2",
+  "semantic_ir_sha256": "49a01d156793d25109d9512ea6b3765ea3b9653ef03aaabfd0c80462a0795b47",
   "source": {
     "bytes": 4115,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271449r1091059_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271449r1091059_rule/provenance.json",
-    "sha256": "b86e60f16d3c4425d1c3e3715cc524f8b9f1cf475fd41de2f9f971a835f614f6"
+    "sha256": "c34b036cac00332335eacb832380a6c0db137914596304c520d8a6c97ec7e734"
   },
   "states": [],
   "tests": [
@@ -368,6 +368,7 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {},
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -396,6 +397,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

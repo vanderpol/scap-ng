@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Audit 32-bit invocations of /var/log/lastlog",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:28116200"
-          },
-          {
-            "comment": "Audit 64-bit invocations of /var/log/lastlog",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:28116201"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:281162",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Successful/unsuccessful modifications to the lastlog file in the operating system must generate an audit record."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:281162",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Audit 32-bit invocations of /var/log/lastlog",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:28116200"
+          },
+          {
+            "comment": "Audit 64-bit invocations of /var/log/lastlog",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:28116201"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:281162",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Successful/unsuccessful modifications to the lastlog file in the operating system must generate an audit record."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258225",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:281162"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -106,13 +113,6 @@
       "from": "oval:mil.disa.stig.defs:def:281162",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:28116201"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258225",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:281162"
     },
     {
       "attribute": "object_ref",
@@ -223,7 +223,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+-F\\s+path=\\/var\\/log\\/lastlog\\s+-F\\s+perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\\s+-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+-F\\s+path=\\/var\\/log\\/lastlog\\s+-F\\s+perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\\s+-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
         },
         {
           "attributes": {
@@ -237,7 +237,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:28116200",
+      "id": "oval:mil.disa.stig.ind:obj:28116201",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -257,7 +257,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+-F\\s+path=\\/var\\/log\\/lastlog\\s+-F\\s+perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\\s+-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+-F\\s+path=\\/var\\/log\\/lastlog\\s+-F\\s+perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\\s+-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
         },
         {
           "attributes": {
@@ -271,7 +271,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:28116201",
+      "id": "oval:mil.disa.stig.ind:obj:28116200",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -301,12 +301,12 @@
       "oval:mil.disa.stig.defs:def:281162"
     ]
   },
-  "semantic_ir_sha256": "c4831c2685c2e4d91634be9eb5fdd5eeac8af052247d1aed2d84c2bf6a3193ae",
+  "semantic_ir_sha256": "c31f8f99a4b535a2959a4ca282d9017b4204cf9ae3db5d212882c89b207b1e31",
   "source": {
     "bytes": 4174,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258225r1210927_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258225r1210927_rule/provenance.json",
-    "sha256": "d5ef4a363cb06f35ff574aad5242a613f449677062f707639859d7dee61a6572"
+    "sha256": "20c2918654b9568955a3ffdd79e613940cb5ccf101bc3ac371ebd2a0f92698c0"
   },
   "states": [],
   "tests": [
@@ -352,6 +352,7 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {},
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -380,6 +381,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

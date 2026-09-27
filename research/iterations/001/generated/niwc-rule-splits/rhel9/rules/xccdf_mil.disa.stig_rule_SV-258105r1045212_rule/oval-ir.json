@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "Root does not have a minimum password age of 0 or blank",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23036400"
+          },
+          {
+            "comment": "Non-system users do not have a minimum password age of 0 or blank",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:23036401"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230364",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system passwords must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230364",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Root does not have a minimum password age of 0 or blank",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23036400"
-          },
-          {
-            "comment": "Non-system users do not have a minimum password age of 0 or blank",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:23036401"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230364",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system passwords must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258105",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230364"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -115,11 +108,11 @@
       "to": "oval:mil.disa.stig.unix:tst:23036401"
     },
     {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.unix:tst:23036401",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.unix:obj:23036401"
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258105",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230364"
     },
     {
       "attribute": "object_ref",
@@ -127,6 +120,13 @@
       "from": "oval:mil.disa.stig.ind:tst:23036400",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23036400"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.unix:tst:23036401",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.unix:obj:23036401"
     },
     {
       "attribute": "var_ref",
@@ -159,16 +159,16 @@
     {
       "attribute": "object_ref",
       "element": "object_component",
-      "from": "oval:mil.disa.stig.defs:var:23036401",
+      "from": "oval:mil.disa.stig.defs:var:23036400",
       "kind": "object_component",
-      "to": "oval:mil.disa.stig.ind:obj:23036403"
+      "to": "oval:mil.disa.stig.ind:obj:23036402"
     },
     {
       "attribute": "object_ref",
       "element": "object_component",
-      "from": "oval:mil.disa.stig.defs:var:23036400",
+      "from": "oval:mil.disa.stig.defs:var:23036401",
       "kind": "object_component",
-      "to": "oval:mil.disa.stig.ind:obj:23036402"
+      "to": "oval:mil.disa.stig.ind:obj:23036403"
     }
   ],
   "dependency_integrity": {
@@ -276,6 +276,38 @@
       "children": [
         {
           "attributes": {
+            "datatype": "string",
+            "operation": "equals",
+            "var_check": "at least one",
+            "var_ref": "oval:mil.disa.stig.defs:var:23036400"
+          },
+          "kind": "element",
+          "name": "username",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+        },
+        {
+          "kind": "element",
+          "name": "filter",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "oval:mil.disa.stig.unix:ste:23036400"
+        },
+        {
+          "kind": "element",
+          "name": "filter",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "oval:mil.disa.stig.unix:ste:23036401"
+        }
+      ],
+      "comment": "Users with a password age of zero minus system users",
+      "id": "oval:mil.disa.stig.unix:obj:23036401",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "type": "password_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
             "datatype": "string"
           },
           "kind": "element",
@@ -345,38 +377,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "equals",
-            "var_check": "at least one",
-            "var_ref": "oval:mil.disa.stig.defs:var:23036400"
-          },
-          "kind": "element",
-          "name": "username",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
-        },
-        {
-          "kind": "element",
-          "name": "filter",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "oval:mil.disa.stig.unix:ste:23036400"
-        },
-        {
-          "kind": "element",
-          "name": "filter",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "oval:mil.disa.stig.unix:ste:23036401"
-        }
-      ],
-      "comment": "Users with a password age of zero minus system users",
-      "id": "oval:mil.disa.stig.unix:obj:23036401",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "type": "password_object",
-      "version": "2"
     },
     {
       "children": [
@@ -456,12 +456,12 @@
       "oval:mil.disa.stig.unix:obj:23036401"
     ]
   },
-  "semantic_ir_sha256": "c16ddb0ffc020bcd94692cc4f1b31c5dc26340d6868769bdd4e4d562f150ff46",
+  "semantic_ir_sha256": "d75b0b3fd41e39b5df60e9224be0132ba146b08f7787e9da625f59a697904a29",
   "source": {
     "bytes": 5817,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258105r1045212_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258105r1045212_rule/provenance.json",
-    "sha256": "1c39d217163d9aa453c4e1de94c9d07d92dbab299449dd8c736317223c83471f"
+    "sha256": "4ad25ebf0eee77a7ff77f78b1d4832df87723f890a1a94780c7c9e4dd9559112"
   },
   "states": [
     {
@@ -510,26 +510,6 @@
     {
       "check": "all",
       "check_existence": "none_exist",
-      "comment": "Non-system users do not have a minimum password age of 0 or blank",
-      "id": "oval:mil.disa.stig.unix:tst:23036401",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.unix:obj:23036401"
-          },
-          "object_ref": "oval:mil.disa.stig.unix:obj:23036401"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "password_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "none_exist",
       "comment": "Root does not have a minimum password age of 0 or blank",
       "id": "oval:mil.disa.stig.ind:tst:23036400",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -546,9 +526,75 @@
       "states": [],
       "type": "textfilecontent54_test",
       "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "none_exist",
+      "comment": "Non-system users do not have a minimum password age of 0 or blank",
+      "id": "oval:mil.disa.stig.unix:tst:23036401",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.unix:obj:23036401"
+          },
+          "object_ref": "oval:mil.disa.stig.unix:obj:23036401"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "password_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {
+    "oval:mil.disa.stig.defs:var:23036400": {
+      "datatype": "string",
+      "dependencies": {
+        "objects": [
+          "oval:mil.disa.stig.ind:obj:23036402"
+        ],
+        "operations": [
+          "object_component"
+        ],
+        "variables": []
+      },
+      "expression": {
+        "item_field": "subexpression",
+        "object_ref": "oval:mil.disa.stig.ind:obj:23036402",
+        "op": "object_component",
+        "record_field": null
+      },
+      "mode": "target_dependent",
+      "resolution_status": "dynamic_object_dependency",
+      "variable_id": "oval:mil.disa.stig.defs:var:23036400",
+      "variable_type": "local_variable"
+    },
+    "oval:mil.disa.stig.defs:var:23036401": {
+      "datatype": "int",
+      "dependencies": {
+        "objects": [
+          "oval:mil.disa.stig.ind:obj:23036403"
+        ],
+        "operations": [
+          "object_component"
+        ],
+        "variables": []
+      },
+      "expression": {
+        "item_field": "subexpression",
+        "object_ref": "oval:mil.disa.stig.ind:obj:23036403",
+        "op": "object_component",
+        "record_field": null
+      },
+      "mode": "target_dependent",
+      "resolution_status": "dynamic_object_dependency",
+      "variable_id": "oval:mil.disa.stig.defs:var:23036401",
+      "variable_type": "local_variable"
+    }
+  },
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -577,6 +623,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",
@@ -609,36 +656,6 @@
         {
           "attributes": {
             "item_field": "subexpression",
-            "object_ref": "oval:mil.disa.stig.ind:obj:23036403"
-          },
-          "kind": "element",
-          "name": "object_component",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-        }
-      ],
-      "comment": "UID for user nobody",
-      "datatype": "int",
-      "id": "oval:mil.disa.stig.defs:var:23036401",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-      "semantic_ast": {
-        "datatype": "int",
-        "expression": {
-          "item_field": "subexpression",
-          "object_ref": "oval:mil.disa.stig.ind:obj:23036403",
-          "op": "object_component",
-          "record_field": null
-        },
-        "id": "oval:mil.disa.stig.defs:var:23036401",
-        "type": "local_variable"
-      },
-      "type": "local_variable",
-      "version": "1"
-    },
-    {
-      "body": [
-        {
-          "attributes": {
-            "item_field": "subexpression",
             "object_ref": "oval:mil.disa.stig.ind:obj:23036402"
           },
           "kind": "element",
@@ -659,6 +676,36 @@
           "record_field": null
         },
         "id": "oval:mil.disa.stig.defs:var:23036400",
+        "type": "local_variable"
+      },
+      "type": "local_variable",
+      "version": "1"
+    },
+    {
+      "body": [
+        {
+          "attributes": {
+            "item_field": "subexpression",
+            "object_ref": "oval:mil.disa.stig.ind:obj:23036403"
+          },
+          "kind": "element",
+          "name": "object_component",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+        }
+      ],
+      "comment": "UID for user nobody",
+      "datatype": "int",
+      "id": "oval:mil.disa.stig.defs:var:23036401",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "int",
+        "expression": {
+          "item_field": "subexpression",
+          "object_ref": "oval:mil.disa.stig.ind:obj:23036403",
+          "op": "object_component",
+          "record_field": null
+        },
+        "id": "oval:mil.disa.stig.defs:var:23036401",
         "type": "local_variable"
       },
       "type": "local_variable",

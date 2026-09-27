@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "/usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25812900"
+          },
+          {
+            "comment": "/etc/systemd/system/rescue.service.d/*.conf:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25812901"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "OR"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258129",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system operating systems must require authentication upon booting into rescue mode."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258129",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25812900"
-          },
-          {
-            "comment": "/etc/systemd/system/rescue.service.d/*.conf:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25812901"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "OR"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258129",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system operating systems must require authentication upon booting into rescue mode."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258129",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258129"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -115,11 +108,11 @@
       "to": "oval:mil.disa.stig.ind:tst:25812901"
     },
     {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25812900",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:25812900"
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258129",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258129"
     },
     {
       "attribute": "object_ref",
@@ -127,6 +120,13 @@
       "from": "oval:mil.disa.stig.ind:tst:25812901",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25812901"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25812900",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25812900"
     }
   ],
   "dependency_integrity": {
@@ -224,55 +224,6 @@
           "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/usr/lib/systemd/system"
-        },
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "equals"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "rescue.service"
-        },
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*ExecStart=-\\/usr\\/lib\\/systemd\\/systemd-sulogin-shell\\srescue$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25812900",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "equals"
-          },
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/systemd/system/rescue.service.d"
         },
         {
@@ -311,6 +262,55 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "equals"
+          },
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/usr/lib/systemd/system"
+        },
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "equals"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "rescue.service"
+        },
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*ExecStart=-\\/usr\\/lib\\/systemd\\/systemd-sulogin-shell\\srescue$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:25812900",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
     }
   ],
   "parser_contract": {
@@ -337,35 +337,15 @@
       "oval:mil.disa.stig.defs:def:258129"
     ]
   },
-  "semantic_ir_sha256": "93acbe5fd27f36bbedc39f08a7f80106f993c8870acf7241f3eaed3f3ce2a3ae",
+  "semantic_ir_sha256": "caa6c6d027b73b7bb5ac04a2bd543c2dab5c02713f70e7199f031ae126b4de10",
   "source": {
     "bytes": 4896,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258129r1155628_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258129r1155628_rule/provenance.json",
-    "sha256": "19e48d32f5a42d3580caaee98ec1612eb8dae0cd1f948c18abfbdb3a640f5ff2"
+    "sha256": "8faa8a5ac3dae678c931841e172ac25ab0620486131a4d1cca8c1c5306bab2c1"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "/usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue",
-      "id": "oval:mil.disa.stig.ind:tst:25812900",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25812900"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25812900"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -385,9 +365,30 @@
       "states": [],
       "type": "textfilecontent54_test",
       "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "/usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue",
+      "id": "oval:mil.disa.stig.ind:tst:25812900",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25812900"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25812900"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {},
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -416,6 +417,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

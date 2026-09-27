@@ -239,40 +239,6 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/dconf/profile/user"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^system-db:(\\S+)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "dconf user databases",
-      "id": "oval:mil.disa.stig.ind:obj:25802600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
           "attributes": {
             "var_check": "at least one",
             "var_ref": "oval:mil.disa.stig.defs:var:25802600"
@@ -315,6 +281,40 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/dconf/profile/user"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^system-db:(\\S+)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "dconf user databases",
+      "id": "oval:mil.disa.stig.ind:obj:25802600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
     }
   ],
   "parser_contract": {
@@ -346,12 +346,12 @@
       "oval:mil.disa.stig.defs:def:258013"
     ]
   },
-  "semantic_ir_sha256": "75198f23f65d58c8436c9d9721f6c5e73411751813ee908532b31099d5c4dac4",
+  "semantic_ir_sha256": "28c0126759d18f8c4f96e46dca93d37dd36a76a974904a61681c1608e75309e6",
   "source": {
     "bytes": 4620,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271680r1091752_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271680r1091752_rule/provenance.json",
-    "sha256": "3fee98f21f24dd4aae7fab32d1123cbef4e60008fd219284aff8437e0ec224e2"
+    "sha256": "4b6dcabd2001e19ce0cbf26a947d0e666fb50a2ebd1c7e70f6416a511adf087b"
   },
   "states": [],
   "tests": [
@@ -397,6 +397,56 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {
+    "oval:mil.disa.stig.defs:var:25802600": {
+      "blocked_by": {
+        "item_field": "subexpression",
+        "object_ref": "oval:mil.disa.stig.ind:obj:25802600",
+        "operation": "object_component",
+        "record_field": null,
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "string",
+      "dependencies": {
+        "objects": [
+          "oval:mil.disa.stig.ind:obj:25802600"
+        ],
+        "operations": [
+          "concat",
+          "literal_component",
+          "object_component"
+        ],
+        "variables": []
+      },
+      "expression": {
+        "args": [
+          {
+            "datatype": "string",
+            "op": "literal_component",
+            "value": "/etc/dconf/db/"
+          },
+          {
+            "item_field": "subexpression",
+            "object_ref": "oval:mil.disa.stig.ind:obj:25802600",
+            "op": "object_component",
+            "record_field": null
+          },
+          {
+            "datatype": "string",
+            "op": "literal_component",
+            "value": ".d/locks"
+          }
+        ],
+        "attributes": {},
+        "op": "concat"
+      },
+      "mode": "target_dependent",
+      "reason": "concat_child_not_static:object_component",
+      "resolution_status": "dynamic_object_dependency",
+      "variable_id": "oval:mil.disa.stig.defs:var:25802600",
+      "variable_type": "local_variable"
+    }
+  },
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -425,6 +475,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

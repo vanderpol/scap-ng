@@ -4,7 +4,19 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:256893" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.windows11:def:256893" version="1" class="compliance">
+          <metadata>
+            <title>WN11-CC-000391 - Internet Explorer must be disabled for Windows 11.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows 11</platform>
+            </affected>
+            <description>Internet Explorer 11 (IE11) is not supported on Windows 11 semi-annual channel.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:256893"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:256893" version="1" class="compliance">
           <metadata>
             <title>Internet Explorer must be disabled for Windows.</title>
             <description/>
@@ -21,24 +33,18 @@
             </criteria>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.windows11:def:256893" version="1" class="compliance">
-          <metadata>
-            <title>WN11-CC-000391 - Internet Explorer must be disabled for Windows 11.</title>
-            <affected family="windows">
-              <platform>Microsoft Windows 11</platform>
-            </affected>
-            <description>Internet Explorer 11 (IE11) is not supported on Windows 11 semi-annual channel.</description>
-          </metadata>
-          <criteria>
-            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:256893"/>
-          </criteria>
-        </definition>
         </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25689300" version="3" check_existence="any_exist" check="all" comment="Internet Explorer 11 optional feature disabled or not installed">
           <object object_ref="oval:mil.disa.stig.win:obj:25689300"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000020"/>
         </wmi57_test>
         <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:tst:101" version="2" check_existence="none_exist" check="all" comment="32-bit Microsoft Edge is installed">
           <object object_ref="oval:mil.disa.stig.edge:obj:103"/>
+        </registry_test>
+        <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25689301" version="1" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="Internet Explorer 11 is disabled as a standalone browser">
+          <object object_ref="oval:mil.disa.stig.win:obj:25689301"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000002"/>
         </registry_test>
         <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:tst:100" version="2" check_existence="none_exist" check="all" comment="64-bit Microsoft Edge is installed">
           <object object_ref="oval:mil.disa.stig.edge:obj:102"/>
@@ -47,55 +53,51 @@
           <object object_ref="oval:mil.disa.stig.win:obj:20000017"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000018"/>
         </registry_test>
-        <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25689301" version="1" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="Internet Explorer 11 is disabled as a standalone browser">
-          <object object_ref="oval:mil.disa.stig.win:obj:25689301"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000002"/>
-        </registry_test>
-        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:obj:100" version="1" comment="64-bit DisplayName registry value">
-          <behaviors max_depth="1" recurse_direction="down"/>
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string">SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall</key>
-          <name datatype="string">DisplayName</name>
-        </registry_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:obj:103" version="1" comment="32-bit DisplayName equals Microsoft Edge">
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:obj:103" version="1" comment="32-bit DisplayName equals Microsoft Edge">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
             <object_reference>oval:mil.disa.stig.edge:obj:101</object_reference>
             <filter action="include">oval:mil.disa.stig.edge:ste:100</filter>
           </set>
         </registry_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000017" version="1" comment="EditionID">
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
-          <name datatype="string">EditionId</name>
-        </registry_object>
         <wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25689300" version="1">
           <namespace datatype="string">root\cimv2</namespace>
           <wql datatype="string" operation="equals">SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'</wql>
         </wmi57_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:obj:102" version="1" comment="64-bit DisplayName equals Microsoft Edge">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
-            <object_reference>oval:mil.disa.stig.edge:obj:100</object_reference>
-            <filter action="include">oval:mil.disa.stig.edge:ste:100</filter>
-          </set>
-        </registry_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25689301" version="1">
-          <hive>HKEY_LOCAL_MACHINE</hive>
-          <key>SOFTWARE\Policies\Microsoft\Internet Explorer\Main</key>
-          <name>NotifyDisableIEOptions</name>
-        </registry_object>
         <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:obj:101" version="1" comment="32-bit DisplayName registry value">
           <behaviors max_depth="1" recurse_direction="down"/>
           <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
           <key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall</key>
           <name datatype="string">DisplayName</name>
         </registry_object>
-        </objects><states><wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000020" version="1">
-          <result datatype="record" operation="equals">
-            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="installstate" entity_check="at least one" datatype="string">2</field>
-          </result>
-        </wmi57_state>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000017" version="1" comment="EditionID">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
+          <name datatype="string">EditionId</name>
+        </registry_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25689301" version="1">
+          <hive>HKEY_LOCAL_MACHINE</hive>
+          <key>SOFTWARE\Policies\Microsoft\Internet Explorer\Main</key>
+          <name>NotifyDisableIEOptions</name>
+        </registry_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:obj:100" version="1" comment="64-bit DisplayName registry value">
+          <behaviors max_depth="1" recurse_direction="down"/>
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall</key>
+          <name datatype="string">DisplayName</name>
+        </registry_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:obj:102" version="1" comment="64-bit DisplayName equals Microsoft Edge">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
+            <object_reference>oval:mil.disa.stig.edge:obj:100</object_reference>
+            <filter action="include">oval:mil.disa.stig.edge:ste:100</filter>
+          </set>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000018" version="2" comment="EditionID = EnterpriseS (reg_sz)">
+          <type>reg_sz</type>
+          <value datatype="string">EnterpriseS</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:ste:100" version="1" comment="registry value equals Microsoft Edge">
+          <value datatype="string">Microsoft Edge</value>
+        </registry_state>
         <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000000" version="1">
           <type>reg_dword</type>
           <value datatype="int">0</value>
@@ -108,11 +110,9 @@
           <type>reg_dword</type>
           <value datatype="int">1</value>
         </registry_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000018" version="2" comment="EditionID = EnterpriseS (reg_sz)">
-          <type>reg_sz</type>
-          <value datatype="string">EnterpriseS</value>
-        </registry_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.edge:ste:100" version="1" comment="registry value equals Microsoft Edge">
-          <value datatype="string">Microsoft Edge</value>
-        </registry_state>
+        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000020" version="1">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="installstate" entity_check="at least one" datatype="string">2</field>
+          </result>
+        </wmi57_state>
         </states></oval_definitions>

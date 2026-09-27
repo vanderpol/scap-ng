@@ -362,32 +362,32 @@
       "oval:mil.disa.stig.unix:ste:20000022"
     ]
   },
-  "semantic_ir_sha256": "5f61a5d08ffe7457a5c760b0e6b00f2ec43f738089d88ecaccc617325af7c429",
+  "semantic_ir_sha256": "51ac7a585a29729b25fcba6d59f1677cecd87f4564f5c8f1746b38bfb84624a2",
   "source": {
     "bytes": 4872,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271784r1184219_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271784r1184219_rule/provenance.json",
-    "sha256": "7ae9a20fbe32c714d018a20a1e9189ad8c7fd8e6c48ad17a6f775b913f2670db"
+    "sha256": "068210e51b06410fc4560a13669fe683fe0ea52fbde60020f582c4cf64ab4c7f"
   },
   "states": [
     {
-      "comment": "uid = 65534 (nobody)",
+      "comment": "nologin shell",
       "entities": [
         {
           "attributes": {
-            "datatype": "int"
+            "operation": "pattern match"
           },
           "kind": "element",
-          "name": "user_id",
+          "name": "login_shell",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "65534"
+          "value": "^.*nologin.*$"
         }
       ],
-      "id": "oval:mil.disa.stig.unix:ste:25789003",
+      "id": "oval:mil.disa.stig.unix:ste:25789000",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "operator": "AND",
       "type": "password_state",
-      "version": "1"
+      "version": "3"
     },
     {
       "comment": "uid < 1000",
@@ -408,25 +408,6 @@
       "operator": "AND",
       "type": "password_state",
       "version": "2"
-    },
-    {
-      "comment": "nologin shell",
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "login_shell",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "^.*nologin.*$"
-        }
-      ],
-      "id": "oval:mil.disa.stig.unix:ste:25789000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "operator": "AND",
-      "type": "password_state",
-      "version": "3"
     },
     {
       "comment": "mode 0750 or less permissive",
@@ -500,6 +481,25 @@
       "operator": "AND",
       "type": "file_state",
       "version": "1"
+    },
+    {
+      "comment": "uid = 65534 (nobody)",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "user_id",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "65534"
+        }
+      ],
+      "id": "oval:mil.disa.stig.unix:ste:25789003",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "operator": "AND",
+      "type": "password_state",
+      "version": "1"
     }
   ],
   "tests": [
@@ -532,6 +532,30 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {
+    "oval:mil.disa.stig.defs:var:25789000": {
+      "datatype": "string",
+      "dependencies": {
+        "objects": [
+          "oval:mil.disa.stig.unix:obj:25789000"
+        ],
+        "operations": [
+          "object_component"
+        ],
+        "variables": []
+      },
+      "expression": {
+        "item_field": "home_dir",
+        "object_ref": "oval:mil.disa.stig.unix:obj:25789000",
+        "op": "object_component",
+        "record_field": null
+      },
+      "mode": "target_dependent",
+      "resolution_status": "dynamic_object_dependency",
+      "variable_id": "oval:mil.disa.stig.defs:var:25789000",
+      "variable_type": "local_variable"
+    }
+  },
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -560,6 +584,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

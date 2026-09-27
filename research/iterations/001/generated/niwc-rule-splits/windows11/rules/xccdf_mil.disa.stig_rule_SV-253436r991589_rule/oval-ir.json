@@ -276,34 +276,14 @@
       "oval:mil.disa.stig.defs:def:253436"
     ]
   },
-  "semantic_ir_sha256": "48d684c5904b898f27f21103822b88694e672e037d04bcc4132c6b643ebcd168",
+  "semantic_ir_sha256": "90dd9c1046ee4aaaf1e84c973bf14d9351f957ef3fa89a6f20b5e04886c240b4",
   "source": {
     "bytes": 3664,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253436r991589_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253436r991589_rule/provenance.json",
-    "sha256": "90a973f82aa43cdaddb99f3cf42d793542e49b0237f00eeb4870ff340f26843d"
+    "sha256": "9ecf1048a6e947d51bd463eab3df63a4700c17f80e04dbe5e26eaa5058bf1097"
   },
   "states": [
-    {
-      "comment": "Not Guest",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "case insensitive not equal"
-          },
-          "kind": "element",
-          "name": "trustee_name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "Guest"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:25343600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "sid_sid_state",
-      "version": "1"
-    },
     {
       "comment": "Not localdomain\\Guest",
       "entities": [
@@ -319,6 +299,26 @@
         }
       ],
       "id": "oval:mil.disa.stig.win:ste:25343601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "sid_sid_state",
+      "version": "1"
+    },
+    {
+      "comment": "Not Guest",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "case insensitive not equal"
+          },
+          "kind": "element",
+          "name": "trustee_name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "Guest"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:25343600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "sid_sid_state",
@@ -361,6 +361,51 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {
+    "oval:mil.disa.stig.win:var:25343600": {
+      "blocked_by": {
+        "item_field": "trustee_domain",
+        "object_ref": "oval:mil.disa.stig.win:obj:25343600",
+        "operation": "object_component",
+        "record_field": null,
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "string",
+      "dependencies": {
+        "objects": [
+          "oval:mil.disa.stig.win:obj:25343600"
+        ],
+        "operations": [
+          "concat",
+          "literal_component",
+          "object_component"
+        ],
+        "variables": []
+      },
+      "expression": {
+        "args": [
+          {
+            "item_field": "trustee_domain",
+            "object_ref": "oval:mil.disa.stig.win:obj:25343600",
+            "op": "object_component",
+            "record_field": null
+          },
+          {
+            "datatype": "string",
+            "op": "literal_component",
+            "value": "\\Guest"
+          }
+        ],
+        "attributes": {},
+        "op": "concat"
+      },
+      "mode": "target_dependent",
+      "reason": "concat_child_not_static:object_component",
+      "resolution_status": "dynamic_object_dependency",
+      "variable_id": "oval:mil.disa.stig.win:var:25343600",
+      "variable_type": "local_variable"
+    }
+  },
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -389,6 +434,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

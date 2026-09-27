@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271635" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:257787" version="3" class="compliance">
+          <metadata>
+            <title>The operating system must require a boot loader superuser password.</title>
+            <description/>
+          </metadata>
+          <criteria comment="Verify a BIOS GRUB superuser password is configured.">
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25778700" comment="/etc/grub2.cfg:superusers exists and has a name."/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25778701" comment="/boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned."/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271635" version="1" class="compliance">
           <metadata>
             <title>OL09-00-001115 - OL 9 must require a boot loader superuser password.</title>
             <affected family="unix">
@@ -18,23 +28,13 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257787"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:257787" version="3" class="compliance">
-          <metadata>
-            <title>The operating system must require a boot loader superuser password.</title>
-            <description/>
-          </metadata>
-          <criteria comment="Verify a BIOS GRUB superuser password is configured.">
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25778700" comment="/etc/grub2.cfg:superusers exists and has a name."/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25778701" comment="/boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned."/>
-          </criteria>
-        </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25778700" version="2" check_existence="all_exist" check="all" comment="/etc/grub2.cfg:superusers exists and has a name.">
-          <object object_ref="oval:mil.disa.stig.ind:obj:25778700"/>
-          <state state_ref="oval:mil.disa.stig.ind:ste:25778700"/>
-        </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25778701" version="1" check_existence="all_exist" check="all" comment="/boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.">
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25778701" version="1" check_existence="all_exist" check="all" comment="/boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.">
           <object object_ref="oval:mil.disa.stig.ind:obj:25778701"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25778701"/>
+        </textfilecontent54_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25778700" version="2" check_existence="all_exist" check="all" comment="/etc/grub2.cfg:superusers exists and has a name.">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25778700"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:25778700"/>
         </textfilecontent54_test>
         </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25778700" version="3" comment="/etc/grub2.cfg:superusers">
           <filepath datatype="string">/etc/grub2.cfg</filepath>
@@ -46,10 +46,10 @@
           <pattern operation="pattern match">^\s*GRUB2_PASSWORD=(\S+)\b</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25778701" version="2" comment="GRUB superuser password">
-          <subexpression datatype="string" operation="pattern match">^grub\.pbkdf2\.sha512\.</subexpression>
-        </textfilecontent54_state>
-        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25778700" version="1" comment="GRUB superuser name">
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25778700" version="1" comment="GRUB superuser name">
           <subexpression datatype="string" operation="pattern match">^\S+$</subexpression>
+        </textfilecontent54_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25778701" version="2" comment="GRUB superuser password">
+          <subexpression datatype="string" operation="pattern match">^grub\.pbkdf2\.sha512\.</subexpression>
         </textfilecontent54_state>
         </states></oval_definitions>

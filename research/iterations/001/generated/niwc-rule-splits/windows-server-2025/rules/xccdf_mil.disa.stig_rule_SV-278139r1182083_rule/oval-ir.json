@@ -268,7 +268,7 @@
       "oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902"
     ]
   },
-  "semantic_ir_sha256": "cf2cc15647dd663121776dcd37bd2724d444e8f59cc938299ba7f2fd4c6cd7a8",
+  "semantic_ir_sha256": "3be67caccd8d7738f52e1d468c2be025d1c63f60d8c6bfa4a5a3e4b26cebbe48",
   "source": {
     "bytes": 6685,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278139r1182083_rule/oval.xml",
@@ -344,6 +344,84 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {
+    "oval:navy.navwar.niwcatlantic.scc.windows:var:27813901": {
+      "datatype": "string",
+      "mode": "static",
+      "resolution_status": "exact_static",
+      "values": [
+        "(?i)NT AUTHORITY\\\\Authenticated Users:\\(RX\\)",
+        "(?i)NT AUTHORITY\\\\Authenticated Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+        "(?i)BUILTIN\\\\Server Operators:\\(RX\\)",
+        "(?i)BUILTIN\\\\Server Operators:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+        "(?i)BUILTIN\\\\Administrators:\\(M,WDAC,WO\\)",
+        "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+        "(?i)NT AUTHORITY\\\\SYSTEM:\\(F\\)",
+        "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+        "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+      ],
+      "variable_id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27813901",
+      "variable_type": "constant_variable"
+    },
+    "oval:navy.navwar.niwcatlantic.scc.windows:var:27813902": {
+      "blocked_by": {
+        "blocked_by": [
+          {
+            "item_field": "value",
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902",
+            "operation": "object_component",
+            "record_field": null,
+            "status": "dynamic_object_dependency"
+          }
+        ],
+        "operation": "regex_capture",
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "string",
+      "dependencies": {
+        "objects": [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902"
+        ],
+        "operations": [
+          "concat",
+          "literal_component",
+          "object_component",
+          "regex_capture"
+        ],
+        "variables": []
+      },
+      "expression": {
+        "args": [
+          {
+            "datatype": "string",
+            "op": "literal_component",
+            "value": "icacls"
+          },
+          {
+            "args": [
+              {
+                "item_field": "value",
+                "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902",
+                "op": "object_component",
+                "record_field": null
+              }
+            ],
+            "attributes": {
+              "pattern": "(^[a-zA-Z]:\\\\.+)\\\\sysvol"
+            },
+            "op": "regex_capture"
+          }
+        ],
+        "attributes": {},
+        "op": "concat"
+      },
+      "mode": "target_dependent",
+      "reason": "concat_child_not_static:regex_capture",
+      "resolution_status": "dynamic_object_dependency",
+      "variable_id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27813902",
+      "variable_type": "local_variable"
+    }
+  },
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -372,6 +450,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

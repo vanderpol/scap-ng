@@ -116,13 +116,6 @@
       "to": "oval:mil.disa.stig.win:ste:25340100"
     },
     {
-      "attribute": "var_ref",
-      "element": "key",
-      "from": "oval:mil.disa.stig.win:obj:25340102",
-      "kind": "variable_reference",
-      "to": "oval:mil.disa.stig.defs:var:25340100"
-    },
-    {
       "attribute": null,
       "element": "object_reference",
       "from": "oval:mil.disa.stig.win:obj:25340100",
@@ -135,6 +128,13 @@
       "from": "oval:mil.disa.stig.win:obj:25340100",
       "kind": "set_object_reference",
       "to": "oval:mil.disa.stig.win:obj:25340102"
+    },
+    {
+      "attribute": "var_ref",
+      "element": "key",
+      "from": "oval:mil.disa.stig.win:obj:25340102",
+      "kind": "variable_reference",
+      "to": "oval:mil.disa.stig.defs:var:25340100"
     },
     {
       "attribute": "object_ref",
@@ -289,13 +289,12 @@
         },
         {
           "attributes": {
-            "datatype": "string",
-            "var_check": "at least one",
-            "var_ref": "oval:mil.disa.stig.defs:var:25340100"
+            "datatype": "string"
           },
           "kind": "element",
           "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity"
         },
         {
           "attributes": {
@@ -307,11 +306,11 @@
           "value": "MinimumPINLength"
         }
       ],
-      "comment": "Intune registry entry for MinimumPINLength",
-      "id": "oval:mil.disa.stig.win:obj:25340102",
+      "comment": "Group Policy registry entry for MinimumPINLength",
+      "id": "oval:mil.disa.stig.win:obj:25340101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "4"
+      "version": "1"
     },
     {
       "children": [
@@ -349,12 +348,13 @@
         },
         {
           "attributes": {
-            "datatype": "string"
+            "datatype": "string",
+            "var_check": "at least one",
+            "var_ref": "oval:mil.disa.stig.defs:var:25340100"
           },
           "kind": "element",
           "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity"
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
         },
         {
           "attributes": {
@@ -366,11 +366,11 @@
           "value": "MinimumPINLength"
         }
       ],
-      "comment": "Group Policy registry entry for MinimumPINLength",
-      "id": "oval:mil.disa.stig.win:obj:25340101",
+      "comment": "Intune registry entry for MinimumPINLength",
+      "id": "oval:mil.disa.stig.win:obj:25340102",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "1"
+      "version": "4"
     }
   ],
   "parser_contract": {
@@ -405,12 +405,12 @@
       "oval:mil.disa.stig.defs:def:253401"
     ]
   },
-  "semantic_ir_sha256": "fb01688cb5216d5d7c226e19dd2bad7377989d45dcd4e55c25584e914ad59c4c",
+  "semantic_ir_sha256": "2b2bea1139670ea13dd6a754877a2d330b90384076db1d912e4aa0988af06e47",
   "source": {
     "bytes": 5212,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253401r1210296_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253401r1210296_rule/provenance.json",
-    "sha256": "5c25ed862394a1f73f006c7cae63a6cfc05c635f420b764f52454f1257100312"
+    "sha256": "07039772deac4855cdfa2c30e80e54e5231d29364365a0ce7ab236e0764d267f"
   },
   "states": [
     {
@@ -470,6 +470,71 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {
+    "oval:mil.disa.stig.defs:var:25340100": {
+      "blocked_by": {
+        "blocked_by": [
+          {
+            "item_field": "key",
+            "object_ref": "oval:mil.disa.stig.win:obj:25340103",
+            "operation": "object_component",
+            "record_field": null,
+            "status": "dynamic_object_dependency"
+          }
+        ],
+        "operation": "regex_capture",
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "string",
+      "dependencies": {
+        "objects": [
+          "oval:mil.disa.stig.win:obj:25340103"
+        ],
+        "operations": [
+          "concat",
+          "literal_component",
+          "object_component",
+          "regex_capture"
+        ],
+        "variables": []
+      },
+      "expression": {
+        "args": [
+          {
+            "datatype": "string",
+            "op": "literal_component",
+            "value": "SOFTWARE\\Microsoft\\Policies\\PassportForWork\\"
+          },
+          {
+            "args": [
+              {
+                "item_field": "key",
+                "object_ref": "oval:mil.disa.stig.win:obj:25340103",
+                "op": "object_component",
+                "record_field": null
+              }
+            ],
+            "attributes": {
+              "pattern": "(?i)\\\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$"
+            },
+            "op": "regex_capture"
+          },
+          {
+            "datatype": "string",
+            "op": "literal_component",
+            "value": "\\device\\policies\\PINComplexity"
+          }
+        ],
+        "attributes": {},
+        "op": "concat"
+      },
+      "mode": "target_dependent",
+      "reason": "concat_child_not_static:regex_capture",
+      "resolution_status": "dynamic_object_dependency",
+      "variable_id": "oval:mil.disa.stig.defs:var:25340100",
+      "variable_type": "local_variable"
+    }
+  },
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -498,6 +563,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",

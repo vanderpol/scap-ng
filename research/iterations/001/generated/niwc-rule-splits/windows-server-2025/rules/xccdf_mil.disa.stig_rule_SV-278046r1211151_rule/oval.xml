@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278046" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:278046" version="1" class="compliance">
+          <metadata>
+            <title>Windows Event Viewer must be protected from unauthorized modification and deletion.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:27804600" comment="Eventvwr.exe: Read and Execute rights for Administrators, System, Users, All Application Packages"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows2025:def:278046" version="2" class="compliance">
           <metadata>
             <title>WN25-AU-000060 - Windows Server 2025 Event Viewer must be protected from unauthorized modification and deletion.</title>
             <affected family="windows">
@@ -20,30 +29,21 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:278046"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:278046" version="1" class="compliance">
-          <metadata>
-            <title>Windows Event Viewer must be protected from unauthorized modification and deletion.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:27804600" comment="Eventvwr.exe: Read and Execute rights for Administrators, System, Users, All Application Packages"/>
-          </criteria>
-        </definition>
         </definitions><tests><fileeffectiverights53_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:27804600" version="1" check_existence="any_exist" check="all" comment="Eventvwr.exe: Only Read and Execute rights for users other than TrustedInstaller">
           <object object_ref="oval:mil.disa.stig.win:obj:27804603"/>
           <state state_ref="oval:mil.disa.stig.win:ste:27804601"/>
         </fileeffectiverights53_test>
-        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000015" version="1" comment="System Root Directory">
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
-          <name datatype="string">SystemRoot</name>
-        </registry_object>
-        <fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:27804603" version="1" comment="Eventvwr Rights except for TrustedInstaller">
+        </tests><objects><fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:27804603" version="1" comment="Eventvwr Rights except for TrustedInstaller">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
             <object_reference>oval:mil.disa.stig.win:obj:27804602</object_reference>
             <filter>oval:mil.disa.stig.win:ste:27804600</filter>
           </set>
         </fileeffectiverights53_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000015" version="1" comment="System Root Directory">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
+          <name datatype="string">SystemRoot</name>
+        </registry_object>
         <fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:27804602" version="4" comment="Event Viewer Rights">
           <filepath datatype="string" operation="case insensitive equals" var_ref="oval:mil.disa.stig.win:var:27804600" var_check="at least one"/>
           <trustee_sid datatype="string" operation="pattern match">.*</trustee_sid>

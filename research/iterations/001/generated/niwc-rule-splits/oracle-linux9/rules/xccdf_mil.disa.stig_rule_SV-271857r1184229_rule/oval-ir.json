@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "no remote log acceptance",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25814300"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258143",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must be configured so that the rsyslog daemon does not accept log messages from other servers unless the server is being used for log aggregation."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258143",
             "kind": "definition_ref",
@@ -49,51 +84,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "no remote log acceptance",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25814300"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258143",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must be configured so that the rsyslog daemon does not accept log messages from other servers unless the server is being used for log aggregation."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271857",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258143"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -102,11 +95,25 @@
       "to": "oval:mil.disa.stig.ind:tst:25814300"
     },
     {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271857",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258143"
+    },
+    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25814300",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25814300"
+    },
+    {
+      "attribute": "var_ref",
+      "element": "pattern",
+      "from": "oval:mil.disa.stig.ind:obj:25814302",
+      "kind": "variable_reference",
+      "to": "oval:mil.disa.stig.defs:var:25814300"
     },
     {
       "attribute": null,
@@ -121,13 +128,6 @@
       "from": "oval:mil.disa.stig.ind:obj:25814300",
       "kind": "set_object_reference",
       "to": "oval:mil.disa.stig.ind:obj:25814302"
-    },
-    {
-      "attribute": "var_ref",
-      "element": "pattern",
-      "from": "oval:mil.disa.stig.ind:obj:25814302",
-      "kind": "variable_reference",
-      "to": "oval:mil.disa.stig.defs:var:25814300"
     },
     {
       "attribute": "var_ref",
@@ -234,29 +234,6 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25814301"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25814302"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
-        }
-      ],
-      "comment": "remote log acceptance config",
-      "id": "oval:mil.disa.stig.ind:obj:25814300",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
           "attributes": {
             "ignore_case": "true"
           },
@@ -302,6 +279,29 @@
       ],
       "comment": "rsyslog.d/*.conf: remote log acceptance config",
       "id": "oval:mil.disa.stig.ind:obj:25814302",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25814301"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25814302"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
+        }
+      ],
+      "comment": "remote log acceptance config",
+      "id": "oval:mil.disa.stig.ind:obj:25814300",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -382,12 +382,12 @@
       "oval:mil.disa.stig.defs:def:258143"
     ]
   },
-  "semantic_ir_sha256": "d53d2079f83b74d375c5351a987e5a3727503e465166a610f1a863b94e44a8d4",
+  "semantic_ir_sha256": "d9881f696204b1efb045053b768e3b88b2ca84aa7de1c6bf3c846b4a3c9f8814",
   "source": {
     "bytes": 5021,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271857r1184229_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271857r1184229_rule/provenance.json",
-    "sha256": "fa5673a674dba9dedf658dad9c1f8629b8ed87c262e5b5cca909d316402f4b17"
+    "sha256": "8b866bd3c92e081978cffd7c2e3bd74a0a691a512552f35d047d107d5b0c684e"
   },
   "states": [],
   "tests": [
@@ -413,6 +413,26 @@
     }
   ],
   "unresolved_references": [],
+  "variable_evaluation_plans": {
+    "oval:mil.disa.stig.defs:var:25814300": {
+      "datatype": "string",
+      "mode": "static",
+      "resolution_status": "exact_static",
+      "values": [
+        "^[^#]*InputTCPServerRun",
+        "^[^#]*UDPServerRun",
+        "^[^#]*RELPServerRun",
+        "^[^#]*module\\s*\\(.*\\bload\\s*=\\s*\"imtcp\".*\\)",
+        "^[^#]*module\\s*\\(.*\\bload\\s*=\\s*\"imudp\".*\\)",
+        "^[^#]*module\\s*\\(.*\\bload\\s*=\\s*\"imrelp\".*\\)",
+        "^[^#]*input\\s*\\(.*\\btype\\b\\s*=\\s*\"imtcp\"\\s*\\bport\\b\\s*=\\s*\"514\".*\\)",
+        "^[^#]*input\\s*\\(.*\\btype\\b\\s*=\\s*\"imudp\"\\s*\\bport\\b\\s*=\\s*\"514\".*\\)",
+        "^[^#]*input\\s*\\(.*\\btype\\b\\s*=\\s*\"imrelp\"\\s*\\bport\\b\\s*=\\s*\"514\".*\\)"
+      ],
+      "variable_id": "oval:mil.disa.stig.defs:var:25814300",
+      "variable_type": "constant_variable"
+    }
+  },
   "variable_function_model": {
     "all_component_operations_have_explicit_ast": true,
     "known_operations": [
@@ -441,6 +461,7 @@
       "end",
       "escape_regex",
       "literal_component",
+      "merge",
       "split",
       "substring",
       "unique",
