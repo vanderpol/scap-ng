@@ -22,6 +22,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: generate-priority-niwc-rule-splits-main
+  cancel-in-progress: true
+
 jobs:
   split-and-parse:
     runs-on: ubuntu-latest
@@ -147,4 +151,9 @@ jobs:
             exit 0
           fi
           git commit -m "Generate priority NIWC per-rule OVAL and semantic IR corpus"
+          # Documentation or other non-generator changes may land while this
+          # relatively long corpus build is running. Rebase generated output
+          # over those changes before pushing. Generator/tool changes trigger
+          # a newer run, which concurrency above makes authoritative.
+          git pull --rebase origin main
           git push
