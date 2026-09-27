@@ -235,6 +235,7 @@ def set_node(e):
     out = {
         "kind": "set",
         "operator": e.get("set_operator", "UNION"),
+        "operator_explicit": "set_operator" in e.attrib,
         "children": [],
         "evaluation_semantics": {
             "unique_items": True,
@@ -257,6 +258,7 @@ def set_node(e):
                 "kind": "filter",
                 "state_ref": text_value(c),
                 "action": c.get("action", "exclude"),
+                "action_explicit": "action" in c.attrib,
             })
         else:
             out["children"].append({
