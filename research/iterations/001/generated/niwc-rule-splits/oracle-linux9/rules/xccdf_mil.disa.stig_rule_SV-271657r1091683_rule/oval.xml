@@ -4,18 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:230514" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must mount /var/log with the nodev option.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.linux:tst:23051400"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23051401"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23051402"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.ol9os:def:271657" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271657" version="1" class="compliance">
           <metadata>
             <title>OL09-00-002061 - OL 9 must mount /var/log with the nodev option.</title>
             <affected family="unix">
@@ -29,28 +18,39 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230514"/>
           </criteria>
         </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23051402" version="1" check="all" comment="/var/log is configured in /etc/fstab">
-          <object object_ref="oval:mil.disa.stig.ind:obj:23051402"/>
-        </textfilecontent54_test>
-        <partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23051400" version="1" check="all" comment="/var/log is mounted with the nodev option">
+        <definition id="oval:mil.disa.stig.defs:def:230514" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must mount /var/log with the nodev option.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.linux:tst:23051400"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23051401"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23051402"/>
+          </criteria>
+        </definition>
+        </definitions><tests><partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23051400" version="1" check="all" comment="/var/log is mounted with the nodev option">
           <object object_ref="oval:mil.disa.stig.linux:obj:23051400"/>
           <state state_ref="oval:mil.disa.stig.linux:ste:20000001"/>
         </partition_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23051402" version="1" check="all" comment="/var/log is configured in /etc/fstab">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23051402"/>
+        </textfilecontent54_test>
         <variable_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23051401" version="1" check="all" comment="/var/log is configured with the nodev option in /etc/fstab">
           <object object_ref="oval:mil.disa.stig.ind:obj:23051401"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23051400"/>
         </variable_test>
-        </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23051400" version="1">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23051402" version="1">
+          <filepath>/etc/fstab</filepath>
+          <pattern operation="pattern match">^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$</pattern>
+          <instance datatype="int">1</instance>
+        </textfilecontent54_object>
+        <partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23051400" version="1">
           <mount_point>/var/log</mount_point>
         </partition_object>
         <variable_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23051401" version="1">
           <var_ref>oval:mil.disa.stig.ind:var:23051400</var_ref>
         </variable_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23051402" version="1">
-          <filepath>/etc/fstab</filepath>
-          <pattern operation="pattern match">^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$</pattern>
-          <instance datatype="int">1</instance>
-        </textfilecontent54_object>
         </objects><states><variable_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23051400" version="1">
           <value entity_check="at least one">nodev</value>
         </variable_state>

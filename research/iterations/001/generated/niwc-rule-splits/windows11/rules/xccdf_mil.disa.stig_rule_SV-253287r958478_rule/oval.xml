@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.windows11:def:253287" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253287" version="2" class="compliance">
+          <metadata>
+            <title>The Server Message Block (SMB) v1 protocol must be disabled on the SMB server.</title>
+            <description/>
+          </metadata>
+          <criteria operator="OR">
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25328600" comment="Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed"/>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25328700" comment="Verifies 'Configure SMBv1 Server' is set to 'Disabled'"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows11:def:253287" version="2" class="compliance">
           <metadata>
             <title>WN11-00-000165 - The Server Message Block (SMB) v1 protocol must be disabled on the SMB server.</title>
             <affected family="windows">
@@ -18,24 +28,14 @@ Disabling SMBv1 support may prevent access to file or print sharing resources wi
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253287"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:253287" version="2" class="compliance">
-          <metadata>
-            <title>The Server Message Block (SMB) v1 protocol must be disabled on the SMB server.</title>
-            <description/>
-          </metadata>
-          <criteria operator="OR">
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25328600" comment="Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed"/>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25328700" comment="Verifies 'Configure SMBv1 Server' is set to 'Disabled'"/>
-          </criteria>
-        </definition>
-        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328700" version="1" check_existence="at_least_one_exists" check="all" comment="'Configure SMBv1 Server' is set to 'Disabled'">
-          <object object_ref="oval:mil.disa.stig.win:obj:25328700"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
-        </registry_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328600" version="1" check_existence="all_exist" check="all" comment="'SMB 1.0/CIFS File Sharing Support' feature is not installed">
+        </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328600" version="1" check_existence="all_exist" check="all" comment="'SMB 1.0/CIFS File Sharing Support' feature is not installed">
           <object object_ref="oval:mil.disa.stig.win:obj:25328600"/>
           <state state_ref="oval:mil.disa.stig.win:ste:25328600"/>
         </wmi57_test>
+        <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328700" version="1" check_existence="at_least_one_exists" check="all" comment="'Configure SMBv1 Server' is set to 'Disabled'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25328700"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
+        </registry_test>
         </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328600" version="1">
           <namespace datatype="string">root\cimv2</namespace>
           <wql datatype="string" operation="equals">SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'</wql>

@@ -32,7 +32,15 @@
           <independent-def:stdout_line var_check="at least one" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27813901"/>
           <independent-def:stderr_line check_existence="none_exist"/>
         </independent-def:shellcommand_state>
-        </states><variables><constant_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27813901" version="1" datatype="string" comment="Required Permissions">
+        </states><variables><local_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27813902" datatype="string" version="1" comment="icacls and Path to SYSVOL directory">
+          <concat>
+            <literal_component datatype="string">icacls </literal_component>
+            <regex_capture pattern="(^[a-zA-Z]:\\.+)\\sysvol">
+              <object_component object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902" item_field="value"/>
+            </regex_capture>
+          </concat>
+        </local_variable>
+        <constant_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27813901" version="1" datatype="string" comment="Required Permissions">
           <value>(?i)NT AUTHORITY\\Authenticated Users:\(RX\)</value>
           <value>(?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(GR,GE\)</value>
           <value>(?i)BUILTIN\\Server Operators:\(RX\)</value>
@@ -43,12 +51,4 @@
           <value>(?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(IO\)\(F\)</value>
           <value>(?i)CREATOR OWNER:\(OI\)\(CI\)\(IO\)\(F\)</value>
         </constant_variable>
-        <local_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27813902" datatype="string" version="1" comment="icacls and Path to SYSVOL directory">
-          <concat>
-            <literal_component datatype="string">icacls </literal_component>
-            <regex_capture pattern="(^[a-zA-Z]:\\.+)\\sysvol">
-              <object_component object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902" item_field="value"/>
-            </regex_capture>
-          </concat>
-        </local_variable>
         </variables></oval_definitions>

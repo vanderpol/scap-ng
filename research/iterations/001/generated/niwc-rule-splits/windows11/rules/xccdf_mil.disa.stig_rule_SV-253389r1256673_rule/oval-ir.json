@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "Enhanced anti-spoofing for facial recognition must be enabled",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25338900"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:253389",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Enhanced anti-spoofing for facial recognition must be enabled on Windows."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:253389",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Enhanced anti-spoofing for facial recognition must be enabled",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25338900"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:253389",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Enhanced anti-spoofing for facial recognition must be enabled on Windows."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows11:def:253389",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253389"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:253389",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.win:tst:25338900"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows11:def:253389",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253389"
     },
     {
       "attribute": "object_ref",
@@ -216,38 +216,32 @@
     {
       "children": [
         {
-          "attributes": {
-            "datatype": "string"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.win:obj:25338901"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.win:obj:25338902"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
           },
-          "kind": "element",
-          "name": "hive",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "HKEY_LOCAL_MACHINE"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SOFTWARE\\Microsoft\\Policies\\PassportForWork\\Biometrics"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "FacialFeaturesUseEnhancedAntiSpoofing"
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
-      "comment": "Intune registry entry for facial recognition enhanced anti-spoofing",
-      "id": "oval:mil.disa.stig.win:obj:25338902",
+      "comment": "Registry entries for facial recognition enhanced anti-spoofing",
+      "id": "oval:mil.disa.stig.win:obj:25338900",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "1"
+      "version": "2"
     },
     {
       "children": [
@@ -288,32 +282,38 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.win:obj:25338901"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.win:obj:25338902"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
+          "attributes": {
+            "datatype": "string"
           },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
+          "kind": "element",
+          "name": "hive",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "HKEY_LOCAL_MACHINE"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "key",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SOFTWARE\\Microsoft\\Policies\\PassportForWork\\Biometrics"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "FacialFeaturesUseEnhancedAntiSpoofing"
         }
       ],
-      "comment": "Registry entries for facial recognition enhanced anti-spoofing",
-      "id": "oval:mil.disa.stig.win:obj:25338900",
+      "comment": "Intune registry entry for facial recognition enhanced anti-spoofing",
+      "id": "oval:mil.disa.stig.win:obj:25338902",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "2"
+      "version": "1"
     }
   ],
   "parser_contract": {
@@ -342,12 +342,12 @@
       "oval:mil.disa.stig.defs:def:253389"
     ]
   },
-  "semantic_ir_sha256": "b86c36aab3c66af1ea361cbeb9241916defb1d592724765ae67af30ee3749c29",
+  "semantic_ir_sha256": "57ce7f32be2379bb062f4d6c2705a636d10e3e485ed367d1e3c5934d485c8c79",
   "source": {
     "bytes": 3928,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253389r1256673_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253389r1256673_rule/provenance.json",
-    "sha256": "31500bc69edd2c2224a1f6ee3f7a471b61fb0d1395ca37e07a4159e4dc7ef62f"
+    "sha256": "738f594cc7efea7186b6d1e3d299f9bd152321037e93fb43a32bd00936f407e9"
   },
   "states": [
     {

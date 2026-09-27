@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/modprobe.d contains a file that contains 'install tipc /bin/false'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23049700"
+          },
+          {
+            "comment": "/etc/modprobe.d contains a file that contains 'blacklist tipc'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23049701"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230497",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must disable the transparent inter-process communication (TIPC) protocol."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230497",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/modprobe.d contains a file that contains 'install tipc /bin/false'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23049700"
-          },
-          {
-            "comment": "/etc/modprobe.d contains a file that contains 'blacklist tipc'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23049701"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230497",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must disable the transparent inter-process communication (TIPC) protocol."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271447",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230497"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:230497",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23049701"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271447",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230497"
     },
     {
       "attribute": "object_ref",
@@ -230,7 +230,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*blacklist[ \\t]+tipc[ \\t]*$"
+          "value": "^[ \\t]*install[ \\t]+tipc[ \\t]+/bin/false[ \\t]*$"
         },
         {
           "attributes": {
@@ -244,10 +244,10 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23049701",
+      "id": "oval:mil.disa.stig.ind:obj:23049700",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
+      "version": "2"
     },
     {
       "children": [
@@ -273,7 +273,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*install[ \\t]+tipc[ \\t]+/bin/false[ \\t]*$"
+          "value": "^[ \\t]*blacklist[ \\t]+tipc[ \\t]*$"
         },
         {
           "attributes": {
@@ -287,10 +287,10 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23049700",
+      "id": "oval:mil.disa.stig.ind:obj:23049701",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "2"
+      "version": "1"
     }
   ],
   "parser_contract": {
@@ -317,12 +317,12 @@
       "oval:mil.disa.stig.defs:def:230497"
     ]
   },
-  "semantic_ir_sha256": "3b5e78ef3bd24fa258ca6a4d2bf5e0fda9fdd683da1da5d5a5eb7f80e359cde5",
+  "semantic_ir_sha256": "5c2c32dff3bf94ec5958a011d7b0cf57031d7f15619c81c36b6940f0d3056889",
   "source": {
     "bytes": 4119,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271447r1155295_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271447r1155295_rule/provenance.json",
-    "sha256": "c124412e1416ebff94ad1b9f0255b52180ffaf0566141a08a528978928316476"
+    "sha256": "a8e00fa880c0b1b31eeee451d5aacc811708f681ed3c8656dd7698d2ddf46a73"
   },
   "states": [],
   "tests": [

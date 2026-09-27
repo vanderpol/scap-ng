@@ -33,25 +33,22 @@
           <object object_ref="oval:mil.disa.stig.win:obj:27804603"/>
           <state state_ref="oval:mil.disa.stig.win:ste:27804601"/>
         </fileeffectiverights53_test>
-        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000015" version="1" comment="System Root Directory">
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
-          <name datatype="string">SystemRoot</name>
-        </registry_object>
+        </tests><objects><fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:27804602" version="4" comment="Event Viewer Rights">
+          <filepath datatype="string" operation="case insensitive equals" var_ref="oval:mil.disa.stig.win:var:27804600" var_check="at least one"/>
+          <trustee_sid datatype="string" operation="pattern match">.*</trustee_sid>
+        </fileeffectiverights53_object>
         <fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:27804603" version="1" comment="Eventvwr Rights except for TrustedInstaller">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
             <object_reference>oval:mil.disa.stig.win:obj:27804602</object_reference>
             <filter>oval:mil.disa.stig.win:ste:27804600</filter>
           </set>
         </fileeffectiverights53_object>
-        <fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:27804602" version="4" comment="Event Viewer Rights">
-          <filepath datatype="string" operation="case insensitive equals" var_ref="oval:mil.disa.stig.win:var:27804600" var_check="at least one"/>
-          <trustee_sid datatype="string" operation="pattern match">.*</trustee_sid>
-        </fileeffectiverights53_object>
-        </objects><states><fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:27804600" version="1" comment="TrustedInstaller">
-          <trustee_sid datatype="string" operation="equals">S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464</trustee_sid>
-        </fileeffectiverights53_state>
-        <fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:27804601" version="1" comment="No Rights except Read and Execute">
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000015" version="1" comment="System Root Directory">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
+          <name datatype="string">SystemRoot</name>
+        </registry_object>
+        </objects><states><fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:27804601" version="1" comment="No Rights except Read and Execute">
           <standard_delete entity_check="all" datatype="boolean" operation="equals">false</standard_delete>
           <standard_write_dac entity_check="all" datatype="boolean" operation="equals">false</standard_write_dac>
           <standard_write_owner entity_check="all" datatype="boolean" operation="equals">false</standard_write_owner>
@@ -61,6 +58,9 @@
           <file_write_ea entity_check="all" datatype="boolean" operation="equals">false</file_write_ea>
           <file_delete_child entity_check="all" datatype="boolean" operation="equals">false</file_delete_child>
           <file_write_attributes entity_check="all" datatype="boolean" operation="equals">false</file_write_attributes>
+        </fileeffectiverights53_state>
+        <fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:27804600" version="1" comment="TrustedInstaller">
+          <trustee_sid datatype="string" operation="equals">S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464</trustee_sid>
         </fileeffectiverights53_state>
         </states><variables><local_variable id="oval:mil.disa.stig.win:var:27804600" version="2" datatype="string" comment="Expanded value of %SystemRoot%\system32\eventvwr.exe">
           <concat>

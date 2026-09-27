@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "configured faillock directory has correct selinux context",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:25808000"
+          },
+          {
+            "comment": "/etc/security/faillock.conf dir option exists",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25808000"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258080",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258080",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "configured faillock directory has correct selinux context",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:25808000"
-          },
-          {
-            "comment": "/etc/security/faillock.conf dir option exists",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25808000"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258080",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258080",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258080"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:258080",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.linux:tst:25808000"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258080",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258080"
     },
     {
       "attribute": "object_ref",
@@ -248,6 +248,31 @@
     {
       "children": [
         {
+          "attributes": {
+            "var_ref": "oval:mil.disa.stig.defs:var:25808000"
+          },
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
+        },
+        {
+          "attributes": {
+            "nil": "true"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
+        }
+      ],
+      "comment": "configured faillock directory selinux context",
+      "id": "oval:mil.disa.stig.linux:obj:25808000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "selinuxsecuritycontext_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -277,31 +302,6 @@
       "id": "oval:mil.disa.stig.ind:obj:25808000",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "var_ref": "oval:mil.disa.stig.defs:var:25808000"
-          },
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
-        },
-        {
-          "attributes": {
-            "nil": "true"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
-        }
-      ],
-      "comment": "configured faillock directory selinux context",
-      "id": "oval:mil.disa.stig.linux:obj:25808000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "selinuxsecuritycontext_object",
       "version": "1"
     }
   ],
@@ -336,12 +336,12 @@
       "oval:mil.disa.stig.defs:def:258080"
     ]
   },
-  "semantic_ir_sha256": "ad1c01c25b7535e895f698579cd94daebc47a818ac974ab4e7d4a6b2f8bb3495",
+  "semantic_ir_sha256": "89ed51ff5d2e70446384714399fcff2c8b4ba792b249a79e9c87df85b205bda0",
   "source": {
     "bytes": 4133,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258080r1045162_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258080r1045162_rule/provenance.json",
-    "sha256": "44fe0bc1ebd40fd524772a7c7d3ea8bb3131eccd3bfd74c4e526192a65ce704f"
+    "sha256": "e3470daf78c70eb71d9d1720177d8dfbede7977ba3f29083450eff463c613c70"
   },
   "states": [
     {

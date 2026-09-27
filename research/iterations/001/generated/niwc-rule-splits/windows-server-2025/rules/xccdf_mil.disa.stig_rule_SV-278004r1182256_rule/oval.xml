@@ -20,24 +20,38 @@
             </criteria>
           </criteria>
         </definition>
-        </definitions><tests><win-def:wmi57_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800404" version="1" comment="The system is a Windows Domain Controller" check="all" state_operator="OR">
-          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800402"/>
-          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404"/>
-          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405"/>
-        </win-def:wmi57_test>
+        </definitions><tests><win-def:cmdlet_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800401" version="1" comment="Windows Server - Accounts must require passwords." check_existence="none_exist" check="all">
+          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800401"/>
+        </win-def:cmdlet_test>
         <win-def:cmdlet_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800403" version="1" comment="Windows Domain Controller - Accounts must require passwords." check_existence="any_exist" check="all">
           <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800403"/>
           <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800403"/>
         </win-def:cmdlet_test>
+        <win-def:wmi57_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800404" version="1" comment="The system is a Windows Domain Controller" check="all" state_operator="OR">
+          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800402"/>
+          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404"/>
+          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405"/>
+        </win-def:wmi57_test>
         <win-def:wmi57_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800402" version="1" comment="The system is a Windows Standalone Server or a Windows Domain Member Server" check="all" state_operator="OR">
           <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800402"/>
           <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800401"/>
           <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800402"/>
         </win-def:wmi57_test>
-        <win-def:cmdlet_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800401" version="1" comment="Windows Server - Accounts must require passwords." check_existence="none_exist" check="all">
-          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800401"/>
-        </win-def:cmdlet_test>
-        </tests><objects><win-def:cmdlet_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800403" version="1" comment="Enabled Local Accounts with PasswordNeverExpires=False should not exist (list only the first 100, if any are found)">
+        </tests><objects><win-def:cmdlet_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800401" version="1" comment="Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any are found)">
+          <win-def:module_name>CimCmdlets</win-def:module_name>
+          <win-def:module_id xsi:nil="true"/>
+          <win-def:module_version datatype="version" xsi:nil="true"/>
+          <win-def:verb>Get</win-def:verb>
+          <win-def:noun>CimInstance</win-def:noun>
+          <win-def:parameters datatype="record">
+            <field name="class">Win32_Useraccount</field>
+            <field name="filter">PasswordRequired=False and LocalAccount=True and Disabled=false</field>
+          </win-def:parameters>
+          <win-def:select datatype="record">
+            <field name="first">100</field>
+          </win-def:select>
+        </win-def:cmdlet_object>
+        <win-def:cmdlet_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800403" version="1" comment="Enabled Local Accounts with PasswordNeverExpires=False should not exist (list only the first 100, if any are found)">
           <win-def:module_name>ActiveDirectory</win-def:module_name>
           <win-def:module_id xsi:nil="true"/>
           <win-def:module_version datatype="version" xsi:nil="true"/>
@@ -55,28 +69,9 @@
           <win-def:namespace>root\cimv2</win-def:namespace>
           <win-def:wql>SELECT DomainRole FROM win32_computersystem</win-def:wql>
         </win-def:wmi57_object>
-        <win-def:cmdlet_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800401" version="1" comment="Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any are found)">
-          <win-def:module_name>CimCmdlets</win-def:module_name>
-          <win-def:module_id xsi:nil="true"/>
-          <win-def:module_version datatype="version" xsi:nil="true"/>
-          <win-def:verb>Get</win-def:verb>
-          <win-def:noun>CimInstance</win-def:noun>
-          <win-def:parameters datatype="record">
-            <field name="class">Win32_Useraccount</field>
-            <field name="filter">PasswordRequired=False and LocalAccount=True and Disabled=false</field>
-          </win-def:parameters>
-          <win-def:select datatype="record">
-            <field name="first">100</field>
-          </win-def:select>
-        </win-def:cmdlet_object>
-        </objects><states><win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405" version="1" comment="Primary Domain Controller">
+        </objects><states><win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404" version="1" comment="Backup Domain Controller">
           <win-def:result datatype="record" operation="equals">
-            <field name="domainrole">5</field>
-          </win-def:result>
-        </win-def:wmi57_state>
-        <win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800401" version="1" comment="Standalone Server">
-          <win-def:result datatype="record" operation="equals">
-            <field name="domainrole">2</field>
+            <field name="domainrole">4</field>
           </win-def:result>
         </win-def:wmi57_state>
         <win-def:cmdlet_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800403" version="1" comment="Accounts with passwordnotrequired = true and enabled = true shall not exist">
@@ -90,9 +85,14 @@
             <field name="domainrole">3</field>
           </win-def:result>
         </win-def:wmi57_state>
-        <win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404" version="1" comment="Backup Domain Controller">
+        <win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405" version="1" comment="Primary Domain Controller">
           <win-def:result datatype="record" operation="equals">
-            <field name="domainrole">4</field>
+            <field name="domainrole">5</field>
+          </win-def:result>
+        </win-def:wmi57_state>
+        <win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800401" version="1" comment="Standalone Server">
+          <win-def:result datatype="record" operation="equals">
+            <field name="domainrole">2</field>
           </win-def:result>
         </win-def:wmi57_state>
         </states></oval_definitions>

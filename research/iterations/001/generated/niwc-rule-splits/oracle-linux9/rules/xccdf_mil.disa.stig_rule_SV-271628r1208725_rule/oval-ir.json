@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "No active password hash in /etc/shadow has a prefix other than '$6$'.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23023200"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230232",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230232",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "No active password hash in /etc/shadow has a prefix other than '$6$'.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23023200"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230232",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:230232",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:23023200"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.ol9os:def:271628",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:230232"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:230232",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:23023200"
     },
     {
       "attribute": "object_ref",
@@ -321,34 +321,14 @@
       "oval:mil.disa.stig.defs:def:230232"
     ]
   },
-  "semantic_ir_sha256": "17c2044c0e7a79fea2114cdda8bba8855c7aae282fdcba7dd1e4cb6336296cc6",
+  "semantic_ir_sha256": "b5a64c5154999811f164dc2a633587397d1cfcf8a5f24810baa97182ad60dbf9",
   "source": {
     "bytes": 4116,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271628r1208725_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271628r1208725_rule/provenance.json",
-    "sha256": "cbf0d79df3c9488c7ce39cf424c7528e191d895e02fdac911cb8a8dab94d4d68"
+    "sha256": "4e36e0514b5d646ae19f12758e1bf0ce7ad76525a0a9155035bccf0f0dc0cd46"
   },
   "states": [
-    {
-      "comment": "Exclude hashes with leading '$6$'.",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "subexpression",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[$][6][$]"
-        }
-      ],
-      "id": "oval:mil.disa.stig.ind:ste:23023201",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "textfilecontent54_state",
-      "version": "2"
-    },
     {
       "comment": "Exclude inactive/locked hashes (with leading '!' or '*').",
       "entities": [
@@ -368,6 +348,26 @@
       "operator": "AND",
       "type": "textfilecontent54_state",
       "version": "1"
+    },
+    {
+      "comment": "Exclude hashes with leading '$6$'.",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "subexpression",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^[$][6][$]"
+        }
+      ],
+      "id": "oval:mil.disa.stig.ind:ste:23023201",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "textfilecontent54_state",
+      "version": "2"
     }
   ],
   "tests": [

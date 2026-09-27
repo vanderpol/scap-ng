@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:258061" version="1" class="compliance">
-          <metadata>
-            <title>The operating system groups must have unique Group ID (GID).</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25806100" comment="GIDs are unique"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.ol9os:def:271835" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271835" version="1" class="compliance">
           <metadata>
             <title>OL09-00-003006 - OL 9 groups must have unique Group ID (GID).</title>
             <affected family="unix">
@@ -25,31 +16,40 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258061"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:258061" version="1" class="compliance">
+          <metadata>
+            <title>The operating system groups must have unique Group ID (GID).</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25806100" comment="GIDs are unique"/>
+          </criteria>
+        </definition>
         </definitions><tests><variable_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25806100" version="1" check_existence="at_least_one_exists" check="all" comment="GIDs are unique">
           <object object_ref="oval:mil.disa.stig.ind:obj:25806101"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25806100"/>
         </variable_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25806100" version="1" comment="/etc/group GIDs">
+        </tests><objects><variable_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25806101" version="1" comment="count of group entries">
+          <var_ref>oval:mil.disa.stig.defs:var:25806100</var_ref>
+        </variable_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25806100" version="1" comment="/etc/group GIDs">
           <filepath>/etc/group</filepath>
           <pattern operation="pattern match">^[^:]*:[^:]*:([^:]+):</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <variable_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25806101" version="1" comment="count of group entries">
-          <var_ref>oval:mil.disa.stig.defs:var:25806100</var_ref>
-        </variable_object>
         </objects><states><variable_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25806100" version="1" comment="count of unique GIDs">
           <value datatype="int" var_ref="oval:mil.disa.stig.defs:var:25806101"/>
         </variable_state>
-        </states><variables><local_variable id="oval:mil.disa.stig.defs:var:25806101" version="1" datatype="int" comment="count of unique GIDs">
+        </states><variables><local_variable id="oval:mil.disa.stig.defs:var:25806100" version="1" datatype="int" comment="count of group entries">
+          <count>
+            <object_component object_ref="oval:mil.disa.stig.ind:obj:25806100" item_field="subexpression"/>
+          </count>
+        </local_variable>
+        <local_variable id="oval:mil.disa.stig.defs:var:25806101" version="1" datatype="int" comment="count of unique GIDs">
           <count>
             <unique>
               <object_component object_ref="oval:mil.disa.stig.ind:obj:25806100" item_field="subexpression"/>
             </unique>
-          </count>
-        </local_variable>
-        <local_variable id="oval:mil.disa.stig.defs:var:25806100" version="1" datatype="int" comment="count of group entries">
-          <count>
-            <object_component object_ref="oval:mil.disa.stig.ind:obj:25806100" item_field="subexpression"/>
           </count>
         </local_variable>
         </variables></oval_definitions>

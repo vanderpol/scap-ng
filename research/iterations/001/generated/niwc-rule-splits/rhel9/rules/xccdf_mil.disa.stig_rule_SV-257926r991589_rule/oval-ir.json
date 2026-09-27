@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/cron* files owned by root",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:25792600"
+          },
+          {
+            "comment": "/etc/cron* directories owned by root",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:25792601"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:257926",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system cron configuration files directory must be owned by root."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:257926",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/cron* files owned by root",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:25792600"
-          },
-          {
-            "comment": "/etc/cron* directories owned by root",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:25792601"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:257926",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system cron configuration files directory must be owned by root."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257926",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:257926"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:257926",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.unix:tst:25792601"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257926",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:257926"
     },
     {
       "attribute": "object_ref",
@@ -227,30 +227,6 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "/etc"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "^cron.*$"
-        }
-      ],
-      "comment": "/etc/cron* files",
-      "id": "oval:mil.disa.stig.unix:obj:25792600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "type": "file_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
           "attributes": {
             "operation": "pattern match"
           },
@@ -270,6 +246,30 @@
       ],
       "comment": "/etc/cron* directories",
       "id": "oval:mil.disa.stig.unix:obj:25792601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "type": "file_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "/etc"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "^cron.*$"
+        }
+      ],
+      "comment": "/etc/cron* files",
+      "id": "oval:mil.disa.stig.unix:obj:25792600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "type": "file_object",
       "version": "1"
@@ -302,12 +302,12 @@
       "oval:mil.disa.stig.unix:ste:20000005"
     ]
   },
-  "semantic_ir_sha256": "380afe9941026beb751041e99116e0b3b085ca8d54b4093efa26e499bd017585",
+  "semantic_ir_sha256": "50aadebdd2ff295f52ce1bc444bd5f16ca1017fa66ab755e07bd9e94f04e60d7",
   "source": {
     "bytes": 3529,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257926r991589_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257926r991589_rule/provenance.json",
-    "sha256": "f97d63bdc2bf8d3a10e19ee972edf1ececa783780a40605f984af359db1c8298"
+    "sha256": "0b76ce5a2c297affcce4da3b762d85e5d72029886ccb300c749b9b5c59b5d9ef"
   },
   "states": [
     {
