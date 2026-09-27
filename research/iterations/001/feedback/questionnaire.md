@@ -40,7 +40,13 @@ Reviewers do not need to answer every question. Please preserve the question IDs
 
 **BOOL-003** — Is the distinction between `outcome_complete` and `diagnostics_complete` useful and sufficient?
 
-**BOOL-004** — Does the nested-logic result example provide enough information to explain the root cause without a full OVAL-style result tree?
+**BOOL-004** — Does the proposed decisive outcome explanation provide enough information to explain nested Boolean failures without a full OVAL-style result tree?
+
+**BOOL-005** — For a failed AND, should one decisive failed child be the required minimum while additional failed children are optional diagnostics?
+
+**BOOL-006** — For a failed OR, do reviewers agree that the explanation must contain a decisive failure for every alternative necessary to prove the OR false?
+
+**BOOL-007** — When several equally minimal decisive explanations exist, should the standard require deterministic selection of one, or allow bounded multiple explanations?
 
 ## Evidence and scale
 
@@ -83,6 +89,10 @@ Reviewers do not need to answer every question. Please preserve the question IDs
 **RES-003** — Should compact, explain, and forensic result profiles be standardized?
 
 **RES-004** — What additional requirements arise when aggregating results from 100,000+ systems?
+
+**RES-005** — Should structured decisive explanations be mandatory for automated Fail results, with human-readable summaries treated as derived convenience text?
+
+**RES-006** — Are `decisive`, `additional_findings`, `supporting`, and `unevaluated` the right categories for explanation data?
 
 ## Packaging and signatures
 

@@ -361,25 +361,30 @@ If a full traversal occurs, `count_type: exact` is appropriate.
 
 An implementation or enterprise policy may impose a stricter operational cap than the content requests, but this must be visible in the result rather than silently changing reporting behavior.
 
-## 14. Compact root-cause reporting
+## 14. Decisive outcome explanation
 
-For nested Boolean logic, normal results should report the smallest unsatisfied logical subtree or set of subtrees sufficient to explain the outcome.
+Iteration 001 uses a **decisive outcome explanation** rather than relying on free-form root-cause text or a complete OVAL-style result graph.
 
-Given:
+For an automated Fail, the scanner should emit the smallest evaluated expression subtree, or set of subtrees, sufficient to prove the reported outcome. Atomic decisive assertions carry subject, actual value, operator, expected value, outcome, and evidence references.
 
-```text
-A AND (B OR C) AND D
-```
+Boolean proof semantics determine what must be retained:
 
-where A and D pass but both B and C fail, a normal explanation should be equivalent to:
+- a failed AND needs at least one failed child to prove failure;
+- a failed OR needs a decisive failure from every required alternative;
+- a failed NOT reports the successful child condition that made the prohibited condition true;
+- universal population checks may fail from one violating item;
+- positive existence failures require evidence that the searched scope was complete;
+- conditional results separately record branch-selection evidence and the decisive outcome explanation inside the selected branch.
 
-> Failed: neither acceptable alternative B nor acceptable alternative C was satisfied.
+The result distinguishes decisive findings, optional additional findings, supporting context, and unevaluated branches. It also distinguishes outcome completeness from diagnostic completeness.
 
-The result should include the actual/expected evidence for B and C without repeating every passing node.
+Collection errors, unsupported capabilities, parse errors, and similar conditions are structured result reasons, not compliance root causes.
 
-A forensic result profile may include the full evaluation trace.
+A human-readable summary may be generated from the structured explanation, but consumers should not need to parse prose to determine why a rule failed.
 
-This principle is prototyped in iteration 001.
+The detailed prototype contract is documented in `result-explanation-model.md`.
+
+A forensic result profile may retain the complete evaluation trace when needed for debugging or migration validation.
 
 ## 15. Result outcomes
 
@@ -631,6 +636,12 @@ A21. Combined-rule overlays must not directly alter shared assessment logic; aut
 A22. Build validation should verify that an automated resolved rule preserves the authoritative policy-only rule semantics.
 
 A23. Benchmark scoring must be deterministic and reproducible. Severity-derived effective weight is the leading default direction; exact mappings and override rules remain open.
+
+A24. Automated results should contain a structured decisive outcome explanation. For Fail, this is the minimal evaluated expression subtree or set of subtrees sufficient to prove failure, with evidence references and explicit completeness semantics.
+
+A25. Logical failure explanation, additional remediation findings, supporting Pass context, and unevaluated branches are distinct result concepts.
+
+A26. Error/collection failure reasons are not compliance root causes and must remain distinct from Fail explanations.
 
 ## Appendix B — Questions that must be answered before a specification can stabilize
 

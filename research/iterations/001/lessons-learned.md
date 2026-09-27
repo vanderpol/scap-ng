@@ -79,7 +79,19 @@ A per-rule numeric weight exists in XCCDF, but relying on every policy author to
 
 A nominal compliance percentage should also not conceal incomplete assessment; separate assessment-coverage reporting is worth prototyping.
 
-## 12. Questions carried forward
+## 12. Root cause should mean logical outcome explanation
+
+The prototypes initially used `root_cause` and `root_causes` fields inconsistently.
+
+**Lesson:** The normative model should instead define one structured decisive outcome explanation. It explains the logical/evidentiary reason the assessment reached its outcome; it does not claim to identify the human or operational cause of the misconfiguration.
+
+For Boolean expressions, the explanation is a pruned proof tree. A failed AND may need only one failed child, while a failed OR requires failure evidence for every acceptable alternative. Additional independently useful failures belong in bounded diagnostics rather than being confused with the minimal proof.
+
+Collection errors and applicability decisions use separate structured reason/applicability data.
+
+See `result-explanation-model.md`.
+
+## 13. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 
