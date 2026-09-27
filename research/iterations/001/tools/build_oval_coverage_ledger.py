@@ -12,7 +12,7 @@ def keys(rows):
     return {f'{x.get("namespace","")}#{x.get("name","")}' for x in rows}
 
 
-def classify(key, self_counts, prod_counts):
+def classify(key, self_counts, prod_counts, prod_examples):
     s=self_counts.get(key,0)
     p=prod_counts.get(key,0)
     if s and p:
@@ -30,6 +30,7 @@ def classify(key, self_counts, prod_counts):
         "name":name,
         "self_assertion_count":s,
         "niwc_priority_stig_count":p,
+        "niwc_example_ir_paths":list(prod_examples.get(key,[])),
         "status":status,
     }
 
@@ -70,7 +71,8 @@ def main():
 
     for category,(schema_keys,self_counts,prod_counts) in categories.items():
         observed_extra=(set(self_counts)|set(prod_counts))-schema_keys
-        rows=[classify(k,self_counts,prod_counts) for k in sorted(schema_keys)]
+        prod_examples=prod.get("qualified_type_examples",{}).get(category,{})
+        rows=[classify(k,self_counts,prod_counts,prod_examples) for k in sorted(schema_keys)]
         counts=Counter(x["status"] for x in rows)
         ledger[category]=rows
         summary[category]={
