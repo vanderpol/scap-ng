@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse, hashlib, itertools, json, re
 from pathlib import Path
 
-XATTR_SYSCALL_RE = re.compile(r"\b(?:f|l)?(?:remove|set)xattr\b")
+XATTR_SYSCALL_RE = re.compile(r"(?:f|l)?(?:remove|set)xattr")
 ARCHES = ("b32", "b64")
 
 
@@ -147,46 +147,87 @@ def main():
             "test_id":test_id,
             "object_id":obj["id"],
             "cell":cell,
+            "check":test.get("check"),
+            "check_existence":test.get("check_existence"),
             "pattern_sha256":hashlib.sha256(pattern.encode()).hexdigest(),
         })
 
     if filepaths != {"/etc/audit/audit.rules"}:
         raise ValueError(f"unexpected audit rule sources: {sorted(filepaths)}")
 
-    cell_set=set(cells)
-    if len(cell_set)!=len(cells):
-        raise ValueError("duplicate semantic matrix cells detected")
+    # Group source tests by the coarse semantic cell we recognized. Duplicate
+    # identical conditions are Boolean-idempotent in an AND criteria graph, but
+    # distinct patterns/check semantics within one coarse cell must not be
+    # collapsed.
+    grouped_cells={}
+    for check in source_checks:
+        cell=check["cell"]
+        key=(cell["syscall"],cell["architecture"],cell["subject"])
+        grouped_cells.setdefault(key,[]).append(check)
 
+    conflicts=[]
+    duplicates=[]
+    for key,checks in sorted(grouped_cells.items()):
+        signatures={
+            (
+                c["pattern_sha256"],
+                c["check"],
+                c["check_existence"],
+            )
+            for c in checks
+        }
+        if len(signatures)>1:
+            conflicts.append({
+                "cell":{"syscall":key[0],"architecture":key[1],"subject":key[2]},
+                "source_checks":[c["test_id"] for c in checks],
+                "reason":"same_coarse_cell_has_distinct_source_semantics",
+            })
+        elif len(checks)>1:
+            duplicates.append({
+                "cell":{"syscall":key[0],"architecture":key[1],"subject":key[2]},
+                "source_checks":[c["test_id"] for c in checks],
+                "count":len(checks),
+            })
+
+    if conflicts:
+        raise ValueError(f"coarse audit-cell normalization conflicts: {conflicts}")
+
+    cell_set=set(grouped_cells)
     syscalls=sorted({c[0] for c in cell_set})
     arches=sorted({c[1] for c in cell_set})
     subjects=sorted({c[2] for c in cell_set})
     expected=set(itertools.product(syscalls,arches,subjects))
-    if cell_set != expected:
-        missing=sorted(expected-cell_set)
-        extra=sorted(cell_set-expected)
-        raise ValueError(f"coverage is not a complete Cartesian matrix; missing={missing}, extra={extra}")
+    missing=sorted(expected-cell_set)
+    extra=sorted(cell_set-expected)
+    complete_matrix=(not missing and not extra)
 
     if set(subjects)!={"interactive_users","root"} or set(arches)!={"b32","b64"}:
         raise ValueError(f"unexpected matrix dimensions: arches={arches}, subjects={subjects}")
+
+    required_cells=[
+        {"syscall":s,"architecture":a,"subject":u}
+        for s,a,u in sorted(cell_set)
+    ]
+
+    subject_definitions=[
+        {
+            "name":"interactive_users",
+            "all":[
+                {"field":"auid","op":"ge","value":1000},
+                {"field":"auid","op":"not_in","value":[-1,4294967295,"unset"]},
+            ],
+        },
+        {"name":"root","field":"auid","op":"eq","value":0},
+    ]
 
     semantic={
         "capability":"linux.audit.configured_rules",
         "source":{"type":"audit_rules_file","path":"/etc/audit/audit.rules"},
         "required_coverage":{
-            "syscalls":syscalls,
-            "architectures":["b32","b64"],
-            "subjects":[
-                {
-                    "name":"interactive_users",
-                    "all":[
-                        {"field":"auid","op":"ge","value":1000},
-                        {"field":"auid","op":"not_in","value":[-1,4294967295,"unset"]},
-                    ],
-                },
-                {"name":"root","field":"auid","op":"eq","value":0},
-            ],
+            "cells":required_cells,
+            "subjects":subject_definitions,
             "action_equivalent_to":["always,exit","exit,always"],
-            "matrix_cell_count":len(cell_set),
+            "cell_count":len(required_cells),
         },
         "assertion":{"quantifier":"every","predicate":"covered_by_audit_rule"},
     }
@@ -206,10 +247,27 @@ def main():
         "source_checks":source_checks,
         "normalization_evidence":{
             "reachable_test_count":len(reachable_tests),
-            "matrix_cell_count":len(cell_set),
+            "unique_semantic_cell_count":len(cell_set),
             "all_patterns_resolved":True,
-            "complete_cartesian_matrix":True,
-            "note":"Candidate native normalization; differential execution required for exact_normalized.",
+            "duplicate_source_conditions":duplicates,
+            "complete_cartesian_matrix":complete_matrix,
+            "missing_cartesian_cells":[
+                {"syscall":s,"architecture":a,"subject":u} for s,a,u in missing
+            ],
+            "extra_cartesian_cells":[
+                {"syscall":s,"architecture":a,"subject":u} for s,a,u in extra
+            ],
+            "review_candidate_matrix":{
+                "syscalls":syscalls,
+                "architectures":arches,
+                "subjects":subjects,
+                "cell_count":len(expected),
+            },
+            "note":(
+                "Faithful native representation preserves the unique conditions actually "
+                "enforced by source OVAL. Missing matrix cells are not invented. "
+                "Differential execution and policy review are required."
+            ),
         },
     }
     args.output.parent.mkdir(parents=True,exist_ok=True)
@@ -218,6 +276,8 @@ def main():
         "rule":result["source"]["rule_id"],
         "tests":len(reachable_tests),
         "cells":len(cell_set),
+        "complete_cartesian_matrix":complete_matrix,
+        "missing_cells":len(missing),
         "fingerprint":result["semantic_fingerprint_sha256"],
     },indent=2))
     return 0

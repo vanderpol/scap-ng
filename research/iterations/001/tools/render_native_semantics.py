@@ -17,12 +17,11 @@ def quoted_presenter(dumper, data):
 yaml.SafeDumper.add_representer(Quoted, quoted_presenter)
 
 
-def matrix_from_semantic(s):
+def coverage_from_semantic(s):
     cov=s["required_coverage"]
     return {
-        "syscall":cov["syscalls"],
-        "architecture":cov["architectures"],
-        "subject":cov["subjects"],
+        "cells":cov["cells"],
+        "subjects":cov["subjects"],
     }
 
 
@@ -41,7 +40,7 @@ def original(doc):
             "source":s["source"],
           }
         },
-        "derive":{"required_coverage":{"matrix":matrix_from_semantic(s)}},
+        "derive":{"required_coverage":{"matrix":coverage_from_semantic(s)}},
         "assert":{
           "every":{
             "item":"$derived.required_coverage",
@@ -86,7 +85,7 @@ def ansible(doc):
           },
           {
             "name":"Build required syscall audit coverage",
-            "derive":{"matrix":matrix_from_semantic(s)},
+            "derive":{"matrix":coverage_from_semantic(s)},
             "register":"required_coverage",
           },
         ],
