@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import calendar
 import datetime as dt
+import decimal
 import hashlib
 import itertools
 import json
@@ -1109,7 +1110,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             if child["status"] != "exact_static":
                 return child
             values = [
-                "".join("\\\\" + ch if ch in REGEX_META else ch for ch in str(value))
+                "".join("\\" + ch if ch in REGEX_META else ch for ch in str(value))
                 for value in child["values"]
             ]
             return bounded(values, name)
@@ -1125,11 +1126,13 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             values = []
             for combo in itertools.product(*children["values"]):
                 try:
-                    numeric = [float(x) if any(ch in str(x).lower() for ch in ".e") else int(x) for x in combo]
+                    texts = [str(x) for x in combo]
+                    has_float = any(any(ch in text.lower() for ch in ".e") for text in texts)
+                    numeric = [decimal.Decimal(text) for text in texts]
                     if op == "add":
-                        value = sum(numeric)
+                        value = sum(numeric, decimal.Decimal(0))
                     elif op == "multiply":
-                        value = 1
+                        value = decimal.Decimal(1)
                         for x in numeric:
                             value *= x
                     elif op == "subtract":
@@ -1140,10 +1143,17 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                         value = numeric[0]
                         for x in numeric[1:]:
                             value /= x
-                    if isinstance(value, float) and value.is_integer() and all(isinstance(x, int) for x in numeric):
-                        value = int(value)
-                    values.append(str(value))
-                except (ValueError, ZeroDivisionError):
+
+                    if not has_float and value == value.to_integral_value():
+                        rendered = str(int(value))
+                    else:
+                        rendered = format(value, "f")
+                        if "." in rendered:
+                            rendered = rendered.rstrip("0").rstrip(".")
+                        if rendered in {"", "-0"}:
+                            rendered = "0"
+                    values.append(rendered)
+                except (decimal.InvalidOperation, decimal.DivisionByZero, ValueError, ZeroDivisionError):
                     return result(
                         "static_evaluation_error",
                         reason="arithmetic_input_or_operation_error",
