@@ -8,6 +8,7 @@ on:
       - "research/iterations/001/tools/scap14_rule_splitter.py"
       - "research/iterations/001/tools/oval_semantic_ir.py"
       - "research/iterations/001/tools/analyze_oval_ir_corpus.py"
+      - "research/iterations/001/tools/build_oval_coverage_ledger.py"
       - "research/iterations/001/tools/test_oval_dependency_graph.py"
       - "research/iterations/001/tools/test_oval_variable_evaluation_plans.py"
       - "research/iterations/001/tools/test_oval_static_variable_functions.py"
@@ -112,6 +113,14 @@ jobs:
           python scap-ng/research/iterations/001/tools/analyze_oval_ir_corpus.py \
             scap-ng/research/iterations/001/generated/niwc-rule-splits \
             --output scap-ng/research/iterations/001/generated/niwc-rule-splits/corpus-semantic-inventory.json
+
+      - name: Build schema/conformance/production OVAL coverage ledger
+        run: |
+          python scap-ng/research/iterations/001/tools/build_oval_coverage_ledger.py \
+            scap-ng/research/iterations/001/generated/oval-schema-semantic-catalog.json \
+            scap-ng/research/iterations/001/generated/oval-self-assertion/full-corpus-inventory.json \
+            scap-ng/research/iterations/001/generated/niwc-rule-splits/corpus-semantic-inventory.json \
+            --output scap-ng/research/iterations/001/generated/oval-5.12.3-evidence-ledger.json
 
       - name: Normalize flagship audit syscall cases
         shell: bash
