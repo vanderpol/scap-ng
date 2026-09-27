@@ -60,20 +60,6 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
-      "kind": "test_object",
-      "to": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
-      "kind": "test_state",
-      "to": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
       "from": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601",
       "kind": "test_object",
       "to": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601"
@@ -82,6 +68,20 @@
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601",
+      "kind": "test_state",
+      "to": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
+      "kind": "test_object",
+      "to": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
       "kind": "test_state",
       "to": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601"
     }
@@ -169,6 +169,33 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "powershell"
+        },
+        {
+          "kind": "element",
+          "name": "command",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "if (([adsi]\"LDAP://$((Get-ADDomain).DistinguishedName)\").PSBase.ObjectSecurity.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference -eq 'S-1-5-7' -and $_.AccessControlType -eq 'Allow' }) { Write-Host \"FAIL: ANONYMOUS LOGON is configured with ALLOW permissions.\" } else { Write-Host \"PASS: ANONYMOUS LOGON is missing or does not have ALLOW permissions.\" }"
+        },
+        {
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": ".+"
+        }
+      ],
+      "comment": "Analyse permissions on Active Directory Users and Computers. Domain Security Permissions via PowerShell.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "shellcommand_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "error_if_stderr_exists": "true"
           },
@@ -200,33 +227,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "shellcommand_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "shell",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "powershell"
-        },
-        {
-          "kind": "element",
-          "name": "command",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "if (([adsi]\"LDAP://$((Get-ADDomain).DistinguishedName)\").PSBase.ObjectSecurity.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference -eq 'S-1-5-7' -and $_.AccessControlType -eq 'Allow' }) { Write-Host \"FAIL: ANONYMOUS LOGON is configured with ALLOW permissions.\" } else { Write-Host \"PASS: ANONYMOUS LOGON is missing or does not have ALLOW permissions.\" }"
-        },
-        {
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": ".+"
-        }
-      ],
-      "comment": "Analyse permissions on Active Directory Users and Computers. Domain Security Permissions via PowerShell.",
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "shellcommand_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -253,12 +253,12 @@
       "oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601"
     ]
   },
-  "semantic_ir_sha256": "495cdafab64a88b9ecd65e5a63c2b59d699f7f20587658cde23ee4927b3780bd",
+  "semantic_ir_sha256": "5958b411bc6b99dceb41c449b761ad5747518d44e9a5e1f0e12a1266ec77a9c8",
   "source": {
     "bytes": 7664,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278146r1182098_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278146r1182098_rule/provenance.json",
-    "sha256": "18ea0a7540e222bd82ac102e2dadbed38cfc312c561c7bd8a85cf52c42acf77f"
+    "sha256": "ebc44404e511c55a846181e56f9200534c297a0975b93447006a9d8c5c4c4ad4"
   },
   "states": [
     {
@@ -286,15 +286,15 @@
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
-      "comment": "Open Active Directory Users and Computers. Select View - Advanced Features. Right click on domain name in left pane (which is listed under Active Directory Users and Computers) and click properties. Select the Security Tab and click Advanced. Verify Allow permissions of any kind are not granted to ANONYMOUS LOGON.",
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
+      "comment": "Analyze the dsHeuristics to check for annonymous access.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602"
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601"
           },
-          "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602"
+          "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601"
         }
       ],
       "other": [],
@@ -313,15 +313,15 @@
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
-      "comment": "Analyze the dsHeuristics to check for annonymous access.",
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601",
+      "comment": "Open Active Directory Users and Computers. Select View - Advanced Features. Right click on domain name in left pane (which is listed under Active Directory Users and Computers) and click properties. Select the Security Tab and click Advanced. Verify Allow permissions of any kind are not granted to ANONYMOUS LOGON.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601"
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602"
           },
-          "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601"
+          "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602"
         }
       ],
       "other": [],

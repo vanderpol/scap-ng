@@ -24,73 +24,65 @@
             </criteria>
           </criteria>
         </definition>
-        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800101" version="1" comment="Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained." check="all">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101"/>
+        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800104" version="1" comment="Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained." check="all">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104"/>
         </independent-def:shellcommand_test>
         <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800103" version="1" comment="Default Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained." check="all">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102"/>
-        </independent-def:shellcommand_test>
-        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800104" version="1" comment="Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained." check="all">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104"/>
-        </independent-def:shellcommand_test>
-        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800102" version="1" comment="Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained." check="all">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104"/>
         </independent-def:shellcommand_test>
         <win-def:wmi57_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800105" version="1" check="all" state_operator="OR" comment="The system is a Windows Domain Controller">
           <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105"/>
           <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800105"/>
           <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106"/>
         </win-def:wmi57_test>
-        </tests><objects><independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103" version="1" comment="Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry">
-          <independent-def:shell>powershell</independent-def:shell>
-          <independent-def:command>([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\d+' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }</independent-def:command>
-        </independent-def:shellcommand_object>
+        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800102" version="1" comment="Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained." check="all">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104"/>
+        </independent-def:shellcommand_test>
+        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27800101" version="1" comment="Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained." check="all">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101"/>
+        </independent-def:shellcommand_test>
+        </tests><objects><win-def:wmi57_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105" version="1">
+          <win-def:namespace>root\cimv2</win-def:namespace>
+          <win-def:wql>SELECT DomainRole FROM win32_computersystem</win-def:wql>
+        </win-def:wmi57_object>
         <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101" version="1" comment="Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry">
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command>([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Security", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access |  Where-Object { $_.RegistryRights -notmatch '\d+' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }</independent-def:command>
         </independent-def:shellcommand_object>
-        <win-def:wmi57_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105" version="1">
-          <win-def:namespace>root\cimv2</win-def:namespace>
-          <win-def:wql>SELECT DomainRole FROM win32_computersystem</win-def:wql>
-        </win-def:wmi57_object>
+        <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103" version="1" comment="Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry">
+          <independent-def:shell>powershell</independent-def:shell>
+          <independent-def:command>([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\d+' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }</independent-def:command>
+        </independent-def:shellcommand_object>
         <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102" version="1" comment="Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry">
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command>([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Software", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\d+' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }</independent-def:command>
         </independent-def:shellcommand_object>
-        </objects><states><win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800105" version="1" comment="Backup Domain Controller">
+        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102" version="1" comment="Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\System">
+          <independent-def:stdout_line var_check="at least one" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27800102"/>
+        </independent-def:shellcommand_state>
+        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101" version="1" comment="Required Permissions for HKEY_LOCAL_MACHINE\Security">
+          <independent-def:stdout_line var_check="at least one" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27800101"/>
+        </independent-def:shellcommand_state>
+        <win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800105" version="1" comment="Backup Domain Controller">
           <win-def:result datatype="record" operation="equals">
             <field name="domainrole">4</field>
           </win-def:result>
         </win-def:wmi57_state>
-        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102" version="1" comment="Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\System">
-          <independent-def:stdout_line var_check="at least one" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27800102"/>
+        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104" version="1" comment="Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software on all servers">
+          <independent-def:stdout_line var_check="at least one" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27800103"/>
         </independent-def:shellcommand_state>
         <win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106" version="1" comment="Primary Domain Controller">
           <win-def:result datatype="record" operation="equals">
             <field name="domainrole">5</field>
           </win-def:result>
         </win-def:wmi57_state>
-        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101" version="1" comment="Required Permissions for HKEY_LOCAL_MACHINE\Security">
-          <independent-def:stdout_line var_check="at least one" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27800101"/>
-        </independent-def:shellcommand_state>
-        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104" version="1" comment="Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software on all servers">
-          <independent-def:stdout_line var_check="at least one" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27800103"/>
-        </independent-def:shellcommand_state>
         </states><variables><constant_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27800101" version="1" datatype="string" comment="Required Permissions for HKEY_LOCAL_MACHINE\Security">
           <value>^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
           <value>^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
-        </constant_variable>
-        <constant_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27800103" version="1" datatype="string" comment="Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software on all servers">
-          <value>^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
-          <value>^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
-          <value>^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
-          <value>^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$</value>
-          <value>^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
-          <value>^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
         </constant_variable>
         <constant_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27800102" version="1" datatype="string" comment="Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\System">
           <value>^Identity:NT AUTHORITY\\Authenticated Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
@@ -101,5 +93,13 @@
           <value>^Identity:BUILTIN\\Server Operators, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
           <value>^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
           <value/>
+        </constant_variable>
+        <constant_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27800103" version="1" datatype="string" comment="Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software on all servers">
+          <value>^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
+          <value>^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
+          <value>^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
+          <value>^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$</value>
+          <value>^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
+          <value>^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$</value>
         </constant_variable>
         </variables></oval_definitions>

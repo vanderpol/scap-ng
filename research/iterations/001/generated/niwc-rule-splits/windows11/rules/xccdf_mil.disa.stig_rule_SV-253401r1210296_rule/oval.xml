@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.windows11:def:253401" version="3" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253401" version="3" class="compliance">
+          <metadata>
+            <title>Windows must be configured to require a minimum pin length of six characters or greater.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25340100" comment="Minimum PIN length is 6 or greater"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows11:def:253401" version="3" class="compliance">
           <metadata>
             <title>WN11-CC-000260 - Windows 11 must be configured to require a minimum PIN length of six characters or greater</title>
             <affected family="windows">
@@ -18,20 +27,21 @@ Note: A different registry location is needed when systems are managed by Intune
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253401"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:253401" version="3" class="compliance">
-          <metadata>
-            <title>Windows must be configured to require a minimum pin length of six characters or greater.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25340100" comment="Minimum PIN length is 6 or greater"/>
-          </criteria>
-        </definition>
         </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25340100" version="3" check="all" comment="Minimum PIN length is 6 or greater">
           <object object_ref="oval:mil.disa.stig.win:obj:25340100"/>
           <state state_ref="oval:mil.disa.stig.win:ste:25340100"/>
         </registry_test>
-        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25340100" version="2" comment="Registry entries for MinimumPINLength">
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25340103" version="4" comment="Registry object for the Tenant ID of the account currently in use">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" operation="pattern match">(?i)SYSTEM\\CurrentControlSet\\Control\\CloudDomainJoin\\TenantInfo\\[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</key>
+          <name xsi:nil="true"/>
+        </registry_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25340102" version="4" comment="Intune registry entry for MinimumPINLength">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" var_ref="oval:mil.disa.stig.defs:var:25340100" var_check="at least one"/>
+          <name datatype="string">MinimumPINLength</name>
+        </registry_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25340100" version="2" comment="Registry entries for MinimumPINLength">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
             <object_reference>oval:mil.disa.stig.win:obj:25340101</object_reference>
             <object_reference>oval:mil.disa.stig.win:obj:25340102</object_reference>
@@ -41,16 +51,6 @@ Note: A different registry location is needed when systems are managed by Intune
           <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
           <key datatype="string">SOFTWARE\Policies\Microsoft\PassportForWork\PINComplexity</key>
           <name datatype="string">MinimumPINLength</name>
-        </registry_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25340102" version="4" comment="Intune registry entry for MinimumPINLength">
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string" var_ref="oval:mil.disa.stig.defs:var:25340100" var_check="at least one"/>
-          <name datatype="string">MinimumPINLength</name>
-        </registry_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25340103" version="4" comment="Registry object for the Tenant ID of the account currently in use">
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string" operation="pattern match">(?i)SYSTEM\\CurrentControlSet\\Control\\CloudDomainJoin\\TenantInfo\\[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</key>
-          <name xsi:nil="true"/>
         </registry_object>
         </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25340100" version="1">
           <type>reg_dword</type>

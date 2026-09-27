@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257993" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:271720" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must not allow users to override SSH environment variables.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:27172000" comment="Check to see if PermitUserEnvironment is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257993" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-255085 - RHEL 9 must not allow users to override SSH environment variables.</title>
             <affected family="unix">
@@ -16,24 +25,14 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:271720"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:271720" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must not allow users to override SSH environment variables.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:27172000" comment="Check to see if PermitUserEnvironment is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf"/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:27172000" version="1" check_existence="at_least_one_exists" check="all" comment="The PermitUserEnvironment option is not set to yes in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf.">
           <object object_ref="oval:mil.disa.stig.ind:obj:27172000"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000017"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27172000" version="1">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:27172001</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:27172002</object_reference>
-          </set>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27172001" version="1">
+          <filepath>/etc/ssh/sshd_config</filepath>
+          <pattern operation="pattern match">^(?i)\s*PermitUserEnvironment\s+(\w+)$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27172002" version="1">
           <behaviors max_depth="-1" recurse_direction="down"/>
@@ -42,10 +41,11 @@
           <pattern operation="pattern match">^(?i)\s*PermitUserEnvironment\s+(\w+)$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27172001" version="1">
-          <filepath>/etc/ssh/sshd_config</filepath>
-          <pattern operation="pattern match">^(?i)\s*PermitUserEnvironment\s+(\w+)$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27172000" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:27172001</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:27172002</object_reference>
+          </set>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000017" version="1">
           <subexpression datatype="string" operation="pattern match">^(no|"no")$</subexpression>

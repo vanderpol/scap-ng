@@ -4,19 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271861" version="1" class="compliance">
-          <metadata>
-            <title>OL09-00-006003 - OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured.</title>
-            <affected family="unix">
-              <platform>Oracle Linux 9</platform>
-            </affected>
-            <description>To provide availability for name resolution services, multiple redundant name servers are mandated. A failure in name resolution could lead to the failure of security functions requiring name resolution, which may include time synchronization, centralized authentication, and remote system logging.</description>
-          </metadata>
-          <criteria>
-            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230316"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.defs:def:230316" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230316" version="2" class="compliance">
           <metadata>
             <title>For Systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured.</title>
             <description/>
@@ -30,6 +18,18 @@
             </criteria>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271861" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-006003 - OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>To provide availability for name resolution services, multiple redundant name servers are mandated. A failure in name resolution could lead to the failure of security functions requiring name resolution, which may include time synchronization, centralized authentication, and remote system logging.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230316"/>
+          </criteria>
+        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23031602" version="1" check_existence="at_least_one_exists" check="all" comment="/etc/resolv.conf contains at least one nameserver entry">
           <object object_ref="oval:mil.disa.stig.ind:obj:23031602"/>
         </textfilecontent54_test>
@@ -41,19 +41,19 @@
           <object object_ref="oval:mil.disa.stig.ind:obj:23031600"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23031600"/>
         </textfilecontent54_test>
-        </tests><objects><variable_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031601" version="1" comment="count of unique name servers">
-          <var_ref>oval:mil.disa.stig.ind:var:23031600</var_ref>
-        </variable_object>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031600" version="2" comment="/etc/nsswitch.conf hosts entry">
+          <filepath>/etc/nsswitch.conf</filepath>
+          <pattern operation="pattern match">^\s*hosts:\s*(.*)$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031602" version="2" comment="/etc/resolv.conf nameserver entries">
           <filepath>/etc/resolv.conf</filepath>
           <pattern operation="pattern match">^nameserver\s+(.*)$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031600" version="2" comment="/etc/nsswitch.conf hosts entry">
-          <filepath>/etc/nsswitch.conf</filepath>
-          <pattern operation="pattern match">^\s*hosts:\s*(.*)$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
+        <variable_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031601" version="1" comment="count of unique name servers">
+          <var_ref>oval:mil.disa.stig.ind:var:23031600</var_ref>
+        </variable_object>
         </objects><states><variable_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23031601" version="2" comment="/etc/resolv.conf is configured with at least two name servers">
           <value datatype="int" operation="greater than or equal">2</value>
         </variable_state>

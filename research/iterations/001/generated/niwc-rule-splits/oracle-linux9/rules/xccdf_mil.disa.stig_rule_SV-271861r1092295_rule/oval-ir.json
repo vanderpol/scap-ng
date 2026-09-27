@@ -5,56 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:230316",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.ol9os:def:271861",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "OL09-00-006003 - OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Oracle Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "To provide availability for name resolution services, multiple redundant name servers are mandated. A failure in name resolution could lead to the failure of security functions requiring name resolution, which may include time synchronization, centralized authentication, and remote system logging."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": "The system is not using DNS",
             "kind": "test_ref",
             "negate": true,
@@ -110,16 +60,59 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:230316",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.ol9os:def:271861",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "OL09-00-006003 - OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Oracle Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "To provide availability for name resolution services, multiple redundant name servers are mandated. A failure in name resolution could lead to the failure of security functions requiring name resolution, which may include time synchronization, centralized authentication, and remote system logging."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271861",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230316"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -140,6 +133,13 @@
       "from": "oval:mil.disa.stig.defs:def:230316",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23031602"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271861",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230316"
     },
     {
       "attribute": "object_ref",
@@ -295,16 +295,35 @@
       "children": [
         {
           "kind": "element",
-          "name": "var_ref",
+          "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "oval:mil.disa.stig.ind:var:23031600"
+          "value": "/etc/nsswitch.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*hosts:\\s*(.*)$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
         }
       ],
-      "comment": "count of unique name servers",
-      "id": "oval:mil.disa.stig.ind:obj:23031601",
+      "comment": "/etc/nsswitch.conf hosts entry",
+      "id": "oval:mil.disa.stig.ind:obj:23031600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "variable_object",
-      "version": "1"
+      "type": "textfilecontent54_object",
+      "version": "2"
     },
     {
       "children": [
@@ -344,35 +363,16 @@
       "children": [
         {
           "kind": "element",
-          "name": "filepath",
+          "name": "var_ref",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/nsswitch.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*hosts:\\s*(.*)$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
+          "value": "oval:mil.disa.stig.ind:var:23031600"
         }
       ],
-      "comment": "/etc/nsswitch.conf hosts entry",
-      "id": "oval:mil.disa.stig.ind:obj:23031600",
+      "comment": "count of unique name servers",
+      "id": "oval:mil.disa.stig.ind:obj:23031601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
+      "type": "variable_object",
+      "version": "1"
     }
   ],
   "parser_contract": {
@@ -413,12 +413,12 @@
       "oval:mil.disa.stig.defs:def:230316"
     ]
   },
-  "semantic_ir_sha256": "3a02c4ec59007ca123fb6842745d189f05b8fc212cc78381b4e9ba9003bf1203",
+  "semantic_ir_sha256": "c5f1e2d3b7ef5b54c30c68787c089b0742bc704e457b9a560241ccd54580c1fa",
   "source": {
     "bytes": 5781,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271861r1092295_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271861r1092295_rule/provenance.json",
-    "sha256": "875b5f894fe1bd80bb6614a8d56e7eb1de32d197dbeb16665913b5bc283c1bca"
+    "sha256": "64aca37ba06640c2e302863c54833daa9837512da1c4e7558c33171d836a93b0"
   },
   "states": [
     {
