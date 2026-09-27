@@ -74,6 +74,7 @@ STATIC_EVALUATOR_OPERATIONS = {
     "end",
     "escape_regex",
     "merge",
+    "regex_capture",
     "split",
     "substring",
     "unique",
@@ -754,6 +755,28 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                         values.append(string_value)
             return bounded(values, name)
 
+        if name == "regex_capture":
+            child = one_child_values(node, name)
+            if child["status"] != "exact_static":
+                return child
+            pattern = node.get("pattern", "")
+            try:
+                rx = pyre.compile(pattern)
+            except pyre.error as exc:
+                return result(
+                    "static_evaluation_error",
+                    reason=f"regex_capture_invalid_pattern:{exc}",
+                    operation=name,
+                )
+            values = []
+            for value in child["values"]:
+                match = rx.search(str(value))
+                if match is None or rx.groups == 0:
+                    values.append("")
+                else:
+                    values.append(match.group(1) or "")
+            return bounded(values, name)
+
         if name == "merge":
             children = all_children_static(node, name, minimum=1)
             if children["status"] != "exact_static":
@@ -940,7 +963,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
 
         # These operations are fully represented in semantic_ast but are not
         # claimed as exact-static by this prototype evaluator yet.
-        if name in {"regex_capture", "glob_to_regex", "time_difference"}:
+        if name in {"glob_to_regex", "time_difference"}:
             child_ops = [
                 component_values(c)
                 for c in node
