@@ -1,0 +1,77 @@
+name: OVAL 5.12.3 Self-Assertion conformance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/oval-self-assertion-conformance.yml"
+      - "AGENTS.md"
+      - "research/iterations/001/public-corpus-manifest.yaml"
+      - "research/iterations/001/tools/oval_semantic_ir.py"
+      - "research/iterations/001/tools/analyze_oval_self_assertion.py"
+      - "research/iterations/001/tools/test_oval_dependency_graph.py"
+      - "research/iterations/001/tools/test_oval_variable_evaluation_plans.py"
+      - "research/iterations/001/tools/test_oval_static_variable_functions.py"
+      - "research/iterations/001/tools/test_oval_set_filter_semantics.py"
+      - "third_party/scap-1.4-schemas/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: oval-self-assertion-conformance-main
+  cancel-in-progress: true
+
+jobs:
+  agnostic-core-language:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned OVAL Self-Assertion corpus
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: self-assertion
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install importer dependencies
+        run: python -m pip install --disable-pip-version-check lxml
+
+      - name: Run semantic importer regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="scap-ng/research/iterations/001/tools"
+          python "$root/test_oval_dependency_graph.py"
+          python "$root/test_oval_variable_evaluation_plans.py"
+          python "$root/test_oval_static_variable_functions.py"
+          python "$root/test_oval_set_filter_semantics.py"
+
+      - name: Inventory agnostic OVAL language test content
+        run: |
+          python scap-ng/research/iterations/001/tools/analyze_oval_self_assertion.py             self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic             --output scap-ng/research/iterations/001/generated/oval-self-assertion/agnostic-conformance-inventory.json             --fail-on-unresolved
+
+      - name: Commit reproducible conformance inventory
+        working-directory: scap-ng
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/iterations/001/generated/oval-self-assertion
+          if git diff --cached --quiet; then
+            echo "Self-Assertion inventory already matches."
+            exit 0
+          fi
+          git commit -m "Generate OVAL Self-Assertion conformance inventory"
+          git pull --rebase origin main
+          git push
