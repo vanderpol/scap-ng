@@ -116,6 +116,74 @@ def evaluate_values(actual, state):
     return None,"unsupported_entity_check"
 
 
+
+def evaluate_criteria_node(node, test_outcomes, definition_lookup, definition_cache, stack):
+    name=local(node.tag)
+    negate=node.get("negate","false").lower()=="true"
+
+    if name=="criterion":
+        test_ref=node.get("test_ref")
+        value=test_outcomes.get(test_ref)
+        if value is None:
+            return None
+        return (not value) if negate else value
+
+    if name=="extend_definition":
+        definition_ref=node.get("definition_ref")
+        value=evaluate_definition(
+            definition_ref, definition_lookup, test_outcomes,
+            definition_cache, stack
+        )
+        if value is None:
+            return None
+        return (not value) if negate else value
+
+    if name!="criteria":
+        return None
+
+    children=[
+        evaluate_criteria_node(
+            child,test_outcomes,definition_lookup,definition_cache,stack
+        )
+        for child in node
+        if local(child.tag) in {"criteria","criterion","extend_definition"}
+    ]
+    if any(value is None for value in children):
+        return None
+
+    operator=node.get("operator","AND")
+    true_count=sum(bool(x) for x in children)
+    if operator=="AND":
+        value=all(children)
+    elif operator=="OR":
+        value=any(children)
+    elif operator=="XOR":
+        value=(true_count % 2)==1
+    elif operator=="ONE":
+        value=true_count==1
+    else:
+        return None
+    return (not value) if negate else value
+
+
+def evaluate_definition(definition_id, definition_lookup, test_outcomes, cache, stack):
+    if definition_id in cache:
+        return cache[definition_id]
+    if definition_id in stack:
+        return None
+    definition=definition_lookup.get(definition_id)
+    if definition is None:
+        return None
+    criteria=next((c for c in definition if local(c.tag)=="criteria"),None)
+    if criteria is None:
+        return None
+    stack.add(definition_id)
+    value=evaluate_criteria_node(criteria,test_outcomes,definition_lookup,cache,stack)
+    stack.remove(definition_id)
+    cache[definition_id]=value
+    return value
+
+
 def inspect_file(path):
     data=path.read_bytes()
     root=etree.fromstring(data)
@@ -126,7 +194,30 @@ def inspect_file(path):
     tests_section=root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}tests")
     results=[]
     if tests_section is None:
-        return results
+        definitions_section=root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}definitions")
+    definition_results=[]
+    if definitions_section is not None:
+        lookup={d.get("id"):d for d in definitions_section if local(d.tag)=="definition"}
+        test_outcomes={
+            result["test_id"]: (
+                True if result["status"]=="evaluated_true"
+                else False if result["status"]=="evaluated_false"
+                else None
+            )
+            for result in results
+        }
+        cache={}
+        for definition_id in lookup:
+            value=evaluate_definition(definition_id,lookup,test_outcomes,cache,set())
+            definition_results.append({
+                "definition_id":definition_id,
+                "status":(
+                    "evaluated_true" if value is True
+                    else "evaluated_false" if value is False
+                    else "skipped"
+                ),
+            })
+    return results,definition_results
     for test in tests_section:
         if local(test.tag)!="variable_test":
             continue
@@ -156,7 +247,7 @@ def inspect_file(path):
         # false entity result is therefore a semantic mismatch to investigate.
         results.append({
             "test_id":test_id,
-            "status":"pass" if outcome else "semantic_mismatch",
+            "status":"evaluated_true" if outcome else "evaluated_false",
             "object_ref":object_ref,
             "state_ref":state_ref,
             "actual_values":actual,
@@ -173,38 +264,54 @@ def main():
 
     files=[]
     all_results=[]
+    definition_results_all=[]
     for path in sorted(args.root.rglob("*.xml")):
         rel=path.relative_to(args.root).as_posix()
         try:
-            results=inspect_file(path)
+            results,definition_results=inspect_file(path)
         except Exception as exc:
             files.append({"path":rel,"status":"error","error":f"{type(exc).__name__}: {exc}"})
             continue
         counts=Counter(x["status"] for x in results)
-        files.append({"path":rel,"status":"ok","test_counts":dict(sorted(counts.items()))})
+        def_counts=Counter(x["status"] for x in definition_results)
+        files.append({
+            "path":rel,
+            "status":"ok",
+            "test_counts":dict(sorted(counts.items())),
+            "definition_counts":dict(sorted(def_counts.items())),
+        })
         for result in results:
             all_results.append({"path":rel,**result})
+        for result in definition_results:
+            result["path"]=rel
+            definition_results_all.append(result)
 
     counts=Counter(x["status"] for x in all_results)
+    definition_counts=Counter(x["status"] for x in definition_results_all)
     report={
         "format":"scap-ng-oval-self-assertion-static-verification-0.1",
         "role":"offline_language_conformance",
-        "counts":dict(sorted(counts.items())),
-        "semantic_mismatches":[x for x in all_results if x["status"]=="semantic_mismatch"],
+        "test_counts":dict(sorted(counts.items())),
+        "definition_counts":dict(sorted(definition_counts.items())),
+        "definition_mismatches":[
+            x for x in definition_results_all if x["status"]=="evaluated_false"
+        ],
         "skipped_reasons":dict(sorted(Counter(
             x.get("reason","unknown") for x in all_results if x["status"]=="skipped"
         ).items())),
         "files":files,
-        "results":all_results,
+        "test_results":all_results,
+        "definition_results":definition_results_all,
     }
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     print(json.dumps({
-        "counts":report["counts"],
+        "test_counts":report["test_counts"],
+        "definition_counts":report["definition_counts"],
         "skipped_reasons":report["skipped_reasons"],
-        "semantic_mismatch_count":len(report["semantic_mismatches"]),
+        "definition_mismatch_count":len(report["definition_mismatches"]),
     },indent=2,sort_keys=True))
-    return 1 if report["semantic_mismatches"] else 0
+    return 1 if report["definition_mismatches"] else 0
 
 
 if __name__=="__main__":
