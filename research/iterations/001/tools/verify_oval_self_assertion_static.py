@@ -83,6 +83,103 @@ def expected_state_values(root, ir):
     return out
 
 
+def rpmvercmp(left, right):
+    """Compare RPM version/release strings using rpmvercmp-style segments."""
+    a=str(left)
+    b=str(right)
+    ia=ib=0
+
+    while True:
+        while ia<len(a) and not a[ia].isalnum() and a[ia] not in "~^":
+            ia+=1
+        while ib<len(b) and not b[ib].isalnum() and b[ib] not in "~^":
+            ib+=1
+
+        # Tilde sorts before everything, including end-of-string.
+        if (ia<len(a) and a[ia]=="~") or (ib<len(b) and b[ib]=="~"):
+            if not (ia<len(a) and a[ia]=="~"):
+                return 1
+            if not (ib<len(b) and b[ib]=="~"):
+                return -1
+            ia+=1; ib+=1
+            continue
+
+        # Caret sorts after end-of-string but before any other following segment.
+        if (ia<len(a) and a[ia]=="^") or (ib<len(b) and b[ib]=="^"):
+            if ia>=len(a):
+                return -1
+            if ib>=len(b):
+                return 1
+            if a[ia]!="^":
+                return 1
+            if b[ib]!="^":
+                return -1
+            ia+=1; ib+=1
+            continue
+
+        enda=ia>=len(a)
+        endb=ib>=len(b)
+        if enda or endb:
+            if enda and endb:
+                return 0
+            return -1 if enda else 1
+
+        a_numeric=a[ia].isdigit()
+        b_numeric=b[ib].isdigit()
+
+        ja=ia
+        while ja<len(a) and a[ja].isalnum() and a[ja].isdigit()==a_numeric:
+            ja+=1
+        jb=ib
+        while jb<len(b) and b[jb].isalnum() and b[jb].isdigit()==b_numeric:
+            jb+=1
+
+        sa=a[ia:ja]
+        sb=b[ib:jb]
+        ia,ib=ja,jb
+
+        if a_numeric and not b_numeric:
+            return 1
+        if b_numeric and not a_numeric:
+            return -1
+
+        if a_numeric:
+            na=sa.lstrip("0") or "0"
+            nb=sb.lstrip("0") or "0"
+            if len(na)!=len(nb):
+                return 1 if len(na)>len(nb) else -1
+            if na!=nb:
+                return 1 if na>nb else -1
+        else:
+            if sa!=sb:
+                return 1 if sa>sb else -1
+
+
+def split_evr(value):
+    text=str(value)
+    epoch_text,sep,rest=text.partition(":")
+    if not sep:
+        epoch_text="0"
+        rest=text
+    epoch=int(epoch_text or "0",10)
+    version,sep,release=rest.rpartition("-")
+    if not sep:
+        version=rest
+        release=""
+    return epoch,version,release
+
+
+def compare_evr(left,right):
+    le,lv,lr=split_evr(left)
+    re_,rv,rr=split_evr(right)
+    if le!=re_:
+        return 1 if le>re_ else -1
+    version_cmp=rpmvercmp(lv,rv)
+    if version_cmp:
+        return version_cmp
+    return rpmvercmp(lr,rr)
+
+
 def cast_value(value, datatype):
     text=str(value)
     if datatype=="string":
@@ -130,6 +227,25 @@ def cast_value(value, datatype):
 
 
 def compare_value(actual, expected, datatype, operation):
+    if datatype=="evr_string":
+        try:
+            cmp=compare_evr(actual,expected)
+        except ValueError:
+            return None,"datatype_cast_error:evr_string"
+        if operation=="equals":
+            return cmp==0,None
+        if operation=="not equal":
+            return cmp!=0,None
+        if operation=="greater than":
+            return cmp>0,None
+        if operation=="greater than or equal":
+            return cmp>=0,None
+        if operation=="less than":
+            return cmp<0,None
+        if operation=="less than or equal":
+            return cmp<=0,None
+        return None,f"unsupported_operation:{operation}"
+
     try:
         if operation=="pattern match":
             if datatype!="string":
