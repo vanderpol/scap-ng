@@ -1,0 +1,53 @@
+name: Vendor SCAP 1.4 OVAL 5.12.3 schemas
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/vendor-scap14-schemas.yml"
+      - "research/iterations/001/tools/build_vendor_schema_manifest.py"
+      - "third_party/scap-1.4-oval-5.12.3/README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned schema source
+        uses: actions/checkout@v4
+        with:
+          repository: vanderpol/scap-content
+          ref: 32ab7642b4d9e9eb02476d59698dd3f83ae0e282
+          path: scap-content
+
+      - name: Copy schema tree exactly
+        run: |
+          set -euo pipefail
+          dst="scap-ng/third_party/scap-1.4-oval-5.12.3"
+          keep="$dst/README.md"
+          mkdir -p "$dst"
+          find "$dst" -mindepth 1 -maxdepth 1 ! -name README.md -exec rm -rf {} +
+          cp -a scap-content/schemas/scap-1.4-oval-5.12.3/. "$dst/"
+          python scap-ng/research/iterations/001/tools/build_vendor_schema_manifest.py "$dst"
+
+      - name: Commit vendored schemas
+        working-directory: scap-ng
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add third_party/scap-1.4-oval-5.12.3
+          if git diff --cached --quiet; then
+            echo "Vendored schema tree already matches pinned source."
+            exit 0
+          fi
+          git commit -m "Vendor pinned SCAP 1.4 OVAL 5.12.3 schemas"
+          git push
