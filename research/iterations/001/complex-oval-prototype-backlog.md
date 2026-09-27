@@ -4,6 +4,12 @@
 **Status:** Active research backlog  
 **Purpose:** Identify real OVAL definitions whose semantics could expose gaps in the SCAP-NG assessment, migration, collection, or decisive-explanation models.
 
+## Implementation status
+
+All Priority 1 and Priority 2 candidate families listed below now have iteration 001 native-translation prototypes under `prototypes/oval-migration-cases/`.
+
+Their status remains `prototype_native_translation`: implementation in the research syntax is complete enough for architecture review, but differential execution against the source OVAL is still required before any equivalence claim.
+
 This backlog is intentionally biased toward difficult constructs rather than representative easy rules.
 
 The source paths below are from `vanderpol/scap-content`. Inclusion does not imply the source OVAL is perfect; each candidate must also be reviewed for correctness before it is treated as migration ground truth.

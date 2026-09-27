@@ -1,6 +1,6 @@
 # OVAL Migration Case Prototypes
 
-These examples translate difficult existing OVAL definitions from `vanderpol/scap-content` into candidate SCAP-NG structures.
+These examples translate difficult existing OVAL definitions from `vanderpol/scap-content` into candidate SCAP-NG structures. The current corpus has 12 migration-case directories covering 16 source OVAL definitions.
 
 They are **semantic research cases**, not official replacement content and not yet conformance examples.
 

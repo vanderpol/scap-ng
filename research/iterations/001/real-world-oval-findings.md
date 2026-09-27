@@ -6,7 +6,7 @@
 
 ## Implemented corpus
 
-Iteration 001 now contains 13 migration-case directories covering 16 source OVAL definitions. The cases span RHEL 8/10, Windows Server 2012, and PostgreSQL 16.
+Iteration 001 now contains 12 migration-case directories (plus one cross-case normalization note) covering 16 source OVAL definitions. The cases span RHEL 8/10, Windows Server 2012, and PostgreSQL 16.
 
 The corpus intentionally includes:
 
