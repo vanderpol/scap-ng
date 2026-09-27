@@ -8,11 +8,11 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 
-def keys(rows):
-    return {f'{x.get("namespace","")}#{x.get("name","")}' for x in rows}
+def keyed(rows):
+    return {f'{x.get("namespace","")}#{x.get("name","")}':x for x in rows}
 
 
-def classify(key, self_counts, prod_counts, prod_examples):
+def classify(key, schema_row, self_counts, prod_counts, prod_examples):
     s=self_counts.get(key,0)
     p=prod_counts.get(key,0)
     if s and p:
@@ -31,6 +31,8 @@ def classify(key, self_counts, prod_counts, prod_examples):
         "self_assertion_count":s,
         "niwc_priority_stig_count":p,
         "niwc_example_ir_paths":list(prod_examples.get(key,[])),
+        "deprecated":bool(schema_row.get("deprecated",False)),
+        "deprecation_evidence":schema_row.get("deprecation_evidence"),
         "status":status,
     }
 
@@ -49,17 +51,17 @@ def main():
 
     categories={
         "tests":(
-            keys(schema.get("test_elements",[])),
+            keyed(schema.get("test_elements",[])),
             self_inv.get("qualified_test_types",{}),
             prod.get("qualified_test_types",{}),
         ),
         "objects":(
-            keys(schema.get("object_elements",[])),
+            keyed(schema.get("object_elements",[])),
             self_inv.get("qualified_object_types",{}),
             prod.get("qualified_object_types",{}),
         ),
         "states":(
-            keys(schema.get("state_elements",[])),
+            keyed(schema.get("state_elements",[])),
             self_inv.get("qualified_state_types",{}),
             prod.get("qualified_state_types",{}),
         ),
@@ -69,10 +71,14 @@ def main():
     summary={}
     by_namespace=defaultdict(lambda:Counter())
 
-    for category,(schema_keys,self_counts,prod_counts) in categories.items():
+    for category,(schema_rows,self_counts,prod_counts) in categories.items():
+        schema_keys=set(schema_rows)
         observed_extra=(set(self_counts)|set(prod_counts))-schema_keys
         prod_examples=prod.get("qualified_type_examples",{}).get(category,{})
-        rows=[classify(k,self_counts,prod_counts,prod_examples) for k in sorted(schema_keys)]
+        rows=[
+            classify(k,schema_rows[k],self_counts,prod_counts,prod_examples)
+            for k in sorted(schema_keys)
+        ]
         counts=Counter(x["status"] for x in rows)
         ledger[category]=rows
         summary[category]={
@@ -81,6 +87,10 @@ def main():
             "conformance_only":counts["conformance_only"],
             "production_only":counts["production_only"],
             "schema_only":counts["schema_only"],
+            "deprecated_total":sum(1 for x in rows if x["deprecated"]),
+            "production_only_deprecated":sum(
+                1 for x in rows if x["status"]=="production_only" and x["deprecated"]
+            ),
             "observed_not_in_schema":sorted(observed_extra),
         }
         for row in rows:
