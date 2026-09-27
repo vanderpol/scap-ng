@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:253297",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.windows2025:def:278033",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "WN25-AC-000010 - Windows Server 2025 account lockout duration must be configured to 15 minutes or greater."
+          },
+          {
+            "attributes": {
+              "family": "windows"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Microsoft Windows Server 2025"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "When enabled, the account lockout feature prevents brute-force password attacks on the system. This parameter specifies the period of time that an account will remain locked after the specified number of failed logon attempts."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": "Verifies 'Account lockout threshold' is not set to '0'",
             "kind": "test_ref",
             "negate": false,
@@ -54,59 +104,23 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:253297",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.windows2025:def:278033",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "WN25-AC-000010 - Windows Server 2025 account lockout duration must be configured to 15 minutes or greater."
-          },
-          {
-            "attributes": {
-              "family": "windows"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Microsoft Windows Server 2025"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "When enabled, the account lockout feature prevents brute-force password attacks on the system. This parameter specifies the period of time that an account will remain locked after the specified number of failed logon attempts."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows2025:def:278033",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253297"
+    },
+    {
+      "attribute": "id",
+      "element": "definition",
+      "from": "oval:mil.disa.stig.windows2025:def:278033",
+      "kind": "definition:id",
+      "to": "oval:mil.disa.stig.windows2025:def:278033"
+    },
     {
       "attribute": "id",
       "element": "definition",
@@ -136,18 +150,25 @@
       "to": "oval:mil.disa.stig.win:tst:25329801"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows2025:def:278033",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253297"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.win:tst:25329801",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.win:obj:20000001"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.win:tst:25329801",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.win:ste:25329801"
     },
     {
       "attribute": "id",
-      "element": "definition",
-      "from": "oval:mil.disa.stig.windows2025:def:278033",
-      "kind": "definition:id",
-      "to": "oval:mil.disa.stig.windows2025:def:278033"
+      "element": "lockoutpolicy_test",
+      "from": "oval:mil.disa.stig.win:tst:25329801",
+      "kind": "lockoutpolicy_test:id",
+      "to": "oval:mil.disa.stig.win:tst:25329801"
     },
     {
       "attribute": "object_ref",
@@ -169,27 +190,6 @@
       "from": "oval:mil.disa.stig.win:tst:25329701",
       "kind": "lockoutpolicy_test:id",
       "to": "oval:mil.disa.stig.win:tst:25329701"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:25329801",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.win:obj:20000001"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:25329801",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.win:ste:25329801"
-    },
-    {
-      "attribute": "id",
-      "element": "lockoutpolicy_test",
-      "from": "oval:mil.disa.stig.win:tst:25329801",
-      "kind": "lockoutpolicy_test:id",
-      "to": "oval:mil.disa.stig.win:tst:25329801"
     },
     {
       "attribute": "object_ref",
@@ -229,20 +229,6 @@
     {
       "attribute": "id",
       "element": "lockoutpolicy_state",
-      "from": "oval:mil.disa.stig.win:ste:25329700",
-      "kind": "lockoutpolicy_state:id",
-      "to": "oval:mil.disa.stig.win:ste:25329700"
-    },
-    {
-      "attribute": "id",
-      "element": "lockoutpolicy_state",
-      "from": "oval:mil.disa.stig.win:ste:25329701",
-      "kind": "lockoutpolicy_state:id",
-      "to": "oval:mil.disa.stig.win:ste:25329701"
-    },
-    {
-      "attribute": "id",
-      "element": "lockoutpolicy_state",
       "from": "oval:mil.disa.stig.win:ste:25329801",
       "kind": "lockoutpolicy_state:id",
       "to": "oval:mil.disa.stig.win:ste:25329801"
@@ -250,9 +236,23 @@
     {
       "attribute": "id",
       "element": "lockoutpolicy_state",
+      "from": "oval:mil.disa.stig.win:ste:25329700",
+      "kind": "lockoutpolicy_state:id",
+      "to": "oval:mil.disa.stig.win:ste:25329700"
+    },
+    {
+      "attribute": "id",
+      "element": "lockoutpolicy_state",
       "from": "oval:mil.disa.stig.win:ste:25329702",
       "kind": "lockoutpolicy_state:id",
       "to": "oval:mil.disa.stig.win:ste:25329702"
+    },
+    {
+      "attribute": "id",
+      "element": "lockoutpolicy_state",
+      "from": "oval:mil.disa.stig.win:ste:25329701",
+      "kind": "lockoutpolicy_state:id",
+      "to": "oval:mil.disa.stig.win:ste:25329701"
     }
   ],
   "dependency_integrity": {
@@ -361,7 +361,8 @@
     "ambiguous_native_mapping": "requires_review",
     "core_logic_model": "explicit",
     "platform_specific_nodes": "losslessly_preserved",
-    "policy_intent_inference": "forbidden"
+    "policy_intent_inference": "forbidden",
+    "static_variable_evaluation": "conservative_exact_only"
   },
   "reference_graph": {
     "oval:mil.disa.stig.defs:def:253297": [
@@ -406,13 +407,33 @@
       "oval:mil.disa.stig.windows2025:def:278033"
     ]
   },
-  "semantic_ir_sha256": "f5ccd6618e7db71c6e48870b9f5370672aba87ab38ca28e2c866a4d14bef2d34",
+  "semantic_ir_sha256": "f65a4b3e4c9f6449643a9926676a96a9c04169ba449c144a80a8b689c837d50b",
   "source": {
     "bytes": 5044,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278033r1180805_rule/oval.xml",
-    "sha256": "d81004414b63cc54a62b3feeaa18243db80a46fb7e09cd95b760e79462e738af"
+    "sha256": "bb18f1c804155f78b7ac409cf9f970bdd08f1aafd7a59dea851e2d315d64795b"
   },
   "states": [
+    {
+      "comment": "Lockout Threshold is greater than 0",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than"
+          },
+          "kind": "element",
+          "name": "lockout_threshold",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "0"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:25329801",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "lockoutpolicy_state",
+      "version": "1"
+    },
     {
       "comment": "Lockout Duration equals -1",
       "entities": [
@@ -429,46 +450,6 @@
         }
       ],
       "id": "oval:mil.disa.stig.win:ste:25329700",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "lockoutpolicy_state",
-      "version": "1"
-    },
-    {
-      "comment": "Lockout Duration equals 4294967295",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "equals"
-          },
-          "kind": "element",
-          "name": "lockout_duration",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "4294967295"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:25329701",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "lockoutpolicy_state",
-      "version": "1"
-    },
-    {
-      "comment": "Lockout Threshold is greater than 0",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than"
-          },
-          "kind": "element",
-          "name": "lockout_threshold",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "0"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:25329801",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "lockoutpolicy_state",
@@ -494,36 +475,29 @@
       "operator": "AND",
       "type": "lockoutpolicy_state",
       "version": "1"
+    },
+    {
+      "comment": "Lockout Duration equals 4294967295",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "equals"
+          },
+          "kind": "element",
+          "name": "lockout_duration",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "4294967295"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:25329701",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "lockoutpolicy_state",
+      "version": "1"
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "'Account lockout duration' is set to '15 minutes' or greater",
-      "id": "oval:mil.disa.stig.win:tst:25329701",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:20000001"
-          },
-          "object_ref": "oval:mil.disa.stig.win:obj:20000001"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.win:ste:25329702"
-          },
-          "state_ref": "oval:mil.disa.stig.win:ste:25329702"
-        }
-      ],
-      "type": "lockoutpolicy_test",
-      "version": "2"
-    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -546,6 +520,33 @@
             "state_ref": "oval:mil.disa.stig.win:ste:25329801"
           },
           "state_ref": "oval:mil.disa.stig.win:ste:25329801"
+        }
+      ],
+      "type": "lockoutpolicy_test",
+      "version": "2"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "'Account lockout duration' is set to '15 minutes' or greater",
+      "id": "oval:mil.disa.stig.win:tst:25329701",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.win:obj:20000001"
+          },
+          "object_ref": "oval:mil.disa.stig.win:obj:20000001"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.win:ste:25329702"
+          },
+          "state_ref": "oval:mil.disa.stig.win:ste:25329702"
         }
       ],
       "type": "lockoutpolicy_test",
@@ -586,5 +587,6 @@
     }
   ],
   "unresolved_references": [],
+  "variable_resolution": {},
   "variables": []
 }

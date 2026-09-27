@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "Defaults timestamp_timeout is configured to a positive number in /etc/sudoers or /etc/sudoers.d.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:27401400"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:274014",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must require re-authentication when using the \"sudo\" command."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:274014",
             "kind": "definition_ref",
@@ -49,58 +84,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Defaults timestamp_timeout is configured to a positive number in /etc/sudoers or /etc/sudoers.d.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:27401400"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:274014",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must require re-authentication when using the \"sudo\" command."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258084",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:274014"
-    },
-    {
-      "attribute": "id",
-      "element": "definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258084",
-      "kind": "definition:id",
-      "to": "oval:mil.disa.stig.rhel9os:def:258084"
-    },
     {
       "attribute": "id",
       "element": "definition",
@@ -114,6 +100,20 @@
       "from": "oval:mil.disa.stig.defs:def:274014",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:27401400"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258084",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:274014"
+    },
+    {
+      "attribute": "id",
+      "element": "definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258084",
+      "kind": "definition:id",
+      "to": "oval:mil.disa.stig.rhel9os:def:258084"
     },
     {
       "attribute": "object_ref",
@@ -139,9 +139,9 @@
     {
       "attribute": "id",
       "element": "textfilecontent54_object",
-      "from": "oval:mil.disa.stig.ind:obj:23764301",
+      "from": "oval:mil.disa.stig.ind:obj:23764300",
       "kind": "textfilecontent54_object:id",
-      "to": "oval:mil.disa.stig.ind:obj:23764301"
+      "to": "oval:mil.disa.stig.ind:obj:23764300"
     },
     {
       "attribute": null,
@@ -167,9 +167,9 @@
     {
       "attribute": "id",
       "element": "textfilecontent54_object",
-      "from": "oval:mil.disa.stig.ind:obj:23764300",
+      "from": "oval:mil.disa.stig.ind:obj:23764301",
       "kind": "textfilecontent54_object:id",
-      "to": "oval:mil.disa.stig.ind:obj:23764300"
+      "to": "oval:mil.disa.stig.ind:obj:23764301"
     },
     {
       "attribute": "id",
@@ -277,6 +277,70 @@
       "children": [
         {
           "attributes": {
+            "ignore_case": "true"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/sudoers"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*Defaults\\s+timestamp_timeout\\s*=\\s*([-\\d]+)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:23764300",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23764300"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23764301"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:23764302",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
             "ignore_case": "true",
             "max_depth": "-1",
             "recurse_direction": "down"
@@ -324,77 +388,14 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23764300"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23764301"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23764302",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "ignore_case": "true"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        },
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/sudoers"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*Defaults\\s+timestamp_timeout\\s*=\\s*([-\\d]+)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23764300",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
     "ambiguous_native_mapping": "requires_review",
     "core_logic_model": "explicit",
     "platform_specific_nodes": "losslessly_preserved",
-    "policy_intent_inference": "forbidden"
+    "policy_intent_inference": "forbidden",
+    "static_variable_evaluation": "conservative_exact_only"
   },
   "reference_graph": {
     "oval:mil.disa.stig.defs:def:274014": [
@@ -425,11 +426,11 @@
       "oval:mil.disa.stig.rhel9os:def:258084"
     ]
   },
-  "semantic_ir_sha256": "63eb10972fd5248c6d3d370f5a49d3df499aacac8c3e09b86413963c31ab8aa6",
+  "semantic_ir_sha256": "781687bcaabbc24d30c78610935ea080a2f7d98d05b281d65a77b96b5ba26760",
   "source": {
     "bytes": 4306,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258084r1050789_rule/oval.xml",
-    "sha256": "af74b02de6a1f54b453036ef6e741d4238b108f444aee486a0c7e1f42e705680"
+    "sha256": "80260a953c58118ee79930fc75c0c304a7b92813f8dd1745e6b47cb507568c99"
   },
   "states": [
     {
@@ -483,5 +484,6 @@
     }
   ],
   "unresolved_references": [],
+  "variable_resolution": {},
   "variables": []
 }

@@ -4,19 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271712" version="1" class="compliance">
-          <metadata>
-            <title>OL09-00-002349 - OL 9 SSH daemon must not allow known hosts authentication.</title>
-            <affected family="unix">
-              <platform>Oracle Linux 9</platform>
-            </affected>
-            <description>Configuring the IgnoreUserKnownHosts setting for the SSH daemon provides additional assurance that remote login via SSH will require a password, even in the event of misconfiguration elsewhere.</description>
-          </metadata>
-          <criteria>
-            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258006"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.defs:def:258006" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258006" version="2" class="compliance">
           <metadata>
             <title>The operating system SSH daemon must not allow authentication using known host's authentication.</title>
             <description/>
@@ -29,24 +17,31 @@
             </criteria>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271712" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-002349 - OL 9 SSH daemon must not allow known hosts authentication.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Configuring the IgnoreUserKnownHosts setting for the SSH daemon provides additional assurance that remote login via SSH will require a password, even in the event of misconfiguration elsewhere.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258006"/>
+          </criteria>
+        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25800601" version="1" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config.d:IgnoreUserKnownHosts == yes">
           <object object_ref="oval:mil.disa.stig.ind:obj:25800601"/>
-          <state state_ref="oval:mil.disa.stig.ind:ste:20000016"/>
-        </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25800600" version="1" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config:IgnoreUserKnownHosts == yes">
-          <object object_ref="oval:mil.disa.stig.ind:obj:25800600"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000016"/>
         </textfilecontent54_test>
         <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25798801" version="1" check_existence="at_least_one_exists" check="at least one" comment="sshd_config includes sshd_config.d">
           <object object_ref="oval:mil.disa.stig.ind:obj:25798800"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25798801"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25800600" version="1">
-          <filepath>/etc/ssh/sshd_config</filepath>
-          <pattern operation="pattern match">^\s*(?i)IgnoreUserKnownHosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798800" version="1" comment="sshd_config includes">
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25800600" version="1" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config:IgnoreUserKnownHosts == yes">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25800600"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:20000016"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798800" version="1" comment="sshd_config includes">
           <behaviors ignore_case="true"/>
           <filepath datatype="string">/etc/ssh/sshd_config</filepath>
           <pattern operation="pattern match">^\s*include\s+(.*)\s*$</pattern>
@@ -55,6 +50,11 @@
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25800601" version="1">
           <path>/etc/ssh/sshd_config.d</path>
           <filename datatype="string" operation="pattern match">^.+\.conf$</filename>
+          <pattern operation="pattern match">^\s*(?i)IgnoreUserKnownHosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25800600" version="1">
+          <filepath>/etc/ssh/sshd_config</filepath>
           <pattern operation="pattern match">^\s*(?i)IgnoreUserKnownHosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>

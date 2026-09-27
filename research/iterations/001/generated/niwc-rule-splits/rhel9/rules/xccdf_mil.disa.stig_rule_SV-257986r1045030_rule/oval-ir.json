@@ -139,20 +139,6 @@
     {
       "attribute": "id",
       "element": "textfilecontent54_object",
-      "from": "oval:mil.disa.stig.ind:obj:25798602",
-      "kind": "textfilecontent54_object:id",
-      "to": "oval:mil.disa.stig.ind:obj:25798602"
-    },
-    {
-      "attribute": "id",
-      "element": "textfilecontent54_object",
-      "from": "oval:mil.disa.stig.ind:obj:25798601",
-      "kind": "textfilecontent54_object:id",
-      "to": "oval:mil.disa.stig.ind:obj:25798601"
-    },
-    {
-      "attribute": "id",
-      "element": "textfilecontent54_object",
       "from": "oval:mil.disa.stig.ind:obj:25798600",
       "kind": "textfilecontent54_object:id",
       "to": "oval:mil.disa.stig.ind:obj:25798600"
@@ -169,6 +155,20 @@
       "element": "object_reference",
       "from": "oval:mil.disa.stig.ind:obj:25798600",
       "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:25798602"
+    },
+    {
+      "attribute": "id",
+      "element": "textfilecontent54_object",
+      "from": "oval:mil.disa.stig.ind:obj:25798601",
+      "kind": "textfilecontent54_object:id",
+      "to": "oval:mil.disa.stig.ind:obj:25798601"
+    },
+    {
+      "attribute": "id",
+      "element": "textfilecontent54_object",
+      "from": "oval:mil.disa.stig.ind:obj:25798602",
+      "kind": "textfilecontent54_object:id",
       "to": "oval:mil.disa.stig.ind:obj:25798602"
     },
     {
@@ -266,42 +266,22 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config.d"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^.+\\.conf$"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*UsePAM\\s+(\\w*)"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25798601"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25798602"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
         }
       ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25798602",
+      "comment": "UsePAM in all sshd_config and sshd_config.d/* files",
+      "id": "oval:mil.disa.stig.ind:obj:25798600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
@@ -343,22 +323,42 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25798601"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25798602"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config.d"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^.+\\.conf$"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*UsePAM\\s+(\\w*)"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
         }
       ],
-      "comment": "UsePAM in all sshd_config and sshd_config.d/* files",
-      "id": "oval:mil.disa.stig.ind:obj:25798600",
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:25798602",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
@@ -368,7 +368,8 @@
     "ambiguous_native_mapping": "requires_review",
     "core_logic_model": "explicit",
     "platform_specific_nodes": "losslessly_preserved",
-    "policy_intent_inference": "forbidden"
+    "policy_intent_inference": "forbidden",
+    "static_variable_evaluation": "conservative_exact_only"
   },
   "reference_graph": {
     "oval:mil.disa.stig.defs:def:257986": [
@@ -399,11 +400,11 @@
       "oval:mil.disa.stig.rhel9os:def:257986"
     ]
   },
-  "semantic_ir_sha256": "217913fb2f8cb754921c47604ddb2581ab2a33d6fa3331dec0838fc0c6a8b2e4",
+  "semantic_ir_sha256": "5bbd95ec1db8ed750e4bb095ded9a61cd5abf51444f81cac92b9f4d6527f95df",
   "source": {
     "bytes": 4002,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257986r1045030_rule/oval.xml",
-    "sha256": "7dc8ff4e0bd2a4a36abe0ebc3ba08e1d25a08be46b5572f61b3d9d943713f92d"
+    "sha256": "0406d5fe3ba71d4a8580b52a23761f120140ca5cb1457c4b4734038b02bd391a"
   },
   "states": [
     {
@@ -453,5 +454,6 @@
     }
   ],
   "unresolved_references": [],
+  "variable_resolution": {},
   "variables": []
 }
