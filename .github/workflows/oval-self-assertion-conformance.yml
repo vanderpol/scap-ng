@@ -75,3 +75,21 @@ jobs:
           git commit -m "Generate OVAL Self-Assertion conformance inventory"
           git pull --rebase origin main
           git push
+
+      - name: Enforce agnostic importer gate
+        working-directory: scap-ng
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("research/iterations/001/generated/oval-self-assertion/agnostic-conformance-inventory.json")
+          d=json.loads(p.read_text())
+          failures=[]
+          if d["parse_failure_count"]:
+              failures.append(f'{d["parse_failure_count"]} parse failures')
+          if d["unresolved_reference_file_count"]:
+              failures.append(f'{d["unresolved_reference_file_count"]} files with unresolved references')
+          if failures:
+              raise SystemExit("OVAL Self-Assertion gate failed: " + ", ".join(failures))
+          print("PASS: all agnostic Self-Assertion documents parsed with complete dependency closure")
+          PY
