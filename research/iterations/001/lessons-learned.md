@@ -91,35 +91,37 @@ Collection errors and applicability decisions use separate structured reason/app
 
 See `result-explanation-model.md`.
 
-## 13. Real OVAL shows that derivation is a core semantic need
+## 13. Complex-language hypotheses must be revalidated against published NIWC content
 
-Local variables, object components, regex capture, defaults, unique counts, and dynamic expected values appear in the selected real definitions.
+Earlier development-repository experiments suggested useful ideas around derivation, quantifiers, semantic capabilities, and reuse. Those examples are no longer part of the published-content evidence corpus.
 
-**Lesson:** SCAP-NG likely needs a first-class deterministic `derive` layer between collection and assertion. It should be typed, side-effect-free, and evidence-traceable rather than recreating arbitrary procedural scripting.
+**Lesson:** keep the architectural hypotheses, but do not cite them as real-world proof until the same semantic pressures are reproduced from pinned NIWC `Current/` packages.
 
-## 14. Empty-population semantics must be explicit
+The first depth pass now uses RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025.
 
-The RHEL umask example demonstrates that universal quantification and required existence are separate requirements.
+## 14. Cross-platform reuse should be measured, not assumed
 
-**Lesson:** Quantifiers must not accidentally make empty populations compliant. Cardinality/existence constraints need explicit, composable semantics.
+RHEL 9 and Oracle Linux 9 are intentionally paired to quantify overlap. Windows 11 and Windows Server 2025 provide a second reuse axis.
 
-## 15. Many OVAL sets/filters can become semantic population assertions
+**Lesson:** report several overlap levels separately: shared policy references, similar wording, equivalent OVAL semantics, exact reusable assessments, and parameterizable reusable assessments. Similarity alone does not justify automation reuse.
 
-Large definitions often use set/filter graphs to construct violating populations.
+## 15. Published-source provenance is part of the prototype
 
-**Lesson:** Collection scopes + quantifiers + predicates may replace much OVAL set/filter authoring. General set algebra should not be removed until corpus analysis proves it unnecessary.
+A migration case is useful evidence only if it can be traced to the exact signed NIWC publication artifact.
 
-## 16. High-level capabilities reduce content complexity by centralizing semantics
+**Lesson:** every real-world prototype needs the pinned repository revision, ZIP path/digest, component identity, XCCDF rule, and OVAL definition provenance.
 
-Package verification, normalized audit rules, effective crypto policy, and PostgreSQL instance/settings collection substantially reduce individual assessment size.
+## 16. Full-corpus breadth follows priority-platform depth
 
-**Lesson:** This is beneficial only if capability contracts are standardized and conformance-tested. Complexity moved into an interoperable reusable capability is a win; complexity hidden in vendor-specific scanner behavior is not.
+The four priority platforms are for learning quickly from current content; they do not reduce the final conversion obligation.
 
-## 17. Existing shell-command duplication exposes real reuse opportunities
+**Lesson:** prototype deeply on the four anchors, then run the same converter across every individual benchmark in the pinned NIWC `Current/` corpus before specification finalization.
 
-Two PostgreSQL rules and four RHEL audit syscall rules collapse naturally into parameterized assessments.
+## 17. Experimental content must remain visibly separate from evidence
 
-**Lesson:** Reuse should be demonstrated and validated against existing content, not just synthetic examples.
+Development and prototype repositories are valuable for experimentation but can blur the line between published behavior and research assumptions.
+
+**Lesson:** experimental content may motivate a hypothesis, but only pinned published NIWC content can substantiate public-corpus migration findings in iteration 001.
 
 ## 18. SCAP 1.4 conversion constrains every authoring experiment
 

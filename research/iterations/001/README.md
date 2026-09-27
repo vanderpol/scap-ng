@@ -7,6 +7,8 @@ Iteration 001 is intentionally **not a draft specification** and remains our int
 
 **SCAP 1.4 forward conversion is a hard requirement.** Every architecture and authoring-syntax experiment in this iteration must remain capable of representing content converted from existing SCAP 1.4 datastreams through the same faithful semantic model.
 
+Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content-library/Current` corpus. The first depth pass focuses on RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025; the final conversion gate covers every individual benchmark in the pinned `Current/` tree.
+
 ## Contents
 
 - `preliminary-architecture-discussion.md` — consolidated architecture discussion and rationale.
@@ -16,6 +18,7 @@ Iteration 001 is intentionally **not a draft specification** and remains our int
 - `complex-oval-prototype-backlog.md` — ranked real-world OVAL cases selected for semantic stress testing.
 - `real-world-oval-findings.md` — requirements and observations learned by translating those OVAL cases.
 - `scap14-public-corpus-conversion-requirement.md` — hard pre-specification conversion gates for the versioned public SCAP 1.4 corpus.
+- `semantic-ir.md` — one faithful SCAP 1.4 semantic model feeding all authoring/rendering formats.
 - `public-corpus-manifest.yaml` — pinned public sources used for repeatable conversion coverage.
 - `prototypes/full-benchmarks/` — primary file-oriented benchmark prototypes, results, and signed bundles.
 - `feedback/` — questionnaire, response template, response evidence, and decision register.

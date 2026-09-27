@@ -7,7 +7,7 @@
 
 Before the SCAP-NG specification is considered ready to finalize, the project must demonstrate repeatable forward conversion of the declared public SCAP 1.4 corpus.
 
-This is not satisfied by hand-converting representative examples.
+This is not satisfied by hand-converting representative examples. For iteration 001, the authoritative public corpus is the pinned NIWC Atlantic `scap-content-library/Current` tree recorded in `public-corpus-manifest.yaml`.
 
 The demonstration must use an automated corpus converter and a versioned corpus manifest so an independent reviewer can rerun the same test.
 
@@ -26,6 +26,19 @@ Each corpus source must record, where applicable:
 - acquisition notes.
 
 The manifest may grow over time. A published conversion report is meaningful only relative to a specific manifest revision.
+
+## Priority depth pass
+
+Before attempting native conversion across the whole corpus, iteration 001 will develop and stress the semantic IR against four current published anchors:
+
+- RHEL 9;
+- Oracle Linux 9;
+- Windows 11;
+- Windows Server 2025.
+
+RHEL 9 and Oracle Linux 9 are paired to quantify Linux cross-distribution reuse. Windows 11 and Windows Server 2025 are paired to quantify client/server reuse.
+
+These priorities do not weaken the final all-benchmark gate.
 
 ## Conversion pipeline
 
