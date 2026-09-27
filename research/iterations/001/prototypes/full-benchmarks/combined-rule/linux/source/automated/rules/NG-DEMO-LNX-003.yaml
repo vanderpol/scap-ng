@@ -1,0 +1,22 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: NG-DEMO-LNX-003
+  title: Illustrative OpenSSH server package must meet the minimum supported version
+  severity: medium
+  references:
+    source: illustrative Linux STIG-like policy
+    cci: [CCI-DEMO-LNX-003]
+  discussion: This rule demonstrates typed package-version comparison.
+  check: Verify the installed OpenSSH server package version is at least 8.7.
+  fix: Upgrade the OpenSSH server package to a supported version.
+  assessment:
+    id: demo.linux.openssh-minimum-version
+    version: 1
+    collect:
+      package: {capability: package.inventory, name: openssh-server, fields: [installed, version]}
+    assert:
+      all:
+        - compare: {subject: package_installed, actual: "$package.installed", op: eq, expected: true}
+        - compare: {subject: package_version, actual: "$package.version", op: version_ge, expected: "8.7"}

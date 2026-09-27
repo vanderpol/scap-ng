@@ -1,0 +1,22 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: NG-DEMO-LNX-004
+  title: Illustrative IPv4 redirect acceptance must be disabled in all and default scopes
+  severity: medium
+  references:
+    source: illustrative Linux STIG-like policy
+    cci: [CCI-DEMO-LNX-004]
+  discussion: Both effective sysctl values must be disabled.
+  check: Verify net.ipv4.conf.all.accept_redirects and net.ipv4.conf.default.accept_redirects are both 0.
+  fix: Set both redirect-acceptance sysctl values to 0 and apply them.
+  assessment:
+    id: demo.linux.ipv4-redirects-disabled
+    version: 1
+    collect:
+      sysctl: {capability: linux.sysctl.effective-values, keys: [net.ipv4.conf.all.accept_redirects, net.ipv4.conf.default.accept_redirects]}
+    assert:
+      all:
+        - compare: {subject: all_accept_redirects, actual: "$sysctl.net.ipv4.conf.all.accept_redirects", op: eq, expected: 0}
+        - compare: {subject: default_accept_redirects, actual: "$sysctl.net.ipv4.conf.default.accept_redirects", op: eq, expected: 0}

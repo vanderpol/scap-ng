@@ -1,0 +1,27 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: NG-DEMO-LNX-005
+  title: Illustrative NFS export policy must be hardened when the NFS server is installed
+  severity: medium
+  references:
+    source: illustrative Linux STIG-like policy
+    cci: [CCI-DEMO-LNX-005]
+  discussion: The requirement only applies to systems providing NFS server functionality.
+  check: If the NFS server package is installed, verify exports do not use the illustrative prohibited option.
+  fix: Remove prohibited NFS export options.
+  applicability_text: Applicable only when the NFS server package is installed.
+  assessment:
+    id: demo.linux.nfs-export-policy
+    version: 1
+    collect:
+      nfs_package: {capability: package.inventory, name: nfs-utils, fields: [installed]}
+      exports: {capability: linux.nfs.effective-exports, fields: [path, options]}
+    applies_when:
+      compare: {actual: "$nfs_package.installed", op: eq, expected: true}
+    assert:
+      none:
+        item: "$exports"
+        condition:
+          contains: {actual: "$item.options", value: no_root_squash}
