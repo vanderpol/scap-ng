@@ -11,6 +11,7 @@ import argparse
 import importlib.util
 import json
 import decimal
+import ipaddress
 import re
 from collections import Counter
 from pathlib import Path
@@ -102,6 +103,29 @@ def cast_value(value, datatype):
         if len(cleaned)%2 or any(ch not in "0123456789abcdef" for ch in cleaned):
             raise ValueError(f"invalid binary {text!r}")
         return bytes.fromhex(cleaned)
+    if datatype=="version":
+        parts=[int(x) for x in re.findall(r"[0-9]+",text)]
+        if not parts:
+            raise ValueError(f"invalid version {text!r}")
+        return tuple(parts)
+    if datatype=="ipv4_address":
+        address,prefix=(text.split("/",1)+[None])[:2] if "/" in text else (text,None)
+        octets=address.split(".")
+        if len(octets)!=4:
+            raise ValueError(f"invalid IPv4 address {text!r}")
+        normalized=".".join(str(int(x,10)) for x in octets)
+        if prefix is None:
+            prefix="32"
+        elif "." in prefix:
+            mask_octets=prefix.split(".")
+            if len(mask_octets)!=4:
+                raise ValueError(f"invalid IPv4 netmask {text!r}")
+            mask_norm=".".join(str(int(x,10)) for x in mask_octets)
+            prefix=str(ipaddress.IPv4Network(f"0.0.0.0/{mask_norm}").prefixlen)
+        return ipaddress.IPv4Network(f"{normalized}/{prefix}",strict=False)
+    if datatype=="ipv6_address":
+        value=text if "/" in text else text+"/128"
+        return ipaddress.IPv6Network(value,strict=False)
     raise NotImplementedError(datatype)
 
 
@@ -118,6 +142,29 @@ def compare_value(actual, expected, datatype, operation):
         return None,f"unsupported_datatype:{datatype}"
     except (ValueError,decimal.InvalidOperation):
         return None,f"datatype_cast_error:{datatype}"
+
+    if datatype=="version":
+        size=max(len(left),len(right))
+        left=left+(0,)*(size-len(left))
+        right=right+(0,)*(size-len(right))
+
+    if datatype in {"ipv4_address","ipv6_address"}:
+        if operation=="subset of":
+            return left.subnet_of(right),None
+        if operation=="superset of":
+            return left.supernet_of(right),None
+        if operation in {"greater than","greater than or equal","less than","less than or equal"}:
+            if left.prefixlen!=right.prefixlen:
+                return None,"ip_prefix_mismatch_requires_error_semantics"
+            left_key=int(left.network_address)
+            right_key=int(right.network_address)
+            if operation=="greater than":
+                return left_key>right_key,None
+            if operation=="greater than or equal":
+                return left_key>=right_key,None
+            if operation=="less than":
+                return left_key<right_key,None
+            return left_key<=right_key,None
 
     if operation=="equals":
         return left==right,None
