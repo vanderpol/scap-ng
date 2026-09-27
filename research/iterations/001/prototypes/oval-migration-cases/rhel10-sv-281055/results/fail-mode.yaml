@@ -1,0 +1,21 @@
+outcome: fail
+assessment: migration.rhel10.audit-log-directory-mode
+decision:
+  branch: alternate-group-mode
+  condition: {subject: effective_log_group, actual: audit, operator: ne, expected: root, outcome: pass}
+explanation:
+  expression_ref: alternate-group-mode
+  kind: all
+  outcome: fail
+  decisive:
+    - kind: bitmask
+      subject: log_directory_mode
+      actual: "0770"
+      operator: bitmask_clear
+      expected_mask: "0027"
+      outcome: fail
+      evidence_refs: [ev-dir]
+evidence:
+  ev-dir: {path: /var/log/audit, mode: "0770", group: audit}
+evaluation: {outcome_complete: true, diagnostics_complete: true}
+summary: "Failed: /var/log/audit is mode 0770; group write is not permitted for the alternate-group policy."

@@ -1,0 +1,38 @@
+scap_ng: 0.1-prototype
+prototype: true
+rule:
+  id: SV-226208
+  title: The Windows Store application must be turned off.
+  references: {stig: SV-226208r794444}
+  policy_metadata_status: incomplete_from_oval_only
+  assessment:
+      id: migration.windows.store-disabled
+      version: 1
+      collect:
+        winstore:
+          capability: filesystem.entry
+          path: 'C:\\Windows\\WinStore'
+        remove_store_policy:
+          capability: windows.registry.value
+          hive: HKEY_LOCAL_MACHINE
+          key: 'SOFTWARE\\Policies\\Microsoft\\WindowsStore'
+          name: RemoveWindowsStore
+      applies_when:
+        compare:
+          subject: winstore_present
+          actual: "$winstore.exists"
+          op: eq
+          expected: true
+      assert:
+        all:
+          - compare:
+              subject: remove_windows_store_value_exists
+              actual: "$remove_store_policy.exists"
+              op: eq
+              expected: true
+          - compare:
+              subject: remove_windows_store
+              actual: "$remove_store_policy.value"
+              op: eq
+              expected: 1
+    
