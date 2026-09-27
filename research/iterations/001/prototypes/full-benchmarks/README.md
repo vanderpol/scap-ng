@@ -5,13 +5,22 @@ These are the primary iteration 001 architecture prototypes. Each model/platform
 Each pair includes:
 
 - human-readable authoring source;
-- a policy-only benchmark source;
+- a complete policy-only seven-rule benchmark definition;
 - automation source where applicable;
 - complete policy-only manual scan results;
 - complete automated/mixed-method scan results;
-- two actual `.scapng` ZIP-compatible bundles (policy-only and resolved automated);
-- sidecar manifest/signature files for review.
+- an actual resolved automated `.scapng` ZIP-compatible bundle;
+- benchmark/profile, individual rule or policy objects, assessment/binding objects where applicable, provenance, a member-hash manifest, and a prototype digital signature inside the bundle.
 
-The `.scapng` archives themselves contain the proposed redistributable directory structure: benchmark/profile documents, individual policy/rule documents, assessment/binding documents where applicable, provenance, a member-hash manifest, and a prototype digital signature.
+The build tool in `research/iterations/001/tools/build_full_benchmarks.py` can also emit policy-only bundles from the committed policy sources. The four committed binary bundles are the scanner-facing automated examples used for architecture comparison.
 
-All content is illustrative. It is not an official DISA baseline.
+The same logical policy and automated outcomes are used in both architecture tracks so the comparison tests organization and lifecycle behavior rather than different security semantics.
+
+## Committed scanner-facing bundles
+
+- combined-rule / Windows automated
+- combined-rule / Linux automated
+- split-policy-assessment-binding / Windows automated
+- split-policy-assessment-binding / Linux automated
+
+All content is illustrative. It is not an official DISA baseline. The prototype signatures use a public RFC 8032 Ed25519 test key and demonstrate package integrity/signature mechanics only; they provide no publisher trust.
