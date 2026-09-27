@@ -1,34 +1,50 @@
-# OVAL Migration Case Prototypes
+# Published NIWC SCAP 1.4 Migration Prototypes
 
-These examples translate difficult existing OVAL definitions from `vanderpol/scap-content` into candidate SCAP-NG structures. The current corpus has 12 migration-case directories covering 16 source OVAL definitions.
+**Iteration:** 001  
+**Authoritative research source:** `niwc-atlantic/scap-content-library/Current`  
+**Pinned revision:** `8c8e5dff860af6b1290ee9273a282db24278f8d5`
 
-They are **semantic research cases**, not official replacement content and not yet conformance examples.
+Only content extracted from the pinned NIWC public `Current/` publication tree may be used as real-world migration evidence in this directory.
 
-Each case is intended to answer four questions:
+Earlier prototypes sourced from development/experimental repositories were removed so they cannot be confused with published SCAP 1.4 evidence.
 
-1. Can the OVAL semantics be represented natively without silent loss?
-2. Is the NG source easier for an author/reviewer to understand?
-3. Can a scanner collect the evidence efficiently using semantic capabilities?
-4. Can the result explain a failure without reconstructing the complete OVAL graph?
+## Source requirement
 
-Where useful, both architecture candidates are shown:
+Every future case SHALL record:
 
-- `split/assessment.yaml` — reusable assessment object;
-- `combined/rule.yaml` or shared-rule + overlay — policy and automation together.
+- NIWC repository revision;
+- exact `Current/<published-zip>` path;
+- SHA-256 of the published ZIP;
+- internal datastream/component identity;
+- XCCDF Rule identifier;
+- OVAL Definition identifier(s);
+- source-component digest where practical.
 
-Result fixtures use the decisive-outcome explanation model from `../../result-explanation-model.md`.
+A case is not admitted into this corpus merely because an equivalent-looking definition exists elsewhere.
 
-## Implemented cases
+## Workflow
 
-| Case | OVAL semantics stressed |
-|---|---|
-| RHEL 10 SV-281055 | nested AND/OR, sets/filters, local variables, derived path, default/alternate branch, mode bits |
-| RHEL 8 SV-230385 | check=all + at_least_one_exists, regex matching, required population in three files |
-| Windows Server 2012 SV-226208 | OVAL OR used to encode policy N/A, existence + registry state |
-| PostgreSQL 16 SV-261875 | multi-valued external variable, object expansion, check=all |
-| RHEL 10 SV-281050 / SV-281053 | local variables, regex capture, concat/group lookup, dynamic expected GID |
-| PostgreSQL 16 SV-261956 / SV-261957 | opaque shellcommand decomposed into instance discovery + typed DB settings + universal assertion |
+```text
+NIWC Current signed ZIP
+        |
+        v
+safe extraction + component inventory
+        |
+        v
+faithful SCAP 1.4 semantic IR
+        |
+        +----------------------+
+        |                      |
+        v                      v
+original NG YAML      Ansible-inspired NG YAML
+        \                      /
+         \                    /
+          v                  v
+            canonical NG semantics
+```
 
-## Migration status
+Both YAML forms are generated/rendered from the same semantic IR.
 
-These are `prototype_native_translation` examples. They have not yet completed differential execution against the original OVAL and therefore must not be labeled `exact_native`.
+## Current status
+
+The corpus is intentionally empty after the evidence-boundary reset. It will be repopulated from the pinned NIWC public corpus using the automated corpus mining/conversion tooling.
