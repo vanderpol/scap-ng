@@ -57,12 +57,19 @@ def main():
         for child in root:
             kind=child.tag.rsplit("}",1)[-1]
             if kind=="element" and child.get("name"):
+                annotation_text=" ".join(
+                    text(n)
+                    for n in child
+                    if n.tag.rsplit("}",1)[-1]=="annotation"
+                )
                 row={
                     "name":child.get("name"),
                     "namespace":target,
                     "type":child.get("type"),
                     "substitution_group":child.get("substitutionGroup"),
                     "schema":rel,
+                    "deprecated":"deprecat" in annotation_text.lower(),
+                    "deprecation_evidence":annotation_text if "deprecat" in annotation_text.lower() else None,
                 }
                 global_elements.append(row)
                 sub=qlocal(child.get("substitutionGroup"))
