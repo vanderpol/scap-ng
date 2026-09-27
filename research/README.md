@@ -1,0 +1,2 @@
+# SCAP Next Gen Research
+This directory is designed for saving all R&D efforts related to the creation of the SCAP next gen specification.   This is designed to help future users understand how and why this specifcation was created.
