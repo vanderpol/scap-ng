@@ -218,9 +218,28 @@ def inspect_file(path):
                 results.append({"test_id":test_id,"status":"skipped","reason":reason})
                 continue
 
+            existence=test.get("check_existence","at_least_one_exists")
+            if existence in {"all_exist","any_exist","at_least_one_exists","only_one_exists"}:
+                existence_result=True
+            elif existence=="none_exist":
+                existence_result=False
+            else:
+                results.append({"test_id":test_id,"status":"skipped","reason":"unsupported_check_existence"})
+                continue
+
+            check=test.get("check","all")
+            if check in {"all","at least one","only one"}:
+                state_result=outcome
+            elif check=="none satisfy":
+                state_result=not outcome
+            else:
+                results.append({"test_id":test_id,"status":"skipped","reason":"unsupported_test_check"})
+                continue
+
+            test_outcome=existence_result and state_result
             results.append({
                 "test_id":test_id,
-                "status":"evaluated_true" if outcome else "evaluated_false",
+                "status":"evaluated_true" if test_outcome else "evaluated_false",
                 "object_ref":object_ref,
                 "state_ref":state_ref,
                 "actual_values":actual,
@@ -240,15 +259,27 @@ def inspect_file(path):
             for result in results
         }
         cache={}
-        for definition_id in lookup:
+        for definition_id,definition in lookup.items():
             value=evaluate_definition(definition_id,lookup,test_outcomes,cache,set())
+            metadata=next((c for c in definition if local(c.tag)=="metadata"),None)
+            title=""
+            if metadata is not None:
+                title_node=next((c for c in metadata if local(c.tag)=="title"),None)
+                if title_node is not None:
+                    title=(title_node.text or "").strip()
+            expected=False if title.lower().startswith("evaluate to false") else True
+            if value is None:
+                status="skipped"
+            elif value==expected:
+                status="matches_expected"
+            else:
+                status="semantic_mismatch"
             definition_results.append({
                 "definition_id":definition_id,
-                "status":(
-                    "evaluated_true" if value is True
-                    else "evaluated_false" if value is False
-                    else "skipped"
-                ),
+                "status":status,
+                "actual":value,
+                "expected":expected,
+                "title":title,
             })
 
     return results,definition_results
@@ -291,7 +322,7 @@ def main():
         "test_counts":dict(sorted(counts.items())),
         "definition_counts":dict(sorted(definition_counts.items())),
         "definition_mismatches":[
-            x for x in definition_results_all if x["status"]=="evaluated_false"
+            x for x in definition_results_all if x["status"]=="semantic_mismatch"
         ],
         "skipped_reasons":dict(sorted(Counter(
             x.get("reason","unknown") for x in all_results if x["status"]=="skipped"
