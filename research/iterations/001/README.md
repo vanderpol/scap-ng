@@ -16,7 +16,8 @@ Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content
 - `lessons-learned.md` — implementation-derived lessons and requirements discovered while building iteration 001.
 - `result-explanation-model.md` — structured decisive-outcome explanation model for Pass/Fail diagnostics.
 - `complex-oval-prototype-backlog.md` — ranked real-world OVAL cases selected for semantic stress testing.
-- `real-world-oval-findings.md` — requirements and observations learned by translating those OVAL cases.
+- `real-world-oval-findings.md` — requirements and observations learned from pinned published NIWC STIG migration cases.
+- `oval-self-assertion-findings.md` — separate OVAL 5.12.3 language-conformance findings from the pinned Self-Assertion corpus.
 - `scap14-public-corpus-conversion-requirement.md` — hard pre-specification conversion gates for the versioned public SCAP 1.4 corpus.
 - `semantic-ir.md` — one faithful SCAP 1.4 semantic model feeding all authoring/rendering formats.
 - `public-corpus-manifest.yaml` — pinned public sources used for repeatable conversion coverage.
