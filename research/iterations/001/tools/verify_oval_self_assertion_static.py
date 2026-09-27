@@ -460,7 +460,7 @@ def evaluate_criteria_node(node, test_outcomes, definition_lookup, definition_ca
         value=test_outcomes.get(test_ref)
         if value is None:
             return None
-        return (not value) if negate else value
+        return oval_ir.oval_negate_result(value) if negate else value
 
     if name=="extend_definition":
         definition_ref=node.get("definition_ref")
@@ -470,7 +470,7 @@ def evaluate_criteria_node(node, test_outcomes, definition_lookup, definition_ca
         )
         if value is None:
             return None
-        return (not value) if negate else value
+        return oval_ir.oval_negate_result(value) if negate else value
 
     if name!="criteria":
         return None
@@ -485,19 +485,8 @@ def evaluate_criteria_node(node, test_outcomes, definition_lookup, definition_ca
     if any(value is None for value in children):
         return None
 
-    operator=node.get("operator","AND")
-    true_count=sum(bool(x) for x in children)
-    if operator=="AND":
-        value=all(children)
-    elif operator=="OR":
-        value=any(children)
-    elif operator=="XOR":
-        value=(true_count % 2)==1
-    elif operator=="ONE":
-        value=true_count==1
-    else:
-        return None
-    return (not value) if negate else value
+    value=oval_ir.oval_combine_results(node.get("operator","AND"),children)
+    return oval_ir.oval_negate_result(value) if negate else value
 
 
 def evaluate_definition(definition_id, definition_lookup, test_outcomes, cache, stack):
@@ -529,9 +518,16 @@ def inspect_file(path):
     results=[]
     if tests_section is not None:
         for test in tests_section:
-            if local(test.tag)!="variable_test":
-                continue
+            test_type=local(test.tag)
             test_id=test.get("id")
+            if test_type=="unknown_test":
+                results.append({
+                    "test_id":test_id,
+                    "status":"evaluated_unknown",
+                })
+                continue
+            if test_type!="variable_test":
+                continue
             object_nodes=[c for c in test if local(c.tag)=="object"]
             state_nodes=[c for c in test if local(c.tag)=="state"]
             if len(object_nodes)!=1 or len(state_nodes)>1:
@@ -623,8 +619,9 @@ def inspect_file(path):
         lookup={d.get("id"):d for d in definitions_section if local(d.tag)=="definition"}
         test_outcomes={
             result["test_id"]: (
-                True if result["status"]=="evaluated_true"
-                else False if result["status"]=="evaluated_false"
+                "true" if result["status"]=="evaluated_true"
+                else "false" if result["status"]=="evaluated_false"
+                else "unknown" if result["status"]=="evaluated_unknown"
                 else None
             )
             for result in results
@@ -642,20 +639,18 @@ def inspect_file(path):
             if lower_title.startswith("evaluate to unknown"):
                 expected="unknown"
             elif lower_title.startswith("evaluate to false"):
-                expected=False
+                expected="false"
             else:
-                expected=True
+                expected="true"
 
             if value is None:
-                if expected=="unknown":
-                    status="expected_nonboolean_unknown"
-                elif "family_test" in lower_title:
+                if "family_test" in lower_title:
                     status="platform_collection_required"
                 elif path.name=="oval-def_time_difference_function.xml":
                     status="runtime_context_required"
                 else:
                     status="skipped"
-            elif expected!="unknown" and value==expected:
+            elif value==expected:
                 status="matches_expected"
             else:
                 status="semantic_mismatch"
