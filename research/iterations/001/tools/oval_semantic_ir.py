@@ -800,6 +800,84 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
 
     return dict(sorted(cache.items()))
 
+
+def build_variable_evaluation_plans(variables, variable_resolution):
+    """Build deterministic evaluation plans for every OVAL variable.
+
+    The plan does not reinterpret OVAL semantics. It makes the already-parsed
+    expression graph explicit as an execution dependency contract for later
+    native lowering: static variables carry exact values, external variables
+    carry typed inputs, and target-dependent local variables carry their full
+    expression AST plus recursively referenced object/variable dependencies.
+    """
+
+    def expression_dependencies(node, out):
+        if not isinstance(node, dict):
+            return
+        op = node.get("op")
+        if op:
+            out["operations"].add(op)
+        obj = node.get("object_ref")
+        if obj:
+            out["objects"].add(obj)
+        var = node.get("variable_ref")
+        if var:
+            out["variables"].add(var)
+        for arg in node.get("args", []):
+            expression_dependencies(arg, out)
+
+    plans = {}
+    for variable in variables:
+        var_id = variable.get("id")
+        ast = variable.get("semantic_ast", {})
+        resolved = variable_resolution.get(var_id, {})
+        status = resolved.get("status", "unknown")
+        plan = {
+            "variable_id": var_id,
+            "variable_type": variable.get("type"),
+            "datatype": variable.get("datatype"),
+            "resolution_status": status,
+        }
+
+        if status == "exact_static":
+            plan.update({
+                "mode": "static",
+                "values": resolved.get("values", []),
+            })
+        elif status == "external_input":
+            plan.update({
+                "mode": "external_input",
+                "input": ast.get("input", {
+                    "kind": "external",
+                    "datatype": variable.get("datatype"),
+                }),
+            })
+        elif variable.get("type") == "local_variable" and "expression" in ast:
+            deps = {"objects": set(), "variables": set(), "operations": set()}
+            expression_dependencies(ast["expression"], deps)
+            plan.update({
+                "mode": "target_dependent" if status == "dynamic_object_dependency" else "unresolved",
+                "expression": ast["expression"],
+                "dependencies": {
+                    "objects": sorted(deps["objects"]),
+                    "variables": sorted(deps["variables"]),
+                    "operations": sorted(deps["operations"]),
+                },
+            })
+            if resolved.get("reason"):
+                plan["reason"] = resolved["reason"]
+            if resolved.get("blocked_by") is not None:
+                plan["blocked_by"] = resolved["blocked_by"]
+        else:
+            plan["mode"] = "unresolved"
+            if resolved:
+                plan["resolution"] = resolved
+
+        plans[var_id] = plan
+
+    return dict(sorted(plans.items()))
+
+
 def feature_inventory(root):
     elements = {}
     attributes = {}
@@ -937,6 +1015,10 @@ def parse(path: Path, provenance_path: Path | None = None):
             ),
         },
     }
+
+    semantic["variable_evaluation_plans"] = build_variable_evaluation_plans(
+        semantic["variables"], semantic["variable_resolution"]
+    )
 
     if provenance:
         exports_by_name = {}
