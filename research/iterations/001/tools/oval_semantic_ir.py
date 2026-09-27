@@ -89,6 +89,101 @@ REGEX_META = set("^$\\.[](){}*+?|")
 
 
 
+
+OVAL_RESULTS = (
+    "true",
+    "false",
+    "error",
+    "unknown",
+    "not_evaluated",
+    "not_applicable",
+)
+
+
+def oval_negate_result(value):
+    """Apply OVAL negation: only true/false are inverted."""
+    if value not in OVAL_RESULTS:
+        raise ValueError(f"unknown OVAL result {value}")
+    if value=="true":
+        return "false"
+    if value=="false":
+        return "true"
+    return value
+
+
+def oval_combine_results(operator, results):
+    """Combine OVAL result values using the 5.12.3 OperatorEnumeration tables."""
+    operator=operator.upper()
+    values=list(results)
+    if not values:
+        raise ValueError("OVAL operator requires at least one result")
+    if any(value not in OVAL_RESULTS for value in values):
+        bad=[value for value in values if value not in OVAL_RESULTS]
+        raise ValueError(f"unknown OVAL result values: {bad}")
+
+    counts={value:values.count(value) for value in OVAL_RESULTS}
+    t=counts["true"]
+    f=counts["false"]
+    e=counts["error"]
+    u=counts["unknown"]
+    ne=counts["not_evaluated"]
+    na=counts["not_applicable"]
+
+    if operator=="AND":
+        if f:
+            return "false"
+        if e:
+            return "error"
+        if u:
+            return "unknown"
+        if ne:
+            return "not_evaluated"
+        if t:
+            return "true"
+        return "not_applicable"
+
+    if operator=="OR":
+        if t:
+            return "true"
+        if e:
+            return "error"
+        if u:
+            return "unknown"
+        if ne:
+            return "not_evaluated"
+        if f:
+            return "false"
+        return "not_applicable"
+
+    if operator=="ONE":
+        if t>=2:
+            return "false"
+        if t==0 and f:
+            return "false"
+        if e:
+            return "error"
+        if u:
+            return "unknown"
+        if ne:
+            return "not_evaluated"
+        if t==1:
+            return "true"
+        return "not_applicable"
+
+    if operator=="XOR":
+        if e:
+            return "error"
+        if u:
+            return "unknown"
+        if ne:
+            return "not_evaluated"
+        if t==0 and f==0 and na:
+            return "not_applicable"
+        return "true" if t%2 else "false"
+
+    raise ValueError(f"unknown OVAL boolean operator {operator}")
+
+
 OVAL_SET_FLAGS = (
     "error",
     "complete",
