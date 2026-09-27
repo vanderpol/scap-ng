@@ -21,6 +21,8 @@ Supported structural semantics include:
 from __future__ import annotations
 
 import argparse
+import calendar
+import datetime as dt
 import hashlib
 import itertools
 import json
@@ -78,6 +80,7 @@ STATIC_EVALUATOR_OPERATIONS = {
     "regex_capture",
     "split",
     "substring",
+    "time_difference",
     "unique",
 }
 
@@ -744,6 +747,55 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
         out.append("$")
         return "".join(out)
 
+    def parse_oval_datetime(value, format_name):
+        text = str(value).strip()
+
+        if format_name == "seconds_since_epoch":
+            return int(text, 10)
+
+        if format_name == "win_filetime":
+            # OVAL test content represents Windows FILETIME as hexadecimal
+            # 100-nanosecond intervals since 1601-01-01 UTC.
+            ticks = int(text, 16)
+            return ticks // 10_000_000 - 11_644_473_600
+
+        formats = {
+            "year_month_day": (
+                "%Y%m%d",
+                "%Y%m%dT%H%M%S",
+                "%Y/%m/%d %H:%M:%S",
+                "%Y/%m/%d",
+                "%Y-%m-%d %H:%M:%S",
+                "%Y-%m-%d",
+            ),
+            "month_day_year": (
+                "%m/%d/%Y %H:%M:%S",
+                "%m/%d/%Y",
+                "%m-%d-%Y %H:%M:%S",
+                "%m-%d-%Y",
+                "%B, %d %Y %H:%M:%S",
+                "%B, %d %Y",
+                "%b, %d %Y %H:%M:%S",
+                "%b, %d %Y",
+            ),
+            "day_month_year": (
+                "%d/%m/%Y %H:%M:%S",
+                "%d/%m/%Y",
+                "%d-%m-%Y %H:%M:%S",
+                "%d-%m-%Y",
+            ),
+        }
+        if format_name not in formats:
+            raise ValueError(f"unsupported OVAL date-time format {format_name}")
+
+        for pattern in formats[format_name]:
+            try:
+                parsed = dt.datetime.strptime(text, pattern)
+                return calendar.timegm(parsed.timetuple())
+            except ValueError:
+                pass
+        raise ValueError(f"value {text!r} does not match {format_name}")
+
     def component_values(node):
         name = local(node.tag)
 
@@ -831,6 +883,53 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                     if string_value not in seen:
                         seen.add(string_value)
                         values.append(string_value)
+            return bounded(values, name)
+
+        if name == "time_difference":
+            children = [c for c in node if isinstance(c.tag, str)]
+            if len(children) not in {1, 2}:
+                return result(
+                    "unsupported",
+                    reason=f"time_difference_component_count:{len(children)}",
+                    operation=name,
+                )
+
+            child_results = [component_values(child) for child in children]
+            if any(child["status"] != "exact_static" for child in child_results):
+                first = next(child for child in child_results if child["status"] != "exact_static")
+                return result(
+                    first["status"],
+                    reason=f"time_difference_child_not_static:{first.get('reason', first.get('operation'))}",
+                    operation=name,
+                    blocked_by=first,
+                )
+
+            if len(children) == 1:
+                return result(
+                    "runtime_time_dependency",
+                    reason="time_difference_single_component_uses_current_utc_time",
+                    operation=name,
+                    format_2=node.get("format_2", "year_month_day"),
+                    values=child_results[0]["values"],
+                )
+
+            format_1 = node.get("format_1", "year_month_day")
+            format_2 = node.get("format_2", "year_month_day")
+            values = []
+            try:
+                for left, right in itertools.product(
+                    child_results[0]["values"], child_results[1]["values"]
+                ):
+                    values.append(str(
+                        parse_oval_datetime(left, format_1)
+                        - parse_oval_datetime(right, format_2)
+                    ))
+            except (ValueError, OverflowError) as exc:
+                return result(
+                    "static_evaluation_error",
+                    reason=f"time_difference_invalid_value:{exc}",
+                    operation=name,
+                )
             return bounded(values, name)
 
         if name == "glob_to_regex":
@@ -1054,7 +1153,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
 
         # These operations are fully represented in semantic_ast but are not
         # claimed as exact-static by this prototype evaluator yet.
-        if name in {"time_difference"}:
+        if name in set():
             child_ops = [
                 component_values(c)
                 for c in node
