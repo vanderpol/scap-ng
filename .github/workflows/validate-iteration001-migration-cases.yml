@@ -1,0 +1,26 @@
+name: Validate SCAP-NG iteration 001 OVAL migration cases
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/validate-iteration001-migration-cases.yml"
+      - "research/iterations/001/prototypes/oval-migration-cases/**"
+      - "research/iterations/001/tools/validate_migration_cases.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install YAML parser
+        run: python -m pip install --disable-pip-version-check PyYAML
+      - name: Validate migration prototype YAML
+        run: python research/iterations/001/tools/validate_migration_cases.py
