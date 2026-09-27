@@ -73,6 +73,7 @@ STATIC_EVALUATOR_OPERATIONS = {
     "count",
     "end",
     "escape_regex",
+    "merge",
     "split",
     "substring",
     "unique",
