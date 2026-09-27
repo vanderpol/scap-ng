@@ -5,12 +5,11 @@
 **Rule:** `xccdf_mil.disa.stig_rule_SV-258179r1155601_rule`  
 **OVAL definition:** `oval:mil.disa.stig.rhel9os:def:258179`
 
-This case is intentionally retained as a flagship test for whether SCAP-NG
-actually reduces assessment complexity.
+This case is the flagship demonstration for both OVAL complexity reduction and conservative migration.
 
 ## Published OVAL closure
 
-The standalone rule split currently contains:
+The standalone rule split contains:
 
 | Construct | Count |
 |---|---:|
@@ -25,104 +24,102 @@ The standalone rule split currently contains:
 | `concat` operations | 8 |
 | Standalone OVAL bytes | 39,135 |
 
-The 17 variables are not incidental. They construct regex fragments used by
-objects that test audit-rule text. This is exactly the kind of dependency graph
-that a splitter must follow to a fixed point.
+All 17 variables resolve statically in this case.
 
-## Underlying requirement shape
+## Important source finding
 
-The source OVAL resolves to 24 audit-rule checks:
+The policy wording strongly suggests a 6-syscall × 2-architecture × 2-subject matrix, but the published OVAL does **not** implement a complete 24-cell matrix.
+
+The 24 tests contain 22 unique conditions:
+
+- `lsetxattr | b32 | root` is duplicated;
+- `removexattr | b32 | root` is duplicated;
+- `lsetxattr | b64 | root` is absent;
+- `removexattr | b64 | root` is absent.
+
+The duplicate pairs use byte-identical regular-expression conditions.
+
+This is therefore both a complexity example and a migration-correctness test.
+
+## Faithful generated conversion
+
+The automated pipeline resolves the OVAL variables, interprets the 24 tests, collapses only Boolean-idempotent duplicate conditions, and emits the **22 unique conditions actually enforced**.
+
+Generated artifacts:
+
+- `../../generated/native-normalizations/rhel9-sv-258179/native-semantic.json`
+- `../../generated/native-normalizations/rhel9-sv-258179/original-ng.yaml`
+- `../../generated/native-normalizations/rhel9-sv-258179/ansible-inspired.yaml`
+
+The migration status remains `requires_review` until differential execution proves equivalence.
+
+The faithful generated authoring comparison is:
+
+| Rendering | Lines | Characters |
+|---|---:|---:|
+| Original NG | 115 | 3,323 |
+| Ansible-inspired | 121 | 3,518 |
+
+Both are renderings of the same source-semantic object.
+
+## Policy-review candidate
+
+The files in this showcase named `review-candidate-*.yaml` intentionally show what the assessment could look like **if policy review confirms that the two missing b64/root conditions were intended**.
+
+They are not faithful source conversions.
+
+The review candidate can use a compact Cartesian matrix and is therefore much shorter:
+
+| Rendering | Lines | Characters |
+|---|---:|---:|
+| Original NG review candidate | 71 | 1,756 |
+| Ansible-inspired review candidate | 77 | 2,025 |
+
+This separation is deliberate:
 
 ```text
-6 syscalls
-  x 2 architectures
-  x 2 subject scopes
-  = 24 required coverage cells
+published OVAL
+     |
+     v
+faithful IR
+     |
+     +--> faithful 22-condition NG
+     |
+     +--> review finding
+              |
+              +--> possible 24-cell corrected matrix
 ```
 
-Syscalls:
+SCAP-NG conversion must never jump directly to the corrected-looking matrix.
 
-- `setxattr`
-- `fsetxattr`
-- `lsetxattr`
-- `removexattr`
-- `fremovexattr`
-- `lremovexattr`
+## Cross-STIG reuse result
 
-Architectures:
+Oracle Linux 9 `SV-271536` contains the same source semantics and the same anomaly.
 
-- `b32`
-- `b64`
+Both normalize to semantic fingerprint:
 
-Subject scopes:
+```text
+0f34fddeace27334af90bf5bb9e3dc26fc1800847d86b5cde6a119f4329f9421
+```
 
-- interactive users: `auid >= 1000` and not unset
-- root: `auid = 0`
+See:
 
-The OVAL implementation expresses those semantics through repeated
-`textfilecontent54` tests and regex-building variables against
-`/etc/audit/audit.rules`.
+`../../generated/native-normalizations/rhel9-oracle9-xattr-reuse.json`
 
-## Candidate SCAP-NG normalization
+This is a strong published-content example of one technical assessment being reusable across different policy identities, while also demonstrating why reuse needs provenance and review status.
 
-The candidate NG form expresses the same requirement as:
+## Differential tests still required
 
-1. collect normalized configured audit rules once;
-2. derive the 6 x 2 x 2 required coverage matrix;
-3. assert that every matrix cell is covered.
+Before promotion to `exact_normalized`, fixtures should cover:
 
-Two YAML spellings are included:
-
-- `original-ng.yaml`
-- `ansible-inspired.yaml`
-
-They intentionally describe the same proposed semantic model.
-
-## Important status
-
-This is currently `requires_review`, not `exact_normalized`.
-
-The smaller representation is compelling, but size/readability are not proof
-of equivalence. The normalization must be differential-tested against the
-published OVAL using fixtures that cover:
-
-- each syscall;
-- both architectures;
-- both subject scopes;
+- all source-enforced syscall/architecture/AUID combinations;
+- the two duplicated conditions;
+- the two absent b64/root conditions;
 - combined syscall lists;
 - both accepted action orderings;
 - optional audit keys;
 - unset AUID spellings;
-- missing rules;
-- malformed rules;
-- duplicate/overlapping rules;
+- missing and malformed rules;
 - collection/read failures.
 
-Only then should this pattern be promoted into an automatic normalization rule.
-
-## Why this case matters
-
-This example separates three things that OVAL currently intertwines:
-
-```text
-policy requirement
-        |
-        v
-24 semantic coverage conditions
-        |
-        v
-OVAL implementation machinery
-  7 definitions
-  24 tests
-  24 objects
-  17 variables
-  regex assembly
-```
-
-SCAP-NG should preserve the first two while avoiding the need for every content
-author to reproduce the third.
-
-That is a stronger adoption argument than "YAML is shorter than XML": it shows
-that a reusable semantic collector can move repeated parsing mechanics into a
-standardized, conformance-tested capability while leaving the assessment itself
-close to the security requirement.
+The source behavior and any reviewed correction should be tested separately.

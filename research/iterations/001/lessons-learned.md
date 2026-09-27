@@ -133,7 +133,35 @@ The original research syntax and the Ansible-inspired syntax should therefore be
 
 This also prevents syntax preference from contaminating migration logic: faithful interpretation of SCAP 1.4 happens first; authoring presentation happens second.
 
-## 19. Questions carried forward
+## 20. Rule splitting must follow variables to a fixed point
+
+The four published priority benchmarks produced 1,333 standalone OVAL rule documents. All validate against the SCAP 1.4 Omni schema with zero unresolved references.
+
+RHEL 9 `SV-258179` demonstrates why a definition/test/object-only traversal is insufficient: its closure includes 17 variables and 64 variable-to-variable references.
+
+**Lesson:** dependency closure must treat variables as first-class graph nodes and recursively follow variable, object-component, set, filter, definition, test, object, and state references until a fixed point. Standalone schema validation provides an independent closure check.
+
+## 21. Faithful migration must preserve published defects
+
+The published RHEL 9 xattr audit rule contains 24 tests but only 22 unique semantic conditions. Two b32/root checks are duplicated and the corresponding b64/root conditions are absent.
+
+**Lesson:** a converter must not infer and silently add the apparently intended conditions. The faithful NG representation preserves source behavior and records the discrepancy as `requires_review`. Correction is a separate reviewed action.
+
+## 22. Semantic fingerprints can prove reuse across policy identities
+
+RHEL 9 `SV-258179` and Oracle Linux 9 `SV-271536` produce the same normalized semantic fingerprint despite having different XCCDF rule IDs and policy identities.
+
+**Lesson:** reusable assessment identity should be based on canonical technical semantics, not title, CCI, platform name, or rule identifier.
+
+The same example also shows that reused logic can reuse a defect, so provenance and review state must travel with reusable assessments.
+
+## 23. Ansible familiarity is not automatically terser
+
+The generated faithful RHEL 9 example is 115 lines in the original NG spelling and 121 lines in the Ansible-inspired spelling.
+
+**Lesson:** evaluate Ansible-inspired syntax on comprehension and adoption familiarity, not an assumption that it will reduce authoring size. Both remain renderings of one semantic model.
+
+## 24. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 

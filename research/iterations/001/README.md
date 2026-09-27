@@ -23,7 +23,10 @@ Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content
 - `prototypes/full-benchmarks/` — primary file-oriented benchmark prototypes, results, and signed bundles.
 - `feedback/` — questionnaire, response template, response evidence, and decision register.
 - `notes/` — supporting observations.
-- `tools/` — iteration-specific package build tooling.
+- `tools/` — iteration-specific package build, splitting, semantic-IR, normalization, and rendering tooling.
+- `generated/niwc-rule-splits/` — 1,333 schema-valid per-rule OVAL splits plus semantic IR for the four published priority benchmarks.
+- `generated/native-normalizations/` — generated native-semantic normalization examples and cross-platform semantic-fingerprint comparisons.
+- `showcases/rhel9-sv-258179/` — flagship complex published OVAL case, including the distinction between faithful conversion and a policy-review normalization candidate.
 
 ## Current benchmark scope
 

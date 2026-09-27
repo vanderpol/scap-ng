@@ -68,6 +68,51 @@ item.file
 
 Renderers may shorten names only when aliases are deterministic and collision-free.
 
+## Implemented OVAL coverage
+
+The current parser has produced faithful IR for 1,333 standalone OVAL rule documents from RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025.
+
+The IR explicitly models:
+
+- criteria AND/OR and negation;
+- test and extended-definition references;
+- test `check`, `check_existence`, and state-operator metadata;
+- object, state, and variable reference graphs;
+- set object references and filters;
+- entity operation/datatype/variable metadata;
+- fixed-point dependency edges;
+- static variable evaluation when exact;
+- lossless preservation of platform-specific nodes.
+
+### Variable/function completeness checklist
+
+The vendored OVAL 5.12.3 schema defines the following component/function set:
+
+- `object_component`
+- `variable_component`
+- `literal_component`
+- `arithmetic`
+- `begin`
+- `concat`
+- `count`
+- `end`
+- `escape_regex`
+- `glob_to_regex`
+- `merge`
+- `regex_capture`
+- `split`
+- `substring`
+- `time_difference`
+- `unique`
+
+The static evaluator currently resolves literal values, constant variables, variable references, `concat`, and `unique` when their inputs are static.
+
+The four priority benchmarks additionally exercise dynamic/unsupported cases involving `object_component`, `arithmetic`, `count`, `merge`, `regex_capture`, `split`, and `substring`. These remain explicit IR nodes and form a concrete implementation backlog rather than being silently flattened.
+
+### Faithful normalization versus policy review
+
+The RHEL 9 `SV-258179` case demonstrated why the IR must precede simplification. The source contains 24 tests but only 22 unique conditions. The faithful native normalization preserves those 22 conditions and separately reports the apparent 24-cell matrix as a review candidate.
+
 ## Specification exit criterion
 
 Before finalizing SCAP-NG:
