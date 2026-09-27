@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/modprobe.d contains a file that contains 'install tipc /bin/false'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23049700"
+          },
+          {
+            "comment": "/etc/modprobe.d contains a file that contains 'blacklist tipc'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23049701"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230497",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must disable the transparent inter-process communication (TIPC) protocol."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230497",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/modprobe.d contains a file that contains 'install tipc /bin/false'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23049700"
-          },
-          {
-            "comment": "/etc/modprobe.d contains a file that contains 'blacklist tipc'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23049701"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230497",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must disable the transparent inter-process communication (TIPC) protocol."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257808",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230497"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:230497",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23049701"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257808",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230497"
     },
     {
       "attribute": "object_ref",
@@ -230,7 +230,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*install[ \\t]+tipc[ \\t]+/bin/false[ \\t]*$"
+          "value": "^[ \\t]*blacklist[ \\t]+tipc[ \\t]*$"
         },
         {
           "attributes": {
@@ -244,10 +244,10 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23049700",
+      "id": "oval:mil.disa.stig.ind:obj:23049701",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "2"
+      "version": "1"
     },
     {
       "children": [
@@ -273,7 +273,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*blacklist[ \\t]+tipc[ \\t]*$"
+          "value": "^[ \\t]*install[ \\t]+tipc[ \\t]+/bin/false[ \\t]*$"
         },
         {
           "attributes": {
@@ -287,10 +287,10 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23049701",
+      "id": "oval:mil.disa.stig.ind:obj:23049700",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
+      "version": "2"
     }
   ],
   "parser_contract": {
@@ -317,12 +317,12 @@
       "oval:mil.disa.stig.defs:def:230497"
     ]
   },
-  "semantic_ir_sha256": "c287b0395edddca4e55a00a70bc9a183062d06d64a8bdc5f2eb3da3a6fadc9e1",
+  "semantic_ir_sha256": "a5d1fdd2c8f9cd08e02c9754bae4bb15ace4e1ec35e5d81a0f084cfe345ce2bf",
   "source": {
     "bytes": 4174,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257808r1044865_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257808r1044865_rule/provenance.json",
-    "sha256": "f9b1d5f72e6a71ea3179d104c9c9ff6e4a40d3df1f9c94832645d3e7d0e0a62e"
+    "sha256": "e5f0f90bd49d4406a34602768e1c189296b445c5adae78a5e186d7882ea0d6d6"
   },
   "states": [],
   "tests": [
@@ -396,10 +396,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

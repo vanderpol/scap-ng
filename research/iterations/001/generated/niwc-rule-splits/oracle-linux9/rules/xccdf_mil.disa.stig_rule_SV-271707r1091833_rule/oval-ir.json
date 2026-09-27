@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:UsePAM == yes",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25798600"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:257986",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must enable the Pluggable Authentication Module (PAM) interface for SSHD."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "4"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:257986",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:UsePAM == yes",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25798600"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:257986",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must enable the Pluggable Authentication Module (PAM) interface for SSHD."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "4"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:257986",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:25798600"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.ol9os:def:271707",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:257986"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:257986",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:25798600"
     },
     {
       "attribute": "object_ref",
@@ -220,6 +220,36 @@
     {
       "children": [
         {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25798601"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25798602"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "UsePAM in all sshd_config and sshd_config.d/* files",
+      "id": "oval:mil.disa.stig.ind:obj:25798600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
           "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -256,36 +286,6 @@
       ],
       "comment": null,
       "id": "oval:mil.disa.stig.ind:obj:25798602",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25798601"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25798602"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
-        }
-      ],
-      "comment": "UsePAM in all sshd_config and sshd_config.d/* files",
-      "id": "oval:mil.disa.stig.ind:obj:25798600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
@@ -351,12 +351,12 @@
       "oval:mil.disa.stig.defs:def:257986"
     ]
   },
-  "semantic_ir_sha256": "3c0db3baf7ac6b3e462620305478fc666a71068a286cbdcdd4b348f27d97f3f7",
+  "semantic_ir_sha256": "8023252abba374e07b39ed76c889f3e0a58ad0b451f624ec3ae41a3a37d1d74b",
   "source": {
     "bytes": 3986,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271707r1091833_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271707r1091833_rule/provenance.json",
-    "sha256": "690941caa85dd8faaa22061dbba5ef281fa30dae0d4c5104eb607d4569a36bd3"
+    "sha256": "2583211a66854a061d3d9183d259e63b81d4d0ffaa9c701ed67e9461c3dafaed"
   },
   "states": [
     {
@@ -434,10 +434,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

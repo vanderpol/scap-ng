@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "debug-shell.service LoadState is masked if it exists.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23053200"
+          },
+          {
+            "comment": "debug-shell.service UnitFileState is masked if it exists.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23053201"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230532",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The debug-shell systemd service must be disabled on the operating system."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "6"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230532",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "debug-shell.service LoadState is masked if it exists.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23053200"
-          },
-          {
-            "comment": "debug-shell.service UnitFileState is masked if it exists.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23053201"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230532",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The debug-shell systemd service must be disabled on the operating system."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "6"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257786",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230532"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:230532",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.linux:tst:23053201"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257786",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230532"
     },
     {
       "attribute": "object_ref",
@@ -288,12 +288,12 @@
       "oval:mil.disa.stig.defs:def:230532"
     ]
   },
-  "semantic_ir_sha256": "fb69a166f39c610b36aee5fa19fdc205492d71c77f0c72ab7a6aa13ece3ddd7f",
+  "semantic_ir_sha256": "377dcd47ffa93e07997bd37444af216a13aee8c4be85dc1871f3ff4cd06ccfcc",
   "source": {
     "bytes": 3903,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257786r1044834_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257786r1044834_rule/provenance.json",
-    "sha256": "b7c4e5d58f7b101193e0e61fc2bdcc891c91f446112ad8ce66f6315565aa5819"
+    "sha256": "4071b9e1bc28c8a22bb72d293e0627f0e358902fb2f3089ab5cf86605a138227"
   },
   "states": [
     {
@@ -398,10 +398,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

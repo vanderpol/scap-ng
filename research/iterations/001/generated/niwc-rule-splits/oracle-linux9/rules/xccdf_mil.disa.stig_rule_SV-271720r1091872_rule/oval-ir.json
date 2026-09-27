@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "Check to see if PermitUserEnvironment is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:27172000"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:271720",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must not allow users to override SSH environment variables."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:271720",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Check to see if PermitUserEnvironment is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:27172000"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:271720",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must not allow users to override SSH environment variables."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271720",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:271720"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:271720",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:27172000"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271720",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:271720"
     },
     {
       "attribute": "object_ref",
@@ -231,29 +231,33 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:27172001"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:27172002"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
           },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^(?i)\\s*PermitUserEnvironment\\s+(\\w+)$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:27172000",
+      "id": "oval:mil.disa.stig.ind:obj:27172001",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -313,33 +317,29 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:27172001"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:27172002"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
           },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^(?i)\\s*PermitUserEnvironment\\s+(\\w+)$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:27172001",
+      "id": "oval:mil.disa.stig.ind:obj:27172000",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -371,12 +371,12 @@
       "oval:mil.disa.stig.defs:def:271720"
     ]
   },
-  "semantic_ir_sha256": "5a328a507be9aadf8230606ffe10afa6a6f07f5b50b2592dab20581b92f188c0",
+  "semantic_ir_sha256": "580655f1ce1058a01b0a7e5b8d53e780de827292e86285e79b9c01d1da65e942",
   "source": {
     "bytes": 3964,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271720r1091872_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271720r1091872_rule/provenance.json",
-    "sha256": "f6e49fc2192dc80f3be429dbe7f7db5a099601b39b8aef15fa0d1bb3f8372525"
+    "sha256": "2f0c00638aafb6e9b5e2de36ef4ae36d74567da3b8e731373c7f14b1a6b94004"
   },
   "states": [
     {
@@ -458,10 +458,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

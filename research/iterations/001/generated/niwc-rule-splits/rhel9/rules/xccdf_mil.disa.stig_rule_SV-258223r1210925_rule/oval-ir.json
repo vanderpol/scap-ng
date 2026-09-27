@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Audit 32-bit invocations of /etc/shadow",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:28116000"
-          },
-          {
-            "comment": "Audit 64-bit invocations of /etc/shadow",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:28116001"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:281160",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:281160",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Audit 32-bit invocations of /etc/shadow",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:28116000"
+          },
+          {
+            "comment": "Audit 64-bit invocations of /etc/shadow",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:28116001"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:281160",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258223",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:281160"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,11 @@
       "to": "oval:mil.disa.stig.ind:tst:28116001"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258223",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:281160"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:28116001",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:28116001"
     },
     {
       "attribute": "object_ref",
@@ -120,13 +127,6 @@
       "from": "oval:mil.disa.stig.ind:tst:28116000",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:28116000"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:28116001",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:28116001"
     }
   ],
   "dependency_integrity": {
@@ -223,7 +223,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32?\\s+-F\\s+path=/etc/shadow\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64?\\s+-F\\s+path=/etc/shadow\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
         },
         {
           "attributes": {
@@ -237,7 +237,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:28116000",
+      "id": "oval:mil.disa.stig.ind:obj:28116001",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -257,7 +257,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64?\\s+-F\\s+path=/etc/shadow\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32?\\s+-F\\s+path=/etc/shadow\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
         },
         {
           "attributes": {
@@ -271,7 +271,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:28116001",
+      "id": "oval:mil.disa.stig.ind:obj:28116000",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -301,35 +301,15 @@
       "oval:mil.disa.stig.defs:def:281160"
     ]
   },
-  "semantic_ir_sha256": "30f85d22cf364a5eb3947da75f7949411012867ac9050e7ecbfa0541254a9c5f",
+  "semantic_ir_sha256": "b6c77cbd86640593a3c7164c82a9d948fd5300883f28fe236b297f38e078ac1e",
   "source": {
     "bytes": 4216,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258223r1210925_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258223r1210925_rule/provenance.json",
-    "sha256": "9008fd6a93fd29379d956e5a45ec7b0f644e379039da7fc4f48208a69497f88d"
+    "sha256": "c959d94c637a6096e100b11ef29df953d651a119f571852d10e548107c9b1285"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "Audit 32-bit invocations of /etc/shadow",
-      "id": "oval:mil.disa.stig.ind:tst:28116000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:28116000"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:28116000"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -342,6 +322,26 @@
             "object_ref": "oval:mil.disa.stig.ind:obj:28116001"
           },
           "object_ref": "oval:mil.disa.stig.ind:obj:28116001"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "Audit 32-bit invocations of /etc/shadow",
+      "id": "oval:mil.disa.stig.ind:tst:28116000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:28116000"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:28116000"
         }
       ],
       "other": [],
@@ -380,10 +380,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

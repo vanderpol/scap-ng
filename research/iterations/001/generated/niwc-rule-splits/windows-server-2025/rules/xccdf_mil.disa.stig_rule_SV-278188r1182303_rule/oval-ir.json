@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:254439",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.windows2025:def:278188",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "WN25-MS-000120 - The Windows Server 2025 \"Deny log on through Remote Desktop Services\" user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and all local accounts and from unauthenticated access on all systems."
+          },
+          {
+            "attributes": {
+              "family": "windows"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Microsoft Windows Server 2025"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\n  The \"Deny log on through Remote Desktop Services\" user right defines the accounts that are prevented from logging on using Remote Desktop Services.\n\n  In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower-trust systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to the compromise of an entire domain.\n\n  Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement resulting from credential theft attacks.\n\n  The Guests group must be assigned this right to prevent unauthenticated access."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "children": [
               {
                 "comment": "System is a member of a domain",
@@ -86,59 +136,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "5"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:254439",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.windows2025:def:278188",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "WN25-MS-000120 - The Windows Server 2025 \"Deny log on through Remote Desktop Services\" user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and all local accounts and from unauthenticated access on all systems."
-          },
-          {
-            "attributes": {
-              "family": "windows"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Microsoft Windows Server 2025"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\n  The \"Deny log on through Remote Desktop Services\" user right defines the accounts that are prevented from logging on using Remote Desktop Services.\n\n  In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower-trust systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to the compromise of an entire domain.\n\n  Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement resulting from credential theft attacks.\n\n  The Guests group must be assigned this right to prevent unauthenticated access."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows2025:def:278188",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:254439"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -182,32 +189,18 @@
       "to": "oval:mil.disa.stig.win:tst:25349510"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows2025:def:278188",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:254439"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:10002300",
+      "from": "oval:mil.disa.stig.win:tst:25349507",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.win:obj:10000100"
+      "to": "oval:mil.disa.stig.win:obj:25349500"
     },
     {
       "attribute": "state_ref",
       "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:10002300",
+      "from": "oval:mil.disa.stig.win:tst:25349507",
       "kind": "test_state",
-      "to": "oval:mil.disa.stig.win:ste:10000200"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:10002300",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.win:ste:10000400"
+      "to": "oval:mil.disa.stig.win:ste:20000033"
     },
     {
       "attribute": "object_ref",
@@ -261,16 +254,23 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:25349507",
+      "from": "oval:mil.disa.stig.win:tst:10002300",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.win:obj:25349500"
+      "to": "oval:mil.disa.stig.win:obj:10000100"
     },
     {
       "attribute": "state_ref",
       "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:25349507",
+      "from": "oval:mil.disa.stig.win:tst:10002300",
       "kind": "test_state",
-      "to": "oval:mil.disa.stig.win:ste:20000033"
+      "to": "oval:mil.disa.stig.win:ste:10000200"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.win:tst:10002300",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.win:ste:10000400"
     },
     {
       "attribute": "object_ref",
@@ -384,21 +384,6 @@
       "children": [
         {
           "kind": "element",
-          "name": "userright",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:25349500",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "userright_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
           "name": "namespace",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
           "value": "root\\cimv2"
@@ -414,6 +399,21 @@
       "id": "oval:mil.disa.stig.win:obj:10000100",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "wmi57_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "userright",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.win:obj:25349500",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "userright_object",
       "version": "1"
     }
   ],
@@ -473,16 +473,73 @@
       "oval:mil.disa.stig.defs:def:254439"
     ]
   },
-  "semantic_ir_sha256": "734b9f880451c81e1fa9964231b16a0888bda4385df76b8f41bb4495113df8f5",
+  "semantic_ir_sha256": "cddfeed38e07a631f42e44ae57049b3755debb6544d9fac4d8d2e463ce32796b",
   "source": {
     "bytes": 9251,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278188r1182303_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278188r1182303_rule/provenance.json",
-    "sha256": "90485421431873ed00acf99cad5ea4e7cc711e46fc43885898dd6cf8456ca152"
+    "sha256": "06d758ecf279c2e6202af0044d4d434abee777846f6c580ba7f6b097c72218a3"
   },
   "states": [
     {
-      "comment": "Domain Member Workstation",
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "trustee_name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "^(?i)(.+\\\\)?Enterprise Admins$"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000041",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "userright_state",
+      "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "trustee_name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "^(?i)(.+\\\\)?Domain Admins$"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000040",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "userright_state",
+      "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "operation": "case insensitive equals"
+          },
+          "kind": "element",
+          "name": "trustee_name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "Guests"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000033",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "userright_state",
+      "version": "1"
+    },
+    {
+      "comment": "Standalone Workstation",
       "entities": [
         {
           "attributes": {
@@ -497,7 +554,7 @@
               "kind": "element",
               "name": "field",
               "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-              "value": "1"
+              "value": "0"
             }
           ],
           "kind": "element",
@@ -505,7 +562,37 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
         }
       ],
-      "id": "oval:mil.disa.stig.win:ste:10000200",
+      "id": "oval:mil.disa.stig.win:ste:10000100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "wmi57_state",
+      "version": "1"
+    },
+    {
+      "comment": "Standalone Server",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "record",
+            "operation": "equals"
+          },
+          "children": [
+            {
+              "attributes": {
+                "name": "domainrole"
+              },
+              "kind": "element",
+              "name": "field",
+              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+              "value": "2"
+            }
+          ],
+          "kind": "element",
+          "name": "result",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:10000300",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "wmi57_state",
@@ -561,26 +648,7 @@
       "version": "2"
     },
     {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "trustee_name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "^(?i)(.+\\\\)?Domain Admins$"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000040",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "userright_state",
-      "version": "1"
-    },
-    {
-      "comment": "Standalone Workstation",
+      "comment": "Domain Member Workstation",
       "entities": [
         {
           "attributes": {
@@ -595,7 +663,7 @@
               "kind": "element",
               "name": "field",
               "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-              "value": "0"
+              "value": "1"
             }
           ],
           "kind": "element",
@@ -603,114 +671,40 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
         }
       ],
-      "id": "oval:mil.disa.stig.win:ste:10000100",
+      "id": "oval:mil.disa.stig.win:ste:10000200",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "wmi57_state",
-      "version": "1"
-    },
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "trustee_name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "^(?i)(.+\\\\)?Enterprise Admins$"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000041",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "userright_state",
-      "version": "1"
-    },
-    {
-      "comment": "Standalone Server",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "record",
-            "operation": "equals"
-          },
-          "children": [
-            {
-              "attributes": {
-                "name": "domainrole"
-              },
-              "kind": "element",
-              "name": "field",
-              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-              "value": "2"
-            }
-          ],
-          "kind": "element",
-          "name": "result",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:10000300",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "wmi57_state",
-      "version": "1"
-    },
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "operation": "case insensitive equals"
-          },
-          "kind": "element",
-          "name": "trustee_name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "Guests"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000033",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "userright_state",
       "version": "1"
     }
   ],
   "tests": [
     {
-      "check": "all",
+      "check": "at least one",
       "check_existence": "at_least_one_exists",
-      "comment": "The system is a non-DC domain-joined Windows server or workstation",
-      "id": "oval:mil.disa.stig.win:tst:10002300",
+      "comment": "Deny log on through Remote Desktop Services - Guests",
+      "id": "oval:mil.disa.stig.win:tst:25349507",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:10000100"
+            "object_ref": "oval:mil.disa.stig.win:obj:25349500"
           },
-          "object_ref": "oval:mil.disa.stig.win:obj:10000100"
+          "object_ref": "oval:mil.disa.stig.win:obj:25349500"
         }
       ],
       "other": [],
-      "state_operator": "OR",
+      "state_operator": "AND",
       "states": [
         {
           "attributes": {
-            "state_ref": "oval:mil.disa.stig.win:ste:10000200"
+            "state_ref": "oval:mil.disa.stig.win:ste:20000033"
           },
-          "state_ref": "oval:mil.disa.stig.win:ste:10000200"
-        },
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.win:ste:10000400"
-          },
-          "state_ref": "oval:mil.disa.stig.win:ste:10000400"
+          "state_ref": "oval:mil.disa.stig.win:ste:20000033"
         }
       ],
-      "type": "wmi57_test",
-      "version": "1"
+      "type": "userright_test",
+      "version": "4"
     },
     {
       "check": "at least one",
@@ -800,31 +794,37 @@
       "version": "4"
     },
     {
-      "check": "at least one",
+      "check": "all",
       "check_existence": "at_least_one_exists",
-      "comment": "Deny log on through Remote Desktop Services - Guests",
-      "id": "oval:mil.disa.stig.win:tst:25349507",
+      "comment": "The system is a non-DC domain-joined Windows server or workstation",
+      "id": "oval:mil.disa.stig.win:tst:10002300",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:25349500"
+            "object_ref": "oval:mil.disa.stig.win:obj:10000100"
           },
-          "object_ref": "oval:mil.disa.stig.win:obj:25349500"
+          "object_ref": "oval:mil.disa.stig.win:obj:10000100"
         }
       ],
       "other": [],
-      "state_operator": "AND",
+      "state_operator": "OR",
       "states": [
         {
           "attributes": {
-            "state_ref": "oval:mil.disa.stig.win:ste:20000033"
+            "state_ref": "oval:mil.disa.stig.win:ste:10000200"
           },
-          "state_ref": "oval:mil.disa.stig.win:ste:20000033"
+          "state_ref": "oval:mil.disa.stig.win:ste:10000200"
+        },
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.win:ste:10000400"
+          },
+          "state_ref": "oval:mil.disa.stig.win:ste:10000400"
         }
       ],
-      "type": "userright_test",
-      "version": "4"
+      "type": "wmi57_test",
+      "version": "1"
     },
     {
       "check": "at least one",
@@ -883,10 +883,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

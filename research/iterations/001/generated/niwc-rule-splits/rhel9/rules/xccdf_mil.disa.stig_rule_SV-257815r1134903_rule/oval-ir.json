@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "systemd-coredump.socket LoadState is masked if exists",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23031200"
+          },
+          {
+            "comment": "systemd-coredump.socket UnitFileState is masked if exists",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23031201"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230312",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must disable acquiring, saving, and processing core dumps."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230312",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "systemd-coredump.socket LoadState is masked if exists",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23031200"
-          },
-          {
-            "comment": "systemd-coredump.socket UnitFileState is masked if exists",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23031201"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230312",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must disable acquiring, saving, and processing core dumps."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257815",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230312"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:230312",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.linux:tst:23031201"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257815",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230312"
     },
     {
       "attribute": "object_ref",
@@ -291,12 +291,12 @@
       "oval:mil.disa.stig.defs:def:230312"
     ]
   },
-  "semantic_ir_sha256": "08c18a8461bf5b571b2748719416b38d1092eae6bc145d2f31308b110e82151f",
+  "semantic_ir_sha256": "0f8763ff378a2f9675e433c3a2333456555044efc8407d3beb5e2162e7533247",
   "source": {
     "bytes": 3724,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257815r1134903_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257815r1134903_rule/provenance.json",
-    "sha256": "77ba8d6f61a743258f7112bae692167f01ac71187b3aad8ad87e35450b409ea1"
+    "sha256": "2fb97921dc1d51ffd5b91207ecefbbb707e0f726e810c6a54189ab3da00fdf99"
   },
   "states": [
     {
@@ -401,10 +401,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

@@ -139,14 +139,14 @@
     {
       "attribute": "object_ref",
       "element": "object_component",
-      "from": "oval:mil.disa.stig.defs:var:25804500",
+      "from": "oval:mil.disa.stig.defs:var:25804501",
       "kind": "object_component",
       "to": "oval:mil.disa.stig.unix:obj:25804500"
     },
     {
       "attribute": "object_ref",
       "element": "object_component",
-      "from": "oval:mil.disa.stig.defs:var:25804501",
+      "from": "oval:mil.disa.stig.defs:var:25804500",
       "kind": "object_component",
       "to": "oval:mil.disa.stig.unix:obj:25804500"
     }
@@ -327,33 +327,14 @@
     ],
     "oval:mil.disa.stig.unix:ste:25804500": []
   },
-  "semantic_ir_sha256": "157c0d9df17ac571b11e78cd25d705d8048dbbf6cd8f8b41077b4b2a0d1a27c6",
+  "semantic_ir_sha256": "58866d036da28b3153b7fbe9d3bb5b1da0bb903535419e977fb186f268abb4ea",
   "source": {
     "bytes": 4087,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271832r1092208_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271832r1092208_rule/provenance.json",
-    "sha256": "0e428dbeddf4a92004872e0bc74bf4d0dcdd012c6135f838023bfc51632e25db"
+    "sha256": "11026cd9d79044d181bca2ad080de68aa886dd29a18a1882e5c6c08de05de555"
   },
   "states": [
-    {
-      "comment": "count of passwd UIDs",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "int",
-            "var_ref": "oval:mil.disa.stig.defs:var:25804501"
-          },
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        }
-      ],
-      "id": "oval:mil.disa.stig.ind:ste:25804500",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "variable_state",
-      "version": "1"
-    },
     {
       "comment": "Interactive Users",
       "entities": [
@@ -372,6 +353,25 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "operator": "AND",
       "type": "password_state",
+      "version": "1"
+    },
+    {
+      "comment": "count of passwd UIDs",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "int",
+            "var_ref": "oval:mil.disa.stig.defs:var:25804501"
+          },
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        }
+      ],
+      "id": "oval:mil.disa.stig.ind:ste:25804500",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "variable_state",
       "version": "1"
     }
   ],
@@ -522,10 +522,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]
@@ -568,49 +571,6 @@
     }
   },
   "variables": [
-    {
-      "body": [
-        {
-          "children": [
-            {
-              "attributes": {
-                "item_field": "user_id",
-                "object_ref": "oval:mil.disa.stig.unix:obj:25804500"
-              },
-              "kind": "element",
-              "name": "object_component",
-              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-            }
-          ],
-          "kind": "element",
-          "name": "count",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-        }
-      ],
-      "comment": "count of passwd entries",
-      "datatype": "int",
-      "id": "oval:mil.disa.stig.defs:var:25804500",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-      "semantic_ast": {
-        "datatype": "int",
-        "expression": {
-          "args": [
-            {
-              "item_field": "user_id",
-              "object_ref": "oval:mil.disa.stig.unix:obj:25804500",
-              "op": "object_component",
-              "record_field": null
-            }
-          ],
-          "attributes": {},
-          "op": "count"
-        },
-        "id": "oval:mil.disa.stig.defs:var:25804500",
-        "type": "local_variable"
-      },
-      "type": "local_variable",
-      "version": "1"
-    },
     {
       "body": [
         {
@@ -662,6 +622,49 @@
           "op": "count"
         },
         "id": "oval:mil.disa.stig.defs:var:25804501",
+        "type": "local_variable"
+      },
+      "type": "local_variable",
+      "version": "1"
+    },
+    {
+      "body": [
+        {
+          "children": [
+            {
+              "attributes": {
+                "item_field": "user_id",
+                "object_ref": "oval:mil.disa.stig.unix:obj:25804500"
+              },
+              "kind": "element",
+              "name": "object_component",
+              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+            }
+          ],
+          "kind": "element",
+          "name": "count",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+        }
+      ],
+      "comment": "count of passwd entries",
+      "datatype": "int",
+      "id": "oval:mil.disa.stig.defs:var:25804500",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "int",
+        "expression": {
+          "args": [
+            {
+              "item_field": "user_id",
+              "object_ref": "oval:mil.disa.stig.unix:obj:25804500",
+              "op": "object_component",
+              "record_field": null
+            }
+          ],
+          "attributes": {},
+          "op": "count"
+        },
+        "id": "oval:mil.disa.stig.defs:var:25804500",
         "type": "local_variable"
       },
       "type": "local_variable",

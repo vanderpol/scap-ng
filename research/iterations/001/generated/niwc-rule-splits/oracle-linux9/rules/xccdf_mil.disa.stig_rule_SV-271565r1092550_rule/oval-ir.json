@@ -150,13 +150,6 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23043802",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23043802"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23043803",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23043803"
@@ -167,6 +160,13 @@
       "from": "oval:mil.disa.stig.ind:tst:23043800",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23043800"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:23043802",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:23043802"
     }
   ],
   "dependency_integrity": {
@@ -248,6 +248,40 @@
     "status": "requires_review"
   },
   "objects": [
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/audit/audit.rules"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+(?:.*(-S\\s+init_module\\s+|(\\s+|,)init_module(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "64-bit init_module syscall",
+      "id": "oval:mil.disa.stig.ind:obj:23043801",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
     {
       "children": [
         {
@@ -349,40 +383,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/audit/audit.rules"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+(?:.*(-S\\s+init_module\\s+|(\\s+|,)init_module(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "64-bit init_module syscall",
-      "id": "oval:mil.disa.stig.ind:obj:23043801",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -419,12 +419,12 @@
       "oval:mil.disa.stig.defs:def:230438"
     ]
   },
-  "semantic_ir_sha256": "15796f15547e74df3e97c80624d7440b848234ae77974119fd007db4f6ae3ba4",
+  "semantic_ir_sha256": "f589fa9f0e8960dcd89104f4ab18f191bfa3490384fd578c536fae47ccd81ddc",
   "source": {
     "bytes": 7185,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271565r1092550_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271565r1092550_rule/provenance.json",
-    "sha256": "ed345b22af8140ef9799bb9223480190fd162f17163306d916ae64c635150cd0"
+    "sha256": "728d6f49b4768374ac4bc88385c23fc42e83b657d3c843f38800e5c9e3992dd8"
   },
   "states": [],
   "tests": [
@@ -440,26 +440,6 @@
             "object_ref": "oval:mil.disa.stig.ind:obj:23043801"
           },
           "object_ref": "oval:mil.disa.stig.ind:obj:23043801"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "Audit 32-bit invocations of finit_module syscall",
-      "id": "oval:mil.disa.stig.ind:tst:23043802",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23043802"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23043802"
         }
       ],
       "other": [],
@@ -507,6 +487,26 @@
       "states": [],
       "type": "textfilecontent54_test",
       "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "Audit 32-bit invocations of finit_module syscall",
+      "id": "oval:mil.disa.stig.ind:tst:23043802",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:23043802"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:23043802"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
@@ -538,10 +538,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

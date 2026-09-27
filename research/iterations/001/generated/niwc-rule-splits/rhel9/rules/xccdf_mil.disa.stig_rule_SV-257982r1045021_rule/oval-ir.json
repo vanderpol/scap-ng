@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "/etc/ssh/sshd_config:LogLevel == VERBOSE",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23481500"
-          }
-        ],
-        "comment": "SSH LogLevel == VERBOSE",
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:234815",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system operating system must log SSH connection attempts and failures to the server."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:234815",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "/etc/ssh/sshd_config:LogLevel == VERBOSE",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23481500"
+          }
+        ],
+        "comment": "SSH LogLevel == VERBOSE",
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:234815",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system operating system must log SSH connection attempts and failures to the server."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:234815",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:23481500"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.rhel9os:def:257982",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:234815"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:234815",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:23481500"
     },
     {
       "attribute": "object_ref",
@@ -224,6 +224,40 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*(?i)LogLevel(?-i)[ \\t]+([\\w\\\"]+)[\\s]*(?:|(?:#.*))?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "Pull value of /etc/ssh/sshd_config:LogLevel",
+      "id": "oval:mil.disa.stig.ind:obj:23481500",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "children": [
             {
               "kind": "object_ref",
@@ -293,40 +327,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*(?i)LogLevel(?-i)[ \\t]+([\\w\\\"]+)[\\s]*(?:|(?:#.*))?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "Pull value of /etc/ssh/sshd_config:LogLevel",
-      "id": "oval:mil.disa.stig.ind:obj:23481500",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -355,12 +355,12 @@
       "oval:mil.disa.stig.defs:def:234815"
     ]
   },
-  "semantic_ir_sha256": "a7ee198a1beb711e8f1caf822ee7fb51a2dbaca2e453ac09dccd1376e05e555d",
+  "semantic_ir_sha256": "b307af2e3a6986727d1f2631ab8b61c9fefb5fe4dd48e54cd73e738aab646afa",
   "source": {
     "bytes": 4540,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257982r1045021_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257982r1045021_rule/provenance.json",
-    "sha256": "6002b4d5a010e6b0e25940a719adc26c7c2d734c92f81c28ff82afe8bbf522fc"
+    "sha256": "aee57caf5c6da1bb5b7f4b1b0e299c27b5725181e25b6cad9ea35dd1e71bf483"
   },
   "states": [
     {
@@ -442,10 +442,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

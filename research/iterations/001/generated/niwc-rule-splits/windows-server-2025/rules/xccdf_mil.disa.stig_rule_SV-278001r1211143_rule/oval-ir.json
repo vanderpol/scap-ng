@@ -206,9 +206,9 @@
     {
       "attribute": "var_ref",
       "element": "stdout_line",
-      "from": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104",
+      "from": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102",
       "kind": "variable_reference",
-      "to": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800103"
+      "to": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102"
     },
     {
       "attribute": "var_ref",
@@ -220,9 +220,9 @@
     {
       "attribute": "var_ref",
       "element": "stdout_line",
-      "from": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102",
+      "from": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104",
       "kind": "variable_reference",
-      "to": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102"
+      "to": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800103"
     }
   ],
   "dependency_integrity": {
@@ -335,6 +335,48 @@
       "children": [
         {
           "kind": "element",
+          "name": "shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "powershell"
+        },
+        {
+          "kind": "element",
+          "name": "command",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"System\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }"
+        }
+      ],
+      "comment": "Gather permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "shellcommand_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "powershell"
+        },
+        {
+          "kind": "element",
+          "name": "command",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"Security\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access |  Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }"
+        }
+      ],
+      "comment": "Gather permissions for the HKEY_LOCAL_MACHINE\\SECURITY registry",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "shellcommand_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "namespace",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
           "value": "root\\cimv2"
@@ -364,53 +406,11 @@
           "kind": "element",
           "name": "command",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"Security\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access |  Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }"
-        }
-      ],
-      "comment": "Gather permissions for the HKEY_LOCAL_MACHINE\\SECURITY registry",
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "shellcommand_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "shell",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "powershell"
-        },
-        {
-          "kind": "element",
-          "name": "command",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"Software\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }"
         }
       ],
       "comment": "Gather permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry",
       "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "shellcommand_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "shell",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "powershell"
-        },
-        {
-          "kind": "element",
-          "name": "command",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"System\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }"
-        }
-      ],
-      "comment": "Gather permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry",
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "shellcommand_object",
       "version": "1"
@@ -471,14 +471,54 @@
     "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102": [],
     "oval:navy.navwar.niwcatlantic.scc.windows:var:27800103": []
   },
-  "semantic_ir_sha256": "11ff4b4936d0745c875fab5c5b36c5b3c1cf0f19cafae2ff287aa35ae8cc27d3",
+  "semantic_ir_sha256": "cd143a2b679bdcd3ba0f2e6854be0d7a29daa208658ee4bebe265103524912d9",
   "source": {
     "bytes": 15301,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278001r1211143_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278001r1211143_rule/provenance.json",
-    "sha256": "3e7d9129c8820a263363a4d9e2e8b20c60da1df1ea3bc054a3dd22b6694c3f84"
+    "sha256": "da88521f4e9c9249c9b9f376ad8b0a679cf2a7bda7365b5da5de919b39396863"
   },
   "states": [
+    {
+      "comment": "Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\\System",
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match",
+            "var_check": "at least one",
+            "var_ref": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102"
+          },
+          "kind": "element",
+          "name": "stdout_line",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        }
+      ],
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "shellcommand_state",
+      "version": "1"
+    },
+    {
+      "comment": "Required Permissions for HKEY_LOCAL_MACHINE\\Security",
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match",
+            "var_check": "at least one",
+            "var_ref": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800101"
+          },
+          "kind": "element",
+          "name": "stdout_line",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        }
+      ],
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "shellcommand_state",
+      "version": "1"
+    },
     {
       "comment": "Backup Domain Controller",
       "entities": [
@@ -507,46 +547,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "wmi57_state",
-      "version": "1"
-    },
-    {
-      "comment": "Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\\System and for HKEY_LOCAL_MACHINE\\Software on all servers",
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match",
-            "var_check": "at least one",
-            "var_ref": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800103"
-          },
-          "kind": "element",
-          "name": "stdout_line",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        }
-      ],
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "shellcommand_state",
-      "version": "1"
-    },
-    {
-      "comment": "Required Permissions for HKEY_LOCAL_MACHINE\\Security",
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match",
-            "var_check": "at least one",
-            "var_ref": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800101"
-          },
-          "kind": "element",
-          "name": "stdout_line",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        }
-      ],
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "shellcommand_state",
       "version": "1"
     },
     {
@@ -580,20 +580,20 @@
       "version": "1"
     },
     {
-      "comment": "Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\\System",
+      "comment": "Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\\System and for HKEY_LOCAL_MACHINE\\Software on all servers",
       "entities": [
         {
           "attributes": {
             "operation": "pattern match",
             "var_check": "at least one",
-            "var_ref": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102"
+            "var_ref": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800103"
           },
           "kind": "element",
           "name": "stdout_line",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
         }
       ],
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "shellcommand_state",
@@ -816,10 +816,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]
@@ -864,102 +867,6 @@
     }
   },
   "variables": [
-    {
-      "body": [
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "^Identity:NT AUTHORITY\\\\Authenticated Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-        },
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "^Identity:BUILTIN\\\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-        },
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-        },
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$"
-        },
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "^Identity:APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-        },
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "^Identity:BUILTIN\\\\Server Operators, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-        },
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-        },
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-        }
-      ],
-      "comment": "Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\\System",
-      "datatype": "string",
-      "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-      "semantic_ast": {
-        "datatype": "string",
-        "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102",
-        "type": "constant_variable",
-        "values": [
-          {
-            "datatype": "string",
-            "value": "^Identity:NT AUTHORITY\\\\Authenticated Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-          },
-          {
-            "datatype": "string",
-            "value": "^Identity:BUILTIN\\\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-          },
-          {
-            "datatype": "string",
-            "value": "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-          },
-          {
-            "datatype": "string",
-            "value": "^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$"
-          },
-          {
-            "datatype": "string",
-            "value": "^Identity:APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-          },
-          {
-            "datatype": "string",
-            "value": "^Identity:BUILTIN\\\\Server Operators, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-          },
-          {
-            "datatype": "string",
-            "value": "^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
-          },
-          {
-            "datatype": "string",
-            "value": ""
-          }
-        ]
-      },
-      "type": "constant_variable",
-      "version": "1"
-    },
     {
       "body": [
         {
@@ -1068,6 +975,102 @@
           {
             "datatype": "string",
             "value": "^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+          }
+        ]
+      },
+      "type": "constant_variable",
+      "version": "1"
+    },
+    {
+      "body": [
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "^Identity:NT AUTHORITY\\\\Authenticated Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+        },
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "^Identity:BUILTIN\\\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+        },
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+        },
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$"
+        },
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "^Identity:APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+        },
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "^Identity:BUILTIN\\\\Server Operators, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+        },
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+        },
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+        }
+      ],
+      "comment": "Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\\System",
+      "datatype": "string",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "string",
+        "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27800102",
+        "type": "constant_variable",
+        "values": [
+          {
+            "datatype": "string",
+            "value": "^Identity:NT AUTHORITY\\\\Authenticated Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+          },
+          {
+            "datatype": "string",
+            "value": "^Identity:BUILTIN\\\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+          },
+          {
+            "datatype": "string",
+            "value": "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+          },
+          {
+            "datatype": "string",
+            "value": "^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$"
+          },
+          {
+            "datatype": "string",
+            "value": "^Identity:APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+          },
+          {
+            "datatype": "string",
+            "value": "^Identity:BUILTIN\\\\Server Operators, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+          },
+          {
+            "datatype": "string",
+            "value": "^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+          },
+          {
+            "datatype": "string",
+            "value": ""
           }
         ]
       },

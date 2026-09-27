@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:257996" version="1" class="compliance">
-          <metadata>
-            <title>The operating system SSH daemon must be configured with a timeout interval.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25799600" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.* :ClientAliveInterval == 600"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.ol9os:def:271710" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271710" version="1" class="compliance">
           <metadata>
             <title>OL09-00-002347 - OL 9 must be configured so that all network connections associated with SSH traffic are terminated after 10 minutes of becoming unresponsive.</title>
             <affected family="unix">
@@ -31,21 +22,30 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257996"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:257996" version="1" class="compliance">
+          <metadata>
+            <title>The operating system SSH daemon must be configured with a timeout interval.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25799600" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.* :ClientAliveInterval == 600"/>
+          </criteria>
+        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25799600" version="1" check_existence="at_least_one_exists" check="all" state_operator="AND" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.*:ClientAliveInterval == 600">
           <object object_ref="oval:mil.disa.stig.ind:obj:25799602"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25799600"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25799601"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25799600" version="1">
-          <filepath>/etc/ssh/sshd_config</filepath>
-          <pattern operation="pattern match">^\s*(?i)ClientAliveInterval(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25799602" version="1">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25799602" version="1">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
             <object_reference>oval:mil.disa.stig.ind:obj:25799600</object_reference>
             <object_reference>oval:mil.disa.stig.ind:obj:25799601</object_reference>
           </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25799600" version="1">
+          <filepath>/etc/ssh/sshd_config</filepath>
+          <pattern operation="pattern match">^\s*(?i)ClientAliveInterval(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25799601" version="2">
           <path>/etc/ssh/sshd_config.d</path>

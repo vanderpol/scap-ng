@@ -6,53 +6,6 @@
         "children": [
           {
             "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23031000"
-          },
-          {
-            "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23031001"
-          },
-          {
-            "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23031002"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230310",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must disable kernel dumps unless needed."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230310",
             "kind": "definition_ref",
             "negate": false
@@ -96,9 +49,63 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23031000"
+          },
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23031001"
+          },
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23031002"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230310",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must disable kernel dumps unless needed."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271733",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230310"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -121,11 +128,18 @@
       "to": "oval:mil.disa.stig.linux:tst:23031002"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271733",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230310"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.linux:tst:23031001",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.linux:obj:23031001"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.linux:tst:23031001",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.linux:ste:20000005"
     },
     {
       "attribute": "object_ref",
@@ -152,20 +166,6 @@
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.linux:tst:23031000",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.linux:ste:20000005"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.linux:tst:23031001",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.linux:obj:23031001"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.linux:tst:23031001",
       "kind": "test_state",
       "to": "oval:mil.disa.stig.linux:ste:20000005"
     }
@@ -257,6 +257,27 @@
           "kind": "element",
           "name": "property",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "ActiveState"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.linux:obj:23031002",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "systemdunitproperty_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "unit",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "kdump.service"
+        },
+        {
+          "kind": "element",
+          "name": "property",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
           "value": "LoadState"
         }
       ],
@@ -283,27 +304,6 @@
       ],
       "comment": null,
       "id": "oval:mil.disa.stig.linux:obj:23031001",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "systemdunitproperty_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "unit",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "kdump.service"
-        },
-        {
-          "kind": "element",
-          "name": "property",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "ActiveState"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23031002",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
       "type": "systemdunitproperty_object",
       "version": "1"
@@ -343,30 +343,14 @@
       "oval:mil.disa.stig.defs:def:230310"
     ]
   },
-  "semantic_ir_sha256": "e1c3c89a358ab56a51f59d68388b9c39305e7c1649c56c094f3605b948e48968",
+  "semantic_ir_sha256": "41298bab107e2c10d9db50f0faf7dca954b9e776a10dd2311664bf92f2eb61d8",
   "source": {
     "bytes": 4577,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271733r1092598_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271733r1092598_rule/provenance.json",
-    "sha256": "9b57df5c5401edd15e5bd5097bca8ddf94ae7410ca2c3bee9f4a1d9b2316da2e"
+    "sha256": "ce36a1fb810b463f48caf9a360a0d85f9ba75b38f0edfc6ae406b951bcdb1fa3"
   },
   "states": [
-    {
-      "comment": null,
-      "entities": [
-        {
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "inactive"
-        }
-      ],
-      "id": "oval:mil.disa.stig.linux:ste:20000007",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "operator": "AND",
-      "type": "systemdunitproperty_state",
-      "version": "1"
-    },
     {
       "comment": null,
       "entities": [
@@ -382,9 +366,52 @@
       "operator": "AND",
       "type": "systemdunitproperty_state",
       "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "inactive"
+        }
+      ],
+      "id": "oval:mil.disa.stig.linux:ste:20000007",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "operator": "AND",
+      "type": "systemdunitproperty_state",
+      "version": "1"
     }
   ],
   "tests": [
+    {
+      "check": "all",
+      "check_existence": "any_exist",
+      "comment": "kdump.service UnitFileState is masked if it exists.",
+      "id": "oval:mil.disa.stig.linux:tst:23031001",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.linux:obj:23031001"
+          },
+          "object_ref": "oval:mil.disa.stig.linux:obj:23031001"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.linux:ste:20000005"
+          },
+          "state_ref": "oval:mil.disa.stig.linux:ste:20000005"
+        }
+      ],
+      "type": "systemdunitproperty_test",
+      "version": "2"
+    },
     {
       "check": "all",
       "check_existence": "any_exist",
@@ -438,33 +465,6 @@
       ],
       "type": "systemdunitproperty_test",
       "version": "2"
-    },
-    {
-      "check": "all",
-      "check_existence": "any_exist",
-      "comment": "kdump.service UnitFileState is masked if it exists.",
-      "id": "oval:mil.disa.stig.linux:tst:23031001",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23031001"
-          },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23031001"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.linux:ste:20000005"
-          },
-          "state_ref": "oval:mil.disa.stig.linux:ste:20000005"
-        }
-      ],
-      "type": "systemdunitproperty_test",
-      "version": "2"
     }
   ],
   "unresolved_references": [],
@@ -496,10 +496,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

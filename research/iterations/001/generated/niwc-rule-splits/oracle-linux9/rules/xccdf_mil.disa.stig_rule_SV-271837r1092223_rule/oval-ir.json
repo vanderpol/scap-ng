@@ -231,16 +231,16 @@
       "oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704"
     ]
   },
-  "semantic_ir_sha256": "75842db6012d6fea81e430b7e050acc73dea150514a26609f1ca5101fd0967c3",
+  "semantic_ir_sha256": "8609910f453c30e0ec1a64e2eb49d234fd9874ee307160a2a3964b9483700c82",
   "source": {
     "bytes": 6579,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271837r1092223_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271837r1092223_rule/provenance.json",
-    "sha256": "e0cc034fcf444f2c5e4c05ddcafa458b82fc85989a3daf5ea1205d01e7135af5"
+    "sha256": "58157aaff857f96c6066ae6c8713b9fd2522ec8d8c473fd8e6bcf74d52337e81"
   },
   "states": [
     {
-      "comment": "Check that auth required pam_faillock.so preath line exists.",
+      "comment": "Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.",
       "entities": [
         {
           "attributes": {
@@ -249,29 +249,10 @@
           "kind": "element",
           "name": "text",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "\\n\\s*auth\\s+required\\s+pam_faillock.so\\s+preauth\\b"
+          "value": "\\n\\s*auth\\s+required\\s+pam_faillock.so\\s+preauth(.*\\n)*auth\\s+(required|sufficient|requisite)\\s+pam_unix.so"
         }
       ],
-      "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "textfilecontent54_state",
-      "version": "5"
-    },
-    {
-      "comment": "Check that auth required pam_faillock.so authfail line exists.",
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "text",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "\\n\\s*auth\\s+required\\s+pam_faillock.so\\s+authfail\\b"
-        }
-      ],
-      "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:27183702",
+      "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",
@@ -297,7 +278,7 @@
       "version": "5"
     },
     {
-      "comment": "Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.",
+      "comment": "Check that auth required pam_faillock.so authfail line exists.",
       "entities": [
         {
           "attributes": {
@@ -306,10 +287,29 @@
           "kind": "element",
           "name": "text",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "\\n\\s*auth\\s+required\\s+pam_faillock.so\\s+preauth(.*\\n)*auth\\s+(required|sufficient|requisite)\\s+pam_unix.so"
+          "value": "\\n\\s*auth\\s+required\\s+pam_faillock.so\\s+authfail\\b"
         }
       ],
-      "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704",
+      "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:27183702",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "textfilecontent54_state",
+      "version": "5"
+    },
+    {
+      "comment": "Check that auth required pam_faillock.so preath line exists.",
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "text",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "\\n\\s*auth\\s+required\\s+pam_faillock.so\\s+preauth\\b"
+        }
+      ],
+      "id": "oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",
@@ -392,10 +392,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]

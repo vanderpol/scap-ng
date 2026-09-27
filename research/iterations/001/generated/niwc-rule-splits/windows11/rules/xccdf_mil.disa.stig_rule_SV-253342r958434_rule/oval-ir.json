@@ -152,9 +152,16 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:25334201",
+      "from": "oval:mil.disa.stig.win:tst:25334202",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.win:obj:25334203"
+      "to": "oval:mil.disa.stig.win:obj:25334202"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.win:tst:25334202",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.win:ste:20000016"
     },
     {
       "attribute": "object_ref",
@@ -166,16 +173,9 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:25334202",
+      "from": "oval:mil.disa.stig.win:tst:25334201",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.win:obj:25334202"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:25334202",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.win:ste:20000016"
+      "to": "oval:mil.disa.stig.win:obj:25334203"
     },
     {
       "attribute": null,
@@ -218,6 +218,13 @@
       "from": "oval:mil.disa.stig.win:obj:25334203",
       "kind": "set_filter_state",
       "to": "oval:mil.disa.stig.win:ste:20000015"
+    },
+    {
+      "attribute": "var_ref",
+      "element": "filepath",
+      "from": "oval:mil.disa.stig.win:obj:25334201",
+      "kind": "variable_reference",
+      "to": "oval:mil.disa.stig.win:var:25334201"
     },
     {
       "attribute": null,
@@ -267,13 +274,6 @@
       "from": "oval:mil.disa.stig.win:obj:25334204",
       "kind": "variable_reference",
       "to": "oval:mil.disa.stig.win:var:25334202"
-    },
-    {
-      "attribute": "var_ref",
-      "element": "filepath",
-      "from": "oval:mil.disa.stig.win:obj:25334201",
-      "kind": "variable_reference",
-      "to": "oval:mil.disa.stig.win:var:25334201"
     },
     {
       "attribute": "object_ref",
@@ -411,42 +411,6 @@
     {
       "children": [
         {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "hive",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "HKEY_LOCAL_MACHINE"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SystemRoot"
-        }
-      ],
-      "comment": "System Root Directory",
-      "id": "oval:mil.disa.stig.win:obj:20000015",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "registry_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
           "children": [
             {
               "kind": "object_ref",
@@ -498,6 +462,72 @@
       "id": "oval:mil.disa.stig.win:obj:25334203",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "fileeffectiverights53_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "case insensitive equals",
+            "var_check": "at least one",
+            "var_ref": "oval:mil.disa.stig.win:var:25334201"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+        },
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "trustee_sid",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": ".*"
+        }
+      ],
+      "comment": "The System event log. Built filepath.",
+      "id": "oval:mil.disa.stig.win:obj:25334201",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "fileeffectiverights53_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "hive",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "HKEY_LOCAL_MACHINE"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "key",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SYSTEM\\CurrentControlSet\\Services\\EventLog\\System"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "file"
+        }
+      ],
+      "comment": "path System.evtx",
+      "id": "oval:mil.disa.stig.win:obj:25334202",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "registry_object",
       "version": "1"
     },
     {
@@ -574,7 +604,7 @@
           "kind": "element",
           "name": "key",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SYSTEM\\CurrentControlSet\\Services\\EventLog\\System"
+          "value": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
         },
         {
           "attributes": {
@@ -583,11 +613,11 @@
           "kind": "element",
           "name": "name",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "file"
+          "value": "SystemRoot"
         }
       ],
-      "comment": "path System.evtx",
-      "id": "oval:mil.disa.stig.win:obj:25334202",
+      "comment": "System Root Directory",
+      "id": "oval:mil.disa.stig.win:obj:20000015",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
       "version": "1"
@@ -618,36 +648,6 @@
       ],
       "comment": "The System event log. Strict filepath, as listed.",
       "id": "oval:mil.disa.stig.win:obj:25334204",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "fileeffectiverights53_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "case insensitive equals",
-            "var_check": "at least one",
-            "var_ref": "oval:mil.disa.stig.win:var:25334201"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
-        },
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "trustee_sid",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": ".*"
-        }
-      ],
-      "comment": "The System event log. Built filepath.",
-      "id": "oval:mil.disa.stig.win:obj:25334201",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "fileeffectiverights53_object",
       "version": "1"
@@ -717,71 +717,14 @@
       "oval:mil.disa.stig.defs:def:253342"
     ]
   },
-  "semantic_ir_sha256": "de81098071ee8ae302ef86c3d91f48e011e2c63b84b363f257435890e78ea38a",
+  "semantic_ir_sha256": "0d32600c949625feb430ce943bd046b700db2d237cd0675d31c625d23c6acb29",
   "source": {
     "bytes": 10116,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253342r958434_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253342r958434_rule/provenance.json",
-    "sha256": "8eca9dbd06c1105c0dd9277510073ce0ec47d2eba4b6760e531c07978e95e77e"
+    "sha256": "8955ea19781908cb32f09c95597ee91f0e6ab51511318abb2422959f2f33e185"
   },
   "states": [
-    {
-      "comment": "APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES account.",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "trustee_sid",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "S-1-15-2-1"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000015",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "fileeffectiverights53_state",
-      "version": "1"
-    },
-    {
-      "comment": "Event Log process account. Deterministically built with respect to service name.",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "trustee_sid",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000011",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "fileeffectiverights53_state",
-      "version": "1"
-    },
-    {
-      "comment": "SYSTEM account.",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "trustee_sid",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "S-1-5-18"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000012",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "fileeffectiverights53_state",
-      "version": "1"
-    },
     {
       "comment": "Administrators account.",
       "entities": [
@@ -822,6 +765,63 @@
       "version": "1"
     },
     {
+      "comment": "Event Log process account. Deterministically built with respect to service name.",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "trustee_sid",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000011",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "fileeffectiverights53_state",
+      "version": "1"
+    },
+    {
+      "comment": "APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES account.",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "trustee_sid",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "S-1-15-2-1"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000015",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "fileeffectiverights53_state",
+      "version": "1"
+    },
+    {
+      "comment": "SYSTEM account.",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "trustee_sid",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "S-1-5-18"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000012",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "fileeffectiverights53_state",
+      "version": "1"
+    },
+    {
       "comment": "LOCAL SERVICE account, the owner.",
       "entities": [
         {
@@ -842,46 +842,6 @@
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "none_exist",
-      "comment": "The System event log must have at least default permissions. Strict Path",
-      "id": "oval:mil.disa.stig.win:tst:25334201",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:25334203"
-          },
-          "object_ref": "oval:mil.disa.stig.win:obj:25334203"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "fileeffectiverights53_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "none_exist",
-      "comment": "The System event log must have at least default permissions. Built Path",
-      "id": "oval:mil.disa.stig.win:tst:25334200",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:25334200"
-          },
-          "object_ref": "oval:mil.disa.stig.win:obj:25334200"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "fileeffectiverights53_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -907,6 +867,46 @@
         }
       ],
       "type": "registry_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "none_exist",
+      "comment": "The System event log must have at least default permissions. Built Path",
+      "id": "oval:mil.disa.stig.win:tst:25334200",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.win:obj:25334200"
+          },
+          "object_ref": "oval:mil.disa.stig.win:obj:25334200"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "fileeffectiverights53_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "none_exist",
+      "comment": "The System event log must have at least default permissions. Strict Path",
+      "id": "oval:mil.disa.stig.win:tst:25334201",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.win:obj:25334203"
+          },
+          "object_ref": "oval:mil.disa.stig.win:obj:25334203"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "fileeffectiverights53_test",
       "version": "1"
     }
   ],
@@ -967,16 +967,14 @@
       "variable_type": "local_variable"
     },
     "oval:mil.disa.stig.win:var:25334202": {
-      "blocked_by": [
-        {
-          "item_field": "value",
-          "object_ref": "oval:mil.disa.stig.win:obj:25334202",
-          "operation": "object_component",
-          "reason": "object_component_requires_collection:registry_object",
-          "record_field": null,
-          "status": "dynamic_object_dependency"
-        }
-      ],
+      "blocked_by": {
+        "item_field": "value",
+        "object_ref": "oval:mil.disa.stig.win:obj:25334202",
+        "operation": "object_component",
+        "reason": "object_component_requires_collection:registry_object",
+        "record_field": null,
+        "status": "dynamic_object_dependency"
+      },
       "datatype": "string",
       "dependencies": {
         "objects": [
@@ -1003,6 +1001,7 @@
         "op": "regex_capture"
       },
       "mode": "target_dependent",
+      "reason": "regex_capture_child_not_static:object_component_requires_collection:registry_object",
       "resolution_status": "dynamic_object_dependency",
       "variable_id": "oval:mil.disa.stig.win:var:25334202",
       "variable_type": "local_variable"
@@ -1035,10 +1034,13 @@
       "count",
       "end",
       "escape_regex",
+      "glob_to_regex",
       "literal_component",
       "merge",
+      "regex_capture",
       "split",
       "substring",
+      "time_difference",
       "unique",
       "variable_component"
     ]
@@ -1060,18 +1062,17 @@
       "variable_type": "local_variable"
     },
     "oval:mil.disa.stig.win:var:25334202": {
-      "blocked_by": [
-        {
-          "item_field": "value",
-          "object_ref": "oval:mil.disa.stig.win:obj:25334202",
-          "operation": "object_component",
-          "reason": "object_component_requires_collection:registry_object",
-          "record_field": null,
-          "status": "dynamic_object_dependency"
-        }
-      ],
+      "blocked_by": {
+        "item_field": "value",
+        "object_ref": "oval:mil.disa.stig.win:obj:25334202",
+        "operation": "object_component",
+        "reason": "object_component_requires_collection:registry_object",
+        "record_field": null,
+        "status": "dynamic_object_dependency"
+      },
       "datatype": "string",
       "operation": "regex_capture",
+      "reason": "regex_capture_child_not_static:object_component_requires_collection:registry_object",
       "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }
