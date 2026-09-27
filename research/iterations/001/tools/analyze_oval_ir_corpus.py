@@ -21,6 +21,9 @@ def main():
     rules_with_unsupported_variable_functions=0
     unsupported_ops=Counter()
     variable_ast_ops=Counter()
+    evaluation_plan_modes=Counter()
+    target_dependent_plan_ops=Counter()
+    target_dependent_object_refs=Counter()
     per_benchmark=defaultdict(lambda:{
         "rules":0,"rules_with_variables":0,"variables":0,
         "exact_static_variables":0,"unsupported_variable_resolutions":0
@@ -55,6 +58,16 @@ def main():
             if "expression" in ast:
                 count_ast_ops(ast["expression"])
 
+        plans=ir.get("variable_evaluation_plans",{})
+        for plan in plans.values():
+            mode=plan.get("mode","unknown")
+            evaluation_plan_modes[mode]+=1
+            if mode=="target_dependent":
+                for op in plan.get("dependencies",{}).get("operations",[]):
+                    target_dependent_plan_ops[op]+=1
+                for obj in plan.get("dependencies",{}).get("objects",[]):
+                    target_dependent_object_refs[obj]+=1
+
         vr=ir.get("variable_resolution",{})
         if vr:
             rules_with_variables+=1
@@ -84,6 +97,9 @@ def main():
       "variable_resolution_status":dict(sorted(variable_status.items())),
       "variable_types":dict(sorted(variable_types.items())),
       "variable_expression_operations":dict(sorted(variable_ast_ops.items())),
+      "variable_evaluation_plan_modes":dict(sorted(evaluation_plan_modes.items())),
+      "target_dependent_plan_operations":dict(sorted(target_dependent_plan_ops.items())),
+      "target_dependent_object_reference_count":len(target_dependent_object_refs),
       "variable_function_model":{
         "oval_5_12_3_component_operations":[
           "arithmetic","begin","concat","count","end","escape_regex",
@@ -112,6 +128,8 @@ def main():
       "rules_with_variables":out["rules_with_variables"],
       "variable_resolution_status":out["variable_resolution_status"],
       "unsupported_or_dynamic_variable_operations":out["unsupported_or_dynamic_variable_operations"],
+      "variable_evaluation_plan_modes":out["variable_evaluation_plan_modes"],
+      "target_dependent_plan_operations":out["target_dependent_plan_operations"],
     },indent=2,sort_keys=True))
     return 0
 
