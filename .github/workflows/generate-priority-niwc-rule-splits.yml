@@ -9,6 +9,7 @@ on:
       - "research/iterations/001/tools/oval_semantic_ir.py"
       - "research/iterations/001/tools/analyze_oval_ir_corpus.py"
       - "research/iterations/001/tools/test_oval_dependency_graph.py"
+      - "research/iterations/001/tools/build_oval_schema_semantic_catalog.py"
       - "research/iterations/001/tools/normalize_audit_syscall_matrix.py"
       - "research/iterations/001/tools/render_native_semantics.py"
       - "research/iterations/001/tools/compare_native_semantics.py"
@@ -49,6 +50,13 @@ jobs:
 
       - name: Test variable-driven dependency closure
         run: python scap-ng/research/iterations/001/tools/test_oval_dependency_graph.py
+
+      - name: Build schema-derived OVAL semantic catalog
+        run: |
+          python scap-ng/research/iterations/001/tools/build_oval_schema_semantic_catalog.py \
+            scap-ng/third_party/scap-1.4-schemas/oval_5.12.3 \
+            --parser scap-ng/research/iterations/001/tools/oval_semantic_ir.py \
+            --output scap-ng/research/iterations/001/generated/oval-schema-semantic-catalog.json
 
       - name: Split four priority published benchmarks
         shell: bash
