@@ -15,6 +15,8 @@ Iteration 001 is intentionally **not a draft specification** and remains our int
 - `result-explanation-model.md` — structured decisive-outcome explanation model for Pass/Fail diagnostics.
 - `complex-oval-prototype-backlog.md` — ranked real-world OVAL cases selected for semantic stress testing.
 - `real-world-oval-findings.md` — requirements and observations learned by translating those OVAL cases.
+- `scap14-public-corpus-conversion-requirement.md` — hard pre-specification conversion gates for the versioned public SCAP 1.4 corpus.
+- `public-corpus-manifest.yaml` — pinned public sources used for repeatable conversion coverage.
 - `prototypes/full-benchmarks/` — primary file-oriented benchmark prototypes, results, and signed bundles.
 - `feedback/` — questionnaire, response template, response evidence, and decision register.
 - `notes/` — supporting observations.

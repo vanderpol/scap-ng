@@ -1,0 +1,41 @@
+name: SCAP 1.4 public corpus conversion coverage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/scap14-public-corpus-coverage.yml"
+      - "research/iterations/001/tools/scap14_corpus_convert.py"
+      - "research/iterations/001/public-corpus-manifest.yaml"
+      - "research/iterations/001/scap14-public-corpus-conversion-requirement.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  niwc-current-ingestion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC public corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: public-corpus
+
+      - name: Run SCAP 1.4 corpus ingestion/accounting gate
+        run: |
+          python scap-ng/research/iterations/001/tools/scap14_corpus_convert.py             public-corpus/Current             --output-dir scap-ng/work/public-corpus-conversion             --gate ingest
+
+      - name: Upload corpus conversion accounting
+        uses: actions/upload-artifact@v4
+        with:
+          name: niwc-current-scap14-conversion-accounting
+          path: scap-ng/work/public-corpus-conversion/
+          if-no-files-found: error
