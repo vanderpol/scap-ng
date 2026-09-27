@@ -1153,24 +1153,6 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
 
         # These operations are fully represented in semantic_ast but are not
         # claimed as exact-static by this prototype evaluator yet.
-        if name in set():
-            child_ops = [
-                component_values(c)
-                for c in node
-                if isinstance(c.tag, str)
-            ]
-            if any(c["status"] == "dynamic_object_dependency" for c in child_ops):
-                return result(
-                    "dynamic_object_dependency",
-                    operation=name,
-                    blocked_by=[c for c in child_ops if c["status"] != "exact_static"],
-                )
-            return result(
-                "modeled_not_static_evaluated",
-                operation=name,
-                reason="function_semantics_explicit_in_ast_but_static_evaluator_not_enabled",
-            )
-
         return result(
             "unsupported_function",
             operation=name,
@@ -1296,8 +1278,12 @@ def build_variable_evaluation_plans(variables, variable_resolution):
         elif variable.get("type") == "local_variable" and "expression" in ast:
             deps = {"objects": set(), "variables": set(), "operations": set()}
             expression_dependencies(ast["expression"], deps)
+            plan_mode = {
+                "dynamic_object_dependency": "target_dependent",
+                "runtime_time_dependency": "runtime_dependent",
+            }.get(status, "unresolved")
             plan.update({
-                "mode": "target_dependent" if status == "dynamic_object_dependency" else "unresolved",
+                "mode": plan_mode,
                 "expression": ast["expression"],
                 "dependencies": {
                     "objects": sorted(deps["objects"]),
