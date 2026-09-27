@@ -1,0 +1,24 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: demo.windows.remote-registry-disabled
+  version: 1
+  description: Reusable Remote Registry service assessment.
+  collect:
+    service:
+      capability: windows.service
+      name: RemoteRegistry
+      fields: [startup_type, running]
+  assert:
+    all:
+      - compare:
+          subject: startup_type
+          actual: "$service.startup_type"
+          op: eq
+          expected: disabled
+      - compare:
+          subject: running
+          actual: "$service.running"
+          op: eq
+          expected: false

@@ -1,0 +1,17 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: demo.windows.defender-realtime
+  version: 1
+  description: Reusable Microsoft Defender real-time protection assessment.
+  collect:
+    defender:
+      capability: windows.defender.status
+      fields: [realtime_protection_enabled]
+  assert:
+    compare:
+      subject: realtime_protection_enabled
+      actual: "$defender.realtime_protection_enabled"
+      op: eq
+      expected: true
