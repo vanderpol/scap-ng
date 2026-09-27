@@ -1,0 +1,74 @@
+scap_ng: 0.1-prototype
+prototype: true
+rule:
+  id: SV-281050
+  title: RHEL 10 must enforce group ownership of audit logs by "root" or by a restricted logging group to prevent unauthorized read access.
+  references: {stig: SV-281050}
+  policy_metadata_status: incomplete_from_oval_only
+  assessment:
+      id: migration.rhel10.audit-log-group-owner.sv-281050
+      version: 1
+      description: Candidate native translation of the audit log group ownership dataflow.
+    
+      collect:
+        auditd_directives:
+          capability: linux.config.directives
+          file: /etc/audit/auditd.conf
+          names: [log_file, log_group]
+          comments: shell
+          ordering: source
+        audit_log_file:
+          capability: filesystem.metadata
+          path: "$derived.configured_log_file"
+        audit_log_directory:
+          capability: filesystem.metadata
+          path: "$derived.log_directory"
+        configured_group:
+          capability: identity.group
+          name: "$derived.effective_log_group"
+    
+      derive:
+        distinct_log_files:
+          unique: {select: "$auditd_directives.log_file.values"}
+        distinct_log_groups:
+          unique: {select: "$auditd_directives.log_group.values"}
+        configured_log_file:
+          last: "$auditd_directives.log_file.values"
+        configured_log_group:
+          last_or_null: "$auditd_directives.log_group.values"
+        effective_log_group:
+          coalesce: ["$derived.configured_log_group", root]
+        log_directory:
+          path_dirname: "$derived.configured_log_file"
+        expected_gid:
+          if:
+            when: {compare: {actual: "$derived.effective_log_group", op: eq, expected: root}}
+            then: 0
+            else: "$configured_group.gid"
+    
+      assert:
+        all:
+          id: root
+          children:
+            - cardinality: {id: one-log-file, subject: "$derived.distinct_log_files", min: 1, max: 1}
+            - cardinality: {id: at-most-one-log-group, subject: "$derived.distinct_log_groups", max: 1}
+            - compare: {id: absolute-path, subject: configured_log_file, actual: "$derived.configured_log_file", op: path_is_absolute, expected: true}
+            - compare: {id: log-file-exists, subject: audit_log_file_exists, actual: "$audit_log_file.exists", op: eq, expected: true}
+            - compare: {id: directory-exists, subject: log_directory_exists, actual: "$audit_log_directory.exists", op: eq, expected: true}
+            - if:
+                id: group-resolution
+                when: {compare: {actual: "$derived.effective_log_group", op: ne, expected: root}}
+                then:
+                  cardinality: {subject: "$configured_group.matches", min: 1, max: 1}
+                else:
+                  literal: true
+            - compare:
+                id: group-owner
+                subject: audit_log_group_id
+                actual: "$audit_log_file.group_id"
+                op: eq
+                expected: "$derived.expected_gid"
+    
+      diagnostics:
+        max_failure_causes: 4
+    

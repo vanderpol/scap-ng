@@ -1,0 +1,19 @@
+outcome: fail
+assessment: migration.rhel10.audit-log-group-owner.sv-281053
+decision:
+  branch: configured_alternative_group
+  condition: {subject: effective_log_group, actual: audit, operator: ne, expected: root, outcome: pass}
+explanation:
+  kind: comparison
+  assertion_ref: group-owner
+  subject: audit_log_group_id
+  actual: 0
+  operator: eq
+  expected: 190
+  outcome: fail
+  evidence_refs: [ev-file, ev-group]
+evidence:
+  ev-file: {path: /var/log/audit/audit.log, group_id: 0}
+  ev-group: {name: audit, gid: 190, matches: 1}
+evaluation: {outcome_complete: true, diagnostics_complete: true}
+summary: "Failed: audit.log has GID 0; configured log_group 'audit' resolves to GID 190."
