@@ -24,11 +24,33 @@ def main():
     evaluation_plan_modes=Counter()
     target_dependent_plan_ops=Counter()
     target_dependent_object_refs=Counter()
+    set_operators=Counter()
+    filter_actions=Counter()
+    filter_action_origin=Counter()
+    filters_by_state_type=Counter()
+    rules_with_filters=0
     per_benchmark=defaultdict(lambda:{
         "rules":0,"rules_with_variables":0,"variables":0,
         "exact_static_variables":0,"unsupported_variable_resolutions":0
     })
 
+
+    def walk_sets(node, state_types, found):
+        if not isinstance(node, dict):
+            return
+        if node.get("kind")=="set":
+            found["sets"] += 1
+            set_operators[node.get("operator","UNION")] += 1
+            for child in node.get("children",[]):
+                if child.get("kind")=="filter":
+                    found["filters"] += 1
+                    action=child.get("action","exclude")
+                    filter_actions[action] += 1
+                    filter_action_origin["explicit" if child.get("action_explicit") else "default"] += 1
+                    ref=child.get("state_ref")
+                    filters_by_state_type[state_types.get(ref,"missing")] += 1
+                elif child.get("kind")=="set":
+                    walk_sets(child,state_types,found)
 
     def count_ast_ops(node):
         if not isinstance(node, dict):
@@ -52,6 +74,14 @@ def main():
                 attr_counts[attr][value]+=count
         for edge in ir.get("dependency_edges",[]):
             dependency_kinds[edge.get("kind","unknown")]+=1
+
+        state_types={x.get("id"):x.get("type","unknown") for x in ir.get("states",[])}
+        found={"sets":0,"filters":0}
+        for obj in ir.get("objects",[]):
+            for child in obj.get("children",[]):
+                walk_sets(child,state_types,found)
+        if found["filters"]:
+            rules_with_filters += 1
 
         for variable in ir.get("variables",[]):
             ast=variable.get("semantic_ast",{})
@@ -100,6 +130,13 @@ def main():
       "variable_evaluation_plan_modes":dict(sorted(evaluation_plan_modes.items())),
       "target_dependent_plan_operations":dict(sorted(target_dependent_plan_ops.items())),
       "target_dependent_object_reference_count":len(target_dependent_object_refs),
+      "set_filter_semantics":{
+        "rules_with_filters":rules_with_filters,
+        "set_operators":dict(sorted(set_operators.items())),
+        "filter_actions":dict(sorted(filter_actions.items())),
+        "filter_action_origin":dict(sorted(filter_action_origin.items())),
+        "filters_by_state_type":dict(sorted(filters_by_state_type.items())),
+      },
       "variable_function_model":{
         "oval_5_12_3_component_operations":[
           "arithmetic","begin","concat","count","end","escape_regex",
@@ -130,6 +167,7 @@ def main():
       "unsupported_or_dynamic_variable_operations":out["unsupported_or_dynamic_variable_operations"],
       "variable_evaluation_plan_modes":out["variable_evaluation_plan_modes"],
       "target_dependent_plan_operations":out["target_dependent_plan_operations"],
+      "set_filter_semantics":out["set_filter_semantics"],
     },indent=2,sort_keys=True))
     return 0
 
