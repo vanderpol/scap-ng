@@ -1,0 +1,36 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: NG-DEMO-WC-001
+  title: Illustrative Windows client password policy must meet the client baseline
+  severity: high
+  references:
+    source: illustrative Windows Client STIG-like policy
+    cci: [CCI-DEMO-WC-001]
+  discussion: The effective password policy must satisfy the client baseline.
+  check: Verify the system is a Windows client and the effective minimum password length is at least 14 with password history of at least 24.
+  fix: Configure the effective Windows client password policy.
+  assessment:
+    id: demo.windows.password-policy-by-role
+    version: 1
+    parameters:
+      applicable_role: workstation
+      minimum_length: 14
+      history_count: 24
+    collect:
+      system_role:
+        capability: windows.system-role
+      password_policy:
+        capability: auth.password-policy
+        fields: [minimum_length, history_count]
+    assert:
+      if:
+        when:
+          compare: {actual: "$system_role.role", op: eq, expected: workstation}
+        then:
+          all:
+            - compare: {subject: minimum_password_length, actual: "$password_policy.minimum_length", op: ge, expected: 14}
+            - compare: {subject: password_history, actual: "$password_policy.history_count", op: ge, expected: 24}
+        else:
+          outcome: not_applicable
