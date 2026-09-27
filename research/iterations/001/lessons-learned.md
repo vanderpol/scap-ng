@@ -91,7 +91,37 @@ Collection errors and applicability decisions use separate structured reason/app
 
 See `result-explanation-model.md`.
 
-## 13. Questions carried forward
+## 13. Real OVAL shows that derivation is a core semantic need
+
+Local variables, object components, regex capture, defaults, unique counts, and dynamic expected values appear in the selected real definitions.
+
+**Lesson:** SCAP-NG likely needs a first-class deterministic `derive` layer between collection and assertion. It should be typed, side-effect-free, and evidence-traceable rather than recreating arbitrary procedural scripting.
+
+## 14. Empty-population semantics must be explicit
+
+The RHEL umask example demonstrates that universal quantification and required existence are separate requirements.
+
+**Lesson:** Quantifiers must not accidentally make empty populations compliant. Cardinality/existence constraints need explicit, composable semantics.
+
+## 15. Many OVAL sets/filters can become semantic population assertions
+
+Large definitions often use set/filter graphs to construct violating populations.
+
+**Lesson:** Collection scopes + quantifiers + predicates may replace much OVAL set/filter authoring. General set algebra should not be removed until corpus analysis proves it unnecessary.
+
+## 16. High-level capabilities reduce content complexity by centralizing semantics
+
+Package verification, normalized audit rules, effective crypto policy, and PostgreSQL instance/settings collection substantially reduce individual assessment size.
+
+**Lesson:** This is beneficial only if capability contracts are standardized and conformance-tested. Complexity moved into an interoperable reusable capability is a win; complexity hidden in vendor-specific scanner behavior is not.
+
+## 17. Existing shell-command duplication exposes real reuse opportunities
+
+Two PostgreSQL rules and four RHEL audit syscall rules collapse naturally into parameterized assessments.
+
+**Lesson:** Reuse should be demonstrated and validated against existing content, not just synthetic examples.
+
+## 18. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 

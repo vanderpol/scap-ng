@@ -34,6 +34,14 @@ Reviewers do not need to answer every question. Please preserve the question IDs
 
 **AUTO-002** — What should happen when an IF/ELIF condition cannot be evaluated because evidence is missing or collection errors?
 
+**AUTO-003** — Does the real OVAL corpus justify a first-class typed `derive` phase between collection and assertion?
+
+**AUTO-004** — Which derivation primitives are essential in the core language (for example unique, count, path operations, coalesce, regex capture, concat, typed conversion)?
+
+**AUTO-005** — Should general set algebra remain a core author-facing feature if corpus migration can represent most current set/filter usage through collection scopes, predicates, quantifiers, and derivations?
+
+**AUTO-006** — What safeguards are needed so the derive layer does not become another general-purpose scripting language?
+
 **BOOL-001** — Should scanners normally short-circuit AND/OR expressions once the final truth value is invariant?
 
 **BOOL-002** — Should content be able to request additional independent failure causes after the verdict is already known?
@@ -67,6 +75,10 @@ Reviewers do not need to answer every question. Please preserve the question IDs
 **MIG-003** — What should be required before a converted assessment is labeled semantically equivalent to the original OVAL definition?
 
 **MIG-004** — Is a temporary legacy OVAL compatibility execution mechanism acceptable as a migration safety valve?
+
+**MIG-005** — When may a converter replace OVAL Boolean compliance logic with explicit SCAP-NG applicability, as demonstrated by the Windows Store case?
+
+**MIG-006** — What differential-test evidence should be required before a real-world prototype translation can move from `prototype_native_translation` to `exact_native` or `exact_normalized`?
 
 ## Scoring
 
@@ -109,6 +121,10 @@ Reviewers do not need to answer every question. Please preserve the question IDs
 **CAP-001** — Which native collection capability families are essential for a first usable release?
 
 **CAP-002** — How should the capability registry evolve without recreating OVAL's platform-schema proliferation?
+
+**CAP-003** — Are higher-level contracts such as package verification, effective audit rules, crypto policy, and PostgreSQL instance/settings collection appropriate standard capabilities, or are any too implementation-specific?
+
+**CAP-004** — What conformance evidence is necessary to prove two scanner implementations return semantically equivalent evidence for the same capability?
 
 **CMD-001** — What restrictions should be placed on command/shell fallback collection?
 

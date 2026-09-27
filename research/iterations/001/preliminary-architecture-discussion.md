@@ -273,7 +273,32 @@ assert:
 
 This is intentionally closer to the security requirement than an explicit test/object/state graph.
 
-### 10.2 Capability registry
+### 10.2 Derived values
+
+Real OVAL migration prototypes show that deterministic derivation is a core assessment requirement, not merely an XML artifact.
+
+SCAP-NG should support a typed, side-effect-free derivation phase between collection and assertion for operations such as:
+
+- selecting the last/effective configuration value;
+- unique/distinct and count;
+- path derivation;
+- defaults/coalescing;
+- string/regex extraction;
+- typed conversion;
+- lookup-derived expected values;
+- bounded collection transformations.
+
+Derived values must remain traceable to their input evidence. They must not become a general-purpose scripting environment.
+
+Conceptually:
+
+```text
+collect -> derive -> assert
+```
+
+The exact core derivation operation set remains open and should be driven by the OVAL corpus inventory.
+
+### 10.3 Capability registry
 
 A standardized capability describes what evidence is returned, not how a product must collect it.
 
@@ -281,7 +306,7 @@ Candidate capabilities include filesystem metadata/content, structured configura
 
 The registry should be extensible without requiring the core standard to be revised for every new product family.
 
-### 10.3 Command fallback
+### 10.4 Command fallback
 
 A command capability remains necessary for gaps, but it should be explicitly second-class.
 
@@ -642,6 +667,16 @@ A24. Automated results should contain a structured decisive outcome explanation.
 A25. Logical failure explanation, additional remediation findings, supporting Pass context, and unevaluated branches are distinct result concepts.
 
 A26. Error/collection failure reasons are not compliance root causes and must remain distinct from Fail explanations.
+
+A27. Real OVAL migration requires a deterministic typed derivation layer between collection and assertion.
+
+A28. Existence/cardinality and universal/existential quantification are independent semantics and must compose explicitly; empty populations must not pass accidentally.
+
+A29. OVAL set/filter constructs should be normalized to clearer population scopes, predicates, quantifiers, and derivations when equivalent, but general set algebra must not be removed until corpus evidence supports that decision.
+
+A30. Semantic collection capabilities introduced to simplify content must have standardized request/evidence/completeness contracts and conformance tests.
+
+A31. Migration may normalize OVAL Boolean structures into explicit applicability only when policy semantics prove the mapping preserves the intended policy outcome.
 
 ## Appendix B — Questions that must be answered before a specification can stabilize
 
