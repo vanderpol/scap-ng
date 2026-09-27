@@ -10,6 +10,8 @@ Iteration 001 is intentionally **not a draft specification** and remains our int
 - `preliminary-architecture-discussion.md` — consolidated architecture discussion and rationale.
 - `prototype-comparison.md` — comparison criteria for the two candidate architectures.
 - `lessons-learned.md` — implementation-derived lessons and requirements discovered while building iteration 001.
+- `result-explanation-model.md` — structured decisive-outcome explanation model for Pass/Fail diagnostics.
+- `complex-oval-prototype-backlog.md` — ranked real-world OVAL cases to translate next.
 - `prototypes/full-benchmarks/` — primary file-oriented benchmark prototypes, results, and signed bundles.
 - `feedback/` — questionnaire, response template, response evidence, and decision register.
 - `notes/` — supporting observations.
