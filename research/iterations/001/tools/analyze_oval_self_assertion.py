@@ -43,6 +43,9 @@ def main() -> int:
     checks = Counter()
     existence = Counter()
     namespaces = Counter()
+    test_types = Counter()
+    object_types = Counter()
+    state_types = Counter()
     by_directory = defaultdict(lambda: {"files": 0, "parse_failures": 0, "unresolved": 0})
 
     xml_files = list(iter_xml(args.root))
@@ -76,6 +79,13 @@ def main() -> int:
                     if op:
                         functions[op] += 1
                     stack.extend(x for x in node.get("args", []) if isinstance(x, dict))
+
+        for item in ir.get("tests", []):
+            test_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
+        for item in ir.get("objects", []):
+            object_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
+        for item in ir.get("states", []):
+            state_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
 
         features = ir.get("features", {})
         elements.update(features.get("elements", {}))
@@ -118,6 +128,9 @@ def main() -> int:
         "test_checks": dict(sorted(checks.items())),
         "check_existence": dict(sorted(existence.items())),
         "namespaces": dict(sorted(namespaces.items())),
+        "qualified_test_types": dict(sorted(test_types.items())),
+        "qualified_object_types": dict(sorted(object_types.items())),
+        "qualified_state_types": dict(sorted(state_types.items())),
         "by_directory": dict(sorted(by_directory.items())),
         "files": files,
         "gate": {
@@ -141,6 +154,9 @@ def main() -> int:
         "unresolved_reference_files": len(unresolved_files),
         "variable_resolution_status": report["variable_resolution_status"],
         "plan_modes": report["variable_evaluation_plan_modes"],
+        "qualified_test_types": len(report["qualified_test_types"]),
+        "qualified_object_types": len(report["qualified_object_types"]),
+        "qualified_state_types": len(report["qualified_state_types"]),
     }, indent=2, sort_keys=True))
 
     if parse_failures:
