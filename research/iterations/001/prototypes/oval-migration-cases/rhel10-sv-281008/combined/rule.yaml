@@ -1,0 +1,30 @@
+scap_ng: 0.1-prototype
+prototype: true
+rule:
+  id: SV-281008
+  title: RHEL 10 must implement a FIPS 140-3-compliant systemwide cryptographic policy.
+  references: {stig: SV-281008}
+  policy_metadata_status: incomplete_from_oval_only
+  assessment:
+      id: migration.rhel10.fips-system-crypto-policy
+      version: 1
+      collect:
+        crypto_policy:
+          capability: linux.crypto-policy.effective
+          fields:
+            - selected_policy
+            - allowed_hashes
+            - minimum_rsa_bits
+      assert:
+        all:
+          - compare: {subject: selected_policy, actual: "$crypto_policy.selected_policy", op: eq, expected: FIPS}
+          - contains_all:
+              subject: allowed_hashes
+              actual: "$crypto_policy.allowed_hashes"
+              expected: [SHA2-224, SHA2-256, SHA2-384, SHA2-512, SHA3-256, SHA3-384, SHA3-512, SHAKE-256]
+          - contains_none:
+              subject: prohibited_hashes
+              actual: "$crypto_policy.allowed_hashes"
+              expected: [SHA1, MD2, MD4, MD5]
+          - compare: {subject: minimum_rsa_bits, actual: "$crypto_policy.minimum_rsa_bits", op: ge, expected: 2048}
+    

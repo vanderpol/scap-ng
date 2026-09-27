@@ -1,0 +1,24 @@
+outcome: fail
+rule: SV-281125
+assessment: migration.rhel10.audit-syscall-coverage
+explanation:
+  expression_ref: every-required-audit-case-covered
+  kind: every
+  outcome: fail
+  decisive:
+    - requirement:
+        architecture: b64
+        syscall: openat
+        subject: interactive
+        failure_result: EACCES
+      actual: uncovered
+      expected: covered
+      outcome: fail
+      evidence_refs: [ev-rules]
+evidence:
+  ev-rules:
+    capability: linux.audit.effective-rules
+    source: runtime
+    collection_complete: true
+evaluation: {outcome_complete: true, diagnostics_complete: false}
+summary: "Failed: no loaded audit rule covers b64 openat for interactive users with EACCES."

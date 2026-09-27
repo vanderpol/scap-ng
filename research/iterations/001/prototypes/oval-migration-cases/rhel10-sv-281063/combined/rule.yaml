@@ -1,0 +1,53 @@
+scap_ng: 0.1-prototype
+prototype: true
+rule:
+  id: SV-281063
+  title: RHEL 10 must be configured to prohibit modification of permissions for cron configuration files and directories from the operating system defaults.
+  references: {stig: SV-281063}
+  policy_metadata_status: incomplete_from_oval_only
+  assessment:
+      id: migration.rhel10.cron-package-integrity
+      version: 1
+      collect:
+        packages:
+          capability: package.inventory
+          names: [cronie, crontabs]
+          fields: [installed]
+        verification:
+          capability: package.verify
+          packages: [cronie, crontabs]
+          scope: packaged_files
+          fields:
+            - mode_differs
+            - device_differs
+            - link_mismatch
+            - ownership_differs
+            - group_differs
+            - capabilities_differ
+            - size_differs
+            - filedigest_differs
+            - mtime_differs
+          collection_status: required
+      assert:
+        all:
+          - every:
+              item: "$packages"
+              condition: {compare: {subject: package_installed, actual: "$item.installed", op: eq, expected: true}}
+          - none:
+              id: no-relevant-package-verification-failures
+              item: "$verification.items"
+              condition:
+                any_true:
+                  fields:
+                    - mode_differs
+                    - device_differs
+                    - link_mismatch
+                    - ownership_differs
+                    - group_differs
+                    - capabilities_differ
+                    - size_differs
+                    - filedigest_differs
+                    - mtime_differs
+      evidence:
+        max_records: 25
+    

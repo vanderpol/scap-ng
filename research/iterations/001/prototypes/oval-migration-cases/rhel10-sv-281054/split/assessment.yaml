@@ -1,0 +1,39 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  id: migration.rhel10.audit-log-file-modes
+  version: 1
+  collect:
+    auditd_directives:
+      capability: linux.config.directives
+      file: /etc/audit/auditd.conf
+      names: [log_file]
+      comments: shell
+      ordering: source
+    audit_files:
+      capability: filesystem.entries
+      root: "$derived.log_directory"
+      recursive: true
+      type: regular_file
+      fields: [path, type, mode]
+  derive:
+    distinct_log_files:
+      unique: {select: "$auditd_directives.log_file.values"}
+    configured_log_file:
+      last: "$auditd_directives.log_file.values"
+    log_directory:
+      path_dirname: "$derived.configured_log_file"
+  assert:
+    all:
+      - cardinality: {subject: "$derived.distinct_log_files", min: 1, max: 1}
+      - compare: {actual: "$derived.configured_log_file", op: path_is_absolute, expected: true}
+      - cardinality: {subject: "$audit_files", min: 1}
+      - every:
+          id: every-audit-file-mode
+          item: "$audit_files"
+          condition:
+            all:
+              - bitmask_clear: {subject: disallowed_permission_bits, actual: "$item.mode", mask: "0177"}
+              - bitmask_clear: {subject: special_bits, actual: "$item.mode", mask: "7000"}
+  evidence: {max_records: 50}
+  evaluation: {stop_after_violations: 50}
