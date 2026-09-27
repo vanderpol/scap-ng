@@ -24,3 +24,12 @@ This register separates current working decisions from unresolved questions. It 
 | D-018 | Open | Exact capability registry design. | Inventory real OVAL constructs and current content usage. |
 | D-019 | Open | Whether compact/explain/forensic result profiles are normative. | Test enterprise reporting scenarios. |
 | D-020 | Open | Whether CBOR/streaming formats belong in the core specification. | Measure result volumes after prototype stabilizes. |
+| D-021 | Accepted direction | Source-level reuse dependencies are resolved at build time; published automated packages remain self-contained. | Demonstrated by shared assessments and shared-rule overlays across two Windows benchmarks. |
+| D-022 | Accepted direction | Benchmark membership and source provenance should not be conflated with intrinsic policy-rule semantics. | Remove benchmark-specific generic source metadata from reusable rule semantics; provenance remains separate. |
+| D-023 | Accepted direction | Combined-rule architecture must be evaluated using constrained shared-rule overlays rather than forced automation duplication. | Five Windows technical concepts now reused across Client and Server overlays. |
+| D-024 | Accepted direction | Combined-rule overlays may specialize policy fields and declared parameters but must not directly patch shared assessment logic. | Build resolver enforces source separation; refine normative override list with reviewers. |
+| D-025 | Accepted direction | Build validation should compare resolved automated policy fields with authoritative policy-only rules. | Implemented in iteration 001 builder. |
+| D-026 | Open | Combined shared-rule overlays vs split policy/assessment/binding remains unresolved. | Both now demonstrate cross-STIG exact and parameterized reuse; seek reviewer feedback on lifecycle complexity. |
+| D-027 | Accepted requirement | Benchmark scoring must be deterministic and reproducible; every scored rule needs an effective weight. | Prototype scoring after architecture examples stabilize. |
+| D-028 | Open | Severity-derived default weights, exact numeric mapping, and exceptional per-rule overrides. | Compare mappings against representative STIGs and seek OVAL/DISA feedback. |
+| D-029 | Open | Compliance scoring treatment of error/indeterminate/not-evaluated and whether assessment coverage is separately mandatory. | Prototype score + coverage results before external review. |

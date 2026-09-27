@@ -410,60 +410,80 @@ The normal enterprise result should not embed copies of policy or assessment def
 
 A reporting UI can join that digest to the locally stored benchmark and show all policy text alongside the result without transmitting the policy 100,000 times.
 
-## 17. Reusable automation
+## 17. Reusable automation and reusable policy structure
 
 Automation reuse should be first-class, but reuse must not silently imply policy equivalence.
 
-A reusable assessment can be parameterized. Multiple policy rules can reference the same assessment with different thresholds.
+A reusable assessment can be parameterized. Multiple policy rules can use the same technical assessment with different thresholds or role parameters when the assessment contract explicitly permits those parameters.
 
-A reusable semantic assessment may also have platform-specific implementations when the underlying policy concept is the same but the mechanism differs.
+Iteration 001 also demonstrated that policy membership and rule identity should be separate concepts. A policy rule should not need to embed the identity of every benchmark that contains it. Benchmark membership belongs to the benchmark/profile structure; source provenance belongs to provenance metadata. This permits exact policy-rule reuse when complete policy semantics are genuinely identical without forcing it as a common DISA publishing pattern.
 
-For example, a conceptual password minimum-length assessment could expose a common observation while Windows and Linux implementations obtain it differently.
+A reusable semantic assessment may have platform-specific implementations only when the resulting semantic contract remains equivalent. Similar titles, CCI references, or policy concepts are insufficient evidence of equivalence.
 
-Whether reusable assessments live inside individual rule files or as separate objects is the largest unresolved architecture question in iteration 001.
+The Windows Client and Windows Server prototypes deliberately exercise cross-benchmark reuse with different policy rule IDs and wording.
 
 ## 18. Combined rule versus split policy/assessment/binding
 
-Two architectures are being prototyped.
+Two source architectures are being prototyped. Both now demonstrate genuine cross-STIG automation reuse.
 
-### 18.1 Combined-rule architecture
+### 18.1 Combined rule with constrained shared-rule overlays
 
-A rule is the principal object and contains policy plus its assessment.
+A normal combined rule contains policy and its assessment in one object.
+
+For reuse across policies, iteration 001 adds a build-time shared-rule model:
+
+1. a reusable combined rule base contains common rule semantics and automated assessment logic;
+2. a STIG-specific overlay supplies policy identity/wording and declared assessment parameter values;
+3. the build resolves the base and overlay into a complete scanner-facing rule;
+4. validation requires the resolved policy portion to match the authoritative policy-only rule.
+
+An overlay must not directly patch collector/assertion logic. A change to shared automated semantics requires a new shared-rule version. Parameter values are legal only when declared by the shared rule's parameter schema.
 
 Advantages to test:
 
-- one file provides a complete human view of a rule;
-- fewer explicit mappings;
-- simple local review.
+- retains a rule-centric authoring view;
+- supports cross-STIG reuse without duplicating assessment logic;
+- produces simple fully resolved scanner-facing rules;
+- can keep policy-specific identity and wording separate from reusable automation.
 
 Risks to test:
 
-- duplicate assessment logic;
-- awkward reuse;
-- platform-specific implementations inside policy objects;
-- difficulty separating policy and automation provenance;
-- potential need for generalized overlays when automation comes from a different publisher.
+- introduces inheritance/overlay semantics;
+- source dependencies may be less obvious than a single complete file;
+- override rules must be tightly constrained to prevent accidental semantic divergence;
+- provenance/versioning across base rule and overlay may become complex.
 
-### 18.2 Split architecture
+### 18.2 Split policy / assessment / binding
 
 Policy, assessment, and their binding are separate objects.
 
+The same Windows prototypes represent shared technical assessments once and bind them to different policy rules, including parameterized reuse.
+
 Advantages to test:
 
-- explicit reuse;
+- explicit reuse and composition;
 - independent policy/automation provenance;
 - natural fit with current internal SCAP development practice;
 - straightforward policy-only publication;
-- shared technical assessments across rules/platforms.
+- shared technical assessments across rules and benchmarks.
 
 Risks to test:
 
 - mapping bookkeeping;
 - dangling references;
 - harder one-file human review;
-- potentially greater scanner/content-tool complexity.
+- potentially greater content-tool complexity.
 
-Regardless of source representation, a published automated `.scapng` package should contain the complete resolved policy and automation so operators install one coherent versioned artifact.
+### 18.3 Refined architecture question
+
+The iteration 001 question is no longer whether both designs can support reuse. Both can.
+
+The more useful question is which abstraction is safer and easier to author, validate, version, migrate from SCAP 1.4, review in source control, explain to content publishers, and implement consistently:
+
+- **inheritance plus constrained overlays**, or
+- **explicit policy + assessment + binding composition**.
+
+Regardless of source representation, a published automated `.scapng` package should contain complete resolved policy and automation. Shared source dependencies are build-time concerns, not scanner runtime dependencies.
 
 The purpose of the prototypes is to decide this question from concrete complex examples rather than preference.
 
@@ -542,6 +562,26 @@ It is intended to answer whether the fundamental ideas remain understandable whe
 5. Which content organization is more maintainable: combined rule or split policy/assessment/binding?
 6. Can both architectures compile into the same self-contained signed distribution concept and equivalent result semantics?
 
+## 24. Scoring direction
+
+SCAP-NG should define deterministic benchmark scoring rather than merely inherit XCCDF's per-rule weight field without examining how it is actually used.
+
+Every scored applicable rule needs an effective numeric weight. The current leading direction is for severity to determine the default effective weight through a standard or scoring-profile mapping, rather than requiring content authors to populate a separate weight on every rule.
+
+An explicit per-rule weight override may still be necessary for migration fidelity or specialized profiles, but it should be exceptional and provenance/justification-aware rather than routine authoring.
+
+The exact severity-to-weight values remain open.
+
+Scoring must also distinguish compliance from assessment completeness. A benchmark that passes every successfully evaluated rule but has collection errors or unevaluated applicable rules should not appear indistinguishable from a complete clean assessment.
+
+Iteration 001 should therefore prototype and seek feedback on:
+
+- the exact severity-to-weight mapping;
+- whether per-rule overrides are allowed and under what conditions;
+- treatment of `not_applicable`, `error`, `indeterminate`, and `not_evaluated` in scoring;
+- whether a separate assessment-coverage percentage is mandatory;
+- how raw weighted totals are represented so the percentage is reproducible.
+
 ## Appendix A — Accepted design directions for iteration 001
 
 These are working design directions, not immutable specification requirements.
@@ -578,17 +618,37 @@ A15. The XSD corpus should be semantically inventoried rather than mechanically 
 
 A16. Complex AND/OR results should identify concise decisive root causes and reserve full trace data for forensic detail.
 
+A17. Authoring-source reuse and scanner-facing distribution are separate concerns. Shared source dependencies should be resolved into self-contained published packages.
+
+A18. Benchmark membership should be expressed by benchmark/profile structure rather than by embedding benchmark identity as generic rule-source metadata.
+
+A19. Policy provenance should be represented separately from normative policy references such as CCI.
+
+A20. Both architecture candidates must be evaluated with genuine cross-benchmark reuse: constrained shared-rule overlays for the combined model and explicit bindings for the split model.
+
+A21. Combined-rule overlays must not directly alter shared assessment logic; automated semantic changes require versioned shared-rule changes. Declared parameters may specialize reusable logic.
+
+A22. Build validation should verify that an automated resolved rule preserves the authoritative policy-only rule semantics.
+
+A23. Benchmark scoring must be deterministic and reproducible. Severity-derived effective weight is the leading default direction; exact mappings and override rules remain open.
+
 ## Appendix B — Questions that must be answered before a specification can stabilize
 
 ### Architecture
 
 **ARCH-001:** Should policy and automation be authored as one combined rule object or as separate policy, assessment, and binding objects?
 
-**ARCH-002:** If the combined model is selected, how are assessments reused without either duplication or a generalized overlay system?
+**ARCH-002:** If the combined model is selected, are constrained shared-rule overlays a sufficiently clear and safe reuse mechanism, and which policy fields may legally be overlaid?
 
-**ARCH-003:** If the split model is selected, what validation and tooling are required to eliminate mapping/version mistakes?
+**ARCH-003:** If the split model is selected, what validation and tooling are required to eliminate mapping/version mistakes and make dependencies as understandable as a resolved combined rule?
 
 **ARCH-004:** Should the compiled scanner-facing representation preserve the source architecture exactly, or may a compiler normalize either source model into one internal package model?
+
+**ARCH-005:** Which policy properties belong to reusable rule identity versus benchmark membership or source provenance?
+
+**ARCH-006:** For the combined model, should overlay resolution be normative source semantics or only a standardized build convention?
+
+**ARCH-007:** What provenance must a resolved rule retain about its shared base, overlay, parameters, and digests?
 
 ### Policy and manual assessment
 
@@ -694,6 +754,20 @@ A16. Complex AND/OR results should identify concise decisive root causes and res
 
 **MIG-005:** Should normalization/deduplication occur automatically after equivalence testing, or always require explicit review?
 
+### Scoring
+
+**SCORE-001:** Should every scored rule receive its default effective weight from severity?
+
+**SCORE-002:** What normative high/medium/low severity-to-weight mapping produces useful compliance percentages?
+
+**SCORE-003:** Should explicit per-rule weight overrides be allowed, and if so must they include justification/provenance?
+
+**SCORE-004:** Which outcomes participate in the compliance-score denominator?
+
+**SCORE-005:** Should assessment coverage be a separate mandatory percentage so collection errors and unevaluated applicable rules cannot be hidden by a nominal 100% compliance score?
+
+**SCORE-006:** Which raw weighted totals must be emitted so independent consumers can reproduce the reported score?
+
 ### Packaging and signatures
 
 **PKG-001:** Should ZIP be the normative container format?
@@ -752,6 +826,12 @@ C9. What package/signature requirements are essential for existing government co
 
 C10. What would prevent an organization such as DISA from publishing policy-only SCAP-NG content derived directly from the information it already maintains in STIGs?
 
-C11. Which prototype cases would reviewers consider strong enough to judge the combined-versus-split architecture?
+C11. Do the shared-rule overlay and split binding prototypes exercise the architecture question fairly, or are important reuse/lifecycle cases still missing?
 
 C12. What additional complex real-world OVAL definitions should be added to subsequent prototype iterations?
+
+C13. Does a constrained shared-rule overlay model create unacceptable inheritance/versioning complexity compared with explicit assessment bindings?
+
+C14. Which policy fields should be considered intrinsic rule semantics, and which should instead belong to benchmark membership, profile/tailoring, or provenance?
+
+C15. Should SCAP-NG standardize severity-derived scoring weights, and how should unresolved/error outcomes affect compliance and assessment-coverage reporting?

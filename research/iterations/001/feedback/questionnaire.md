@@ -8,11 +8,17 @@ Reviewers do not need to answer every question. Please preserve the question IDs
 
 **ARCH-001** — Based on the supplied prototypes, which source organization is more maintainable: combined policy/assessment rule objects or split policy/assessment/binding objects? Please identify concrete reasons rather than only a preference.
 
-**ARCH-002** — What failure modes or lifecycle problems do you expect from the combined model?
+**ARCH-002** — What failure modes or lifecycle problems do you expect from the combined shared-rule + constrained-overlay model?
 
 **ARCH-003** — What failure modes or lifecycle problems do you expect from the split model?
 
 **ARCH-004** — Should a compiler be free to normalize either source model into a different optimized internal package representation?
+
+**ARCH-005** — In the combined model, are constrained overlays easier to understand/version than explicit policy-to-assessment bindings, or do they introduce problematic inheritance semantics?
+
+**ARCH-006** — Which fields should an overlay be permitted to specialize (ID, title, severity, references, discussion, Check Content, Fix Text, applicability, declared parameters), and which must be immutable?
+
+**ARCH-007** — Should benchmark membership and source provenance be kept outside intrinsic policy-rule semantics so exact rule objects can be reused across benchmarks when appropriate?
 
 ## Policy-only and manual assessment
 
@@ -55,6 +61,18 @@ Reviewers do not need to answer every question. Please preserve the question IDs
 **MIG-003** — What should be required before a converted assessment is labeled semantically equivalent to the original OVAL definition?
 
 **MIG-004** — Is a temporary legacy OVAL compatibility execution mechanism acceptable as a migration safety valve?
+
+## Scoring
+
+**SCORE-001** — Should severity determine the default effective rule weight rather than requiring policy authors to populate a separate weight value?
+
+**SCORE-002** — What severity-to-weight mapping should be normative or default?
+
+**SCORE-003** — Should exceptional per-rule weight overrides be allowed, and what justification/provenance should they require?
+
+**SCORE-004** — How should Error, Indeterminate, Not Evaluated, and Not Applicable affect the compliance-score denominator?
+
+**SCORE-005** — Should scanners report a separate assessment-coverage percentage alongside compliance percentage?
 
 ## Results
 
