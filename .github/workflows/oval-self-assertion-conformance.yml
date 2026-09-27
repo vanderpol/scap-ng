@@ -86,14 +86,26 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Generated reports are reproducible outputs. If main advanced while
+          # this run was executing, carry the freshly generated directory over
+          # the newest main rather than rebasing an old generated JSON commit
+          # and creating a content conflict.
+          tmpdir="$(mktemp -d)"
+          cp -a research/iterations/001/generated/oval-self-assertion "$tmpdir/"
+          git fetch origin main
+          git reset --hard origin/main
+          rm -rf research/iterations/001/generated/oval-self-assertion
+          mkdir -p research/iterations/001/generated
+          cp -a "$tmpdir/oval-self-assertion" research/iterations/001/generated/
+
           git add research/iterations/001/generated/oval-self-assertion
           if git diff --cached --quiet; then
             echo "Self-Assertion inventory already matches."
             exit 0
           fi
           git commit -m "Generate OVAL Self-Assertion conformance inventory"
-          git pull --rebase origin main
-          git push
+          git push origin HEAD:main
 
       - name: Enforce offline definition gate
         working-directory: scap-ng
