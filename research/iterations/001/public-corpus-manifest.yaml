@@ -1,10 +1,12 @@
 corpus_manifest: 0.2-prototype
 iteration: "001"
-scope_policy: niwc_published_current_only
+scope_policy: separated_production_and_conformance_corpora
 purpose: >
-  Versioned public SCAP 1.4 corpus for iteration 001. Published content under
+  Versioned public SCAP 1.4 corpora for iteration 001. Published content under
   the pinned NIWC Atlantic scap-content-library/Current tree is the authoritative
-  migration/conversion evidence source.
+  production migration/conversion evidence source. OVAL Community Self-Assertion
+  OVAL Test Content is a separate language-conformance corpus used to exercise
+  OVAL 5.12.3 features and evaluator semantics; it is not migration evidence.
 sources:
   - id: niwc-atlantic-scap-content-library-current
     type: git
@@ -17,6 +19,33 @@ sources:
     observed_individual_benchmark_zip_count: 65
     consolidated_bundle:
       path: Current/Consolidated_Bundle_Q3_2026.zip
+
+  - id: oval-community-scap-self-assertion-oval-test-content
+    type: git
+    repository: OVAL-Community/SCAP-Self-Assertion
+    revision: e3538595c5083b9c34d937a81d319234df9bbfaa
+    path: SCAP_1.4/OVAL_Test_Content
+    public: true
+    status: ready
+    role: language_conformance
+    schema_version: "OVAL 5.12.3"
+    evidence_use: >
+      Unit-test and semantic coverage evidence for OVAL language constructs.
+      Keep separate from published STIG migration evidence.
+    initial_focus:
+      - agnostic/oval-def_object_component.xml
+      - agnostic/oval-def_merge.xml
+      - agnostic/oval-def_regex_capture_function.xml
+      - agnostic/oval-def_arithmetic_function.xml
+      - agnostic/oval-def_concat_function.xml
+      - agnostic/oval-def_split_function.xml
+      - agnostic/oval-def_substring_function.xml
+      - agnostic/oval-def_time_difference_function.xml
+      - agnostic/oval-def_globtoregex_test.xml
+      - agnostic/oval_check_enumeration_entity.xml
+      - agnostic/oval_check_enumeration_object_state.xml
+      - agnostic/oval_check_enumeration_variable_values.xml
+      - agnostic/oval_existence_enumeration.xml
 
 priority_targets:
   - id: rhel9
@@ -68,5 +97,8 @@ coverage_targets:
 
 evidence_policy:
   published_migration_case_source_must_match_manifest: true
+  production_migration_evidence_source: niwc-atlantic-scap-content-library-current
+  language_conformance_evidence_source: oval-community-scap-self-assertion-oval-test-content
+  conformance_content_is_not_migration_evidence: true
   development_repository_content_is_not_conversion_evidence: true
   experimental_content_is_not_conversion_evidence: true
