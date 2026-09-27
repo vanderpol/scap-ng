@@ -1,0 +1,51 @@
+scap_ng: "0.1-prototype"
+prototype: true
+model: combined-rule
+
+rule:
+  id: NG-DEMO-LNX-001
+  title: "Illustrative Linux files in the protected scope must have valid owners"
+  severity: medium
+
+  discussion: |
+    Demonstrates a rule that may evaluate millions of filesystem entries.
+    The rule needs enough evidence to establish noncompliance and assist
+    remediation, not a mandatory serialized record for every failing file.
+
+  check: |
+    Examine files and directories beneath the protected scope. Every entry
+    must resolve to a valid local or directory-service owner.
+
+  fix: |
+    Assign a valid owner to each reported file or directory.
+
+  assessment:
+    collect:
+      protected_entries:
+        capability: filesystem.entries
+        root: /usr
+        recursive: true
+        fields:
+          - path
+          - uid
+          - owner_name
+          - owner_resolves
+
+    assert:
+      every:
+        item: "$protected_entries"
+        condition:
+          compare:
+            subject: owner_resolves
+            actual: "$item.owner_resolves"
+            op: eq
+            expected: true
+
+    evidence:
+      max_records: 50
+
+    evaluation:
+      stop_after_violations: 50
+
+    diagnostics:
+      max_failure_causes: 50

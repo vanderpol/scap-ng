@@ -1,0 +1,49 @@
+scap_ng_result: "0.1-prototype"
+prototype: true
+source_model: combined-rule
+
+rule: NG-DEMO-LNX-001
+outcome: fail
+method: automated
+
+summary:
+  examined: 93412
+  violations:
+    observed: 50
+    count_type: at_least
+
+root_cause:
+  type: population_violations
+  subject: filesystem_owner_resolves
+  explanation: "At least 50 filesystem entries in the protected scope do not resolve to valid owners."
+
+evaluation:
+  outcome_complete: true
+  diagnostics_complete: false
+
+collection:
+  complete: false
+  termination:
+    reason: violation_threshold_reached
+    threshold: 50
+
+evidence:
+  max_records: 50
+  returned: 50
+  truncated: true
+  records:
+    - path: /usr/lib/example-a
+      uid: 991
+      owner_name: null
+      owner_resolves: false
+    - path: /usr/share/example-b
+      uid: 65531
+      owner_name: null
+      owner_resolves: false
+    - path: /usr/local/example-c
+      uid: 44001
+      owner_name: null
+      owner_resolves: false
+    - note: "47 additional illustrative records omitted from this prototype file."
+
+human_summary: "Failed: at least 50 entries have unresolved owners. The scan stopped at the configured violation threshold; 50 remediation examples are available."
