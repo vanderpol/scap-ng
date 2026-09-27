@@ -9,6 +9,7 @@ on:
       - "research/iterations/001/tools/oval_semantic_ir.py"
       - "research/iterations/001/tools/analyze_oval_ir_corpus.py"
       - "research/iterations/001/tools/build_oval_coverage_ledger.py"
+      - "research/iterations/001/tools/build_oval_priority_gap_backlog.py"
       - "research/iterations/001/tools/test_oval_dependency_graph.py"
       - "research/iterations/001/tools/test_oval_variable_evaluation_plans.py"
       - "research/iterations/001/tools/test_oval_static_variable_functions.py"
@@ -121,6 +122,12 @@ jobs:
             scap-ng/research/iterations/001/generated/oval-self-assertion/full-corpus-inventory.json \
             scap-ng/research/iterations/001/generated/niwc-rule-splits/corpus-semantic-inventory.json \
             --output scap-ng/research/iterations/001/generated/oval-5.12.3-evidence-ledger.json
+
+      - name: Build target-relevant OVAL gap backlog
+        run: |
+          python scap-ng/research/iterations/001/tools/build_oval_priority_gap_backlog.py \
+            scap-ng/research/iterations/001/generated/oval-5.12.3-evidence-ledger.json \
+            --output scap-ng/research/iterations/001/generated/oval-priority-gap-backlog.json
 
       - name: Normalize flagship audit syscall cases
         shell: bash
