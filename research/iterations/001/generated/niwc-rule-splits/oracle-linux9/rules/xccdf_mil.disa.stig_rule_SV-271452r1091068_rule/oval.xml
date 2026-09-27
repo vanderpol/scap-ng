@@ -4,18 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:230240" version="3" class="compliance">
-          <metadata>
-            <title>The operating system must use a Linux Security Module configured to enforce limits on system services.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.linux:tst:23024000" comment="selinux is active"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23024000" comment="selinux is enforcing"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23024001" comment="/etc/selinux/config:SELINUX=enforcing"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.ol9os:def:271452" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271452" version="1" class="compliance">
           <metadata>
             <title>OL09-00-000060 - OL 9 must use a Linux Security Module configured to enforce limits on system services.</title>
             <affected family="unix">
@@ -31,11 +20,18 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230240"/>
           </criteria>
         </definition>
-        </definitions><tests><partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23024000" version="1" check_existence="at_least_one_exists" check="all" comment="selinux is active">
-          <object object_ref="oval:mil.disa.stig.linux:obj:23024000"/>
-          <state state_ref="oval:mil.disa.stig.linux:ste:23024000"/>
-        </partition_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23024000" version="2" check_existence="only_one_exists" check="all" comment="selinux is enforcing">
+        <definition id="oval:mil.disa.stig.defs:def:230240" version="3" class="compliance">
+          <metadata>
+            <title>The operating system must use a Linux Security Module configured to enforce limits on system services.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.linux:tst:23024000" comment="selinux is active"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23024000" comment="selinux is enforcing"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23024001" comment="/etc/selinux/config:SELINUX=enforcing"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23024000" version="2" check_existence="only_one_exists" check="all" comment="selinux is enforcing">
           <object object_ref="oval:mil.disa.stig.ind:obj:23024000"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23024000"/>
         </textfilecontent54_test>
@@ -43,10 +39,11 @@
           <object object_ref="oval:mil.disa.stig.ind:obj:23024001"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23024001"/>
         </textfilecontent54_test>
-        </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23024000" version="1" comment="/sys/fs/selinux">
-          <mount_point>/sys/fs/selinux</mount_point>
-        </partition_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23024001" version="2" comment="/etc/selinux/config:SELINUX value">
+        <partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23024000" version="1" check_existence="at_least_one_exists" check="all" comment="selinux is active">
+          <object object_ref="oval:mil.disa.stig.linux:obj:23024000"/>
+          <state state_ref="oval:mil.disa.stig.linux:ste:23024000"/>
+        </partition_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23024001" version="2" comment="/etc/selinux/config:SELINUX value">
           <filepath>/etc/selinux/config</filepath>
           <pattern operation="pattern match">^SELINUX=(.*)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
@@ -56,13 +53,16 @@
           <pattern operation="pattern match">^(\d+)$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23024001" version="1" comment="/etc/selinux/config:SELINUX=enforcing">
+        <partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23024000" version="1" comment="/sys/fs/selinux">
+          <mount_point>/sys/fs/selinux</mount_point>
+        </partition_object>
+        </objects><states><partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:23024000" version="2">
+          <fs_type>selinuxfs</fs_type>
+        </partition_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23024001" version="1" comment="/etc/selinux/config:SELINUX=enforcing">
           <subexpression datatype="string">enforcing</subexpression>
         </textfilecontent54_state>
         <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23024000" version="1" comment="/sys/fs/selinux/enforce != 0">
           <subexpression datatype="int" operation="not equal">0</subexpression>
         </textfilecontent54_state>
-        <partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:23024000" version="2">
-          <fs_type>selinuxfs</fs_type>
-        </partition_state>
         </states></oval_definitions>

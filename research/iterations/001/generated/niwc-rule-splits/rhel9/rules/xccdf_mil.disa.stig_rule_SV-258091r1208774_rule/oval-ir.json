@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/security/pwquality.conf:retry not greater than 3 and not 0",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25809100"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258091",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258091",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/security/pwquality.conf:retry not greater than 3 and not 0",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25809100"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258091",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258091",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258091"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:258091",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25809100"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258091",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258091"
     },
     {
       "attribute": "object_ref",
@@ -224,62 +224,6 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/security/pwquality.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*retry\\s*=\\s*(-?\\d*)\\s*(?:#.*)?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value",
-      "id": "oval:mil.disa.stig.ind:obj:25809101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25809101"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25809102"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25809100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
           "attributes": {
             "recurse_direction": "down"
           },
@@ -326,6 +270,62 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25809101"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25809102"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:25809100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/security/pwquality.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*retry\\s*=\\s*(-?\\d*)\\s*(?:#.*)?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value",
+      "id": "oval:mil.disa.stig.ind:obj:25809101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
     }
   ],
   "parser_contract": {
@@ -354,11 +354,11 @@
       "oval:mil.disa.stig.defs:def:258091"
     ]
   },
-  "semantic_ir_sha256": "f78c5e4429a5130d9177b79e9de34774bb32d35e1fafe3507931bd2ea91be035",
+  "semantic_ir_sha256": "a3fdf3c3d787f2fa211f06af04032d8f70bad3d5258d250ae6d2524d9ec1cb1d",
   "source": {
     "bytes": 4688,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258091r1208774_rule/oval.xml",
-    "sha256": "66fab7f6125be5c72ba43e75c6cd83e5ac3a06d47186d80e0b34e218e7f49f87"
+    "sha256": "8ea6dc432768993c4045c1638784afe40b7ac240bb7c34cb6323ff2471b9e105"
   },
   "states": [
     {
@@ -412,6 +412,40 @@
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

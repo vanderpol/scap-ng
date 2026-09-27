@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "No active password hash in /etc/shadow has a prefix other than '$6$'.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23023200"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230232",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230232",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "No active password hash in /etc/shadow has a prefix other than '$6$'.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23023200"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230232",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271628",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230232"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:230232",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23023200"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271628",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230232"
     },
     {
       "attribute": "object_ref",
@@ -219,6 +219,35 @@
     {
       "children": [
         {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23023200"
+            },
+            {
+              "action": "exclude",
+              "kind": "filter",
+              "state_ref": "oval:mil.disa.stig.ind:ste:23023200"
+            },
+            {
+              "action": "exclude",
+              "kind": "filter",
+              "state_ref": "oval:mil.disa.stig.ind:ste:23023201"
+            }
+          ],
+          "kind": "set",
+          "operator": "UNION"
+        }
+      ],
+      "comment": "Filter out acceptable shadow password entries.",
+      "id": "oval:mil.disa.stig.ind:obj:23023201",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "datatype": "string"
           },
@@ -252,35 +281,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23023200"
-            },
-            {
-              "action": "exclude",
-              "kind": "filter",
-              "state_ref": "oval:mil.disa.stig.ind:ste:23023200"
-            },
-            {
-              "action": "exclude",
-              "kind": "filter",
-              "state_ref": "oval:mil.disa.stig.ind:ste:23023201"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
-        }
-      ],
-      "comment": "Filter out acceptable shadow password entries.",
-      "id": "oval:mil.disa.stig.ind:obj:23023201",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -309,33 +309,13 @@
       "oval:mil.disa.stig.defs:def:230232"
     ]
   },
-  "semantic_ir_sha256": "2d5a077116278f02133c91089362baf2419b50afa141641716a112f2e6ca663c",
+  "semantic_ir_sha256": "7d51742ae79b72b67d64c7dec9128f8eebd18ea745503b6213704a2fd209928a",
   "source": {
     "bytes": 4116,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271628r1208725_rule/oval.xml",
-    "sha256": "eb98f575f5c2068bfb3d82916ae380165da4b61de5b8ecffefa90a4a821710cd"
+    "sha256": "cbf0d79df3c9488c7ce39cf424c7528e191d895e02fdac911cb8a8dab94d4d68"
   },
   "states": [
-    {
-      "comment": "Exclude inactive/locked hashes (with leading '!' or '*').",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "subexpression",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[!*]"
-        }
-      ],
-      "id": "oval:mil.disa.stig.ind:ste:23023200",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "textfilecontent54_state",
-      "version": "1"
-    },
     {
       "comment": "Exclude hashes with leading '$6$'.",
       "entities": [
@@ -355,6 +335,26 @@
       "operator": "AND",
       "type": "textfilecontent54_state",
       "version": "2"
+    },
+    {
+      "comment": "Exclude inactive/locked hashes (with leading '!' or '*').",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "subexpression",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^[!*]"
+        }
+      ],
+      "id": "oval:mil.disa.stig.ind:ste:23023200",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "textfilecontent54_state",
+      "version": "1"
     }
   ],
   "tests": [
@@ -380,6 +380,40 @@
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

@@ -241,6 +241,21 @@
       "children": [
         {
           "kind": "element",
+          "name": "var_ref",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "oval:mil.disa.stig.defs:var:25806100"
+        }
+      ],
+      "comment": "count of group entries",
+      "id": "oval:mil.disa.stig.ind:obj:25806101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "variable_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/group"
@@ -269,21 +284,6 @@
       "id": "oval:mil.disa.stig.ind:obj:25806100",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "var_ref",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "oval:mil.disa.stig.defs:var:25806100"
-        }
-      ],
-      "comment": "count of group entries",
-      "id": "oval:mil.disa.stig.ind:obj:25806101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "variable_object",
       "version": "1"
     }
   ],
@@ -319,11 +319,11 @@
       "oval:mil.disa.stig.defs:def:258061"
     ]
   },
-  "semantic_ir_sha256": "8b72f6b197384704b7679219e45d768718fb6257b186d7e13559a8c1714ca3d3",
+  "semantic_ir_sha256": "f93c2baa40505ac3d792a5d0b228b78f1a28a14854925a1554ec6209b44423a4",
   "source": {
     "bytes": 3696,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258061r958482_rule/oval.xml",
-    "sha256": "c14ce034aecfce4d2425d3c833ae3157b7237da4fd4b4e10af602b043eef0b0d"
+    "sha256": "5c196062526fe801546ba4e3118a01a19c4a40aaba70bc6023047b9ec7e89218"
   },
   "states": [
     {
@@ -376,15 +376,72 @@
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {
     "oval:mil.disa.stig.defs:var:25806100": {
+      "blocked_by": {
+        "item_field": "subexpression",
+        "object_ref": "oval:mil.disa.stig.ind:obj:25806100",
+        "operation": "object_component",
+        "record_field": null,
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "int",
       "operation": "count",
-      "status": "unsupported_function",
+      "reason": "count_child_not_static:object_component",
+      "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     },
     "oval:mil.disa.stig.defs:var:25806101": {
+      "blocked_by": {
+        "blocked_by": {
+          "item_field": "subexpression",
+          "object_ref": "oval:mil.disa.stig.ind:obj:25806100",
+          "operation": "object_component",
+          "record_field": null,
+          "status": "dynamic_object_dependency"
+        },
+        "operation": "unique",
+        "reason": "unique_child_not_static:object_component",
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "int",
       "operation": "count",
-      "status": "unsupported_function",
+      "reason": "count_child_not_static:unique_child_not_static:object_component",
+      "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }
   },
@@ -412,6 +469,23 @@
       "datatype": "int",
       "id": "oval:mil.disa.stig.defs:var:25806100",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "int",
+        "expression": {
+          "args": [
+            {
+              "item_field": "subexpression",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25806100",
+              "op": "object_component",
+              "record_field": null
+            }
+          ],
+          "attributes": {},
+          "op": "count"
+        },
+        "id": "oval:mil.disa.stig.defs:var:25806100",
+        "type": "local_variable"
+      },
       "type": "local_variable",
       "version": "1"
     },
@@ -445,6 +519,29 @@
       "datatype": "int",
       "id": "oval:mil.disa.stig.defs:var:25806101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "int",
+        "expression": {
+          "args": [
+            {
+              "args": [
+                {
+                  "item_field": "subexpression",
+                  "object_ref": "oval:mil.disa.stig.ind:obj:25806100",
+                  "op": "object_component",
+                  "record_field": null
+                }
+              ],
+              "attributes": {},
+              "op": "unique"
+            }
+          ],
+          "attributes": {},
+          "op": "count"
+        },
+        "id": "oval:mil.disa.stig.defs:var:25806101",
+        "type": "local_variable"
+      },
       "type": "local_variable",
       "version": "1"
     }

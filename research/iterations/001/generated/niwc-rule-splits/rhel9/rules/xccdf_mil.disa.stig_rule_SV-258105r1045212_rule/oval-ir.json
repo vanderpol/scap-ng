@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "Root does not have a minimum password age of 0 or blank",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23036400"
+          },
+          {
+            "comment": "Non-system users do not have a minimum password age of 0 or blank",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:23036401"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230364",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system passwords must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230364",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Root does not have a minimum password age of 0 or blank",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23036400"
-          },
-          {
-            "comment": "Non-system users do not have a minimum password age of 0 or blank",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:23036401"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230364",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system passwords must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258105",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230364"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:230364",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.unix:tst:23036401"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258105",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230364"
     },
     {
       "attribute": "object_ref",
@@ -313,43 +313,6 @@
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/passwd"
-        },
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^nobody:[^:]*:([0-9]+):"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23036403",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/shadow"
         },
         {
@@ -374,6 +337,43 @@
       ],
       "comment": null,
       "id": "oval:mil.disa.stig.ind:obj:23036400",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/passwd"
+        },
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^nobody:[^:]*:([0-9]+):"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:23036403",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -456,11 +456,11 @@
       "oval:mil.disa.stig.unix:obj:23036401"
     ]
   },
-  "semantic_ir_sha256": "2d1c004e43f1cd8dc234410d6cce83518485331b5d181b1c5fae3d80b83fdefe",
+  "semantic_ir_sha256": "3ecbaef21b1f03aff433809ca07b17e59bdfaa459f25b6f42d67cf14197e2a08",
   "source": {
     "bytes": 5817,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258105r1045212_rule/oval.xml",
-    "sha256": "8f04d301b7b002949e9bfb24999abab2b90b10b14645af19436a8b2507386c30"
+    "sha256": "5247440e0a151747651fe07e7de10eb5c5525407b93563396129079412661383"
   },
   "states": [
     {
@@ -548,18 +548,56 @@
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {
     "oval:mil.disa.stig.defs:var:23036400": {
+      "datatype": "string",
       "item_field": "subexpression",
       "object_ref": "oval:mil.disa.stig.ind:obj:23036402",
       "operation": "object_component",
+      "record_field": null,
       "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     },
     "oval:mil.disa.stig.defs:var:23036401": {
+      "datatype": "int",
       "item_field": "subexpression",
       "object_ref": "oval:mil.disa.stig.ind:obj:23036403",
       "operation": "object_component",
+      "record_field": null,
       "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }
@@ -581,6 +619,17 @@
       "datatype": "int",
       "id": "oval:mil.disa.stig.defs:var:23036401",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "int",
+        "expression": {
+          "item_field": "subexpression",
+          "object_ref": "oval:mil.disa.stig.ind:obj:23036403",
+          "op": "object_component",
+          "record_field": null
+        },
+        "id": "oval:mil.disa.stig.defs:var:23036401",
+        "type": "local_variable"
+      },
       "type": "local_variable",
       "version": "1"
     },
@@ -600,6 +649,17 @@
       "datatype": "string",
       "id": "oval:mil.disa.stig.defs:var:23036400",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "string",
+        "expression": {
+          "item_field": "subexpression",
+          "object_ref": "oval:mil.disa.stig.ind:obj:23036402",
+          "op": "object_component",
+          "record_field": null
+        },
+        "id": "oval:mil.disa.stig.defs:var:23036400",
+        "type": "local_variable"
+      },
       "type": "local_variable",
       "version": "1"
     }

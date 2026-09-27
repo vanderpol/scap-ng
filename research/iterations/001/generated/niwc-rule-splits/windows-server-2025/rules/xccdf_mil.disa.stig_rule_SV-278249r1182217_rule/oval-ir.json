@@ -159,6 +159,13 @@
     {
       "attribute": "object_ref",
       "element": "object",
+      "from": "oval:mil.disa.stig.win:tst:25449902",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.win:obj:20000014"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
       "from": "oval:mil.disa.stig.win:tst:25449903",
       "kind": "object_reference",
       "to": "oval:mil.disa.stig.win:obj:25348900"
@@ -183,13 +190,6 @@
       "from": "oval:mil.disa.stig.win:tst:25449903",
       "kind": "state_reference",
       "to": "oval:mil.disa.stig.win:ste:25449900"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:25449902",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.win:obj:20000014"
     }
   ],
   "dependency_integrity": {
@@ -288,6 +288,21 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "userright",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SE_CREATE_SYMBOLIC_LINK_NAME"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.win:obj:25348900",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "userright_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "datatype": "string"
           },
@@ -312,21 +327,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "wmi57_object",
       "version": "4"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "userright",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SE_CREATE_SYMBOLIC_LINK_NAME"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:25348900",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "userright_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -365,13 +365,32 @@
       "oval:mil.disa.stig.defs:def:254499"
     ]
   },
-  "semantic_ir_sha256": "e225c5acae2d087988aaabe8e4edadcf32812c08592353d8f98073d7ae0b7c3c",
+  "semantic_ir_sha256": "0cab172c4249d35694d780cd8618450940421326651b9a62e1a53c32abee7d62",
   "source": {
     "bytes": 4814,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278249r1182217_rule/oval.xml",
-    "sha256": "0f28cad8e226a04adf76cacd4b34444bdb4bc93470c5e4a988ea7c146f6813f5"
+    "sha256": "c3253bff58a16200180a023e8a9605f2777b14fc788ac0d1e1490947a26a0708"
   },
   "states": [
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "trustee_name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "^(?i)(NT VIRTUAL MACHINE\\\\)?Virtual Machines$"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:25449900",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "userright_state",
+      "version": "1"
+    },
     {
       "comment": null,
       "entities": [
@@ -401,25 +420,6 @@
         }
       ],
       "id": "oval:mil.disa.stig.win:ste:20000029",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "userright_state",
-      "version": "1"
-    },
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "trustee_name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "^(?i)(NT VIRTUAL MACHINE\\\\)?Virtual Machines$"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:25449900",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "userright_state",
@@ -461,6 +461,26 @@
       "version": "2"
     },
     {
+      "check": "at least one",
+      "check_existence": "at_least_one_exists",
+      "comment": "Hyper-V Role is installed",
+      "id": "oval:mil.disa.stig.win:tst:25449902",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.win:obj:20000014"
+          },
+          "object_ref": "oval:mil.disa.stig.win:obj:20000014"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "wmi57_test",
+      "version": "5"
+    },
+    {
       "check": "all",
       "check_existence": "at_least_one_exists",
       "comment": "Create symbolic links - Administrators, Virtual Machines",
@@ -498,29 +518,43 @@
       ],
       "type": "userright_test",
       "version": "2"
-    },
-    {
-      "check": "at least one",
-      "check_existence": "at_least_one_exists",
-      "comment": "Hyper-V Role is installed",
-      "id": "oval:mil.disa.stig.win:tst:25449902",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:20000014"
-          },
-          "object_ref": "oval:mil.disa.stig.win:obj:20000014"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "wmi57_test",
-      "version": "5"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

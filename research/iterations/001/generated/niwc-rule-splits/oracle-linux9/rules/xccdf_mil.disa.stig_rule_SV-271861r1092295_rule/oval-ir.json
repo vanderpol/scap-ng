@@ -312,40 +312,6 @@
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/resolv.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^nameserver\\s+(.*)$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "/etc/resolv.conf nameserver entries",
-      "id": "oval:mil.disa.stig.ind:obj:23031602",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/nsswitch.conf"
         },
         {
@@ -370,6 +336,40 @@
       ],
       "comment": "/etc/nsswitch.conf hosts entry",
       "id": "oval:mil.disa.stig.ind:obj:23031600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/resolv.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^nameserver\\s+(.*)$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "/etc/resolv.conf nameserver entries",
+      "id": "oval:mil.disa.stig.ind:obj:23031602",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
@@ -413,11 +413,11 @@
       "oval:mil.disa.stig.defs:def:230316"
     ]
   },
-  "semantic_ir_sha256": "2472123bf6c2ed824ff7a96416739012bdf1e1d72ee08ffd8ef1a9cae8a573e4",
+  "semantic_ir_sha256": "9e8d099d36bd40cac94284841e33f3e1bfd091abd1020f012655a696aae3eba9",
   "source": {
     "bytes": 5781,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271861r1092295_rule/oval.xml",
-    "sha256": "dc103ffa0e9d811cf73835f4d26178f90303ba23fc00818e2fbefdcaf7df183a"
+    "sha256": "6913a6b6c16827ea41ce0095ea07d5a59c95ff936f78e2f946899ef0aedab652"
   },
   "states": [
     {
@@ -537,10 +537,58 @@
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {
     "oval:mil.disa.stig.ind:var:23031600": {
+      "blocked_by": {
+        "blocked_by": {
+          "item_field": "subexpression",
+          "object_ref": "oval:mil.disa.stig.ind:obj:23031602",
+          "operation": "object_component",
+          "record_field": null,
+          "status": "dynamic_object_dependency"
+        },
+        "operation": "unique",
+        "reason": "unique_child_not_static:object_component",
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "int",
       "operation": "count",
-      "status": "unsupported_function",
+      "reason": "count_child_not_static:unique_child_not_static:object_component",
+      "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }
   },
@@ -575,6 +623,29 @@
       "datatype": "int",
       "id": "oval:mil.disa.stig.ind:var:23031600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "int",
+        "expression": {
+          "args": [
+            {
+              "args": [
+                {
+                  "item_field": "subexpression",
+                  "object_ref": "oval:mil.disa.stig.ind:obj:23031602",
+                  "op": "object_component",
+                  "record_field": null
+                }
+              ],
+              "attributes": {},
+              "op": "unique"
+            }
+          ],
+          "attributes": {},
+          "op": "count"
+        },
+        "id": "oval:mil.disa.stig.ind:var:23031600",
+        "type": "local_variable"
+      },
       "type": "local_variable",
       "version": "1"
     }

@@ -6,47 +6,6 @@
         "children": [
           {
             "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23030100"
-          },
-          {
-            "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23030101"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230301",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must prevent special devices on non-root local partitions."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230301",
             "kind": "definition_ref",
             "negate": false
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23030100"
+          },
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23030101"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230301",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must prevent special devices on non-root local partitions."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257881",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230301"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,18 @@
       "to": "oval:mil.disa.stig.linux:tst:23030100"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257881",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230301"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:23030101",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:23030101"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.ind:tst:23030101",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.ind:ste:23030100"
     },
     {
       "attribute": "object_ref",
@@ -127,20 +141,6 @@
       "from": "oval:mil.disa.stig.linux:tst:23030100",
       "kind": "state_reference",
       "to": "oval:mil.disa.stig.linux:ste:20000001"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23030101",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:23030101"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.ind:tst:23030101",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.ind:ste:23030100"
     },
     {
       "attribute": null,
@@ -247,6 +247,33 @@
     {
       "children": [
         {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "mount_point",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "^/\\S+$"
+        },
+        {
+          "attributes": {
+            "action": "include"
+          },
+          "kind": "element",
+          "name": "filter",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "oval:mil.disa.stig.linux:ste:23030102"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.linux:obj:23030100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "partition_object",
+      "version": "3"
+    },
+    {
+      "children": [
+        {
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -276,33 +303,6 @@
       "id": "oval:mil.disa.stig.ind:obj:23030101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "3"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "mount_point",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "^/\\S+$"
-        },
-        {
-          "attributes": {
-            "action": "include"
-          },
-          "kind": "element",
-          "name": "filter",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "oval:mil.disa.stig.linux:ste:23030102"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23030100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "partition_object",
       "version": "3"
     }
   ],
@@ -337,32 +337,13 @@
       "oval:mil.disa.stig.defs:def:230301"
     ]
   },
-  "semantic_ir_sha256": "af0c34879d4d2c6d0f1c8db82d65109040e29016510538d3a15253a350236aa2",
+  "semantic_ir_sha256": "2c86a20f71df395bb1b5f9c2f4f8682fc22ace1b879f41825909fbbe6676b511",
   "source": {
     "bytes": 4512,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257881r1184299_rule/oval.xml",
-    "sha256": "a55d7f95f78a1480000f1ef2adbecc19037c03d6373f89ec5a950c98ce5e2270"
+    "sha256": "57c4d8247f165e0c973ca107ca50ae2f892eefe8405baed51a3737e317946798"
   },
   "states": [
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "entity_check": "at least one"
-          },
-          "kind": "element",
-          "name": "mount_options",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "nodev"
-        }
-      ],
-      "id": "oval:mil.disa.stig.linux:ste:20000001",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "operator": "AND",
-      "type": "partition_state",
-      "version": "1"
-    },
     {
       "comment": null,
       "entities": [
@@ -400,36 +381,28 @@
       "operator": "AND",
       "type": "textfilecontent54_state",
       "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "entity_check": "at least one"
+          },
+          "kind": "element",
+          "name": "mount_options",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "nodev"
+        }
+      ],
+      "id": "oval:mil.disa.stig.linux:ste:20000001",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "operator": "AND",
+      "type": "partition_state",
+      "version": "1"
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "any_exist",
-      "comment": "Device files are mounted with the nodev option.  Mounts on '/' are ignored.",
-      "id": "oval:mil.disa.stig.linux:tst:23030100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23030100"
-          },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23030100"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.linux:ste:20000001"
-          },
-          "state_ref": "oval:mil.disa.stig.linux:ste:20000001"
-        }
-      ],
-      "type": "partition_test",
-      "version": "3"
-    },
     {
       "check": "all",
       "check_existence": "any_exist",
@@ -456,9 +429,70 @@
       ],
       "type": "textfilecontent54_test",
       "version": "3"
+    },
+    {
+      "check": "all",
+      "check_existence": "any_exist",
+      "comment": "Device files are mounted with the nodev option.  Mounts on '/' are ignored.",
+      "id": "oval:mil.disa.stig.linux:tst:23030100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.linux:obj:23030100"
+          },
+          "object_ref": "oval:mil.disa.stig.linux:obj:23030100"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.linux:ste:20000001"
+          },
+          "state_ref": "oval:mil.disa.stig.linux:ste:20000001"
+        }
+      ],
+      "type": "partition_test",
+      "version": "3"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

@@ -5,56 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:230386",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:258176",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-654010 - RHEL 9 must audit uses of the \"execve\" system call."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Misuse of privileged functions, either intentionally or unintentionally by authorized users, or by unauthorized external entities that have compromised information system accounts, is a serious and ongoing concern and can have significant adverse impacts on organizations. Auditing the use of privileged functions is one way to detect such misuse and identify the risk from insider threats and the advanced persistent threat.\n\nSatisfies: SRG-OS-000326-GPOS-00126, SRG-OS-000327-GPOS-00127"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": "Audit 32-bit invocations of execve syscall comparing uids",
             "kind": "test_ref",
             "negate": false,
@@ -102,16 +52,59 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:230386",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:258176",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-654010 - RHEL 9 must audit uses of the \"execve\" system call."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Misuse of privileged functions, either intentionally or unintentionally by authorized users, or by unauthorized external entities that have compromised information system accounts, is a serious and ongoing concern and can have significant adverse impacts on organizations. Auditing the use of privileged functions is one way to detect such misuse and identify the risk from insider threats and the advanced persistent threat.\n\nSatisfies: SRG-OS-000326-GPOS-00126, SRG-OS-000327-GPOS-00127"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258176",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230386"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -141,6 +134,20 @@
       "to": "oval:mil.disa.stig.ind:tst:23038603"
     },
     {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258176",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230386"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:23038601",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:23038601"
+    },
+    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23038600",
@@ -160,13 +167,6 @@
       "from": "oval:mil.disa.stig.ind:tst:23038603",
       "kind": "object_reference",
       "to": "oval:mil.disa.stig.ind:obj:23038603"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23038601",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:23038601"
     }
   ],
   "dependency_integrity": {
@@ -263,40 +263,6 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+-S\\s+execve\\s+-C\\s+uid!=euid\\s+-F\\s+euid=0\\s*((\\s+-k\\s+|-F\\s+key=)\\S+\\s*)?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "32-bit execve syscall uid comparison",
-      "id": "oval:mil.disa.stig.ind:obj:23038600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/audit/audit.rules"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+-S\\s+execve\\s+-C\\s+uid!=euid\\s+-F\\s+euid=0\\s*((\\s+-k\\s+|-F\\s+key=)\\S+\\s*)?$"
         },
         {
@@ -346,6 +312,40 @@
       ],
       "comment": "64-bit execve syscall gid comparison",
       "id": "oval:mil.disa.stig.ind:obj:23038603",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/audit/audit.rules"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+-S\\s+execve\\s+-C\\s+uid!=euid\\s+-F\\s+euid=0\\s*((\\s+-k\\s+|-F\\s+key=)\\S+\\s*)?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "32-bit execve syscall uid comparison",
+      "id": "oval:mil.disa.stig.ind:obj:23038600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -419,14 +419,34 @@
       "oval:mil.disa.stig.defs:def:230386"
     ]
   },
-  "semantic_ir_sha256": "bfc8aafeb6f05f9470d635542223666c6d5000d67983a46cfdfa87b66f20e67a",
+  "semantic_ir_sha256": "98ecdad32f9d14eaa7bc46970373b98dd642aeb2cb424c2f63ae48a3c5ee56d1",
   "source": {
     "bytes": 6310,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258176r1155595_rule/oval.xml",
-    "sha256": "b93a585726bf6791e29e4e78184f33d5c89db765d0f351ad5c7acfd472a26402"
+    "sha256": "734cf2ccf438955f470f471cddb6ee4cefdc36adef28c119ee52efd64f5f2b84"
   },
   "states": [],
   "tests": [
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "Audit 64-bit invocations of execve syscall comparing uids",
+      "id": "oval:mil.disa.stig.ind:tst:23038601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:23038601"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:23038601"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -486,29 +506,43 @@
       "states": [],
       "type": "textfilecontent54_test",
       "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "Audit 64-bit invocations of execve syscall comparing uids",
-      "id": "oval:mil.disa.stig.ind:tst:23038601",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23038601"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23038601"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

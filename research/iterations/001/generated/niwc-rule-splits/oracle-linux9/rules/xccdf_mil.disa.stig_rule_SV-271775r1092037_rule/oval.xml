@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271775" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:271775" version="1" class="compliance">
+          <metadata>
+            <title>The operating system system commands must have mode 755 or less permissive.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:27177500" comment="There are no group-writable system command files"/>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:27177501" comment="There are no world-writable system command files"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271775" version="2" class="compliance">
           <metadata>
             <title>OL09-00-002506 - OL 9 system commands must have mode 755 or less permissive.</title>
             <affected family="unix">
@@ -18,44 +28,34 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:271775"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:271775" version="1" class="compliance">
-          <metadata>
-            <title>The operating system system commands must have mode 755 or less permissive.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.unix:tst:27177500" comment="There are no group-writable system command files"/>
-            <criterion test_ref="oval:mil.disa.stig.unix:tst:27177501" comment="There are no world-writable system command files"/>
-          </criteria>
-        </definition>
-        </definitions><tests><file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:27177500" version="1" check_existence="none_exist" check="all" comment="There are no group-writable system command files">
-          <object object_ref="oval:mil.disa.stig.unix:obj:27177500"/>
-        </file_test>
-        <file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:27177501" version="1" check_existence="none_exist" check="all" comment="There are no world-writable system command files">
+        </definitions><tests><file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:27177501" version="1" check_existence="none_exist" check="all" comment="There are no world-writable system command files">
           <object object_ref="oval:mil.disa.stig.unix:obj:27177501"/>
         </file_test>
-        </tests><objects><file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:27177500" version="1" comment="Group-writable files in system command directories">
-          <behaviors recurse_direction="down"/>
-          <path datatype="string" var_ref="oval:mil.disa.stig.defs:var:20000019" var_check="at least one"/>
-          <filename datatype="string" operation="pattern match">.*</filename>
-          <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.unix:ste:20000024</filter>
-          <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.unix:ste:20000002</filter>
-        </file_object>
-        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:27177501" version="1" comment="World-writable files in system command directories">
+        <file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:27177500" version="1" check_existence="none_exist" check="all" comment="There are no group-writable system command files">
+          <object object_ref="oval:mil.disa.stig.unix:obj:27177500"/>
+        </file_test>
+        </tests><objects><file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:27177501" version="1" comment="World-writable files in system command directories">
           <behaviors recurse_direction="down"/>
           <path datatype="string" var_ref="oval:mil.disa.stig.defs:var:20000019" var_check="at least one"/>
           <filename datatype="string" operation="pattern match">.*</filename>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.unix:ste:20000025</filter>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.unix:ste:20000002</filter>
         </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:27177500" version="1" comment="Group-writable files in system command directories">
+          <behaviors recurse_direction="down"/>
+          <path datatype="string" var_ref="oval:mil.disa.stig.defs:var:20000019" var_check="at least one"/>
+          <filename datatype="string" operation="pattern match">.*</filename>
+          <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.unix:ste:20000024</filter>
+          <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.unix:ste:20000002</filter>
+        </file_object>
         </objects><states><file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000002" version="1" comment="symbolic links">
           <type entity_check="all" datatype="string" operation="equals">symbolic link</type>
         </file_state>
-        <file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000025" version="1" comment="Not world-writable">
-          <owrite datatype="boolean">false</owrite>
-        </file_state>
         <file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000024" version="1" comment="Not group-writable">
           <gwrite datatype="boolean">false</gwrite>
+        </file_state>
+        <file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000025" version="1" comment="Not world-writable">
+          <owrite datatype="boolean">false</owrite>
         </file_state>
         </states><variables><constant_variable id="oval:mil.disa.stig.defs:var:20000019" version="1" datatype="string" comment="system command directories (including /usr/libexec)">
           <value>/bin</value>

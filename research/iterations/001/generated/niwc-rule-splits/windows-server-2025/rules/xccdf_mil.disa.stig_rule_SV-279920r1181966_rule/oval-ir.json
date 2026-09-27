@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Audit - Registry - Failure only",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:27894600"
-          },
-          {
-            "comment": "Audit - Registry - Success and Failure",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:27894601"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "OR"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:278946",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must be configured to audit registry failures."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:278946",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Audit - Registry - Failure only",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:27894600"
+          },
+          {
+            "comment": "Audit - Registry - Success and Failure",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:27894601"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "OR"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:278946",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must be configured to audit registry failures."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows2025:def:279920",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:278946"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,18 @@
       "to": "oval:mil.disa.stig.win:tst:27894601"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows2025:def:279920",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:278946"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.win:tst:27894601",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.win:obj:20000000"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.win:tst:27894601",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.win:ste:27894601"
     },
     {
       "attribute": "object_ref",
@@ -127,20 +141,6 @@
       "from": "oval:mil.disa.stig.win:tst:27894600",
       "kind": "state_reference",
       "to": "oval:mil.disa.stig.win:ste:27894600"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:27894601",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.win:obj:20000000"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:27894601",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.win:ste:27894601"
     }
   ],
   "dependency_integrity": {
@@ -258,11 +258,11 @@
       "oval:mil.disa.stig.defs:def:278946"
     ]
   },
-  "semantic_ir_sha256": "e9a9e2f19af9e1fbcdd8dba23e7e5ae476b8ca610478be307e5832d850bca178",
+  "semantic_ir_sha256": "c2af2dddf1bbd4d2df90642f48b97ca34c37903635346f100b160a116b320d85",
   "source": {
     "bytes": 3959,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-279920r1181966_rule/oval.xml",
-    "sha256": "017c97d9baf440d468da2326337b8992feda71e9adb812494683d9c283f144ed"
+    "sha256": "7f2ac722e7a250a9a5cbba07901f86f4d14056ed34c69f9a3625c3b331a441a8"
   },
   "states": [
     {
@@ -308,33 +308,6 @@
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
-      "comment": "'Audit Registry' is set to 'Failure'",
-      "id": "oval:mil.disa.stig.win:tst:27894600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:20000000"
-          },
-          "object_ref": "oval:mil.disa.stig.win:obj:20000000"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.win:ste:27894600"
-          },
-          "state_ref": "oval:mil.disa.stig.win:ste:27894600"
-        }
-      ],
-      "type": "auditeventpolicysubcategories_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
       "comment": "'Audit Registry' is set to 'Success' and 'Failure'",
       "id": "oval:mil.disa.stig.win:tst:27894601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
@@ -358,9 +331,70 @@
       ],
       "type": "auditeventpolicysubcategories_test",
       "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "'Audit Registry' is set to 'Failure'",
+      "id": "oval:mil.disa.stig.win:tst:27894600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.win:obj:20000000"
+          },
+          "object_ref": "oval:mil.disa.stig.win:obj:20000000"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.win:ste:27894600"
+          },
+          "state_ref": "oval:mil.disa.stig.win:ste:27894600"
+        }
+      ],
+      "type": "auditeventpolicysubcategories_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

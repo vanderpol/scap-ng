@@ -253,42 +253,6 @@
         },
         {
           "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "MinimumPINLength"
-        }
-      ],
-      "comment": "Group Policy registry entry for MinimumPINLength",
-      "id": "oval:mil.disa.stig.win:obj:25340101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "registry_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "hive",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "HKEY_LOCAL_MACHINE"
-        },
-        {
-          "attributes": {
             "datatype": "string",
             "operation": "pattern match"
           },
@@ -311,6 +275,42 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
       "version": "4"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "hive",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "HKEY_LOCAL_MACHINE"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "key",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "MinimumPINLength"
+        }
+      ],
+      "comment": "Group Policy registry entry for MinimumPINLength",
+      "id": "oval:mil.disa.stig.win:obj:25340101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "registry_object",
+      "version": "1"
     },
     {
       "children": [
@@ -405,11 +405,11 @@
       "oval:mil.disa.stig.defs:def:253401"
     ]
   },
-  "semantic_ir_sha256": "400994619b2e1420c1ea1a0d2873f80a3ffe93638941b1fd46f075069750b731",
+  "semantic_ir_sha256": "5f20e6511259402514e5405a41bc6d092616f18c72061a526344e0beb5c46324",
   "source": {
     "bytes": 5212,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253401r1210296_rule/oval.xml",
-    "sha256": "0801837a8d3431c3ff3ff76c5fa599eb890a9219c0739d165e284b3047ff9429"
+    "sha256": "1deed5a915384956ff64d96962523828b98dcebced4d5f28592105268f1f7848"
   },
   "states": [
     {
@@ -469,11 +469,59 @@
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {
     "oval:mil.disa.stig.defs:var:25340100": {
+      "blocked_by": {
+        "blocked_by": [
+          {
+            "item_field": "key",
+            "object_ref": "oval:mil.disa.stig.win:obj:25340103",
+            "operation": "object_component",
+            "record_field": null,
+            "status": "dynamic_object_dependency"
+          }
+        ],
+        "operation": "regex_capture",
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "string",
       "operation": "concat",
       "reason": "concat_child_not_static:regex_capture",
-      "status": "unsupported_function",
+      "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }
   },
@@ -523,6 +571,41 @@
       "datatype": "string",
       "id": "oval:mil.disa.stig.defs:var:25340100",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "string",
+        "expression": {
+          "args": [
+            {
+              "datatype": "string",
+              "op": "literal_component",
+              "value": "SOFTWARE\\Microsoft\\Policies\\PassportForWork\\"
+            },
+            {
+              "args": [
+                {
+                  "item_field": "key",
+                  "object_ref": "oval:mil.disa.stig.win:obj:25340103",
+                  "op": "object_component",
+                  "record_field": null
+                }
+              ],
+              "attributes": {
+                "pattern": "(?i)\\\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$"
+              },
+              "op": "regex_capture"
+            },
+            {
+              "datatype": "string",
+              "op": "literal_component",
+              "value": "\\device\\policies\\PINComplexity"
+            }
+          ],
+          "attributes": {},
+          "op": "concat"
+        },
+        "id": "oval:mil.disa.stig.defs:var:25340100",
+        "type": "local_variable"
+      },
       "type": "local_variable",
       "version": "2"
     }

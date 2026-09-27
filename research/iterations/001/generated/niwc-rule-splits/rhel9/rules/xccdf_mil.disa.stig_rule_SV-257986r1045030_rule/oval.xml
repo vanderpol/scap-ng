@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257986" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:257986" version="4" class="compliance">
+          <metadata>
+            <title>The operating system must enable the Pluggable Authentication Module (PAM) interface for SSHD.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25798600" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:UsePAM == yes"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257986" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-255050 - RHEL 9 must enable the Pluggable Authentication Module (PAM) interface for SSHD.</title>
             <affected family="unix">
@@ -16,20 +25,16 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257986"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:257986" version="4" class="compliance">
-          <metadata>
-            <title>The operating system must enable the Pluggable Authentication Module (PAM) interface for SSHD.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25798600" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:UsePAM == yes"/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25798600" version="2" check="all" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:UsePAM == yes">
           <object object_ref="oval:mil.disa.stig.ind:obj:25798600"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000023"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798600" version="2" comment="UsePAM in all sshd_config and sshd_config.d/* files">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798601" version="1">
+          <filepath>/etc/ssh/sshd_config</filepath>
+          <pattern operation="pattern match">^\s*UsePAM\s+(\w*)</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798600" version="2" comment="UsePAM in all sshd_config and sshd_config.d/* files">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
             <object_reference>oval:mil.disa.stig.ind:obj:25798601</object_reference>
             <object_reference>oval:mil.disa.stig.ind:obj:25798602</object_reference>
@@ -38,11 +43,6 @@
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798602" version="2">
           <path>/etc/ssh/sshd_config.d</path>
           <filename operation="pattern match">^.+\.conf$</filename>
-          <pattern operation="pattern match">^\s*UsePAM\s+(\w*)</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798601" version="1">
-          <filepath>/etc/ssh/sshd_config</filepath>
           <pattern operation="pattern match">^\s*UsePAM\s+(\w*)</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>

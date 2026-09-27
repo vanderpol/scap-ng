@@ -13,18 +13,6 @@
             <criterion test_ref="oval:mil.disa.stig.win:tst:25339401" comment="'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple, or Bypass' selected."/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.windows11:def:253394" version="2" class="compliance">
-          <metadata>
-            <title>WN11-CC-000206 - Windows Update must not obtain updates from other PCs on the internet.</title>
-            <affected family="windows">
-              <platform>Microsoft Windows 11</platform>
-            </affected>
-            <description>Windows 11 allows Windows Update to obtain updates from additional sources instead of Microsoft. In addition to Microsoft, updates can be obtained from and sent to PCs on the local network as well as on the Internet. This is part of the Windows Update trusted process, however to minimize outside exposure, obtaining updates from or sending to systems on the internet must be prevented.</description>
-          </metadata>
-          <criteria>
-            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253394"/>
-          </criteria>
-        </definition>
         <definition id="oval:mil.disa.stig.defs:def:253394" version="3" class="compliance">
           <metadata>
             <title>Windows Update for workstations must not obtain updates from other PCs on the internet.</title>
@@ -38,17 +26,19 @@
             </criteria>
           </criteria>
         </definition>
-        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25339403" version="2" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="'DownloadMode' is set to 'Enabled' with 'HTTP only or LAN' selected.">
-          <object object_ref="oval:mil.disa.stig.win:obj:25339401"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
-        </registry_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25339402" version="2" check="all" state_operator="OR" comment="The system is a Windows Standalone Workstation or Server">
-          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
-        </wmi57_test>
-        <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25339401" version="1" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple or Bypass' selected.">
+        <definition id="oval:mil.disa.stig.windows11:def:253394" version="2" class="compliance">
+          <metadata>
+            <title>WN11-CC-000206 - Windows Update must not obtain updates from other PCs on the internet.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows 11</platform>
+            </affected>
+            <description>Windows 11 allows Windows Update to obtain updates from additional sources instead of Microsoft. In addition to Microsoft, updates can be obtained from and sent to PCs on the local network as well as on the Internet. This is part of the Windows Update trusted process, however to minimize outside exposure, obtaining updates from or sending to systems on the internet must be prevented.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253394"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25339401" version="1" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple or Bypass' selected.">
           <object object_ref="oval:mil.disa.stig.win:obj:25339400"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
@@ -56,46 +46,56 @@
           <state state_ref="oval:mil.disa.stig.win:ste:25339400"/>
           <state state_ref="oval:mil.disa.stig.win:ste:25339401"/>
         </registry_test>
-        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25339400" version="1">
-          <hive datatype="string" operation="equals">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string" operation="equals">Software\Policies\Microsoft\Windows\DeliveryOptimization</key>
-          <name datatype="string" operation="equals">DODownloadMode</name>
-        </registry_object>
+        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25339402" version="2" check="all" state_operator="OR" comment="The system is a Windows Standalone Workstation or Server">
+          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
+        </wmi57_test>
+        <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25339403" version="2" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="'DownloadMode' is set to 'Enabled' with 'HTTP only or LAN' selected.">
+          <object object_ref="oval:mil.disa.stig.win:obj:25339401"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
+        </registry_test>
+        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
+          <namespace>root\cimv2</namespace>
+          <wql>SELECT DomainRole FROM win32_computersystem</wql>
+        </wmi57_object>
         <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25339401" version="1" comment="DownloadMode set through the Settings App">
           <hive datatype="string" operation="equals">HKEY_LOCAL_MACHINE</hive>
           <key datatype="string" operation="equals">SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config</key>
           <name datatype="string" operation="equals">DODownloadMode</name>
         </registry_object>
-        <wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
-          <namespace>root\cimv2</namespace>
-          <wql>SELECT DomainRole FROM win32_computersystem</wql>
-        </wmi57_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25339400" version="1">
+          <hive datatype="string" operation="equals">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" operation="equals">Software\Policies\Microsoft\Windows\DeliveryOptimization</key>
+          <name datatype="string" operation="equals">DODownloadMode</name>
+        </registry_object>
         </objects><states><wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000100" version="1" comment="Standalone Workstation">
           <result datatype="record" operation="equals">
             <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">0</field>
           </result>
         </wmi57_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
-          <type>reg_dword</type>
-          <value datatype="int">1</value>
-        </registry_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25339400" version="1" comment="Reg_Dword type and value equals 99">
-          <type>reg_dword</type>
-          <value datatype="int" operation="equals">99</value>
-        </registry_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25339401" version="1" comment="Reg_Dword type and value equals 100">
-          <type>reg_dword</type>
-          <value datatype="int" operation="equals">100</value>
-        </registry_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000000" version="1">
-          <type>reg_dword</type>
-          <value datatype="int">0</value>
-        </registry_state>
         <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000300" version="1" comment="Standalone Server">
           <result datatype="record" operation="equals">
             <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">2</field>
           </result>
         </wmi57_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25339401" version="1" comment="Reg_Dword type and value equals 100">
+          <type>reg_dword</type>
+          <value datatype="int" operation="equals">100</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">1</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000000" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">0</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25339400" version="1" comment="Reg_Dword type and value equals 99">
+          <type>reg_dword</type>
+          <value datatype="int" operation="equals">99</value>
+        </registry_state>
         <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000002" version="1">
           <type>reg_dword</type>
           <value datatype="int">2</value>

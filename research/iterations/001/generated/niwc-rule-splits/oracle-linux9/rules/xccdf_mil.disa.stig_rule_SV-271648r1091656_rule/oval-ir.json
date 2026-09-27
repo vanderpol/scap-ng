@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "/boot is mounted an configured with the nosuid option.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23030000"
+          },
+          {
+            "comment": "If /boot is configured in /etc/fstab it is with the nosuid option.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23030001"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230300",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must prevent files with the setuid and setgid bit set from being executed on the /boot directory."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230300",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/boot is mounted an configured with the nosuid option.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23030000"
-          },
-          {
-            "comment": "If /boot is configured in /etc/fstab it is with the nosuid option.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23030001"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230300",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must prevent files with the setuid and setgid bit set from being executed on the /boot directory."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271648",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230300"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -115,18 +108,11 @@
       "to": "oval:mil.disa.stig.linux:tst:23030000"
     },
     {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.linux:tst:23030000",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.linux:obj:23030000"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.linux:tst:23030000",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.linux:ste:20000002"
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271648",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230300"
     },
     {
       "attribute": "object_ref",
@@ -141,6 +127,20 @@
       "from": "oval:mil.disa.stig.ind:tst:23030001",
       "kind": "state_reference",
       "to": "oval:mil.disa.stig.ind:ste:2303001"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.linux:tst:23030000",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.linux:obj:23030000"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.linux:tst:23030000",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.linux:ste:20000002"
     }
   ],
   "dependency_integrity": {
@@ -238,6 +238,21 @@
       "children": [
         {
           "kind": "element",
+          "name": "mount_point",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "/boot"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.linux:obj:23030000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "partition_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/fstab"
@@ -265,21 +280,6 @@
       "id": "oval:mil.disa.stig.ind:obj:23030001",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "mount_point",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "/boot"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23030000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "partition_object",
       "version": "1"
     }
   ],
@@ -311,11 +311,11 @@
       "oval:mil.disa.stig.defs:def:230300"
     ]
   },
-  "semantic_ir_sha256": "bfec3f0d0f2f8c2570215a861f3a2064c355be9de878403190b17882050100b4",
+  "semantic_ir_sha256": "9d451d50b1adb6911c92ae526a15bc907c098083de6a1e79295197869bb01dac",
   "source": {
     "bytes": 4187,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271648r1091656_rule/oval.xml",
-    "sha256": "8815278ce78b40bb9663b4864c1cfaad3152da7568bef48db385ad2031c7b10b"
+    "sha256": "a1a91bf4f89d844ba8d27e0dd0e75dbb9a7eb052f64ac864f41bf5da6d9b351d"
   },
   "states": [
     {
@@ -361,33 +361,6 @@
     {
       "check": "all",
       "check_existence": "any_exist",
-      "comment": "If /boot is mounted, it is mounted with the nosuid option",
-      "id": "oval:mil.disa.stig.linux:tst:23030000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23030000"
-          },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23030000"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.linux:ste:20000002"
-          },
-          "state_ref": "oval:mil.disa.stig.linux:ste:20000002"
-        }
-      ],
-      "type": "partition_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "any_exist",
       "comment": "If /boot is configured in /etc/fstab, it is configured with the nosuid option",
       "id": "oval:mil.disa.stig.ind:tst:23030001",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -411,9 +384,70 @@
       ],
       "type": "textfilecontent54_test",
       "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "any_exist",
+      "comment": "If /boot is mounted, it is mounted with the nosuid option",
+      "id": "oval:mil.disa.stig.linux:tst:23030000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.linux:obj:23030000"
+          },
+          "object_ref": "oval:mil.disa.stig.linux:obj:23030000"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.linux:ste:20000002"
+          },
+          "state_ref": "oval:mil.disa.stig.linux:ste:20000002"
+        }
+      ],
+      "type": "partition_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

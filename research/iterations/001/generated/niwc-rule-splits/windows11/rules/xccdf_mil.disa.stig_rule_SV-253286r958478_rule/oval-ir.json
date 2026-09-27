@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:253286",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.windows11:def:253286",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "WN11-00-000160 - The Server Message Block (SMB) v1 protocol must be disabled on the system."
+          },
+          {
+            "attributes": {
+              "family": "windows"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Microsoft Windows 11"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "SMBv1 is a legacy protocol that uses the MD5 algorithm as part of SMB. MD5 is known to be vulnerable to a number of attacks such as collision and preimage attacks as well as not being FIPS compliant.\n\nDisabling SMBv1 support may prevent access to file or print sharing resources with systems or devices that only support SMBv1. File shares and print services hosted on Windows Server 2003 are an example, however Windows Server 2003 is no longer a supported operating system. Some older Network Attached Storage (NAS) devices may only support SMBv1."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": "Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed",
             "kind": "test_ref",
             "negate": false,
@@ -136,59 +186,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:253286",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.windows11:def:253286",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "WN11-00-000160 - The Server Message Block (SMB) v1 protocol must be disabled on the system."
-          },
-          {
-            "attributes": {
-              "family": "windows"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Microsoft Windows 11"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "SMBv1 is a legacy protocol that uses the MD5 algorithm as part of SMB. MD5 is known to be vulnerable to a number of attacks such as collision and preimage attacks as well as not being FIPS compliant.\n\nDisabling SMBv1 support may prevent access to file or print sharing resources with systems or devices that only support SMBv1. File shares and print services hosted on Windows Server 2003 are an example, however Windows Server 2003 is no longer a supported operating system. Some older Network Attached Storage (NAS) devices may only support SMBv1."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows11:def:253286",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253286"
+    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
@@ -239,27 +246,6 @@
       "to": "oval:mil.disa.stig.win:tst:25328700"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows11:def:253286",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253286"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.win:tst:25328600",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.win:obj:25328600"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.win:tst:25328600",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.win:ste:25328600"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.win:tst:25328700",
@@ -286,6 +272,20 @@
       "from": "oval:mil.disa.stig.win:tst:25328800",
       "kind": "state_reference",
       "to": "oval:mil.disa.stig.win:ste:20000004"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.win:tst:25328600",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.win:obj:25328600"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.win:tst:25328600",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.win:ste:25328600"
     }
   ],
   "dependency_integrity": {
@@ -532,13 +532,38 @@
       "oval:mil.disa.stig.defs:def:253286"
     ]
   },
-  "semantic_ir_sha256": "9fedd161feb926080320b8d0412e01e58ca2487a7d7e409a99ddfde76fd4c1dd",
+  "semantic_ir_sha256": "3f7fc1a275560492b159742f9aea141df8df297c5b3605670b014636436ba398",
   "source": {
     "bytes": 7480,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253286r958478_rule/oval.xml",
-    "sha256": "81b305694645a0df7667bca7a30d3e5d5c64c4717e935803de79b99e9bd3ed4c"
+    "sha256": "bf25070254e5b7251baf99a34129f6523cd0f3ec5aeeb82bdec40eb8692b47cb"
   },
   "states": [
+    {
+      "comment": null,
+      "entities": [
+        {
+          "kind": "element",
+          "name": "type",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "reg_dword"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "0"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "registry_state",
+      "version": "1"
+    },
     {
       "comment": "Reg_Dword type and value equals 4",
       "entities": [
@@ -595,61 +620,9 @@
       "operator": "AND",
       "type": "wmi57_state",
       "version": "1"
-    },
-    {
-      "comment": null,
-      "entities": [
-        {
-          "kind": "element",
-          "name": "type",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "reg_dword"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "0"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "registry_state",
-      "version": "1"
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "'SMB 1.0/CIFS File Sharing Support' feature is not installed",
-      "id": "oval:mil.disa.stig.win:tst:25328600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.win:obj:25328600"
-          },
-          "object_ref": "oval:mil.disa.stig.win:obj:25328600"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.win:ste:25328600"
-          },
-          "state_ref": "oval:mil.disa.stig.win:ste:25328600"
-        }
-      ],
-      "type": "wmi57_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -703,9 +676,70 @@
       ],
       "type": "registry_test",
       "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "'SMB 1.0/CIFS File Sharing Support' feature is not installed",
+      "id": "oval:mil.disa.stig.win:tst:25328600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.win:obj:25328600"
+          },
+          "object_ref": "oval:mil.disa.stig.win:obj:25328600"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.win:ste:25328600"
+          },
+          "state_ref": "oval:mil.disa.stig.win:ste:25328600"
+        }
+      ],
+      "type": "wmi57_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

@@ -362,13 +362,71 @@
       "oval:mil.disa.stig.unix:ste:20000022"
     ]
   },
-  "semantic_ir_sha256": "7dc998947188d436083e2a99b7f0e7b31c6be9552dc25f5eac4003dcf92d2ea3",
+  "semantic_ir_sha256": "4e0a807ce006e75a049f0dc4d3601041fa15449762de34b54fa6d1d97d5232f2",
   "source": {
     "bytes": 4892,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257890r1184305_rule/oval.xml",
-    "sha256": "5cb6d9e0a6db95f9f440ec617a444d3743ad187be376bb7b944c235f84946702"
+    "sha256": "4013407bd51c0560c09f5f1c8c8ba2057664bbe5bec7892e04f2e7a36a209cf4"
   },
   "states": [
+    {
+      "comment": "uid = 65534 (nobody)",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "user_id",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "65534"
+        }
+      ],
+      "id": "oval:mil.disa.stig.unix:ste:25789003",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "operator": "AND",
+      "type": "password_state",
+      "version": "1"
+    },
+    {
+      "comment": "nologin shell",
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "login_shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "^.*nologin.*$"
+        }
+      ],
+      "id": "oval:mil.disa.stig.unix:ste:25789000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "operator": "AND",
+      "type": "password_state",
+      "version": "3"
+    },
+    {
+      "comment": "uid < 1000",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "less than"
+          },
+          "kind": "element",
+          "name": "user_id",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "1000"
+        }
+      ],
+      "id": "oval:mil.disa.stig.unix:ste:25789002",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "operator": "AND",
+      "type": "password_state",
+      "version": "2"
+    },
     {
       "comment": "mode 0750 or less permissive",
       "entities": [
@@ -441,64 +499,6 @@
       "operator": "AND",
       "type": "file_state",
       "version": "1"
-    },
-    {
-      "comment": "nologin shell",
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "login_shell",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "^.*nologin.*$"
-        }
-      ],
-      "id": "oval:mil.disa.stig.unix:ste:25789000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "operator": "AND",
-      "type": "password_state",
-      "version": "3"
-    },
-    {
-      "comment": "uid < 1000",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "less than"
-          },
-          "kind": "element",
-          "name": "user_id",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "1000"
-        }
-      ],
-      "id": "oval:mil.disa.stig.unix:ste:25789002",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "operator": "AND",
-      "type": "password_state",
-      "version": "2"
-    },
-    {
-      "comment": "uid = 65534 (nobody)",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "user_id",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "65534"
-        }
-      ],
-      "id": "oval:mil.disa.stig.unix:ste:25789003",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "operator": "AND",
-      "type": "password_state",
-      "version": "1"
     }
   ],
   "tests": [
@@ -531,11 +531,47 @@
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {
     "oval:mil.disa.stig.defs:var:25789000": {
+      "datatype": "string",
       "item_field": "home_dir",
       "object_ref": "oval:mil.disa.stig.unix:obj:25789000",
       "operation": "object_component",
+      "record_field": null,
       "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }
@@ -557,6 +593,17 @@
       "datatype": "string",
       "id": "oval:mil.disa.stig.defs:var:25789000",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "string",
+        "expression": {
+          "item_field": "home_dir",
+          "object_ref": "oval:mil.disa.stig.unix:obj:25789000",
+          "op": "object_component",
+          "record_field": null
+        },
+        "id": "oval:mil.disa.stig.defs:var:25789000",
+        "type": "local_variable"
+      },
       "type": "local_variable",
       "version": "1"
     }

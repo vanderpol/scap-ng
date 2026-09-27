@@ -61,20 +61,6 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781701",
-      "kind": "object_reference",
-      "to": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781701",
-      "kind": "state_reference",
-      "to": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
       "from": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781702",
       "kind": "object_reference",
       "to": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781702"
@@ -83,6 +69,20 @@
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781702",
+      "kind": "state_reference",
+      "to": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781701",
+      "kind": "object_reference",
+      "to": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781701",
       "kind": "state_reference",
       "to": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701"
     }
@@ -172,11 +172,11 @@
           "kind": "element",
           "name": "command",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "grubby --info=ALL | grep args | grep -E '([^[:alnum:]])(noexec)([^[:alnum:]])'"
+          "value": "grep ^flags /proc/cpuinfo | grep -Ev '([^[:alnum:]])(nx)([^[:alnum:]]|$)'"
         }
       ],
-      "comment": "Verify execshield is enabled in grub.",
-      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781702",
+      "comment": "Check flags in /proc/cpuinfo.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "shellcommand_object",
       "version": "13"
@@ -193,11 +193,11 @@
           "kind": "element",
           "name": "command",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "grep ^flags /proc/cpuinfo | grep -Ev '([^[:alnum:]])(nx)([^[:alnum:]]|$)'"
+          "value": "grubby --info=ALL | grep args | grep -E '([^[:alnum:]])(noexec)([^[:alnum:]])'"
         }
       ],
-      "comment": "Check flags in /proc/cpuinfo.",
-      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701",
+      "comment": "Verify execshield is enabled in grub.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781702",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "shellcommand_object",
       "version": "13"
@@ -227,11 +227,11 @@
       "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701"
     ]
   },
-  "semantic_ir_sha256": "e7276aad95186133cc1c2c9c6ce7a4e4710539f79d331354eabbfdf0ca24e761",
+  "semantic_ir_sha256": "4bfa7cbb6906586c25a4d07ba6fec221eae5d9c2c310727e05dc90f4330cfca1",
   "source": {
     "bytes": 6457,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257817r1069383_rule/oval.xml",
-    "sha256": "ea3df11ed264eabf3d5a530f37196bdf168a9cab5178f54cf1e8dd68d5b92c30"
+    "sha256": "4642ef41de0e53dd58d68532841c2acb7672086a4da01ce91952e56e58f422a7"
   },
   "states": [
     {
@@ -254,33 +254,6 @@
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "Check flags in /proc/cpuinfo.",
-      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781701",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701"
-          },
-          "object_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701"
-          },
-          "state_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701"
-        }
-      ],
-      "type": "shellcommand_test",
-      "version": "13"
-    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -307,9 +280,70 @@
       ],
       "type": "shellcommand_test",
       "version": "13"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "Check flags in /proc/cpuinfo.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25781701",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701"
+          },
+          "object_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25781701"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701"
+          },
+          "state_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25781701"
+        }
+      ],
+      "type": "shellcommand_test",
+      "version": "13"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

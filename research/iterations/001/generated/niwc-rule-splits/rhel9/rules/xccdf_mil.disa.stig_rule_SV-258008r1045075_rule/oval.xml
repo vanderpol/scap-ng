@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:230288" version="2" class="compliance">
-          <metadata>
-            <title>The operating system SSH daemon must perform strict mode checking of home directory configuration files.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23028800" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:StrictModes == yes"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:258008" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258008" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-255160 - RHEL 9 SSH daemon must perform strict mode checking of home directory configuration files.</title>
             <affected family="unix">
@@ -25,21 +16,30 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230288"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230288" version="2" class="compliance">
+          <metadata>
+            <title>The operating system SSH daemon must perform strict mode checking of home directory configuration files.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23028800" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:StrictModes == yes"/>
+          </criteria>
+        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23028800" version="2" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:StrictModes == yes">
           <object object_ref="oval:mil.disa.stig.ind:obj:23028802"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000016"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23028802" version="1">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:23028800</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:23028801</object_reference>
-          </set>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23028801" version="1">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23028801" version="1">
           <path>/etc/ssh/sshd_config.d</path>
           <filename operation="pattern match">.+</filename>
           <pattern operation="pattern match">^\s*(?i)StrictModes(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23028802" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:23028800</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:23028801</object_reference>
+          </set>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23028800" version="1">
           <filepath>/etc/ssh/sshd_config</filepath>

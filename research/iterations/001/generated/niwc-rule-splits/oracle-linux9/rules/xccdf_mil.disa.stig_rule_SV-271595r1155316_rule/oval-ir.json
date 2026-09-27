@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "Audit 32-bit invocations of umount2 syscall",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25821600"
+          },
+          {
+            "comment": "Audit 64-bit invocations of umount2 syscall",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25821601"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258216",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Successful/unsuccessful uses of the umount2 system call in the operating system must generate an audit record."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258216",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Audit 32-bit invocations of umount2 syscall",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25821600"
-          },
-          {
-            "comment": "Audit 64-bit invocations of umount2 syscall",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25821601"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258216",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Successful/unsuccessful uses of the umount2 system call in the operating system must generate an audit record."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271595",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258216"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -115,11 +108,11 @@
       "to": "oval:mil.disa.stig.ind:tst:25821601"
     },
     {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25821601",
-      "kind": "object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:25821601"
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271595",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258216"
     },
     {
       "attribute": "object_ref",
@@ -127,6 +120,13 @@
       "from": "oval:mil.disa.stig.ind:tst:25821600",
       "kind": "object_reference",
       "to": "oval:mil.disa.stig.ind:obj:25821600"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25821601",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:25821601"
     }
   ],
   "dependency_integrity": {
@@ -223,7 +223,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+(?:.*(-S\\s+umount2\\s+|(\\s+|,)umount2(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+(?:.*(-S\\s+umount2\\s+|(\\s+|,)umount2(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
         },
         {
           "attributes": {
@@ -236,8 +236,8 @@
           "value": "1"
         }
       ],
-      "comment": "32-bit umount2 syscall",
-      "id": "oval:mil.disa.stig.ind:obj:25821600",
+      "comment": "64-bit umount2 syscall",
+      "id": "oval:mil.disa.stig.ind:obj:25821601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -257,7 +257,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+(?:.*(-S\\s+umount2\\s+|(\\s+|,)umount2(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+(?:.*(-S\\s+umount2\\s+|(\\s+|,)umount2(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
         },
         {
           "attributes": {
@@ -270,8 +270,8 @@
           "value": "1"
         }
       ],
-      "comment": "64-bit umount2 syscall",
-      "id": "oval:mil.disa.stig.ind:obj:25821601",
+      "comment": "32-bit umount2 syscall",
+      "id": "oval:mil.disa.stig.ind:obj:25821600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -301,34 +301,14 @@
       "oval:mil.disa.stig.defs:def:258216"
     ]
   },
-  "semantic_ir_sha256": "74682ce928c4e24631dc9943fe044f35cb7e02065118d734d11ff035794ef79e",
+  "semantic_ir_sha256": "306823cd63c3eb8488548e88ceb2101f2911447286f6a75c9d90211c90d43585",
   "source": {
     "bytes": 4111,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271595r1155316_rule/oval.xml",
-    "sha256": "0195306a07aedfe00aeda196639aead2bd4dc9d82770e5463a48d8db10a61eaa"
+    "sha256": "6091b22b70ff4074f8fbf8f4ce64fc536cae45f797c3525d82812173d06715b6"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "Audit 64-bit invocations of umount2 syscall",
-      "id": "oval:mil.disa.stig.ind:tst:25821601",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25821601"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25821601"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -348,9 +328,63 @@
       "states": [],
       "type": "textfilecontent54_test",
       "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "Audit 64-bit invocations of umount2 syscall",
+      "id": "oval:mil.disa.stig.ind:tst:25821601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25821601"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25821601"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {},
   "variables": []
 }

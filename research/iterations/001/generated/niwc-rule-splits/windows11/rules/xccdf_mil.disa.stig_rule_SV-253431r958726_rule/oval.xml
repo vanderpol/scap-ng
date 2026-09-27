@@ -15,13 +15,13 @@
             <criterion test_ref="oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103" comment="Default permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry hive must be maintained."/>
           </criteria>
         </definition>
-        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103" version="18" comment="Default permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained." check="all">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102"/>
-        </independent-def:shellcommand_test>
-        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101" version="18" comment="Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained." check="all">
+        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101" version="18" comment="Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained." check="all">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101"/>
+        </independent-def:shellcommand_test>
+        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103" version="18" comment="Default permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained." check="all">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102"/>
         </independent-def:shellcommand_test>
         <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102" version="18" comment="Default permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained." check="all">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102"/>
@@ -31,18 +31,18 @@
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command>([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Software", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\d+' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }</independent-def:command>
         </independent-def:shellcommand_object>
-        <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101" version="18" comment="Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry">
-          <independent-def:shell>powershell</independent-def:shell>
-          <independent-def:command>([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Security", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access |  Where-Object { $_.RegistryRights -notmatch '\d+' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }</independent-def:command>
-        </independent-def:shellcommand_object>
         <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103" version="18" comment="Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry">
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command>([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\d+' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }</independent-def:command>
         </independent-def:shellcommand_object>
-        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102" version="18" comment="System, Creator Owner, Admnistrators = Full; ALL APPLICATION PACKAGES, Users, S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681: Read">
-          <independent-def:stdout_line operation="pattern match">^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: (None|InheritOnly)$|^Identity:(NT AUTHORITY\\SYSTEM|BUILTIN\\Administrators), Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$|^Identity:(BUILTIN\\Users|APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES|S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681), Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$</independent-def:stdout_line>
-        </independent-def:shellcommand_state>
-        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101" version="18" comment="System Full, Administrators ReadPermission and ChangePermissions ">
+        <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101" version="18" comment="Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry">
+          <independent-def:shell>powershell</independent-def:shell>
+          <independent-def:command>([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Security", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access |  Where-Object { $_.RegistryRights -notmatch '\d+' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }</independent-def:command>
+        </independent-def:shellcommand_object>
+        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101" version="18" comment="System Full, Administrators ReadPermission and ChangePermissions ">
           <independent-def:stdout_line operation="pattern match">^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$|^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$</independent-def:stdout_line>
+        </independent-def:shellcommand_state>
+        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102" version="18" comment="System, Creator Owner, Admnistrators = Full; ALL APPLICATION PACKAGES, Users, S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681: Read">
+          <independent-def:stdout_line operation="pattern match">^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: (None|InheritOnly)$|^Identity:(NT AUTHORITY\\SYSTEM|BUILTIN\\Administrators), Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$|^Identity:(BUILTIN\\Users|APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES|S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681), Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$</independent-def:stdout_line>
         </independent-def:shellcommand_state>
         </states></oval_definitions>

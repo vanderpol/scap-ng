@@ -130,9 +130,16 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23051601",
+      "from": "oval:mil.disa.stig.linux:tst:23051600",
       "kind": "object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:23051601"
+      "to": "oval:mil.disa.stig.linux:obj:23051600"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.linux:tst:23051600",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.linux:ste:23051600"
     },
     {
       "attribute": "object_ref",
@@ -151,16 +158,9 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.linux:tst:23051600",
+      "from": "oval:mil.disa.stig.ind:tst:23051601",
       "kind": "object_reference",
-      "to": "oval:mil.disa.stig.linux:obj:23051600"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.linux:tst:23051600",
-      "kind": "state_reference",
-      "to": "oval:mil.disa.stig.linux:ste:23051600"
+      "to": "oval:mil.disa.stig.ind:obj:23051601"
     },
     {
       "attribute": null,
@@ -277,21 +277,6 @@
       "children": [
         {
           "kind": "element",
-          "name": "mount_point",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "/var/log"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23051600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "partition_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/fstab"
@@ -319,6 +304,21 @@
       "id": "oval:mil.disa.stig.ind:obj:23051601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "mount_point",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "/var/log"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.linux:obj:23051600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "partition_object",
       "version": "1"
     },
     {
@@ -375,11 +375,11 @@
       "oval:mil.disa.stig.defs:def:230516"
     ]
   },
-  "semantic_ir_sha256": "0db3a08ca400e89a851de3162b452002e90a5e89a64fb966b0b76fd2a0be2991",
+  "semantic_ir_sha256": "109c9970c51449c2636d3476307bac877ac0d5c77d043f534bb5a8e0b5ecc915",
   "source": {
     "bytes": 4755,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257871r958804_rule/oval.xml",
-    "sha256": "5db6d3b1772abe913cc0b8fe9cd3c03fc976b83057051c157426e176609ad5c8"
+    "sha256": "78c9a4234f14516b9652112a3a2c74f4a89ff804b142e2b3356832dafbb8e67e"
   },
   "states": [
     {
@@ -425,21 +425,28 @@
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
-      "comment": "/var/log is configured in /etc/fstab",
-      "id": "oval:mil.disa.stig.ind:tst:23051601",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "comment": "/var/log is mounted with the noexec option",
+      "id": "oval:mil.disa.stig.linux:tst:23051600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23051601"
+            "object_ref": "oval:mil.disa.stig.linux:obj:23051600"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23051601"
+          "object_ref": "oval:mil.disa.stig.linux:obj:23051600"
         }
       ],
       "other": [],
       "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.linux:ste:23051600"
+          },
+          "state_ref": "oval:mil.disa.stig.linux:ste:23051600"
+        }
+      ],
+      "type": "partition_test",
       "version": "1"
     },
     {
@@ -472,36 +479,72 @@
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
-      "comment": "/var/log is mounted with the noexec option",
-      "id": "oval:mil.disa.stig.linux:tst:23051600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "comment": "/var/log is configured in /etc/fstab",
+      "id": "oval:mil.disa.stig.ind:tst:23051601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23051600"
+            "object_ref": "oval:mil.disa.stig.ind:obj:23051601"
           },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23051600"
+          "object_ref": "oval:mil.disa.stig.ind:obj:23051601"
         }
       ],
       "other": [],
       "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.linux:ste:23051600"
-          },
-          "state_ref": "oval:mil.disa.stig.linux:ste:23051600"
-        }
-      ],
-      "type": "partition_test",
+      "states": [],
+      "type": "textfilecontent54_test",
       "version": "1"
     }
   ],
   "unresolved_references": [],
+  "variable_function_model": {
+    "all_component_operations_have_explicit_ast": true,
+    "known_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "glob_to_regex",
+      "literal_component",
+      "merge",
+      "object_component",
+      "regex_capture",
+      "split",
+      "substring",
+      "time_difference",
+      "unique",
+      "variable_component"
+    ],
+    "static_evaluator_operations": [
+      "arithmetic",
+      "begin",
+      "concat",
+      "count",
+      "end",
+      "escape_regex",
+      "literal_component",
+      "split",
+      "substring",
+      "unique",
+      "variable_component"
+    ]
+  },
   "variable_resolution": {
     "oval:mil.disa.stig.defs:var:23051600": {
+      "blocked_by": {
+        "item_field": "subexpression",
+        "object_ref": "oval:mil.disa.stig.ind:obj:23051601",
+        "operation": "object_component",
+        "record_field": null,
+        "status": "dynamic_object_dependency"
+      },
+      "datatype": "string",
       "operation": "split",
-      "status": "unsupported_function",
+      "reason": "split_child_not_static:object_component",
+      "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }
   },
@@ -532,6 +575,25 @@
       "datatype": "string",
       "id": "oval:mil.disa.stig.defs:var:23051600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "string",
+        "expression": {
+          "args": [
+            {
+              "item_field": "subexpression",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23051601",
+              "op": "object_component",
+              "record_field": null
+            }
+          ],
+          "attributes": {
+            "delimiter": ","
+          },
+          "op": "split"
+        },
+        "id": "oval:mil.disa.stig.defs:var:23051600",
+        "type": "local_variable"
+      },
       "type": "local_variable",
       "version": "1"
     }
