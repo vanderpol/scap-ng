@@ -27,24 +27,120 @@ def local(tag):
     return etree.QName(tag).localname if isinstance(tag,str) else None
 
 
-def static_variable_object_values(root, ir):
+def static_variable_object_items(root, ir):
+    """Collect synthetic independent variable_object items without a host.
+
+    A direct variable_object yields one item containing one or more value
+    entities. Set operations combine those items; they do not flatten entity
+    values across item boundaries.
+    """
     resolutions=ir.get("variable_resolution",{})
-    out={}
-    objects=root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}objects")
-    if objects is None:
+    objects_section=root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}objects")
+    if objects_section is None:
+        return {}
+
+    objects={
+        obj.get("id"):obj
+        for obj in objects_section
+        if local(obj.tag)=="variable_object" and obj.get("id")
+    }
+    cache={}
+    resolving=set()
+
+    def item_key(item):
+        return json.dumps(item,sort_keys=True,separators=(",",":"))
+
+    def unique(items):
+        seen=set()
+        out=[]
+        for item in items:
+            key=item_key(item)
+            if key not in seen:
+                seen.add(key)
+                out.append(item)
         return out
-    for obj in objects:
-        if local(obj.tag)!="variable_object":
-            continue
-        refs=[(c.text or "").strip() for c in obj if local(c.tag)=="var_ref"]
+
+    def collect_set(set_node):
+        filters=[c for c in set_node if local(c.tag)=="filter"]
+        if filters:
+            return None,"synthetic_set_filters_not_implemented"
+
+        operands=[]
+        for child in set_node:
+            name=local(child.tag)
+            if name=="object_reference":
+                items,reason=collect_object((child.text or "").strip())
+            elif name=="set":
+                items,reason=collect_set(child)
+            else:
+                continue
+            if items is None:
+                return None,reason
+            operands.append(items)
+
+        if not operands:
+            return None,"synthetic_set_has_no_operands"
+
+        operator=set_node.get("set_operator","UNION")
+        if operator=="UNION":
+            return unique([item for operand in operands for item in operand]),None
+        if operator=="INTERSECTION":
+            common={item_key(item):item for item in operands[0]}
+            for operand in operands[1:]:
+                keys={item_key(item) for item in operand}
+                common={k:v for k,v in common.items() if k in keys}
+            return list(common.values()),None
+        if operator=="COMPLEMENT":
+            if len(operands)!=2:
+                return None,"synthetic_complement_requires_two_operands"
+            remove={item_key(item) for item in operands[1]}
+            return [item for item in operands[0] if item_key(item) not in remove],None
+        return None,f"unsupported_set_operator:{operator}"
+
+    def collect_object(object_ref):
+        if object_ref in cache:
+            return cache[object_ref],None
+        if object_ref in resolving:
+            return None,"synthetic_object_cycle"
+        obj=objects.get(object_ref)
+        if obj is None:
+            return None,"object_not_synthetic_variable_object"
+
+        resolving.add(object_ref)
+        children=[c for c in obj if isinstance(c.tag,str)]
+        sets=[c for c in children if local(c.tag)=="set"]
+        if sets:
+            if len(sets)!=1:
+                resolving.remove(object_ref)
+                return None,"synthetic_object_set_count"
+            items,reason=collect_set(sets[0])
+            resolving.remove(object_ref)
+            if items is not None:
+                cache[object_ref]=items
+            return items,reason
+
+        refs=[(c.text or "").strip() for c in children if local(c.tag)=="var_ref"]
         if len(refs)!=1:
-            continue
+            resolving.remove(object_ref)
+            return None,"synthetic_object_var_ref_count"
         resolved=resolutions.get(refs[0],{})
-        if resolved.get("status")=="exact_static":
-            out[obj.get("id")]={
-                "variable_ref":refs[0],
-                "values":[str(x) for x in resolved.get("values",[])],
-            }
+        if resolved.get("status")!="exact_static":
+            resolving.remove(object_ref)
+            return None,f"synthetic_object_variable_status:{resolved.get('status','missing')}"
+
+        # One variable_object item can contain multiple value entities.
+        items=[{"value":[str(x) for x in resolved.get("values",[])]}]
+        cache[object_ref]=items
+        resolving.remove(object_ref)
+        return items,None
+
+    out={}
+    for object_ref in objects:
+        items,reason=collect_object(object_ref)
+        out[object_ref]={
+            "items":items,
+            "reason":reason,
+        }
     return out
 
 
@@ -426,7 +522,7 @@ def inspect_file(path):
     data=path.read_bytes()
     root=etree.fromstring(data)
     ir=oval_ir.parse(path)
-    obj_values=static_variable_object_values(root,ir)
+    obj_items=static_variable_object_items(root,ir)
     state_values=expected_state_values(root,ir)
 
     tests_section=root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}tests")
@@ -438,38 +534,75 @@ def inspect_file(path):
             test_id=test.get("id")
             object_nodes=[c for c in test if local(c.tag)=="object"]
             state_nodes=[c for c in test if local(c.tag)=="state"]
-            if len(object_nodes)!=1 or len(state_nodes)!=1:
+            if len(object_nodes)!=1 or len(state_nodes)>1:
                 results.append({"test_id":test_id,"status":"skipped","reason":"object_or_state_count"})
                 continue
             object_ref=object_nodes[0].get("object_ref")
             state_ref=state_nodes[0].get("state_ref")
-            if object_ref not in obj_values:
-                results.append({"test_id":test_id,"status":"skipped","reason":"object_not_static_direct_variable_object"})
-                continue
-            if state_ref not in state_values:
-                results.append({"test_id":test_id,"status":"skipped","reason":"state_not_simple_static_equals"})
-                continue
-
-            actual=obj_values[object_ref]["values"]
-            outcome,reason=evaluate_values(actual,state_values[state_ref])
-            if outcome is None:
+            object_info=obj_items.get(object_ref)
+            if object_info is None or object_info.get("items") is None:
+                reason=(object_info or {}).get("reason","object_not_synthetic_variable_object")
                 results.append({"test_id":test_id,"status":"skipped","reason":reason})
                 continue
+            items=object_info["items"]
 
             existence=test.get("check_existence","at_least_one_exists")
-            if existence in {"all_exist","any_exist","at_least_one_exists","only_one_exists"}:
+            count=len(items)
+            if existence in {"all_exist","at_least_one_exists"}:
+                existence_result=count>=1
+            elif existence=="any_exist":
                 existence_result=True
             elif existence=="none_exist":
-                existence_result=False
+                existence_result=count==0
+            elif existence=="only_one_exists":
+                existence_result=count==1
             else:
                 results.append({"test_id":test_id,"status":"skipped","reason":"unsupported_check_existence"})
                 continue
 
+            # Tests without a state are pure existence tests.
+            if not state_nodes:
+                test_outcome=existence_result
+                results.append({
+                    "test_id":test_id,
+                    "status":"evaluated_true" if test_outcome else "evaluated_false",
+                    "object_ref":object_ref,
+                    "item_count":count,
+                })
+                continue
+
+            if len(state_nodes)!=1:
+                results.append({"test_id":test_id,"status":"skipped","reason":"state_count"})
+                continue
+            state_ref=state_nodes[0].get("state_ref")
+            if state_ref not in state_values:
+                results.append({"test_id":test_id,"status":"skipped","reason":"state_not_supported"})
+                continue
+
+            item_results=[]
+            reason=None
+            for item in items:
+                actual=item.get("value")
+                if actual is None:
+                    reason="synthetic_item_missing_value"
+                    break
+                outcome,reason=evaluate_values(actual,state_values[state_ref])
+                if outcome is None:
+                    break
+                item_results.append(outcome)
+            if reason is not None:
+                results.append({"test_id":test_id,"status":"skipped","reason":reason})
+                continue
+
             check=test.get("check","all")
-            if check in {"all","at least one","only one"}:
-                state_result=outcome
+            if check=="all":
+                state_result=all(item_results) if item_results else False
+            elif check=="at least one":
+                state_result=any(item_results)
+            elif check=="only one":
+                state_result=sum(item_results)==1
             elif check=="none satisfy":
-                state_result=not outcome
+                state_result=not any(item_results)
             else:
                 results.append({"test_id":test_id,"status":"skipped","reason":"unsupported_test_check"})
                 continue
@@ -480,7 +613,8 @@ def inspect_file(path):
                 "status":"evaluated_true" if test_outcome else "evaluated_false",
                 "object_ref":object_ref,
                 "state_ref":state_ref,
-                "actual_values":actual,
+                "item_count":count,
+                "item_results":item_results,
                 "expected_values":state_values[state_ref]["values"],
             })
 
