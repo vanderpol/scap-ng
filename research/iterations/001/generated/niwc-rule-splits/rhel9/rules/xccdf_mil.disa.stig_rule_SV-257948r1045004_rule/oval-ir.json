@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:230316",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:257948",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-252035 - RHEL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "To provide availability for name resolution services, multiple redundant name servers are mandated. A failure in name resolution could lead to the failure of security functions requiring name resolution, which may include time synchronization, centralized authentication, and remote system logging."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": "The system is not using DNS",
             "kind": "test_ref",
             "negate": true,
@@ -60,59 +110,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:230316",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:257948",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-252035 - RHEL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "To provide availability for name resolution services, multiple redundant name servers are mandated. A failure in name resolution could lead to the failure of security functions requiring name resolution, which may include time synchronization, centralized authentication, and remote system logging."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257948",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230316"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -133,13 +140,6 @@
       "from": "oval:mil.disa.stig.defs:def:230316",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23031602"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257948",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230316"
     },
     {
       "attribute": "object_ref",
@@ -297,7 +297,7 @@
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/resolv.conf"
+          "value": "/etc/nsswitch.conf"
         },
         {
           "attributes": {
@@ -306,7 +306,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^nameserver\\s+(.*)$"
+          "value": "^\\s*hosts:\\s*(.*)$"
         },
         {
           "attributes": {
@@ -319,8 +319,8 @@
           "value": "1"
         }
       ],
-      "comment": "/etc/resolv.conf nameserver entries",
-      "id": "oval:mil.disa.stig.ind:obj:23031602",
+      "comment": "/etc/nsswitch.conf hosts entry",
+      "id": "oval:mil.disa.stig.ind:obj:23031600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
@@ -346,7 +346,7 @@
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/nsswitch.conf"
+          "value": "/etc/resolv.conf"
         },
         {
           "attributes": {
@@ -355,7 +355,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*hosts:\\s*(.*)$"
+          "value": "^nameserver\\s+(.*)$"
         },
         {
           "attributes": {
@@ -368,8 +368,8 @@
           "value": "1"
         }
       ],
-      "comment": "/etc/nsswitch.conf hosts entry",
-      "id": "oval:mil.disa.stig.ind:obj:23031600",
+      "comment": "/etc/resolv.conf nameserver entries",
+      "id": "oval:mil.disa.stig.ind:obj:23031602",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
@@ -413,14 +413,33 @@
       "oval:mil.disa.stig.defs:def:230316"
     ]
   },
-  "semantic_ir_sha256": "537df1d4af204c70c3001541a363efb548c589eb153489b41a0121be764297b4",
+  "semantic_ir_sha256": "428d6e1cbec9d0ae5e9a1a9f898c6fcedb0f2314cc74e3cfeac59265d48029fc",
   "source": {
     "bytes": 5797,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257948r1045004_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257948r1045004_rule/provenance.json",
-    "sha256": "0ca04084e40e913b508eb694722bbb7084c90a53155c349b0dde46b5d6b91e98"
+    "sha256": "236e0f63255bda3a31e9f39b6081376cea0bf63f5f0ad23e6f0765b121cfdeb8"
   },
   "states": [
+    {
+      "comment": "hosts entry contains dns",
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "subexpression",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "(^|\\s)dns(\\s|$)"
+        }
+      ],
+      "id": "oval:mil.disa.stig.ind:ste:23031600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "textfilecontent54_state",
+      "version": "2"
+    },
     {
       "comment": "/etc/resolv.conf is configured with at least two name servers",
       "entities": [
@@ -439,25 +458,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "variable_state",
-      "version": "2"
-    },
-    {
-      "comment": "hosts entry contains dns",
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "subexpression",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "(^|\\s)dns(\\s|$)"
-        }
-      ],
-      "id": "oval:mil.disa.stig.ind:ste:23031600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "textfilecontent54_state",
       "version": "2"
     }
   ],

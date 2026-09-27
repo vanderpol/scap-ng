@@ -117,6 +117,20 @@
     {
       "attribute": "object_ref",
       "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25814900",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25814900"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.ind:tst:25814900",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.ind:ste:25814900"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25814901",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:20000002"
@@ -134,20 +148,6 @@
       "from": "oval:mil.disa.stig.ind:tst:25814901",
       "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:25814902"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25814900",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:25814900"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.ind:tst:25814900",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.ind:ste:25814900"
     },
     {
       "attribute": null,
@@ -202,6 +202,9 @@
       },
       "operator": {
         "OR": 1
+      },
+      "set_operator": {
+        "UNION": 2
       }
     },
     "elements": {
@@ -282,13 +285,19 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
         },
         {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/rsyslog.d"
+        },
+        {
           "attributes": {
-            "datatype": "string"
+            "operation": "pattern match"
           },
           "kind": "element",
-          "name": "filepath",
+          "name": "filename",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.conf"
+          "value": "^.*\\.conf$"
         },
         {
           "attributes": {
@@ -297,7 +306,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\*\\.\\*\\s+action\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
+          "value": "^\\*\\.\\*\\s+@@(\\S+)"
         },
         {
           "attributes": {
@@ -310,11 +319,11 @@
           "value": "1"
         }
       ],
-      "comment": "rsyslog.conf: action for all messages",
-      "id": "oval:mil.disa.stig.ind:obj:20000003",
+      "comment": "rsyslog.d/*.conf: remote TCP logging",
+      "id": "oval:mil.disa.stig.ind:obj:25814902",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "3"
+      "version": "1"
     },
     {
       "children": [
@@ -425,8 +434,15 @@
               "object_ref": "oval:mil.disa.stig.ind:obj:20000004"
             }
           ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
           "kind": "set",
-          "operator": "UNION"
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
       "comment": "rsyslog: action for all messages",
@@ -448,8 +464,15 @@
               "object_ref": "oval:mil.disa.stig.ind:obj:25814902"
             }
           ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
           "kind": "set",
-          "operator": "UNION"
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
       "comment": "remote TCP logging",
@@ -469,19 +492,13 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
         },
         {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.d"
-        },
-        {
           "attributes": {
-            "operation": "pattern match"
+            "datatype": "string"
           },
           "kind": "element",
-          "name": "filename",
+          "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^.*\\.conf$"
+          "value": "/etc/rsyslog.conf"
         },
         {
           "attributes": {
@@ -490,7 +507,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\*\\.\\*\\s+@@(\\S+)"
+          "value": "^\\*\\.\\*\\s+action\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
         },
         {
           "attributes": {
@@ -503,11 +520,11 @@
           "value": "1"
         }
       ],
-      "comment": "rsyslog.d/*.conf: remote TCP logging",
-      "id": "oval:mil.disa.stig.ind:obj:25814902",
+      "comment": "rsyslog.conf: action for all messages",
+      "id": "oval:mil.disa.stig.ind:obj:20000003",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
+      "version": "3"
     }
   ],
   "parser_contract": {
@@ -550,12 +567,12 @@
       "oval:mil.disa.stig.defs:def:258149"
     ]
   },
-  "semantic_ir_sha256": "1d05abaa273f3c92189c8ee8ba6fe270d21e06edf48da71e1cc9ca32ee4e0d11",
+  "semantic_ir_sha256": "4bce181193a90f59a95f81bee988807a62e9f74e0956b211b26c012fc137fdbb",
   "source": {
     "bytes": 8068,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258149r1155580_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258149r1155580_rule/provenance.json",
-    "sha256": "67631f4e5841610701aee155e89dacc0ee7658aa565deb1bd267ccb4616a4bbc"
+    "sha256": "fb9570ff5337a27daef2637b86933f54cd0d990865eab0b967dc9b48659b9b2e"
   },
   "states": [
     {
@@ -569,14 +586,14 @@
           "kind": "element",
           "name": "subexpression",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "(?i)(?:^|\\n)[^#]*\\bprotocol\\s*=\\s*\"tcp\""
+          "value": "^.+$"
         }
       ],
-      "id": "oval:mil.disa.stig.ind:ste:25814902",
+      "id": "oval:mil.disa.stig.ind:ste:25814900",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",
-      "version": "4"
+      "version": "1"
     },
     {
       "comment": null,
@@ -609,17 +626,44 @@
           "kind": "element",
           "name": "subexpression",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^.+$"
+          "value": "(?i)(?:^|\\n)[^#]*\\bprotocol\\s*=\\s*\"tcp\""
         }
       ],
-      "id": "oval:mil.disa.stig.ind:ste:25814900",
+      "id": "oval:mil.disa.stig.ind:ste:25814902",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",
-      "version": "1"
+      "version": "4"
     }
   ],
   "tests": [
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "remote TCP logging",
+      "id": "oval:mil.disa.stig.ind:tst:25814900",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25814900"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25814900"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.ind:ste:25814900"
+          },
+          "state_ref": "oval:mil.disa.stig.ind:ste:25814900"
+        }
+      ],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
     {
       "check": "at least one",
       "check_existence": "at_least_one_exists",
@@ -652,33 +696,6 @@
       ],
       "type": "textfilecontent54_test",
       "version": "2"
-    },
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "remote TCP logging",
-      "id": "oval:mil.disa.stig.ind:tst:25814900",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25814900"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25814900"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.ind:ste:25814900"
-          },
-          "state_ref": "oval:mil.disa.stig.ind:ste:25814900"
-        }
-      ],
-      "type": "textfilecontent54_test",
-      "version": "1"
     }
   ],
   "unresolved_references": [],

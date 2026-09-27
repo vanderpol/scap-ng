@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271684" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258020" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must prevent a user from overriding the disabling of the graphical user smart card removal action.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25802600" comment="dconf user database(s) exist"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25802000" comment="/org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories exists"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271684" version="1" class="compliance">
           <metadata>
             <title>OL09-00-002126 - OL 9 must prevent a user from overriding the disabling of the graphical user smart card removal action.</title>
             <affected family="unix">
@@ -20,31 +30,21 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258020"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:258020" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must prevent a user from overriding the disabling of the graphical user smart card removal action.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25802600" comment="dconf user database(s) exist"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25802000" comment="/org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories exists"/>
-          </criteria>
-        </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25802600" version="1" check_existence="at_least_one_exists" check="all" comment="dconf user database(s) exist">
-          <object object_ref="oval:mil.disa.stig.ind:obj:25802600"/>
-        </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25802000" version="1" check_existence="at_least_one_exists" check="all" comment="/org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories exists">
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25802000" version="1" check_existence="at_least_one_exists" check="all" comment="/org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories exists">
           <object object_ref="oval:mil.disa.stig.ind:obj:25802000"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25802000" version="1" comment="/org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories">
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25802600" version="1" check_existence="at_least_one_exists" check="all" comment="dconf user database(s) exist">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25802600"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25802600" version="2" comment="dconf user databases">
+          <filepath>/etc/dconf/profile/user</filepath>
+          <pattern operation="pattern match">^system-db:(\S+)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25802000" version="1" comment="/org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories">
           <path var_ref="oval:mil.disa.stig.defs:var:25802600" var_check="at least one"/>
           <filename operation="pattern match">.*</filename>
           <pattern operation="pattern match">^/org/gnome/settings-daemon/peripherals/smartcard/removal-action$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25802600" version="2" comment="dconf user databases">
-          <filepath>/etc/dconf/profile/user</filepath>
-          <pattern operation="pattern match">^system-db:(\S+)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         </objects><variables><local_variable id="oval:mil.disa.stig.defs:var:25802600" version="2" datatype="string" comment="dconf user database locks directories">

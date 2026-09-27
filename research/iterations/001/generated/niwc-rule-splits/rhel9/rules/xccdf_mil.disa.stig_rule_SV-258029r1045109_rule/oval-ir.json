@@ -116,18 +116,18 @@
       "to": "oval:mil.disa.stig.ind:ste:25802900"
     },
     {
-      "attribute": null,
-      "element": "filter",
-      "from": "oval:mil.disa.stig.unix:obj:23035100",
-      "kind": "set_filter_state",
-      "to": "oval:mil.disa.stig.unix:ste:23035100"
-    },
-    {
       "attribute": "var_ref",
       "element": "path",
       "from": "oval:mil.disa.stig.ind:obj:25802900",
       "kind": "variable_reference",
       "to": "oval:mil.disa.stig.defs:var:23035100"
+    },
+    {
+      "attribute": null,
+      "element": "filter",
+      "from": "oval:mil.disa.stig.unix:obj:23035100",
+      "kind": "set_filter_state",
+      "to": "oval:mil.disa.stig.unix:ste:23035100"
     },
     {
       "attribute": "object_ref",
@@ -144,6 +144,9 @@
   },
   "features": {
     "attributes": {
+      "action": {
+        "include": 1
+      },
       "check": {
         "at least one": 1
       },
@@ -246,47 +249,6 @@
       "children": [
         {
           "attributes": {
-            "max_depth": "1",
-            "recurse_direction": "down"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
-        },
-        {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "/etc/dconf/db"
-        },
-        {
-          "attributes": {
-            "nil": "true"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
-        },
-        {
-          "attributes": {
-            "action": "include"
-          },
-          "kind": "element",
-          "name": "filter",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "oval:mil.disa.stig.unix:ste:23035100"
-        }
-      ],
-      "comment": "dconf database directories",
-      "id": "oval:mil.disa.stig.unix:obj:23035100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "type": "file_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
             "datatype": "string",
             "var_check": "at least one",
             "var_ref": "oval:mil.disa.stig.defs:var:23035100"
@@ -330,6 +292,47 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "max_depth": "1",
+            "recurse_direction": "down"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+        },
+        {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "/etc/dconf/db"
+        },
+        {
+          "attributes": {
+            "nil": "true"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+        },
+        {
+          "attributes": {
+            "action": "include"
+          },
+          "kind": "element",
+          "name": "filter",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "oval:mil.disa.stig.unix:ste:23035100"
+        }
+      ],
+      "comment": "dconf database directories",
+      "id": "oval:mil.disa.stig.unix:obj:23035100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "type": "file_object",
+      "version": "2"
     }
   ],
   "parser_contract": {
@@ -362,14 +365,33 @@
     ],
     "oval:mil.disa.stig.unix:ste:23035100": []
   },
-  "semantic_ir_sha256": "497142ba9010e80c61ac8d10f86eac063a4a9223db66a5a7c56d254ee1e5f58d",
+  "semantic_ir_sha256": "2fe51c6ee9116da21c82e2163acc355cf603648d2293a730af3c296ba0bdef81",
   "source": {
     "bytes": 4215,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258029r1045109_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258029r1045109_rule/provenance.json",
-    "sha256": "978938adccb41a82c8975f3efe244a178146f5a6a10017a1d5b625b9a5a4d9f6"
+    "sha256": "3ac22ccaa385e137dde549e2ff1237fd1f239c7d6c0af1309694c560b69e5144"
   },
   "states": [
+    {
+      "comment": "dconf database directories",
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "^/etc/dconf/db/.*\\.d$"
+        }
+      ],
+      "id": "oval:mil.disa.stig.unix:ste:23035100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "operator": "AND",
+      "type": "file_state",
+      "version": "1"
+    },
     {
       "comment": null,
       "entities": [
@@ -389,25 +411,6 @@
       "operator": "AND",
       "type": "textfilecontent54_state",
       "version": "3"
-    },
-    {
-      "comment": "dconf database directories",
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "^/etc/dconf/db/.*\\.d$"
-        }
-      ],
-      "id": "oval:mil.disa.stig.unix:ste:23035100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "operator": "AND",
-      "type": "file_state",
-      "version": "1"
     }
   ],
   "tests": [

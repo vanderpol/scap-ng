@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "AllowIndexingEncryptedStoresOrItems is disabled",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25340910"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:25340900",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Indexing of encrypted files must be turned off."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:25340900",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "AllowIndexingEncryptedStoresOrItems is disabled",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25340910"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:25340900",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Indexing of encrypted files must be turned off."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:25340900",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.win:tst:25340910"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.windows11:def:253409",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:25340900"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:25340900",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.win:tst:25340910"
     },
     {
       "attribute": "object_ref",
@@ -143,6 +143,9 @@
       "datatype": {
         "int": 1,
         "string": 6
+      },
+      "set_operator": {
+        "UNION": 1
       }
     },
     "elements": {
@@ -228,6 +231,42 @@
           "kind": "element",
           "name": "key",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SOFTWARE\\Microsoft\\Policymanager\\current\\device\\search"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "AllowIndexingEncryptedStoresOrItems"
+        }
+      ],
+      "comment": "Registry entry for AllowIndexingEncryptedStoresOrItems used by Intune",
+      "id": "oval:mil.disa.stig.win:obj:25340912",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "registry_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "hive",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "HKEY_LOCAL_MACHINE"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "key",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
           "value": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search"
         },
         {
@@ -259,48 +298,19 @@
               "object_ref": "oval:mil.disa.stig.win:obj:25340912"
             }
           ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
           "kind": "set",
-          "operator": "UNION"
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
       "comment": "Registry entries for AllowIndexingEncryptedStoresOrItems",
       "id": "oval:mil.disa.stig.win:obj:25340910",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "registry_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "hive",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "HKEY_LOCAL_MACHINE"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SOFTWARE\\Microsoft\\Policymanager\\current\\device\\search"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "AllowIndexingEncryptedStoresOrItems"
-        }
-      ],
-      "comment": "Registry entry for AllowIndexingEncryptedStoresOrItems used by Intune",
-      "id": "oval:mil.disa.stig.win:obj:25340912",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
       "version": "1"
@@ -332,12 +342,12 @@
       "oval:mil.disa.stig.defs:def:25340900"
     ]
   },
-  "semantic_ir_sha256": "acbac1f44adba9b0b87643ce4d005d32253de7db5ebbae5f00c1820d9803d96a",
+  "semantic_ir_sha256": "b039953274c33007d5483fa49f07c57a8aec30ebd923e4415c1490ad83b471b8",
   "source": {
     "bytes": 3854,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253409r1210297_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253409r1210297_rule/provenance.json",
-    "sha256": "2f5657a0de68d0b309eeed8cdbb87a5e16a857cf7a4b53c175c1e55bf53b8c1b"
+    "sha256": "6e87868d85f9053e608e63782154df3f17bb0701a3676df413a2f179f0967f03"
   },
   "states": [
     {

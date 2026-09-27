@@ -21,52 +21,46 @@
             <criterion test_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105" comment="Verify minimum rsa size of 2048."/>
           </criteria>
         </definition>
-        </definitions><tests><independent-def:textfilecontent54_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105" check_existence="at_least_one_exists" check="all" version="13" comment="Verify minimum rsa size of 2048.">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105"/>
-        </independent-def:textfilecontent54_test>
-        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824101" check_existence="at_least_one_exists" check="all" version="13" comment="Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy.">
+        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824101" check_existence="at_least_one_exists" check="all" version="13" comment="Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy.">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824101"/>
         </independent-def:shellcommand_test>
-        <independent-def:textfilecontent54_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824103" check_existence="any_exist" check="all" version="13" comment="Verify no SHA1 algorithms are employed.">
+        <independent-def:textfilecontent54_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824102" check_existence="at_least_one_exists" check="all" version="13" comment="Verify the current minimum crypto-policy configuration.">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102"/>
+        </independent-def:textfilecontent54_test>
+        <independent-def:textfilecontent54_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105" check_existence="at_least_one_exists" check="all" version="13" comment="Verify minimum rsa size of 2048.">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105"/>
         </independent-def:textfilecontent54_test>
         <independent-def:textfilecontent54_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824104" check_existence="any_exist" check="all" version="13" comment="Verify minimum hash values of 224.">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104"/>
         </independent-def:textfilecontent54_test>
-        <independent-def:textfilecontent54_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824102" check_existence="at_least_one_exists" check="all" version="13" comment="Verify the current minimum crypto-policy configuration.">
+        <independent-def:textfilecontent54_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824103" check_existence="any_exist" check="all" version="13" comment="Verify no SHA1 algorithms are employed.">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103"/>
         </independent-def:textfilecontent54_test>
-        </tests><objects><independent-def:shellcommand_object version="13" id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101" comment="Retrieve system wide crypto policy(ies).">
+        </tests><objects><independent-def:textfilecontent54_object id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104" version="13" comment="Retrieve the current minimum rsa size.">
+          <independent-def:filepath>/etc/crypto-policies/state/CURRENT.pol</independent-def:filepath>
+          <independent-def:pattern operation="pattern match">^\s*min_rsa_size\s*=\s*(\d+)</independent-def:pattern>
+          <independent-def:instance datatype="int" operation="greater than or equal">1</independent-def:instance>
+        </independent-def:textfilecontent54_object>
+        <independent-def:shellcommand_object version="13" id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101" comment="Retrieve system wide crypto policy(ies).">
           <independent-def:shell>bash</independent-def:shell>
           <independent-def:command>update-crypto-policies --show</independent-def:command>
         </independent-def:shellcommand_object>
-        <independent-def:textfilecontent54_object id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102" version="13" comment="Retrieve the current minimum crypto-policy configuration.">
-          <independent-def:filepath>/etc/crypto-policies/state/CURRENT.pol</independent-def:filepath>
-          <independent-def:pattern operation="pattern match">^hash\s*=\s*.*$</independent-def:pattern>
-          <independent-def:instance datatype="int" operation="greater than or equal">1</independent-def:instance>
-        </independent-def:textfilecontent54_object>
         <independent-def:textfilecontent54_object id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103" version="13" comment="Retrieve the current minimum crypto-policy configuration with hash values subexpression.">
           <independent-def:filepath>/etc/crypto-policies/state/CURRENT.pol</independent-def:filepath>
           <independent-def:pattern operation="pattern match">^hash\s*=\s*([^#\n]+)$</independent-def:pattern>
           <independent-def:instance datatype="int" operation="greater than or equal">1</independent-def:instance>
         </independent-def:textfilecontent54_object>
-        <independent-def:textfilecontent54_object id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104" version="13" comment="Retrieve the current minimum rsa size.">
+        <independent-def:textfilecontent54_object id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102" version="13" comment="Retrieve the current minimum crypto-policy configuration.">
           <independent-def:filepath>/etc/crypto-policies/state/CURRENT.pol</independent-def:filepath>
-          <independent-def:pattern operation="pattern match">^\s*min_rsa_size\s*=\s*(\d+)</independent-def:pattern>
+          <independent-def:pattern operation="pattern match">^hash\s*=\s*.*$</independent-def:pattern>
           <independent-def:instance datatype="int" operation="greater than or equal">1</independent-def:instance>
         </independent-def:textfilecontent54_object>
-        </objects><states><independent-def:textfilecontent54_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102" version="13" comment="Confirm correct algorithms.">
-          <independent-def:text operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101" var_check="all"/>
-        </independent-def:textfilecontent54_state>
-        <independent-def:textfilecontent54_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104" version="13" comment="Confirm minimum hash values of 224.">
-          <independent-def:subexpression operation="pattern match">\b[A-Z]+\d*-((\d{1,2}\b)|(1\d\d\b)|(21\d\b)|(22[1-3]\b))</independent-def:subexpression>
-        </independent-def:textfilecontent54_state>
-        <independent-def:textfilecontent54_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105" version="13" comment="Confirm minimum rsa size of 2048.">
+        </objects><states><independent-def:textfilecontent54_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105" version="13" comment="Confirm minimum rsa size of 2048.">
           <independent-def:subexpression datatype="int" operation="greater than or equal">2048</independent-def:subexpression>
         </independent-def:textfilecontent54_state>
         <independent-def:textfilecontent54_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103" version="13" comment="Check for existence of SHA1 algorithms (negated at criterion level).">
@@ -76,6 +70,12 @@
           <independent-def:exit_status datatype="int">0</independent-def:exit_status>
           <independent-def:stdout_line operation="pattern match">^FIPS:*</independent-def:stdout_line>
         </independent-def:shellcommand_state>
+        <independent-def:textfilecontent54_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102" version="13" comment="Confirm correct algorithms.">
+          <independent-def:text operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101" var_check="all"/>
+        </independent-def:textfilecontent54_state>
+        <independent-def:textfilecontent54_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104" version="13" comment="Confirm minimum hash values of 224.">
+          <independent-def:subexpression operation="pattern match">\b[A-Z]+\d*-((\d{1,2}\b)|(1\d\d\b)|(21\d\b)|(22[1-3]\b))</independent-def:subexpression>
+        </independent-def:textfilecontent54_state>
         </states><variables><constant_variable id="oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101" datatype="string" version="13" comment="Allowed FIPS algorithms.">
           <value>SHA2-256</value>
           <value>SHA2-384</value>

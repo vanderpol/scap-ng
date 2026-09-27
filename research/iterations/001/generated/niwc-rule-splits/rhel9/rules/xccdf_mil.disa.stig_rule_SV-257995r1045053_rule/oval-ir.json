@@ -150,6 +150,9 @@
         "equals": 1,
         "greater than or equal": 2,
         "pattern match": 3
+      },
+      "set_operator": {
+        "UNION": 1
       }
     },
     "elements": {
@@ -231,8 +234,15 @@
               "object_ref": "oval:mil.disa.stig.ind:obj:27170901"
             }
           ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
           "kind": "set",
-          "operator": "UNION"
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
       "comment": "all sshd_config and sshd_config.d/* files",
@@ -240,6 +250,40 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*(?i)ClientAliveCountMax(?-i)\\s+\"?(\\d+)\"?\\s*(?:|(?:#.*))?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:27170900",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
     },
     {
       "children": [
@@ -283,40 +327,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*(?i)ClientAliveCountMax(?-i)\\s+\"?(\\d+)\"?\\s*(?:|(?:#.*))?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:27170900",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -345,12 +355,12 @@
       "oval:mil.disa.stig.defs:def:271709"
     ]
   },
-  "semantic_ir_sha256": "b2d84c49840816dd9046cbac3f7c53fcb398fd792ab927b51d50c9024149c07e",
+  "semantic_ir_sha256": "1c189d2357c2f78ee745b7049259de9bebbc4036bd145285d23e8ff3845a3bea",
   "source": {
     "bytes": 5629,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257995r1045053_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257995r1045053_rule/provenance.json",
-    "sha256": "afe02a2f6fdbd05354e3495dc402a78d6fdd75823829a1bd64ed78372f22f1f8"
+    "sha256": "d97226fb44c5e88635b701ec469d3ad364fc57a5ca67f89dd52704e18be373d6"
   },
   "states": [
     {

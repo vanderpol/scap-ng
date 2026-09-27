@@ -48,11 +48,6 @@ The Guests group must be assigned this right to prevent unauthenticated access.<
           <object object_ref="oval:mil.disa.stig.win:obj:25349400"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000033"/>
         </userright_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10002200" version="1" check="all" state_operator="OR" comment="The system is a standalone Windows server or workstation">
-          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
-        </wmi57_test>
         <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349404" version="4" check="at least one" comment="Deny log on locally - Domain Admins">
           <object object_ref="oval:mil.disa.stig.win:obj:25349400"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000040"/>
@@ -62,32 +57,26 @@ The Guests group must be assigned this right to prevent unauthenticated access.<
           <state state_ref="oval:mil.disa.stig.win:ste:10000200"/>
           <state state_ref="oval:mil.disa.stig.win:ste:10000400"/>
         </wmi57_test>
-        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
+        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10002200" version="1" check="all" state_operator="OR" comment="The system is a standalone Windows server or workstation">
+          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
+        </wmi57_test>
+        </tests><objects><userright_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25349400" version="1">
+          <userright>SE_DENY_INTERACTIVE_LOGON_NAME</userright>
+        </userright_object>
+        <wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
           <namespace>root\cimv2</namespace>
           <wql>SELECT DomainRole FROM win32_computersystem</wql>
         </wmi57_object>
-        <userright_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25349400" version="1">
-          <userright>SE_DENY_INTERACTIVE_LOGON_NAME</userright>
-        </userright_object>
-        </objects><states><wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000300" version="1" comment="Standalone Server">
-          <result datatype="record" operation="equals">
-            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">2</field>
-          </result>
-        </wmi57_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000033" version="1">
-          <trustee_name operation="case insensitive equals">Guests</trustee_name>
+        </objects><states><userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000041" version="1">
+          <trustee_name operation="pattern match">^(?i)(.+\\)?Enterprise Admins$</trustee_name>
         </userright_state>
         <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000200" version="1" comment="Domain Member Workstation">
           <result datatype="record" operation="equals">
             <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">1</field>
           </result>
         </wmi57_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000041" version="1">
-          <trustee_name operation="pattern match">^(?i)(.+\\)?Enterprise Admins$</trustee_name>
-        </userright_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000040" version="1">
-          <trustee_name operation="pattern match">^(?i)(.+\\)?Domain Admins$</trustee_name>
-        </userright_state>
         <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000100" version="1" comment="Standalone Workstation">
           <result datatype="record" operation="equals">
             <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">0</field>
@@ -96,6 +85,17 @@ The Guests group must be assigned this right to prevent unauthenticated access.<
         <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000400" version="1" comment="Domain Member Server">
           <result datatype="record" operation="equals">
             <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">3</field>
+          </result>
+        </wmi57_state>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000040" version="1">
+          <trustee_name operation="pattern match">^(?i)(.+\\)?Domain Admins$</trustee_name>
+        </userright_state>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000033" version="1">
+          <trustee_name operation="case insensitive equals">Guests</trustee_name>
+        </userright_state>
+        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000300" version="1" comment="Standalone Server">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">2</field>
           </result>
         </wmi57_state>
         </states></oval_definitions>

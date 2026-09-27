@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "/etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*:IgnoreRhosts == yes",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25800500"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258005",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system SSH daemon must not allow rhosts authentication."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258005",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "/etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*:IgnoreRhosts == yes",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25800500"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258005",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system SSH daemon must not allow rhosts authentication."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:258005",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:25800500"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.ol9os:def:271711",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:258005"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:258005",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:25800500"
     },
     {
       "attribute": "object_ref",
@@ -150,6 +150,9 @@
       "operation": {
         "greater than or equal": 2,
         "pattern match": 4
+      },
+      "set_operator": {
+        "UNION": 1
       }
     },
     "elements": {
@@ -264,6 +267,36 @@
     {
       "children": [
         {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25800501"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25800502"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "Ignore Rhosts is set to 'yes' in both /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*",
+      "id": "oval:mil.disa.stig.ind:obj:25800500",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -291,29 +324,6 @@
       ],
       "comment": "Pull value of /etc/ssh/sshd_config:IgnoreRhosts",
       "id": "oval:mil.disa.stig.ind:obj:25800501",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25800501"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25800502"
-            }
-          ],
-          "kind": "set",
-          "operator": "UNION"
-        }
-      ],
-      "comment": "Ignore Rhosts is set to 'yes' in both /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*",
-      "id": "oval:mil.disa.stig.ind:obj:25800500",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -345,12 +355,12 @@
       "oval:mil.disa.stig.defs:def:258005"
     ]
   },
-  "semantic_ir_sha256": "88c40706f53092d8b293a71b3a2440018c1346ff9e92ce5acdf518811e7c6f09",
+  "semantic_ir_sha256": "9af8ddf005bd176dd3406a4912d45cd2272cd264aaaa2ba3dd3dd0f8b6ffc220",
   "source": {
     "bytes": 4034,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271711r1091845_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271711r1091845_rule/provenance.json",
-    "sha256": "ff98c7eac4d063168cd8976556fb05b50b265ed529df43bc4ffa805f71256bf2"
+    "sha256": "8d885301f29ecdd07ee8d6f2f4c6cf7598cc23f4333b4606221e78cdd3c4e83f"
   },
   "states": [
     {

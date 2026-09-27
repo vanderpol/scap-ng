@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271709" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:271709" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:27170900" comment="/etc/ssh/sshd_config:ClientAliveCountMax = 1"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271709" version="2" class="compliance">
           <metadata>
             <title>OL09-00-002346 - OL 9 must be configured so that all network connections associated with SSH traffic terminate after becoming unresponsive.</title>
             <affected family="unix">
@@ -22,23 +31,15 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:271709"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:271709" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:27170900" comment="/etc/ssh/sshd_config:ClientAliveCountMax = 1"/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:27170900" version="1" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config:ClientAliveCountMax = 1">
           <object object_ref="oval:mil.disa.stig.ind:obj:27170902"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000003"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27170900" version="1">
-          <filepath>/etc/ssh/sshd_config</filepath>
-          <pattern operation="pattern match">^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27170902" version="2" comment="all sshd_config and sshd_config.d/* files">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:27170900</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:27170901</object_reference>
+          </set>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27170901" version="1">
           <path>/etc/ssh/sshd_config.d</path>
@@ -46,11 +47,10 @@
           <pattern operation="pattern match">^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27170902" version="2" comment="all sshd_config and sshd_config.d/* files">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:27170900</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:27170901</object_reference>
-          </set>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27170900" version="1">
+          <filepath>/etc/ssh/sshd_config</filepath>
+          <pattern operation="pattern match">^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000003" version="1">
           <subexpression datatype="int" operation="equals">1</subexpression>

@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257981" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:257981" version="2" class="compliance">
+          <metadata>
+            <title>The operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25798100" comment="/etc/ssh/sshd_config:banner == /filepath"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25798101" comment="/etc/ssh/sshd_config:banner != none"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257981" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-255025 - RHEL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote access to the system via a SSH logon.</title>
             <affected family="unix">
@@ -18,24 +28,20 @@ Satisfies: SRG-OS-000023-GPOS-00006, SRG-OS-000228-GPOS-00088</description>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257981"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:257981" version="2" class="compliance">
-          <metadata>
-            <title>The operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25798100" comment="/etc/ssh/sshd_config:banner == /filepath"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25798101" comment="/etc/ssh/sshd_config:banner != none"/>
-          </criteria>
-        </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25798100" version="3" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config:banner == /etc/issue">
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25798101" version="1" check_existence="none_exist" check="all" comment="/etc/ssh/sshd_config:banner == none">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25798105"/>
+        </textfilecontent54_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25798100" version="3" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config:banner == /etc/issue">
           <object object_ref="oval:mil.disa.stig.ind:obj:25798102"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25798100"/>
         </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25798101" version="1" check_existence="none_exist" check="all" comment="/etc/ssh/sshd_config:banner == none">
-          <object object_ref="oval:mil.disa.stig.ind:obj:25798105"/>
-        </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798100" version="1" comment="Pull value of /etc/ssh/sshd_config:banner">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798102" version="1" comment="all sshd_config and sshd_config.d/* files">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:25798100</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:25798101</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798100" version="1" comment="Pull value of /etc/ssh/sshd_config:banner">
           <filepath>/etc/ssh/sshd_config</filepath>
           <pattern operation="pattern match">^\s*(?i)banner(?-i)[ \t\"]+([\w\/]+)[\"\s]*(?:|(?:#.*))?$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
@@ -51,12 +57,6 @@ Satisfies: SRG-OS-000023-GPOS-00006, SRG-OS-000228-GPOS-00088</description>
           <filename operation="pattern match">.+</filename>
           <pattern operation="pattern match">^\s*(?i)banner(?-i)[ \t]*(?:none[\s]*|(?:#.*))?$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798102" version="1" comment="all sshd_config and sshd_config.d/* files">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:25798100</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:25798101</object_reference>
-          </set>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25798105" version="1" comment="all sshd_config and sshd_config.d/* files">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
