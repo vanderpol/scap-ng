@@ -73,6 +73,7 @@ STATIC_EVALUATOR_OPERATIONS = {
     "count",
     "end",
     "escape_regex",
+    "glob_to_regex",
     "merge",
     "regex_capture",
     "split",
@@ -666,6 +667,83 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             "object_ref": object_ref,
         }
 
+    def natural_sort_key(value):
+        parts = pyre.split(r"([0-9]+)", str(value))
+        return tuple(
+            (0, int(part)) if part.isdigit() else (1, part)
+            for part in parts
+            if part != ""
+        )
+
+    def oval_glob_to_regex(pattern, noescape=False):
+        """Convert an OVAL glob pattern to its Perl-style regex representation.
+
+        This follows the OVAL 5.12.3 glob_to_regex contract rather than
+        Python fnmatch semantics: '*' and '?' never cross '/', each path
+        segment excludes leading '.', brace/tilde expansion is not performed,
+        and backslash escaping is controlled by glob_noescape.
+        """
+        if pattern == "":
+            return "^$"
+
+        out = ["^"]
+        segment_start = True
+        i = 0
+        while i < len(pattern):
+            if segment_start:
+                out.append(r"(?=[^\.])")
+                segment_start = False
+
+            ch = pattern[i]
+            if ch == "/":
+                out.append("/")
+                segment_start = True
+                i += 1
+                continue
+
+            if ch == "\\" and not noescape:
+                if i + 1 >= len(pattern):
+                    raise ValueError("trailing escape in glob")
+                out.append(pyre.escape(pattern[i + 1]))
+                i += 2
+                continue
+
+            if ch == "\\" and noescape:
+                out.append(r"\\")
+                i += 1
+                continue
+
+            if ch == "*":
+                out.append(r"[^/]*")
+                i += 1
+                continue
+
+            if ch == "?":
+                out.append(r"[^/]")
+                i += 1
+                continue
+
+            if ch == "[":
+                if pattern.startswith("[[:", i):
+                    end = pattern.find(":]]", i + 3)
+                    if end < 0:
+                        raise ValueError("unterminated POSIX character class")
+                    out.append(pattern[i:end + 3])
+                    i = end + 3
+                    continue
+                end = pattern.find("]", i + 1)
+                if end < 0:
+                    raise ValueError("unterminated character class")
+                out.append(pattern[i:end + 1])
+                i = end + 1
+                continue
+
+            out.append(pyre.escape(ch))
+            i += 1
+
+        out.append("$")
+        return "".join(out)
+
     def component_values(node):
         name = local(node.tag)
 
@@ -755,6 +833,23 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                         values.append(string_value)
             return bounded(values, name)
 
+        if name == "glob_to_regex":
+            child = one_child_values(node, name)
+            if child["status"] != "exact_static":
+                return child
+            noescape = node.get("glob_noescape", "false").lower() == "true"
+            values = []
+            try:
+                for value in child["values"]:
+                    values.append(oval_glob_to_regex(str(value), noescape=noescape))
+            except ValueError as exc:
+                return result(
+                    "static_evaluation_error",
+                    reason=f"glob_to_regex_invalid_pattern:{exc}",
+                    operation=name,
+                )
+            return bounded(values, name)
+
         if name == "regex_capture":
             child = one_child_values(node, name)
             if child["status"] != "exact_static":
@@ -810,11 +905,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                         operation=name,
                     )
             elif sort_mode == "natural":
-                return result(
-                    "modeled_not_static_evaluated",
-                    reason="merge_natural_sort_requires_reviewed_cross-runtime_definition",
-                    operation=name,
-                )
+                values = sorted(values, key=natural_sort_key)
             else:
                 return result(
                     "unsupported",
@@ -963,7 +1054,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
 
         # These operations are fully represented in semantic_ast but are not
         # claimed as exact-static by this prototype evaluator yet.
-        if name in {"glob_to_regex", "time_difference"}:
+        if name in {"time_difference"}:
             child_ops = [
                 component_values(c)
                 for c in node
