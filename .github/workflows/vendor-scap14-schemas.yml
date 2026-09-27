@@ -1,4 +1,4 @@
-name: Vendor SCAP 1.4 OVAL 5.12.3 schemas
+name: Vendor SCAP 1.4 schemas
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     paths:
       - ".github/workflows/vendor-scap14-schemas.yml"
       - "research/iterations/001/tools/build_vendor_schema_manifest.py"
-      - "third_party/scap-1.4-oval-5.12.3/README.md"
+      - "third_party/scap-1.4-schemas/README.md"
   workflow_dispatch:
 
 permissions:
@@ -31,7 +31,7 @@ jobs:
       - name: Copy schema tree exactly
         run: |
           set -euo pipefail
-          dst="scap-ng/third_party/scap-1.4-oval-5.12.3"
+          dst="scap-ng/third_party/scap-1.4-schemas"
           keep="$dst/README.md"
           mkdir -p "$dst"
           find "$dst" -mindepth 1 -maxdepth 1 ! -name README.md -exec rm -rf {} +
@@ -44,10 +44,10 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add third_party/scap-1.4-oval-5.12.3
+          git add third_party/scap-1.4-schemas
           if git diff --cached --quiet; then
             echo "Vendored schema tree already matches pinned source."
             exit 0
           fi
-          git commit -m "Vendor pinned SCAP 1.4 OVAL 5.12.3 schemas"
+          git commit -m "Vendor pinned SCAP 1.4 schemas"
           git push
