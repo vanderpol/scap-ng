@@ -27,6 +27,11 @@ def main():
     qualified_test_types=Counter()
     qualified_object_types=Counter()
     qualified_state_types=Counter()
+    qualified_type_examples={
+        "tests":defaultdict(list),
+        "objects":defaultdict(list),
+        "states":defaultdict(list),
+    }
     set_operators=Counter()
     filter_actions=Counter()
     filter_action_origin=Counter()
@@ -76,11 +81,20 @@ def main():
             for value,count in vals.items():
                 attr_counts[attr][value]+=count
         for item in ir.get("tests",[]):
-            qualified_test_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
+            key=f'{item.get("namespace","")}#{item.get("type","unknown")}'
+            qualified_test_types[key] += 1
+            if len(qualified_type_examples["tests"][key]) < 5:
+                qualified_type_examples["tests"][key].append(path.as_posix())
         for item in ir.get("objects",[]):
-            qualified_object_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
+            key=f'{item.get("namespace","")}#{item.get("type","unknown")}'
+            qualified_object_types[key] += 1
+            if len(qualified_type_examples["objects"][key]) < 5:
+                qualified_type_examples["objects"][key].append(path.as_posix())
         for item in ir.get("states",[]):
-            qualified_state_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
+            key=f'{item.get("namespace","")}#{item.get("type","unknown")}'
+            qualified_state_types[key] += 1
+            if len(qualified_type_examples["states"][key]) < 5:
+                qualified_type_examples["states"][key].append(path.as_posix())
 
         for edge in ir.get("dependency_edges",[]):
             dependency_kinds[edge.get("kind","unknown")]+=1
@@ -165,6 +179,10 @@ def main():
       "qualified_test_types":dict(sorted(qualified_test_types.items())),
       "qualified_object_types":dict(sorted(qualified_object_types.items())),
       "qualified_state_types":dict(sorted(qualified_state_types.items())),
+      "qualified_type_examples":{
+        kind:{k:v for k,v in sorted(values.items())}
+        for kind,values in qualified_type_examples.items()
+      },
       "element_counts":dict(sorted(element_counts.items())),
       "semantic_attribute_values":{
         a:dict(sorted(v.items())) for a,v in sorted(attr_counts.items())
