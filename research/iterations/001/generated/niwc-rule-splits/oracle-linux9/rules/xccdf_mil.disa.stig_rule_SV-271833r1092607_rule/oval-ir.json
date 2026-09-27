@@ -145,20 +145,6 @@
     {
       "attribute": null,
       "element": "object_reference",
-      "from": "oval:mil.disa.stig.unix:obj:20000018",
-      "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.unix:obj:20000016"
-    },
-    {
-      "attribute": null,
-      "element": "filter",
-      "from": "oval:mil.disa.stig.unix:obj:20000018",
-      "kind": "set_filter_state",
-      "to": "oval:mil.disa.stig.unix:ste:20000018"
-    },
-    {
-      "attribute": null,
-      "element": "object_reference",
       "from": "oval:mil.disa.stig.unix:obj:20000017",
       "kind": "set_object_reference",
       "to": "oval:mil.disa.stig.unix:obj:20000016"
@@ -169,6 +155,20 @@
       "from": "oval:mil.disa.stig.unix:obj:20000017",
       "kind": "set_filter_state",
       "to": "oval:mil.disa.stig.unix:ste:20000017"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.unix:obj:20000018",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.unix:obj:20000016"
+    },
+    {
+      "attribute": null,
+      "element": "filter",
+      "from": "oval:mil.disa.stig.unix:obj:20000018",
+      "kind": "set_filter_state",
+      "to": "oval:mil.disa.stig.unix:ste:20000018"
     }
   ],
   "dependency_integrity": {
@@ -270,6 +270,38 @@
     {
       "children": [
         {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.unix:obj:20000016"
+            },
+            {
+              "action": "exclude",
+              "action_explicit": false,
+              "kind": "filter",
+              "state_ref": "oval:mil.disa.stig.unix:ste:20000017"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "COMPLEMENT",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "only non-system users (uid>999) home-dirs",
+      "id": "oval:mil.disa.stig.unix:obj:20000017",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "type": "password_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "datatype": "string",
             "operation": "pattern match"
@@ -317,38 +349,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "type": "password_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.unix:obj:20000016"
-            },
-            {
-              "action": "exclude",
-              "action_explicit": false,
-              "kind": "filter",
-              "state_ref": "oval:mil.disa.stig.unix:ste:20000017"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "COMPLEMENT",
-          "operator_explicit": true
-        }
-      ],
-      "comment": "only non-system users (uid>999) home-dirs",
-      "id": "oval:mil.disa.stig.unix:obj:20000017",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "type": "password_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -387,34 +387,14 @@
       "oval:mil.disa.stig.unix:ste:20000016"
     ]
   },
-  "semantic_ir_sha256": "91b063cb9dcff4bdb26719d92416495d9e9c37ed9aa642a0b81e73f1e4917812",
+  "semantic_ir_sha256": "11338ff89f981b0427dcdbce217e247bfd92fbb2f3ed41b5d1de7ba6ed63b339",
   "source": {
     "bytes": 4897,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271833r1092607_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271833r1092607_rule/provenance.json",
-    "sha256": "25dd1ad4fba4d7029e68109939e85ad499394a6cd4189571688825bad5d8a014"
+    "sha256": "d048d847e536c79d353e485a74a14885e24908d88e753efce43ac23cff228fb2"
   },
   "states": [
-    {
-      "comment": "only users with the home directory defined",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "home_dir",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": ".+"
-        }
-      ],
-      "id": "oval:mil.disa.stig.unix:ste:20000016",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "operator": "AND",
-      "type": "password_state",
-      "version": "1"
-    },
     {
       "comment": "only uids > 0",
       "entities": [
@@ -431,6 +411,26 @@
         }
       ],
       "id": "oval:mil.disa.stig.unix:ste:20000018",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "operator": "AND",
+      "type": "password_state",
+      "version": "1"
+    },
+    {
+      "comment": "only users with the home directory defined",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "home_dir",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": ".+"
+        }
+      ],
+      "id": "oval:mil.disa.stig.unix:ste:20000016",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "operator": "AND",
       "type": "password_state",

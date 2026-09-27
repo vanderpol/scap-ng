@@ -6,44 +6,24 @@
         "children": [
           {
             "comment": "'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple, or Bypass' selected.",
-            "definition_ref": "oval:mil.disa.stig.defs:def:254357",
-            "kind": "definition_ref",
-            "negate": false
-          },
-          {
-            "children": [
-              {
-                "comment": "Standalone Windows system",
-                "kind": "test_ref",
-                "negate": false,
-                "test_ref": "oval:mil.disa.stig.win:tst:25339402"
-              },
-              {
-                "comment": "'DownloadMode' is set to 'Enabled' with 'HTTP only, or LAN' selected.",
-                "kind": "test_ref",
-                "negate": false,
-                "test_ref": "oval:mil.disa.stig.win:tst:25339403"
-              }
-            ],
-            "comment": "Standalone version of Windows and Download mode is configured through the Settings App",
-            "kind": "boolean",
+            "kind": "test_ref",
             "negate": false,
-            "operator": "AND"
+            "test_ref": "oval:mil.disa.stig.win:tst:25339401"
           }
         ],
         "comment": null,
         "kind": "boolean",
         "negate": false,
-        "operator": "OR"
+        "operator": "AND"
       },
       "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:253394",
+      "id": "oval:mil.disa.stig.defs:def:254357",
       "metadata": {
         "children": [
           {
             "name": "title",
             "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Windows Update for workstations must not obtain updates from other PCs on the internet."
+            "text": "Windows Update must not obtain updates from other PCs on the internet."
           },
           {
             "name": "description",
@@ -53,7 +33,7 @@
         "name": "metadata",
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
-      "version": "3"
+      "version": "1"
     },
     {
       "class": "compliance",
@@ -111,24 +91,44 @@
         "children": [
           {
             "comment": "'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple, or Bypass' selected.",
-            "kind": "test_ref",
+            "definition_ref": "oval:mil.disa.stig.defs:def:254357",
+            "kind": "definition_ref",
+            "negate": false
+          },
+          {
+            "children": [
+              {
+                "comment": "Standalone Windows system",
+                "kind": "test_ref",
+                "negate": false,
+                "test_ref": "oval:mil.disa.stig.win:tst:25339402"
+              },
+              {
+                "comment": "'DownloadMode' is set to 'Enabled' with 'HTTP only, or LAN' selected.",
+                "kind": "test_ref",
+                "negate": false,
+                "test_ref": "oval:mil.disa.stig.win:tst:25339403"
+              }
+            ],
+            "comment": "Standalone version of Windows and Download mode is configured through the Settings App",
+            "kind": "boolean",
             "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25339401"
+            "operator": "AND"
           }
         ],
         "comment": null,
         "kind": "boolean",
         "negate": false,
-        "operator": "AND"
+        "operator": "OR"
       },
       "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:254357",
+      "id": "oval:mil.disa.stig.defs:def:253394",
       "metadata": {
         "children": [
           {
             "name": "title",
             "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Windows Update must not obtain updates from other PCs on the internet."
+            "text": "Windows Update for workstations must not obtain updates from other PCs on the internet."
           },
           {
             "name": "description",
@@ -138,10 +138,24 @@
         "name": "metadata",
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
-      "version": "1"
+      "version": "3"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:254357",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.win:tst:25339401"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows11:def:253394",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253394"
+    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
@@ -162,20 +176,6 @@
       "from": "oval:mil.disa.stig.defs:def:253394",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.win:tst:25339403"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows11:def:253394",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253394"
-    },
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:254357",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.win:tst:25339401"
     },
     {
       "attribute": "object_ref",
@@ -364,6 +364,27 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "namespace",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "root\\cimv2"
+        },
+        {
+          "kind": "element",
+          "name": "wql",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SELECT DomainRole FROM win32_computersystem"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.win:obj:10000100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "wmi57_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "datatype": "string",
             "operation": "equals"
@@ -398,27 +419,6 @@
       "id": "oval:mil.disa.stig.win:obj:25339400",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "namespace",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "root\\cimv2"
-        },
-        {
-          "kind": "element",
-          "name": "wql",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SELECT DomainRole FROM win32_computersystem"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:10000100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "wmi57_object",
       "version": "1"
     },
     {
@@ -509,44 +509,14 @@
       "oval:mil.disa.stig.defs:def:253394"
     ]
   },
-  "semantic_ir_sha256": "3e8ebe377f43d08e0dfdac9f20341c34cfa877a1c997c71c6b3ce40be30a4200",
+  "semantic_ir_sha256": "1d7c7efaeaa880b50f2d122ae8e3357e6dd73d4c6eaac3fe93320bee7c66ca27",
   "source": {
     "bytes": 8047,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253394r1256679_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253394r1256679_rule/provenance.json",
-    "sha256": "f310cdd3f092f4833e0757c2cb6d725f678ccafeea74aa13e54d5ba275b3365d"
+    "sha256": "3a7302cb2d03848fce68978c3c41198f0b755600c7a5841c8c8611d635013231"
   },
   "states": [
-    {
-      "comment": "Standalone Server",
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "record",
-            "operation": "equals"
-          },
-          "children": [
-            {
-              "attributes": {
-                "name": "domainrole"
-              },
-              "kind": "element",
-              "name": "field",
-              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-              "value": "2"
-            }
-          ],
-          "kind": "element",
-          "name": "result",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:10000300",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "wmi57_state",
-      "version": "1"
-    },
     {
       "comment": null,
       "entities": [
@@ -567,31 +537,6 @@
         }
       ],
       "id": "oval:mil.disa.stig.win:ste:20000002",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "registry_state",
-      "version": "1"
-    },
-    {
-      "comment": null,
-      "entities": [
-        {
-          "kind": "element",
-          "name": "type",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "reg_dword"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "0"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000000",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "registry_state",
@@ -650,6 +595,36 @@
       "version": "1"
     },
     {
+      "comment": "Standalone Server",
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "record",
+            "operation": "equals"
+          },
+          "children": [
+            {
+              "attributes": {
+                "name": "domainrole"
+              },
+              "kind": "element",
+              "name": "field",
+              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+              "value": "2"
+            }
+          ],
+          "kind": "element",
+          "name": "result",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:10000300",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "wmi57_state",
+      "version": "1"
+    },
+    {
       "comment": "Standalone Workstation",
       "entities": [
         {
@@ -677,6 +652,31 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "wmi57_state",
+      "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "kind": "element",
+          "name": "type",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "reg_dword"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "0"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "registry_state",
       "version": "1"
     },
     {

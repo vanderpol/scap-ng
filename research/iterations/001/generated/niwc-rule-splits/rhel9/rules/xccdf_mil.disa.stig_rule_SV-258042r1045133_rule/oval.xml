@@ -4,17 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:230367" version="1" class="compliance">
-          <metadata>
-            <title>The operating system user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.unix:tst:23036700" comment="No password in /etc/shadow has a maximum password age of 0 or greater than 60"/>
-            <criterion test_ref="oval:mil.disa.stig.unix:tst:23036701" comment="Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:258042" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258042" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-411015 - RHEL 9 user account passwords must have a 60-day maximum password lifetime restriction.</title>
             <affected family="unix">
@@ -26,24 +16,34 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230367"/>
           </criteria>
         </definition>
-        </definitions><tests><shadow_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23036700" version="1" check_existence="any_exist" check="all" comment="No password in /etc/shadow has a maximum password age of 0 or greater than 60">
-          <object object_ref="oval:mil.disa.stig.unix:obj:23036700"/>
-          <state state_ref="oval:mil.disa.stig.unix:ste:23036700"/>
-          <state state_ref="oval:mil.disa.stig.unix:ste:23036701"/>
-        </shadow_test>
-        <shadow_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23036701" version="1" check_existence="all_exist" check="all" comment="Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60">
+        <definition id="oval:mil.disa.stig.defs:def:230367" version="1" class="compliance">
+          <metadata>
+            <title>The operating system user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:23036700" comment="No password in /etc/shadow has a maximum password age of 0 or greater than 60"/>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:23036701" comment="Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60"/>
+          </criteria>
+        </definition>
+        </definitions><tests><shadow_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23036701" version="1" check_existence="all_exist" check="all" comment="Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60">
           <object object_ref="oval:mil.disa.stig.unix:obj:23036702"/>
           <state state_ref="oval:mil.disa.stig.unix:ste:23036700"/>
           <state state_ref="oval:mil.disa.stig.unix:ste:23036701"/>
         </shadow_test>
-        </tests><objects><shadow_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23036702" version="1" comment="/etc/shadow max password age for root">
-          <username datatype="string">root</username>
-        </shadow_object>
-        <password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23036701" version="3" comment="interactive non-anonymous users">
+        <shadow_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23036700" version="1" check_existence="any_exist" check="all" comment="No password in /etc/shadow has a maximum password age of 0 or greater than 60">
+          <object object_ref="oval:mil.disa.stig.unix:obj:23036700"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:23036700"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:23036701"/>
+        </shadow_test>
+        </tests><objects><password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23036701" version="3" comment="interactive non-anonymous users">
           <username datatype="string" operation="pattern match">.*</username>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.unix:ste:23036704</filter>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.unix:ste:23036703</filter>
         </password_object>
+        <shadow_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23036702" version="1" comment="/etc/shadow max password age for root">
+          <username datatype="string">root</username>
+        </shadow_object>
         <shadow_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23036700" version="3" comment="/etc/shadow max password ages for non-system users">
           <username datatype="string" operation="pattern match">.+</username>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.unix:ste:23036702</filter>
@@ -51,29 +51,29 @@
         </objects><states><shadow_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23036702" version="1" comment="Lines starting with usernames of system users">
           <username datatype="string" operation="pattern match" var_ref="oval:mil.disa.stig.defs:var:23036700" var_check="at least one"/>
         </shadow_state>
-        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23036703" version="2" comment="anonymous users">
-          <user_id datatype="int" operation="not equal" var_ref="oval:mil.disa.stig.defs:var:23036701" var_check="all"/>
-        </password_state>
-        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23036704" version="2">
-          <user_id datatype="int" operation="greater than or equal">1000</user_id>
-        </password_state>
         <shadow_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23036701" version="1" comment="less than or equal to sixty">
           <chg_req datatype="int" operation="less than or equal">60</chg_req>
         </shadow_state>
         <shadow_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23036700" version="1" comment="greater than zero">
           <chg_req datatype="int" operation="greater than">0</chg_req>
         </shadow_state>
-        </states><variables><local_variable id="oval:mil.disa.stig.defs:var:23036700" version="2" datatype="string" comment="Pattern to match lines starting with usernames of system users">
+        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23036703" version="2" comment="anonymous users">
+          <user_id datatype="int" operation="not equal" var_ref="oval:mil.disa.stig.defs:var:23036701" var_check="all"/>
+        </password_state>
+        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23036704" version="2">
+          <user_id datatype="int" operation="greater than or equal">1000</user_id>
+        </password_state>
+        </states><variables><constant_variable id="oval:mil.disa.stig.defs:var:23036701" version="1" datatype="int" comment="anonymous UIDs">
+          <value>65534</value>
+          <value>65535</value>
+          <value>4294967294</value>
+          <value>4294967295</value>
+        </constant_variable>
+        <local_variable id="oval:mil.disa.stig.defs:var:23036700" version="2" datatype="string" comment="Pattern to match lines starting with usernames of system users">
           <concat>
             <literal_component datatype="string">^</literal_component>
             <object_component object_ref="oval:mil.disa.stig.unix:obj:23036701" item_field="username"/>
             <literal_component datatype="string">$</literal_component>
           </concat>
         </local_variable>
-        <constant_variable id="oval:mil.disa.stig.defs:var:23036701" version="1" datatype="int" comment="anonymous UIDs">
-          <value>65534</value>
-          <value>65535</value>
-          <value>4294967294</value>
-          <value>4294967295</value>
-        </constant_variable>
         </variables></oval_definitions>

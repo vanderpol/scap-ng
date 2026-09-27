@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "dconf disable-restart-buttons true",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25802900"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258029",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must disable the ability of a user to restart the system from the login screen."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258029",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "dconf disable-restart-buttons true",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25802900"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258029",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must disable the ability of a user to restart the system from the login screen."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258029",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258029"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:258029",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25802900"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258029",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258029"
     },
     {
       "attribute": "object_ref",
@@ -116,18 +116,18 @@
       "to": "oval:mil.disa.stig.ind:ste:25802900"
     },
     {
-      "attribute": "var_ref",
-      "element": "path",
-      "from": "oval:mil.disa.stig.ind:obj:25802900",
-      "kind": "variable_reference",
-      "to": "oval:mil.disa.stig.defs:var:23035100"
-    },
-    {
       "attribute": null,
       "element": "filter",
       "from": "oval:mil.disa.stig.unix:obj:23035100",
       "kind": "set_filter_state",
       "to": "oval:mil.disa.stig.unix:ste:23035100"
+    },
+    {
+      "attribute": "var_ref",
+      "element": "path",
+      "from": "oval:mil.disa.stig.ind:obj:25802900",
+      "kind": "variable_reference",
+      "to": "oval:mil.disa.stig.defs:var:23035100"
     },
     {
       "attribute": "object_ref",
@@ -249,6 +249,47 @@
       "children": [
         {
           "attributes": {
+            "max_depth": "1",
+            "recurse_direction": "down"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+        },
+        {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "/etc/dconf/db"
+        },
+        {
+          "attributes": {
+            "nil": "true"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+        },
+        {
+          "attributes": {
+            "action": "include"
+          },
+          "kind": "element",
+          "name": "filter",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "oval:mil.disa.stig.unix:ste:23035100"
+        }
+      ],
+      "comment": "dconf database directories",
+      "id": "oval:mil.disa.stig.unix:obj:23035100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "type": "file_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
             "datatype": "string",
             "var_check": "at least one",
             "var_ref": "oval:mil.disa.stig.defs:var:23035100"
@@ -292,47 +333,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "max_depth": "1",
-            "recurse_direction": "down"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
-        },
-        {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "/etc/dconf/db"
-        },
-        {
-          "attributes": {
-            "nil": "true"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
-        },
-        {
-          "attributes": {
-            "action": "include"
-          },
-          "kind": "element",
-          "name": "filter",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "oval:mil.disa.stig.unix:ste:23035100"
-        }
-      ],
-      "comment": "dconf database directories",
-      "id": "oval:mil.disa.stig.unix:obj:23035100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "type": "file_object",
-      "version": "2"
     }
   ],
   "parser_contract": {
@@ -365,12 +365,12 @@
     ],
     "oval:mil.disa.stig.unix:ste:23035100": []
   },
-  "semantic_ir_sha256": "2fe51c6ee9116da21c82e2163acc355cf603648d2293a730af3c296ba0bdef81",
+  "semantic_ir_sha256": "f60f373ab743ec55cc4a3d283117772a0d3a3ef8f7975ddd347047da76893762",
   "source": {
     "bytes": 4215,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258029r1045109_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258029r1045109_rule/provenance.json",
-    "sha256": "3ac22ccaa385e137dde549e2ff1237fd1f239c7d6c0af1309694c560b69e5144"
+    "sha256": "dce27e61eb166a977d9ee232357e14131e2530b5135cebf70042d24bee45f6ef"
   },
   "states": [
     {
@@ -462,6 +462,7 @@
         "record_field": null
       },
       "mode": "target_dependent",
+      "reason": "object_component_requires_collection:file_object",
       "resolution_status": "dynamic_object_dependency",
       "variable_id": "oval:mil.disa.stig.defs:var:23035100",
       "variable_type": "local_variable"
@@ -508,6 +509,7 @@
       "item_field": "path",
       "object_ref": "oval:mil.disa.stig.unix:obj:23035100",
       "operation": "object_component",
+      "reason": "object_component_requires_collection:file_object",
       "record_field": null,
       "status": "dynamic_object_dependency",
       "variable_type": "local_variable"

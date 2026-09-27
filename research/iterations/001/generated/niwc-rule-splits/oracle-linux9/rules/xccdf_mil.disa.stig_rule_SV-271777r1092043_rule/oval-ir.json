@@ -5,53 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "The /etc/ssh/sshd_config file is owned by root.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:25799800"
-          },
-          {
-            "comment": "The /etc/ssh/sshd_config.d directory and sub-directories are owned by root.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:25799801"
-          },
-          {
-            "comment": "The /etc/ssh/sshd_config.d files are owned by root.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:25799802"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:257998",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system SSH server configuration file must be owned by root."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "3"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:257998",
             "kind": "definition_ref",
@@ -96,9 +49,63 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "The /etc/ssh/sshd_config file is owned by root.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:25799800"
+          },
+          {
+            "comment": "The /etc/ssh/sshd_config.d directory and sub-directories are owned by root.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:25799801"
+          },
+          {
+            "comment": "The /etc/ssh/sshd_config.d files are owned by root.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:25799802"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:257998",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system SSH server configuration file must be owned by root."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "3"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271777",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:257998"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -121,11 +128,18 @@
       "to": "oval:mil.disa.stig.unix:tst:25799802"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271777",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:257998"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.unix:tst:25799800",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.unix:obj:25799900"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.unix:tst:25799800",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.unix:ste:20000005"
     },
     {
       "attribute": "object_ref",
@@ -152,20 +166,6 @@
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.unix:tst:25799802",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.unix:ste:20000005"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.unix:tst:25799800",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.unix:obj:25799900"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.unix:tst:25799800",
       "kind": "test_state",
       "to": "oval:mil.disa.stig.unix:ste:20000005"
     }
@@ -287,16 +287,15 @@
         },
         {
           "attributes": {
-            "operation": "pattern match"
+            "nil": "true"
           },
           "kind": "element",
           "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": ".*"
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.unix:obj:25799902",
+      "id": "oval:mil.disa.stig.unix:obj:25799901",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "type": "file_object",
       "version": "2"
@@ -320,15 +319,16 @@
         },
         {
           "attributes": {
-            "nil": "true"
+            "operation": "pattern match"
           },
           "kind": "element",
           "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix"
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": ".*"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.unix:obj:25799901",
+      "id": "oval:mil.disa.stig.unix:obj:25799902",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "type": "file_object",
       "version": "2"
@@ -367,12 +367,12 @@
       "oval:mil.disa.stig.unix:ste:20000005"
     ]
   },
-  "semantic_ir_sha256": "851129530c6328a8b62bfb936927c431e8ca115d586e02b923c246b8bd8e199c",
+  "semantic_ir_sha256": "74837da3c6fb84865802b0dbb87aec852c791df7424683e999cc7cef4870ab82",
   "source": {
     "bytes": 4358,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271777r1092043_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271777r1092043_rule/provenance.json",
-    "sha256": "ef211e36189feeaa5bb717657ae7c9b1e8fb5e2f7f134c5cbcd9be0b9f3ada0f"
+    "sha256": "c219882a031b7328f51eedc6313ec91809e8c4e5cb0213e38ea3237efb37b8f6"
   },
   "states": [
     {
@@ -396,6 +396,33 @@
     }
   ],
   "tests": [
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "The /etc/ssh/sshd_config file is owned by root.",
+      "id": "oval:mil.disa.stig.unix:tst:25799800",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.unix:obj:25799900"
+          },
+          "object_ref": "oval:mil.disa.stig.unix:obj:25799900"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.unix:ste:20000005"
+          },
+          "state_ref": "oval:mil.disa.stig.unix:ste:20000005"
+        }
+      ],
+      "type": "file_test",
+      "version": "1"
+    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -435,33 +462,6 @@
             "object_ref": "oval:mil.disa.stig.unix:obj:25799902"
           },
           "object_ref": "oval:mil.disa.stig.unix:obj:25799902"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.unix:ste:20000005"
-          },
-          "state_ref": "oval:mil.disa.stig.unix:ste:20000005"
-        }
-      ],
-      "type": "file_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "The /etc/ssh/sshd_config file is owned by root.",
-      "id": "oval:mil.disa.stig.unix:tst:25799800",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.unix:obj:25799900"
-          },
-          "object_ref": "oval:mil.disa.stig.unix:obj:25799900"
         }
       ],
       "other": [],

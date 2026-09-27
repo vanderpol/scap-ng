@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Eventvwr.exe: Read and Execute rights for Administrators, System, Users, All Application Packages",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:27804600"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:278046",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Windows Event Viewer must be protected from unauthorized modification and deletion."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:278046",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Eventvwr.exe: Read and Execute rights for Administrators, System, Users, All Application Packages",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:27804600"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:278046",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Windows Event Viewer must be protected from unauthorized modification and deletion."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:278046",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.win:tst:27804600"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.windows2025:def:278046",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:278046"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:278046",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.win:tst:27804600"
     },
     {
       "attribute": "object_ref",
@@ -116,6 +116,13 @@
       "to": "oval:mil.disa.stig.win:ste:27804601"
     },
     {
+      "attribute": "var_ref",
+      "element": "filepath",
+      "from": "oval:mil.disa.stig.win:obj:27804602",
+      "kind": "variable_reference",
+      "to": "oval:mil.disa.stig.win:var:27804600"
+    },
+    {
       "attribute": null,
       "element": "object_reference",
       "from": "oval:mil.disa.stig.win:obj:27804603",
@@ -128,13 +135,6 @@
       "from": "oval:mil.disa.stig.win:obj:27804603",
       "kind": "set_filter_state",
       "to": "oval:mil.disa.stig.win:ste:27804600"
-    },
-    {
-      "attribute": "var_ref",
-      "element": "filepath",
-      "from": "oval:mil.disa.stig.win:obj:27804602",
-      "kind": "variable_reference",
-      "to": "oval:mil.disa.stig.win:var:27804600"
     },
     {
       "attribute": "object_ref",
@@ -261,6 +261,36 @@
       "children": [
         {
           "attributes": {
+            "datatype": "string",
+            "operation": "case insensitive equals",
+            "var_check": "at least one",
+            "var_ref": "oval:mil.disa.stig.win:var:27804600"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+        },
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "trustee_sid",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": ".*"
+        }
+      ],
+      "comment": "Event Viewer Rights",
+      "id": "oval:mil.disa.stig.win:obj:27804602",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "fileeffectiverights53_object",
+      "version": "4"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
             "datatype": "string"
           },
           "kind": "element",
@@ -324,36 +354,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "fileeffectiverights53_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "case insensitive equals",
-            "var_check": "at least one",
-            "var_ref": "oval:mil.disa.stig.win:var:27804600"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
-        },
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "trustee_sid",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": ".*"
-        }
-      ],
-      "comment": "Event Viewer Rights",
-      "id": "oval:mil.disa.stig.win:obj:27804602",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "fileeffectiverights53_object",
-      "version": "4"
     }
   ],
   "parser_contract": {
@@ -388,12 +388,12 @@
       "oval:mil.disa.stig.defs:def:278046"
     ]
   },
-  "semantic_ir_sha256": "e1fddcfc7861dc7f1743cada38b558a40b0dd3799b22c7aba7bce6ebd71a0ecf",
+  "semantic_ir_sha256": "dda3c7b7442f834aa6a33abaf3fa0651623bf34d82e718566f13cc37f847027c",
   "source": {
     "bytes": 6077,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278046r1211151_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278046r1211151_rule/provenance.json",
-    "sha256": "4600fb8f6df69acbfd920c3f1b95e50af3fb47c82f76e2ba9f217a99aaf9df5d"
+    "sha256": "dd0fc36e6a5a4ba595ae19a6c009ab9b30615dde75614d8989a39b7beae96bf0"
   },
   "states": [
     {
@@ -562,6 +562,7 @@
         "item_field": "value",
         "object_ref": "oval:mil.disa.stig.win:obj:20000015",
         "operation": "object_component",
+        "reason": "object_component_requires_collection:registry_object",
         "record_field": null,
         "status": "dynamic_object_dependency"
       },
@@ -595,7 +596,7 @@
         "op": "concat"
       },
       "mode": "target_dependent",
-      "reason": "concat_child_not_static:object_component",
+      "reason": "concat_child_not_static:object_component_requires_collection:registry_object",
       "resolution_status": "dynamic_object_dependency",
       "variable_id": "oval:mil.disa.stig.win:var:27804600",
       "variable_type": "local_variable"
@@ -642,12 +643,13 @@
         "item_field": "value",
         "object_ref": "oval:mil.disa.stig.win:obj:20000015",
         "operation": "object_component",
+        "reason": "object_component_requires_collection:registry_object",
         "record_field": null,
         "status": "dynamic_object_dependency"
       },
       "datatype": "string",
       "operation": "concat",
-      "reason": "concat_child_not_static:object_component",
+      "reason": "concat_child_not_static:object_component_requires_collection:registry_object",
       "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }

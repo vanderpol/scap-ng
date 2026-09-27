@@ -25,67 +25,67 @@
           <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347604"/>
           <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347604"/>
         </win-def:registry_test>
-        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25347605" version="18" comment="Verify LAPS policy process is completing" check_existence="at_least_one_exists" check="at least one">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347605"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347605"/>
-        </independent-def:shellcommand_test>
-        <win-def:registry_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25347602" version="18" comment="LAPS Compliance: Password Age - 60" check_existence="at_least_one_exists" check="all">
-          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347602"/>
-          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347602"/>
-        </win-def:registry_test>
         <win-def:user_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25347601" version="18" comment="Password Age Check: Verify all enabled local Administrator accounts passwords are less than 60 days old" check_existence="any_exist" check="all">
           <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347601"/>
           <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347601"/>
         </win-def:user_test>
-        </tests><objects><win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347602" version="18" comment="Windows LAPS PasswordAgeDays">
+        <win-def:registry_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25347602" version="18" comment="LAPS Compliance: Password Age - 60" check_existence="at_least_one_exists" check="all">
+          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347602"/>
+          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347602"/>
+        </win-def:registry_test>
+        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:25347605" version="18" comment="Verify LAPS policy process is completing" check_existence="at_least_one_exists" check="at least one">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347605"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347605"/>
+        </independent-def:shellcommand_test>
+        </tests><objects><win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347603" version="18" comment="Windows LAPS PasswordLength">
+          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
+          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
+          <win-def:name datatype="string">PasswordLength</win-def:name>
+        </win-def:registry_object>
+        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347602" version="18" comment="Windows LAPS PasswordAgeDays">
           <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
           <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
           <win-def:name datatype="string">PasswordAgeDays</win-def:name>
+        </win-def:registry_object>
+        <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347605" version="18" comment="Operational logs - Event Viewer - Applications and Services Logs - Microsoft - Windows - LAPS - Operational">
+          <independent-def:shell>powershell</independent-def:shell>
+          <independent-def:command>get-winevent -logname Microsoft-Windows-LAPS/Operational -MaxEvents 50</independent-def:command>
+          <independent-def:pattern>LAPS policy processing (\w+)\.</independent-def:pattern>
+        </independent-def:shellcommand_object>
+        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347604" version="18" comment="Windows LAPS PasswordComplexity">
+          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
+          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
+          <win-def:name datatype="string">PasswordComplexity</win-def:name>
         </win-def:registry_object>
         <win-def:user_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347601" version="18" comment="Enabled Local Administrators">
           <win-def:user operation="pattern match">.*</win-def:user>
           <filter action="include">oval:navy.navwar.niwcatlantic.scc.windows:ste:25347611</filter>
           <filter action="include">oval:navy.navwar.niwcatlantic.scc.windows:ste:25347612</filter>
         </win-def:user_object>
-        <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347605" version="18" comment="Operational logs - Event Viewer - Applications and Services Logs - Microsoft - Windows - LAPS - Operational">
-          <independent-def:shell>powershell</independent-def:shell>
-          <independent-def:command>get-winevent -logname Microsoft-Windows-LAPS/Operational -MaxEvents 50</independent-def:command>
-          <independent-def:pattern>LAPS policy processing (\w+)\.</independent-def:pattern>
-        </independent-def:shellcommand_object>
-        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347603" version="18" comment="Windows LAPS PasswordLength">
-          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
-          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
-          <win-def:name datatype="string">PasswordLength</win-def:name>
-        </win-def:registry_object>
-        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:25347604" version="18" comment="Windows LAPS PasswordComplexity">
-          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
-          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
-          <win-def:name datatype="string">PasswordComplexity</win-def:name>
-        </win-def:registry_object>
-        </objects><states><win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347604" version="18" comment="Registry value must be of type reg_dword and value equals 4">
-          <win-def:type>reg_dword</win-def:type>
-          <win-def:value datatype="int">4</win-def:value>
-        </win-def:registry_state>
-        <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347603" version="18" comment="Registry value must be of type reg_dword and value greater than or equals 14">
-          <win-def:type>reg_dword</win-def:type>
-          <win-def:value datatype="int" operation="greater than or equal">14</win-def:value>
-        </win-def:registry_state>
-        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347612" version="18" comment="Filter for Enabled users">
-          <win-def:enabled datatype="boolean">true</win-def:enabled>
-        </win-def:user_state>
-        <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347602" version="18" comment="Registry value must be of type reg_dword and value less than or equals 60">
-          <win-def:type>reg_dword</win-def:type>
-          <win-def:value datatype="int" operation="less than or equal">60</win-def:value>
-        </win-def:registry_state>
-        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347611" version="18" comment="Filter for members of the Administrator group">
-          <win-def:group>Administrators</win-def:group>
-        </win-def:user_state>
-        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347601" version="18" comment="Confirm that all enabled local Administrators have a password age less than or equal to 60 days">
-          <win-def:password_age_days datatype="int" operation="less than or equal">60</win-def:password_age_days>
-        </win-def:user_state>
-        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347605" version="18" comment="LAPS Operational" operator="AND">
+        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347605" version="18" comment="LAPS Operational" operator="AND">
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command>get-winevent -logname Microsoft-Windows-LAPS/Operational -MaxEvents 50</independent-def:command>
           <independent-def:subexpression operation="pattern match">succeeded</independent-def:subexpression>
         </independent-def:shellcommand_state>
+        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347612" version="18" comment="Filter for Enabled users">
+          <win-def:enabled datatype="boolean">true</win-def:enabled>
+        </win-def:user_state>
+        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347601" version="18" comment="Confirm that all enabled local Administrators have a password age less than or equal to 60 days">
+          <win-def:password_age_days datatype="int" operation="less than or equal">60</win-def:password_age_days>
+        </win-def:user_state>
+        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347611" version="18" comment="Filter for members of the Administrator group">
+          <win-def:group>Administrators</win-def:group>
+        </win-def:user_state>
+        <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347603" version="18" comment="Registry value must be of type reg_dword and value greater than or equals 14">
+          <win-def:type>reg_dword</win-def:type>
+          <win-def:value datatype="int" operation="greater than or equal">14</win-def:value>
+        </win-def:registry_state>
+        <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347604" version="18" comment="Registry value must be of type reg_dword and value equals 4">
+          <win-def:type>reg_dword</win-def:type>
+          <win-def:value datatype="int">4</win-def:value>
+        </win-def:registry_state>
+        <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:25347602" version="18" comment="Registry value must be of type reg_dword and value less than or equals 60">
+          <win-def:type>reg_dword</win-def:type>
+          <win-def:value datatype="int" operation="less than or equal">60</win-def:value>
+        </win-def:registry_state>
         </states></oval_definitions>

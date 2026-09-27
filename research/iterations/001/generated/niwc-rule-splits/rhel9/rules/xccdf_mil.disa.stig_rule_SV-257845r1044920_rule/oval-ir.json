@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "There is a separate file system for /var",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23029200"
-          },
-          {
-            "comment": "There is a separate file system configured for /var",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23029201"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230292",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must use a separate file system for /var."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230292",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "There is a separate file system for /var",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23029200"
+          },
+          {
+            "comment": "There is a separate file system configured for /var",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23029201"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230292",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must use a separate file system for /var."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257845",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230292"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,11 @@
       "to": "oval:mil.disa.stig.linux:tst:23029200"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257845",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230292"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:23029201",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:23029201"
     },
     {
       "attribute": "object_ref",
@@ -120,13 +127,6 @@
       "from": "oval:mil.disa.stig.linux:tst:23029200",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.linux:obj:23029200"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23029201",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23029201"
     }
   ],
   "dependency_integrity": {
@@ -217,6 +217,21 @@
       "children": [
         {
           "kind": "element",
+          "name": "mount_point",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "/var"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.linux:obj:23029200",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "partition_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/fstab"
@@ -247,21 +262,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "mount_point",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "/var"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23029200",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "partition_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -288,35 +288,15 @@
       "oval:mil.disa.stig.defs:def:230292"
     ]
   },
-  "semantic_ir_sha256": "bd43cf75883739d4b54c1832b7eef00c3efb1ab60038b8920b6522ac7e9feaf4",
+  "semantic_ir_sha256": "9fbefc75c96f8ac6984f5548ae2ebee458397919564859e1d9896968422d670c",
   "source": {
     "bytes": 3295,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257845r1044920_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257845r1044920_rule/provenance.json",
-    "sha256": "8419e16f1fbcf50e28c81bc300ba57e75e47aa41f12c17aee123198f87ccd060"
+    "sha256": "3d6bc23ee8ff7d6fb92d2a58a09e19f13de7db3c52785eb18ca61f4de170855a"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "There is a separate file system for /var.",
-      "id": "oval:mil.disa.stig.linux:tst:23029200",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23029200"
-          },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23029200"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "partition_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -335,6 +315,26 @@
       "state_operator": "AND",
       "states": [],
       "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "There is a separate file system for /var.",
+      "id": "oval:mil.disa.stig.linux:tst:23029200",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.linux:obj:23029200"
+          },
+          "object_ref": "oval:mil.disa.stig.linux:obj:23029200"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "partition_test",
       "version": "1"
     }
   ],

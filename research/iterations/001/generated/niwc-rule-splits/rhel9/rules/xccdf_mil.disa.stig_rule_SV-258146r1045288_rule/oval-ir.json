@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:258146",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:258146",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-652040 - RHEL 9 must authenticate the remote logging server for offloading audit logs via rsyslog."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Information stored in one location is vulnerable to accidental or incidental deletion or alteration.\n\nOffloading is a common process in information systems with limited audit storage capacity.\n\nRHEL 9 installation media provides \"rsyslogd\", a system utility providing support for message logging. Support for both internet and Unix domain sockets enables this utility to support both local and remote logging. Coupling this utility with \"gnutls\" (a secure communications library implementing the SSL, TLS and DTLS protocols) creates a method to securely encrypt and offload auditing.\n\n\"Rsyslog\" supported authentication modes include:\nanon - anonymous authentication\nx509/fingerprint - certificate fingerprint authentication\nx509/certvalid - certificate validation only\nx509/name - certificate validation and subject name authentication\n\nSatisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "children": [
               {
                 "comment": "ActionSendStreamDriverAuthMode is set to x509/name (legacy syntax)",
@@ -54,59 +104,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "4"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:258146",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:258146",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-652040 - RHEL 9 must authenticate the remote logging server for offloading audit logs via rsyslog."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Information stored in one location is vulnerable to accidental or incidental deletion or alteration.\n\nOffloading is a common process in information systems with limited audit storage capacity.\n\nRHEL 9 installation media provides \"rsyslogd\", a system utility providing support for message logging. Support for both internet and Unix domain sockets enables this utility to support both local and remote logging. Coupling this utility with \"gnutls\" (a secure communications library implementing the SSL, TLS and DTLS protocols) creates a method to securely encrypt and offload auditing.\n\n\"Rsyslog\" supported authentication modes include:\nanon - anonymous authentication\nx509/fingerprint - certificate fingerprint authentication\nx509/certvalid - certificate validation only\nx509/name - certificate validation and subject name authentication\n\nSatisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258146",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258146"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -127,13 +134,6 @@
       "from": "oval:mil.disa.stig.defs:def:258146",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25814602"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258146",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258146"
     },
     {
       "attribute": "object_ref",
@@ -187,6 +187,20 @@
     {
       "attribute": null,
       "element": "object_reference",
+      "from": "oval:mil.disa.stig.ind:obj:20000002",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:20000003"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.ind:obj:20000002",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:20000004"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
       "from": "oval:mil.disa.stig.ind:obj:25814600",
       "kind": "set_object_reference",
       "to": "oval:mil.disa.stig.ind:obj:25814601"
@@ -211,20 +225,6 @@
       "from": "oval:mil.disa.stig.ind:obj:20000005",
       "kind": "set_object_reference",
       "to": "oval:mil.disa.stig.ind:obj:20000007"
-    },
-    {
-      "attribute": null,
-      "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:20000002",
-      "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:20000003"
-    },
-    {
-      "attribute": null,
-      "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:20000002",
-      "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:20000004"
     }
   ],
   "dependency_integrity": {
@@ -382,51 +382,6 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
         },
         {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\$ActionSendStreamDriverAuthMode\\s+(\\S+)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "rsyslog.conf: ActionSendStreamDriverAuthMode",
-      "id": "oval:mil.disa.stig.ind:obj:25814601",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "ignore_case": "true"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        },
-        {
           "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -466,66 +421,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "3"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25814601"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25814602"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
-        }
-      ],
-      "comment": "ActionSendStreamDriverAuthMode",
-      "id": "oval:mil.disa.stig.ind:obj:25814600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:20000006"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:20000007"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
-        }
-      ],
-      "comment": "rsyslog: module blocks",
-      "id": "oval:mil.disa.stig.ind:obj:20000005",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     },
     {
       "children": [
@@ -634,7 +529,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\*\\.\\*\\s+action\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
+          "value": "^\\$ActionSendStreamDriverAuthMode\\s+(\\S+)\\s*$"
         },
         {
           "attributes": {
@@ -647,11 +542,11 @@
           "value": "1"
         }
       ],
-      "comment": "rsyslog.conf: action for all messages",
-      "id": "oval:mil.disa.stig.ind:obj:20000003",
+      "comment": "rsyslog.conf: ActionSendStreamDriverAuthMode",
+      "id": "oval:mil.disa.stig.ind:obj:25814601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "3"
+      "version": "1"
     },
     {
       "children": [
@@ -700,6 +595,111 @@
       ],
       "comment": "rsyslog.d/*.conf: ActionSendStreamDriverAuthMode",
       "id": "oval:mil.disa.stig.ind:obj:25814602",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "ignore_case": "true"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/rsyslog.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\*\\.\\*\\s+action\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "rsyslog.conf: action for all messages",
+      "id": "oval:mil.disa.stig.ind:obj:20000003",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "3"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25814601"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25814602"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "ActionSendStreamDriverAuthMode",
+      "id": "oval:mil.disa.stig.ind:obj:25814600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:20000006"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:20000007"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "rsyslog: module blocks",
+      "id": "oval:mil.disa.stig.ind:obj:20000005",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -757,12 +757,12 @@
       "oval:mil.disa.stig.defs:def:258146"
     ]
   },
-  "semantic_ir_sha256": "84a205277b318b22e5fc9961337562dfa051f8b498b25d4345daa1eb91cd0ffe",
+  "semantic_ir_sha256": "e0c871d5198964e45f7ada53cf6221bcd51248e063fd262ffb86e2c3b34aefc0",
   "source": {
     "bytes": 10470,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258146r1045288_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258146r1045288_rule/provenance.json",
-    "sha256": "d689894ebf79af5276889a2c026da8e3a82ca1637a0bd3bc518f2fc7f7416701"
+    "sha256": "9ce77e2f6affcf869cad54b7168892d91ecad8425971940829297e93a362aa3e"
   },
   "states": [
     {
@@ -776,14 +776,14 @@
           "kind": "element",
           "name": "subexpression",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "(?i)(?:^|\\n)[^#]*\\bStreamDriver\\.?AuthMode\\s*=\\s*\"x509/name\""
+          "value": "(?i)(?:^|\\n)[^#]*\\btype\\s*=\\s*\"omfwd\""
         }
       ],
-      "id": "oval:mil.disa.stig.ind:ste:25814601",
+      "id": "oval:mil.disa.stig.ind:ste:20000027",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",
-      "version": "3"
+      "version": "2"
     },
     {
       "comment": null,
@@ -816,14 +816,14 @@
           "kind": "element",
           "name": "subexpression",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "(?i)(?:^|\\n)[^#]*\\btype\\s*=\\s*\"omfwd\""
+          "value": "(?i)(?:^|\\n)[^#]*\\bStreamDriver\\.?AuthMode\\s*=\\s*\"x509/name\""
         }
       ],
-      "id": "oval:mil.disa.stig.ind:ste:20000027",
+      "id": "oval:mil.disa.stig.ind:ste:25814601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",
-      "version": "2"
+      "version": "3"
     },
     {
       "comment": null,

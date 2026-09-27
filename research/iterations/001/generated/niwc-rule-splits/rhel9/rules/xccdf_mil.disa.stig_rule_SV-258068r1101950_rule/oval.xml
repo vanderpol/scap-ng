@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258068" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258068" version="3" class="compliance">
+          <metadata>
+            <title>The operating system must automatically exit interactive command shell user sessions after 10 minutes of inactivity.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25806800" comment="TMOUT is set to 600 or less in /etc/profile and /etc/profile.d/*.sh"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:258068" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-412035 - RHEL 9 must automatically exit interactive command shell user sessions after 10 minutes of inactivity.</title>
             <affected family="unix">
@@ -18,20 +27,17 @@ Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000029-GPOS-00010</description>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258068"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:258068" version="3" class="compliance">
-          <metadata>
-            <title>The operating system must automatically exit interactive command shell user sessions after 10 minutes of inactivity.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25806800" comment="TMOUT is set to 600 or less in /etc/profile and /etc/profile.d/*.sh"/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25806800" version="2" check_existence="at_least_one_exists" check="all" comment="TMOUT option is set to 600 or less in /etc/profile and /etc/profile.d/*.sh.">
           <object object_ref="oval:mil.disa.stig.ind:obj:25806800"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000026"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25806802" version="3">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25806800" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:25806801</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:25806802</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25806802" version="3">
           <behaviors max_depth="-1" recurse_direction="down"/>
           <path>/etc/profile.d</path>
           <filename operation="pattern match">^.+\.sh$</filename>
@@ -42,12 +48,6 @@ Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000029-GPOS-00010</description>
           <filepath>/etc/profile</filepath>
           <pattern operation="pattern match">^[^#]*\s*TMOUT=(\d+)\s*$</pattern>
           <instance datatype="int">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25806800" version="1">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:25806801</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:25806802</object_reference>
-          </set>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000026" version="2">
           <subexpression datatype="int" operation="less than or equal">600</subexpression>

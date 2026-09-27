@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271854" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:271854" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must authenticate the remote logging server for offloading audit logs via rsyslog.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25814600" comment="ActionSendStreamDriverAuthMode is set to x509/name"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271854" version="2" class="compliance">
           <metadata>
             <title>OL09-00-005015 - OL 9 must authenticate the remote logging server for offloading audit logs via rsyslog.</title>
             <affected family="unix">
@@ -28,20 +37,18 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:271854"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:271854" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must authenticate the remote logging server for offloading audit logs via rsyslog.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25814600" comment="ActionSendStreamDriverAuthMode is set to x509/name"/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25814600" version="1" check_existence="at_least_one_exists" check="all" comment="ActionSendStreamDriverAuthMode == x509/name">
           <object object_ref="oval:mil.disa.stig.ind:obj:25814600"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25814600"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814600" version="1" comment="ActionSendStreamDriverAuthMode">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814602" version="1" comment="rsyslog.d/*.conf: ActionSendStreamDriverAuthMode">
+          <behaviors ignore_case="true"/>
+          <path>/etc/rsyslog.d</path>
+          <filename operation="pattern match">^.*\.conf$</filename>
+          <pattern operation="pattern match">^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814600" version="1" comment="ActionSendStreamDriverAuthMode">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
             <object_reference>oval:mil.disa.stig.ind:obj:25814601</object_reference>
             <object_reference>oval:mil.disa.stig.ind:obj:25814602</object_reference>
@@ -50,13 +57,6 @@
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814601" version="1" comment="rsyslog.conf: ActionSendStreamDriverAuthMode">
           <behaviors ignore_case="true"/>
           <filepath datatype="string">/etc/rsyslog.conf</filepath>
-          <pattern operation="pattern match">^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814602" version="1" comment="rsyslog.d/*.conf: ActionSendStreamDriverAuthMode">
-          <behaviors ignore_case="true"/>
-          <path>/etc/rsyslog.d</path>
-          <filename operation="pattern match">^.*\.conf$</filename>
           <pattern operation="pattern match">^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>

@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278087" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253362" version="1" class="compliance">
+          <metadata>
+            <title>Hardened UNC Paths must be defined to require mutual authentication and integrity for at least the \\*\SYSVOL and \\*\NETLOGON shares.</title>
+            <description/>
+          </metadata>
+          <criteria operator="AND" comment="has correct UNC path hardening">
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25336200" comment="Mutual Authentication and Integrity for \\*\SYSVOL"/>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25336201" comment="Mutual Authentication and Integrity for \\*\NETLOGON"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows2025:def:278087" version="1" class="compliance">
           <metadata>
             <title>WN25-CC-000080 - Windows Server 2025 hardened Universal Naming Convention (UNC) paths must be defined to require mutual authentication and integrity for at least the \\*\SYSVOL and \\*\NETLOGON shares.</title>
             <affected family="windows">
@@ -14,16 +24,6 @@
           </metadata>
           <criteria>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253362"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.defs:def:253362" version="1" class="compliance">
-          <metadata>
-            <title>Hardened UNC Paths must be defined to require mutual authentication and integrity for at least the \\*\SYSVOL and \\*\NETLOGON shares.</title>
-            <description/>
-          </metadata>
-          <criteria operator="AND" comment="has correct UNC path hardening">
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25336200" comment="Mutual Authentication and Integrity for \\*\SYSVOL"/>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25336201" comment="Mutual Authentication and Integrity for \\*\NETLOGON"/>
           </criteria>
         </definition>
         </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25336200" version="1" check_existence="at_least_one_exists" check="all" comment="Mutual Authentication and Integrity for \\*\SYSVOL">
@@ -50,17 +50,17 @@
           <key datatype="string">SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths</key>
           <name datatype="string">\\*\SYSVOL</name>
         </registry_object>
-        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25336200" version="1" comment="RequireMutualAuthentication=1">
-          <type>reg_sz</type>
-          <value datatype="string" operation="pattern match">(^| *, *)RequireMutualAuthentication=1( *, *|$)</value>
-        </registry_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25336201" version="1" comment="No RequireMutualAuthentication!=1">
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25336201" version="1" comment="No RequireMutualAuthentication!=1">
           <type>reg_sz</type>
           <value entity_check="none satisfy" datatype="string" operation="pattern match">(^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))</value>
         </registry_state>
         <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25336202" version="1" comment="RequireIntegrity=1">
           <type>reg_sz</type>
           <value datatype="string" operation="pattern match">(^| *, *)RequireIntegrity=1( *, *|$)</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25336200" version="1" comment="RequireMutualAuthentication=1">
+          <type>reg_sz</type>
+          <value datatype="string" operation="pattern match">(^| *, *)RequireMutualAuthentication=1( *, *|$)</value>
         </registry_state>
         <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25336203" version="1" comment="No RequireIntegrity!=1">
           <type>reg_sz</type>

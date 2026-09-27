@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "There is a separate file system for audit data directory.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23029400"
+          },
+          {
+            "comment": "There is a separate file system configured for audit data directory.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23029401"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230294",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must use a separate file system for the system audit data path."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230294",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "There is a separate file system for audit data directory.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23029400"
-          },
-          {
-            "comment": "There is a separate file system configured for audit data directory.",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23029401"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230294",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must use a separate file system for the system audit data path."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257847",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230294"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -115,11 +108,11 @@
       "to": "oval:mil.disa.stig.linux:tst:23029400"
     },
     {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.linux:tst:23029400",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.linux:obj:23029400"
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257847",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230294"
     },
     {
       "attribute": "object_ref",
@@ -129,11 +122,11 @@
       "to": "oval:mil.disa.stig.ind:obj:23029401"
     },
     {
-      "attribute": "var_ref",
-      "element": "pattern",
-      "from": "oval:mil.disa.stig.ind:obj:23029401",
-      "kind": "variable_reference",
-      "to": "oval:mil.disa.stig.defs:var:23029401"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.linux:tst:23029400",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.linux:obj:23029400"
     },
     {
       "attribute": "var_ref",
@@ -143,16 +136,23 @@
       "to": "oval:mil.disa.stig.defs:var:23029400"
     },
     {
+      "attribute": "var_ref",
+      "element": "pattern",
+      "from": "oval:mil.disa.stig.ind:obj:23029401",
+      "kind": "variable_reference",
+      "to": "oval:mil.disa.stig.defs:var:23029401"
+    },
+    {
       "attribute": "object_ref",
       "element": "object_component",
-      "from": "oval:mil.disa.stig.defs:var:23029400",
+      "from": "oval:mil.disa.stig.defs:var:23029401",
       "kind": "object_component",
       "to": "oval:mil.disa.stig.ind:obj:23029402"
     },
     {
       "attribute": "object_ref",
       "element": "object_component",
-      "from": "oval:mil.disa.stig.defs:var:23029401",
+      "from": "oval:mil.disa.stig.defs:var:23029400",
       "kind": "object_component",
       "to": "oval:mil.disa.stig.ind:obj:23029402"
     }
@@ -300,6 +300,25 @@
     {
       "children": [
         {
+          "attributes": {
+            "datatype": "string",
+            "var_check": "at least one",
+            "var_ref": "oval:mil.disa.stig.defs:var:23029400"
+          },
+          "kind": "element",
+          "name": "mount_point",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.linux:obj:23029400",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "partition_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -331,25 +350,6 @@
       "id": "oval:mil.disa.stig.ind:obj:23029401",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "var_check": "at least one",
-            "var_ref": "oval:mil.disa.stig.defs:var:23029400"
-          },
-          "kind": "element",
-          "name": "mount_point",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23029400",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "partition_object",
       "version": "1"
     }
   ],
@@ -388,35 +388,15 @@
       "oval:mil.disa.stig.defs:def:230294"
     ]
   },
-  "semantic_ir_sha256": "9d3188dd3c1f3f2f2165b93a14d8657f53b9af06536cfcece060d08094598479",
+  "semantic_ir_sha256": "255e0b5bc9512123bd8ba0e0af4aaa4d76b802d5f0c6e1e50b261db77bd5de15",
   "source": {
     "bytes": 4719,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257847r1044924_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257847r1044924_rule/provenance.json",
-    "sha256": "e3eb44ab11395685f287f2d6e462fc54f9a596155963faf15ab27e5dc22b9fca"
+    "sha256": "8eccb010ec17c33179f7c296c0880507f5d8d0aa1e505cc1d837bc01828efef3"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "There is a separate file system for audit data directory.",
-      "id": "oval:mil.disa.stig.linux:tst:23029400",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23029400"
-          },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23029400"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "partition_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -435,6 +415,26 @@
       "state_operator": "AND",
       "states": [],
       "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "There is a separate file system for audit data directory.",
+      "id": "oval:mil.disa.stig.linux:tst:23029400",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.linux:obj:23029400"
+          },
+          "object_ref": "oval:mil.disa.stig.linux:obj:23029400"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "partition_test",
       "version": "1"
     }
   ],
@@ -458,6 +458,7 @@
         "record_field": null
       },
       "mode": "target_dependent",
+      "reason": "object_component_requires_collection:textfilecontent54_object",
       "resolution_status": "dynamic_object_dependency",
       "variable_id": "oval:mil.disa.stig.defs:var:23029400",
       "variable_type": "local_variable"
@@ -467,6 +468,7 @@
         "item_field": "subexpression",
         "object_ref": "oval:mil.disa.stig.ind:obj:23029402",
         "operation": "object_component",
+        "reason": "object_component_requires_collection:textfilecontent54_object",
         "record_field": null,
         "status": "dynamic_object_dependency"
       },
@@ -505,7 +507,7 @@
         "op": "concat"
       },
       "mode": "target_dependent",
-      "reason": "concat_child_not_static:object_component",
+      "reason": "concat_child_not_static:object_component_requires_collection:textfilecontent54_object",
       "resolution_status": "dynamic_object_dependency",
       "variable_id": "oval:mil.disa.stig.defs:var:23029401",
       "variable_type": "local_variable"
@@ -552,6 +554,7 @@
       "item_field": "subexpression",
       "object_ref": "oval:mil.disa.stig.ind:obj:23029402",
       "operation": "object_component",
+      "reason": "object_component_requires_collection:textfilecontent54_object",
       "record_field": null,
       "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
@@ -561,47 +564,18 @@
         "item_field": "subexpression",
         "object_ref": "oval:mil.disa.stig.ind:obj:23029402",
         "operation": "object_component",
+        "reason": "object_component_requires_collection:textfilecontent54_object",
         "record_field": null,
         "status": "dynamic_object_dependency"
       },
       "datatype": "string",
       "operation": "concat",
-      "reason": "concat_child_not_static:object_component",
+      "reason": "concat_child_not_static:object_component_requires_collection:textfilecontent54_object",
       "status": "dynamic_object_dependency",
       "variable_type": "local_variable"
     }
   },
   "variables": [
-    {
-      "body": [
-        {
-          "attributes": {
-            "item_field": "subexpression",
-            "object_ref": "oval:mil.disa.stig.ind:obj:23029402"
-          },
-          "kind": "element",
-          "name": "object_component",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-        }
-      ],
-      "comment": "audit data directory from /etc/audit/auditd.conf",
-      "datatype": "string",
-      "id": "oval:mil.disa.stig.defs:var:23029400",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-      "semantic_ast": {
-        "datatype": "string",
-        "expression": {
-          "item_field": "subexpression",
-          "object_ref": "oval:mil.disa.stig.ind:obj:23029402",
-          "op": "object_component",
-          "record_field": null
-        },
-        "id": "oval:mil.disa.stig.defs:var:23029400",
-        "type": "local_variable"
-      },
-      "type": "local_variable",
-      "version": "1"
-    },
     {
       "body": [
         {
@@ -662,6 +636,36 @@
           "op": "concat"
         },
         "id": "oval:mil.disa.stig.defs:var:23029401",
+        "type": "local_variable"
+      },
+      "type": "local_variable",
+      "version": "1"
+    },
+    {
+      "body": [
+        {
+          "attributes": {
+            "item_field": "subexpression",
+            "object_ref": "oval:mil.disa.stig.ind:obj:23029402"
+          },
+          "kind": "element",
+          "name": "object_component",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+        }
+      ],
+      "comment": "audit data directory from /etc/audit/auditd.conf",
+      "datatype": "string",
+      "id": "oval:mil.disa.stig.defs:var:23029400",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+      "semantic_ast": {
+        "datatype": "string",
+        "expression": {
+          "item_field": "subexpression",
+          "object_ref": "oval:mil.disa.stig.ind:obj:23029402",
+          "op": "object_component",
+          "record_field": null
+        },
+        "id": "oval:mil.disa.stig.defs:var:23029400",
         "type": "local_variable"
       },
       "type": "local_variable",
