@@ -105,11 +105,13 @@ The vendored OVAL 5.12.3 schema defines the following component/function set:
 - `time_difference`
 - `unique`
 
-The static evaluator currently resolves literal values, constant variables, variable references, `concat`, `unique`, `count`, `split`, `substring`, `begin`, `end`, `escape_regex`, and `arithmetic` when their inputs are target-independent.
+The target-independent evaluator now covers the full OVAL 5.12.3 ComponentGroup/function surface listed above, including `glob_to_regex`, `merge` ordering modes, `regex_capture`, and `time_difference` when the inputs are deterministic. A `time_difference` expression whose semantics require the evaluator's current time remains explicitly runtime-dependent rather than being assigned a fabricated static value.
 
-Target-dependent variables are not flattened to a generic unresolved marker. Each variable now has an explicit evaluation plan. Static plans carry exact values, external-input plans carry typed inputs, and target-dependent plans preserve the complete expression AST plus referenced objects, variables, and function operations.
+Target-dependent variables are not flattened to a generic unresolved marker. Each variable has an explicit evaluation plan. Static plans carry exact values, external-input plans carry typed inputs, runtime-context plans identify dependencies such as current time, and target-dependent plans preserve the complete expression AST plus referenced objects, variables, and function operations.
 
-In the four priority benchmarks, the remaining non-static cases are rooted in `object_component` collection from the target. Function chains above those collections include `concat`, `arithmetic`, `count`, `merge`, `regex_capture`, `split`, and `substring`. These are therefore a native runtime/lowering problem rather than a parser-loss problem.
+The OVAL Community SCAP Self-Assertion corpus is now a separate conformance evidence source. At the pinned revision, all 144 OVAL documents across the available platform directories parse successfully with zero unresolved OVAL references. The platform-agnostic subset contains 195 variables: 194 resolve exactly offline and one remains intentionally runtime-time-dependent. Its offline verification executes 308 tests (224 true, 83 false, one unknown), with 44 definitions matching their documented expected results; one definition requires current-time context and one requires a real platform family collector.
+
+This does **not** mean every OVAL 5.12.3 platform collector has been implemented. The schema catalog defines a substantially larger platform test/object/state surface than the Self-Assertion corpus exercises. Platform-specific payloads remain losslessly modeled in the IR, and collector/native-lowering semantics are tracked separately from structural import correctness.
 
 ### Faithful normalization versus policy review
 
