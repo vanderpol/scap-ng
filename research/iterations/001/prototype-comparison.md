@@ -1,22 +1,41 @@
 # Prototype Comparison Criteria
 
-Iteration 001 intentionally implements the same assessment semantics using two candidate source organizations.
+Iteration 001 implements the same policy intent and result semantics using two candidate source organizations.
 
-The comparison must be based on actual prototype experience rather than aesthetics.
+The comparison must be based on actual full-benchmark prototype experience rather than aesthetics.
 
 ## Candidate A — Combined rule
 
-Policy text, manual procedure, applicability, and automation live in the same rule object.
+Policy text, Check Content, applicability, and automation live in the same automated rule object.
 
 ## Candidate B — Split policy / assessment / binding
 
-Policy, reusable assessment logic, and mapping are separate objects.
+Policy, reusable assessment logic, and mapping are separate authored objects.
 
-## Questions to answer after implementation
+## Controlled prototype set
+
+Both candidates now contain equivalent **seven-rule Windows and seven-rule Linux benchmarks**, including policy-only and automated distributions and complete scan-result examples.
+
+The full benchmark set intentionally covers:
+
+- conditional `if / elif / else`;
+- nested OVAL-style AND/OR logic;
+- multi-assertion rules;
+- applicability and Not Applicable;
+- collection Error;
+- policy/manual assessment;
+- large filesystem populations;
+- evidence truncation and early termination;
+- effective configuration parsing;
+- typed version comparisons.
+
+Both architectures compile into self-contained signed `.scapng` bundles. The result semantics are intentionally kept equivalent so organization can be compared independently from scanner reporting behavior.
+
+## Questions to answer after review
 
 | Area | Combined rule | Split policy/assessment/binding | Evidence / notes |
 |---|---|---|---|
-| Understand one rule by opening one file | TBD | TBD | |
+| Understand one rule by opening one source object | TBD | TBD | |
 | DISA policy-only authoring burden | TBD | TBD | |
 | Add automation without rewriting policy | TBD | TBD | |
 | Reuse one assessment across many rules | TBD | TBD | |
@@ -34,25 +53,19 @@ Policy, reusable assessment logic, and mapping are separate objects.
 | Package/signing clarity | TBD | TBD | |
 | Long-term version management | TBD | TBD | |
 
-## Controlled prototype requirement
+## Measured iteration 001 package observations
 
-Both candidate architectures must represent identical policy intent and produce equivalent result semantics for the Windows conditional, Windows nested-logic, Linux large-filesystem, and policy-only examples.
+These measurements are descriptive only and are **not** an architecture score:
 
-If an architectural choice requires different result semantics, that difference must be documented as a design consequence rather than hidden in the prototype.
+- combined-rule automated packages currently contain 12 ZIP members;
+- split automated packages currently contain 19 ZIP members because assessments and bindings are independently addressable;
+- policy-only packages contain 12 members in both candidate models;
+- all current packages remain very small because this is a seven-rule research benchmark.
+
+Package byte size should not determine the architecture. The significant comparison is lifecycle complexity across policy publication, automation authoring, reuse, migration, validation, scanner ingestion, reporting, provenance, signing, and maintenance.
 
 ## Evaluation principle
 
-No decision should be made solely because one representation is shorter.
+No architecture decision should be made solely because one representation is shorter or uses fewer files.
 
-The preferred architecture should minimize the total lifecycle burden across:
-
-- policy publication;
-- automation authoring;
-- reuse;
-- migration;
-- validation;
-- scanner ingestion;
-- reporting;
-- provenance;
-- signing;
-- maintenance across benchmark revisions.
+If a candidate requires different result semantics merely because source organization differs, that should be treated as an architectural warning rather than hidden in the prototype.
