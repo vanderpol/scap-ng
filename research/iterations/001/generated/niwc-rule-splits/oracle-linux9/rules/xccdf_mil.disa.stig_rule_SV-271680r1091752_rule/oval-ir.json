@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "dconf user database(s) exist",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25802600"
-          },
-          {
-            "comment": "/org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25801300"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258013",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must prevent a user from overriding the banner-message-enable setting for the graphical user interface."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258013",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "dconf user database(s) exist",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25802600"
+          },
+          {
+            "comment": "/org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25801300"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258013",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must prevent a user from overriding the banner-message-enable setting for the graphical user interface."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271680",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258013"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,11 @@
       "to": "oval:mil.disa.stig.ind:tst:25802600"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271680",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258013"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25802600",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25802600"
     },
     {
       "attribute": "object_ref",
@@ -120,13 +127,6 @@
       "from": "oval:mil.disa.stig.ind:tst:25801300",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:25801300"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25802600",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:25802600"
     },
     {
       "attribute": "var_ref",
@@ -239,6 +239,40 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/dconf/profile/user"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^system-db:(\\S+)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "dconf user databases",
+      "id": "oval:mil.disa.stig.ind:obj:25802600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "var_check": "at least one",
             "var_ref": "oval:mil.disa.stig.defs:var:25802600"
@@ -281,40 +315,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/dconf/profile/user"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^system-db:(\\S+)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "dconf user databases",
-      "id": "oval:mil.disa.stig.ind:obj:25802600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
     }
   ],
   "parser_contract": {
@@ -346,35 +346,15 @@
       "oval:mil.disa.stig.defs:def:258013"
     ]
   },
-  "semantic_ir_sha256": "f4525cb2e8bfba3be8f59ba0880f23ece8768a661d2aa564cb86f3597a1a848c",
+  "semantic_ir_sha256": "29bcf372b74bdd42b466ba2342b739171327b0419fed685acbd9e6c12b3a23de",
   "source": {
     "bytes": 4620,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271680r1091752_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271680r1091752_rule/provenance.json",
-    "sha256": "5107a5cd3e954bc658d1921e907435574aa18b32e0eaf10bb1e8f7fdca08e509"
+    "sha256": "2cd0d73c6d884eba52da0c53b82eea4537a0217b07979d26e8619ba5fc310089"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "/org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists",
-      "id": "oval:mil.disa.stig.ind:tst:25801300",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25801300"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25801300"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -387,6 +367,26 @@
             "object_ref": "oval:mil.disa.stig.ind:obj:25802600"
           },
           "object_ref": "oval:mil.disa.stig.ind:obj:25802600"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "/org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists",
+      "id": "oval:mil.disa.stig.ind:tst:25801300",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25801300"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25801300"
         }
       ],
       "other": [],

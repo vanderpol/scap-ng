@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/security/pwquality.conf:retry not greater than 3 and not 0",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25809100"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258091",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258091",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/security/pwquality.conf:retry not greater than 3 and not 0",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25809100"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258091",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258091",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258091"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:258091",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25809100"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258091",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258091"
     },
     {
       "attribute": "object_ref",
@@ -227,6 +227,39 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/security/pwquality.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*retry\\s*=\\s*(-?\\d*)\\s*(?:#.*)?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value",
+      "id": "oval:mil.disa.stig.ind:obj:25809101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "recurse_direction": "down"
           },
@@ -303,39 +336,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/security/pwquality.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*retry\\s*=\\s*(-?\\d*)\\s*(?:#.*)?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value",
-      "id": "oval:mil.disa.stig.ind:obj:25809101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
     }
   ],
   "parser_contract": {
@@ -364,12 +364,12 @@
       "oval:mil.disa.stig.defs:def:258091"
     ]
   },
-  "semantic_ir_sha256": "12c7784b2cd3cd2ebcfddc4e77f060fd83f92d1a2db8e4bad272521a68d5a27c",
+  "semantic_ir_sha256": "d0968357dcbe536dbb1160a1201bc8a467d6ef9cb009ba9811ff837c34ae2200",
   "source": {
     "bytes": 4688,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258091r1208774_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258091r1208774_rule/provenance.json",
-    "sha256": "d90431340d78d1a7493e698ee845973486ac344a18e8e7d3cbc7481aba31d3da"
+    "sha256": "2672fcfe81ee5dbbc0e3bfb7aeba5b5036536a2f3a4341565f1b00d888611b25"
   },
   "states": [
     {

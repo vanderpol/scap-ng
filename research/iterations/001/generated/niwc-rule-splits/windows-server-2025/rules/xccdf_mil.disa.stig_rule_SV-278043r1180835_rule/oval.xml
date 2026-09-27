@@ -4,21 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278043" version="1" class="compliance">
-          <metadata>
-            <title>WN25-AU-000030 - Windows Server 2025 permissions for the Application event log must prevent access by nonprivileged accounts.</title>
-            <affected family="windows">
-              <platform>Microsoft Windows Server 2025</platform>
-            </affected>
-            <description>Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary to provide a trail of evidence in case the system or network is compromised. The Application event log may be susceptible to tampering if proper permissions are not applied.
-
-  Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029</description>
-          </metadata>
-          <criteria>
-            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254296"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.defs:def:254296" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:254296" version="1" class="compliance">
           <metadata>
             <title>Windows permissions for the Application event log must prevent access by non-privileged accounts.</title>
             <description/>
@@ -34,6 +20,20 @@
             </criteria>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.windows2025:def:278043" version="1" class="compliance">
+          <metadata>
+            <title>WN25-AU-000030 - Windows Server 2025 permissions for the Application event log must prevent access by nonprivileged accounts.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary to provide a trail of evidence in case the system or network is compromised. The Application event log may be susceptible to tampering if proper permissions are not applied.
+
+  Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254296"/>
+          </criteria>
+        </definition>
         </definitions><tests><fileeffectiverights53_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25429600" version="1" check_existence="none_exist" check="all" comment="The Application event log must have at least default permissions. Built Path">
           <object object_ref="oval:mil.disa.stig.win:obj:25429600"/>
         </fileeffectiverights53_test>
@@ -44,7 +44,16 @@
         <fileeffectiverights53_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25429601" version="1" check_existence="none_exist" check="all" comment="The Application event log must have at least default permissions. Strict Path">
           <object object_ref="oval:mil.disa.stig.win:obj:25429601"/>
         </fileeffectiverights53_test>
-        </tests><objects><fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25429600" version="1" comment="Permissions of Application event log, minus those allowed. Built filepath.">
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000015" version="1" comment="System Root Directory">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
+          <name datatype="string">SystemRoot</name>
+        </registry_object>
+        <fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25334001" version="1" comment="The Application event log. Built filepath.">
+          <filepath datatype="string" operation="case insensitive equals" var_ref="oval:mil.disa.stig.win:var:25334001" var_check="at least one"/>
+          <trustee_sid datatype="string" operation="pattern match">.*</trustee_sid>
+        </fileeffectiverights53_object>
+        <fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25429600" version="1" comment="Permissions of Application event log, minus those allowed. Built filepath.">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">
             <object_reference>oval:mil.disa.stig.win:obj:25334001</object_reference>
             <filter>oval:mil.disa.stig.win:ste:20000011</filter>
@@ -53,6 +62,11 @@
             <filter>oval:mil.disa.stig.win:ste:20000014</filter>
           </set>
         </fileeffectiverights53_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25334002" version="1" comment="path Application.evtx">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SYSTEM\CurrentControlSet\Services\EventLog\Application</key>
+          <name datatype="string">file</name>
+        </registry_object>
         <fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25334004" version="1" comment="The Application event log. Strict filepath, as listed.">
           <filepath datatype="string" operation="case insensitive equals" var_ref="oval:mil.disa.stig.win:var:25334002" var_check="at least one"/>
           <trustee_sid datatype="string" operation="pattern match">.*</trustee_sid>
@@ -66,25 +80,8 @@
             <filter>oval:mil.disa.stig.win:ste:20000014</filter>
           </set>
         </fileeffectiverights53_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000015" version="1" comment="System Root Directory">
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
-          <name datatype="string">SystemRoot</name>
-        </registry_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25334002" version="1" comment="path Application.evtx">
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string">SYSTEM\CurrentControlSet\Services\EventLog\Application</key>
-          <name datatype="string">file</name>
-        </registry_object>
-        <fileeffectiverights53_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25334001" version="1" comment="The Application event log. Built filepath.">
-          <filepath datatype="string" operation="case insensitive equals" var_ref="oval:mil.disa.stig.win:var:25334001" var_check="at least one"/>
-          <trustee_sid datatype="string" operation="pattern match">.*</trustee_sid>
-        </fileeffectiverights53_object>
-        </objects><states><fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000012" version="1" comment="SYSTEM account.">
-          <trustee_sid datatype="string">S-1-5-18</trustee_sid>
-        </fileeffectiverights53_state>
-        <fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000014" version="1" comment="LOCAL SERVICE account, the owner.">
-          <trustee_sid datatype="string">S-1-5-19</trustee_sid>
+        </objects><states><fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000011" version="1" comment="Event Log process account. Deterministically built with respect to service name.">
+          <trustee_sid datatype="string">S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122</trustee_sid>
         </fileeffectiverights53_state>
         <fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000013" version="1" comment="Administrators account.">
           <trustee_sid datatype="string">S-1-5-32-544</trustee_sid>
@@ -92,8 +89,11 @@
         <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000016" version="1" comment="%SystemRoot% environment variable.">
           <value datatype="string" operation="pattern match">^(?i)%SystemRoot%.*$</value>
         </registry_state>
-        <fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000011" version="1" comment="Event Log process account. Deterministically built with respect to service name.">
-          <trustee_sid datatype="string">S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122</trustee_sid>
+        <fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000012" version="1" comment="SYSTEM account.">
+          <trustee_sid datatype="string">S-1-5-18</trustee_sid>
+        </fileeffectiverights53_state>
+        <fileeffectiverights53_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000014" version="1" comment="LOCAL SERVICE account, the owner.">
+          <trustee_sid datatype="string">S-1-5-19</trustee_sid>
         </fileeffectiverights53_state>
         </states><variables><local_variable id="oval:mil.disa.stig.win:var:25334001" version="1" datatype="string" comment="Path to Application.evtx with the SystemRoot environment variable replaced with its value.">
           <concat>

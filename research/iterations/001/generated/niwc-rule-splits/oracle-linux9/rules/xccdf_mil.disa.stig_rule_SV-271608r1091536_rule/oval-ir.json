@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "sssd config: certificate_verification: ocsp_dgst=sha512",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25812300"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258123",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must implement certificate status checking for multifactor authentication."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258123",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "sssd config: certificate_verification: ocsp_dgst=sha512",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25812300"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258123",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must implement certificate status checking for multifactor authentication."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:258123",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:25812300"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.ol9os:def:271608",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:258123"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:258123",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:25812300"
     },
     {
       "attribute": "object_ref",
@@ -224,29 +224,46 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25812300"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25812301"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
+          "attributes": {
+            "datatype": "string"
           },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/sssd/conf.d"
+        },
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^[^.].*\\.conf$"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*certificate_verification\\s*=\\s*(.*)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
         }
       ],
-      "comment": "sssd config: certificate_verification",
-      "id": "oval:mil.disa.stig.ind:obj:25812302",
+      "comment": "/etc/sssd/conf.d/*.conf: certificate_verification",
+      "id": "oval:mil.disa.stig.ind:obj:25812301",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -291,46 +308,29 @@
     {
       "children": [
         {
-          "attributes": {
-            "datatype": "string"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25812300"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25812301"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
           },
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/sssd/conf.d"
-        },
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[^.].*\\.conf$"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*certificate_verification\\s*=\\s*(.*)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
-      "comment": "/etc/sssd/conf.d/*.conf: certificate_verification",
-      "id": "oval:mil.disa.stig.ind:obj:25812301",
+      "comment": "sssd config: certificate_verification",
+      "id": "oval:mil.disa.stig.ind:obj:25812302",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -362,12 +362,12 @@
       "oval:mil.disa.stig.defs:def:258123"
     ]
   },
-  "semantic_ir_sha256": "907724a8a36b5ad0de5b15ed0118b066254e29f938cc6fdc1dc8db25647dd96d",
+  "semantic_ir_sha256": "077b651f87f6f44bc5e888fc52b3f42542371dc73a824e81a525c5e7fa272dce",
   "source": {
     "bytes": 4872,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271608r1091536_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271608r1091536_rule/provenance.json",
-    "sha256": "0dc1872c16ea94aa5a267d238f6c53a8409def94fed1f438d701d705390d11be"
+    "sha256": "3ba486c9d7d066de8a0593d67529eed26d60498cf0faf554830156ac94c46219"
   },
   "states": [
     {

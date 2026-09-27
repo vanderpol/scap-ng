@@ -4,17 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:230301" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must prevent special devices on non-root local partitions.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.linux:tst:23030100"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23030101"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:257881" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257881" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-231200 - RHEL 9 must prevent special devices on non-root local partitions.</title>
             <affected family="unix">
@@ -28,6 +18,16 @@ The only legitimate location for device files is the "/dev" directory located on
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230301"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230301" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must prevent special devices on non-root local partitions.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.linux:tst:23030100"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23030101"/>
+          </criteria>
+        </definition>
         </definitions><tests><partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23030100" version="3" check_existence="any_exist" check="all" comment="Device files are mounted with the nodev option.  Mounts on '/' are ignored.">
           <object object_ref="oval:mil.disa.stig.linux:obj:23030100"/>
           <state state_ref="oval:mil.disa.stig.linux:ste:20000001"/>
@@ -36,22 +36,22 @@ The only legitimate location for device files is the "/dev" directory located on
           <object object_ref="oval:mil.disa.stig.ind:obj:23030101"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23030100"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23030101" version="3">
+        </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23030100" version="3">
+          <mount_point operation="pattern match">^/\S+$</mount_point>
+          <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.linux:ste:23030102</filter>
+        </partition_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23030101" version="3">
           <filepath>/etc/fstab</filepath>
           <pattern operation="pattern match">^\s*/dev\S*\s+/\S+\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23030100" version="3">
-          <mount_point operation="pattern match">^/\S+$</mount_point>
-          <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.linux:ste:23030102</filter>
-        </partition_object>
-        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23030100" version="1">
-          <subexpression operation="pattern match">(?:^nodev$|^nodev,|,nodev$|,nodev,)</subexpression>
-        </textfilecontent54_state>
-        <partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
+        </objects><states><partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
           <mount_options entity_check="at least one">nodev</mount_options>
         </partition_state>
         <partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:23030102" version="1">
           <device operation="pattern match">^/dev\S*$</device>
         </partition_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23030100" version="1">
+          <subexpression operation="pattern match">(?:^nodev$|^nodev,|,nodev$|,nodev,)</subexpression>
+        </textfilecontent54_state>
         </states></oval_definitions>

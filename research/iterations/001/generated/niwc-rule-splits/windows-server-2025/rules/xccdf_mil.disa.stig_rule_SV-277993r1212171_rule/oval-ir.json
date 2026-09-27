@@ -5,53 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "TPM is enabled",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25325500"
-          },
-          {
-            "comment": "TPM is activated",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25325501"
-          },
-          {
-            "comment": "TPM is owned",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25325502"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:253255",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Windows domain-joined systems must have a Trusted Platform Module (TPM) enabled."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:253255",
             "kind": "definition_ref",
@@ -96,9 +49,63 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "TPM is enabled",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25325500"
+          },
+          {
+            "comment": "TPM is activated",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25325501"
+          },
+          {
+            "comment": "TPM is owned",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25325502"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:253255",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Windows domain-joined systems must have a Trusted Platform Module (TPM) enabled."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows2025:def:277993",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253255"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -119,13 +126,6 @@
       "from": "oval:mil.disa.stig.defs:def:253255",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.win:tst:25325502"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows2025:def:277993",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253255"
     },
     {
       "attribute": "object_ref",
@@ -306,11 +306,11 @@
           "kind": "element",
           "name": "wql",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SELECT IsEnabled_InitialValue FROM Win32_Tpm"
+          "value": "SELECT IsActivated_InitialValue FROM Win32_Tpm"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:25325500",
+      "id": "oval:mil.disa.stig.win:obj:25325501",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "wmi57_object",
       "version": "1"
@@ -327,11 +327,11 @@
           "kind": "element",
           "name": "wql",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SELECT IsActivated_InitialValue FROM Win32_Tpm"
+          "value": "SELECT IsEnabled_InitialValue FROM Win32_Tpm"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:25325501",
+      "id": "oval:mil.disa.stig.win:obj:25325500",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "wmi57_object",
       "version": "1"
@@ -378,44 +378,14 @@
       "oval:mil.disa.stig.defs:def:253255"
     ]
   },
-  "semantic_ir_sha256": "410b585a3f078dedd521331a2525f5c0fdcdf3718f0b696f497332b4d0ccdfde",
+  "semantic_ir_sha256": "78c9e930215d4e4f4462b0dc979969618d84521c311a138a1a79e35279284dd9",
   "source": {
     "bytes": 6541,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-277993r1212171_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-277993r1212171_rule/provenance.json",
-    "sha256": "91c731b0756e75dae79016a0954a54c6dc50a7336882ac9f7c92df968bbe0442"
+    "sha256": "f2f19f6464eb304aa91e15de5fdf515825388103212b0035b818efecbfe581b4"
   },
   "states": [
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "record",
-            "operation": "equals"
-          },
-          "children": [
-            {
-              "attributes": {
-                "name": "isactivated_initialvalue"
-              },
-              "kind": "element",
-              "name": "field",
-              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-              "value": "-1"
-            }
-          ],
-          "kind": "element",
-          "name": "result",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:25325504",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "wmi57_state",
-      "version": "1"
-    },
     {
       "comment": null,
       "entities": [
@@ -441,6 +411,66 @@
         }
       ],
       "id": "oval:mil.disa.stig.win:ste:25325500",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "wmi57_state",
+      "version": "2"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "record",
+            "operation": "equals"
+          },
+          "children": [
+            {
+              "attributes": {
+                "name": "isowned_initialvalue"
+              },
+              "kind": "element",
+              "name": "field",
+              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+              "value": "-1"
+            }
+          ],
+          "kind": "element",
+          "name": "result",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:25325505",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "wmi57_state",
+      "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "record",
+            "operation": "equals"
+          },
+          "children": [
+            {
+              "attributes": {
+                "name": "isactivated_initialvalue"
+              },
+              "kind": "element",
+              "name": "field",
+              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+              "value": "1"
+            }
+          ],
+          "kind": "element",
+          "name": "result",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:25325501",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "wmi57_state",
@@ -492,7 +522,7 @@
               "kind": "element",
               "name": "field",
               "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-              "value": "1"
+              "value": "-1"
             }
           ],
           "kind": "element",
@@ -500,11 +530,11 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
         }
       ],
-      "id": "oval:mil.disa.stig.win:ste:25325501",
+      "id": "oval:mil.disa.stig.win:ste:25325504",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "wmi57_state",
-      "version": "2"
+      "version": "1"
     },
     {
       "comment": null,
@@ -531,36 +561,6 @@
         }
       ],
       "id": "oval:mil.disa.stig.win:ste:25325503",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "wmi57_state",
-      "version": "1"
-    },
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "record",
-            "operation": "equals"
-          },
-          "children": [
-            {
-              "attributes": {
-                "name": "isowned_initialvalue"
-              },
-              "kind": "element",
-              "name": "field",
-              "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-              "value": "-1"
-            }
-          ],
-          "kind": "element",
-          "name": "result",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:25325505",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "wmi57_state",

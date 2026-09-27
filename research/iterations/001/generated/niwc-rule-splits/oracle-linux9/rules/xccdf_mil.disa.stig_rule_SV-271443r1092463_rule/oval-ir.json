@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:257804",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.ol9os:def:271443",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "OL09-00-000040 - OL 9 must be configured to disable the Asynchronous Transfer Mode (ATM) kernel module."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Oracle Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Disabling ATM protects the system against exploitation of any flaws in its implementation."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "children": [
               {
                 "comment": "/etc/modprobe.d contains a file that contains 'install atm /bin/false'",
@@ -68,59 +118,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:257804",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.ol9os:def:271443",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "OL09-00-000040 - OL 9 must be configured to disable the Asynchronous Transfer Mode (ATM) kernel module."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Oracle Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Disabling ATM protects the system against exploitation of any flaws in its implementation."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271443",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:257804"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -148,13 +155,6 @@
       "from": "oval:mil.disa.stig.defs:def:257804",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25780401"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271443",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:257804"
     },
     {
       "attribute": "object_ref",
@@ -313,18 +313,9 @@
       "children": [
         {
           "kind": "element",
-          "name": "path",
+          "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/modprobe.d"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": ".*"
+          "value": "/etc/modprobe.conf"
         },
         {
           "attributes": {
@@ -337,8 +328,7 @@
         },
         {
           "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
+            "datatype": "int"
           },
           "kind": "element",
           "name": "instance",
@@ -347,7 +337,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23049401",
+      "id": "oval:mil.disa.stig.ind:obj:25780401",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -389,9 +379,18 @@
       "children": [
         {
           "kind": "element",
-          "name": "filepath",
+          "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/modprobe.conf"
+          "value": "/etc/modprobe.d"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": ".*"
         },
         {
           "attributes": {
@@ -404,7 +403,8 @@
         },
         {
           "attributes": {
-            "datatype": "int"
+            "datatype": "int",
+            "operation": "greater than or equal"
           },
           "kind": "element",
           "name": "instance",
@@ -413,7 +413,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25780401",
+      "id": "oval:mil.disa.stig.ind:obj:23049401",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -453,12 +453,12 @@
       "oval:mil.disa.stig.defs:def:257804"
     ]
   },
-  "semantic_ir_sha256": "e260ddb3622f752cc8945ea12ba465ccaad2d280bcb5d8ce65c56e0c3bd83a62",
+  "semantic_ir_sha256": "4fb73e5abc0c86bd0111fe23c7319da7261a511cf483b146284ae7999eb51fc0",
   "source": {
     "bytes": 5366,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271443r1092463_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271443r1092463_rule/provenance.json",
-    "sha256": "06c59b49034d2ee869d827dbb95cd2f5ecd48770d36723f0aed55216b620e19c"
+    "sha256": "975e8db9ded61249e9ad225bbbb29d1669ec36170bf9d8f0f5ecc2f0b369d47f"
   },
   "states": [],
   "tests": [

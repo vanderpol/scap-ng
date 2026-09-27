@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:257806",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:257806",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-213055 - RHEL 9 must be configured to disable the FireWire kernel module."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Disabling firewire protects the system against exploitation of any flaws in its implementation."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "children": [
               {
                 "comment": "/etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'",
@@ -68,59 +118,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:257806",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:257806",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-213055 - RHEL 9 must be configured to disable the FireWire kernel module."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Disabling firewire protects the system against exploitation of any flaws in its implementation."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257806",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:257806"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -150,11 +157,18 @@
       "to": "oval:mil.disa.stig.ind:tst:25780601"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257806",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:257806"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25780600",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25780600"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:23049901",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:23049901"
     },
     {
       "attribute": "object_ref",
@@ -166,23 +180,9 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25780600",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:25780600"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23049900",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23049900"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23049901",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23049901"
     }
   ],
   "dependency_integrity": {
@@ -367,7 +367,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*install[ \\t]+firewire-core[ \\t]+/bin/false[ \\t]*$"
+          "value": "^[ \\t]*blacklist[ \\t]+firewire-core[ \\t]*$"
         },
         {
           "attributes": {
@@ -380,7 +380,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25780600",
+      "id": "oval:mil.disa.stig.ind:obj:25780601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -400,7 +400,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*blacklist[ \\t]+firewire-core[ \\t]*$"
+          "value": "^[ \\t]*install[ \\t]+firewire-core[ \\t]+/bin/false[ \\t]*$"
         },
         {
           "attributes": {
@@ -413,7 +413,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25780601",
+      "id": "oval:mil.disa.stig.ind:obj:25780600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -453,35 +453,15 @@
       "oval:mil.disa.stig.defs:def:257806"
     ]
   },
-  "semantic_ir_sha256": "e7b1551860cc78ac490b7151bca12bdd66ac62c6cf6f8cf31a84bd7913de3039",
+  "semantic_ir_sha256": "bf3bae1e3c8e3fcc07c2258d984c8e708b5f306ced9e9dec7146f42d40723450",
   "source": {
     "bytes": 5382,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257806r1044859_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257806r1044859_rule/provenance.json",
-    "sha256": "573493c2a996ca9e0ad3d6107f8cf30383a774000642767b650480bb81271e75"
+    "sha256": "0dfcb05804acc98d2e85edf42672894e8a3c6dd93843d4360c97d4b3ef8cf9d6"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "/etc/modprobe.conf contains 'blacklist firewire-core'",
-      "id": "oval:mil.disa.stig.ind:tst:25780601",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25780601"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25780601"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -494,6 +474,46 @@
             "object_ref": "oval:mil.disa.stig.ind:obj:25780600"
           },
           "object_ref": "oval:mil.disa.stig.ind:obj:25780600"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "/etc/modprobe.d contains a file that contains 'blacklist firewire-core'",
+      "id": "oval:mil.disa.stig.ind:tst:23049901",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:23049901"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:23049901"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "/etc/modprobe.conf contains 'blacklist firewire-core'",
+      "id": "oval:mil.disa.stig.ind:tst:25780601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25780601"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25780601"
         }
       ],
       "other": [],
@@ -521,26 +541,6 @@
       "states": [],
       "type": "textfilecontent54_test",
       "version": "2"
-    },
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "/etc/modprobe.d contains a file that contains 'blacklist firewire-core'",
-      "id": "oval:mil.disa.stig.ind:tst:23049901",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23049901"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23049901"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "1"
     }
   ],
   "unresolved_references": [],

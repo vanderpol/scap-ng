@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "selinux is active",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23024000"
-          },
-          {
-            "comment": "/etc/selinux/config: SELINUXTYPE=targeted",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23028200"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230282",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must enable the SELinux targeted policy."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230282",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "selinux is active",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23024000"
+          },
+          {
+            "comment": "/etc/selinux/config: SELINUXTYPE=targeted",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23028200"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230282",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must enable the SELinux targeted policy."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271453",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230282"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -106,13 +113,6 @@
       "from": "oval:mil.disa.stig.defs:def:230282",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.linux:tst:23024000"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271453",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230282"
     },
     {
       "attribute": "object_ref",
@@ -236,6 +236,21 @@
       "children": [
         {
           "kind": "element",
+          "name": "mount_point",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "/sys/fs/selinux"
+        }
+      ],
+      "comment": "/sys/fs/selinux",
+      "id": "oval:mil.disa.stig.linux:obj:23024000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "partition_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/selinux/config"
@@ -264,21 +279,6 @@
       "id": "oval:mil.disa.stig.ind:obj:23028200",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "mount_point",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "/sys/fs/selinux"
-        }
-      ],
-      "comment": "/sys/fs/selinux",
-      "id": "oval:mil.disa.stig.linux:obj:23024000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "partition_object",
       "version": "1"
     }
   ],
@@ -310,30 +310,14 @@
       "oval:mil.disa.stig.defs:def:230282"
     ]
   },
-  "semantic_ir_sha256": "61f2878ef080c56c9c1fb573cb3d791072cec3886d3594c36be399bb0ed754b9",
+  "semantic_ir_sha256": "57c477a2f3fe50624b094138a1665c4b89776039f1566909f568a6a69c04b47b",
   "source": {
     "bytes": 4007,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271453r1091071_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271453r1091071_rule/provenance.json",
-    "sha256": "f38ea1546a03afb773b66fddffa6bc99b4beeb2b2a8cdf2ca6c8bbec116c8d1b"
+    "sha256": "986637cc7604eb418750c9f719551e3bb80f947bc5c58ae3b79011da8dd12319"
   },
   "states": [
-    {
-      "comment": null,
-      "entities": [
-        {
-          "kind": "element",
-          "name": "fs_type",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "selinuxfs"
-        }
-      ],
-      "id": "oval:mil.disa.stig.linux:ste:23024000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "operator": "AND",
-      "type": "partition_state",
-      "version": "2"
-    },
     {
       "comment": null,
       "entities": [
@@ -349,6 +333,22 @@
       "operator": "AND",
       "type": "textfilecontent54_state",
       "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "kind": "element",
+          "name": "fs_type",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "selinuxfs"
+        }
+      ],
+      "id": "oval:mil.disa.stig.linux:ste:23024000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "operator": "AND",
+      "type": "partition_state",
+      "version": "2"
     }
   ],
   "tests": [

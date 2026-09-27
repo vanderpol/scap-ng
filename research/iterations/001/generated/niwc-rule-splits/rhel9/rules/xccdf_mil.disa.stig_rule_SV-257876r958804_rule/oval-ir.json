@@ -6,47 +6,6 @@
         "children": [
           {
             "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23052000"
-          },
-          {
-            "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23052001"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230520",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must mount /var/tmp with the nodev option."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230520",
             "kind": "definition_ref",
             "negate": false
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23052000"
+          },
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23052001"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230520",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must mount /var/tmp with the nodev option."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257876",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230520"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,18 @@
       "to": "oval:mil.disa.stig.linux:tst:23052000"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257876",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230520"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.linux:tst:23052000",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.linux:obj:23052000"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.linux:tst:23052000",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.linux:ste:20000001"
     },
     {
       "attribute": "object_ref",
@@ -127,20 +141,6 @@
       "from": "oval:mil.disa.stig.ind:tst:23052001",
       "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:23052000"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.linux:tst:23052000",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.linux:obj:23052000"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.linux:tst:23052000",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.linux:ste:20000001"
     }
   ],
   "dependency_integrity": {
@@ -238,6 +238,21 @@
       "children": [
         {
           "kind": "element",
+          "name": "mount_point",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+          "value": "/var/tmp"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.linux:obj:23052000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "partition_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/fstab"
@@ -265,21 +280,6 @@
       "id": "oval:mil.disa.stig.ind:obj:23052001",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "mount_point",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-          "value": "/var/tmp"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23052000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "partition_object",
       "version": "1"
     }
   ],
@@ -311,33 +311,14 @@
       "oval:mil.disa.stig.defs:def:230520"
     ]
   },
-  "semantic_ir_sha256": "ee7b64ec6bc323f3d26e40e8ab307a47a9a74441a508ad626b202197d61bf797",
+  "semantic_ir_sha256": "ad3e17e2921fbd59c79a91a751520e23f07ffb7d6cedecff7e40fb258ef9f1e9",
   "source": {
     "bytes": 4018,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257876r958804_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257876r958804_rule/provenance.json",
-    "sha256": "cca8703b577878db772f45176ea653e30e671fe3153523c4cff684d74ca8bd1c"
+    "sha256": "28dd4cdb024f08625e28569cf26f108dc45fc7e2799d703183dd90cb4fc0ab03"
   },
   "states": [
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "subexpression",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "(?:^nodev$|^nodev,|,nodev$|,nodev,)"
-        }
-      ],
-      "id": "oval:mil.disa.stig.ind:ste:23052000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "textfilecontent54_state",
-      "version": "1"
-    },
     {
       "comment": null,
       "entities": [
@@ -356,36 +337,28 @@
       "operator": "AND",
       "type": "partition_state",
       "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "subexpression",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "(?:^nodev$|^nodev,|,nodev$|,nodev,)"
+        }
+      ],
+      "id": "oval:mil.disa.stig.ind:ste:23052000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "textfilecontent54_state",
+      "version": "1"
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "any_exist",
-      "comment": "If /var/tmp is configured in /etc/fstab, it is configured with the nodev option",
-      "id": "oval:mil.disa.stig.ind:tst:23052001",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23052001"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23052001"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.ind:ste:23052000"
-          },
-          "state_ref": "oval:mil.disa.stig.ind:ste:23052000"
-        }
-      ],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "all",
       "check_existence": "any_exist",
@@ -411,6 +384,33 @@
         }
       ],
       "type": "partition_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "any_exist",
+      "comment": "If /var/tmp is configured in /etc/fstab, it is configured with the nodev option",
+      "id": "oval:mil.disa.stig.ind:tst:23052001",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:23052001"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:23052001"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.ind:ste:23052000"
+          },
+          "state_ref": "oval:mil.disa.stig.ind:ste:23052000"
+        }
+      ],
+      "type": "textfilecontent54_test",
       "version": "1"
     }
   ],

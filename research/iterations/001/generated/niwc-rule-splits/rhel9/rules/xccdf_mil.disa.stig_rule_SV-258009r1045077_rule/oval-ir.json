@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:258009",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:258009",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-255165 - RHEL 9 SSH daemon must display the date and time of the last successful account logon upon an SSH logon."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Providing users feedback on when account accesses last occurred facilitates user recognition and reporting of unauthorized account use."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "children": [
               {
                 "comment": "sshd_config includes sshd_config.d",
@@ -54,59 +104,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:258009",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:258009",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-255165 - RHEL 9 SSH daemon must display the date and time of the last successful account logon upon an SSH logon."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Providing users feedback on when account accesses last occurred facilitates user recognition and reporting of unauthorized account use."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258009",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258009"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -127,13 +134,6 @@
       "from": "oval:mil.disa.stig.defs:def:258009",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25800900"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258009",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258009"
     },
     {
       "attribute": "object_ref",
@@ -281,6 +281,51 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
         },
         {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*include\\s+(.*)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "sshd_config includes",
+      "id": "oval:mil.disa.stig.ind:obj:25798800",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "ignore_case": "true"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
           "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -354,51 +399,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "ignore_case": "true"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*include\\s+(.*)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "sshd_config includes",
-      "id": "oval:mil.disa.stig.ind:obj:25798800",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -435,12 +435,12 @@
       "oval:mil.disa.stig.defs:def:258009"
     ]
   },
-  "semantic_ir_sha256": "01015dfcf693916e386147377b1ec989351ecd3f8d74099d609b2ce8a51e1e8e",
+  "semantic_ir_sha256": "376f7c8efd18af79445ca0b16dc3d71e5a78961864446fb83395400201b1631d",
   "source": {
     "bytes": 5441,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258009r1045077_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258009r1045077_rule/provenance.json",
-    "sha256": "19fe90fe4d85d0be3f4348085bd3cfae82c690d9dab0abf1594932720b20f474"
+    "sha256": "317f24bc097d4363232fdaeeda8c7d9c10697a83d3ff9149adc5d15edf16af7b"
   },
   "states": [
     {

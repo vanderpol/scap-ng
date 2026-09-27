@@ -15,11 +15,7 @@
             <criterion comment="Permissions must conform to minimum requirements for Program Files (x86) directory." test_ref="oval:navy.navwar.niwcatlantic.scc.windows:tst:27799903"/>
           </criteria>
         </definition>
-        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27799903" version="1" comment="Program Files (x86) directory permissions must conform to minimum requirements." check_existence="at_least_one_exists" check="all">
-          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27799903"/>
-          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902"/>
-        </independent-def:shellcommand_test>
-        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27799902" version="1" comment="Program Files directory permissions must conform to minimum requirements." check_existence="at_least_one_exists" check="all">
+        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27799902" version="1" comment="Program Files directory permissions must conform to minimum requirements." check_existence="at_least_one_exists" check="all">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902"/>
         </independent-def:shellcommand_test>
@@ -27,29 +23,33 @@
           <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27799901"/>
           <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901"/>
         </win-def:registry_test>
+        <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27799903" version="1" comment="Program Files (x86) directory permissions must conform to minimum requirements." check_existence="at_least_one_exists" check="all">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27799903"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902"/>
+        </independent-def:shellcommand_test>
         </tests><objects><win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27799901" version="1" comment="everyoneincludesanonymous must be configured">
           <win-def:hive>HKEY_LOCAL_MACHINE</win-def:hive>
           <win-def:key>SYSTEM\CurrentControlSet\Control\Lsa</win-def:key>
           <win-def:name>everyoneincludesanonymous</win-def:name>
         </win-def:registry_object>
-        <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27799903" version="1" comment="Run Icacls command against Program Files (x86) directory">
-          <independent-def:shell>powershell</independent-def:shell>
-          <independent-def:command>icacls (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion" -Name 'ProgramFilesDir (x86)').'ProgramFilesDir (x86)'</independent-def:command>
-          <independent-def:pattern>:</independent-def:pattern>
-        </independent-def:shellcommand_object>
         <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902" version="1" comment="Run Icacls command against Program Files directory">
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command>icacls (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion" -Name ProgramFilesDir).ProgramFilesDir</independent-def:command>
           <independent-def:pattern>:</independent-def:pattern>
         </independent-def:shellcommand_object>
-        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902" version="1" comment="Permissions must equal expected output">
+        <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27799903" version="1" comment="Run Icacls command against Program Files (x86) directory">
+          <independent-def:shell>powershell</independent-def:shell>
+          <independent-def:command>icacls (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion" -Name 'ProgramFilesDir (x86)').'ProgramFilesDir (x86)'</independent-def:command>
+          <independent-def:pattern>:</independent-def:pattern>
+        </independent-def:shellcommand_object>
+        </objects><states><win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901" version="1" comment="Value must be equal to 0">
+          <win-def:value datatype="int" operation="equals">0</win-def:value>
+        </win-def:registry_state>
+        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902" version="1" comment="Permissions must equal expected output">
           <independent-def:exit_status datatype="int">0</independent-def:exit_status>
           <independent-def:stdout_line var_check="at least one" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27799901"/>
           <independent-def:stderr_line check_existence="none_exist"/>
         </independent-def:shellcommand_state>
-        <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901" version="1" comment="Value must be equal to 0">
-          <win-def:value datatype="int" operation="equals">0</win-def:value>
-        </win-def:registry_state>
         </states><variables><constant_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27799901" version="1" datatype="string" comment="Required Permissions">
           <value>(?i)NT SERVICE\\TrustedInstaller:\(F\)</value>
           <value>(?i)NT SERVICE\\TrustedInstaller:\(CI\)\(IO\)\(F\)</value>

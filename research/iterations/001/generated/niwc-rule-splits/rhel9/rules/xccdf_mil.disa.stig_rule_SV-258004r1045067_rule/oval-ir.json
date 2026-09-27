@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:258004",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:258004",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-255140 - RHEL 9 SSH daemon must not allow Kerberos authentication."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Kerberos authentication for SSH is often implemented using Generic Security Service Application Program Interface (GSSAPI). If Kerberos is enabled through SSH, the SSH daemon provides a means of access to the system's Kerberos implementation. Vulnerabilities in the system's Kerberos implementations may be subject to exploitation.\n\nSatisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00227"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "children": [
               {
                 "comment": "/etc/ssh/sshd_config:KerberosAuthentication == no",
@@ -68,59 +118,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "5"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:258004",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:258004",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-255140 - RHEL 9 SSH daemon must not allow Kerberos authentication."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Kerberos authentication for SSH is often implemented using Generic Security Service Application Program Interface (GSSAPI). If Kerberos is enabled through SSH, the SSH daemon provides a means of access to the system's Kerberos implementation. Vulnerabilities in the system's Kerberos implementations may be subject to exploitation.\n\nSatisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00227"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258004",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258004"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -143,11 +150,18 @@
       "to": "oval:mil.disa.stig.ind:tst:25800401"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258004",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258004"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25800400",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25800401"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.ind:tst:25800400",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.ind:ste:20000017"
     },
     {
       "attribute": "object_ref",
@@ -160,20 +174,6 @@
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:25800401",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.ind:ste:20000017"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25800400",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:25800401"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.ind:tst:25800400",
       "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:20000017"
     },
@@ -310,113 +310,6 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config.d"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^.*\\.conf$"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*(?i)KerberosAuthentication(?-i)\\s+(\"?\\w+\"?)\\s*(?:|(?:#.*))?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25800400",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*(?i)KerberosAuthentication(?-i)\\s+(\"?\\w+\"?)\\s*(?:|(?:#.*))?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25800402",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25800402"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25800400"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25800401",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
           "attributes": {
             "ignore_case": "true"
           },
@@ -458,6 +351,113 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25800402"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25800400"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:25800401",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*(?i)KerberosAuthentication(?-i)\\s+(\"?\\w+\"?)\\s*(?:|(?:#.*))?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:25800402",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config.d"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^.*\\.conf$"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*(?i)KerberosAuthentication(?-i)\\s+(\"?\\w+\"?)\\s*(?:|(?:#.*))?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:25800400",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
     }
   ],
   "parser_contract": {
@@ -498,12 +498,12 @@
       "oval:mil.disa.stig.defs:def:258004"
     ]
   },
-  "semantic_ir_sha256": "4f31a98ab3dd2e85e3d81d5592e38b9e875d1144b2d7d544f5eaf7b4994880fb",
+  "semantic_ir_sha256": "a6f83a6a9e8554df58bc7a8c4ee83a2190612396f66c4dee50a6fc8800251074",
   "source": {
     "bytes": 6402,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258004r1045067_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258004r1045067_rule/provenance.json",
-    "sha256": "fc5762ca4e091ab834b3aed3bcab35a78eab9395c2d5c02447d3faf61a20ffa4"
+    "sha256": "d404cc5f9edaecf7a2bda42cbd3ca8359682076d816503e18eb54ae49bbff814"
   },
   "states": [
     {
@@ -550,16 +550,16 @@
   "tests": [
     {
       "check": "all",
-      "check_existence": "all_exist",
-      "comment": "/etc/ssh/sshd_config:KerberosAuthentication == no",
-      "id": "oval:mil.disa.stig.ind:tst:25800401",
+      "check_existence": "at_least_one_exists",
+      "comment": "/etc/ssh/sshd_config + sshd_config.d:KerberosAuthentication == no",
+      "id": "oval:mil.disa.stig.ind:tst:25800400",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25800402"
+            "object_ref": "oval:mil.disa.stig.ind:obj:25800401"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25800402"
+          "object_ref": "oval:mil.disa.stig.ind:obj:25800401"
         }
       ],
       "other": [],
@@ -577,16 +577,16 @@
     },
     {
       "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "/etc/ssh/sshd_config + sshd_config.d:KerberosAuthentication == no",
-      "id": "oval:mil.disa.stig.ind:tst:25800400",
+      "check_existence": "all_exist",
+      "comment": "/etc/ssh/sshd_config:KerberosAuthentication == no",
+      "id": "oval:mil.disa.stig.ind:tst:25800401",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25800401"
+            "object_ref": "oval:mil.disa.stig.ind:obj:25800402"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25800401"
+          "object_ref": "oval:mil.disa.stig.ind:obj:25800402"
         }
       ],
       "other": [],
