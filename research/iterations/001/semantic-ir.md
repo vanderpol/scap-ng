@@ -105,9 +105,11 @@ The vendored OVAL 5.12.3 schema defines the following component/function set:
 - `time_difference`
 - `unique`
 
-The static evaluator currently resolves literal values, constant variables, variable references, `concat`, and `unique` when their inputs are static.
+The static evaluator currently resolves literal values, constant variables, variable references, `concat`, `unique`, `count`, `split`, `substring`, `begin`, `end`, `escape_regex`, and `arithmetic` when their inputs are target-independent.
 
-The four priority benchmarks additionally exercise dynamic/unsupported cases involving `object_component`, `arithmetic`, `count`, `merge`, `regex_capture`, `split`, and `substring`. These remain explicit IR nodes and form a concrete implementation backlog rather than being silently flattened.
+Target-dependent variables are not flattened to a generic unresolved marker. Each variable now has an explicit evaluation plan. Static plans carry exact values, external-input plans carry typed inputs, and target-dependent plans preserve the complete expression AST plus referenced objects, variables, and function operations.
+
+In the four priority benchmarks, the remaining non-static cases are rooted in `object_component` collection from the target. Function chains above those collections include `concat`, `arithmetic`, `count`, `merge`, `regex_capture`, `split`, and `substring`. These are therefore a native runtime/lowering problem rather than a parser-loss problem.
 
 ### Faithful normalization versus policy review
 
