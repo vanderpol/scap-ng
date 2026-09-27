@@ -9,18 +9,22 @@ Each pair includes:
 - automation source where applicable;
 - complete policy-only manual scan results;
 - complete automated/mixed-method scan results;
-- an actual resolved automated `.scapng` ZIP-compatible bundle;
-- benchmark/profile, individual rule or policy objects, assessment/binding objects where applicable, provenance, a member-hash manifest, and a prototype digital signature inside the bundle.
+- actual policy-only and resolved automated `.scapng` ZIP-compatible bundles;
+- benchmark/profile, individual rule or policy objects, assessment/binding objects where applicable, provenance, a member-hash manifest, and a prototype digital signature inside each bundle.
 
-The build tool in `research/iterations/001/tools/build_full_benchmarks.py` can also emit policy-only bundles from the committed policy sources. The four committed binary bundles are the scanner-facing automated examples used for architecture comparison.
+All eight bundles are generated from the committed source by `research/iterations/001/tools/build_full_benchmarks.py` and verified by `tools/verify_scapng_prototype_bundle.py`. The GitHub Actions workflow `.github/workflows/build-scapng-iteration001.yml` rebuilds and verifies them so binary artifacts remain reproducible from source.
 
 The same logical policy and automated outcomes are used in both architecture tracks so the comparison tests organization and lifecycle behavior rather than different security semantics.
 
-## Committed scanner-facing bundles
+## Committed bundles
 
+- combined-rule / Windows policy-only
 - combined-rule / Windows automated
+- combined-rule / Linux policy-only
 - combined-rule / Linux automated
+- split-policy-assessment-binding / Windows policy-only
 - split-policy-assessment-binding / Windows automated
+- split-policy-assessment-binding / Linux policy-only
 - split-policy-assessment-binding / Linux automated
 
 All content is illustrative. It is not an official DISA baseline. The prototype signatures use a public RFC 8032 Ed25519 test key and demonstrate package integrity/signature mechanics only; they provide no publisher trust.
