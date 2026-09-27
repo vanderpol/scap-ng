@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257869" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:257869" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must mount /var with the nodev option.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.linux:tst:25786900"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25786900"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257869" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-231140 - RHEL 9 must mount /var with the nodev option.</title>
             <affected family="unix">
@@ -18,36 +28,26 @@ The only legitimate location for device files is the "/dev" directory located on
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257869"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:257869" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must mount /var with the nodev option.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.linux:tst:25786900"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25786900"/>
-          </criteria>
-        </definition>
-        </definitions><tests><partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:25786900" version="1" check="all" comment="/var is mounted with the nodev option.">
-          <object object_ref="oval:mil.disa.stig.linux:obj:23029200"/>
-          <state state_ref="oval:mil.disa.stig.linux:ste:20000001"/>
-        </partition_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25786900" version="1" check="all" comment="/var is configured in /etc/fstab with the nodev option.">
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25786900" version="1" check="all" comment="/var is configured in /etc/fstab with the nodev option.">
           <object object_ref="oval:mil.disa.stig.ind:obj:25786900"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25785400"/>
         </textfilecontent54_test>
-        </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23029200" version="1">
-          <mount_point>/var</mount_point>
-        </partition_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25786900" version="1">
+        <partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:25786900" version="1" check="all" comment="/var is mounted with the nodev option.">
+          <object object_ref="oval:mil.disa.stig.linux:obj:23029200"/>
+          <state state_ref="oval:mil.disa.stig.linux:ste:20000001"/>
+        </partition_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25786900" version="1">
           <filepath>/etc/fstab</filepath>
           <pattern operation="pattern match">^\s*[^#\s]+\s+/var\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25785400" version="1" comment="nodev option">
-          <subexpression datatype="string" operation="pattern match">(^|,)nodev(,|$)</subexpression>
-        </textfilecontent54_state>
-        <partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
+        <partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23029200" version="1">
+          <mount_point>/var</mount_point>
+        </partition_object>
+        </objects><states><partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
           <mount_options entity_check="at least one">nodev</mount_options>
         </partition_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25785400" version="1" comment="nodev option">
+          <subexpression datatype="string" operation="pattern match">(^|,)nodev(,|$)</subexpression>
+        </textfilecontent54_state>
         </states></oval_definitions>

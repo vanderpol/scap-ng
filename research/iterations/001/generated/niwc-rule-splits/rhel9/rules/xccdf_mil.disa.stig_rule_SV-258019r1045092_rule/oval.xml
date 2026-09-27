@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:230351" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23035100" comment="/proc/sys/crypto/fips_enabled is set to 1"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:258019" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258019" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-271045 - RHEL 9 must be able to initiate directly a session lock for all connection types using smart card when the smart card is removed.</title>
             <affected family="unix">
@@ -29,28 +20,37 @@ Satisfies: SRG-OS-000028-GPOS-00009, SRG-OS-000030-GPOS-00011</description>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230351"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230351" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23035100" comment="/proc/sys/crypto/fips_enabled is set to 1"/>
+          </criteria>
+        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23035100" version="2" check_existence="at_least_one_exists" check="at least one" comment="dconf smartcard removal-action lock-screen">
           <object object_ref="oval:mil.disa.stig.ind:obj:23035100"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23035100"/>
         </textfilecontent54_test>
-        </tests><objects><file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23035100" version="2" comment="dconf database directories">
-          <behaviors max_depth="1" recurse_direction="down"/>
-          <path>/etc/dconf/db</path>
-          <filename xsi:nil="true"/>
-          <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.unix:ste:23035100</filter>
-        </file_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23035100" version="4" comment="dconf org/gnome/settings-daemon/peripherals/smartcard sections">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23035100" version="4" comment="dconf org/gnome/settings-daemon/peripherals/smartcard sections">
           <path datatype="string" var_ref="oval:mil.disa.stig.defs:var:23035100" var_check="at least one"/>
           <filename datatype="string" operation="pattern match">.*</filename>
           <pattern operation="pattern match">^\[org/gnome/settings-daemon/peripherals/smartcard](?:\r?\n(?:[^[\r\n].*)?)*</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23035100" version="1">
-          <text datatype="string" operation="pattern match">\nremoval-action='lock-screen'\s*(\n|$)</text>
-        </textfilecontent54_state>
-        <file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23035100" version="1" comment="dconf database directories">
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23035100" version="2" comment="dconf database directories">
+          <behaviors max_depth="1" recurse_direction="down"/>
+          <path>/etc/dconf/db</path>
+          <filename xsi:nil="true"/>
+          <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.unix:ste:23035100</filter>
+        </file_object>
+        </objects><states><file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23035100" version="1" comment="dconf database directories">
           <path operation="pattern match">^/etc/dconf/db/.*\.d$</path>
         </file_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23035100" version="1">
+          <text datatype="string" operation="pattern match">\nremoval-action='lock-screen'\s*(\n|$)</text>
+        </textfilecontent54_state>
         </states><variables><local_variable id="oval:mil.disa.stig.defs:var:23035100" version="1" datatype="string" comment="dconf database directories">
           <object_component object_ref="oval:mil.disa.stig.unix:obj:23035100" item_field="path"/>
         </local_variable>

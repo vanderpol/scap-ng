@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:230363" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must require the change of at least 8 characters when passwords are changed.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23036300" comment="at least 8 characters must change when passwords are changed"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:258112" version="4" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258112" version="4" class="compliance">
           <metadata>
             <title>RHEL-09-611115 - RHEL 9 must require the change of at least eight characters when passwords are changed.</title>
             <affected family="unix">
@@ -27,14 +18,24 @@ Password complexity is one factor of several that determines how long it takes t
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230363"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230363" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must require the change of at least 8 characters when passwords are changed.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23036300" comment="at least 8 characters must change when passwords are changed"/>
+          </criteria>
+        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23036300" version="1" check="all" comment="at least 8 characters must change when passwords are changed">
           <object object_ref="oval:mil.disa.stig.ind:obj:23036300"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23036300"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036301" version="2">
-          <filepath>/etc/security/pwquality.conf</filepath>
-          <pattern operation="pattern match">^\s*difok\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036300" version="2">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:23036301</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:23036302</object_reference>
+          </set>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036302" version="2">
           <behaviors recurse_direction="down"/>
@@ -43,11 +44,10 @@ Password complexity is one factor of several that determines how long it takes t
           <pattern operation="pattern match">^\s*difok\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036300" version="2">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:23036301</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:23036302</object_reference>
-          </set>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036301" version="2">
+          <filepath>/etc/security/pwquality.conf</filepath>
+          <pattern operation="pattern match">^\s*difok\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23036300" version="1">
           <subexpression datatype="int" operation="greater than or equal">8</subexpression>

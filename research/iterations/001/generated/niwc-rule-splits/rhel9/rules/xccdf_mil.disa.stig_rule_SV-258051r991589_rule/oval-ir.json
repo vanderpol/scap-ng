@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "Check for local non-system users in /etc/passwd without a home directory defined",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:25805100"
+          },
+          {
+            "comment": "Check /etc/passwd if root has a home directory defined",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:25805101"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258051",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "All the operating system local interactive users must have a home directory assigned in the /etc/passwd file."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258051",
             "kind": "definition_ref",
@@ -49,49 +90,162 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Check for local non-system users in /etc/passwd without a home directory defined",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:25805100"
-          },
-          {
-            "comment": "Check /etc/passwd if root has a home directory defined",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:25805101"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258051",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "All the operating system local interactive users must have a home directory assigned in the /etc/passwd file."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
+  "dependency_edges": [
+    {
+      "attribute": "id",
+      "element": "definition",
+      "from": "oval:mil.disa.stig.defs:def:258051",
+      "kind": "definition:id",
+      "to": "oval:mil.disa.stig.defs:def:258051"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:258051",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.unix:tst:25805100"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:258051",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.unix:tst:25805101"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258051",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258051"
+    },
+    {
+      "attribute": "id",
+      "element": "definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258051",
+      "kind": "definition:id",
+      "to": "oval:mil.disa.stig.rhel9os:def:258051"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.unix:tst:25805101",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.unix:obj:20000018"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.unix:tst:25805101",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.unix:ste:20000016"
+    },
+    {
+      "attribute": "id",
+      "element": "password_test",
+      "from": "oval:mil.disa.stig.unix:tst:25805101",
+      "kind": "password_test:id",
+      "to": "oval:mil.disa.stig.unix:tst:25805101"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.unix:tst:25805100",
+      "kind": "object_reference",
+      "to": "oval:mil.disa.stig.unix:obj:20000017"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.unix:tst:25805100",
+      "kind": "state_reference",
+      "to": "oval:mil.disa.stig.unix:ste:20000016"
+    },
+    {
+      "attribute": "id",
+      "element": "password_test",
+      "from": "oval:mil.disa.stig.unix:tst:25805100",
+      "kind": "password_test:id",
+      "to": "oval:mil.disa.stig.unix:tst:25805100"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.unix:obj:20000018",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.unix:obj:20000016"
+    },
+    {
+      "attribute": "id",
+      "element": "password_object",
+      "from": "oval:mil.disa.stig.unix:obj:20000018",
+      "kind": "password_object:id",
+      "to": "oval:mil.disa.stig.unix:obj:20000018"
+    },
+    {
+      "attribute": null,
+      "element": "filter",
+      "from": "oval:mil.disa.stig.unix:obj:20000018",
+      "kind": "set_filter_state",
+      "to": "oval:mil.disa.stig.unix:ste:20000018"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.unix:obj:20000017",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.unix:obj:20000016"
+    },
+    {
+      "attribute": "id",
+      "element": "password_object",
+      "from": "oval:mil.disa.stig.unix:obj:20000017",
+      "kind": "password_object:id",
+      "to": "oval:mil.disa.stig.unix:obj:20000017"
+    },
+    {
+      "attribute": null,
+      "element": "filter",
+      "from": "oval:mil.disa.stig.unix:obj:20000017",
+      "kind": "set_filter_state",
+      "to": "oval:mil.disa.stig.unix:ste:20000017"
+    },
+    {
+      "attribute": "id",
+      "element": "password_object",
+      "from": "oval:mil.disa.stig.unix:obj:20000016",
+      "kind": "password_object:id",
+      "to": "oval:mil.disa.stig.unix:obj:20000016"
+    },
+    {
+      "attribute": "id",
+      "element": "password_state",
+      "from": "oval:mil.disa.stig.unix:ste:20000017",
+      "kind": "password_state:id",
+      "to": "oval:mil.disa.stig.unix:ste:20000017"
+    },
+    {
+      "attribute": "id",
+      "element": "password_state",
+      "from": "oval:mil.disa.stig.unix:ste:20000018",
+      "kind": "password_state:id",
+      "to": "oval:mil.disa.stig.unix:ste:20000018"
+    },
+    {
+      "attribute": "id",
+      "element": "password_state",
+      "from": "oval:mil.disa.stig.unix:ste:20000016",
+      "kind": "password_state:id",
+      "to": "oval:mil.disa.stig.unix:ste:20000016"
+    }
+  ],
+  "dependency_integrity": {
+    "all_resolved_edge_targets_present": true,
+    "edge_count": 21,
+    "missing_edge_targets": []
+  },
   "features": {
     "attributes": {
       "check": {
@@ -207,25 +361,6 @@
     {
       "children": [
         {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "username",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "[\\w]+"
-        }
-      ],
-      "comment": "Users with an username",
-      "id": "oval:mil.disa.stig.unix:obj:20000016",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "type": "password_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
           "children": [
             {
               "kind": "object_ref",
@@ -243,6 +378,25 @@
       ],
       "comment": "only non-system users (uid>999) home-dirs",
       "id": "oval:mil.disa.stig.unix:obj:20000017",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "type": "password_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "username",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "[\\w]+"
+        }
+      ],
+      "comment": "Users with an username",
+      "id": "oval:mil.disa.stig.unix:obj:20000016",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "type": "password_object",
       "version": "1"
@@ -297,28 +451,29 @@
       "oval:mil.disa.stig.unix:tst:25805101"
     ]
   },
-  "semantic_ir_sha256": "04dc2bf6aaa1454dd3ef61b8fee540492531f3ed7b726f8dbeb2aa13534bca39",
+  "semantic_ir_sha256": "7f7e27062ef9867f4adde9ace72bc67e072c8d649147ea73ce3df18eed81d289",
   "source": {
     "bytes": 4917,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258051r991589_rule/oval.xml",
-    "sha256": "2439652f6d4d28b3125e0a71bef4340b8bd5735d3fb9a7c5d8bc2dc25ffab66b"
+    "sha256": "bf19e65ab22a39177f0b929e91d14d611adf4f983a8a277c19f56ff385cee98e"
   },
   "states": [
     {
-      "comment": "only users with the home directory defined",
+      "comment": "only uids < 1000",
       "entities": [
         {
           "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
+            "datatype": "int",
+            "entity_check": "all",
+            "operation": "less than"
           },
           "kind": "element",
-          "name": "home_dir",
+          "name": "user_id",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": ".+"
+          "value": "1000"
         }
       ],
-      "id": "oval:mil.disa.stig.unix:ste:20000016",
+      "id": "oval:mil.disa.stig.unix:ste:20000017",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "operator": "AND",
       "type": "password_state",
@@ -346,21 +501,20 @@
       "version": "1"
     },
     {
-      "comment": "only uids < 1000",
+      "comment": "only users with the home directory defined",
       "entities": [
         {
           "attributes": {
-            "datatype": "int",
-            "entity_check": "all",
-            "operation": "less than"
+            "datatype": "string",
+            "operation": "pattern match"
           },
           "kind": "element",
-          "name": "user_id",
+          "name": "home_dir",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "1000"
+          "value": ".+"
         }
       ],
-      "id": "oval:mil.disa.stig.unix:ste:20000017",
+      "id": "oval:mil.disa.stig.unix:ste:20000016",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "operator": "AND",
       "type": "password_state",
@@ -371,15 +525,15 @@
     {
       "check": "all",
       "check_existence": "all_exist",
-      "comment": "check for users without a home directory not defined",
-      "id": "oval:mil.disa.stig.unix:tst:25805100",
+      "comment": "check if root's home directory is not defined",
+      "id": "oval:mil.disa.stig.unix:tst:25805101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.unix:obj:20000017"
+            "object_ref": "oval:mil.disa.stig.unix:obj:20000018"
           },
-          "object_ref": "oval:mil.disa.stig.unix:obj:20000017"
+          "object_ref": "oval:mil.disa.stig.unix:obj:20000018"
         }
       ],
       "other": [],
@@ -398,15 +552,15 @@
     {
       "check": "all",
       "check_existence": "all_exist",
-      "comment": "check if root's home directory is not defined",
-      "id": "oval:mil.disa.stig.unix:tst:25805101",
+      "comment": "check for users without a home directory not defined",
+      "id": "oval:mil.disa.stig.unix:tst:25805100",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.unix:obj:20000018"
+            "object_ref": "oval:mil.disa.stig.unix:obj:20000017"
           },
-          "object_ref": "oval:mil.disa.stig.unix:obj:20000018"
+          "object_ref": "oval:mil.disa.stig.unix:obj:20000017"
         }
       ],
       "other": [],

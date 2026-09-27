@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258069" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230346" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must limit the number of concurrent sessions to ten for all accounts and/or account types.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23034600" comment="limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23034601" comment="limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:258069" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-412040 - RHEL 9 must limit the number of concurrent sessions to ten for all accounts and/or account types.</title>
             <affected family="unix">
@@ -18,26 +28,23 @@ This requirement addresses concurrent sessions for information system accounts a
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230346"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:230346" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must limit the number of concurrent sessions to ten for all accounts and/or account types.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23034600" comment="limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23034601" comment="limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains"/>
-          </criteria>
-        </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23034600" version="1" check_existence="at_least_one_exists" check="all" comment="limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default">
-          <object object_ref="oval:mil.disa.stig.ind:obj:23034600"/>
-          <state state_ref="oval:mil.disa.stig.ind:ste:23034600"/>
-        </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23034601" version="1" check_existence="any_exist" check="all" comment="limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains">
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23034601" version="1" check_existence="any_exist" check="all" comment="limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains">
           <object object_ref="oval:mil.disa.stig.ind:obj:23034603"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23034600"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23034604" version="1" comment="non-default maxlogins in /etc/security/limits.conf">
-          <filepath>/etc/security/limits.conf</filepath>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23034600" version="1" check_existence="at_least_one_exists" check="all" comment="limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23034600"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23034600"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23034602" version="1" comment="default maxlogins in /etc/security/limits.d/*.conf">
+          <path>/etc/security/limits.d</path>
+          <filename operation="pattern match">.*\.conf$</filename>
+          <pattern operation="pattern match">^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23034605" version="1" comment="non-default maxlogins in /etc/security/limits.d/*.conf">
+          <path>/etc/security/limits.d</path>
+          <filename operation="pattern match">.*\.conf$</filename>
           <pattern operation="pattern match">^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
@@ -53,20 +60,13 @@ This requirement addresses concurrent sessions for information system accounts a
             <object_reference>oval:mil.disa.stig.ind:obj:23034605</object_reference>
           </set>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23034605" version="1" comment="non-default maxlogins in /etc/security/limits.d/*.conf">
-          <path>/etc/security/limits.d</path>
-          <filename operation="pattern match">.*\.conf$</filename>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23034604" version="1" comment="non-default maxlogins in /etc/security/limits.conf">
+          <filepath>/etc/security/limits.conf</filepath>
           <pattern operation="pattern match">^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23034601" version="1" comment="default maxlogins in /etc/security/limits.conf">
           <filepath>/etc/security/limits.conf</filepath>
-          <pattern operation="pattern match">^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23034602" version="1" comment="default maxlogins in /etc/security/limits.d/*.conf">
-          <path>/etc/security/limits.d</path>
-          <filename operation="pattern match">.*\.conf$</filename>
           <pattern operation="pattern match">^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>

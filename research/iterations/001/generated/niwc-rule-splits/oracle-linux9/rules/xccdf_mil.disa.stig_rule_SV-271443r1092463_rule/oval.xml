@@ -4,7 +4,19 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:257804" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271443" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-000040 - OL 9 must be configured to disable the Asynchronous Transfer Mode (ATM) kernel module.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Disabling ATM protects the system against exploitation of any flaws in its implementation.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257804"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:257804" version="1" class="compliance">
           <metadata>
             <title>The operating system must disable the asynchronous transfer mode (ATM) protocol.</title>
             <description/>
@@ -20,22 +32,7 @@
             </criteria>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.ol9os:def:271443" version="1" class="compliance">
-          <metadata>
-            <title>OL09-00-000040 - OL 9 must be configured to disable the Asynchronous Transfer Mode (ATM) kernel module.</title>
-            <affected family="unix">
-              <platform>Oracle Linux 9</platform>
-            </affected>
-            <description>Disabling ATM protects the system against exploitation of any flaws in its implementation.</description>
-          </metadata>
-          <criteria>
-            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257804"/>
-          </criteria>
-        </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049401" version="1" check="all" comment="/etc/modprobe.d contains a file that contains 'blacklist atm'">
-          <object object_ref="oval:mil.disa.stig.ind:obj:23049401"/>
-        </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25780400" version="2" check="all" comment="/etc/modprobe.conf contains a file that contains 'install atm /bin/false'">
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25780400" version="2" check="all" comment="/etc/modprobe.conf contains a file that contains 'install atm /bin/false'">
           <object object_ref="oval:mil.disa.stig.ind:obj:25780400"/>
         </textfilecontent54_test>
         <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25780401" version="1" check="all" comment="/etc/modprobe.conf contains a file that contains 'blacklist atm'">
@@ -44,9 +41,12 @@
         <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049400" version="2" check="all" comment="/etc/modprobe.d contains a file that contains 'install atm /bin/false'">
           <object object_ref="oval:mil.disa.stig.ind:obj:23049400"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25780401" version="1">
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049401" version="1" check="all" comment="/etc/modprobe.d contains a file that contains 'blacklist atm'">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23049401"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25780400" version="1">
           <filepath>/etc/modprobe.conf</filepath>
-          <pattern operation="pattern match">^[ \t]*blacklist[ \t]+atm[ \t]*$</pattern>
+          <pattern operation="pattern match">^[ \t]*install[ \t]+atm[ \t]+/bin/false[ \t]*$</pattern>
           <instance datatype="int">1</instance>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23049400" version="2">
@@ -55,15 +55,15 @@
           <pattern operation="pattern match">^[ \t]*install[ \t]+atm[ \t]+/bin/false[ \t]*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25780401" version="1">
+          <filepath>/etc/modprobe.conf</filepath>
+          <pattern operation="pattern match">^[ \t]*blacklist[ \t]+atm[ \t]*$</pattern>
+          <instance datatype="int">1</instance>
+        </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23049401" version="1">
           <path>/etc/modprobe.d</path>
           <filename operation="pattern match">.*</filename>
           <pattern operation="pattern match">^[ \t]*blacklist[ \t]+atm[ \t]*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25780400" version="1">
-          <filepath>/etc/modprobe.conf</filepath>
-          <pattern operation="pattern match">^[ \t]*install[ \t]+atm[ \t]+/bin/false[ \t]*$</pattern>
-          <instance datatype="int">1</instance>
         </textfilecontent54_object>
         </objects></oval_definitions>

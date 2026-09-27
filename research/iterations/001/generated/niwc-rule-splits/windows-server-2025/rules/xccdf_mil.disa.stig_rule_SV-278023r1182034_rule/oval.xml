@@ -4,14 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:253288" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278023" version="1" class="compliance">
           <metadata>
-            <title>The Server Message Block (SMB) v1 protocol must be disabled on the SMB client.</title>
-            <description/>
+            <title>WN25-00-000380 - Windows Server 2025 must not have the Server Message Block (SMB) v1 protocol installed.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>SMBv1 is a legacy protocol that uses the MD5 algorithm as part of SMB. MD5 is known to be vulnerable to a number of attacks such as collision and preimage attacks and is not FIPS compliant.</description>
           </metadata>
-          <criteria operator="OR">
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25328600" comment="Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed"/>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25328800" comment="Verifies 'Configure SMBv1 client driver' is set to 'Enabled' with 'Disable driver (recommended)' selected for 'Configure MrxSmb10 driver'"/>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253286"/>
           </criteria>
         </definition>
         <definition id="oval:mil.disa.stig.defs:def:253287" version="2" class="compliance">
@@ -22,6 +24,16 @@
           <criteria operator="OR">
             <criterion test_ref="oval:mil.disa.stig.win:tst:25328600" comment="Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed"/>
             <criterion test_ref="oval:mil.disa.stig.win:tst:25328700" comment="Verifies 'Configure SMBv1 Server' is set to 'Disabled'"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:253288" version="2" class="compliance">
+          <metadata>
+            <title>The Server Message Block (SMB) v1 protocol must be disabled on the SMB client.</title>
+            <description/>
+          </metadata>
+          <criteria operator="OR">
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25328600" comment="Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed"/>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25328800" comment="Verifies 'Configure SMBv1 client driver' is set to 'Enabled' with 'Disable driver (recommended)' selected for 'Configure MrxSmb10 driver'"/>
           </criteria>
         </definition>
         <definition id="oval:mil.disa.stig.defs:def:253286" version="2" class="compliance">
@@ -37,36 +49,19 @@
             </criteria>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.windows2025:def:278023" version="1" class="compliance">
-          <metadata>
-            <title>WN25-00-000380 - Windows Server 2025 must not have the Server Message Block (SMB) v1 protocol installed.</title>
-            <affected family="windows">
-              <platform>Microsoft Windows Server 2025</platform>
-            </affected>
-            <description>SMBv1 is a legacy protocol that uses the MD5 algorithm as part of SMB. MD5 is known to be vulnerable to a number of attacks such as collision and preimage attacks and is not FIPS compliant.</description>
-          </metadata>
-          <criteria>
-            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253286"/>
-          </criteria>
-        </definition>
-        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328700" version="1" check_existence="at_least_one_exists" check="all" comment="'Configure SMBv1 Server' is set to 'Disabled'">
-          <object object_ref="oval:mil.disa.stig.win:obj:25328700"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
-        </registry_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328600" version="1" check_existence="all_exist" check="all" comment="'SMB 1.0/CIFS File Sharing Support' feature is not installed">
+        </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328600" version="1" check_existence="all_exist" check="all" comment="'SMB 1.0/CIFS File Sharing Support' feature is not installed">
           <object object_ref="oval:mil.disa.stig.win:obj:25328600"/>
           <state state_ref="oval:mil.disa.stig.win:ste:25328600"/>
         </wmi57_test>
+        <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328700" version="1" check_existence="at_least_one_exists" check="all" comment="'Configure SMBv1 Server' is set to 'Disabled'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25328700"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
+        </registry_test>
         <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25328800" version="1" check_existence="at_least_one_exists" check="all" comment="'Configure SMBv1 client driver' is set to 'Enabled' with 'Disable driver (recommended)' selected for 'Configure MrxSmb10 driver'">
           <object object_ref="oval:mil.disa.stig.win:obj:25328800"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000004"/>
         </registry_test>
-        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328800" version="1">
-          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
-          <key datatype="string">SYSTEM\CurrentControlSet\Services\mrxsmb10</key>
-          <name datatype="string">Start</name>
-        </registry_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328700" version="1">
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328700" version="1">
           <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
           <key datatype="string">SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters</key>
           <name datatype="string">SMB1</name>
@@ -75,12 +70,12 @@
           <namespace datatype="string">root\cimv2</namespace>
           <wql datatype="string" operation="equals">SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'</wql>
         </wmi57_object>
-        </objects><states><wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25328600" version="1" comment="Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2">
-          <result datatype="record" operation="equals">
-            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="installstate" entity_check="at least one" datatype="string">2</field>
-          </result>
-        </wmi57_state>
-        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000000" version="1">
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25328800" version="1">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SYSTEM\CurrentControlSet\Services\mrxsmb10</key>
+          <name datatype="string">Start</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000000" version="1">
           <type>reg_dword</type>
           <value datatype="int">0</value>
         </registry_state>
@@ -88,4 +83,9 @@
           <type>reg_dword</type>
           <value datatype="int">4</value>
         </registry_state>
+        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25328600" version="1" comment="Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="installstate" entity_check="at least one" datatype="string">2</field>
+          </result>
+        </wmi57_state>
         </states></oval_definitions>
