@@ -538,7 +538,6 @@ def inspect_file(path):
                 results.append({"test_id":test_id,"status":"skipped","reason":"object_or_state_count"})
                 continue
             object_ref=object_nodes[0].get("object_ref")
-            state_ref=state_nodes[0].get("state_ref")
             object_info=obj_items.get(object_ref)
             if object_info is None or object_info.get("items") is None:
                 reason=(object_info or {}).get("reason","object_not_synthetic_variable_object")
