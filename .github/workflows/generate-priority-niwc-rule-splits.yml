@@ -70,6 +70,12 @@ jobs:
             python "$parser" "$oval" --output "$(dirname "$oval")/oval-ir.json" --fail-on-unresolved
           done < <(find scap-ng/research/iterations/001/generated/niwc-rule-splits -name oval.xml -print0 | sort -z)
 
+      - name: Aggregate semantic coverage
+        run: |
+          python scap-ng/research/iterations/001/tools/analyze_oval_ir_corpus.py \
+            scap-ng/research/iterations/001/generated/niwc-rule-splits \
+            --output scap-ng/research/iterations/001/generated/niwc-rule-splits/corpus-semantic-inventory.json
+
       - name: Commit reproducible generated research corpus
         working-directory: scap-ng
         run: |

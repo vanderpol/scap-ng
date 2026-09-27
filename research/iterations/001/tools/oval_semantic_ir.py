@@ -330,6 +330,141 @@ def parse_variable(e):
     }
 
 
+
+def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
+    """Resolve variable expressions that are purely deterministic/static.
+
+    OVAL variables are multi-valued. concat therefore computes the Cartesian
+    product of child component value sets. Dynamic object-dependent and external
+    variables are preserved as unresolved rather than guessed.
+    """
+    cache = {}
+    resolving = set()
+
+    def result(status, **kwargs):
+        return {"status": status, **kwargs}
+
+    def component_values(node):
+        name = local(node.tag)
+
+        if name == "literal_component":
+            return result("exact_static", values=[text_value(node) or ""], operation=name)
+
+        if name == "variable_component":
+            ref = node.get("var_ref")
+            if not ref:
+                return result("unsupported", reason="variable_component_missing_var_ref", operation=name)
+            resolved = variable_values(ref)
+            return {
+                **resolved,
+                "operation": name,
+                "variable_ref": ref,
+            }
+
+        if name == "concat":
+            parts = []
+            for child in node:
+                child_result = component_values(child)
+                if child_result["status"] != "exact_static":
+                    return result(
+                        child_result["status"],
+                        reason=f"concat_child_not_static:{child_result.get('reason', child_result.get('operation'))}",
+                        operation=name,
+                    )
+                parts.append(child_result["values"])
+
+            values = [""]
+            for child_values in parts:
+                next_values = []
+                for prefix in values:
+                    for suffix in child_values:
+                        next_values.append(prefix + suffix)
+                        if len(next_values) > max_values:
+                            return result(
+                                "bounded",
+                                reason=f"concat_value_expansion_exceeds_{max_values}",
+                                operation=name,
+                            )
+                values = next_values
+            return result("exact_static", values=values, operation=name)
+
+        if name == "unique":
+            children = list(node)
+            if len(children) != 1:
+                return result("unsupported", reason="unique_requires_one_component", operation=name)
+            child_result = component_values(children[0])
+            if child_result["status"] != "exact_static":
+                return result(child_result["status"], reason=child_result.get("reason"), operation=name)
+            # Preserve source order while removing duplicates.
+            seen = set()
+            values = []
+            for value in child_result["values"]:
+                if value not in seen:
+                    seen.add(value)
+                    values.append(value)
+            return result("exact_static", values=values, operation=name)
+
+        # These require collected object data, runtime/external values, or
+        # function semantics not yet implemented in the prototype evaluator.
+        if name == "object_component":
+            return result(
+                "dynamic_object_dependency",
+                operation=name,
+                object_ref=node.get("object_ref"),
+                item_field=node.get("item_field"),
+            )
+
+        return result("unsupported_function", operation=name)
+
+    def variable_values(var_id):
+        if var_id in cache:
+            return cache[var_id]
+        if var_id in resolving:
+            return result("cycle", reason=f"variable_cycle:{var_id}")
+        element = by_id.get(var_id)
+        if element is None or kind_by_id.get(var_id) != "variable":
+            return result("missing", reason=f"unknown_variable:{var_id}")
+
+        resolving.add(var_id)
+        kind = local(element.tag)
+
+        if kind == "constant_variable":
+            values = [
+                text_value(child) or ""
+                for child in element
+                if local(child.tag) == "value"
+            ]
+            resolved = result("exact_static", values=values, variable_type=kind)
+
+        elif kind == "external_variable":
+            resolved = result("external_input", variable_type=kind)
+
+        elif kind == "local_variable":
+            components = [child for child in element if isinstance(child.tag, str)]
+            if len(components) != 1:
+                resolved = result(
+                    "unsupported",
+                    reason=f"local_variable_component_count:{len(components)}",
+                    variable_type=kind,
+                )
+            else:
+                comp = component_values(components[0])
+                resolved = {**comp, "variable_type": kind}
+
+        else:
+            resolved = result("unsupported_variable_type", variable_type=kind)
+
+        resolving.remove(var_id)
+        cache[var_id] = resolved
+        return resolved
+
+    for oid, kind in kind_by_id.items():
+        if kind == "variable":
+            variable_values(oid)
+
+    return dict(sorted(cache.items()))
+
+
 def feature_inventory(root):
     elements = {}
     attributes = {}
@@ -420,6 +555,7 @@ def parse(path: Path):
             "platform_specific_nodes": "losslessly_preserved",
             "policy_intent_inference": "forbidden",
             "ambiguous_native_mapping": "requires_review",
+            "static_variable_evaluation": "conservative_exact_only",
         },
         "generator": generator,
         "definitions": definitions,
@@ -427,6 +563,7 @@ def parse(path: Path):
         "objects": objects,
         "states": states,
         "variables": variables,
+        "variable_resolution": resolve_static_variables(by_id, kind_by_id),
         "reference_graph": graph,
         "dependency_edges": dependency_edges,
         "dependency_integrity": {
