@@ -1,9 +1,10 @@
-corpus_manifest: 0.1-prototype
+corpus_manifest: 0.2-prototype
 iteration: "001"
+scope_policy: niwc_published_current_only
 purpose: >
-  Versioned public corpus against which SCAP 1.4 forward-conversion coverage
-  will be measured. Inclusion here is a reproducibility boundary, not a claim
-  that these are the only public SCAP sources.
+  Versioned public SCAP 1.4 corpus for iteration 001. Published content under
+  the pinned NIWC Atlantic scap-content-library/Current tree is the authoritative
+  migration/conversion evidence source.
 sources:
   - id: niwc-atlantic-scap-content-library-current
     type: git
@@ -11,24 +12,61 @@ sources:
     revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
     path: Current
     public: true
-    role: primary_cross_platform_conversion_corpus
     status: ready
+    observed_zip_count: 66
+    observed_individual_benchmark_zip_count: 65
+    consolidated_bundle:
+      path: Current/Consolidated_Bundle_Q3_2026.zip
 
-  - id: disa-stig-downloads
-    type: public-download-catalog
-    publisher: DISA
-    public: true
-    role: authoritative_stig_publication_corpus
-    status: acquisition_manifest_required
-    note: >
-      Before a formal conversion run, enumerate every in-scope SCAP 1.4
-      download with publication/version identifiers and SHA-256 digests.
+priority_targets:
+  - id: rhel9
+    platform: Red Hat Enterprise Linux 9
+    published_artifact: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+    priority: 1
+    role: linux_reference
+    rationale: current Linux anchor for complex OVAL migration and capability design
 
-  - id: additional-public-scap14-sources
-    type: extensible
-    public: true
-    status: discovery_required
+  - id: oracle-linux9
+    platform: Oracle Linux 9
+    published_artifact: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+    priority: 1
+    role: linux_reuse_comparison
+    rationale: quantify real reusable policy and assessment semantics against RHEL 9
+
+  - id: windows11
+    platform: Microsoft Windows 11
+    published_artifact: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+    priority: 1
+    role: windows_client_reference
+    rationale: current Windows client anchor and cross-policy reuse candidate
+
+  - id: windows-server-2025
+    platform: Microsoft Windows Server 2025
+    published_artifact: Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+    priority: 1
+    role: windows_server_reference
+    rationale: current Windows server anchor and cross-policy reuse candidate
+
+cross_platform_reuse_experiments:
+  - id: rhel9-vs-oracle-linux9
+    left: rhel9
+    right: oracle-linux9
+    measurements:
+      - shared_cci_sets
+      - shared_normalized_titles
+      - shared_check_semantics
+      - shared_oval_semantic_fingerprints
+      - parameterizable_assessment_candidates
     note: >
-      Add additional authoritative/public SCAP 1.4 repositories or downloads
-      discovered during corpus research. Each must be pinned by revision or
-      digest before it contributes to a published conversion claim.
+      Do not assume overlap percentage. Measure it from the pinned published
+      packages, and distinguish policy similarity from proven automation equivalence.
+
+coverage_targets:
+  first_depth_pass: [rhel9, oracle-linux9, windows11, windows-server-2025]
+  final_gate: all_individual_benchmarks_in_pinned_Current
+  consolidated_bundle_role: packaging_and_duplicate_coverage_cross_check
+
+evidence_policy:
+  published_migration_case_source_must_match_manifest: true
+  development_repository_content_is_not_conversion_evidence: true
+  experimental_content_is_not_conversion_evidence: true
