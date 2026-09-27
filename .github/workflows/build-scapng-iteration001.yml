@@ -1,0 +1,55 @@
+name: Build SCAP-NG iteration 001 prototypes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-scapng-iteration001.yml"
+      - "research/iterations/001/tools/build_full_benchmarks.py"
+      - "research/iterations/001/prototypes/full-benchmarks/**/source/**"
+      - "tools/verify_scapng_prototype_bundle.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install prototype build dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML cryptography
+
+      - name: Build all iteration 001 packages
+        run: python research/iterations/001/tools/build_full_benchmarks.py
+
+      - name: Verify every generated package
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' bundle; do
+            python tools/verify_scapng_prototype_bundle.py "$bundle"
+          done < <(find research/iterations/001/prototypes/full-benchmarks -type f -name '*.scapng' -print0 | sort -z)
+
+      - name: Commit reproducible package artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 'research/iterations/001/prototypes/full-benchmarks/**/dist/*'
+          if git diff --cached --quiet; then
+            echo "Generated package artifacts already match the repository."
+            exit 0
+          fi
+          git commit -m "Rebuild iteration 001 SCAP-NG prototype packages"
+          git push
