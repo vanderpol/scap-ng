@@ -588,6 +588,68 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                         values.append(string_value)
             return bounded(values, name)
 
+        if name == "merge":
+            children = all_children_static(node, name, minimum=1)
+            if children["status"] != "exact_static":
+                return children
+
+            values = [
+                str(value)
+                for child_values in children["values"]
+                for value in child_values
+            ]
+            sort_mode = node.get("sort", "document")
+            order = node.get("order", "ascending")
+            delimiter = node.get("delimiter", "")
+
+            if sort_mode == "document":
+                pass
+            elif sort_mode == "lexical":
+                values = sorted(values)
+            elif sort_mode == "numeric":
+                try:
+                    values = sorted(
+                        values,
+                        key=lambda value: float(value)
+                        if any(ch in value.lower() for ch in ".e")
+                        else int(value),
+                    )
+                except ValueError:
+                    return result(
+                        "static_evaluation_error",
+                        reason="merge_numeric_sort_non_numeric_value",
+                        operation=name,
+                    )
+            elif sort_mode == "natural":
+                return result(
+                    "modeled_not_static_evaluated",
+                    reason="merge_natural_sort_requires_reviewed_cross-runtime_definition",
+                    operation=name,
+                )
+            else:
+                return result(
+                    "unsupported",
+                    reason=f"unknown_merge_sort:{sort_mode}",
+                    operation=name,
+                )
+
+            if sort_mode != "document":
+                if order == "descending":
+                    values.reverse()
+                elif order != "ascending":
+                    return result(
+                        "unsupported",
+                        reason=f"unknown_merge_order:{order}",
+                        operation=name,
+                    )
+
+            return result(
+                "exact_static",
+                values=[delimiter.join(values)],
+                operation=name,
+                datatype="string",
+            )
+
         if name == "count":
             children = all_children_static(node, name, minimum=1)
             if children["status"] != "exact_static":
@@ -712,7 +774,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
 
         # These operations are fully represented in semantic_ast but are not
         # claimed as exact-static by this prototype evaluator yet.
-        if name in {"merge", "regex_capture", "glob_to_regex", "time_difference"}:
+        if name in {"regex_capture", "glob_to_regex", "time_difference"}:
             child_ops = [
                 component_values(c)
                 for c in node
