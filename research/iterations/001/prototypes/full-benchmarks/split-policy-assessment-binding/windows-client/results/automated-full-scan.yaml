@@ -19,8 +19,11 @@ rule_results:
     decision:
       selected_branch: applicable_role
       because: {subject: system_role, actual: workstation, operator: eq, expected: workstation, outcome: pass}
-    root_causes:
-      - {subject: minimum_password_length, actual: 12, operator: ge, expected: 14, outcome: fail, evidence_ref: ev-password}
+    explanation:
+      kind: all
+      outcome: fail
+      decisive:
+        - {subject: minimum_password_length, actual: 12, operator: ge, expected: 14, outcome: fail, evidence_ref: ev-password}
     supporting:
       - {subject: password_history, actual: 24, operator: ge, expected: 24, outcome: pass}
     evaluation: {outcome_complete: true, diagnostics_complete: true}
@@ -34,19 +37,20 @@ rule_results:
     assessment: demo.windows.platform-security-posture
     outcome: fail
     method: automated
-    root_cause:
-      expression: BC
-      type: none_of_alternatives_satisfied
-      explanation: Neither TPM 2.0 readiness nor the approved virtualization exception was satisfied.
-      alternatives:
-        - expression: B
+    explanation:
+      expression_ref: BC
+      kind: any
+      outcome: fail
+      reason: no_alternative_satisfied
+      decisive:
+        - expression_ref: B
           outcome: fail
           decisive:
             - {subject: tpm_present, actual: false, operator: eq, expected: true, outcome: fail, evidence_ref: ev-tpm}
           unevaluated:
             - {subject: tpm_version, reason: logical_short_circuit}
             - {subject: tpm_ready, reason: logical_short_circuit}
-        - expression: C
+        - expression_ref: C
           outcome: fail
           decisive:
             - {subject: approved_virtualization_exception, actual: false, operator: eq, expected: true, outcome: fail, evidence_ref: ev-exception}

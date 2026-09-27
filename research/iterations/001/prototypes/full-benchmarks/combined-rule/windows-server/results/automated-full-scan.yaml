@@ -48,17 +48,23 @@ rule_results:
     assessment: demo.windows.remote-registry-disabled
     outcome: fail
     method: automated
-    root_causes:
-      - {subject: startup_type, actual: automatic, operator: eq, expected: disabled, outcome: fail}
-      - {subject: running, actual: true, operator: eq, expected: false, outcome: fail}
+    explanation:
+      kind: all
+      outcome: fail
+      decisive:
+        - {subject: startup_type, actual: automatic, operator: eq, expected: disabled, outcome: fail}
+        - {subject: running, actual: true, operator: eq, expected: false, outcome: fail}
     evaluation: {outcome_complete: true, diagnostics_complete: true}
     summary: "Failed: Remote Registry is configured automatic and is running."
   - rule: NG-DEMO-WS-105
     assessment: demo.windows-server.smb-signing-required
     outcome: fail
     method: automated
-    root_causes:
-      - {subject: smb_signing_required, actual: false, operator: eq, expected: true, outcome: fail}
+    explanation:
+      kind: comparison
+      outcome: fail
+      decisive:
+        - {subject: smb_signing_required, actual: false, operator: eq, expected: true, outcome: fail}
     evaluation: {outcome_complete: true, diagnostics_complete: true}
     summary: "Failed: SMB server signing is not required."
   - rule: NG-DEMO-WS-106

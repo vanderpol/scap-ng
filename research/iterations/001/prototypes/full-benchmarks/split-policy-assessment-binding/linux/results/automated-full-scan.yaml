@@ -19,10 +19,12 @@ rule_results:
     population:
       examined: 93412
       violations: {observed: 50, count_type: at_least}
-    root_cause:
-      type: population_violations
+    explanation:
+      kind: population_violations
+      outcome: fail
       subject: filesystem_owner_resolves
-      explanation: At least 50 filesystem entries in /usr do not resolve to valid owners.
+      decisive:
+        - {path: /usr/lib/example-a, subject: owner_resolves, actual: false, operator: eq, expected: true, outcome: fail}
     evaluation: {outcome_complete: true, diagnostics_complete: false}
     collection:
       complete: false
@@ -61,8 +63,11 @@ rule_results:
     assessment: demo.linux.ipv4-redirects-disabled
     outcome: fail
     method: automated
-    root_causes:
-      - {subject: default_accept_redirects, actual: 1, operator: eq, expected: 0, outcome: fail}
+    explanation:
+      kind: all
+      outcome: fail
+      decisive:
+        - {subject: default_accept_redirects, actual: 1, operator: eq, expected: 0, outcome: fail}
     supporting:
       - {subject: all_accept_redirects, actual: 0, operator: eq, expected: 0, outcome: pass}
     evaluation: {outcome_complete: true, diagnostics_complete: true}
