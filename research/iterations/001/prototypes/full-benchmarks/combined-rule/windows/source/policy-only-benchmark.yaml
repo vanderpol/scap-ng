@@ -1,0 +1,129 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+benchmark:
+  id: demo.windows.iteration001.policy-only.combined-rule
+  title: SCAP-NG Iteration 001 Windows Policy-Only Benchmark (combined-rule)
+  version: '001'
+  status: research-prototype
+  platform: windows
+  rule_count: 7
+  rules:
+  - NG-DEMO-WIN-001
+  - NG-DEMO-WIN-002
+  - NG-DEMO-WIN-003
+  - NG-DEMO-WIN-004
+  - NG-DEMO-WIN-005
+  - NG-DEMO-WIN-006
+  - NG-DEMO-WIN-MANUAL-001
+  notes: Illustrative content only; not an official security baseline.
+profile:
+  id: demo.windows.full
+  title: Full prototype profile
+  select:
+  - NG-DEMO-WIN-001
+  - NG-DEMO-WIN-002
+  - NG-DEMO-WIN-003
+  - NG-DEMO-WIN-004
+  - NG-DEMO-WIN-005
+  - NG-DEMO-WIN-006
+  - NG-DEMO-WIN-MANUAL-001
+rules:
+- id: NG-DEMO-WIN-001
+  title: Illustrative Windows password policy must meet role-specific requirements
+  severity: high
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-001
+  discussion: "The required effective password policy depends on the Windows system role.\n        This rule is\
+    \ intentionally conditional to exercise native if/elif/else semantics."
+  check: "Determine the Windows system role. For a domain controller, verify minimum password\n        length is\
+    \ at least 15 and password history is at least 24. For a member server, verify\n        minimum password length\
+    \ is at least 14 and password history is at least 24.\n        Other roles are not applicable."
+  fix: Configure the effective password policy for the applicable Windows system role.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+- id: NG-DEMO-WIN-002
+  title: Illustrative Windows platform security posture must satisfy required alternatives
+  severity: high
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-002
+  discussion: "The platform must satisfy multiple controls, including an approved alternative path.\n        This\
+    \ rule intentionally resembles a complex OVAL AND/OR criteria tree."
+  check: "Verify BitLocker protection is enabled. Verify either TPM 2.0 is present and ready\n        or an approved\
+    \ virtualization exception exists. Verify Secure Boot is enabled and\n        either Credential Guard or approved\
+    \ application control is enabled."
+  fix: Correct each failed platform-security condition or document the applicable approved exception.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+- id: NG-DEMO-WIN-003
+  title: Illustrative Microsoft Defender real-time protection must be enabled
+  severity: high
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-003
+  discussion: Real-time anti-malware protection reduces exposure to malicious content.
+  check: Verify Microsoft Defender real-time protection is enabled.
+  fix: Enable Microsoft Defender real-time protection.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+- id: NG-DEMO-WIN-004
+  title: Illustrative Remote Registry service must be disabled
+  severity: medium
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-004
+  discussion: The Remote Registry service is not required for the illustrative baseline.
+  check: Verify the Remote Registry service startup type is disabled and the service is not running.
+  fix: Disable and stop the Remote Registry service.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+- id: NG-DEMO-WIN-005
+  title: Illustrative SMB server signing must be required when the SMB server feature is present
+  severity: medium
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-005
+  discussion: SMB server signing protects applicable SMB server communications.
+  check: If the SMB server feature is installed, verify server signing is required.
+  fix: Require SMB server signing when the SMB server feature is installed.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+  applicability_text: Applicable only when the SMB server feature is installed.
+- id: NG-DEMO-WIN-006
+  title: Illustrative machine certificate trust store must be readable for assessment
+  severity: medium
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-006
+  discussion: This rule exists to exercise collection-error reporting rather than silently producing pass or fail.
+  check: Review the machine certificate trust store and verify the illustrative trusted publisher requirement.
+  fix: Correct certificate-store permissions and configure the required trust state.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+- id: NG-DEMO-WIN-MANUAL-001
+  title: Illustrative Windows security configuration must be reviewed manually
+  severity: medium
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-MANUAL
+  discussion: This rule demonstrates policy-only assessment using existing Check Content with no separate questionnaire.
+  check: Review the organization-defined Windows security configuration and record the observed setting and evidence.
+  fix: Configure the setting in accordance with organizational policy.
+  provenance:
+    classification: illustrative
+    official_disa_content: false

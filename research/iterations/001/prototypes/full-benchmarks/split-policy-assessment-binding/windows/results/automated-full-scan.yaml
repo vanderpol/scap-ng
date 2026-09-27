@@ -1,0 +1,186 @@
+scap_ng_result: 0.1-prototype
+prototype: true
+benchmark:
+  package_id: demo.windows.iteration001.automated.split-policy-assessment-binding
+  version: '001'
+  manifest_sha256: f1e998ac481e76f04e59298c850e87f8fd890cfede6fa87c650cc892f6faf775
+  source_model: split-policy-assessment-binding
+asset:
+  id: demo-asset
+  platform: windows
+scan:
+  id: demo-windows-scan-001
+  result_profile: explain
+summary:
+  rule_count: 7
+  outcomes:
+    pass: 2
+    fail: 3
+    not_applicable: 1
+    error: 1
+rule_results:
+- rule: NG-DEMO-WIN-001
+  assessment: demo.windows.role-specific-password-policy
+  outcome: fail
+  method: automated
+  decision:
+    selected_branch: member_server
+    because:
+      subject: system_role
+      actual: member_server
+      operator: eq
+      expected: member_server
+      outcome: pass
+  root_causes:
+  - subject: minimum_password_length
+    actual: 12
+    operator: ge
+    expected: 14
+    outcome: fail
+    evidence_ref: ev-win-password
+  supporting:
+  - subject: password_history
+    actual: 24
+    operator: ge
+    expected: 24
+    outcome: pass
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: true
+  evidence:
+    ev-win-password:
+      capability: auth.password-policy
+      status: complete
+      observed:
+        minimum_length: 12
+        history_count: 24
+  summary: 'Failed: member-server policy requires minimum password length >= 14; observed 12.'
+- rule: NG-DEMO-WIN-002
+  assessment: demo.windows.platform-security-posture
+  outcome: fail
+  method: automated
+  root_cause:
+    expression: BC
+    type: none_of_alternatives_satisfied
+    explanation: Neither TPM 2.0 readiness nor the approved virtualization exception was satisfied.
+    alternatives:
+    - expression: B
+      outcome: fail
+      decisive:
+      - subject: tpm_present
+        actual: false
+        operator: eq
+        expected: true
+        outcome: fail
+        evidence_ref: ev-win-tpm
+      unevaluated:
+      - subject: tpm_version
+        reason: logical_short_circuit
+      - subject: tpm_ready
+        reason: logical_short_circuit
+    - expression: C
+      outcome: fail
+      decisive:
+      - subject: approved_virtualization_exception
+        actual: false
+        operator: eq
+        expected: true
+        outcome: fail
+        evidence_ref: ev-win-exception
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: false
+    termination:
+      reason: enclosing_and_outcome_decisive
+  evidence:
+    ev-win-tpm:
+      capability: windows.tpm
+      status: complete
+      observed:
+        present: false
+    ev-win-exception:
+      capability: policy.exception-record
+      status: complete
+      observed:
+        approved: false
+  summary: 'Failed: TPM was not present and no approved virtualization exception was found.'
+- rule: NG-DEMO-WIN-003
+  assessment: demo.windows.defender-realtime
+  outcome: pass
+  method: automated
+  comparison:
+    subject: realtime_protection_enabled
+    actual: true
+    operator: eq
+    expected: true
+    outcome: pass
+    evidence_ref: ev-win-defender
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: true
+  evidence:
+    ev-win-defender:
+      capability: windows.defender.status
+      status: complete
+      observed:
+        realtime_protection_enabled: true
+  summary: 'Passed: Defender real-time protection is enabled.'
+- rule: NG-DEMO-WIN-004
+  assessment: demo.windows.remote-registry-disabled
+  outcome: pass
+  method: automated
+  comparisons:
+  - subject: startup_type
+    actual: disabled
+    operator: eq
+    expected: disabled
+    outcome: pass
+  - subject: running
+    actual: false
+    operator: eq
+    expected: false
+    outcome: pass
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: true
+  summary: 'Passed: Remote Registry is disabled and not running.'
+- rule: NG-DEMO-WIN-005
+  assessment: demo.windows.smb-signing-when-server
+  outcome: not_applicable
+  method: automated
+  applicability:
+    subject: smb_server_feature_installed
+    actual: false
+    operator: eq
+    expected: true
+    outcome: 'false'
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: true
+  summary: 'Not applicable: the SMB server feature is not installed.'
+- rule: NG-DEMO-WIN-006
+  assessment: demo.windows.trusted-publisher-store
+  outcome: error
+  method: automated
+  reason:
+    code: collection_permission_denied
+    capability: windows.certificate-store
+    message: Access to the machine TrustedPublisher store was denied.
+  evaluation:
+    outcome_complete: false
+    diagnostics_complete: false
+  summary: 'Error: certificate-store evidence could not be collected because access was denied.'
+- rule: NG-DEMO-WIN-MANUAL-001
+  outcome: fail
+  method: manual
+  manual:
+    procedure_source: policy.check
+    assessor_response: finding
+    comments: The reviewed setting did not match the required organizational value.
+    evidence_refs:
+    - ev-win-manual
+  evidence:
+    ev-win-manual:
+      type: assessor_note
+      summary: Observed setting recorded by assessor.
+  summary: Failed by manual assessment.

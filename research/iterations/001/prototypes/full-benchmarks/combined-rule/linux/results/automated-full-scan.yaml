@@ -1,0 +1,173 @@
+scap_ng_result: 0.1-prototype
+prototype: true
+benchmark:
+  package_id: demo.linux.iteration001.automated.combined-rule
+  version: '001'
+  manifest_sha256: 99f68cc73e3675e850d270aed70275a37c73422250a2817d9ad0f1ca4e914167
+  source_model: combined-rule
+asset:
+  id: demo-asset
+  platform: linux
+scan:
+  id: demo-linux-scan-001
+  result_profile: explain
+summary:
+  rule_count: 7
+  outcomes:
+    pass: 3
+    fail: 2
+    not_applicable: 1
+    error: 1
+rule_results:
+- rule: NG-DEMO-LNX-001
+  assessment: demo.linux.filesystem-valid-owner
+  outcome: fail
+  method: automated
+  population:
+    examined: 93412
+    violations:
+      observed: 50
+      count_type: at_least
+  root_cause:
+    type: population_violations
+    subject: filesystem_owner_resolves
+    explanation: At least 50 filesystem entries in /usr do not resolve to valid owners.
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: false
+  collection:
+    complete: false
+    termination:
+      reason: violation_threshold_reached
+      threshold: 50
+  evidence:
+    max_records: 50
+    returned: 50
+    truncated: true
+    records:
+    - path: /usr/lib/example-a
+      uid: 991
+      owner_name: null
+      owner_resolves: false
+    - path: /usr/share/example-b
+      uid: 65531
+      owner_name: null
+      owner_resolves: false
+    - path: /usr/local/example-c
+      uid: 44001
+      owner_name: null
+      owner_resolves: false
+    - note: 47 additional illustrative records omitted from the repository example; a real result would
+        carry up to the configured cap.
+  summary: 'Failed: at least 50 entries have unresolved owners; collection stopped at the configured threshold.'
+- rule: NG-DEMO-LNX-002
+  assessment: demo.linux.sshd-effective-baseline
+  outcome: pass
+  method: automated
+  comparisons:
+  - subject: permit_root_login
+    actual: 'no'
+    operator: eq
+    expected: 'no'
+    outcome: pass
+  - subject: password_authentication
+    actual: 'no'
+    operator: eq
+    expected: 'no'
+    outcome: pass
+  evidence:
+    effective_sources:
+    - /etc/ssh/sshd_config
+    - /etc/ssh/sshd_config.d/10-baseline.conf
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: true
+  summary: 'Passed: the effective sshd configuration prohibits root login and password authentication.'
+- rule: NG-DEMO-LNX-003
+  assessment: demo.linux.openssh-minimum-version
+  outcome: pass
+  method: automated
+  comparisons:
+  - subject: package_installed
+    actual: true
+    operator: eq
+    expected: true
+    outcome: pass
+  - subject: package_version
+    actual: 8.7p1-44.el9
+    operator: version_ge
+    expected: '8.7'
+    outcome: pass
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: true
+  summary: 'Passed: openssh-server is installed at a version meeting the illustrative minimum.'
+- rule: NG-DEMO-LNX-004
+  assessment: demo.linux.ipv4-redirects-disabled
+  outcome: fail
+  method: automated
+  root_causes:
+  - subject: default_accept_redirects
+    actual: 1
+    operator: eq
+    expected: 0
+    outcome: fail
+    evidence_ref: ev-lnx-sysctl
+  supporting:
+  - subject: all_accept_redirects
+    actual: 0
+    operator: eq
+    expected: 0
+    outcome: pass
+  evidence:
+    ev-lnx-sysctl:
+      capability: linux.sysctl.effective-values
+      status: complete
+      observed:
+        net.ipv4.conf.all.accept_redirects: 0
+        net.ipv4.conf.default.accept_redirects: 1
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: true
+  summary: 'Failed: net.ipv4.conf.default.accept_redirects is 1; expected 0.'
+- rule: NG-DEMO-LNX-005
+  assessment: demo.linux.nfs-export-policy
+  outcome: not_applicable
+  method: automated
+  applicability:
+    subject: nfs_server_package_installed
+    actual: false
+    operator: eq
+    expected: true
+    outcome: 'false'
+  evaluation:
+    outcome_complete: true
+    diagnostics_complete: true
+  summary: 'Not applicable: the NFS server package is not installed.'
+- rule: NG-DEMO-LNX-006
+  assessment: demo.linux.sudoers-baseline
+  outcome: error
+  method: automated
+  reason:
+    code: collection_parse_error
+    capability: linux.sudoers.effective-config
+    message: The sudoers parser encountered an invalid include file and could not produce authoritative
+      effective configuration.
+  evaluation:
+    outcome_complete: false
+    diagnostics_complete: false
+  summary: 'Error: effective sudoers configuration could not be determined because parsing failed.'
+- rule: NG-DEMO-LNX-MANUAL-001
+  outcome: pass
+  method: manual
+  manual:
+    procedure_source: policy.check
+    assessor_response: not_a_finding
+    comments: Assessor verified the documented configuration.
+    evidence_refs:
+    - ev-lnx-manual
+  evidence:
+    ev-lnx-manual:
+      type: assessor_note
+      summary: Manual review evidence recorded.
+  summary: Passed by manual assessment.

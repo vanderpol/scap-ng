@@ -1,0 +1,335 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+benchmark:
+  id: demo.windows.iteration001.automated.combined-rule
+  title: SCAP-NG Iteration 001 Windows Automated Benchmark (combined-rule)
+  version: '001'
+  status: research-prototype
+  platform: windows
+  rule_count: 7
+  rules:
+  - NG-DEMO-WIN-001
+  - NG-DEMO-WIN-002
+  - NG-DEMO-WIN-003
+  - NG-DEMO-WIN-004
+  - NG-DEMO-WIN-005
+  - NG-DEMO-WIN-006
+  - NG-DEMO-WIN-MANUAL-001
+  notes: Illustrative content only; not an official security baseline.
+profile:
+  id: demo.windows.full
+  title: Full prototype profile
+  select:
+  - NG-DEMO-WIN-001
+  - NG-DEMO-WIN-002
+  - NG-DEMO-WIN-003
+  - NG-DEMO-WIN-004
+  - NG-DEMO-WIN-005
+  - NG-DEMO-WIN-006
+  - NG-DEMO-WIN-MANUAL-001
+rules:
+- id: NG-DEMO-WIN-001
+  title: Illustrative Windows password policy must meet role-specific requirements
+  severity: high
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-001
+  discussion: "The required effective password policy depends on the Windows system role.\n        This rule is\
+    \ intentionally conditional to exercise native if/elif/else semantics."
+  check: "Determine the Windows system role. For a domain controller, verify minimum password\n        length is\
+    \ at least 15 and password history is at least 24. For a member server, verify\n        minimum password length\
+    \ is at least 14 and password history is at least 24.\n        Other roles are not applicable."
+  fix: Configure the effective password policy for the applicable Windows system role.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+  assessment:
+    id: demo.windows.role-specific-password-policy
+    version: 1
+    collect:
+      system_role:
+        capability: windows.system-role
+      password_policy:
+        capability: auth.password-policy
+        fields:
+        - minimum_length
+        - history_count
+    assert:
+      if:
+        when:
+          compare:
+            actual: $system_role.role
+            op: eq
+            expected: domain_controller
+        then:
+          all:
+          - compare:
+              subject: minimum_password_length
+              actual: $password_policy.minimum_length
+              op: ge
+              expected: 15
+          - compare:
+              subject: password_history
+              actual: $password_policy.history_count
+              op: ge
+              expected: 24
+        elif:
+        - when:
+            compare:
+              actual: $system_role.role
+              op: eq
+              expected: member_server
+          then:
+            all:
+            - compare:
+                subject: minimum_password_length
+                actual: $password_policy.minimum_length
+                op: ge
+                expected: 14
+            - compare:
+                subject: password_history
+                actual: $password_policy.history_count
+                op: ge
+                expected: 24
+        else:
+          outcome: not_applicable
+    diagnostics:
+      max_failure_causes: 3
+- id: NG-DEMO-WIN-002
+  title: Illustrative Windows platform security posture must satisfy required alternatives
+  severity: high
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-002
+  discussion: "The platform must satisfy multiple controls, including an approved alternative path.\n        This\
+    \ rule intentionally resembles a complex OVAL AND/OR criteria tree."
+  check: "Verify BitLocker protection is enabled. Verify either TPM 2.0 is present and ready\n        or an approved\
+    \ virtualization exception exists. Verify Secure Boot is enabled and\n        either Credential Guard or approved\
+    \ application control is enabled."
+  fix: Correct each failed platform-security condition or document the applicable approved exception.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+  assessment:
+    id: demo.windows.platform-security-posture
+    version: 1
+    collect:
+      bitlocker:
+        capability: windows.disk-encryption
+      tpm:
+        capability: windows.tpm
+      virtualization_exception:
+        capability: policy.exception-record
+        id: virtualization-security-exception
+      secure_boot:
+        capability: windows.secure-boot
+      credential_guard:
+        capability: windows.credential-guard
+      application_control:
+        capability: windows.application-control
+    assert:
+      all:
+      - compare:
+          id: A
+          subject: bitlocker_enabled
+          actual: $bitlocker.enabled
+          op: eq
+          expected: true
+      - any:
+          id: BC
+          children:
+          - all:
+              id: B
+              children:
+              - compare:
+                  subject: tpm_present
+                  actual: $tpm.present
+                  op: eq
+                  expected: true
+              - compare:
+                  subject: tpm_version
+                  actual: $tpm.spec_version
+                  op: version_ge
+                  expected: '2.0'
+              - compare:
+                  subject: tpm_ready
+                  actual: $tpm.ready
+                  op: eq
+                  expected: true
+          - compare:
+              id: C
+              subject: approved_virtualization_exception
+              actual: $virtualization_exception.approved
+              op: eq
+              expected: true
+      - all:
+          id: DEF
+          children:
+          - compare:
+              id: D
+              subject: secure_boot_enabled
+              actual: $secure_boot.enabled
+              op: eq
+              expected: true
+          - any:
+              id: EF
+              children:
+              - compare:
+                  id: E
+                  subject: credential_guard_enabled
+                  actual: $credential_guard.enabled
+                  op: eq
+                  expected: true
+              - compare:
+                  id: F
+                  subject: approved_application_control_enabled
+                  actual: $application_control.approved_policy_enabled
+                  op: eq
+                  expected: true
+    diagnostics:
+      max_failure_causes: 2
+- id: NG-DEMO-WIN-003
+  title: Illustrative Microsoft Defender real-time protection must be enabled
+  severity: high
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-003
+  discussion: Real-time anti-malware protection reduces exposure to malicious content.
+  check: Verify Microsoft Defender real-time protection is enabled.
+  fix: Enable Microsoft Defender real-time protection.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+  assessment:
+    id: demo.windows.defender-realtime
+    version: 1
+    collect:
+      defender:
+        capability: windows.defender.status
+        fields:
+        - realtime_protection_enabled
+    assert:
+      compare:
+        subject: realtime_protection_enabled
+        actual: $defender.realtime_protection_enabled
+        op: eq
+        expected: true
+- id: NG-DEMO-WIN-004
+  title: Illustrative Remote Registry service must be disabled
+  severity: medium
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-004
+  discussion: The Remote Registry service is not required for the illustrative baseline.
+  check: Verify the Remote Registry service startup type is disabled and the service is not running.
+  fix: Disable and stop the Remote Registry service.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+  assessment:
+    id: demo.windows.remote-registry-disabled
+    version: 1
+    collect:
+      service:
+        capability: windows.service
+        name: RemoteRegistry
+        fields:
+        - startup_type
+        - running
+    assert:
+      all:
+      - compare:
+          subject: startup_type
+          actual: $service.startup_type
+          op: eq
+          expected: disabled
+      - compare:
+          subject: running
+          actual: $service.running
+          op: eq
+          expected: false
+- id: NG-DEMO-WIN-005
+  title: Illustrative SMB server signing must be required when the SMB server feature is present
+  severity: medium
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-005
+  discussion: SMB server signing protects applicable SMB server communications.
+  check: If the SMB server feature is installed, verify server signing is required.
+  fix: Require SMB server signing when the SMB server feature is installed.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+  applicability_text: Applicable only when the SMB server feature is installed.
+  assessment:
+    id: demo.windows.smb-signing-when-server
+    version: 1
+    collect:
+      smb_feature:
+        capability: windows.feature
+        name: SMB-Server
+        fields:
+        - installed
+      smb_policy:
+        capability: windows.smb.server-policy
+        fields:
+        - signing_required
+    applies_when:
+      compare:
+        actual: $smb_feature.installed
+        op: eq
+        expected: true
+    assert:
+      compare:
+        subject: smb_signing_required
+        actual: $smb_policy.signing_required
+        op: eq
+        expected: true
+- id: NG-DEMO-WIN-006
+  title: Illustrative machine certificate trust store must be readable for assessment
+  severity: medium
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-006
+  discussion: This rule exists to exercise collection-error reporting rather than silently producing pass or fail.
+  check: Review the machine certificate trust store and verify the illustrative trusted publisher requirement.
+  fix: Correct certificate-store permissions and configure the required trust state.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
+  assessment:
+    id: demo.windows.trusted-publisher-store
+    version: 1
+    collect:
+      store:
+        capability: windows.certificate-store
+        scope: machine
+        store: TrustedPublisher
+    assert:
+      exists:
+        subject: illustrative_required_certificate
+        in: $store.certificates
+        where:
+          field: subject
+          op: eq
+          value: CN=Illustrative Publisher
+- id: NG-DEMO-WIN-MANUAL-001
+  title: Illustrative Windows security configuration must be reviewed manually
+  severity: medium
+  references:
+    source: illustrative SCAP-NG iteration 001 prototype
+    cci:
+    - CCI-DEMO-WIN-MANUAL
+  discussion: This rule demonstrates policy-only assessment using existing Check Content with no separate questionnaire.
+  check: Review the organization-defined Windows security configuration and record the observed setting and evidence.
+  fix: Configure the setting in accordance with organizational policy.
+  provenance:
+    classification: illustrative
+    official_disa_content: false
