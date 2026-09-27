@@ -678,6 +678,9 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             if part != ""
         )
 
+    def oval_regex_escape_literal(ch):
+        return "\\" + ch if ch in REGEX_META else ch
+
     def oval_glob_to_regex(pattern, noescape=False):
         """Convert an OVAL glob pattern to its Perl-style regex representation.
 
@@ -707,7 +710,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             if ch == "\\" and not noescape:
                 if i + 1 >= len(pattern):
                     raise ValueError("trailing escape in glob")
-                out.append(pyre.escape(pattern[i + 1]))
+                out.append(oval_regex_escape_literal(pattern[i + 1]))
                 i += 2
                 continue
 
@@ -741,7 +744,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                 i = end + 1
                 continue
 
-            out.append(pyre.escape(ch))
+            out.append(oval_regex_escape_literal(ch))
             i += 1
 
         out.append("$")
