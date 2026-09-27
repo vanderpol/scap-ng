@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278091" version="1" class="compliance">
+          <metadata>
+            <title>WN25-CC-000130 - Windows Server 2025 Early Launch Antimalware, Boot-Start Driver Initialization Policy must prevent boot drivers identified as bad.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>Compromised boot drivers can introduce malware prior to protection mechanisms that load after initialization. The Early Launch Antimalware driver can limit allowed drivers based on classifications determined by the malware protection application. At a minimum, drivers determined to be bad must not be allowed.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254344"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:254344" version="2" class="compliance">
+          <metadata>
+            <title>Early Launch Antimalware, Boot-Start Driver Initialization Policy must prevent boot drivers.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25434400" comment="Verifies 'Boot-Start Driver Initialization Policy' is not set to 'Enabled' with 'All' selected"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25434400" version="3" check_existence="any_exist" check="all" state_operator="OR" comment="'Boot-Start Driver Initialization Policy' is not set to 'Enabled' with 'All' selected">
+          <object object_ref="oval:mil.disa.stig.win:obj:25337200"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000003"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:25337200"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25337200" version="1">
+          <hive datatype="string" operation="equals">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" operation="equals">System\CurrentControlSet\Policies\EarlyLaunch</key>
+          <name datatype="string" operation="equals">DriverLoadPolicy</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000003" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">3</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25337200" version="1" comment="Reg_Dword type and value equals 8">
+          <type>reg_dword</type>
+          <value datatype="int" operation="equals">8</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">1</value>
+        </registry_state>
+        </states></oval_definitions>

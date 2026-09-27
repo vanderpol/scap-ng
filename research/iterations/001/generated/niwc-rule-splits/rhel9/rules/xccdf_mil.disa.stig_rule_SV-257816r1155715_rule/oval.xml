@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257816" version="2" class="compliance">
+          <metadata>
+            <title>RHEL-09-213105 - RHEL 9 must disable the use of user namespaces.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>User namespaces are used primarily for Linux containers. The value "0" disallows the use of user namespaces.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:271727"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:271727" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must disable the use of user namespaces.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:23054800" comment="user.max_user_namespaces is set to 0"/>
+          </criteria>
+        </definition>
+        </definitions><tests><sysctl_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23054800" version="1" check="all" comment="user.max_user_namespaces is set to 0 in kernel">
+          <object object_ref="oval:mil.disa.stig.unix:obj:23054800"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:20000009"/>
+        </sysctl_test>
+        </tests><objects><sysctl_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23054800" version="1">
+          <name>user.max_user_namespaces</name>
+        </sysctl_object>
+        </objects><states><sysctl_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000009" version="1">
+          <value datatype="int" operation="equals">0</value>
+        </sysctl_state>
+        </states></oval_definitions>

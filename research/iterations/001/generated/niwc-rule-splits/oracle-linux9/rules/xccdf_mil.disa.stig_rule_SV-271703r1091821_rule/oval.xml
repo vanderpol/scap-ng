@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271703" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-002340 - OL 9 must log SSH connection attempts and failures to the server.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>SSH provides several logging levels with varying amounts of verbosity. "DEBUG" is specifically not recommended other than strictly for debugging SSH communications since it provides so much data that it is difficult to identify important security information. "INFO" or "VERBOSE" level is the basic level that only records login activity of SSH users. In many situations, such as Incident Response, it is important to determine when a particular user was active on a system. The logout record can eliminate those users who disconnected, which helps narrow the field.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:234815"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:234815" version="1" class="compliance">
+          <metadata>
+            <title>The operating system operating system must log SSH connection attempts and failures to the server.</title>
+            <description/>
+          </metadata>
+          <criteria comment="SSH LogLevel == VERBOSE">
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23481500" comment="/etc/ssh/sshd_config:LogLevel == VERBOSE"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23481500" version="2" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config:LogLevel == VERBOSE">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23481502"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23481500"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23481502" version="1" comment="all sshd_config and sshd_config.d/* files">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:23481500</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:23481501</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23481500" version="1" comment="Pull value of /etc/ssh/sshd_config:LogLevel">
+          <filepath>/etc/ssh/sshd_config</filepath>
+          <pattern operation="pattern match">^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23481501" version="1" comment="Pull value of /etc/ssh/sshd_config.d:LogLevel">
+          <path>/etc/ssh/sshd_config.d</path>
+          <filename operation="pattern match">.+</filename>
+          <pattern operation="pattern match">^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23481500" version="1" comment="LogLevel value is set to VERBOSE">
+          <subexpression datatype="string" operation="pattern match">^VERBOSE$|^"VERBOSE"$</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

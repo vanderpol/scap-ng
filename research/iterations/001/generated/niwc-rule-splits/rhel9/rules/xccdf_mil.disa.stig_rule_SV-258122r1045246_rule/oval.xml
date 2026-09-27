@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258122" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must enable certificate based smart card authentication.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25812200" comment="sssd.conf: pam_cert_auth = True"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:258122" version="1" class="compliance">
+          <metadata>
+            <title>RHEL-09-611165 - RHEL 9 must enable certificate based smart card authentication.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Without the use of multifactor authentication, the ease of access to privileged functions is greatly increased. Multifactor authentication requires using two or more factors to achieve authentication. A privileged account is defined as an information system account with authorizations of a privileged user. The DOD Common Access Card (CAC) with DOD-approved PKI is an example of multifactor authentication.
+
+Satisfies: SRG-OS-000375-GPOS-00160, SRG-OS-000105-GPOS-00052</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258122"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25812200" version="2" check_existence="at_least_one_exists" check="all" comment="sssd.conf: pam_cert_auth = True">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25812202"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:25812200"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25812202" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:25812200</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:25812201</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25812200" version="1" comment="sssd.conf: pam_cert_auth">
+          <filepath datatype="string">/etc/sssd/sssd.conf</filepath>
+          <pattern operation="pattern match">^\s*pam_cert_auth\s*=\s*(.*)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25812201" version="1" comment="/etc/sssd/conf.d: pam_cert_auth">
+          <behaviors recurse_direction="down"/>
+          <path datatype="string">/etc/sssd/conf.d</path>
+          <filename datatype="string" operation="pattern match">.+</filename>
+          <pattern operation="pattern match">^\s*pam_cert_auth\s*=\s*(.*)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25812200" version="1">
+          <subexpression datatype="string" operation="case insensitive equals">true</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258171" version="1" class="compliance">
+          <metadata>
+            <title>RHEL-09-653110 - RHEL 9 must allow only the information system security manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Without the capability to restrict the roles and individuals that can select which events are audited, unauthorized personnel may be able to prevent the auditing of critical events. Misconfigured audits may degrade the system's performance by overwhelming the audit log. Misconfigured audits may also make it more difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230471"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230471" version="4" class="compliance">
+          <metadata>
+            <title>The operating system must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:23047100" comment="/etc/audit/auditd.conf has mode 0600 or less permissive"/>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:23047101" comment=".rules files in /etc/audit/rules.d have mode 0600 or less permissive"/>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:23047102" comment="/etc/audit/audit.rules has mode 0600 or less permissive"/>
+          </criteria>
+        </definition>
+        </definitions><tests><file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23047101" version="2" check="all" comment=".rules files in /etc/audit/rules.d have mode 0600 or less permissive">
+          <object object_ref="oval:mil.disa.stig.unix:obj:23047101"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:20000004"/>
+        </file_test>
+        <file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23047100" version="2" check="all" comment="/etc/audit/auditd.conf has mode 0600 or less permissive">
+          <object object_ref="oval:mil.disa.stig.unix:obj:23047100"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:20000004"/>
+        </file_test>
+        <file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23047102" version="1" check="all" comment="/etc/audit/audit.rules has mode 0600 or less permissive">
+          <object object_ref="oval:mil.disa.stig.unix:obj:23047102"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:20000004"/>
+        </file_test>
+        </tests><objects><file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23047100" version="1">
+          <filepath>/etc/audit/auditd.conf</filepath>
+        </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23047101" version="1">
+          <path>/etc/audit/rules.d</path>
+          <filename operation="pattern match">.rules$</filename>
+        </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23047102" version="1">
+          <filepath>/etc/audit/audit.rules</filepath>
+        </file_object>
+        </objects><states><file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000004" version="1" comment="Mode 0600 or less permissive">
+          <suid datatype="boolean">false</suid>
+          <sgid datatype="boolean">false</sgid>
+          <sticky datatype="boolean">false</sticky>
+          <uexec datatype="boolean">false</uexec>
+          <gread datatype="boolean">false</gread>
+          <gwrite datatype="boolean">false</gwrite>
+          <gexec datatype="boolean">false</gexec>
+          <oread datatype="boolean">false</oread>
+          <owrite datatype="boolean">false</owrite>
+          <oexec datatype="boolean">false</oexec>
+        </file_state>
+        </states></oval_definitions>

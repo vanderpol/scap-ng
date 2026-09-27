@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230306" version="2" class="compliance">
+          <metadata>
+            <title>The operating system must prevent code from being executed on file systems that are imported via Network File System (NFS).</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23030600" comment="remote nfs filesystems in /etc/fstab have noexec"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257855" version="1" class="compliance">
+          <metadata>
+            <title>RHEL-09-231070 - RHEL 9  must prevent code from being executed on file systems that are imported via Network File System (NFS).</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>The "noexec" mount option causes the system not to execute binary files. This option must be used for mounting any file system not containing approved binary as they may be incompatible. Executing files from untrusted file systems increases the opportunity for nonprivileged users to attain unauthorized administrative access.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230306"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23030600" version="1" check_existence="any_exist" check="all" comment="all nfs entries in /etc/fstab have noexec">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23030600"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23030600"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23030600" version="2">
+          <filepath>/etc/fstab</filepath>
+          <pattern operation="pattern match">^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)</pattern>
+          <instance datatype="int" operation="not equal">0</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23030600" version="2">
+          <subexpression operation="pattern match">(^|,)noexec(,|$)</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

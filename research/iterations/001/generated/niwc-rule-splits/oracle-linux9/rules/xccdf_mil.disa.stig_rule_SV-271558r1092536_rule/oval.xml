@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271558" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-000655 - OL 9 must audit all uses of the setfiles command.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Without generating audit records specific to the security and mission needs of the organization, it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.
+
+	Audit records can be generated from various components within the information system (e.g., module or policy filter).
+
+	When a user logs on, the auid is set to the uid of the account being authenticated. Daemons are not user sessions and have the loginuid set to -1. The auid representation is an unsigned 32-bit integer, which equals 4294967295. The audit system interprets -1, 4294967295, and "unset" in the same way.
+
+	The system call rules are loaded into a matching engine that intercepts each system call made by all programs on the system. Therefore, it is very important to use system call rules only when absolutely necessary since these affect performance. The more rules, the bigger the performance hit. The performance can be helped, however, by combining system calls into one rule whenever possible.
+
+	Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000463-GPOS-00207, SRG-OS-000465-GPOS-00209</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230430"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230430" version="1" class="compliance">
+          <metadata>
+            <title>Successful/unsuccessful uses of setfiles in the operating system must generate an audit record.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23043000" comment="Audit invocations of /usr/sbin/setfiles"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23043000" version="1" check_existence="all_exist" check="all" comment="Audit invocations of /usr/sbin/setfiles">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23043000"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23043000" version="2">
+          <filepath>/etc/audit/audit.rules</filepath>
+          <pattern operation="pattern match">^\s*-a\s+(always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/sbin/setfiles\s+(-F\s+perm=([rwa]*x[rwa]*)\s+)?-F\s+auid&gt;=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)\S+)?\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects></oval_definitions>

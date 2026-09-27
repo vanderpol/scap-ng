@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230369" version="1" class="compliance">
+          <metadata>
+            <title>The operating system passwords must have a minimum of 15 characters.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23036900" comment="passwords must have a minimum of 15 characters"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271633" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-001105 - OL 9 passwords must be created with a minimum of 15 characters.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>The shorter the password, the lower the number of possible combinations that need to be tested before the password is compromised.
+
+	Password complexity, or strength, is a measure of the effectiveness of a password in resisting attempts at guessing and brute-force attacks. Password length is one factor of several that helps to determine strength and how long it takes to crack a password. Use of more characters in a password helps to increase exponentially the time and/or resources required to compromise the password.
+
+	OL 9 uses "pwquality" as a mechanism to enforce password complexity. Configurations are set in the "etc/security/pwquality.conf" file.
+
+	The "minlen", sometimes noted as minimum length, acts as a "score" of complexity based on the credit components of the "pwquality" module. By setting the credit components to a negative value, not only will those components be required, but they will not count toward the total "score" of "minlen". This will enable "minlen" to require a 15-character minimum.
+
+	The DOD minimum password requirement is 15 characters.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230369"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23036900" version="1" check="all" comment="passwords must have a minimum of 15 characters">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23036900"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23036900"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036900" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:23036901</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:23036902</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036902" version="2">
+          <behaviors recurse_direction="down"/>
+          <path>/etc/security/pwquality.conf.d</path>
+          <filename operation="pattern match">\.conf$</filename>
+          <pattern operation="pattern match">^\s*minlen\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036901" version="2">
+          <filepath>/etc/security/pwquality.conf</filepath>
+          <pattern operation="pattern match">^\s*minlen\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23036900" version="1">
+          <subexpression datatype="int" operation="greater than or equal">15</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

@@ -1,0 +1,252 @@
+{
+  "definitions": [
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Audit invocations of /usr/sbin/init",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25821100"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258211",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Successful/unsuccessful uses of the init command in the operating system must generate an audit record."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:258211",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.ol9os:def:271573",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "OL09-00-000730 - OL 9 must be configured so that successful/unsuccessful uses of the init command generate an audit record."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Oracle Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Misuse of the init command may cause availability issues for the system."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    }
+  ],
+  "features": {
+    "attributes": {
+      "check": {
+        "all": 1
+      },
+      "check_existence": {
+        "all_exist": 1
+      },
+      "datatype": {
+        "int": 1
+      },
+      "operation": {
+        "greater than or equal": 1,
+        "pattern match": 1
+      }
+    },
+    "elements": {
+      "affected": 1,
+      "criteria": 2,
+      "criterion": 1,
+      "definition": 2,
+      "definitions": 1,
+      "description": 2,
+      "extend_definition": 1,
+      "filepath": 1,
+      "generator": 1,
+      "instance": 1,
+      "metadata": 2,
+      "object": 1,
+      "objects": 1,
+      "oval_definitions": 1,
+      "pattern": 1,
+      "platform": 1,
+      "product_name": 1,
+      "schema_version": 1,
+      "tests": 1,
+      "textfilecontent54_object": 1,
+      "textfilecontent54_test": 1,
+      "timestamp": 1,
+      "title": 2
+    },
+    "namespaces": {
+      "http://oval.mitre.org/XMLSchema/oval-common-5": 3,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5": 19,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent": 6
+    }
+  },
+  "generator": {
+    "children": [
+      {
+        "name": "product_name",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "Security Content Tool 1.9.0"
+      },
+      {
+        "name": "schema_version",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "5.11"
+      },
+      {
+        "name": "timestamp",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "2026-06-25T09:42:07"
+      }
+    ],
+    "name": "generator",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  },
+  "ir_version": "0.1-prototype",
+  "native_translation": {
+    "note": "Structural OVAL semantics are represented. Native SCAP-NG capability mappings are a separate reviewed translation layer.",
+    "status": "requires_review"
+  },
+  "objects": [
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/audit/audit.rules"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*-a\\s+(always,exit|exit,always)(?:\\s+-S\\s+all)?\\s+-F\\s+path=/usr/sbin/init\\s+(-F\\s+perm=([rwa]*x[rwa]*)\\s+)?-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:25821100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    }
+  ],
+  "parser_contract": {
+    "ambiguous_native_mapping": "requires_review",
+    "core_logic_model": "explicit",
+    "platform_specific_nodes": "losslessly_preserved",
+    "policy_intent_inference": "forbidden"
+  },
+  "reference_graph": {
+    "oval:mil.disa.stig.defs:def:258211": [
+      "oval:mil.disa.stig.defs:def:258211",
+      "oval:mil.disa.stig.ind:tst:25821100"
+    ],
+    "oval:mil.disa.stig.ind:obj:25821100": [
+      "oval:mil.disa.stig.ind:obj:25821100"
+    ],
+    "oval:mil.disa.stig.ind:tst:25821100": [
+      "oval:mil.disa.stig.ind:obj:25821100",
+      "oval:mil.disa.stig.ind:tst:25821100"
+    ],
+    "oval:mil.disa.stig.ol9os:def:271573": [
+      "oval:mil.disa.stig.defs:def:258211",
+      "oval:mil.disa.stig.ol9os:def:271573"
+    ]
+  },
+  "semantic_ir_sha256": "23222435c47c078504e2df6e28cba644ebf7019bb5f417811e15c24bfb4a5610",
+  "source": {
+    "bytes": 2602,
+    "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271573r1092564_rule/oval.xml",
+    "sha256": "74d472cd92bb88726eb86f88a2f2f829d7c196a4e430fed6e24e66922def0a24"
+  },
+  "states": [],
+  "tests": [
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "Audit invocations of /usr/sbin/init",
+      "id": "oval:mil.disa.stig.ind:tst:25821100",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25821100"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25821100"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    }
+  ],
+  "unresolved_references": [],
+  "variables": []
+}

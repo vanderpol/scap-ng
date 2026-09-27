@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258169" version="1" class="compliance">
+          <metadata>
+            <title>RHEL-09-653100 - RHEL 9 must produce audit records containing information to establish the identity of any individual or process associated with the event.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Without establishing what type of events occurred, the source of events, where events occurred, and the outcome of events, it would be difficult to establish, correlate, and investigate the events leading up to an outage or attack.
+
+Audit record content that may be necessary to satisfy this requirement includes, for example, time stamps, source and destination addresses, user/process identifiers, event descriptions, success/fail indications, filenames involved, and access control or flow control rules invoked.
+
+Enriched logging aids in making sense of who, what, and when events occur on a system. Without this, determining root cause of an event will be much more difficult.
+
+Satisfies: SRG-OS-000255-GPOS-00096, SRG-OS-000480-GPOS-00227</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230395"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230395" version="2" class="compliance">
+          <metadata>
+            <title>The operating system must resolve audit information before writing to disk.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23039500" comment="/etc/audit/auditd.conf: log_format = enriched"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23039500" version="2" check="all" comment="/etc/audit/auditd.conf: log_format = enriched">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23039500"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23039500"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23039500" version="1">
+          <filepath>/etc/audit/auditd.conf</filepath>
+          <pattern operation="pattern match">(?i)^\s*log_format\s*=\s*(\w+)\s*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23039500" version="1">
+          <subexpression operation="pattern match">(?i)^enriched$</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

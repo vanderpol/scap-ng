@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:independent-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:unix-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" xmlns:linux-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" xmlns:macos-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#macos" xmlns:win-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" xmlns:sol-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" xmlns:iosxe-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#iosxe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-definitions-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-common-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-common-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#windows https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/windows-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#independent https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/independent-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#unix https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/unix-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#linux https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/linux-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#macos https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/macos-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#iosxe https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/iosxe-definitions-schema.xsd http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/solaris-definitions-schema.xsd http://scap.nist.gov/schema/scap/source/1.2 http://scap.nist.gov/schema/scap/1.4/scap-source-data-stream_1.4.xsd"><generator>
+        <oval:product_name>NIWC Atlantic - Complete Compliance v2</oval:product_name>
+        <oval:schema_version>5.12.3</oval:schema_version>
+        <oval:timestamp>2026-08-26T17:36:15.878708+00:00</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257888" version="13" class="compliance">
+          <metadata>
+            <title>RHEL 9 permissions of cron configuration files and directories must not be modified from the operating system defaults.</title>
+            <description>If the permissions of cron configuration files or directories are modified from the operating system defaults, it may be possible for individuals to insert unauthorized cron jobs that perform unauthorized actions, including potentially escalating privileges.</description>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25788801" comment="Permissions of cron configuration files and directories must not be modified from the operating system defaults."/>
+          </criteria>
+        </definition>
+        </definitions><tests><independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25788801" check_existence="at_least_one_exists" check="all" version="13" comment="Confirm permissions of cron configuration files and directories match the operating system defaults.">
+          <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25788801"/>
+          <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25788801"/>
+        </independent-def:shellcommand_test>
+        </tests><objects><independent-def:shellcommand_object version="13" id="oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25788801" comment="Retrieve cron configuration files and directories which do not match the operating system defaults.">
+          <independent-def:shell>bash</independent-def:shell>
+          <independent-def:command>rpm --verify cronie crontabs | awk '! ($2 == "c" &amp;&amp; $1 ~ /^.\..\.\.\.\..\./) {print $0}'</independent-def:command>
+        </independent-def:shellcommand_object>
+        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25788801" version="13" comment="Confirm no non-compliant files are identified.">
+          <independent-def:stdout_line check_existence="none_exist"/>
+        </independent-def:shellcommand_state>
+        </states></oval_definitions>

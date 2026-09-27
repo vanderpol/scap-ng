@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230360" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23036000"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:258113" version="1" class="compliance">
+          <metadata>
+            <title>RHEL-09-611120 - RHEL 9 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Use of a complex password helps to increase the time and resources required to compromise the password. Password complexity, or strength, is a measure of the effectiveness of a password in resisting attempts at guessing and brute-force attacks.
+
+Password complexity is one factor of several that determines how long it takes to crack a password. The more complex a password, the greater the number of possible combinations that need to be tested before the password is compromised.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230360"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23036000" version="1" check="all" comment="The maximum number of repeating characters of the same character class be limited to four when passwords are changed.">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23036000"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23036000"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:20000015"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036000" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:23036001</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:23036002</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036001" version="1">
+          <filepath>/etc/security/pwquality.conf</filepath>
+          <pattern operation="pattern match">^\s*maxclassrepeat\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23036002" version="1">
+          <behaviors recurse_direction="down"/>
+          <path>/etc/security/pwquality.conf.d</path>
+          <filename operation="pattern match">\.conf$</filename>
+          <pattern operation="pattern match">^\s*maxclassrepeat\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000015" version="1">
+          <subexpression datatype="int" operation="greater than">0</subexpression>
+        </textfilecontent54_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23036000" version="1">
+          <subexpression datatype="int" operation="less than or equal">4</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

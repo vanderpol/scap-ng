@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:254484" version="1" class="compliance">
+          <metadata>
+            <title>Windows User Account Control (UAC) must, at a minimum, prompt administrators for consent on the secure desktop.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25448400" comment="Verifies 'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' is set to 'Prompt for consent on the secure desktop' or 'Prompt for credentials on the secure desktop'"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows2025:def:278234" version="1" class="compliance">
+          <metadata>
+            <title>WN25-SO-000400 - Windows Server 2025 User Account Control (UAC) must, at a minimum, prompt administrators for consent on the secure desktop.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>UAC is a security mechanism for limiting the elevation of privileges, including administrative accounts, unless authorized. This setting configures the elevation requirements for logged-on administrators to complete a task that requires raised privileges.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254484"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25448400" version="1" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' is set to 'Prompt for consent on the secure desktop' or 'Prompt for credentials on the secure desktop'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25346900"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000002"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25346900" version="1">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System</key>
+          <name datatype="string">ConsentPromptBehaviorAdmin</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000002" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">2</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">1</value>
+        </registry_state>
+        </states></oval_definitions>

@@ -1,0 +1,232 @@
+{
+  "definitions": [
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Windows Server Active Directory Domain Controllers Organizational Unit (OU) object must be configured with proper audit settings.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27815101"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:278151",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Windows Server 2025 Active Directory (AD) Domain Controllers Organizational Unit (OU) object must be configured with proper audit settings."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    }
+  ],
+  "features": {
+    "attributes": {
+      "check": {
+        "all": 1
+      },
+      "check_existence": {
+        "at_least_one_exists": 1
+      },
+      "entity_check": {
+        "none satisfy": 1
+      },
+      "operation": {
+        "pattern match": 1
+      }
+    },
+    "elements": {
+      "behaviors": 1,
+      "command": 1,
+      "criteria": 1,
+      "criterion": 1,
+      "definition": 1,
+      "definitions": 1,
+      "description": 1,
+      "generator": 1,
+      "metadata": 1,
+      "object": 1,
+      "objects": 1,
+      "oval_definitions": 1,
+      "pattern": 1,
+      "product_name": 1,
+      "schema_version": 1,
+      "shell": 1,
+      "shellcommand_object": 1,
+      "shellcommand_state": 1,
+      "shellcommand_test": 1,
+      "state": 1,
+      "states": 1,
+      "stdout_line": 1,
+      "tests": 1,
+      "timestamp": 1,
+      "title": 1
+    },
+    "namespaces": {
+      "http://oval.mitre.org/XMLSchema/oval-common-5": 3,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5": 12,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent": 10
+    }
+  },
+  "generator": {
+    "children": [
+      {
+        "name": "product_name",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "NIWC Atlantic - Complete Compliance v2"
+      },
+      {
+        "name": "schema_version",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "5.12.3"
+      },
+      {
+        "name": "timestamp",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "2026-08-26T17:35:53.062040+00:00"
+      }
+    ],
+    "name": "generator",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  },
+  "ir_version": "0.1-prototype",
+  "native_translation": {
+    "note": "Structural OVAL semantics are represented. Native SCAP-NG capability mappings are a separate reviewed translation layer.",
+    "status": "requires_review"
+  },
+  "objects": [
+    {
+      "children": [
+        {
+          "attributes": {
+            "error_if_stderr_exists": "true"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
+          "kind": "element",
+          "name": "shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "powershell"
+        },
+        {
+          "kind": "element",
+          "name": "command",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "$domain = Get-ADDomain; $path = 'AD:\\' + $domain.DomainControllersContainer; $aud = (Get-Acl $path -Audit).Audit; $hasFail = [bool]($aud | Where-Object {$_.IdentityReference -match 'Everyone|S-1-1-0' -and $_.AuditFlags -eq 'Failure' -and ($_.ActiveDirectoryRights -match 'GenericAll|FullControl|All') -and $_.InheritanceType -eq 'All' -and $_.IsInherited -eq $false}); $hasSuccSelf = [bool]($aud | Where-Object {$_.IdentityReference -match 'Everyone|S-1-1-0' -and $_.AuditFlags -eq 'Success' -and $_.InheritanceType -eq 'None' -and $_.IsInherited -eq $false}); $hasSuccDesc = [bool]($aud | Where-Object {$_.IdentityReference -match 'Everyone|S-1-1-0' -and $_.AuditFlags -eq 'Success' -and ($_.ActiveDirectoryRights -match 'WriteProperty|WriteAllProperties') -and $_.InheritanceType -eq 'All' -and $_.IsInherited -eq $false}); . { $t = $path.Replace('AD:\\',''); if (-not $hasFail -or -not $hasSuccSelf -or -not $hasSuccDesc) { $reasons = @(); if (-not $hasFail) { $reasons += 'MISSING: Explicit Everyone : Failure : FullControl [Applies to: All Descendant Objects]' }; if (-not $hasSuccSelf) { $reasons += 'MISSING: Explicit Everyone : Success : Special [Applies to: This Object Only]' }; if (-not $hasSuccDesc) { $reasons += 'MISSING: Explicit Everyone : Success : Write all properties [Applies to: All Descendant Objects]' }; 'Target_Object=' + $t + ' | IdentityReference=Everyone (S-1-1-0) | Status=FAIL | Details=' + ($reasons -join ' ; ') } else { 'Target_Object=' + $t + ' | IdentityReference=Everyone (S-1-1-0) | Status=PASS | Details=All mandatory Failure and Success audit entries and scopes are correctly configured per SV-254404r958732.' } }"
+        },
+        {
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": ".+"
+        }
+      ],
+      "comment": "Query both Fail and Success auditing settings for Domain Controllers Organizational Unit (OU)",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27815101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "shellcommand_object",
+      "version": "1"
+    }
+  ],
+  "parser_contract": {
+    "ambiguous_native_mapping": "requires_review",
+    "core_logic_model": "explicit",
+    "platform_specific_nodes": "losslessly_preserved",
+    "policy_intent_inference": "forbidden"
+  },
+  "reference_graph": {
+    "oval:navy.navwar.niwcatlantic.scc.windows:def:278151": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:def:278151",
+      "oval:navy.navwar.niwcatlantic.scc.windows:tst:27815101"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:obj:27815101": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:obj:27815101"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:ste:27815101": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:ste:27815101"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:tst:27815101": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:obj:27815101",
+      "oval:navy.navwar.niwcatlantic.scc.windows:ste:27815101",
+      "oval:navy.navwar.niwcatlantic.scc.windows:tst:27815101"
+    ]
+  },
+  "semantic_ir_sha256": "6812dc223065cad2b9693679276eb2dbad305de9c12ad9f5f679785c887bb5f2",
+  "source": {
+    "bytes": 6588,
+    "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-278151r1182108_rule/oval.xml",
+    "sha256": "7d5b25dfcffa132af99f88cb760693c8dfc8a83c43e03c1997293ff89e69fdc5"
+  },
+  "states": [
+    {
+      "comment": "No lines shall exist listed with status of 'FAIL'",
+      "entities": [
+        {
+          "attributes": {
+            "entity_check": "none satisfy",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "stdout_line",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "=FAIL"
+        }
+      ],
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27815101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "shellcommand_state",
+      "version": "1"
+    }
+  ],
+  "tests": [
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "Windows Server Active Directory Domain Controllers Organizational Unit (OU) object must be configured with proper audit settings.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27815101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27815101"
+          },
+          "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27815101"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27815101"
+          },
+          "state_ref": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27815101"
+        }
+      ],
+      "type": "shellcommand_test",
+      "version": "1"
+    }
+  ],
+  "unresolved_references": [],
+  "variables": []
+}

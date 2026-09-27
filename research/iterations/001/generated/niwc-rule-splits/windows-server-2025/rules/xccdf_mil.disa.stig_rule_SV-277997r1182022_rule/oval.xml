@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows2025:def:277997" version="1" class="compliance">
+          <metadata>
+            <title>WN25-00-000130 - Windows Server 2025 local volumes must use a format that supports New Technology File System (NTFS) attributes.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>The ability to set access permissions and auditing is critical to maintaining the security and proper access controls of a system. To support this, volumes must be formatted using a file system that supports NTFS attributes.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254250"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:254250" version="1" class="compliance">
+          <metadata>
+            <title>Windows local volumes must use a format that supports NTFS attributes.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25425000"/>
+          </criteria>
+        </definition>
+        </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25425000" version="3" check_existence="none_exist" check="all" comment="local volumes are formatted using NTFS, ReFS or CSVFS">
+          <object object_ref="oval:mil.disa.stig.win:obj:25425000"/>
+        </wmi57_test>
+        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25425000" version="3">
+          <namespace>root\cimv2</namespace>
+          <wql>SELECT filesystem FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!='NTFS' AND filesystem!='ReFS' AND filesystem!='CSVFS'</wql>
+        </wmi57_object>
+        </objects></oval_definitions>

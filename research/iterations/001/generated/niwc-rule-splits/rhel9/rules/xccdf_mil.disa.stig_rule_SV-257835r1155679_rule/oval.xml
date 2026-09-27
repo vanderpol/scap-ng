@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:257835" version="1" class="compliance">
+          <metadata>
+            <title>The TFTP daemon must be configured to operate in secure mode.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:24890200" comment="/usr/lib/systemd/system/tftp.service: ExecStart has a -s option with a subdirectory assigned"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257835" version="2" class="compliance">
+          <metadata>
+            <title>RHEL-09-215060 - The Trivial File Transfer Protocol (TFTP) server must not be installed unless it is required, and if required, the RHEL 9 TFTP daemon must be configured to operate in secure mode.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Removing the "tftp-server" package decreases the risk of the accidental (or intentional) activation of tftp services.
+
+If TFTP is required for operational support (such as transmission of router configurations), its use must be documented with the information systems security manager (ISSM), restricted to only authorized personnel, and have access control rules established.
+
+Restricting TFTP to a specific directory prevents remote users from copying, transferring, or overwriting system files.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257835"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:24890200" version="1" check="all" comment="/usr/lib/systemd/system/tftp.service: ExecStart has a -s option with a subdirectory assigned">
+          <object object_ref="oval:mil.disa.stig.ind:obj:24890200"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:24890200" version="1">
+          <filepath>/usr/lib/systemd/system/tftp.service</filepath>
+          <pattern operation="pattern match">^ExecStart[ \t]*=[ \t]*\/usr\/sbin\/in\.tftpd[ \t]*-s[ \t]+/\S+[ \t]*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects></oval_definitions>

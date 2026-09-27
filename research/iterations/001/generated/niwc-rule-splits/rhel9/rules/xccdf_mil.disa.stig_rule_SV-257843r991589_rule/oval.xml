@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257843" version="1" class="compliance">
+          <metadata>
+            <title>RHEL-09-231010 - A separate RHEL 9 file system must be used for user home directories (such as /home or an equivalent).</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Ensuring that "/home" is mounted on its own partition enables the setting of more restrictive mount options, and also helps ensure that users cannot trivially fill partitions used for log or audit data storage.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230328"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230328" version="1" class="compliance">
+          <metadata>
+            <title>A separate operating system filesystem must be used for user home directories (such as /home or an equivalent).</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.linux:tst:23032800" comment="A separate operating system filesystem is used for user home directories"/>
+          </criteria>
+        </definition>
+        </definitions><tests><partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23032800" version="1" check_existence="all_exist" check="all" comment="A separate operating system filesystem is used for user home directories">
+          <object object_ref="oval:mil.disa.stig.linux:obj:23032800"/>
+        </partition_test>
+        </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23032800" version="2">
+          <mount_point operation="pattern match">.*\/home</mount_point>
+        </partition_object>
+        </objects></oval_definitions>

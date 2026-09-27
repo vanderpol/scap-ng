@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271868" version="2" class="compliance">
+          <metadata>
+            <title>OL09-00-006024 - OL 9 must use reverse path filtering on all IPv4 interfaces.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Enabling reverse path filtering drops packets with source addresses that should not have been able to be received on the interface on which they were received. It must not be used on systems that are routers for complicated networks but is helpful for end hosts and routers serving small networks.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:271868"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:271868" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must use reverse path filtering on all IPv4 interfaces.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:27186800" comment="net.ipv4.conf.all.rp_filter setting in kernel is 1"/>
+          </criteria>
+        </definition>
+        </definitions><tests><sysctl_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:27186800" version="1" check_existence="all_exist" check="all" comment="net.ipv4.conf.all.rp_filter setting in kernel is set to 1">
+          <object object_ref="oval:mil.disa.stig.unix:obj:23054900"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:20000010"/>
+        </sysctl_test>
+        </tests><objects><sysctl_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23054900" version="1">
+          <name>net.ipv4.conf.all.rp_filter</name>
+        </sysctl_object>
+        </objects><states><sysctl_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000010" version="1">
+          <value datatype="int" operation="equals">1</value>
+        </sysctl_state>
+        </states></oval_definitions>

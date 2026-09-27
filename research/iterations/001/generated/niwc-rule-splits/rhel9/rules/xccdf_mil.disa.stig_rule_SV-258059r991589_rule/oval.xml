@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258059" version="3" class="compliance">
+          <metadata>
+            <title>RHEL-09-411100 - The root account must be the only account having unrestricted access to RHEL 9 system.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>An account has root authority if it has a user identifier (UID) of "0". Multiple accounts with a UID of "0" afford more opportunity for potential intruders to guess a password for a privileged account. Proper configuration of sudo is recommended to afford multiple system administrators access to root privileges in an accountable manner.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230534"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230534" version="1" class="compliance">
+          <metadata>
+            <title>The root account must be the only account having unrestricted access to the operating system system.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:23053400" comment="Only the root account has a UID of zero."/>
+          </criteria>
+        </definition>
+        </definitions><tests><password_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23053400" version="1" check="all" comment="Only the root account has a UID of zero.">
+          <object object_ref="oval:mil.disa.stig.unix:obj:23053400"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:23053400"/>
+        </password_test>
+        </tests><objects><password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23053400" version="1">
+          <username operation="not equal">root</username>
+        </password_object>
+        </objects><states><password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:23053400" version="1">
+          <user_id datatype="int" operation="not equal">0</user_id>
+        </password_state>
+        </states></oval_definitions>

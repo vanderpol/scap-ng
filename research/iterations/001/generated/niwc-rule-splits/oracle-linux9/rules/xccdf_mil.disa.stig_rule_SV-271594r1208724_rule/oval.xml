@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258215" version="1" class="compliance">
+          <metadata>
+            <title>Successful/unsuccessful uses of the umount system call in the operating system must generate an audit record.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25821500" comment="Audit 32-bit invocations of umount syscall"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271594" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-000840 - OL 9 must be configured so that successful/unsuccessful uses of the umount system call generate an audit record.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>The changing of file permissions could indicate that a user is attempting to gain access to information that would otherwise be disallowed. Auditing DAC modifications can facilitate the identification of patterns of abuse among both authorized and unauthorized users.
+
+	Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258215"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25821500" version="1" check_existence="all_exist" check="all" comment="Audit 32-bit invocations of umount syscall">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25821500"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25821500" version="1" comment="32-bit umount syscall">
+          <filepath>/etc/audit/audit.rules</filepath>
+          <pattern operation="pattern match">^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+umount\s+|(\s+|,)umount(\s+|,))).*-F\s+auid&gt;=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects></oval_definitions>

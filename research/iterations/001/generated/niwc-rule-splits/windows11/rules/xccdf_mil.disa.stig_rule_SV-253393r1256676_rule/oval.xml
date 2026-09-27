@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows11:def:253393" version="3" class="compliance">
+          <metadata>
+            <title>WN11-CC-000205 - Windows Telemetry must not be configured to Full.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows 11</platform>
+            </affected>
+            <description>Some features may communicate with the vendor, sending system information or downloading data or components for the feature. Limiting this capability will prevent potentially sensitive information from being sent outside the enterprise. The "Security" option for Telemetry configures the lowest amount of data, effectively none outside of the Malicious Software Removal Tool (MSRT), Defender and telemetry client settings. "Basic" sends basic diagnostic and usage data and may be required to support some Microsoft services. "Enhanced" includes additional information on how Windows and apps are used and advanced reliability data. Windows Analytics can use a "limited enhanced" level to provide information such as health data for devices.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253393"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:253393" version="2" class="compliance">
+          <metadata>
+            <title>Windows Telemetry must not be configured to Full.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25339300" comment="Verifies 'Allow Diagnostic Data' is set to 'Diagnostic Data Off (Not recommended)' or 'Send Required Diagnostic Data' selected in 'Options:'"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25339300" version="2" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="'Allow Diagnostic Data' is set to 'Enabled' with 'Diagnostic Data Off (Not recommended)' or 'Send Required Diagnostic Data' selected in 'Options:'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25339300"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25339300" version="1">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Policies\Microsoft\Windows\DataCollection</key>
+          <name datatype="string">AllowTelemetry</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">1</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000000" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">0</value>
+        </registry_state>
+        </states></oval_definitions>

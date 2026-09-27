@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258073" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must define default permissions for the c shell.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23038501" comment="UMASK is set to only 077 in /etc/csh.cshrc"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271694" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-002302 - OL 9 must define default permissions for the c shell.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>The umask controls the default access mode assigned to newly created files. A umask of 077 limits new files to mode 600 or less permissive. Although umask can be represented as a four-digit number, the first digit representing special access modes is typically ignored or required to be "0". This requirement applies to the globally configured system defaults and the local interactive user defaults for each account on the system.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258073"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23038501" version="1" check_existence="all_exist" check="all" comment="UMASK is set to only 077 in /etc/csh.cshrc">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23038501"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23038500"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23038501" version="1">
+          <filepath>/etc/csh.cshrc</filepath>
+          <pattern operation="pattern match">^\s*(?i)umask\s*(\d+)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23038500" version="1">
+          <subexpression datatype="string" operation="equals">077</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

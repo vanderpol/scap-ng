@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271735" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-002391 - OL 9 must enable mitigations against processor-based vulnerabilities.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Kernel page-table isolation is a kernel feature that mitigates the Meltdown security vulnerability and hardens the kernel against attempts to bypass kernel address space layout randomization (KASLR).
+
+	Satisfies: SRG-OS-000433-GPOS-00193, SRG-OS-000095-GPOS-00049</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230491"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230491" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must enable mitigations against processor-based vulnerabilities.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23049100"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23049101"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049100" version="1" check="all" comment="BLS options contain pti=on">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25779300"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23049100"/>
+        </textfilecontent54_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049101" version="1" check="all" comment="The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain pti=on">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25779301"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23049100"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25779301" version="1" comment="/etc/default/grub GRUB_CMDLINE_LINUX">
+          <filepath>/etc/default/grub</filepath>
+          <pattern operation="pattern match">^GRUB_CMDLINE_LINUX="(.*)"</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25779300" version="1" comment="BLS options">
+          <path>/boot/loader/entries</path>
+          <filename operation="pattern match">^.*\.conf$</filename>
+          <pattern operation="pattern match">^options\s+(.*)$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23049100" version="1">
+          <subexpression operation="pattern match">(^|\s)pti=on(\s|$)</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

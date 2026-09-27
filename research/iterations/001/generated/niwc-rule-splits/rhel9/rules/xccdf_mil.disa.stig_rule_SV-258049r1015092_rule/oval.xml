@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258049" version="1" class="compliance">
+          <metadata>
+            <title>RHEL-09-411050 - RHEL 9 must disable account identifiers (individuals, groups, roles, and devices) after 35 days of inactivity.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Inactive identifiers pose a risk to systems and applications because attackers may exploit an inactive identifier and potentially obtain undetected access to the system.
+
+Disabling inactive accounts ensures that accounts which may not have been responsibly removed are not available to attackers who may have compromised their credentials.
+
+Owners of inactive accounts will not notice if unauthorized access to their user account has been obtained.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230373"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230373" version="1" class="compliance">
+          <metadata>
+            <title>The operating system account identifiers (individuals, groups, roles, and devices) must be disabled after 35 days of inactivity.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23037300" comment="/etc/default/useradd: INACTIVE is set to 35 or less, but not -1"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23037300" version="2" check="all" comment="/etc/default/useradd: INACTIVE is set to 35 or less, but not -1">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23037300"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:20000019"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23037300"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23037300" version="1">
+          <filepath>/etc/default/useradd</filepath>
+          <pattern operation="pattern match">(?i)^\s*INACTIVE\s*=\s*(-?\d+)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000019" version="2">
+          <subexpression datatype="int" operation="greater than or equal">0</subexpression>
+        </textfilecontent54_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23037300" version="1">
+          <subexpression datatype="int" operation="less than or equal">35</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

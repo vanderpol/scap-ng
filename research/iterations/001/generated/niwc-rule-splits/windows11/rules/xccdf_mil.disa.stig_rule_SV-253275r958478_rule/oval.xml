@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253275" version="1" class="compliance">
+          <metadata>
+            <title>Internet Information System (IIS) or its subcomponents must not be installed on a workstation.</title>
+            <description/>
+          </metadata>
+          <criteria operator="AND" comment="No IIS components are installed">
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25327500" comment="Verifies 'Internet Information Services' feature is not installed"/>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25327501" comment="Verifies 'Internet Information Services Hostable Web Core' feature is not installed"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows11:def:253275" version="2" class="compliance">
+          <metadata>
+            <title>WN11-00-000100 - Internet Information System (IIS) or its subcomponents must not be installed on a workstation.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows 11</platform>
+            </affected>
+            <description>IIS is not installed by default. Installation of Internet Information System (IIS) may allow unauthorized internet services to be hosted. Websites must only be hosted on servers that have been designed for that purpose and can be adequately secured.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253275"/>
+          </criteria>
+        </definition>
+        </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25327501" version="1" check_existence="all_exist" check="all" comment="'Internet Information Services Hostable Web Core' feature is not installed">
+          <object object_ref="oval:mil.disa.stig.win:obj:25327501"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:25327500"/>
+        </wmi57_test>
+        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25327500" version="1" check_existence="all_exist" check="all" comment="'Internet Information Services' feature is not installed">
+          <object object_ref="oval:mil.disa.stig.win:obj:25327500"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:25327500"/>
+        </wmi57_test>
+        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25327501" version="1">
+          <namespace datatype="string">root\cimv2</namespace>
+          <wql datatype="string" operation="equals">SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-HostableWebCore'</wql>
+        </wmi57_object>
+        <wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25327500" version="1">
+          <namespace datatype="string">root\cimv2</namespace>
+          <wql datatype="string" operation="equals">SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-WebServerRole'</wql>
+        </wmi57_object>
+        </objects><states><wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25327500" version="1" comment="InstallState is equal to 2">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="installstate" entity_check="at least one" datatype="string">2</field>
+          </result>
+        </wmi57_state>
+        </states></oval_definitions>

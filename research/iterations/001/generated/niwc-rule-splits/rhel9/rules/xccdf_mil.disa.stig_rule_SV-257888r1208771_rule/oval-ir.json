@@ -1,0 +1,210 @@
+{
+  "definitions": [
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Permissions of cron configuration files and directories must not be modified from the operating system defaults.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25788801"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257888",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL 9 permissions of cron configuration files and directories must not be modified from the operating system defaults."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "If the permissions of cron configuration files or directories are modified from the operating system defaults, it may be possible for individuals to insert unauthorized cron jobs that perform unauthorized actions, including potentially escalating privileges."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "13"
+    }
+  ],
+  "features": {
+    "attributes": {
+      "check": {
+        "all": 1
+      },
+      "check_existence": {
+        "at_least_one_exists": 1,
+        "none_exist": 1
+      }
+    },
+    "elements": {
+      "command": 1,
+      "criteria": 1,
+      "criterion": 1,
+      "definition": 1,
+      "definitions": 1,
+      "description": 1,
+      "generator": 1,
+      "metadata": 1,
+      "object": 1,
+      "objects": 1,
+      "oval_definitions": 1,
+      "product_name": 1,
+      "schema_version": 1,
+      "shell": 1,
+      "shellcommand_object": 1,
+      "shellcommand_state": 1,
+      "shellcommand_test": 1,
+      "state": 1,
+      "states": 1,
+      "stdout_line": 1,
+      "tests": 1,
+      "timestamp": 1,
+      "title": 1
+    },
+    "namespaces": {
+      "http://oval.mitre.org/XMLSchema/oval-common-5": 3,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5": 12,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent": 8
+    }
+  },
+  "generator": {
+    "children": [
+      {
+        "name": "product_name",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "NIWC Atlantic - Complete Compliance v2"
+      },
+      {
+        "name": "schema_version",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "5.12.3"
+      },
+      {
+        "name": "timestamp",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "2026-08-26T17:36:15.878708+00:00"
+      }
+    ],
+    "name": "generator",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  },
+  "ir_version": "0.1-prototype",
+  "native_translation": {
+    "note": "Structural OVAL semantics are represented. Native SCAP-NG capability mappings are a separate reviewed translation layer.",
+    "status": "requires_review"
+  },
+  "objects": [
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "bash"
+        },
+        {
+          "kind": "element",
+          "name": "command",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "rpm --verify cronie crontabs | awk '! ($2 == \"c\" && $1 ~ /^.\\..\\.\\.\\.\\..\\./) {print $0}'"
+        }
+      ],
+      "comment": "Retrieve cron configuration files and directories which do not match the operating system defaults.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25788801",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "shellcommand_object",
+      "version": "13"
+    }
+  ],
+  "parser_contract": {
+    "ambiguous_native_mapping": "requires_review",
+    "core_logic_model": "explicit",
+    "platform_specific_nodes": "losslessly_preserved",
+    "policy_intent_inference": "forbidden"
+  },
+  "reference_graph": {
+    "oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257888": [
+      "oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257888",
+      "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25788801"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25788801": [
+      "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25788801"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25788801": [
+      "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25788801"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25788801": [
+      "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25788801",
+      "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25788801",
+      "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25788801"
+    ]
+  },
+  "semantic_ir_sha256": "b1e1f1f920eb13fecca6f21cc3909c4fc62d73801a6c50888e8b8dd5f9891e74",
+  "source": {
+    "bytes": 5046,
+    "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257888r1208771_rule/oval.xml",
+    "sha256": "aef3da5992a349f63ea3b6c0ed26024319f450b1c885c7b9635e3d1d11dcbeed"
+  },
+  "states": [
+    {
+      "comment": "Confirm no non-compliant files are identified.",
+      "entities": [
+        {
+          "attributes": {
+            "check_existence": "none_exist"
+          },
+          "kind": "element",
+          "name": "stdout_line",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        }
+      ],
+      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25788801",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "shellcommand_state",
+      "version": "13"
+    }
+  ],
+  "tests": [
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "Confirm permissions of cron configuration files and directories match the operating system defaults.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25788801",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25788801"
+          },
+          "object_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25788801"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25788801"
+          },
+          "state_ref": "oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25788801"
+        }
+      ],
+      "type": "shellcommand_test",
+      "version": "13"
+    }
+  ],
+  "unresolved_references": [],
+  "variables": []
+}

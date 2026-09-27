@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253346" version="1" class="compliance">
+          <metadata>
+            <title>Windows must be configured to audit other Logon/Logoff Events Failures.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25334600" comment="Audit - Logon - Failure only and Success and Failure"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows11:def:253346" version="2" class="compliance">
+          <metadata>
+            <title>WN11-AU-000565 - Windows 11 must be configured to audit other Logon/Logoff Events Failures.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows 11</platform>
+            </affected>
+            <description>Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.
+
+Audit Other Logon/Logoff Events determines whether Windows generates audit events for other logon or logoff events. Logon events are essential to understanding user activity and detecting potential attacks.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253346"/>
+          </criteria>
+        </definition>
+        </definitions><tests><auditeventpolicysubcategories_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25334600" version="1" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="'Audit Logon' is set to 'Failure' and 'Succss and Failure">
+          <object object_ref="oval:mil.disa.stig.win:obj:20000000"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:25334600"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:25334601"/>
+        </auditeventpolicysubcategories_test>
+        </tests><objects><auditeventpolicysubcategories_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:20000000" version="1"/>
+        </objects><states><auditeventpolicysubcategories_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25334601" version="1" comment="'Log On' is set to 'Success' and 'Failure'">
+          <other_logon_logoff_events datatype="string">AUDIT_SUCCESS_FAILURE</other_logon_logoff_events>
+        </auditeventpolicysubcategories_state>
+        <auditeventpolicysubcategories_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25334600" version="1" comment="'Log On' is set to 'Failure'">
+          <other_logon_logoff_events datatype="string">AUDIT_FAILURE</other_logon_logoff_events>
+        </auditeventpolicysubcategories_state>
+        </states></oval_definitions>

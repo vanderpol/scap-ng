@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271586" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-000800 - OL 9 audit system must audit local events.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Without establishing what type of events occurred, the source of events, where events occurred, and the outcome of events, it would be difficult to establish, correlate, and investigate the events leading up to an outage or attack.
+
+	If option "local_events" isn't set to "yes" only events from network will be aggregated.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230393"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230393" version="1" class="compliance">
+          <metadata>
+            <title>The operating system audit system must audit local events.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23039300" comment="/etc/audit/auditd.conf: local_events = yes"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23039300" version="2" check="all" comment="/etc/audit/auditd.conf: local_events = yes">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23039300"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:20000022"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23039300" version="1">
+          <filepath>/etc/audit/auditd.conf</filepath>
+          <pattern operation="pattern match">(?i)^\s*local_events\s*=\s*(\w+)\s*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000022" version="1">
+          <subexpression datatype="string" operation="pattern match">(?i)^yes$</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

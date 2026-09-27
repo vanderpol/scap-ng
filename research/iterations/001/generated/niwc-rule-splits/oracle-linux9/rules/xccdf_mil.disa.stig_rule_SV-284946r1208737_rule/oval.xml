@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:272496" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must elevate the SELinux context when an administrator calls the sudo command.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:27249600" comment="elevate the SELinux context when an administrator calls the sudo command"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:284946" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-000066 - OL 9 must elevate the SELinux context when an administrator calls the sudo command.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Without verification of the security functions, they may not operate correctly and the failure may go unnoticed. Security function is defined as the hardware, software, and/or firmware of the information system responsible for enforcing the system security policy and supporting the isolation of code and data on which the protection is based. 
+
+	Security functionality includes, but is not limited to, establishing system accounts, configuring access authorizations (i.e., permissions, privileges), setting events to be audited, and setting intrusion detection parameters.
+
+	This requirement applies to operating systems performing security function verification/testing and/or systems and environments that require this functionality.
+
+	Preventing nonprivileged users from executing privileged functions mitigates the risk that unauthorized individuals or processes may gain unnecessary access to information or privileges.
+
+	Privileged functions include, for example, establishing accounts, performing system integrity checks, or administering cryptographic key management activities. Nonprivileged users are individuals who do not possess appropriate authorizations. Circumventing intrusion detection and prevention mechanisms or malicious code protection mechanisms are examples of privileged functions that require protection from nonprivileged users.
+
+	Sudo reads from "/etc/sudoers", then form files inside "/etc/sudoers.d/", and within that directory reads in lexicographical order from low to high using a "last match wins" principle. Any options in the last matching rule will override options from earlier matching rules.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:272496"/>
+          </criteria>
+        </definition>
+      </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:27249600" version="2" check_existence="at_least_one_exists" check="all" comment="elevate the SELinux context when an administrator calls the sudo command">
+          <object object_ref="oval:mil.disa.stig.ind:obj:27249602"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:27249600"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27249601" version="1">
+          <behaviors ignore_case="true" max_depth="-1" recurse_direction="down"/>
+          <path>/etc/sudoers.d</path>
+          <filename operation="pattern match">.*</filename>
+          <pattern operation="pattern match">^(.*\bsysadm_r\b.*)$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27249602" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:27249600</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:27249601</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27249600" version="1">
+          <filepath>/etc/sudoers</filepath>
+          <pattern operation="pattern match">^(.*\bsysadm_r\b.*)$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:27249600" version="1">
+          <subexpression operation="pattern match">^[ \t]*%[a-zA-Z0-9_-]+[ \t]+ALL=\(ALL\)[ \t]+TYPE=sysadm_t[ \t]+ROLE=sysadm_r[ \t]+ALL[ \t]*$</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230279" version="2" class="compliance">
+          <metadata>
+            <title>The operating system must clear memory when it is freed to prevent use-after-free attacks.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23027900"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23027901"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257794" version="2" class="compliance">
+          <metadata>
+            <title>RHEL-09-212045 - RHEL 9 must clear memory when it is freed to prevent use-after-free attacks.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Some adversaries launch attacks with the intent of executing code in nonexecutable regions of memory or in memory locations that are prohibited. Security safeguards employed to protect memory include, for example, data execution prevention and address space layout randomization. Data execution prevention safeguards can be either hardware-enforced or software-enforced with hardware providing the greater strength of mechanism.
+
+Poisoning writes an arbitrary value to freed pages, so any modification or reference to that page after being freed or before being initialized will be detected and prevented. This prevents many types of use-after-free vulnerabilities at little performance cost. Also prevents leak of data and detection of corrupted memory.
+
+init_on_free is a Linux kernel boot parameter that enhances security by initializing memory regions when they are freed, preventing data leakage. This process ensures that stale data in freed memory cannot be accessed by malicious programs.
+
+SLUB canaries add a randomized value (canary) at the end of SLUB-allocated objects to detect memory corruption caused by buffer overflows or underflows. Redzoning adds padding (red zones) around SLUB-allocated objects to detect overflows or underflows by triggering a fault when adjacent memory is accessed. SLUB canaries are often more efficient and provide stronger detection against buffer overflows compared to redzoning. SLUB canaries are supported in hardened Linux kernels like the ones provided by Linux-hardened.
+
+SLAB objects are blocks of physically contiguous memory. SLUB is the unqueued SLAB allocator.
+
+Satisfies: SRG-OS-000433-GPOS-00192, SRG-OS-000134-GPOS-00068</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230279"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23027900" version="2" check="all" comment="BLS options contain init_on_free=1">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25779300"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23027900"/>
+        </textfilecontent54_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23027901" version="2" check="all" comment="The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain init_on_free=1">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25779301"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23027900"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25779301" version="1" comment="/etc/default/grub GRUB_CMDLINE_LINUX">
+          <filepath>/etc/default/grub</filepath>
+          <pattern operation="pattern match">^GRUB_CMDLINE_LINUX="(.*)"</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25779300" version="1" comment="BLS options">
+          <path>/boot/loader/entries</path>
+          <filename operation="pattern match">^.*\.conf$</filename>
+          <pattern operation="pattern match">^options\s+(.*)$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23027900" version="2">
+          <subexpression operation="pattern match">(^|\s)init_on_free=1(\s|$)</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

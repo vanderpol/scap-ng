@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271852" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-005005 - OL 9 must be configured to forward audit records via TCP to a different system or media from the system being audited via rsyslog.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Information stored in one location is vulnerable to accidental or incidental deletion or alteration.
+
+	Offloading is a common process in information systems with limited audit storage capacity.
+
+	OL 9 installation media provides "rsyslogd", a system utility providing support for message logging. Support for both internet and Unix domain sockets enables this utility to support both local and remote logging. Coupling this utility with "gnutls" (a secure communications library implementing the SSL, TLS, and DTLS protocols) creates a method to securely encrypt and offload auditing.
+
+	Rsyslog provides three ways to forward message: the traditional UDP transport, which is extremely lossy but standard; the plain TCP based transport, which loses messages only during certain situations but is widely available; and the RELP transport, which does not lose messages but is currently available only as part of the rsyslogd 3.15.0 and above.
+
+	Examples of each configuration:
+	UDP *.* @remotesystemname
+	TCP *.* @@remotesystemname
+	RELP *.* :omrelp:remotesystemname:2514
+	Note that a port number was given as there is no standard port for RELP.
+
+	Satisfies: SRG-OS-000479-GPOS-00224, SRG-OS-000342-GPOS-00133</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258149"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:258149" version="2" class="compliance">
+          <metadata>
+            <title>The operating system audit records must be off-loaded onto a different system or storage media from the system being audited.</title>
+            <description/>
+          </metadata>
+          <criteria operator="OR">
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25814900" comment="remote TCP logging (basic syntax)"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25814901" comment="remote TCP logging (advanced syntax)"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25814900" version="1" check_existence="at_least_one_exists" check="all" comment="remote TCP logging">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25814900"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:25814900"/>
+        </textfilecontent54_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25814901" version="2" check_existence="at_least_one_exists" check="at least one" comment="remote TCP logging (advanced syntax)">
+          <object object_ref="oval:mil.disa.stig.ind:obj:20000002"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:20000027"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:25814902"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814901" version="1" comment="rsyslog.conf: remote TCP logging">
+          <behaviors ignore_case="true"/>
+          <filepath datatype="string">/etc/rsyslog.conf</filepath>
+          <pattern operation="pattern match">^\*\.\*\s+@@(\S+)</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000002" version="1" comment="rsyslog: action for all messages">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:20000003</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:20000004</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814900" version="1" comment="remote TCP logging">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:25814901</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:25814902</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25814902" version="1" comment="rsyslog.d/*.conf: remote TCP logging">
+          <behaviors ignore_case="true"/>
+          <path>/etc/rsyslog.d</path>
+          <filename operation="pattern match">^.*\.conf$</filename>
+          <pattern operation="pattern match">^\*\.\*\s+@@(\S+)</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000003" version="3" comment="rsyslog.conf: action for all messages">
+          <behaviors ignore_case="true"/>
+          <filepath datatype="string">/etc/rsyslog.conf</filepath>
+          <pattern operation="pattern match">^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000004" version="3" comment="rsyslog.d/*.conf: action for all messages">
+          <behaviors ignore_case="true"/>
+          <path>/etc/rsyslog.d</path>
+          <filename operation="pattern match">^.*\.conf$</filename>
+          <pattern operation="pattern match">^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25814900" version="1">
+          <subexpression datatype="string" operation="pattern match">^.+$</subexpression>
+        </textfilecontent54_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000027" version="2">
+          <subexpression datatype="string" operation="pattern match">(?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"</subexpression>
+        </textfilecontent54_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:25814902" version="4">
+          <subexpression datatype="string" operation="pattern match">(?i)(?:^|\n)[^#]*\bprotocol\s*=\s*"tcp"</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

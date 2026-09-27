@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278181" version="1" class="compliance">
+          <metadata>
+            <title>WN25-MS-000050 - Windows Server 2025 must limit the caching of logon credentials to four or less on domain-joined member servers.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>The default Windows configuration caches the last logon credentials for users who log on interactively to a system. This feature is provided for system availability reasons, such as the user's machine being disconnected from the network or domain controllers being unavailable. Even though the credential cache is well protected, if a system is attacked, an unauthorized individual may isolate the password to a domain user account using a password-cracking program and gain access to the domain.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254432"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:254432" version="1" class="compliance">
+          <metadata>
+            <title>Windows must limit the caching of logon credentials to four or less on domain-joined member servers.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25443200" comment="'Interactive logon: Number of previous logons to cache' is set to 4 or less"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25443200" version="1" check_existence="at_least_one_exists" check="all" comment="'Interactive logon: Number of previous logons to cache' is set to 4 or less">
+          <object object_ref="oval:mil.disa.stig.win:obj:25344700"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:25443200"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25344700" version="2">
+          <hive datatype="string" operation="case insensitive equals">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" operation="case insensitive equals">SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon</key>
+          <name datatype="string" operation="case insensitive equals">CachedLogonsCount</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25443200" version="1" comment="Reg_sz value of 4 or less">
+          <type>reg_sz</type>
+          <value datatype="int" operation="less than or equal">4</value>
+        </registry_state>
+        </states></oval_definitions>

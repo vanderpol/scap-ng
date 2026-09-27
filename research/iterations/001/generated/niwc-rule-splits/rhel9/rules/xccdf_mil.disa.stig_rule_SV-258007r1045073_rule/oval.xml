@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258007" version="1" class="compliance">
+          <metadata>
+            <title>RHEL-09-255155 - RHEL 9 SSH daemon must disable remote X connections for interactive users.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>When X11 forwarding is enabled, there may be additional exposure to the server and client displays if the sshd proxy display is configured to listen on the wildcard address.  By default, sshd binds the forwarding server to the loopback address and sets the hostname part of the DISPLAY environment variable to localhost. This prevents remote hosts from connecting to the proxy display.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230555"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230555" version="2" class="compliance">
+          <metadata>
+            <title>The operating system remote X connections for interactive users must be disabled unless to fulfill documented and validated mission requirements.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23055500" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:X11Forwarding == no"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23055500" version="2" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:X11Forwarding == no">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23055500"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:20000017"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23055500" version="2" comment="X11Forwarding in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:23055501</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:23055502</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23055502" version="1">
+          <path>/etc/ssh/sshd_config.d</path>
+          <filename operation="pattern match">.+</filename>
+          <pattern operation="pattern match">^\s*(?i)X11Forwarding[ \t]+([^\s#]*)[ \t]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23055501" version="1">
+          <filepath>/etc/ssh/sshd_config</filepath>
+          <pattern operation="pattern match">^\s*(?i)X11Forwarding[ \t]+([^\s#]*)[ \t]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000017" version="1">
+          <subexpression datatype="string" operation="pattern match">^(no|"no")$</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

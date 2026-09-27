@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows2025:def:285323" version="1" class="compliance">
+          <metadata>
+            <title>WN25-SH-000110 - Windows Server 2025 OpenSSH must not allow GSSAPI authentication.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>Generic Security Service Application Program Interface (GSSAPI) authentication is used to provide additional authentication mechanisms to applications. Allowing GSSAPI authentication through SSH exposes the system's GSSAPI to remote hosts, increasing the attack surface of the system.
+
+Satisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00228</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:285323"/>
+          </criteria>
+        </definition>
+      <definition id="oval:mil.disa.stig.defs:def:285323" version="2" class="compliance">
+          <metadata>
+            <title>The operating system OpenSSH must not allow GSSAPI authentication.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:28532300" comment="C:\ProgramData\ssh\sshd_config:GSSAPIAuthentication==no"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:28532300" version="1" check="all" comment="C:\ProgramData\ssh\sshd_config:GSSAPIAuthentication==no">
+          <object object_ref="oval:mil.disa.stig.ind:obj:28532300"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:20000017"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:28532300" version="1">
+          <behaviors ignore_case="true"/>
+          <filepath>C:\ProgramData\ssh\sshd_config</filepath>
+          <pattern operation="pattern match">^\s*(?i)GSSAPIAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000017" version="1">
+          <subexpression datatype="string" operation="pattern match">^(no|"no")$</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

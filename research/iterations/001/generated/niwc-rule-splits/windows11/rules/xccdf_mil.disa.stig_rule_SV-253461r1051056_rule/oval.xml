@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253461" version="1" class="compliance">
+          <metadata>
+            <title>The system must be configured to prevent the storage of the LAN Manager hash of passwords.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25346100" comment="Verifies 'Network security: Do not store LAN Manager hash value on next password change' is set to 'Enabled'"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows11:def:253461" version="2" class="compliance">
+          <metadata>
+            <title>WN11-SO-000195 - The system must be configured to prevent the storage of the LAN Manager hash of passwords.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows 11</platform>
+            </affected>
+            <description>The LAN Manager hash uses a weak encryption algorithm and there are several tools available that use this hash to retrieve account passwords. This setting controls whether or not a LAN Manager hash of the password is stored in the SAM the next time the password is changed.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253461"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25346100" version="1" check_existence="at_least_one_exists" check="all" comment="'Network security: Do not store LAN Manager hash value on next password change' is set to 'Enabled'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25346100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25346100" version="1" comment="Check the contents of HKLM\System\CurrentControlSet\Control\Lsa\NoLMHash">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">System\CurrentControlSet\Control\Lsa</key>
+          <name datatype="string" operation="case insensitive equals">NoLMHash</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">1</value>
+        </registry_state>
+        </states></oval_definitions>

@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:254390" version="1" class="compliance">
+          <metadata>
+            <title>Windows computer clock synchronization tolerance must be limited to five minutes or less.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25439000" comment="Kerberos Policy - Maximum tolerance for computer clock synchronization - 5 minutes or less"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows2025:def:278137" version="1" class="compliance">
+          <metadata>
+            <title>WN25-DC-000060 - Windows Server 2025 computer clock synchronization tolerance must be limited to five minutes or less.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>This setting determines the maximum time difference (in minutes) that Kerberos will tolerate between the time on a client's clock and the time on a server's clock while still considering the two clocks synchronous. To prevent replay attacks, Kerberos uses timestamps as part of its protocol definition. For timestamps to work properly, the clocks of the client and the server must be in sync as much as possible.
+
+  Satisfies: SRG-OS-000112-GPOS-00057, SRG-OS-000113-GPOS-00058</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254390"/>
+          </criteria>
+        </definition>
+        </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25439000" version="1" check_existence="at_least_one_exists" check="all" comment="Kerberos Policy - Maximum tolerance for computer clock synchronization - 5 minutes or less">
+          <object object_ref="oval:mil.disa.stig.win:obj:25439000"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:25439000"/>
+        </wmi57_test>
+        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25439000" version="1" comment="Kerberos Policy - Maximum tolerance for computer clock synchronization must be 5 minutes or less">
+          <namespace datatype="string">root\rsop\computer</namespace>
+          <wql datatype="string">SELECT setting FROM RSOP_SecuritySettingNumeric WHERE KeyName='MaxClockSkew'</wql>
+        </wmi57_object>
+        </objects><states><wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:25439000" version="1" comment="Maximum tolerance for computer clock synchronization lte 5">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="setting" datatype="int" operation="less than or equal">5</field>
+          </result>
+        </wmi57_state>
+        </states></oval_definitions>

@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278182" version="1" class="compliance">
+          <metadata>
+            <title>WN25-MS-000060 - Windows Server 2025 must restrict remote calls to the Security Account Manager (SAM) to Administrators on domain-joined member servers and stand-alone or nondomain-joined systems.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>The Windows SAM stores users' passwords. Restricting Remote Procedure Call (RPC) connections to the SAM to Administrators helps protect those credentials.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253457"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:253457" version="1" class="compliance">
+          <metadata>
+            <title>Remote calls to the Security Account Manager (SAM) must be restricted to Administrators.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.windows:tst:25345700" comment="Allow Administrators group to make remote calls to SAM"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.windows:tst:25345700" version="1" check_existence="at_least_one_exists" check="all" comment="Allow Administrators group to make remote calls to SAM">
+          <object object_ref="oval:mil.disa.stig.windows:obj:25345700"/>
+          <state state_ref="oval:mil.disa.stig.windows:ste:25345700"/>
+        </registry_test>
+      </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.windows:obj:25345700" version="2">
+          <hive datatype="string" operation="case insensitive equals">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" operation="case insensitive equals">SYSTEM\CurrentControlSet\Control\Lsa</key>
+          <name datatype="string" operation="case insensitive equals">RestrictRemoteSAM</name>
+        </registry_object>
+      </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.windows:ste:25345700" version="1" comment="Reg_Sz type and value equals O:BAG:BAD:(A;;RC;;;BA)">
+          <type>reg_sz</type>
+          <value datatype="string" operation="equals">O:BAG:BAD:(A;;RC;;;BA)</value>
+        </registry_state>
+      </states></oval_definitions>

@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257800" version="2" class="compliance">
+          <metadata>
+            <title>RHEL-09-213025 - RHEL 9 must restrict exposed kernel pointer addresses access.</title>
+            <affected family="unix">
+              <platform>Red Hat Enterprise Linux 9</platform>
+            </affected>
+            <description>Exposing kernel pointers (through procfs or "seq_printf()") exposes kernel writeable structures, which may contain functions pointers. If a write vulnerability occurs in the kernel, allowing write access to any of this structure, the kernel can be compromised. This option disallows any program without the CAP_SYSLOG capability to get the addresses of kernel pointers by replacing them with "0".
+
+Satisfies: SRG-OS-000132-GPOS-00067, SRG-OS-000433-GPOS-00192, SRG-OS-000480-GPOS-00227</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257800"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:257800" version="2" class="compliance">
+          <metadata>
+            <title>The operating system must restrict exposed kernel pointer addresses access.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:25780000" comment="kernel.kptr_restrict is set to 1"/>
+          </criteria>
+        </definition>
+        </definitions><tests><sysctl_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:25780000" version="2" check="all" comment="kernel.kptr_restrict is set to 1">
+          <object object_ref="oval:mil.disa.stig.unix:obj:23054700"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:20000010"/>
+        </sysctl_test>
+        </tests><objects><sysctl_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:23054700" version="1">
+          <name>kernel.kptr_restrict</name>
+        </sysctl_object>
+        </objects><states><sysctl_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000010" version="1">
+          <value datatype="int" operation="equals">1</value>
+        </sysctl_state>
+        </states></oval_definitions>

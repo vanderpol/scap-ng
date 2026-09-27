@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278099" version="1" class="compliance">
+          <metadata>
+            <title>WN25-CC-000210 - Windows Server 2025 AutoPlay must be turned off for nonvolume devices.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>Allowing AutoPlay to execute may introduce malicious code to a system. AutoPlay begins reading from a drive as soon as media is inserted into the drive. As a result, the setup file of programs or music on audio media may start. This setting will disable AutoPlay for nonvolume devices, such as Media Transfer Protocol (MTP) devices.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253386"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:253386" version="1" class="compliance">
+          <metadata>
+            <title>Autoplay must be turned off for non-volume devices.</title>
+            <description/>
+          </metadata>
+          <criteria operator="AND">
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25338600" comment="Verifies 'Disallow Autoplay for non-volume devices' is set to 'Enabled'"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25338600" version="1" check_existence="at_least_one_exists" check="all" comment="'Disallow Autoplay for non-volume devices' is set to 'Enabled'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25338600"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25338600" version="1">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Policies\Microsoft\Windows\Explorer</key>
+          <name datatype="string">NoAutoplayfornonVolume</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">1</value>
+        </registry_state>
+        </states></oval_definitions>

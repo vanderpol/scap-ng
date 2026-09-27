@@ -1,0 +1,252 @@
+{
+  "definitions": [
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Audit 32-bit invocations of umount syscall",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25821500"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258215",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Successful/unsuccessful uses of the umount system call in the operating system must generate an audit record."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:258215",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.ol9os:def:271594",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "OL09-00-000840 - OL 9 must be configured so that successful/unsuccessful uses of the umount system call generate an audit record."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Oracle Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The changing of file permissions could indicate that a user is attempting to gain access to information that would otherwise be disallowed. Auditing DAC modifications can facilitate the identification of patterns of abuse among both authorized and unauthorized users.\n\n\tSatisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    }
+  ],
+  "features": {
+    "attributes": {
+      "check": {
+        "all": 1
+      },
+      "check_existence": {
+        "all_exist": 1
+      },
+      "datatype": {
+        "int": 1
+      },
+      "operation": {
+        "greater than or equal": 1,
+        "pattern match": 1
+      }
+    },
+    "elements": {
+      "affected": 1,
+      "criteria": 2,
+      "criterion": 1,
+      "definition": 2,
+      "definitions": 1,
+      "description": 2,
+      "extend_definition": 1,
+      "filepath": 1,
+      "generator": 1,
+      "instance": 1,
+      "metadata": 2,
+      "object": 1,
+      "objects": 1,
+      "oval_definitions": 1,
+      "pattern": 1,
+      "platform": 1,
+      "product_name": 1,
+      "schema_version": 1,
+      "tests": 1,
+      "textfilecontent54_object": 1,
+      "textfilecontent54_test": 1,
+      "timestamp": 1,
+      "title": 2
+    },
+    "namespaces": {
+      "http://oval.mitre.org/XMLSchema/oval-common-5": 3,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5": 19,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent": 6
+    }
+  },
+  "generator": {
+    "children": [
+      {
+        "name": "product_name",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "Security Content Tool 1.9.0"
+      },
+      {
+        "name": "schema_version",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "5.11"
+      },
+      {
+        "name": "timestamp",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "2026-06-25T09:42:07"
+      }
+    ],
+    "name": "generator",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  },
+  "ir_version": "0.1-prototype",
+  "native_translation": {
+    "note": "Structural OVAL semantics are represented. Native SCAP-NG capability mappings are a separate reviewed translation layer.",
+    "status": "requires_review"
+  },
+  "objects": [
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/audit/audit.rules"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+(?:.*(-S\\s+umount\\s+|(\\s+|,)umount(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "32-bit umount syscall",
+      "id": "oval:mil.disa.stig.ind:obj:25821500",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    }
+  ],
+  "parser_contract": {
+    "ambiguous_native_mapping": "requires_review",
+    "core_logic_model": "explicit",
+    "platform_specific_nodes": "losslessly_preserved",
+    "policy_intent_inference": "forbidden"
+  },
+  "reference_graph": {
+    "oval:mil.disa.stig.defs:def:258215": [
+      "oval:mil.disa.stig.defs:def:258215",
+      "oval:mil.disa.stig.ind:tst:25821500"
+    ],
+    "oval:mil.disa.stig.ind:obj:25821500": [
+      "oval:mil.disa.stig.ind:obj:25821500"
+    ],
+    "oval:mil.disa.stig.ind:tst:25821500": [
+      "oval:mil.disa.stig.ind:obj:25821500",
+      "oval:mil.disa.stig.ind:tst:25821500"
+    ],
+    "oval:mil.disa.stig.ol9os:def:271594": [
+      "oval:mil.disa.stig.defs:def:258215",
+      "oval:mil.disa.stig.ol9os:def:271594"
+    ]
+  },
+  "semantic_ir_sha256": "3000ba317d2355f9d241222f664b0b5ca1b35ac0edb5670e42d7e14969606cd8",
+  "source": {
+    "bytes": 2987,
+    "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271594r1208724_rule/oval.xml",
+    "sha256": "af570e6b7ac18c6466568d1499a7b3878bcd813d2f8ef479ffc8c641f9934c77"
+  },
+  "states": [],
+  "tests": [
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "Audit 32-bit invocations of umount syscall",
+      "id": "oval:mil.disa.stig.ind:tst:25821500",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25821500"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25821500"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    }
+  ],
+  "unresolved_references": [],
+  "variables": []
+}

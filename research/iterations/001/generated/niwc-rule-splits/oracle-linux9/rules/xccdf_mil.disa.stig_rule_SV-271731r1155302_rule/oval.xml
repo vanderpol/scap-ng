@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230313" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must disable core dumps for all users.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23031300"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23031301"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271731" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-002383 - OL 9 must disable core dumps for all users.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>A core dump includes a memory image taken at the time the operating system terminates an application. The memory image could contain sensitive data and is generally useful only for developers trying to debug problems.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230313"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23031301" version="2" check_existence="any_exist" check="all" comment="If core is set for any specific domains, it is set to 0.">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23031301"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23031300"/>
+        </textfilecontent54_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23031300" version="2" check="all" comment="For the global domain, core is set to 0.">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23031300"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23031300"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031305" version="1">
+          <path>/etc/security/limits.d</path>
+          <filename operation="pattern match">\.conf$</filename>
+          <pattern operation="pattern match">^[ \t]*[^#*\s]+[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031304" version="1">
+          <filepath>/etc/security/limits.conf</filepath>
+          <pattern operation="pattern match">^[ \t]*[^#*\s]+[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031300" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:23031302</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:23031303</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031302" version="1">
+          <filepath>/etc/security/limits.conf</filepath>
+          <pattern operation="pattern match">^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031301" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:23031304</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:23031305</object_reference>
+          </set>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23031303" version="1">
+          <path>/etc/security/limits.d</path>
+          <filename operation="pattern match">\.conf$</filename>
+          <pattern operation="pattern match">^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23031300" version="1">
+          <subexpression datatype="int">0</subexpression>
+        </textfilecontent54_state>
+        </states></oval_definitions>

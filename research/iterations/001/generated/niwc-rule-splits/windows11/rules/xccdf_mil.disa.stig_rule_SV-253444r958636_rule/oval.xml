@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows11:def:253444" version="2" class="compliance">
+          <metadata>
+            <title>WN11-SO-000070 - The machine inactivity limit must be set to 15 minutes, locking the system with the screensaver.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows 11</platform>
+            </affected>
+            <description>Unattended systems are susceptible to unauthorized use and must be locked when unattended. The screen saver must be set at a maximum of 15 minutes and be password protected. This protects critical and sensitive data from exposure to unauthorized personnel with physical access to the computer.
+
+Satisfies: SRG-OS-000279-GPOS-00109, SRG-OS-000163-GPOS-00072</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253444"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:253444" version="1" class="compliance">
+          <metadata>
+            <title>The machine inactivity limit must be set to 15 minutes, locking the system with the screensaver.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.windows:tst:25344400" comment="The machine inactivity limit is set to 15 minutes or less"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.windows:tst:25344400" version="1" check_existence="at_least_one_exists" check="all" comment="The machine inactivity limit is set to 15 minutes or less">
+          <object object_ref="oval:mil.disa.stig.windows:obj:25344400"/>
+          <state state_ref="oval:mil.disa.stig.windows:ste:25344400"/>
+          <state state_ref="oval:mil.disa.stig.windows:ste:25344401"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.windows:obj:25344400" version="1">
+          <hive datatype="string" operation="case insensitive equals">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" operation="case insensitive equals">Software\Microsoft\Windows\CurrentVersion\Policies\System</key>
+          <name datatype="string" operation="case insensitive equals">InactivityTimeoutSecs</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.windows:ste:25344401" version="1">
+          <type>reg_dword</type>
+          <value datatype="int" operation="greater than">0</value>
+        </registry_state>
+        <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.windows:ste:25344400" version="1">
+          <type>reg_dword</type>
+          <value datatype="int" operation="less than or equal">900</value>
+        </registry_state>
+        </states></oval_definitions>

@@ -1,0 +1,357 @@
+{
+  "definitions": [
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Default permissions for the HKEY_LOCAL_MACHINE\\SECURITY registry hive must be maintained.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101"
+          },
+          {
+            "comment": "Default permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry hive must be maintained.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102"
+          },
+          {
+            "comment": "Default permissions for the HKEY_LOCAL_MACHINE\\SYSTEM registry hive must be maintained.",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:253431",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Default permissions for the HKEY_LOCAL_MACHINE registry hive must be maintained."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "18"
+    }
+  ],
+  "features": {
+    "attributes": {
+      "check": {
+        "all": 3
+      },
+      "operation": {
+        "pattern match": 2
+      }
+    },
+    "elements": {
+      "command": 3,
+      "criteria": 1,
+      "criterion": 3,
+      "definition": 1,
+      "definitions": 1,
+      "description": 1,
+      "generator": 1,
+      "metadata": 1,
+      "object": 3,
+      "objects": 1,
+      "oval_definitions": 1,
+      "product_name": 1,
+      "schema_version": 1,
+      "shell": 3,
+      "shellcommand_object": 3,
+      "shellcommand_state": 2,
+      "shellcommand_test": 3,
+      "state": 3,
+      "states": 1,
+      "stdout_line": 2,
+      "tests": 1,
+      "timestamp": 1,
+      "title": 1
+    },
+    "namespaces": {
+      "http://oval.mitre.org/XMLSchema/oval-common-5": 3,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5": 14,
+      "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent": 22
+    }
+  },
+  "generator": {
+    "children": [
+      {
+        "name": "product_name",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "NIWC Atlantic - Complete Compliance v2"
+      },
+      {
+        "name": "schema_version",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "5.12.3"
+      },
+      {
+        "name": "timestamp",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-common-5",
+        "text": "2026-08-26T17:35:29.705113+00:00"
+      }
+    ],
+    "name": "generator",
+    "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  },
+  "ir_version": "0.1-prototype",
+  "native_translation": {
+    "note": "Structural OVAL semantics are represented. Native SCAP-NG capability mappings are a separate reviewed translation layer.",
+    "status": "requires_review"
+  },
+  "objects": [
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "powershell"
+        },
+        {
+          "kind": "element",
+          "name": "command",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"Software\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }"
+        }
+      ],
+      "comment": "Gather permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "shellcommand_object",
+      "version": "18"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "powershell"
+        },
+        {
+          "kind": "element",
+          "name": "command",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"Security\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access |  Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }"
+        }
+      ],
+      "comment": "Gather permissions for the HKEY_LOCAL_MACHINE\\SECURITY registry",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "shellcommand_object",
+      "version": "18"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "shell",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "powershell"
+        },
+        {
+          "kind": "element",
+          "name": "command",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"System\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }"
+        }
+      ],
+      "comment": "Gather permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "shellcommand_object",
+      "version": "18"
+    }
+  ],
+  "parser_contract": {
+    "ambiguous_native_mapping": "requires_review",
+    "core_logic_model": "explicit",
+    "platform_specific_nodes": "losslessly_preserved",
+    "policy_intent_inference": "forbidden"
+  },
+  "reference_graph": {
+    "oval:navy.navwar.niwcatlantic.scc.windows:def:253431": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:def:253431",
+      "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101",
+      "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102",
+      "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101",
+      "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101",
+      "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102",
+      "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102",
+      "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102"
+    ],
+    "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103": [
+      "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103",
+      "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102",
+      "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103"
+    ]
+  },
+  "semantic_ir_sha256": "70d4ed4f3131a0c170c8c884d6945a1a1c87e88ee4d75ed96d788194f0860534",
+  "source": {
+    "bytes": 9390,
+    "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253431r958726_rule/oval.xml",
+    "sha256": "06ff819f7ccad9750b96c8d10f6adf204f095a397937e5f20d0c3c0472dc1910"
+  },
+  "states": [
+    {
+      "comment": "System Full, Administrators ReadPermission and ChangePermissions ",
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "stdout_line",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$|^Identity:BUILTIN\\\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$"
+        }
+      ],
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "shellcommand_state",
+      "version": "18"
+    },
+    {
+      "comment": "System, Creator Owner, Admnistrators = Full; ALL APPLICATION PACKAGES, Users, S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681: Read",
+      "entities": [
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "stdout_line",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: (None|InheritOnly)$|^Identity:(NT AUTHORITY\\\\SYSTEM|BUILTIN\\\\Administrators), Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$|^Identity:(BUILTIN\\\\Users|APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES|S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681), Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$"
+        }
+      ],
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "shellcommand_state",
+      "version": "18"
+    }
+  ],
+  "tests": [
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "Default permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry key must be maintained.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102"
+          },
+          "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102"
+          },
+          "state_ref": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102"
+        }
+      ],
+      "type": "shellcommand_test",
+      "version": "18"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "Default permissions for the HKEY_LOCAL_MACHINE\\SECURITY registry key must be maintained.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101"
+          },
+          "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101"
+          },
+          "state_ref": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101"
+        }
+      ],
+      "type": "shellcommand_test",
+      "version": "18"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "Default permissions for the HKEY_LOCAL_MACHINE\\SYSTEM registry key must be maintained.",
+      "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103"
+          },
+          "object_ref": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102"
+          },
+          "state_ref": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102"
+        }
+      ],
+      "type": "shellcommand_test",
+      "version": "18"
+    }
+  ],
+  "unresolved_references": [],
+  "variables": []
+}

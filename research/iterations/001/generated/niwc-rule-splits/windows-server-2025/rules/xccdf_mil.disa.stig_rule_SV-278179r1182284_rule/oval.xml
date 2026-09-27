@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.windows2025:def:278179" version="1" class="compliance">
+          <metadata>
+            <title>WN25-MS-000030 - Windows Server 2025 local users on domain-joined member servers must not be enumerated.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>The username is one part of logon credentials that could be used to gain access to a system. Preventing the enumeration of users limits this information to authorized personnel.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253379"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:253379" version="1" class="compliance">
+          <metadata>
+            <title>Local users on domain-joined computers must not be enumerated.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25337900" comment="Verifies 'Enumerate local users on domain-joined computers' is set to 'Disabled'"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25337900" version="1" check_existence="at_least_one_exists" check="all" comment="'Enumerate local users on domain-joined computers' is set to 'Disabled'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25337900"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25337900" version="2">
+          <hive datatype="string" operation="case insensitive equals">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" operation="case insensitive equals">SOFTWARE\Policies\Microsoft\Windows\System</key>
+          <name datatype="string" operation="case insensitive equals">EnumerateLocalUsers</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000000" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">0</value>
+        </registry_state>
+        </states></oval_definitions>

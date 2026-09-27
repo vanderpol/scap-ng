@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271585" version="1" class="compliance">
+          <metadata>
+            <title>OL09-00-000795 - OL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit log.</title>
+            <affected family="unix">
+              <platform>Oracle Linux 9</platform>
+            </affected>
+            <description>Only authorized personnel should be aware of errors and the details of the errors. Error messages are an indicator of an organization's operational state or can identify the OL 9 system or platform. Additionally, Personally Identifiable Information (PII) and operational information must not be revealed through error messages to unauthorized personnel or their designated representatives.
+
+	The structure and content of error messages must be carefully considered by the organization and development team. The extent to which the information system is able to identify and handle error conditions is guided by organizational policy and operational requirements.
+
+	Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029, SRG-OS-000206-GPOS-00084</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230396"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.defs:def:230396" version="1" class="compliance">
+          <metadata>
+            <title>The operating system audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:23039600" comment="Audit log is mode 0600 or less permissive"/>
+          </criteria>
+        </definition>
+        </definitions><tests><file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:23039600" version="1" check="all" comment="Audit log is mode 0600 or less permissive">
+          <object object_ref="oval:mil.disa.stig.unix:obj:20000011"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:20000004"/>
+        </file_test>
+        </tests><objects><file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000011" version="1" comment="Audit log file location">
+          <filepath var_ref="oval:mil.disa.stig.defs:var:20000004"/>
+        </file_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:20000001" version="1" comment="Audit log file">
+          <filepath>/etc/audit/auditd.conf</filepath>
+          <pattern operation="pattern match">^\s*log_file\s*=\s*(\S+)\s*(?:#.*)?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        </objects><states><file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000004" version="1" comment="Mode 0600 or less permissive">
+          <suid datatype="boolean">false</suid>
+          <sgid datatype="boolean">false</sgid>
+          <sticky datatype="boolean">false</sticky>
+          <uexec datatype="boolean">false</uexec>
+          <gread datatype="boolean">false</gread>
+          <gwrite datatype="boolean">false</gwrite>
+          <gexec datatype="boolean">false</gexec>
+          <oread datatype="boolean">false</oread>
+          <owrite datatype="boolean">false</owrite>
+          <oexec datatype="boolean">false</oexec>
+        </file_state>
+        </states><variables><local_variable id="oval:mil.disa.stig.defs:var:20000004" version="1" datatype="string" comment="Audit log location from /etc/audit/auditd.conf">
+          <object_component object_ref="oval:mil.disa.stig.ind:obj:20000001" item_field="subexpression"/>
+        </local_variable>
+        </variables></oval_definitions>

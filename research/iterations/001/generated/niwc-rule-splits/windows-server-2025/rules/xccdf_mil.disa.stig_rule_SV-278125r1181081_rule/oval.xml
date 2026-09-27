@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.1</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253416" version="1" class="compliance">
+          <metadata>
+            <title>The Windows Remote Management (WinRM) client must not use Basic authentication.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25341600" comment="Verifies 'Allow Basic authentication' is set to 'Disabled'"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows2025:def:278125" version="1" class="compliance">
+          <metadata>
+            <title>WN25-CC-000470 - Windows Server 2025 Windows Remote Management (WinRM) client must not use Basic authentication.</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server 2025</platform>
+            </affected>
+            <description>Basic authentication uses plain-text passwords that could be used to compromise a system. Disabling Basic authentication will reduce this potential.</description>
+          </metadata>
+          <criteria>
+            <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253416"/>
+          </criteria>
+        </definition>
+        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25341600" version="2" check_existence="at_least_one_exists" check="all" comment="'Allow Basic authentication' is set to 'Disabled'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25341600"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000000"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25341600" version="1">
+          <hive datatype="string" operation="equals">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string" operation="equals">Software\Policies\Microsoft\Windows\WinRM\Client</key>
+          <name datatype="string" operation="equals">AllowBasic</name>
+        </registry_object>
+        </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000000" version="1">
+          <type>reg_dword</type>
+          <value datatype="int">0</value>
+        </registry_state>
+        </states></oval_definitions>
