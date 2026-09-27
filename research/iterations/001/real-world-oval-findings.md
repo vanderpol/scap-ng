@@ -40,8 +40,9 @@ Variables occur in 104 of the 1,333 automated rule splits.
 Across the per-rule closures:
 
 - 78 variable instances can currently be evaluated as exact static values;
-- 59 are object-dependent;
-- 34 use functions not yet implemented by the static evaluator.
+- 93 are target-dependent because their evaluation ultimately requires values collected from OVAL objects.
+
+The earlier split between "object-dependent" and "unsupported function" cases was misleading: many functions such as `concat`, `count`, `split`, and `substring` are implemented for static inputs but correctly remain target-dependent when an input chain contains `object_component`.
 
 The priority corpus exercises variable/function constructs including:
 
@@ -139,6 +140,6 @@ This provides concrete evidence for the decision to separate faithful interpreta
 
 ## Next work
 
-The semantic parser now has a finite OVAL 5.12.3 variable-function checklist driven by the vendored schema. The next implementation work is to explicitly model the remaining function semantics and then mine additional difficult published rules from all four priority benchmarks.
+The semantic parser now has a finite OVAL 5.12.3 variable-function checklist driven by the vendored schema and emits explicit evaluation plans for static, external-input, and target-dependent variables. The next implementation work is to lower target-dependent `object_component` collection and its surrounding function chains into native SCAP-NG collection/derivation semantics, then mine additional difficult published rules from all four priority benchmarks.
 
 Differential execution remains required before any native normalization moves from `requires_review` to `exact_normalized`.
