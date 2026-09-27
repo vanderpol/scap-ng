@@ -1,5 +1,7 @@
-# Windows Server — combined-rule
+# Windows Server — combined rule with overlays
 
-Seven policy rules live individually under `source/policy/rules/`. Seven automated-rule files live under `source/automated/rules/`; six include inline assessments and one remains manual-only.
+Seven policy rules live individually under `source/policy/rules/`.
 
-Several automated rules duplicate the same technical logic used by the Windows Client combined-rule benchmark. This is intentional for the architecture comparison.
+Five automated rules are produced from reusable bases in `../../shared-rules/windows/` plus STIG-specific files under `source/automated/overlays/`. The server-specific SMB signing rule and manual-only rule remain local under `source/automated/rules/`.
+
+The package build resolves overlays into complete rules and verifies that their policy fields match the policy-only source exactly.

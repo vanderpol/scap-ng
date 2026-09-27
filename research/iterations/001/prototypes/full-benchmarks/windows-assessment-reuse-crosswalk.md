@@ -1,6 +1,6 @@
-# Windows Cross-STIG Assessment Reuse Prototype
+# Windows Cross-STIG Reuse Prototype
 
-Iteration 001 now includes two separate illustrative Windows STIG-like policies:
+Iteration 001 includes two separate illustrative Windows STIG-like policies:
 
 - **Windows Client** — rule IDs `NG-DEMO-WC-*`
 - **Windows Server** — rule IDs `NG-DEMO-WS-*`
@@ -9,40 +9,42 @@ They intentionally use different policy rule IDs, titles, references, and in som
 
 This is not a claim that any real DISA rules are equivalent. The examples exist to test the SCAP-NG architecture.
 
-## Shared assessment mappings
+## Shared technical concepts
 
-| Assessment | Windows Client rule | Windows Server rule | Reuse type |
+| Technical concept | Windows Client rule | Windows Server rule | Reuse type |
 |---|---|---|---|
-| `demo.windows.password-policy-by-role` | `NG-DEMO-WC-001` | `NG-DEMO-WS-101` | Parameterized: client requires length 14; server requires length 15 |
-| `demo.windows.platform-security-posture` | `NG-DEMO-WC-002` | `NG-DEMO-WS-102` | Exact technical assessment reuse |
-| `demo.windows.defender-realtime` | `NG-DEMO-WC-003` | `NG-DEMO-WS-103` | Exact technical assessment despite differing policy title |
-| `demo.windows.remote-registry-disabled` | `NG-DEMO-WC-004` | `NG-DEMO-WS-104` | Exact technical assessment despite differing policy title |
-| `demo.windows.trusted-publisher-store` | `NG-DEMO-WC-006` | `NG-DEMO-WS-106` | Exact technical assessment reuse |
+| Password policy by role | `NG-DEMO-WC-001` | `NG-DEMO-WS-101` | Parameterized: client length 14; server length 15 |
+| Platform security posture | `NG-DEMO-WC-002` | `NG-DEMO-WS-102` | Exact automation reuse |
+| Defender real-time | `NG-DEMO-WC-003` | `NG-DEMO-WS-103` | Exact automation despite differing policy title |
+| Remote Registry disabled | `NG-DEMO-WC-004` | `NG-DEMO-WS-104` | Exact automation despite differing policy title |
+| TrustedPublisher certificate | `NG-DEMO-WC-006` | `NG-DEMO-WS-106` | Exact automation reuse |
 
-Benchmark-specific assessments:
+Benchmark-specific automation:
 
-- Client `NG-DEMO-WC-005` -> `demo.windows-client.credential-guard-when-vbs`
-- Server `NG-DEMO-WS-105` -> `demo.windows-server.smb-signing-required`
+- Client `NG-DEMO-WC-005` — Credential Guard when VBS applies.
+- Server `NG-DEMO-WS-105` — SMB signing required.
+- Manual rules intentionally have no automated logic.
 
-Manual rules have no automated assessment.
+## Split-model representation
 
-## What the split model demonstrates
-
-The shared technical definitions exist once under:
+The five shared technical assessments exist once under:
 
 `split-policy-assessment-binding/shared-assessments/windows/`
 
-Each benchmark has its own individual policy files and its own `bindings.yaml`. A binding gives the policy rule an assessment identity and parameters. The package builder resolves the referenced assessment into each self-contained distributable.
+Each STIG has its own policy files and `bindings.yaml`. The builder resolves referenced assessments into each self-contained distributable.
 
-The scanner operator therefore still installs one complete benchmark package; shared authoring does **not** create a runtime dependency.
+## Combined-model representation
 
-## What the combined model demonstrates
+The five reusable combined rule bases exist once under:
 
-Each automated rule contains its assessment inline. The client and server rules can use the same assessment identity, but equivalent logic is physically repeated in separate rule files.
+`combined-rule/shared-rules/windows/`
 
-This is intentional. It exposes a central architectural tradeoff:
+Each STIG has an overlay under:
 
-- the combined form gives a reviewer one complete rule file;
-- cross-STIG technical reuse requires duplication, generation/templates outside the standard, or introducing a reference mechanism that begins to resemble the split architecture.
+`<benchmark>/source/automated/overlays/`
 
-The crosswalk is research evidence. It is not a proposed runtime mapping file for the combined model.
+The overlay supplies STIG-specific identity/metadata and, when allowed by the shared rule, parameter values. It does not directly patch the assessment logic.
+
+At build time the shared rule and overlay are resolved into a complete rule. The build verifies that the resolved policy fields exactly match the policy-only rule for that STIG.
+
+This preserves one scanner-facing self-contained package while allowing the combined-rule candidate to demonstrate genuine cross-STIG reuse instead of artificial duplication.
