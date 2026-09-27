@@ -638,10 +638,24 @@ def inspect_file(path):
                 title_node=next((c for c in metadata if local(c.tag)=="title"),None)
                 if title_node is not None:
                     title=(title_node.text or "").strip()
-            expected=False if title.lower().startswith("evaluate to false") else True
+            lower_title=title.lower()
+            if lower_title.startswith("evaluate to unknown"):
+                expected="unknown"
+            elif lower_title.startswith("evaluate to false"):
+                expected=False
+            else:
+                expected=True
+
             if value is None:
-                status="skipped"
-            elif value==expected:
+                if expected=="unknown":
+                    status="expected_nonboolean_unknown"
+                elif "family_test" in lower_title:
+                    status="platform_collection_required"
+                elif path.name=="oval-def_time_difference_function.xml":
+                    status="runtime_context_required"
+                else:
+                    status="skipped"
+            elif expected!="unknown" and value==expected:
                 status="matches_expected"
             else:
                 status="semantic_mismatch"
