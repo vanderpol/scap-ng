@@ -10,6 +10,8 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import decimal
+import re
 from collections import Counter
 from pathlib import Path
 from lxml import etree
@@ -59,8 +61,6 @@ def expected_state_values(root, ir):
             continue
         entity=entities[0]
         operation=entity.get("operation","equals")
-        if operation!="equals":
-            continue
         var_ref=entity.get("var_ref")
         if var_ref:
             resolved=resolutions.get(var_ref,{})
@@ -77,32 +77,108 @@ def expected_state_values(root, ir):
             "var_check":entity.get("var_check","all"),
             "entity_check":entity.get("entity_check","all"),
             "datatype":entity.get("datatype","string"),
+            "operation":operation,
         }
     return out
+
+
+def cast_value(value, datatype):
+    text=str(value)
+    if datatype=="string":
+        return text
+    if datatype=="int":
+        return int(text,10)
+    if datatype=="float":
+        return decimal.Decimal(text)
+    if datatype=="boolean":
+        lowered=text.strip().lower()
+        if lowered in {"true","1"}:
+            return True
+        if lowered in {"false","0"}:
+            return False
+        raise ValueError(f"invalid boolean {text!r}")
+    if datatype=="binary":
+        cleaned=text.strip().lower()
+        if len(cleaned)%2 or any(ch not in "0123456789abcdef" for ch in cleaned):
+            raise ValueError(f"invalid binary {text!r}")
+        return bytes.fromhex(cleaned)
+    raise NotImplementedError(datatype)
+
+
+def compare_value(actual, expected, datatype, operation):
+    try:
+        if operation=="pattern match":
+            if datatype!="string":
+                return None,"pattern_match_non_string"
+            return re.search(str(expected),str(actual)) is not None,None
+
+        left=cast_value(actual,datatype)
+        right=cast_value(expected,datatype)
+    except NotImplementedError:
+        return None,f"unsupported_datatype:{datatype}"
+    except (ValueError,decimal.InvalidOperation):
+        return None,f"datatype_cast_error:{datatype}"
+
+    if operation=="equals":
+        return left==right,None
+    if operation=="not equal":
+        return left!=right,None
+    if operation=="case insensitive equals":
+        if datatype!="string":
+            return None,"case_insensitive_non_string"
+        return str(left).casefold()==str(right).casefold(),None
+    if operation=="case insensitive not equal":
+        if datatype!="string":
+            return None,"case_insensitive_non_string"
+        return str(left).casefold()!=str(right).casefold(),None
+    if operation=="greater than":
+        return left>right,None
+    if operation=="greater than or equal":
+        return left>=right,None
+    if operation=="less than":
+        return left<right,None
+    if operation=="less than or equal":
+        return left<=right,None
+    if operation=="bitwise and":
+        if datatype!="int":
+            return None,"bitwise_non_int"
+        return (left & right)==right,None
+    if operation=="bitwise or":
+        if datatype!="int":
+            return None,"bitwise_non_int"
+        return (left | right)==right,None
+    return None,f"unsupported_operation:{operation}"
 
 
 def evaluate_values(actual, state):
     expected=state["values"]
     var_check=state["var_check"]
     entity_check=state["entity_check"]
+    datatype=state["datatype"]
+    operation=state["operation"]
 
     def against_expected(value):
-        matches=[value==candidate for candidate in expected]
+        matches=[]
+        for candidate in expected:
+            comparison,reason=compare_value(value,candidate,datatype,operation)
+            if comparison is None:
+                return None,reason
+            matches.append(comparison)
         if var_check=="all":
-            return all(matches)
+            return all(matches),None
         if var_check=="at least one":
-            return any(matches)
+            return any(matches),None
         if var_check=="only one":
-            return sum(matches)==1
+            return sum(matches)==1,None
         if var_check=="none satisfy":
-            return not any(matches)
-        return None
+            return not any(matches),None
+        return None,"unsupported_var_check"
 
     results=[]
     for value in actual:
-        r=against_expected(value)
+        r,reason=against_expected(value)
         if r is None:
-            return None,"unsupported_var_check"
+            return None,reason
         results.append(r)
 
     if entity_check=="all":
@@ -114,7 +190,6 @@ def evaluate_values(actual, state):
     if entity_check=="none satisfy":
         return not any(results),None
     return None,"unsupported_entity_check"
-
 
 
 def evaluate_criteria_node(node, test_outcomes, definition_lookup, definition_cache, stack):
