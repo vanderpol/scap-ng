@@ -193,8 +193,41 @@ def inspect_file(path):
 
     tests_section=root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}tests")
     results=[]
-    if tests_section is None:
-        definitions_section=root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}definitions")
+    if tests_section is not None:
+        for test in tests_section:
+            if local(test.tag)!="variable_test":
+                continue
+            test_id=test.get("id")
+            object_nodes=[c for c in test if local(c.tag)=="object"]
+            state_nodes=[c for c in test if local(c.tag)=="state"]
+            if len(object_nodes)!=1 or len(state_nodes)!=1:
+                results.append({"test_id":test_id,"status":"skipped","reason":"object_or_state_count"})
+                continue
+            object_ref=object_nodes[0].get("object_ref")
+            state_ref=state_nodes[0].get("state_ref")
+            if object_ref not in obj_values:
+                results.append({"test_id":test_id,"status":"skipped","reason":"object_not_static_direct_variable_object"})
+                continue
+            if state_ref not in state_values:
+                results.append({"test_id":test_id,"status":"skipped","reason":"state_not_simple_static_equals"})
+                continue
+
+            actual=obj_values[object_ref]["values"]
+            outcome,reason=evaluate_values(actual,state_values[state_ref])
+            if outcome is None:
+                results.append({"test_id":test_id,"status":"skipped","reason":reason})
+                continue
+
+            results.append({
+                "test_id":test_id,
+                "status":"evaluated_true" if outcome else "evaluated_false",
+                "object_ref":object_ref,
+                "state_ref":state_ref,
+                "actual_values":actual,
+                "expected_values":state_values[state_ref]["values"],
+            })
+
+    definitions_section=root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}definitions")
     definition_results=[]
     if definitions_section is not None:
         lookup={d.get("id"):d for d in definitions_section if local(d.tag)=="definition"}
@@ -217,44 +250,8 @@ def inspect_file(path):
                     else "skipped"
                 ),
             })
+
     return results,definition_results
-    for test in tests_section:
-        if local(test.tag)!="variable_test":
-            continue
-        test_id=test.get("id")
-        object_nodes=[c for c in test if local(c.tag)=="object"]
-        state_nodes=[c for c in test if local(c.tag)=="state"]
-        if len(object_nodes)!=1 or len(state_nodes)!=1:
-            results.append({"test_id":test_id,"status":"skipped","reason":"object_or_state_count"})
-            continue
-        object_ref=object_nodes[0].get("object_ref")
-        state_ref=state_nodes[0].get("state_ref")
-        if object_ref not in obj_values:
-            results.append({"test_id":test_id,"status":"skipped","reason":"object_not_static_direct_variable_object"})
-            continue
-        if state_ref not in state_values:
-            results.append({"test_id":test_id,"status":"skipped","reason":"state_not_simple_static_equals"})
-            continue
-
-        actual=obj_values[object_ref]["values"]
-        outcome,reason=evaluate_values(actual,state_values[state_ref])
-        if outcome is None:
-            results.append({"test_id":test_id,"status":"skipped","reason":reason})
-            continue
-
-        # Self-Assertion test content is authored so definitions/tests evaluate
-        # true unless otherwise specified. For this focused static subset, a
-        # false entity result is therefore a semantic mismatch to investigate.
-        results.append({
-            "test_id":test_id,
-            "status":"evaluated_true" if outcome else "evaluated_false",
-            "object_ref":object_ref,
-            "state_ref":state_ref,
-            "actual_values":actual,
-            "expected_values":state_values[state_ref]["values"],
-        })
-    return results
-
 
 def main():
     ap=argparse.ArgumentParser()
