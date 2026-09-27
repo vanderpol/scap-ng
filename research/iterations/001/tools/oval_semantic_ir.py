@@ -88,6 +88,132 @@ STATIC_EVALUATOR_OPERATIONS = {
 REGEX_META = set("^$\\.[](){}*+?|")
 
 
+
+OVAL_SET_FLAGS = (
+    "error",
+    "complete",
+    "incomplete",
+    "does_not_exist",
+    "not_collected",
+    "not_applicable",
+)
+
+# OVAL 5.12.3 set flag-combination tables. Rows are the second operand's
+# flag; columns are the first operand's flag, matching the schema charts.
+OVAL_SET_FLAG_TABLES = {
+    "UNION": {
+        "error":          ["error","error","error","error","error","error"],
+        "complete":       ["error","complete","incomplete","complete","incomplete","complete"],
+        "incomplete":     ["error","incomplete","incomplete","incomplete","incomplete","incomplete"],
+        "does_not_exist": ["error","complete","incomplete","does_not_exist","incomplete","does_not_exist"],
+        "not_collected":  ["error","incomplete","incomplete","incomplete","not_collected","not_collected"],
+        "not_applicable": ["error","complete","incomplete","does_not_exist","not_collected","not_applicable"],
+    },
+    "INTERSECTION": {
+        "error":          ["error","error","error","does_not_exist","error","error"],
+        "complete":       ["error","complete","incomplete","does_not_exist","not_collected","complete"],
+        "incomplete":     ["error","incomplete","incomplete","does_not_exist","not_collected","incomplete"],
+        "does_not_exist": ["does_not_exist","does_not_exist","does_not_exist","does_not_exist","does_not_exist","does_not_exist"],
+        "not_collected":  ["error","not_collected","not_collected","does_not_exist","not_collected","not_collected"],
+        "not_applicable": ["error","complete","incomplete","does_not_exist","not_collected","not_applicable"],
+    },
+    "COMPLEMENT": {
+        "error":          ["error","error","error","does_not_exist","error","error"],
+        "complete":       ["error","complete","incomplete","does_not_exist","not_collected","error"],
+        "incomplete":     ["error","error","error","does_not_exist","not_collected","error"],
+        "does_not_exist": ["error","complete","incomplete","does_not_exist","not_collected","error"],
+        "not_collected":  ["error","not_collected","not_collected","does_not_exist","not_collected","error"],
+        "not_applicable": ["error","error","error","error","error","error"],
+    },
+}
+
+
+def oval_set_flag(operator, first_flag, second_flag):
+    """Combine two collected-object flags exactly per OVAL 5.12.3."""
+    operator=operator.upper()
+    if operator not in OVAL_SET_FLAG_TABLES:
+        raise ValueError(f"unknown OVAL set operator {operator}")
+    if first_flag not in OVAL_SET_FLAGS or second_flag not in OVAL_SET_FLAGS:
+        raise ValueError(f"unknown OVAL collection flag: {first_flag}, {second_flag}")
+    column=OVAL_SET_FLAGS.index(first_flag)
+    return OVAL_SET_FLAG_TABLES[operator][second_flag][column]
+
+
+def oval_set_items(operator, operands):
+    """Apply OVAL set membership semantics to already-collected unique items.
+
+    Items may be any JSON-serializable values. OVAL set results are unique.
+    COMPLEMENT is relative and therefore requires exactly two operands.
+    """
+    operator=operator.upper()
+
+    def key(item):
+        return json.dumps(item,sort_keys=True,separators=(",",":"),ensure_ascii=False)
+
+    def unique(items):
+        seen=set()
+        out=[]
+        for item in items:
+            k=key(item)
+            if k not in seen:
+                seen.add(k)
+                out.append(item)
+        return out
+
+    operands=[unique(list(x)) for x in operands]
+    if not operands:
+        raise ValueError("OVAL set requires at least one operand")
+    if len(operands)==1:
+        return operands[0]
+
+    if operator=="UNION":
+        return unique([item for operand in operands for item in operand])
+
+    if operator=="INTERSECTION":
+        common={key(item):item for item in operands[0]}
+        for operand in operands[1:]:
+            keys={key(item) for item in operand}
+            common={k:v for k,v in common.items() if k in keys}
+        return list(common.values())
+
+    if operator=="COMPLEMENT":
+        if len(operands)!=2:
+            raise ValueError("OVAL COMPLEMENT requires exactly two operands")
+        remove={key(item) for item in operands[1]}
+        return [item for item in operands[0] if key(item) not in remove]
+
+    raise ValueError(f"unknown OVAL set operator {operator}")
+
+
+def oval_apply_filter(items, matches, action="exclude"):
+    """Apply one OVAL filter to a collected item list.
+
+    The matches sequence aligns one-for-one with items and indicates whether
+    each item satisfies the referenced OVAL state. Default action is exclude.
+    """
+    if len(items)!=len(matches):
+        raise ValueError("OVAL filter match vector must align with items")
+    action=action.lower()
+    if action not in {"include","exclude"}:
+        raise ValueError(f"unknown OVAL filter action {action}")
+    if action=="include":
+        return [item for item,matched in zip(items,matches) if matched]
+    return [item for item,matched in zip(items,matches) if not matched]
+
+
+def oval_apply_filters(items, filters):
+    """Apply OVAL filters sequentially before the enclosing set operator.
+
+    Each filter is a pair of action and predicate; predicate(item) returns
+    True when the item matches the filter's referenced OVAL state.
+    """
+    current=list(items)
+    for action,predicate in filters:
+        matches=[bool(predicate(item)) for item in current]
+        current=oval_apply_filter(current,matches,action or "exclude")
+    return current
+
+
 def local(tag) -> str | None:
     if not isinstance(tag, str):
         return None
