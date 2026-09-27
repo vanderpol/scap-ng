@@ -52,17 +52,31 @@ objects = {x["id"]: x for x in ir["objects"]}
 top = objects["oval:x:obj:1"]["children"][0]
 assert top["kind"] == "set", top
 assert top["operator"] == "INTERSECTION", top
+assert top["operator_explicit"] is True, top
 assert top["evaluation_semantics"]["filters_apply_before_set_operator"] is True, top
 assert top["evaluation_semantics"]["filter_default_action"] == "exclude", top
 
 filters = [x for x in top["children"] if x["kind"] == "filter"]
 assert filters == [
-    {"kind": "filter", "state_ref": "oval:x:ste:1", "action": "exclude"},
-    {"kind": "filter", "state_ref": "oval:x:ste:2", "action": "include"},
+    {
+        "kind": "filter",
+        "state_ref": "oval:x:ste:1",
+        "action": "exclude",
+        "action_explicit": False,
+    },
+    {
+        "kind": "filter",
+        "state_ref": "oval:x:ste:2",
+        "action": "include",
+        "action_explicit": True,
+    },
 ], filters
 
 nested = objects["oval:x:obj:2"]["children"][0]
 assert nested["operator"] == "COMPLEMENT", nested
+assert nested["operator_explicit"] is True, nested
+assert nested["children"][0]["operator"] == "UNION", nested
+assert nested["children"][0]["operator_explicit"] is False, nested
 assert nested["evaluation_semantics"]["complement_is_relative"] is True, nested
 assert len([x for x in nested["children"] if x["kind"] == "set"]) == 2, nested
 
