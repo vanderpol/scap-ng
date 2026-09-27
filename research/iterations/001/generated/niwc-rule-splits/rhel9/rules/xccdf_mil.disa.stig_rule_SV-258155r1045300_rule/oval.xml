@@ -4,17 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:258155" version="3" class="compliance">
-          <metadata>
-            <title>The operating system must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.linux:tst:23029400" comment="Audit file system exists"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25815500" comment="Audit file system total space &gt;= 10GiB"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:258155" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258155" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-653030 - RHEL 9 must allocate audit record storage capacity to store at least one week's worth of audit records.</title>
             <affected family="unix">
@@ -30,22 +20,32 @@ Satisfies: SRG-OS-000341-GPOS-00132, SRG-OS-000342-GPOS-00133</description>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258155"/>
           </criteria>
         </definition>
-        </definitions><tests><partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23029400" version="1" check_existence="all_exist" check="all" comment="There is a separate file system for audit data directory.">
-          <object object_ref="oval:mil.disa.stig.linux:obj:23029400"/>
-        </partition_test>
-        <variable_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25815500" version="1" check_existence="all_exist" check="all" comment="Audit file system total space &gt;= 10GiB">
+        <definition id="oval:mil.disa.stig.defs:def:258155" version="3" class="compliance">
+          <metadata>
+            <title>The operating system must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.linux:tst:23029400" comment="Audit file system exists"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25815500" comment="Audit file system total space &gt;= 10GiB"/>
+          </criteria>
+        </definition>
+        </definitions><tests><variable_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25815500" version="1" check_existence="all_exist" check="all" comment="Audit file system total space &gt;= 10GiB">
           <object object_ref="oval:mil.disa.stig.ind:obj:25815500"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:25815500"/>
         </variable_test>
-        </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23029400" version="1">
-          <mount_point datatype="string" var_ref="oval:mil.disa.stig.defs:var:23029400" var_check="at least one"/>
-        </partition_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23029402" version="2">
+        <partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23029400" version="1" check_existence="all_exist" check="all" comment="There is a separate file system for audit data directory.">
+          <object object_ref="oval:mil.disa.stig.linux:obj:23029400"/>
+        </partition_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23029402" version="2">
           <behaviors ignore_case="true"/>
           <filepath>/etc/audit/auditd.conf</filepath>
           <pattern datatype="string" operation="pattern match">^\s*log_file\s*=\s*(\S+)/\S+\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
+        <partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23029400" version="1">
+          <mount_point datatype="string" var_ref="oval:mil.disa.stig.defs:var:23029400" var_check="at least one"/>
+        </partition_object>
         <variable_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25815500" version="1">
           <var_ref>oval:mil.disa.stig.defs:var:25815500</var_ref>
         </variable_object>

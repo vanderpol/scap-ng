@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/ssh/sshd_config:ClientAliveCountMax = 1",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:27170900"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:271709",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:271709",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/ssh/sshd_config:ClientAliveCountMax = 1",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:27170900"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:271709",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271709",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:271709"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:271709",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:27170900"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271709",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:271709"
     },
     {
       "attribute": "object_ref",
@@ -258,36 +258,6 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:27170900"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:27170901"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
-        }
-      ],
-      "comment": "all sshd_config and sshd_config.d/* files",
-      "id": "oval:mil.disa.stig.ind:obj:27170902",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
-    },
-    {
-      "children": [
-        {
           "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -327,6 +297,36 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:27170900"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:27170901"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "all sshd_config and sshd_config.d/* files",
+      "id": "oval:mil.disa.stig.ind:obj:27170902",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
     }
   ],
   "parser_contract": {
@@ -355,12 +355,12 @@
       "oval:mil.disa.stig.defs:def:271709"
     ]
   },
-  "semantic_ir_sha256": "30dbc4135ec4330fe9dd218fd42719334bb7dda55312ac028c4c0f20e9c5e7b6",
+  "semantic_ir_sha256": "9f3027807838c81db276663aed538ac88d6ac14ac19134c3c809ea9c434a6952",
   "source": {
     "bytes": 5610,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271709r1091839_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271709r1091839_rule/provenance.json",
-    "sha256": "ccb10194d9fb4356c37c33850c0953f6c998fa698adc65a5057372576bba34a9"
+    "sha256": "26a01800a78d3a93eb2426c396d29bdea30da6f5cde06277d5532d895d533d08"
   },
   "states": [
     {

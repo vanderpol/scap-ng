@@ -138,20 +138,6 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25814600",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:25814600"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.ind:tst:25814600",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.ind:ste:25814600"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25814601",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:20000002"
@@ -185,18 +171,32 @@
       "to": "oval:mil.disa.stig.ind:ste:25814602"
     },
     {
-      "attribute": null,
-      "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:20000002",
-      "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:20000003"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25814600",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25814600"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.ind:tst:25814600",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.ind:ste:25814600"
     },
     {
       "attribute": null,
       "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:20000002",
+      "from": "oval:mil.disa.stig.ind:obj:20000005",
       "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:20000004"
+      "to": "oval:mil.disa.stig.ind:obj:20000006"
+    },
+    {
+      "attribute": null,
+      "element": "object_reference",
+      "from": "oval:mil.disa.stig.ind:obj:20000005",
+      "kind": "set_object_reference",
+      "to": "oval:mil.disa.stig.ind:obj:20000007"
     },
     {
       "attribute": null,
@@ -215,16 +215,16 @@
     {
       "attribute": null,
       "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:20000005",
+      "from": "oval:mil.disa.stig.ind:obj:20000002",
       "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:20000006"
+      "to": "oval:mil.disa.stig.ind:obj:20000003"
     },
     {
       "attribute": null,
       "element": "object_reference",
-      "from": "oval:mil.disa.stig.ind:obj:20000005",
+      "from": "oval:mil.disa.stig.ind:obj:20000002",
       "kind": "set_object_reference",
-      "to": "oval:mil.disa.stig.ind:obj:20000007"
+      "to": "oval:mil.disa.stig.ind:obj:20000004"
     }
   ],
   "dependency_integrity": {
@@ -352,7 +352,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\$ActionSendStreamDriverAuthMode\\s+(\\S+)\\s*$"
+          "value": "^\\s*module\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
         },
         {
           "attributes": {
@@ -365,8 +365,83 @@
           "value": "1"
         }
       ],
-      "comment": "rsyslog.conf: ActionSendStreamDriverAuthMode",
-      "id": "oval:mil.disa.stig.ind:obj:25814601",
+      "comment": "rsyslog.conf: module blocks",
+      "id": "oval:mil.disa.stig.ind:obj:20000006",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "ignore_case": "true"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/rsyslog.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\*\\.\\*\\s+action\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "rsyslog.conf: action for all messages",
+      "id": "oval:mil.disa.stig.ind:obj:20000003",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "3"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:20000006"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:20000007"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "rsyslog: module blocks",
+      "id": "oval:mil.disa.stig.ind:obj:20000005",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -421,177 +496,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "ignore_case": "true"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\*\\.\\*\\s+action\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "rsyslog.conf: action for all messages",
-      "id": "oval:mil.disa.stig.ind:obj:20000003",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "3"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "ignore_case": "true"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*module\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "rsyslog.conf: module blocks",
-      "id": "oval:mil.disa.stig.ind:obj:20000006",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:20000003"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:20000004"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
-        }
-      ],
-      "comment": "rsyslog: action for all messages",
-      "id": "oval:mil.disa.stig.ind:obj:20000002",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "ignore_case": "true"
-          },
-          "kind": "element",
-          "name": "behaviors",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
-        },
-        {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.d"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^.*\\.conf$"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\*\\.\\*\\s+action\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "rsyslog.d/*.conf: action for all messages",
-      "id": "oval:mil.disa.stig.ind:obj:20000004",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "3"
     },
     {
       "children": [
@@ -655,6 +559,87 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\*\\.\\*\\s+action\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "rsyslog.d/*.conf: action for all messages",
+      "id": "oval:mil.disa.stig.ind:obj:20000004",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "3"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:20000003"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:20000004"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "rsyslog: action for all messages",
+      "id": "oval:mil.disa.stig.ind:obj:20000002",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "ignore_case": "true"
+          },
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/rsyslog.d"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^.*\\.conf$"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "^\\s*module\\((\\s*(?:[^#\\)]*(?:#.*$)?\\n)*[^#\\)]*)\\)"
         },
         {
@@ -677,29 +662,44 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:20000006"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:20000007"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
+          "attributes": {
+            "ignore_case": "true"
           },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
+          "kind": "element",
+          "name": "behaviors",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/rsyslog.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\$ActionSendStreamDriverAuthMode\\s+(\\S+)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
         }
       ],
-      "comment": "rsyslog: module blocks",
-      "id": "oval:mil.disa.stig.ind:obj:20000005",
+      "comment": "rsyslog.conf: ActionSendStreamDriverAuthMode",
+      "id": "oval:mil.disa.stig.ind:obj:25814601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -757,12 +757,12 @@
       "oval:mil.disa.stig.defs:def:258146"
     ]
   },
-  "semantic_ir_sha256": "99b947a5a95922834cf8309044dd77e37b4d78e389b182dfe047e1567af497dd",
+  "semantic_ir_sha256": "76240420697e4b8c432285cad37721086bc5334f5cc5d8c0c31f01f71ae7c844",
   "source": {
     "bytes": 10470,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258146r1045288_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258146r1045288_rule/provenance.json",
-    "sha256": "ae6f36eb1280b3b84a4e396ffa176629683837b839180945bbf110f8825e5935"
+    "sha256": "84e067e68b2acd954c418cb4a29a835b4681cf713cd80ae1efe846a2028ac488"
   },
   "states": [
     {
@@ -784,26 +784,6 @@
       "operator": "AND",
       "type": "textfilecontent54_state",
       "version": "2"
-    },
-    {
-      "comment": null,
-      "entities": [
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "subexpression",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "(?i)(?:^|\\n)[^#]*\\bStreamDriver\\.?AuthMode\\s*=\\s*\"x509/name\""
-        }
-      ],
-      "id": "oval:mil.disa.stig.ind:ste:25814601",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "operator": "AND",
-      "type": "textfilecontent54_state",
-      "version": "3"
     },
     {
       "comment": null,
@@ -844,36 +824,29 @@
       "operator": "AND",
       "type": "textfilecontent54_state",
       "version": "1"
+    },
+    {
+      "comment": null,
+      "entities": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "subexpression",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "(?i)(?:^|\\n)[^#]*\\bStreamDriver\\.?AuthMode\\s*=\\s*\"x509/name\""
+        }
+      ],
+      "id": "oval:mil.disa.stig.ind:ste:25814601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "operator": "AND",
+      "type": "textfilecontent54_state",
+      "version": "3"
     }
   ],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "ActionSendStreamDriverAuthMode == x509/name",
-      "id": "oval:mil.disa.stig.ind:tst:25814600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25814600"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25814600"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.ind:ste:25814600"
-          },
-          "state_ref": "oval:mil.disa.stig.ind:ste:25814600"
-        }
-      ],
-      "type": "textfilecontent54_test",
-      "version": "1"
-    },
     {
       "check": "at least one",
       "check_existence": "at_least_one_exists",
@@ -929,6 +902,33 @@
             "state_ref": "oval:mil.disa.stig.ind:ste:25814602"
           },
           "state_ref": "oval:mil.disa.stig.ind:ste:25814602"
+        }
+      ],
+      "type": "textfilecontent54_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "ActionSendStreamDriverAuthMode == x509/name",
+      "id": "oval:mil.disa.stig.ind:tst:25814600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:25814600"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:25814600"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.ind:ste:25814600"
+          },
+          "state_ref": "oval:mil.disa.stig.ind:ste:25814600"
         }
       ],
       "type": "textfilecontent54_test",

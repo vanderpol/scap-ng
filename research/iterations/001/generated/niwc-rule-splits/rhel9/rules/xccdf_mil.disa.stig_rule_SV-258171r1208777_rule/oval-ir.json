@@ -5,6 +5,53 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/audit/auditd.conf has mode 0600 or less permissive",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:23047100"
+          },
+          {
+            "comment": ".rules files in /etc/audit/rules.d have mode 0600 or less permissive",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:23047101"
+          },
+          {
+            "comment": "/etc/audit/audit.rules has mode 0600 or less permissive",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.unix:tst:23047102"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230471",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "4"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230471",
             "kind": "definition_ref",
@@ -49,63 +96,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/audit/auditd.conf has mode 0600 or less permissive",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:23047100"
-          },
-          {
-            "comment": ".rules files in /etc/audit/rules.d have mode 0600 or less permissive",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:23047101"
-          },
-          {
-            "comment": "/etc/audit/audit.rules has mode 0600 or less permissive",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.unix:tst:23047102"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230471",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "4"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258171",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230471"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -126,6 +119,27 @@
       "from": "oval:mil.disa.stig.defs:def:230471",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.unix:tst:23047102"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258171",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230471"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.unix:tst:23047101",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.unix:obj:23047101"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.unix:tst:23047101",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.unix:ste:20000004"
     },
     {
       "attribute": "object_ref",
@@ -152,20 +166,6 @@
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.unix:tst:23047102",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.unix:ste:20000004"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.unix:tst:23047101",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.unix:obj:23047101"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.unix:tst:23047101",
       "kind": "test_state",
       "to": "oval:mil.disa.stig.unix:ste:20000004"
     }
@@ -262,21 +262,6 @@
       "children": [
         {
           "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-          "value": "/etc/audit/auditd.conf"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.unix:obj:23047100",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "type": "file_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
           "value": "/etc/audit/rules.d"
@@ -308,6 +293,21 @@
       ],
       "comment": null,
       "id": "oval:mil.disa.stig.unix:obj:23047102",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "type": "file_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+          "value": "/etc/audit/auditd.conf"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.unix:obj:23047100",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
       "type": "file_object",
       "version": "1"
@@ -346,12 +346,12 @@
       "oval:mil.disa.stig.unix:ste:20000004"
     ]
   },
-  "semantic_ir_sha256": "a5d797f036070ef72603af4accd53207dd306b1732dca92f10323cbc25879f6b",
+  "semantic_ir_sha256": "b63ff6c69bff9a6c03319c5820d52c440376a1feb413af9e3530057e3d79b33e",
   "source": {
     "bytes": 5071,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258171r1208777_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258171r1208777_rule/provenance.json",
-    "sha256": "928790709a5c37f566a6c7f9cc2da073148aedac5d75679aaa2e5db86ed5fcc5"
+    "sha256": "0c59c5ad9a0d1612af0dffb076ac1eaf67ecebc761276b6d1ccb200591287eaa"
   },
   "states": [
     {
@@ -459,6 +459,33 @@
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
+      "comment": ".rules files in /etc/audit/rules.d have mode 0600 or less permissive",
+      "id": "oval:mil.disa.stig.unix:tst:23047101",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.unix:obj:23047101"
+          },
+          "object_ref": "oval:mil.disa.stig.unix:obj:23047101"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [
+        {
+          "attributes": {
+            "state_ref": "oval:mil.disa.stig.unix:ste:20000004"
+          },
+          "state_ref": "oval:mil.disa.stig.unix:ste:20000004"
+        }
+      ],
+      "type": "file_test",
+      "version": "2"
+    },
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
       "comment": "/etc/audit/auditd.conf has mode 0600 or less permissive",
       "id": "oval:mil.disa.stig.unix:tst:23047100",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
@@ -509,33 +536,6 @@
       ],
       "type": "file_test",
       "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": ".rules files in /etc/audit/rules.d have mode 0600 or less permissive",
-      "id": "oval:mil.disa.stig.unix:tst:23047101",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.unix:obj:23047101"
-          },
-          "object_ref": "oval:mil.disa.stig.unix:obj:23047101"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [
-        {
-          "attributes": {
-            "state_ref": "oval:mil.disa.stig.unix:ste:20000004"
-          },
-          "state_ref": "oval:mil.disa.stig.unix:ste:20000004"
-        }
-      ],
-      "type": "file_test",
-      "version": "2"
     }
   ],
   "unresolved_references": [],

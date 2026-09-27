@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.* :ClientAliveInterval == 600",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25799600"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:257996",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system SSH daemon must be configured with a timeout interval."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:257996",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.* :ClientAliveInterval == 600",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25799600"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:257996",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system SSH daemon must be configured with a timeout interval."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257996",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:257996"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:257996",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25799600"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257996",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:257996"
     },
     {
       "attribute": "object_ref",
@@ -236,6 +236,40 @@
       "children": [
         {
           "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*(?i)ClientAliveInterval(?-i)[ \\t]+([\\w\\\"]+)[\\s]*(?:|(?:#.*))?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:25799600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/ssh/sshd_config.d"
@@ -304,40 +338,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*(?i)ClientAliveInterval(?-i)[ \\t]+([\\w\\\"]+)[\\s]*(?:|(?:#.*))?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25799600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -368,12 +368,12 @@
       "oval:mil.disa.stig.defs:def:257996"
     ]
   },
-  "semantic_ir_sha256": "b2c4255c134fd41aed4995166e798431549b7ace3500b279c22ff0fa405e7104",
+  "semantic_ir_sha256": "fe504fa4352208f64ee9788c860efea05edf51965166b30596cebf1a16ee04f3",
   "source": {
     "bytes": 5936,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257996r1134915_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257996r1134915_rule/provenance.json",
-    "sha256": "da3d1b29463bf22b4e391f27eea68a1a05a40770b141c7e276863772dbad1b3b"
+    "sha256": "289b4cb4e728d4ff046f9232aef957f83fbeffda0abb392c027acc22829b6d72"
   },
   "states": [
     {

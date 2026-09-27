@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Audit file system exists",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.linux:tst:23029400"
-          },
-          {
-            "comment": "Audit file system total space >= 10GiB",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25815500"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:258155",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "3"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:258155",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Audit file system exists",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.linux:tst:23029400"
+          },
+          {
+            "comment": "Audit file system total space >= 10GiB",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25815500"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:258155",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "3"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258155",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258155"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,20 +115,6 @@
       "to": "oval:mil.disa.stig.linux:tst:23029400"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258155",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258155"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.linux:tst:23029400",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.linux:obj:23029400"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:25815500",
@@ -134,6 +127,13 @@
       "from": "oval:mil.disa.stig.ind:tst:25815500",
       "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:25815500"
+    },
+    {
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.linux:tst:23029400",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.linux:obj:23029400"
     },
     {
       "attribute": "var_ref",
@@ -269,25 +269,6 @@
       "children": [
         {
           "attributes": {
-            "datatype": "string",
-            "var_check": "at least one",
-            "var_ref": "oval:mil.disa.stig.defs:var:23029400"
-          },
-          "kind": "element",
-          "name": "mount_point",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.linux:obj:23029400",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "type": "partition_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
             "ignore_case": "true"
           },
           "kind": "element",
@@ -326,6 +307,25 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string",
+            "var_check": "at least one",
+            "var_ref": "oval:mil.disa.stig.defs:var:23029400"
+          },
+          "kind": "element",
+          "name": "mount_point",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.linux:obj:23029400",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "type": "partition_object",
+      "version": "1"
     },
     {
       "children": [
@@ -380,12 +380,12 @@
       "oval:mil.disa.stig.defs:def:258155"
     ]
   },
-  "semantic_ir_sha256": "7d307f538b3e035377ef17e640b776d5acd093ddcc1747ffb4ea0e7c6b9da645",
+  "semantic_ir_sha256": "f26e8b399d719ab8484e6584eafa129000037be6b61a6f2c909284eedb028186",
   "source": {
     "bytes": 4991,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258155r1045300_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258155r1045300_rule/provenance.json",
-    "sha256": "43cf0c8d69889c9a3965a25e9ccb6f6f3183a6ebc244cecb924aca345ccc41af"
+    "sha256": "e105728e6f9f7097e597409bd922d0c0016821f3ec1f0801fc7a7c3e08ff5581"
   },
   "states": [
     {
@@ -413,26 +413,6 @@
     {
       "check": "all",
       "check_existence": "all_exist",
-      "comment": "There is a separate file system for audit data directory.",
-      "id": "oval:mil.disa.stig.linux:tst:23029400",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23029400"
-          },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23029400"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "partition_test",
-      "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "all_exist",
       "comment": "Audit file system total space >= 10GiB",
       "id": "oval:mil.disa.stig.ind:tst:25815500",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -455,6 +435,26 @@
         }
       ],
       "type": "variable_test",
+      "version": "1"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "There is a separate file system for audit data directory.",
+      "id": "oval:mil.disa.stig.linux:tst:23029400",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.linux:obj:23029400"
+          },
+          "object_ref": "oval:mil.disa.stig.linux:obj:23029400"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "partition_test",
       "version": "1"
     }
   ],

@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:230498",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:257880",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-231195 - RHEL 9 must disable mounting of cramfs."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "It is detrimental for operating systems to provide, or install by default, functionality exceeding requirements or mission objectives. These unnecessary capabilities or services are often overlooked and therefore may remain unsecured. They increase the risk to the platform by providing additional attack vectors.\n\nRemoving support for unneeded filesystem types reduces the local attack surface of the server.\n\nCompressed ROM/RAM file system (or cramfs) is a read-only file system designed for simplicity and space-efficiency. It is mainly used in embedded and small-footprint systems."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "children": [
               {
                 "comment": "/etc/modprobe.d contains a file that contains 'install cramfs /bin/false'",
@@ -68,59 +118,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:230498",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:257880",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-231195 - RHEL 9 must disable mounting of cramfs."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "It is detrimental for operating systems to provide, or install by default, functionality exceeding requirements or mission objectives. These unnecessary capabilities or services are often overlooked and therefore may remain unsecured. They increase the risk to the platform by providing additional attack vectors.\n\nRemoving support for unneeded filesystem types reduces the local attack surface of the server.\n\nCompressed ROM/RAM file system (or cramfs) is a read-only file system designed for simplicity and space-efficiency. It is mainly used in embedded and small-footprint systems."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257880",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230498"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -150,11 +157,11 @@
       "to": "oval:mil.disa.stig.ind:tst:23049803"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257880",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230498"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:23049800",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:23049800"
     },
     {
       "attribute": "object_ref",
@@ -169,13 +176,6 @@
       "from": "oval:mil.disa.stig.ind:tst:23049803",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:23049803"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23049800",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23049800"
     },
     {
       "attribute": "object_ref",
@@ -290,6 +290,49 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^[ \\t]*blacklist[ \\t]+cramfs[ \\t]*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:23049801",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/modprobe.d"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "filename",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": ".*"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "^[ \\t]*install[ \\t]+cramfs[ \\t]+/bin/false[ \\t]*$"
         },
         {
@@ -338,49 +381,6 @@
       ],
       "comment": null,
       "id": "oval:mil.disa.stig.ind:obj:23049803",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/modprobe.d"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "filename",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": ".*"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*blacklist[ \\t]+cramfs[ \\t]*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23049801",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -453,15 +453,35 @@
       "oval:mil.disa.stig.defs:def:230498"
     ]
   },
-  "semantic_ir_sha256": "a90a17534366f93fd2b2953599d54edf00c93109422d1cfb16ed571622393881",
+  "semantic_ir_sha256": "d09c82e59c6c9b6cc0e8c1579884c49466f10dfb5131dc1850e1aa1e1159f168",
   "source": {
     "bytes": 5753,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257880r1044951_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257880r1044951_rule/provenance.json",
-    "sha256": "dba1cdca2efe4f49bd93c1ecafb4d0695b1504770c8f3c8ad08adfbf98e522ee"
+    "sha256": "0d2b949894c0f551ccf0b1d9480a4b0337a2b107cadbc4d399b1a2641c5df617"
   },
   "states": [],
   "tests": [
+    {
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "comment": "/etc/modprobe.d contains a file that contains 'install cramfs /bin/false'",
+      "id": "oval:mil.disa.stig.ind:tst:23049800",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:23049800"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:23049800"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "2"
+    },
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
@@ -501,26 +521,6 @@
       "states": [],
       "type": "textfilecontent54_test",
       "version": "1"
-    },
-    {
-      "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "/etc/modprobe.d contains a file that contains 'install cramfs /bin/false'",
-      "id": "oval:mil.disa.stig.ind:tst:23049800",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23049800"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23049800"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "2"
     },
     {
       "check": "all",

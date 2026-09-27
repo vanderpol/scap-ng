@@ -25,76 +25,71 @@
             </criteria>
           </criteria>
         </definition>
-        </definitions><tests><win-def:registry_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798604" version="1" comment="LAPS Compliance: Password Complexity - large letters + small letters + numbers + specials" check_existence="at_least_one_exists" check="all">
-          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798604"/>
-          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798604"/>
+        </definitions><tests><win-def:wmi57_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798620" version="1" check="all" comment="The system is a Windows Standalone Server">
+          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798620"/>
+          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798620"/>
+        </win-def:wmi57_test>
+        <win-def:registry_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798603" version="1" comment="LAPS Compliance: Password Length - 14" check_existence="at_least_one_exists" check="all">
+          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798603"/>
+          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798603"/>
+        </win-def:registry_test>
+        <win-def:registry_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798602" version="1" comment="LAPS Compliance: Password Age - 60" check_existence="at_least_one_exists" check="all">
+          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798602"/>
+          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798602"/>
         </win-def:registry_test>
         <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798605" version="1" comment="Verify LAPS policy process is completing" check_existence="at_least_one_exists" check="at least one">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798605"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798605"/>
         </independent-def:shellcommand_test>
-        <win-def:registry_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798602" version="1" comment="LAPS Compliance: Password Age - 60" check_existence="at_least_one_exists" check="all">
-          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798602"/>
-          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798602"/>
-        </win-def:registry_test>
-        <win-def:wmi57_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798620" version="1" check="all" comment="The system is a Windows Standalone Server">
-          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798620"/>
-          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798620"/>
-        </win-def:wmi57_test>
         <win-def:user_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798610" version="1" comment="Enabled local administrator accounts are not found on the system." check_existence="none_exist" check="all">
           <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798610"/>
         </win-def:user_test>
-        <win-def:registry_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798603" version="1" comment="LAPS Compliance: Password Length - 14" check_existence="at_least_one_exists" check="all">
-          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798603"/>
-          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798603"/>
-        </win-def:registry_test>
         <independent-def:shellcommand_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798601" version="1" comment="Password Age Check: Verify local Administrator account password age is less than 60 day old (if enabled)" check_existence="at_least_one_exists" check="at least one">
           <independent-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798601"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798601"/>
         </independent-def:shellcommand_test>
+        <win-def:registry_test id="oval:navy.navwar.niwcatlantic.scc.windows:tst:27798604" version="1" comment="LAPS Compliance: Password Complexity - large letters + small letters + numbers + specials" check_existence="at_least_one_exists" check="all">
+          <win-def:object object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798604"/>
+          <win-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798604"/>
+        </win-def:registry_test>
         </tests><objects><independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798601" version="1" comment="Verify local Administrator account password age is less than 60 day old (if enabled).">
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command>Get-LocalUser | Where-Object {$_.SID -like "*500"} | Where-object {$_.Enabled -eq $True} | ForEach-Object ($_.PasswordLastSet){"$($_.Name) password is: $([int]((Get-Date) - $_.PasswordLastSet).TotalDays) days old"}</independent-def:command>
           <independent-def:pattern>password is: (\d+) days old</independent-def:pattern>
         </independent-def:shellcommand_object>
-        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798604" version="1" comment="Windows LAPS PasswordComplexity">
-          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
-          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
-          <win-def:name datatype="string">PasswordComplexity</win-def:name>
-        </win-def:registry_object>
-        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798603" version="1" comment="Windows LAPS PasswordLength">
-          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
-          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
-          <win-def:name datatype="string">PasswordLength</win-def:name>
-        </win-def:registry_object>
-        <win-def:wmi57_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798620" version="1">
-          <win-def:namespace>root\cimv2</win-def:namespace>
-          <win-def:wql>SELECT DomainRole FROM win32_computersystem</win-def:wql>
-        </win-def:wmi57_object>
-        <win-def:user_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798610" version="1" comment="Enabled Local Administrators">
-          <win-def:user operation="pattern match">.*</win-def:user>
-          <filter action="include">oval:navy.navwar.niwcatlantic.scc.windows:ste:27798611</filter>
-          <filter action="include">oval:navy.navwar.niwcatlantic.scc.windows:ste:27798612</filter>
-        </win-def:user_object>
-        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798602" version="1" comment="Windows LAPS PasswordAgeDays">
-          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
-          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
-          <win-def:name datatype="string">PasswordAgeDays</win-def:name>
-        </win-def:registry_object>
         <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798605" version="1" comment="Operational logs - Event Viewer - Applications and Services Logs - Microsoft - Windows - LAPS - Operational">
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command>get-winevent -logname Microsoft-Windows-LAPS/Operational -MaxEvents 50</independent-def:command>
           <independent-def:pattern>LAPS policy processing (\w+)\.</independent-def:pattern>
         </independent-def:shellcommand_object>
-        </objects><states><independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798601" version="1" comment="Verify password is less than 60 day old, if no data is returned that means the local administrator account is disabled.">
-          <independent-def:subexpression datatype="int" check_existence="any_exist" operation="less than">60</independent-def:subexpression>
-        </independent-def:shellcommand_state>
-        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798612" version="1" comment="Filter for Enabled users">
-          <win-def:enabled datatype="boolean">true</win-def:enabled>
-        </win-def:user_state>
-        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798611" version="1" comment="Filter for members of the Administrator group">
-          <win-def:group>Administrators</win-def:group>
-        </win-def:user_state>
+        <win-def:wmi57_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798620" version="1">
+          <win-def:namespace>root\cimv2</win-def:namespace>
+          <win-def:wql>SELECT DomainRole FROM win32_computersystem</win-def:wql>
+        </win-def:wmi57_object>
+        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798603" version="1" comment="Windows LAPS PasswordLength">
+          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
+          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
+          <win-def:name datatype="string">PasswordLength</win-def:name>
+        </win-def:registry_object>
+        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798602" version="1" comment="Windows LAPS PasswordAgeDays">
+          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
+          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
+          <win-def:name datatype="string">PasswordAgeDays</win-def:name>
+        </win-def:registry_object>
+        <win-def:user_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798610" version="1" comment="Enabled Local Administrators">
+          <win-def:user operation="pattern match">.*</win-def:user>
+          <filter action="include">oval:navy.navwar.niwcatlantic.scc.windows:ste:27798611</filter>
+          <filter action="include">oval:navy.navwar.niwcatlantic.scc.windows:ste:27798612</filter>
+        </win-def:user_object>
+        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27798604" version="1" comment="Windows LAPS PasswordComplexity">
+          <win-def:hive datatype="string">HKEY_LOCAL_MACHINE</win-def:hive>
+          <win-def:key datatype="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\LAPS</win-def:key>
+          <win-def:name datatype="string">PasswordComplexity</win-def:name>
+        </win-def:registry_object>
+        </objects><states><win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798602" version="1" comment="Registry value must be of type reg_dword and value less than or equals 60">
+          <win-def:type>reg_dword</win-def:type>
+          <win-def:value datatype="int" operation="less than or equal">60</win-def:value>
+        </win-def:registry_state>
         <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798603" version="1" comment="Registry value must be of type reg_dword and value greater than or equals 14">
           <win-def:type>reg_dword</win-def:type>
           <win-def:value datatype="int" operation="greater than or equal">14</win-def:value>
@@ -104,13 +99,18 @@
           <independent-def:command>get-winevent -logname Microsoft-Windows-LAPS/Operational -MaxEvents 50</independent-def:command>
           <independent-def:subexpression operation="pattern match">succeeded</independent-def:subexpression>
         </independent-def:shellcommand_state>
+        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798611" version="1" comment="Filter for members of the Administrator group">
+          <win-def:group>Administrators</win-def:group>
+        </win-def:user_state>
+        <win-def:user_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798612" version="1" comment="Filter for Enabled users">
+          <win-def:enabled datatype="boolean">true</win-def:enabled>
+        </win-def:user_state>
+        <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798601" version="1" comment="Verify password is less than 60 day old, if no data is returned that means the local administrator account is disabled.">
+          <independent-def:subexpression datatype="int" check_existence="any_exist" operation="less than">60</independent-def:subexpression>
+        </independent-def:shellcommand_state>
         <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798604" version="1" comment="Registry value must be of type reg_dword and value equals 4">
           <win-def:type>reg_dword</win-def:type>
           <win-def:value datatype="int">4</win-def:value>
-        </win-def:registry_state>
-        <win-def:registry_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798602" version="1" comment="Registry value must be of type reg_dword and value less than or equals 60">
-          <win-def:type>reg_dword</win-def:type>
-          <win-def:value datatype="int" operation="less than or equal">60</win-def:value>
         </win-def:registry_state>
         <win-def:wmi57_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27798620" version="1" comment="Standalone Server">
           <win-def:result datatype="record" operation="equals">

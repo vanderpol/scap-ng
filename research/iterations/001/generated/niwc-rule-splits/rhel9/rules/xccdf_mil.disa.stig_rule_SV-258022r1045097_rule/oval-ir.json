@@ -6,47 +6,6 @@
         "children": [
           {
             "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25801700"
-          },
-          {
-            "comment": null,
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:24453900"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:244539",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:244539",
             "kind": "definition_ref",
             "negate": false
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25801700"
+          },
+          {
+            "comment": null,
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:24453900"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:244539",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258022",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:244539"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -106,13 +113,6 @@
       "from": "oval:mil.disa.stig.defs:def:244539",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25801700"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258022",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:244539"
     },
     {
       "attribute": "object_ref",
@@ -214,6 +214,40 @@
       "children": [
         {
           "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/dconf/profile/user"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*system-db\\s*:\\s*local\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "check that /etc/dconf/profile/user:system-db is at minimum set to local",
+      "id": "oval:mil.disa.stig.ind:obj:25801700",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "3"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/dconf/db/local.d/locks"
@@ -252,40 +286,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/dconf/profile/user"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*system-db\\s*:\\s*local\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "check that /etc/dconf/profile/user:system-db is at minimum set to local",
-      "id": "oval:mil.disa.stig.ind:obj:25801700",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "3"
     }
   ],
   "parser_contract": {
@@ -312,12 +312,12 @@
       "oval:mil.disa.stig.defs:def:244539"
     ]
   },
-  "semantic_ir_sha256": "24ce21f9017d1d38a3c056f82bf0db3d2a7fe8fca35c710bda547970be531641",
+  "semantic_ir_sha256": "9ecb2fc4202c73e1276c4bad6f0fa0289e77a62221c1f7c0b8b4c1185b8a624e",
   "source": {
     "bytes": 4225,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258022r1045097_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258022r1045097_rule/provenance.json",
-    "sha256": "7de597ff3cfc08c9c7843d7b8ac3b847b1301fac3b157b3da69660622b745a25"
+    "sha256": "6fa3ea0769f8065505e52c5103578fe7b70d7ba03f07234c17065d87595f0495"
   },
   "states": [],
   "tests": [

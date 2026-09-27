@@ -16,16 +16,22 @@
             <criterion test_ref="oval:mil.disa.stig.win:tst:10000300"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.win:def:100004" version="2" class="inventory">
+        <definition id="oval:mil.disa.stig.defs:def:254436" version="6" class="compliance">
           <metadata>
-            <title>The system is a Windows Domain Member Server</title>
-            <affected family="windows">
-              <platform>Microsoft Windows Server</platform>
-            </affected>
+            <title>Windows Deny log on as a batch job user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and from unauthenticated access on all systems.</title>
             <description/>
           </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:10000400"/>
+          <criteria operator="OR">
+            <criteria>
+              <extend_definition definition_ref="oval:mil.disa.stig.win:def:100004" comment="System is a domain-joined member server"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349202" comment="Deny log on as a batch job - Domain Admins"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349203" comment="Deny log on as a batch job - Enterprise Admins"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25443601" comment="Deny log on as a batch job - Guests"/>
+            </criteria>
+            <criteria>
+              <extend_definition definition_ref="oval:mil.disa.stig.win:def:100003" comment="System is a standalone server"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25443601" comment="Deny log on as a batch job - Guests"/>
+            </criteria>
           </criteria>
         </definition>
         <definition id="oval:mil.disa.stig.windows2025:def:278185" version="1" class="compliance">
@@ -46,51 +52,45 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254436"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:254436" version="6" class="compliance">
+        <definition id="oval:mil.disa.stig.win:def:100004" version="2" class="inventory">
           <metadata>
-            <title>Windows Deny log on as a batch job user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and from unauthenticated access on all systems.</title>
+            <title>The system is a Windows Domain Member Server</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server</platform>
+            </affected>
             <description/>
           </metadata>
-          <criteria operator="OR">
-            <criteria>
-              <extend_definition definition_ref="oval:mil.disa.stig.win:def:100004" comment="System is a domain-joined member server"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349202" comment="Deny log on as a batch job - Domain Admins"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349203" comment="Deny log on as a batch job - Enterprise Admins"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25443601" comment="Deny log on as a batch job - Guests"/>
-            </criteria>
-            <criteria>
-              <extend_definition definition_ref="oval:mil.disa.stig.win:def:100003" comment="System is a standalone server"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25443601" comment="Deny log on as a batch job - Guests"/>
-            </criteria>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:10000400"/>
           </criteria>
         </definition>
         </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000400" version="1" check="all" comment="The system is a Windows Domain Member Server">
           <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
           <state state_ref="oval:mil.disa.stig.win:ste:10000400"/>
         </wmi57_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000300" version="1" check="all" comment="The system is a Windows Standalone Server">
-          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
-        </wmi57_test>
-        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25443601" version="2" check="at least one" comment="Deny log on as a batch job - Guests">
-          <object object_ref="oval:mil.disa.stig.win:obj:25349200"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000033"/>
-        </userright_test>
-        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349202" version="5" check="at least one" comment="Deny log on as a batch job - Domain Admins">
-          <object object_ref="oval:mil.disa.stig.win:obj:25349200"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000040"/>
-        </userright_test>
         <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349203" version="1" check="at least one" comment="Deny log on as a batch job - Enterprise Admins">
           <object object_ref="oval:mil.disa.stig.win:obj:25349200"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000041"/>
         </userright_test>
-        </tests><objects><userright_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25349200" version="1">
-          <userright>SE_DENY_BATCH_LOGON_NAME</userright>
-        </userright_object>
-        <wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
+        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000300" version="1" check="all" comment="The system is a Windows Standalone Server">
+          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
+        </wmi57_test>
+        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349202" version="5" check="at least one" comment="Deny log on as a batch job - Domain Admins">
+          <object object_ref="oval:mil.disa.stig.win:obj:25349200"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000040"/>
+        </userright_test>
+        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25443601" version="2" check="at least one" comment="Deny log on as a batch job - Guests">
+          <object object_ref="oval:mil.disa.stig.win:obj:25349200"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000033"/>
+        </userright_test>
+        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
           <namespace>root\cimv2</namespace>
           <wql>SELECT DomainRole FROM win32_computersystem</wql>
         </wmi57_object>
+        <userright_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25349200" version="1">
+          <userright>SE_DENY_BATCH_LOGON_NAME</userright>
+        </userright_object>
         </objects><states><userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000033" version="1">
           <trustee_name operation="case insensitive equals">Guests</trustee_name>
         </userright_state>

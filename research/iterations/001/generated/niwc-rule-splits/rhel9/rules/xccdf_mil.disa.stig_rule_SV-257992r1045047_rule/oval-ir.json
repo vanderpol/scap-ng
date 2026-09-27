@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "HostbasedAuthentication is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25799200"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:257992",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must not allow a noncertificate trusted host SSH logon to the system."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:257992",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "HostbasedAuthentication is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25799200"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:257992",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must not allow a noncertificate trusted host SSH logon to the system."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257992",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:257992"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:257992",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25799200"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257992",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:257992"
     },
     {
       "attribute": "object_ref",
@@ -230,32 +230,29 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ssh/sshd_config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25799201"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:25799202"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
           },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^(?i)\\s*HostbasedAuthentication\\s+(\\w+)$"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25799201",
+      "id": "oval:mil.disa.stig.ind:obj:25799200",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -314,29 +311,32 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25799201"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:25799202"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ssh/sshd_config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
           },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^(?i)\\s*HostbasedAuthentication\\s+(\\w+)$"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:25799200",
+      "id": "oval:mil.disa.stig.ind:obj:25799201",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -368,12 +368,12 @@
       "oval:mil.disa.stig.defs:def:257992"
     ]
   },
-  "semantic_ir_sha256": "3c8de2d8c4fa248282f966fc0d847cecc7ae0691eaf11df2fa507f161daaceae",
+  "semantic_ir_sha256": "d03f3b1fee94bdf3f8d50848191660ef257130fb3ca5d0014fbd1c2444be2b70",
   "source": {
     "bytes": 3929,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257992r1045047_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257992r1045047_rule/provenance.json",
-    "sha256": "9ea122b4ba509af1e1ade4f615d1a3966dde483f2217adc8d6d7d6049d39425c"
+    "sha256": "3b3f2b427dab1e7471bf0be32694b786b2b61adf6bc0c44bd39239182e15c07f"
   },
   "states": [
     {

@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "/etc/sssd/sssd.conf:cache_credentials = true does not exist",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23037600"
+          },
+          {
+            "comment": "/etc/sssd/sssd.conf:offline_credentials_expiration = 1",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23037602"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "OR"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230376",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must prohibit the use of cached authentications after one day."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230376",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "/etc/sssd/sssd.conf:cache_credentials = true does not exist",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23037600"
-          },
-          {
-            "comment": "/etc/sssd/sssd.conf:offline_credentials_expiration = 1",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23037602"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "OR"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230376",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must prohibit the use of cached authentications after one day."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271609",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230376"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:230376",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23037602"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271609",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230376"
     },
     {
       "attribute": "object_ref",
@@ -269,6 +269,70 @@
     {
       "children": [
         {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/sssd/sssd.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*offline_credentials_expiration\\s*=\\s*(\\d*)\\s*(?:#.*)?$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:23037602",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23037600"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23037603"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.ind:obj:23037606",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
           "attributes": {
             "ignore_case": "true",
             "max_depth": "-1",
@@ -318,36 +382,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "2"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23037600"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23037603"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23037606",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     },
     {
       "children": [
@@ -434,40 +468,6 @@
     {
       "children": [
         {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/sssd/sssd.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*offline_credentials_expiration\\s*=\\s*(\\d*)\\s*(?:#.*)?$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23037602",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
           "attributes": {
             "ignore_case": "true"
           },
@@ -544,12 +544,12 @@
       "oval:mil.disa.stig.defs:def:230376"
     ]
   },
-  "semantic_ir_sha256": "a25a27292da6a665dfc789433f48c7e7286fcc0d52e38a93aceea94bb6fe979e",
+  "semantic_ir_sha256": "c262182a4a8759c71c2edd34b26c22fb8eae9f32df14c17a970df85a5a8e37f9",
   "source": {
     "bytes": 5903,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271609r1091539_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271609r1091539_rule/provenance.json",
-    "sha256": "a0e1e0853f24365b1b76ee9832f6f28288dc28f4ee69acd48300b2b213860b36"
+    "sha256": "08bb89a5dda6fffbe5d3cb4130533e9c25f669206d32f27aeb9d044b7858542e"
   },
   "states": [
     {
