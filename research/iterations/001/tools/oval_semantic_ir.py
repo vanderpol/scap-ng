@@ -82,11 +82,15 @@ STATIC_EVALUATOR_OPERATIONS = {
 REGEX_META = set("^$\\.[](){}*+?|")
 
 
-def local(tag: str) -> str:
+def local(tag) -> str | None:
+    if not isinstance(tag, str):
+        return None
     return etree.QName(tag).localname
 
 
-def ns(tag: str) -> str:
+def ns(tag) -> str:
+    if not isinstance(tag, str):
+        return ""
     return etree.QName(tag).namespace or ""
 
 
@@ -176,6 +180,8 @@ def collect_refs(source_id: str, e, known_ids: set[str]):
     unresolved = set()
     edges = []
     for n in e.iter():
+        if not isinstance(n.tag, str):
+            continue
         for attr_name, v in n.attrib.items():
             value = v.strip()
             attr = local(attr_name)
@@ -1105,6 +1111,8 @@ def feature_inventory(root):
     attributes = {}
     namespaces = {}
     for e in root.iter():
+        if not isinstance(e.tag, str):
+            continue
         n = local(e.tag)
         elements[n] = elements.get(n, 0) + 1
         uri = ns(e.tag)
@@ -1135,6 +1143,8 @@ def parse(path: Path, provenance_path: Path | None = None):
     by_id = {}
     kind_by_id = {}
     for section in root:
+        if not isinstance(section.tag, str):
+            continue
         sn = local(section.tag)
         if sn not in SECTION_KIND:
             continue
