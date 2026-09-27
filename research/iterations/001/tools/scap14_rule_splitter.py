@@ -155,9 +155,9 @@ class OvalComponent:
         if source == "test_ref":
             return "criterion_test"
         if source == "object_ref":
-            return "test_or_component_object"
+            return "object_component" if name == "object_component" else "test_object"
         if source == "state_ref":
-            return "test_or_filter_state"
+            return "test_state" if name == "state" else "state_reference"
         if source == "var_ref":
             return "variable_reference"
         if name == "object_reference" and source == "text":
@@ -225,11 +225,11 @@ class OvalComponent:
             dedup[key] = edge
         return refs, unresolved_looking, list(dedup.values())
 
-    def closure(self, definition_ids: list[str]):
+    def closure(self, seed_ids: list[str]):
         wanted = set()
         unresolved = set()
         dependency_edges = []
-        queue = list(definition_ids)
+        queue = list(seed_ids)
         while queue:
             oid = queue.pop(0)
             if oid in wanted:
@@ -259,7 +259,32 @@ class OvalComponent:
         return wanted, unresolved, dependency_edges
 
 
+def xccdf_node(element):
+    out = {
+        "name": local(element.tag),
+        "namespace": etree.QName(element.tag).namespace or "",
+    }
+    if element.attrib:
+        out["attributes"] = {
+            etree.QName(k).localname: v for k, v in sorted(element.attrib.items())
+        }
+    if element.text and element.text.strip():
+        out["text"] = element.text.strip()
+    children = [
+        xccdf_node(child) for child in element
+        if isinstance(child.tag, str)
+    ]
+    if children:
+        out["children"] = children
+    return out
+
+
 def rule_oval_refs(benchmark):
+    values = {
+        e.get("id"): xccdf_node(e)
+        for e in benchmark.iter()
+        if local(e.tag) == "Value" and e.get("id")
+    }
     rows = []
     for rule in benchmark.iter():
         if local(rule.tag) != "Rule":
@@ -275,9 +300,11 @@ def rule_oval_refs(benchmark):
             exports = []
             for child in check.iter():
                 if local(child.tag) == "check-export":
+                    value_id = child.get("value-id")
                     exports.append({
                         "export_name": child.get("export-name"),
-                        "value_id": child.get("value-id"),
+                        "value_id": value_id,
+                        "value_definition": values.get(value_id),
                     })
             for ref in check.iter():
                 if local(ref.tag) != "check-content-ref":
@@ -481,7 +508,23 @@ def main() -> int:
                     })
                     continue
                 component = matches[0]
-                grouped.setdefault(component, []).append(definition_id)
+                entry = grouped.setdefault(component, {
+                    "definition_ids": [],
+                    "export_variable_ids": [],
+                    "unresolved_export_names": [],
+                })
+                entry["definition_ids"].append(definition_id)
+                for export in check.get("exports", []):
+                    export_name = export.get("export_name")
+                    if not export_name:
+                        continue
+                    if (
+                        export_name in component.by_id
+                        and component.kind_by_id.get(export_name) == "variables"
+                    ):
+                        entry["export_variable_ids"].append(export_name)
+                    elif OVAL_ID_RE.match(export_name):
+                        entry["unresolved_export_names"].append(export_name)
                 resolution.append({
                     **check,
                     "definition_id": definition_id,
@@ -504,8 +547,16 @@ def main() -> int:
             unresolved = set()
             closure_ids = []
             dependency_edges = []
-            for component, definition_ids in grouped.items():
-                closure, missing, edges = component.closure(sorted(set(definition_ids)))
+            xccdf_export_edges = []
+            unresolved_exports = set()
+            export_variable_ids = set()
+            for component, group in grouped.items():
+                definition_ids = sorted(set(group["definition_ids"]))
+                exported = sorted(set(group["export_variable_ids"]))
+                unresolved_exports |= set(group["unresolved_export_names"])
+                export_variable_ids |= set(exported)
+                seeds = definition_ids + exported
+                closure, missing, edges = component.closure(seeds)
                 component_closures.append((component, closure))
                 unresolved |= missing
                 closure_ids.extend(sorted(closure))
@@ -513,6 +564,15 @@ def main() -> int:
                     **edge,
                     "oval_component": component.component_id,
                 } for edge in edges)
+                for export_id in exported:
+                    xccdf_export_edges.append({
+                        "from": row["rule_id"],
+                        "to": export_id,
+                        "kind": "xccdf_check_export",
+                        "oval_component": component.component_id,
+                    })
+            unresolved |= unresolved_exports
+            dependency_edges.extend(xccdf_export_edges)
 
             stats["unresolved_references"] += len(unresolved)
             if unresolved and args.fail_on_unresolved:
@@ -558,6 +618,12 @@ def main() -> int:
                     if c["status"] == "resolved"
                 }),
                 "oval_component_ids": sorted(c.component_id for c in grouped),
+                "external_variable_ids_from_check_export": sorted(export_variable_ids),
+                "check_exports": [
+                    export
+                    for check in resolution
+                    for export in check.get("exports", [])
+                ],
                 "closure": {
                     "counts": counts,
                     "ids": sorted(set(closure_ids)),

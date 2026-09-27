@@ -151,15 +151,16 @@ def criteria_node(e):
 
 def dependency_kind(node, source: str) -> str:
     name = local(node.tag)
-    mapping = {
-        "definition_ref": "extend_definition",
-        "test_ref": "criterion_test",
-        "object_ref": "object_reference",
-        "state_ref": "state_reference",
-        "var_ref": "variable_reference",
-    }
-    if source in mapping:
-        return mapping[source]
+    if source == "definition_ref":
+        return "extend_definition"
+    if source == "test_ref":
+        return "criterion_test"
+    if source == "object_ref":
+        return "object_component" if name == "object_component" else "test_object"
+    if source == "state_ref":
+        return "test_state" if name == "state" else "state_reference"
+    if source == "var_ref":
+        return "variable_reference"
     if name == "object_reference" and source == "text":
         return "set_object_reference"
     if name == "filter" and source == "text":
@@ -820,8 +821,12 @@ def feature_inventory(root):
     }
 
 
-def parse(path: Path):
+def parse(path: Path, provenance_path: Path | None = None):
     data = path.read_bytes()
+    provenance = (
+        json.loads(provenance_path.read_text(encoding="utf-8"))
+        if provenance_path is not None else None
+    )
     root = etree.fromstring(data)
     if local(root.tag) != "oval_definitions":
         raise ValueError(f"{path}: root is {local(root.tag)}, expected oval_definitions")
@@ -883,7 +888,19 @@ def parse(path: Path):
             "path": path.as_posix(),
             "sha256": sha256(data),
             "bytes": len(data),
+            "provenance_path": provenance_path.as_posix() if provenance_path else None,
         },
+        "xccdf_context": (
+            {
+                "rule_id": provenance.get("xccdf_rule_id"),
+                "title": provenance.get("xccdf_title"),
+                "component": provenance.get("xccdf_component"),
+                "checks": provenance.get("checks", []),
+                "check_exports": provenance.get("check_exports", []),
+                "published_source": provenance.get("source"),
+            }
+            if provenance else None
+        ),
         "parser_contract": {
             "core_logic_model": "explicit",
             "platform_specific_nodes": "losslessly_preserved",
@@ -921,6 +938,21 @@ def parse(path: Path):
         },
     }
 
+    if provenance:
+        exports_by_name = {}
+        for export in provenance.get("check_exports", []):
+            name = export.get("export_name")
+            if name:
+                exports_by_name.setdefault(name, []).append(export)
+        for variable in semantic["variables"]:
+            if variable.get("type") != "external_variable":
+                continue
+            bindings = exports_by_name.get(variable.get("id"), [])
+            variable["semantic_ast"].setdefault("input", {})["xccdf_check_exports"] = bindings
+            resolved = semantic.get("variable_resolution", {}).get(variable.get("id"))
+            if resolved is not None and bindings:
+                resolved["xccdf_check_exports"] = bindings
+
     digest_basis = dict(semantic)
     digest_basis["source"] = {
         "sha256": semantic["source"]["sha256"],
@@ -937,10 +969,11 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("input", type=Path)
     ap.add_argument("--output", type=Path)
+    ap.add_argument("--provenance", type=Path)
     ap.add_argument("--fail-on-unresolved", action="store_true")
     args = ap.parse_args()
 
-    ir = parse(args.input)
+    ir = parse(args.input, args.provenance)
     text = json.dumps(ir, indent=2, sort_keys=True) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

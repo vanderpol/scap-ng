@@ -8,6 +8,7 @@ on:
       - "research/iterations/001/tools/scap14_rule_splitter.py"
       - "research/iterations/001/tools/oval_semantic_ir.py"
       - "research/iterations/001/tools/analyze_oval_ir_corpus.py"
+      - "research/iterations/001/tools/test_oval_dependency_graph.py"
       - "research/iterations/001/tools/normalize_audit_syscall_matrix.py"
       - "research/iterations/001/tools/render_native_semantics.py"
       - "research/iterations/001/tools/compare_native_semantics.py"
@@ -46,6 +47,9 @@ jobs:
           python scap-ng/research/iterations/001/tools/validate_scap14_schema_bundle.py \
             scap-ng/third_party/scap-1.4-schemas
 
+      - name: Test variable-driven dependency closure
+        run: python scap-ng/research/iterations/001/tools/test_oval_dependency_graph.py
+
       - name: Split four priority published benchmarks
         shell: bash
         run: |
@@ -71,7 +75,9 @@ jobs:
           set -euo pipefail
           parser="scap-ng/research/iterations/001/tools/oval_semantic_ir.py"
           while IFS= read -r -d '' oval; do
-            python "$parser" "$oval" --output "$(dirname "$oval")/oval-ir.json" --fail-on-unresolved
+            python "$parser" "$oval" \
+              --provenance "$(dirname "$oval")/provenance.json" \
+              --output "$(dirname "$oval")/oval-ir.json" --fail-on-unresolved
           done < <(find scap-ng/research/iterations/001/generated/niwc-rule-splits -name oval.xml -print0 | sort -z)
 
       - name: Aggregate semantic coverage
