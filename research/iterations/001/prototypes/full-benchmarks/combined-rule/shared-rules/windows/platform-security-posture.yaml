@@ -1,0 +1,44 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule-overlay
+shared_rule:
+  id: demo.windows.shared.platform-security-posture
+  version: 1
+  rule:
+    title: Illustrative Windows platform protections must satisfy required alternatives
+    severity: high
+    discussion: The platform must satisfy disk encryption, TPM or approved exception, Secure Boot, and an approved advanced protection path.
+    check: Verify BitLocker is enabled; verify either TPM 2.0 is present and ready or an approved virtualization exception exists; verify Secure Boot is enabled and either Credential Guard or approved application control is enabled.
+    fix: Correct each failed platform-security condition or document the applicable approved exception.
+    assessment:
+      id: demo.windows.platform-security-posture
+      version: 1
+      collect:
+        bitlocker: {capability: windows.disk-encryption}
+        tpm: {capability: windows.tpm}
+        virtualization_exception: {capability: policy.exception-record, id: virtualization-security-exception}
+        secure_boot: {capability: windows.secure-boot}
+        credential_guard: {capability: windows.credential-guard}
+        application_control: {capability: windows.application-control}
+      assert:
+        all:
+          - compare: {id: A, subject: bitlocker_enabled, actual: "$bitlocker.enabled", op: eq, expected: true}
+          - any:
+              id: BC
+              children:
+                - all:
+                    id: B
+                    children:
+                      - compare: {subject: tpm_present, actual: "$tpm.present", op: eq, expected: true}
+                      - compare: {subject: tpm_version, actual: "$tpm.spec_version", op: version_ge, expected: "2.0"}
+                      - compare: {subject: tpm_ready, actual: "$tpm.ready", op: eq, expected: true}
+                - compare: {id: C, subject: approved_virtualization_exception, actual: "$virtualization_exception.approved", op: eq, expected: true}
+          - all:
+              id: DEF
+              children:
+                - compare: {id: D, subject: secure_boot_enabled, actual: "$secure_boot.enabled", op: eq, expected: true}
+                - any:
+                    id: EF
+                    children:
+                      - compare: {id: E, subject: credential_guard_enabled, actual: "$credential_guard.enabled", op: eq, expected: true}
+                      - compare: {id: F, subject: approved_application_control_enabled, actual: "$application_control.approved_policy_enabled", op: eq, expected: true}

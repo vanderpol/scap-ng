@@ -1,0 +1,22 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule-overlay
+shared_rule:
+  id: demo.windows.shared.trusted-publisher-store
+  version: 1
+  rule:
+    title: Illustrative Windows publisher trust requirement must be satisfied
+    severity: medium
+    discussion: The machine TrustedPublisher store must contain the illustrative required publisher certificate.
+    check: Review the machine TrustedPublisher store and verify the illustrative publisher certificate is present.
+    fix: Correct certificate-store permissions and configure the required trust state.
+    assessment:
+      id: demo.windows.trusted-publisher-store
+      version: 1
+      collect:
+        store: {capability: windows.certificate-store, scope: machine, store: TrustedPublisher}
+      assert:
+        exists:
+          subject: illustrative_required_certificate
+          in: "$store.certificates"
+          where: {field: subject, op: eq, value: "CN=Illustrative Publisher"}

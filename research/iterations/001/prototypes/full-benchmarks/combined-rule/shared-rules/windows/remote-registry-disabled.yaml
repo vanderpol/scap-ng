@@ -1,0 +1,21 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule-overlay
+shared_rule:
+  id: demo.windows.shared.remote-registry-disabled
+  version: 1
+  rule:
+    title: Illustrative Windows Remote Registry service must be disabled
+    severity: medium
+    discussion: Remote Registry is not required for the illustrative baseline.
+    check: Verify the Remote Registry service startup type is disabled and the service is not running.
+    fix: Disable and stop the Remote Registry service.
+    assessment:
+      id: demo.windows.remote-registry-disabled
+      version: 1
+      collect:
+        service: {capability: windows.service, name: RemoteRegistry, fields: [startup_type, running]}
+      assert:
+        all:
+          - compare: {subject: startup_type, actual: "$service.startup_type", op: eq, expected: disabled}
+          - compare: {subject: running, actual: "$service.running", op: eq, expected: false}
