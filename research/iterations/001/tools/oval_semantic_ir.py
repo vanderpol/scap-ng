@@ -534,6 +534,131 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             out.append(child["values"])
         return result("exact_static", values=out, operation=operation)
 
+    def canonical_item(item):
+        return json.dumps(item, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+    def unique_items(items):
+        seen = set()
+        out = []
+        for item in items:
+            key = canonical_item(item)
+            if key not in seen:
+                seen.add(key)
+                out.append(item)
+        return out
+
+    def synthetic_set_items(set_element):
+        refs_or_sets = []
+        filters = []
+        for child in set_element:
+            name = local(child.tag)
+            if name == "object_reference":
+                refs_or_sets.append(("object", text_value(child)))
+            elif name == "set":
+                refs_or_sets.append(("set", child))
+            elif name == "filter":
+                filters.append(child)
+
+        if filters:
+            return result(
+                "dynamic_object_dependency",
+                reason="synthetic_set_filter_evaluation_not_implemented",
+                operation="set",
+            )
+
+        operands = []
+        for kind, value in refs_or_sets:
+            resolved = (
+                synthetic_object_items(value)
+                if kind == "object"
+                else synthetic_set_items(value)
+            )
+            if resolved["status"] != "exact_static":
+                return resolved
+            operands.append(resolved["items"])
+
+        if not operands:
+            return result("unsupported", reason="set_has_no_operands", operation="set")
+
+        operator = set_element.get("set_operator", "UNION")
+        if operator == "UNION":
+            items = unique_items([item for operand in operands for item in operand])
+        elif operator == "INTERSECTION":
+            common = {canonical_item(x): x for x in operands[0]}
+            for operand in operands[1:]:
+                keys = {canonical_item(x) for x in operand}
+                common = {k: v for k, v in common.items() if k in keys}
+            items = list(common.values())
+        elif operator == "COMPLEMENT":
+            if len(operands) != 2:
+                return result(
+                    "unsupported",
+                    reason=f"complement_requires_two_operands:{len(operands)}",
+                    operation="set",
+                )
+            remove = {canonical_item(x) for x in operands[1]}
+            items = [x for x in operands[0] if canonical_item(x) not in remove]
+        else:
+            return result(
+                "unsupported",
+                reason=f"unknown_set_operator:{operator}",
+                operation="set",
+            )
+        return {"status": "exact_static", "items": unique_items(items), "operation": "set"}
+
+    def synthetic_object_items(object_ref):
+        element = by_id.get(object_ref)
+        if element is None or kind_by_id.get(object_ref) != "object":
+            return result(
+                "dynamic_object_dependency",
+                reason=f"object_component_unknown_object:{object_ref}",
+                operation="object_component",
+            )
+
+        object_type = local(element.tag)
+        if object_type != "variable_object":
+            return result(
+                "dynamic_object_dependency",
+                reason=f"object_component_requires_collection:{object_type}",
+                operation="object_component",
+                object_ref=object_ref,
+            )
+
+        children = [c for c in element if isinstance(c.tag, str)]
+        set_children = [c for c in children if local(c.tag) == "set"]
+        if set_children:
+            if len(set_children) != 1:
+                return result(
+                    "unsupported",
+                    reason=f"variable_object_set_count:{len(set_children)}",
+                    operation="object_component",
+                )
+            return synthetic_set_items(set_children[0])
+
+        var_refs = [text_value(c) for c in children if local(c.tag) == "var_ref"]
+        if len(var_refs) != 1 or not var_refs[0]:
+            return result(
+                "dynamic_object_dependency",
+                reason=f"variable_object_var_ref_count:{len(var_refs)}",
+                operation="object_component",
+                object_ref=object_ref,
+            )
+        resolved = variable_values(var_refs[0])
+        if resolved["status"] != "exact_static":
+            return result(
+                resolved["status"],
+                reason=f"variable_object_variable_not_static:{var_refs[0]}",
+                operation="object_component",
+                object_ref=object_ref,
+                blocked_by=resolved,
+            )
+        return {
+            "status": "exact_static",
+            "items": [{"value": list(resolved.get("values", []))}],
+            "operation": "variable_object",
+            "object_ref": object_ref,
+        }
+
     def component_values(node):
         name = local(node.tag)
 
@@ -561,13 +686,39 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             }
 
         if name == "object_component":
-            return result(
-                "dynamic_object_dependency",
-                operation=name,
-                object_ref=node.get("object_ref"),
-                item_field=node.get("item_field"),
-                record_field=node.get("record_field"),
-            )
+            object_ref = node.get("object_ref")
+            item_field = node.get("item_field")
+            record_field = node.get("record_field")
+            if record_field:
+                return result(
+                    "dynamic_object_dependency",
+                    reason="synthetic_record_field_collection_not_implemented",
+                    operation=name,
+                    object_ref=object_ref,
+                    item_field=item_field,
+                    record_field=record_field,
+                )
+            collected = synthetic_object_items(object_ref)
+            if collected["status"] != "exact_static":
+                return {
+                    **collected,
+                    "operation": name,
+                    "object_ref": object_ref,
+                    "item_field": item_field,
+                    "record_field": record_field,
+                }
+            values = []
+            for item in collected["items"]:
+                if item_field not in item:
+                    return result(
+                        "static_evaluation_error",
+                        reason=f"object_component_item_field_missing:{item_field}",
+                        operation=name,
+                        object_ref=object_ref,
+                    )
+                field = item[item_field]
+                values.extend(field if isinstance(field, list) else [field])
+            return bounded(values, name)
 
         if name == "concat":
             children = all_children_static(node, name, minimum=2)
