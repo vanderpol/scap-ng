@@ -9,6 +9,7 @@ on:
       - "research/iterations/001/public-corpus-manifest.yaml"
       - "research/iterations/001/tools/oval_semantic_ir.py"
       - "research/iterations/001/tools/analyze_oval_self_assertion.py"
+      - "research/iterations/001/tools/verify_oval_self_assertion_static.py"
       - "research/iterations/001/tools/test_oval_dependency_graph.py"
       - "research/iterations/001/tools/test_oval_variable_evaluation_plans.py"
       - "research/iterations/001/tools/test_oval_static_variable_functions.py"
@@ -69,6 +70,12 @@ jobs:
           python scap-ng/research/iterations/001/tools/analyze_oval_self_assertion.py \
             self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic \
             --output scap-ng/research/iterations/001/generated/oval-self-assertion/agnostic-conformance-inventory.json || true
+
+      - name: Verify statically reducible variable tests offline
+        run: |
+          python scap-ng/research/iterations/001/tools/verify_oval_self_assertion_static.py \
+            self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic \
+            --output scap-ng/research/iterations/001/generated/oval-self-assertion/agnostic-static-verification.json
 
       - name: Commit reproducible conformance inventory
         working-directory: scap-ng
