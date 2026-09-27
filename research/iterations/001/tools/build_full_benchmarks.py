@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """Build iteration 001 SCAP-NG prototype bundles from individual authoring files.
 
-Authoring layout is intentionally file-oriented:
-- combined-rule: policy/rules/*.yaml and automated/rules/*.yaml
-- split model: policy/rules/*.yaml, automation/assessments/*.yaml, bindings.yaml
-- shared split-model assessments may be referenced by multiple benchmarks
+Combined-rule Windows prototypes support shared rule bases plus STIG-specific
+overlays. Overlays are a source/build concept only: published packages contain
+fully resolved self-contained rule documents.
 
-Every published .scapng package is self-contained.
+Split-model assessments may also be shared across benchmarks and are resolved
+into each published package.
 """
 from __future__ import annotations
 
 import argparse
 import base64
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -41,6 +42,8 @@ def canonical(obj) -> bytes:
 
 def load_rule_dir(path: Path) -> dict[str, dict]:
     rules = {}
+    if not path.exists():
+        return rules
     for file in sorted(path.glob("*.yaml")):
         doc = load(file)
         rule = doc["rule"]
@@ -57,7 +60,8 @@ def validate_rules(benchmark: dict, rules: dict[str, dict]) -> None:
     extra = sorted(set(actual) - set(expected))
     if missing or extra:
         raise ValueError(
-            f"rule closure mismatch for {benchmark['id']}: missing={missing}, extra={extra}"
+            f"rule closure mismatch for {benchmark['id']}: "
+            f"missing={missing}, extra={extra}"
         )
 
 
@@ -91,15 +95,115 @@ def assessment_index(model_root: Path, benchmark_dir: Path) -> dict[str, dict]:
     return index
 
 
-def combined_members(benchmark_dir: Path, package_type: str):
+def shared_rule_index(model_root: Path) -> dict[str, dict]:
+    index = {}
+    shared = model_root / "shared-rules"
+    if not shared.exists():
+        return index
+    for file in sorted(shared.rglob("*.yaml")):
+        doc = load(file)
+        item = doc["shared_rule"]
+        sid = item["id"]
+        if sid in index and index[sid] != doc:
+            raise ValueError(f"conflicting shared rule definitions for {sid}")
+        index[sid] = doc
+    return index
+
+
+def policy_part(rule: dict) -> dict:
+    return {k: copy.deepcopy(v) for k, v in rule.items() if k != "assessment"}
+
+
+def validate_resolved_policy(
+    benchmark_id: str,
+    resolved: dict[str, dict],
+    policy_rules: dict[str, dict],
+) -> None:
+    for rule_id, doc in resolved.items():
+        expected = policy_rules[rule_id]["rule"]
+        actual = policy_part(doc["rule"])
+        if actual != expected:
+            raise ValueError(
+                f"resolved combined rule policy mismatch for {benchmark_id} / "
+                f"{rule_id}\nexpected={expected!r}\nactual={actual!r}"
+            )
+
+
+def resolve_combined_overlays(
+    model_root: Path,
+    benchmark_dir: Path,
+) -> dict[str, dict]:
+    shared = shared_rule_index(model_root)
+    overlay_dir = benchmark_dir / "source" / "automated" / "overlays"
+    resolved = {}
+
+    if not overlay_dir.exists():
+        return resolved
+
+    for file in sorted(overlay_dir.glob("*.yaml")):
+        doc = load(file)
+        overlay = doc["overlay"]
+        sid = overlay["extends"]
+        if sid not in shared:
+            raise ValueError(f"{file}: unknown shared rule {sid}")
+
+        shared_doc = shared[sid]["shared_rule"]
+        requested_version = overlay.get("version")
+        if requested_version != shared_doc["version"]:
+            raise ValueError(
+                f"{file}: requested shared rule {sid}@{requested_version}, "
+                f"available version is {shared_doc['version']}"
+            )
+
+        rule = copy.deepcopy(shared_doc["rule"])
+        for key, value in overlay.get("rule", {}).items():
+            rule[key] = copy.deepcopy(value)
+
+        params = overlay.get("assessment_parameters")
+        if params is not None:
+            if "assessment" not in rule:
+                raise ValueError(f"{file}: parameters supplied to rule without assessment")
+            rule["assessment"]["parameters"] = copy.deepcopy(params)
+
+        rule_id = rule.get("id")
+        if not rule_id:
+            raise ValueError(f"{file}: resolved overlay has no rule id")
+        if rule_id in resolved:
+            raise ValueError(f"{file}: duplicate resolved rule id {rule_id}")
+
+        resolved[rule_id] = {
+            "scap_ng": SPEC,
+            "prototype": True,
+            "model": "combined-rule",
+            "resolved_from": {
+                "shared_rule": sid,
+                "shared_rule_version": shared_doc["version"],
+                "overlay": file.name,
+            },
+            "rule": rule,
+        }
+
+    return resolved
+
+
+def combined_members(model_root: Path, benchmark_dir: Path, package_type: str):
     benchmark_doc, profile_doc, provenance_doc, policy_rules = policy_documents(
         benchmark_dir
     )
+
     if package_type == "policy-only":
         rules = policy_rules
     else:
         rules = load_rule_dir(benchmark_dir / "source" / "automated" / "rules")
+        overlays = resolve_combined_overlays(model_root, benchmark_dir)
+        duplicate = sorted(set(rules) & set(overlays))
+        if duplicate:
+            raise ValueError(f"local and overlay rules collide: {duplicate}")
+        rules.update(overlays)
         validate_rules(benchmark_doc["benchmark"], rules)
+        validate_resolved_policy(
+            benchmark_doc["benchmark"]["id"], rules, policy_rules
+        )
 
     members = {
         "benchmark.json": benchmark_doc,
@@ -265,7 +369,7 @@ def main() -> int:
             for package_type in ("policy-only", "automated"):
                 if model == "combined-rule":
                     members, benchmark = combined_members(
-                        benchmark_dir, package_type
+                        model_root, benchmark_dir, package_type
                     )
                 else:
                     members, benchmark = split_members(
@@ -277,13 +381,7 @@ def main() -> int:
                 )
                 output = benchmark_dir / "dist" / filename
                 metrics.append(
-                    write_bundle(
-                        output,
-                        model,
-                        package_type,
-                        members,
-                        benchmark,
-                    )
+                    write_bundle(output, model, package_type, members, benchmark)
                 )
                 print(output)
 
