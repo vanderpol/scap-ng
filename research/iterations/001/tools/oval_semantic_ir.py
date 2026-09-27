@@ -9,7 +9,8 @@ Supported structural semantics include:
   * definition metadata and criteria AND/OR/negation;
   * criterion test references and extend_definition references;
   * test check/check_existence/state_operator semantics;
-  * object/state/variable dependency graph;
+  * fixed-point object/state/variable dependency graph, including variable_component,
+    object_component, var_ref, set object_reference, and filter-induced dependencies;
   * object set/filter structure;
   * entity comparison attributes (operation, datatype, var_ref, var_check,
     entity_check, mask);
@@ -111,23 +112,80 @@ def criteria_node(e):
     return {"kind": "unknown_criteria_node", "xml": generic_node(e)}
 
 
-def collect_refs(e, known_ids: set[str]):
+def dependency_kind(node, source: str) -> str:
+    name = local(node.tag)
+    mapping = {
+        "definition_ref": "extend_definition",
+        "test_ref": "criterion_test",
+        "object_ref": "object_reference",
+        "state_ref": "state_reference",
+        "var_ref": "variable_reference",
+    }
+    if source in mapping:
+        return mapping[source]
+    if name == "object_reference" and source == "text":
+        return "set_object_reference"
+    if name == "filter" and source == "text":
+        return "set_filter_state"
+    return f"{name}:{source}"
+
+
+def collect_refs(source_id: str, e, known_ids: set[str]):
     refs = set()
     unresolved = set()
+    edges = []
     for n in e.iter():
-        for v in n.attrib.values():
+        for attr_name, v in n.attrib.items():
             value = v.strip()
+            attr = local(attr_name)
             if value in known_ids:
                 refs.add(value)
+                edges.append({
+                    "from": source_id,
+                    "to": value,
+                    "kind": dependency_kind(n, attr),
+                    "element": local(n.tag),
+                    "attribute": attr,
+                })
             elif OVAL_ID_RE.match(value):
                 unresolved.add(value)
+                edges.append({
+                    "from": source_id,
+                    "to": value,
+                    "kind": dependency_kind(n, attr),
+                    "element": local(n.tag),
+                    "attribute": attr,
+                    "resolved": False,
+                })
         if n.text:
             value = n.text.strip()
             if value in known_ids:
                 refs.add(value)
+                edges.append({
+                    "from": source_id,
+                    "to": value,
+                    "kind": dependency_kind(n, "text"),
+                    "element": local(n.tag),
+                    "attribute": None,
+                })
             elif OVAL_ID_RE.match(value):
                 unresolved.add(value)
-    return refs, unresolved
+                edges.append({
+                    "from": source_id,
+                    "to": value,
+                    "kind": dependency_kind(n, "text"),
+                    "element": local(n.tag),
+                    "attribute": None,
+                    "resolved": False,
+                })
+    dedup = {}
+    for edge in edges:
+        key = (edge["from"], edge["to"], edge["kind"], edge["element"], edge["attribute"])
+        dedup[key] = edge
+    return refs, unresolved, sorted(
+        dedup.values(),
+        key=lambda x: (x["from"], x["to"], x["kind"], x["element"], x.get("attribute") or "")
+    )
 
 
 def set_node(e):
@@ -318,11 +376,17 @@ def parse(path: Path):
 
     known = set(by_id)
     graph = {}
+    dependency_edges = []
     unresolved = set()
     for oid, element in by_id.items():
-        refs, missing = collect_refs(element, known)
+        refs, missing, edges = collect_refs(oid, element, known)
         graph[oid] = sorted(refs)
+        dependency_edges.extend(edges)
         unresolved |= missing
+
+    edge_targets = {e["to"] for e in dependency_edges if e.get("resolved", True)}
+    missing_edge_targets = sorted(edge_targets - known)
+    unresolved |= set(missing_edge_targets)
 
     definitions = []
     tests = []
@@ -364,6 +428,12 @@ def parse(path: Path):
         "states": states,
         "variables": variables,
         "reference_graph": graph,
+        "dependency_edges": dependency_edges,
+        "dependency_integrity": {
+            "all_resolved_edge_targets_present": not missing_edge_targets,
+            "missing_edge_targets": missing_edge_targets,
+            "edge_count": len(dependency_edges),
+        },
         "unresolved_references": sorted(unresolved),
         "features": feature_inventory(root),
         "native_translation": {

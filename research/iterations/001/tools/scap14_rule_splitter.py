@@ -147,27 +147,84 @@ class OvalComponent:
             and self.kind_by_id.get(definition_id) == "definitions"
         )
 
-    def references_from(self, element):
+    @staticmethod
+    def reference_kind(node, source: str) -> str:
+        name = local(node.tag)
+        if source == "definition_ref":
+            return "extend_definition"
+        if source == "test_ref":
+            return "criterion_test"
+        if source == "object_ref":
+            return "test_or_component_object"
+        if source == "state_ref":
+            return "test_or_filter_state"
+        if source == "var_ref":
+            return "variable_reference"
+        if name == "object_reference" and source == "text":
+            return "set_object_reference"
+        if name == "filter" and source == "text":
+            return "set_filter_state"
+        return f"{name}:{source}"
+
+    def references_from(self, source_id: str, element):
         refs = set()
         unresolved_looking = set()
+        edges = []
         for node in element.iter():
-            for value in node.attrib.values():
+            for attr_name, value in node.attrib.items():
                 v = value.strip()
+                attr = local(attr_name)
                 if v in self.by_id:
                     refs.add(v)
+                    edges.append({
+                        "from": source_id,
+                        "to": v,
+                        "kind": self.reference_kind(node, attr),
+                        "element": local(node.tag),
+                        "attribute": attr,
+                    })
                 elif OVAL_ID_RE.match(v):
                     unresolved_looking.add(v)
+                    edges.append({
+                        "from": source_id,
+                        "to": v,
+                        "kind": self.reference_kind(node, attr),
+                        "element": local(node.tag),
+                        "attribute": attr,
+                        "resolved": False,
+                    })
             if node.text:
                 v = node.text.strip()
                 if v in self.by_id:
                     refs.add(v)
+                    edges.append({
+                        "from": source_id,
+                        "to": v,
+                        "kind": self.reference_kind(node, "text"),
+                        "element": local(node.tag),
+                        "attribute": None,
+                    })
                 elif OVAL_ID_RE.match(v):
                     unresolved_looking.add(v)
-        return refs, unresolved_looking
+                    edges.append({
+                        "from": source_id,
+                        "to": v,
+                        "kind": self.reference_kind(node, "text"),
+                        "element": local(node.tag),
+                        "attribute": None,
+                        "resolved": False,
+                    })
+        # XML sometimes repeats equivalent refs. Preserve one typed edge.
+        dedup = {}
+        for edge in edges:
+            key = (edge["from"], edge["to"], edge["kind"], edge["element"], edge["attribute"])
+            dedup[key] = edge
+        return refs, unresolved_looking, list(dedup.values())
 
     def closure(self, definition_ids: list[str]):
         wanted = set()
         unresolved = set()
+        dependency_edges = []
         queue = list(definition_ids)
         while queue:
             oid = queue.pop(0)
@@ -178,12 +235,24 @@ class OvalComponent:
                 unresolved.add(oid)
                 continue
             wanted.add(oid)
-            refs, unresolved_looking = self.references_from(element)
+            refs, unresolved_looking, edges = self.references_from(oid, element)
+            dependency_edges.extend(edges)
             unresolved |= unresolved_looking
             for ref in sorted(refs):
                 if ref not in wanted:
                     queue.append(ref)
-        return wanted, unresolved
+
+        # Fixed-point integrity: every resolved edge from a reachable node must
+        # terminate inside the closure.
+        escaped = sorted({
+            e["to"] for e in dependency_edges
+            if e.get("resolved", True) and e["from"] in wanted and e["to"] not in wanted
+        })
+        unresolved |= set(escaped)
+        dependency_edges.sort(key=lambda e: (
+            e["from"], e["to"], e["kind"], e["element"], e.get("attribute") or ""
+        ))
+        return wanted, unresolved, dependency_edges
 
 
 def rule_oval_refs(benchmark):
@@ -199,6 +268,13 @@ def rule_oval_refs(benchmark):
             if local(check.tag) != "check":
                 continue
             system = check.get("system")
+            exports = []
+            for child in check.iter():
+                if local(child.tag) == "check-export":
+                    exports.append({
+                        "export_name": child.get("export-name"),
+                        "value_id": child.get("value-id"),
+                    })
             for ref in check.iter():
                 if local(ref.tag) != "check-content-ref":
                     continue
@@ -208,6 +284,7 @@ def rule_oval_refs(benchmark):
                     "system": system,
                     "name": name,
                     "href": href,
+                    "exports": exports,
                 })
         rows.append({
             "rule_id": rule_id,
@@ -422,11 +499,16 @@ def main() -> int:
             component_closures = []
             unresolved = set()
             closure_ids = []
+            dependency_edges = []
             for component, definition_ids in grouped.items():
-                closure, missing = component.closure(sorted(set(definition_ids)))
+                closure, missing, edges = component.closure(sorted(set(definition_ids)))
                 component_closures.append((component, closure))
                 unresolved |= missing
                 closure_ids.extend(sorted(closure))
+                dependency_edges.extend({
+                    **edge,
+                    "oval_component": component.component_id,
+                } for edge in edges)
 
             stats["unresolved_references"] += len(unresolved)
             if unresolved and args.fail_on_unresolved:
@@ -476,6 +558,8 @@ def main() -> int:
                     "counts": counts,
                     "ids": sorted(set(closure_ids)),
                     "unresolved": sorted(unresolved),
+                    "dependency_edges": dependency_edges,
+                    "fixed_point_complete": not unresolved,
                 },
                 "split_oval": {
                     "path": oval_path.relative_to(out).as_posix(),
@@ -507,6 +591,7 @@ def main() -> int:
                 "sha256": split_digest,
                 "definition_ids": provenance["definition_ids"],
                 "closure_counts": counts,
+                "dependency_edge_count": len(dependency_edges),
                 "unresolved": sorted(unresolved),
                 "schema_errors": schema_errors,
             })
