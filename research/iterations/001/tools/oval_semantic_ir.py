@@ -22,7 +22,9 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import json
+import re as pyre
 from pathlib import Path
 import re
 import sys
@@ -42,6 +44,41 @@ CORE_ATTRS = {
     "operation", "datatype", "var_ref", "var_check", "entity_check", "mask",
     "recurse_direction", "max_depth", "behaviors",
 }
+
+OVAL_COMPONENT_OPERATIONS = {
+    "object_component",
+    "variable_component",
+    "literal_component",
+    "arithmetic",
+    "begin",
+    "concat",
+    "count",
+    "end",
+    "escape_regex",
+    "glob_to_regex",
+    "merge",
+    "regex_capture",
+    "split",
+    "substring",
+    "time_difference",
+    "unique",
+}
+
+STATIC_EVALUATOR_OPERATIONS = {
+    "literal_component",
+    "variable_component",
+    "arithmetic",
+    "begin",
+    "concat",
+    "count",
+    "end",
+    "escape_regex",
+    "split",
+    "substring",
+    "unique",
+}
+
+REGEX_META = set("^$\\.[](){}*+?|")
 
 
 def local(tag: str) -> str:
@@ -320,6 +357,95 @@ def parse_state(e):
     }
 
 
+
+def variable_expression(node):
+    """Return an explicit semantic AST for every OVAL ComponentGroup operation."""
+    name = local(node.tag)
+    attrs = {etree.QName(k).localname: v for k, v in node.attrib.items()}
+
+    if name == "literal_component":
+        return {
+            "op": "literal_component",
+            "datatype": attrs.get("datatype", "string"),
+            "value": text_value(node) or "",
+        }
+
+    if name == "variable_component":
+        return {
+            "op": "variable_component",
+            "variable_ref": attrs.get("var_ref"),
+        }
+
+    if name == "object_component":
+        return {
+            "op": "object_component",
+            "object_ref": attrs.get("object_ref"),
+            "item_field": attrs.get("item_field"),
+            "record_field": attrs.get("record_field"),
+        }
+
+    if name in OVAL_COMPONENT_OPERATIONS:
+        return {
+            "op": name,
+            "attributes": attrs,
+            "args": [
+                variable_expression(child)
+                for child in node
+                if isinstance(child.tag, str)
+            ],
+        }
+
+    return {
+        "op": "preserved_unknown_component",
+        "name": name,
+        "namespace": ns(node.tag),
+        "xml": generic_node(node),
+    }
+
+
+def variable_ast(e):
+    kind = local(e.tag)
+    base = {
+        "id": e.get("id"),
+        "type": kind,
+        "datatype": e.get("datatype"),
+    }
+
+    if kind == "constant_variable":
+        base["values"] = [
+            {
+                "value": text_value(child) or "",
+                "datatype": child.get("datatype") or e.get("datatype"),
+            }
+            for child in e
+            if local(child.tag) == "value"
+        ]
+        return base
+
+    if kind == "external_variable":
+        base["input"] = {
+            "kind": "external",
+            "datatype": e.get("datatype"),
+        }
+        return base
+
+    if kind == "local_variable":
+        components = [child for child in e if isinstance(child.tag, str)]
+        base["expression"] = (
+            variable_expression(components[0])
+            if len(components) == 1
+            else {
+                "op": "invalid_component_count",
+                "count": len(components),
+                "components": [generic_node(c) for c in components],
+            }
+        )
+        return base
+
+    base["preserved"] = generic_node(e)
+    return base
+
+
 def parse_variable(e):
     kind = local(e.tag)
     body = [semantic_child(c) for c in e if isinstance(c.tag, str)]
@@ -331,16 +457,18 @@ def parse_variable(e):
         "comment": e.get("comment"),
         "datatype": e.get("datatype"),
         "body": body,
+        "semantic_ast": variable_ast(e),
     }
 
 
 
 def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
-    """Resolve variable expressions that are purely deterministic/static.
+    """Resolve variable expressions only when their values are target-independent.
 
-    OVAL variables are multi-valued. concat therefore computes the Cartesian
-    product of child component value sets. Dynamic object-dependent and external
-    variables are preserved as unresolved rather than guessed.
+    Dynamic object components and external inputs remain explicit dependencies.
+    Function evaluation is bounded to prevent authoring content from exploding
+    the converter's memory. Exact-static status is used only for operations
+    implemented directly from the OVAL 5.12.3 schema semantics.
     """
     cache = {}
     resolving = set()
@@ -348,16 +476,73 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
     def result(status, **kwargs):
         return {"status": status, **kwargs}
 
+    def bounded(values, operation):
+        if len(values) > max_values:
+            return result(
+                "bounded",
+                reason=f"{operation}_value_expansion_exceeds_{max_values}",
+                operation=operation,
+            )
+        return result("exact_static", values=values, operation=operation)
+
+    def one_child_values(node, operation):
+        children = [c for c in node if isinstance(c.tag, str)]
+        if len(children) != 1:
+            return result(
+                "unsupported",
+                reason=f"{operation}_requires_one_component",
+                operation=operation,
+            )
+        child = component_values(children[0])
+        if child["status"] != "exact_static":
+            return result(
+                child["status"],
+                reason=f"{operation}_child_not_static:{child.get('reason', child.get('operation'))}",
+                operation=operation,
+                blocked_by=child,
+            )
+        return child
+
+    def all_children_static(node, operation, minimum=1):
+        children = [c for c in node if isinstance(c.tag, str)]
+        if len(children) < minimum:
+            return result(
+                "unsupported",
+                reason=f"{operation}_requires_at_least_{minimum}_components",
+                operation=operation,
+            )
+        out = []
+        for child_node in children:
+            child = component_values(child_node)
+            if child["status"] != "exact_static":
+                return result(
+                    child["status"],
+                    reason=f"{operation}_child_not_static:{child.get('reason', child.get('operation'))}",
+                    operation=operation,
+                    blocked_by=child,
+                )
+            out.append(child["values"])
+        return result("exact_static", values=out, operation=operation)
+
     def component_values(node):
         name = local(node.tag)
 
         if name == "literal_component":
-            return result("exact_static", values=[text_value(node) or ""], operation=name)
+            return result(
+                "exact_static",
+                values=[text_value(node) or ""],
+                operation=name,
+                datatype=node.get("datatype", "string"),
+            )
 
         if name == "variable_component":
             ref = node.get("var_ref")
             if not ref:
-                return result("unsupported", reason="variable_component_missing_var_ref", operation=name)
+                return result(
+                    "unsupported",
+                    reason="variable_component_missing_var_ref",
+                    operation=name,
+                )
             resolved = variable_values(ref)
             return {
                 **resolved,
@@ -365,60 +550,190 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                 "variable_ref": ref,
             }
 
-        if name == "concat":
-            parts = []
-            for child in node:
-                child_result = component_values(child)
-                if child_result["status"] != "exact_static":
-                    return result(
-                        child_result["status"],
-                        reason=f"concat_child_not_static:{child_result.get('reason', child_result.get('operation'))}",
-                        operation=name,
-                    )
-                parts.append(child_result["values"])
-
-            values = [""]
-            for child_values in parts:
-                next_values = []
-                for prefix in values:
-                    for suffix in child_values:
-                        next_values.append(prefix + suffix)
-                        if len(next_values) > max_values:
-                            return result(
-                                "bounded",
-                                reason=f"concat_value_expansion_exceeds_{max_values}",
-                                operation=name,
-                            )
-                values = next_values
-            return result("exact_static", values=values, operation=name)
-
-        if name == "unique":
-            children = list(node)
-            if len(children) != 1:
-                return result("unsupported", reason="unique_requires_one_component", operation=name)
-            child_result = component_values(children[0])
-            if child_result["status"] != "exact_static":
-                return result(child_result["status"], reason=child_result.get("reason"), operation=name)
-            # Preserve source order while removing duplicates.
-            seen = set()
-            values = []
-            for value in child_result["values"]:
-                if value not in seen:
-                    seen.add(value)
-                    values.append(value)
-            return result("exact_static", values=values, operation=name)
-
-        # These require collected object data, runtime/external values, or
-        # function semantics not yet implemented in the prototype evaluator.
         if name == "object_component":
             return result(
                 "dynamic_object_dependency",
                 operation=name,
                 object_ref=node.get("object_ref"),
                 item_field=node.get("item_field"),
+                record_field=node.get("record_field"),
             )
 
-        return result("unsupported_function", operation=name)
+        if name == "concat":
+            children = all_children_static(node, name, minimum=2)
+            if children["status"] != "exact_static":
+                return children
+            values = [""]
+            for child_values in children["values"]:
+                values = [
+                    prefix + str(suffix)
+                    for prefix, suffix in itertools.product(values, child_values)
+                ]
+                if len(values) > max_values:
+                    return bounded(values, name)
+            return bounded(values, name)
+
+        if name == "unique":
+            children = all_children_static(node, name, minimum=1)
+            if children["status"] != "exact_static":
+                return children
+            seen = set()
+            values = []
+            for child_values in children["values"]:
+                for value in child_values:
+                    string_value = str(value)
+                    if string_value not in seen:
+                        seen.add(string_value)
+                        values.append(string_value)
+            return bounded(values, name)
+
+        if name == "count":
+            children = all_children_static(node, name, minimum=1)
+            if children["status"] != "exact_static":
+                return children
+            count = sum(len(values) for values in children["values"])
+            return result("exact_static", values=[str(count)], operation=name, datatype="int")
+
+        if name == "split":
+            child = one_child_values(node, name)
+            if child["status"] != "exact_static":
+                return child
+            delimiter = node.get("delimiter")
+            if delimiter is None:
+                return result("unsupported", reason="split_missing_delimiter", operation=name)
+            values = []
+            for value in child["values"]:
+                values.extend(str(value).split(delimiter))
+                if len(values) > max_values:
+                    return bounded(values, name)
+            return bounded(values, name)
+
+        if name == "substring":
+            child = one_child_values(node, name)
+            if child["status"] != "exact_static":
+                return child
+            try:
+                start = int(node.get("substring_start"))
+                length = int(node.get("substring_length"))
+            except (TypeError, ValueError):
+                return result("unsupported", reason="invalid_substring_attributes", operation=name)
+
+            values = []
+            for value in child["values"]:
+                s = str(value)
+                index = max(start, 1) - 1
+                if index >= len(s):
+                    return result(
+                        "static_evaluation_error",
+                        reason="substring_start_beyond_input_length",
+                        operation=name,
+                        input=s,
+                        substring_start=start,
+                    )
+                values.append(s[index:] if length < 0 or length > len(s) else s[index:index + length])
+            return bounded(values, name)
+
+        if name == "begin":
+            child = one_child_values(node, name)
+            if child["status"] != "exact_static":
+                return child
+            prefix = node.get("character")
+            if prefix is None:
+                return result("unsupported", reason="begin_missing_character", operation=name)
+            values = [
+                str(value) if str(value).startswith(prefix) else prefix + str(value)
+                for value in child["values"]
+            ]
+            return bounded(values, name)
+
+        if name == "end":
+            child = one_child_values(node, name)
+            if child["status"] != "exact_static":
+                return child
+            suffix = node.get("character")
+            if suffix is None:
+                return result("unsupported", reason="end_missing_character", operation=name)
+            values = [
+                str(value) if str(value).endswith(suffix) else str(value) + suffix
+                for value in child["values"]
+            ]
+            return bounded(values, name)
+
+        if name == "escape_regex":
+            child = one_child_values(node, name)
+            if child["status"] != "exact_static":
+                return child
+            values = [
+                "".join("\\\\" + ch if ch in REGEX_META else ch for ch in str(value))
+                for value in child["values"]
+            ]
+            return bounded(values, name)
+
+        if name == "arithmetic":
+            children = all_children_static(node, name, minimum=2)
+            if children["status"] != "exact_static":
+                return children
+            op = node.get("arithmetic_operation")
+            if op not in {"add", "multiply", "divide", "subtract"}:
+                return result("unsupported", reason=f"unknown_arithmetic_operation:{op}", operation=name)
+
+            values = []
+            for combo in itertools.product(*children["values"]):
+                try:
+                    numeric = [float(x) if any(ch in str(x).lower() for ch in ".e") else int(x) for x in combo]
+                    if op == "add":
+                        value = sum(numeric)
+                    elif op == "multiply":
+                        value = 1
+                        for x in numeric:
+                            value *= x
+                    elif op == "subtract":
+                        value = numeric[0]
+                        for x in numeric[1:]:
+                            value -= x
+                    else:
+                        value = numeric[0]
+                        for x in numeric[1:]:
+                            value /= x
+                    if isinstance(value, float) and value.is_integer() and all(isinstance(x, int) for x in numeric):
+                        value = int(value)
+                    values.append(str(value))
+                except (ValueError, ZeroDivisionError):
+                    return result(
+                        "static_evaluation_error",
+                        reason="arithmetic_input_or_operation_error",
+                        operation=name,
+                        inputs=[str(x) for x in combo],
+                    )
+                if len(values) > max_values:
+                    return bounded(values, name)
+            return bounded(values, name)
+
+        # These operations are fully represented in semantic_ast but are not
+        # claimed as exact-static by this prototype evaluator yet.
+        if name in {"merge", "regex_capture", "glob_to_regex", "time_difference"}:
+            child_ops = [
+                component_values(c)
+                for c in node
+                if isinstance(c.tag, str)
+            ]
+            if any(c["status"] == "dynamic_object_dependency" for c in child_ops):
+                return result(
+                    "dynamic_object_dependency",
+                    operation=name,
+                    blocked_by=[c for c in child_ops if c["status"] != "exact_static"],
+                )
+            return result(
+                "modeled_not_static_evaluated",
+                operation=name,
+                reason="function_semantics_explicit_in_ast_but_static_evaluator_not_enabled",
+            )
+
+        return result(
+            "unsupported_function",
+            operation=name,
+            reason="component_operation_not_in_oval_5_12_3_model",
+        )
 
     def variable_values(var_id):
         if var_id in cache:
@@ -438,10 +753,19 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                 for child in element
                 if local(child.tag) == "value"
             ]
-            resolved = result("exact_static", values=values, variable_type=kind)
+            resolved = result(
+                "exact_static",
+                values=values,
+                variable_type=kind,
+                datatype=element.get("datatype"),
+            )
 
         elif kind == "external_variable":
-            resolved = result("external_input", variable_type=kind)
+            resolved = result(
+                "external_input",
+                variable_type=kind,
+                datatype=element.get("datatype"),
+            )
 
         elif kind == "local_variable":
             components = [child for child in element if isinstance(child.tag, str)]
@@ -453,10 +777,17 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
                 )
             else:
                 comp = component_values(components[0])
-                resolved = {**comp, "variable_type": kind}
+                resolved = {
+                    **comp,
+                    "variable_type": kind,
+                    "datatype": element.get("datatype"),
+                }
 
         else:
-            resolved = result("unsupported_variable_type", variable_type=kind)
+            resolved = result(
+                "unsupported_variable_type",
+                variable_type=kind,
+            )
 
         resolving.remove(var_id)
         cache[var_id] = resolved
@@ -467,7 +798,6 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             variable_values(oid)
 
     return dict(sorted(cache.items()))
-
 
 def feature_inventory(root):
     elements = {}
@@ -568,6 +898,11 @@ def parse(path: Path):
         "states": states,
         "variables": variables,
         "variable_resolution": resolve_static_variables(by_id, kind_by_id),
+        "variable_function_model": {
+            "known_operations": sorted(OVAL_COMPONENT_OPERATIONS),
+            "static_evaluator_operations": sorted(STATIC_EVALUATOR_OPERATIONS),
+            "all_component_operations_have_explicit_ast": True,
+        },
         "reference_graph": graph,
         "dependency_edges": dependency_edges,
         "dependency_integrity": {

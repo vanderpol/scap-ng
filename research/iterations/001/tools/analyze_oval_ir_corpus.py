@@ -20,10 +20,21 @@ def main():
     rules_with_variables=0
     rules_with_unsupported_variable_functions=0
     unsupported_ops=Counter()
+    variable_ast_ops=Counter()
     per_benchmark=defaultdict(lambda:{
         "rules":0,"rules_with_variables":0,"variables":0,
         "exact_static_variables":0,"unsupported_variable_resolutions":0
     })
+
+
+    def count_ast_ops(node):
+        if not isinstance(node, dict):
+            return
+        op=node.get("op")
+        if op:
+            variable_ast_ops[op]+=1
+        for arg in node.get("args",[]):
+            count_ast_ops(arg)
 
     for path in files:
         ir=json.loads(path.read_text())
@@ -38,6 +49,11 @@ def main():
                 attr_counts[attr][value]+=count
         for edge in ir.get("dependency_edges",[]):
             dependency_kinds[edge.get("kind","unknown")]+=1
+
+        for variable in ir.get("variables",[]):
+            ast=variable.get("semantic_ast",{})
+            if "expression" in ast:
+                count_ast_ops(ast["expression"])
 
         vr=ir.get("variable_resolution",{})
         if vr:
@@ -67,6 +83,20 @@ def main():
       "rules_with_nonstatic_or_unsupported_variable_resolution":rules_with_unsupported_variable_functions,
       "variable_resolution_status":dict(sorted(variable_status.items())),
       "variable_types":dict(sorted(variable_types.items())),
+      "variable_expression_operations":dict(sorted(variable_ast_ops.items())),
+      "variable_function_model":{
+        "oval_5_12_3_component_operations":[
+          "arithmetic","begin","concat","count","end","escape_regex",
+          "glob_to_regex","literal_component","merge","object_component",
+          "regex_capture","split","substring","time_difference","unique",
+          "variable_component"
+        ],
+        "explicit_ast_operations":sorted(variable_ast_ops.keys()),
+        "static_evaluator_operations":[
+          "arithmetic","begin","concat","count","end","escape_regex",
+          "literal_component","split","substring","unique","variable_component"
+        ],
+      },
       "unsupported_or_dynamic_variable_operations":dict(sorted(unsupported_ops.items())),
       "dependency_edge_kinds":dict(sorted(dependency_kinds.items())),
       "element_counts":dict(sorted(element_counts.items())),
