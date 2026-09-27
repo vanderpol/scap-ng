@@ -24,6 +24,9 @@ def main():
     evaluation_plan_modes=Counter()
     target_dependent_plan_ops=Counter()
     target_dependent_object_refs=Counter()
+    qualified_test_types=Counter()
+    qualified_object_types=Counter()
+    qualified_state_types=Counter()
     set_operators=Counter()
     filter_actions=Counter()
     filter_action_origin=Counter()
@@ -72,6 +75,13 @@ def main():
         for attr,vals in ir.get("features",{}).get("attributes",{}).items():
             for value,count in vals.items():
                 attr_counts[attr][value]+=count
+        for item in ir.get("tests",[]):
+            qualified_test_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
+        for item in ir.get("objects",[]):
+            qualified_object_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
+        for item in ir.get("states",[]):
+            qualified_state_types[f'{item.get("namespace","")}#{item.get("type","unknown")}'] += 1
+
         for edge in ir.get("dependency_edges",[]):
             dependency_kinds[edge.get("kind","unknown")]+=1
 
@@ -152,6 +162,9 @@ def main():
       },
       "unsupported_or_dynamic_variable_operations":dict(sorted(unsupported_ops.items())),
       "dependency_edge_kinds":dict(sorted(dependency_kinds.items())),
+      "qualified_test_types":dict(sorted(qualified_test_types.items())),
+      "qualified_object_types":dict(sorted(qualified_object_types.items())),
+      "qualified_state_types":dict(sorted(qualified_state_types.items())),
       "element_counts":dict(sorted(element_counts.items())),
       "semantic_attribute_values":{
         a:dict(sorted(v.items())) for a,v in sorted(attr_counts.items())
@@ -168,6 +181,11 @@ def main():
       "variable_evaluation_plan_modes":out["variable_evaluation_plan_modes"],
       "target_dependent_plan_operations":out["target_dependent_plan_operations"],
       "set_filter_semantics":out["set_filter_semantics"],
+      "qualified_type_counts":{
+        "tests":len(out["qualified_test_types"]),
+        "objects":len(out["qualified_object_types"]),
+        "states":len(out["qualified_state_types"]),
+      },
     },indent=2,sort_keys=True))
     return 0
 
