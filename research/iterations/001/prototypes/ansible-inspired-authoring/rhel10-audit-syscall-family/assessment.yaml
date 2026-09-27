@@ -1,0 +1,62 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+source_assessment: research/iterations/001/prototypes/oval-migration-cases/rhel10-audit-syscall-family/split/assessment.yaml
+assessment:
+  id: migration.rhel10.audit-syscall-coverage
+  version: 1
+  parameters:
+    syscalls:
+      type: array
+      items:
+        type: string
+      min_items: 1
+    subject_profiles:
+      type: array
+      items:
+        type: string
+        enum:
+        - interactive
+        - root
+      min_items: 1
+    failure_results:
+      type: array
+      items:
+        type: string
+      default: []
+  name: migration.rhel10.audit-syscall-coverage
+  steps:
+  - name: Collect loaded rules
+    collect:
+      capability: scapng.linux.audit.effective_rules
+      source: runtime
+      fields:
+      - architecture
+      - syscalls
+      - auid_min
+      - auid_unset_excluded
+      - auid_exact
+      - exit_filter
+    register: loaded_rules
+  - name: Derive required cases
+    derive:
+      audit_coverage_matrix:
+        architectures:
+        - b32
+        - b64
+        syscalls: syscalls
+        subjects: subject_profiles
+        failure_results: failure_results
+    register: required_cases
+  assert:
+    that:
+      every:
+        id: every-required-audit-case-covered
+        item: required_cases
+        condition:
+          audit_rule_covered_by:
+            requirement: item
+            rules: loaded_rules
+  diagnostics:
+    max_failure_causes: 20

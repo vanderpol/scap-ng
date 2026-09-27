@@ -1,0 +1,37 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+source_assessment: research/iterations/001/prototypes/oval-migration-cases/rhel8-sv-230385/split/assessment.yaml
+assessment:
+  id: migration.rhel.umask-required-files
+  version: 1
+  name: migration.rhel.umask-required-files
+  steps:
+  - name: Collect umask directives
+    collect:
+      capability: scapng.linux.config.matching_lines
+      files:
+      - /etc/bashrc
+      - /etc/csh.cshrc
+      - /etc/profile
+      pattern: (?i)^\\s*(?!#)\\s*umask\\s+.*$
+      group_by: file
+    register: umask_directives
+  assert:
+    that:
+      every:
+        item: umask_directives.by_file
+        condition:
+          all:
+          - cardinality:
+              subject: item.matches
+              min: 1
+          - every:
+              item: item.matches
+              condition:
+                regex:
+                  actual: item.text
+                  pattern: (?i)^\\s*umask\\s+077(?:\\s*(?:#.*)?)?$
+  diagnostics:
+    max_failure_causes: 6

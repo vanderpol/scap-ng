@@ -1,0 +1,66 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+source_assessment: research/iterations/001/prototypes/oval-migration-cases/rhel10-sv-281063/split/assessment.yaml
+assessment:
+  id: migration.rhel10.cron-package-integrity
+  version: 1
+  name: migration.rhel10.cron-package-integrity
+  steps:
+  - name: Collect packages
+    collect:
+      capability: scapng.package.inventory
+      names:
+      - cronie
+      - crontabs
+      fields:
+      - installed
+    register: packages
+  - name: Collect verification
+    collect:
+      capability: scapng.package.verify
+      packages:
+      - cronie
+      - crontabs
+      scope: packaged_files
+      fields:
+      - mode_differs
+      - device_differs
+      - link_mismatch
+      - ownership_differs
+      - group_differs
+      - capabilities_differ
+      - size_differs
+      - filedigest_differs
+      - mtime_differs
+      collection_status: required
+    register: verification
+  assert:
+    that:
+      all:
+      - every:
+          item: packages
+          condition:
+            compare:
+              subject: package_installed
+              actual: item.installed
+              op: eq
+              expected: true
+      - none:
+          id: no-relevant-package-verification-failures
+          item: verification.items
+          condition:
+            any_true:
+              fields:
+              - mode_differs
+              - device_differs
+              - link_mismatch
+              - ownership_differs
+              - group_differs
+              - capabilities_differ
+              - size_differs
+              - filedigest_differs
+              - mtime_differs
+  evidence:
+    max_records: 25
