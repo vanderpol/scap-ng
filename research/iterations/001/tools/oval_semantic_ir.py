@@ -42,7 +42,7 @@ SECTION_KIND = {
 CORE_ATTRS = {
     "operator", "negate", "check", "check_existence", "state_operator",
     "operation", "datatype", "var_ref", "var_check", "entity_check", "mask",
-    "recurse_direction", "max_depth", "behaviors",
+    "recurse_direction", "max_depth", "behaviors", "action", "set_operator",
 }
 
 OVAL_COMPONENT_OPERATIONS = {
@@ -234,8 +234,14 @@ def collect_refs(source_id: str, e, known_ids: set[str]):
 def set_node(e):
     out = {
         "kind": "set",
-        "operator": e.get("set_operator", e.get("operator", "UNION")),
+        "operator": e.get("set_operator", "UNION"),
         "children": [],
+        "evaluation_semantics": {
+            "unique_items": True,
+            "filters_apply_before_set_operator": True,
+            "filter_default_action": "exclude",
+            "complement_is_relative": True,
+        },
     }
     for c in e:
         n = local(c.tag)
@@ -250,7 +256,7 @@ def set_node(e):
             out["children"].append({
                 "kind": "filter",
                 "state_ref": text_value(c),
-                "action": c.get("action", "include"),
+                "action": c.get("action", "exclude"),
             })
         else:
             out["children"].append({
