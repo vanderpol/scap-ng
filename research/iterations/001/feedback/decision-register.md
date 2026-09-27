@@ -4,7 +4,7 @@ This register separates current working decisions from unresolved questions. It 
 
 | ID | Status | Current direction | Evidence / next action |
 |---|---|---|---|
-| D-001 | Accepted direction | SCAP 1.4 -> NG migration is a primary requirement; reverse conversion is not. | Preserve in future architecture. |
+| D-001 | Accepted requirement | **SCAP 1.4 datastream -> SCAP-NG forward conversion is a non-negotiable hard requirement**; reverse conversion is not. | Every architecture and syntax candidate must demonstrate faithful conversion of existing content. |
 | D-002 | Accepted direction | XML is not required for NG. | Prototype source in YAML and eventual canonical interchange in JSON. |
 | D-003 | Accepted direction | Policy-only content is valid. | Prototype DISA-style policy-only rules and manual results. |
 | D-004 | Accepted direction | Existing policy Check Content should serve as the default manual procedure. | Validate with DISA/NIST/OVAL reviewers. |
@@ -33,3 +33,6 @@ This register separates current working decisions from unresolved questions. It 
 | D-027 | Accepted requirement | Benchmark scoring must be deterministic and reproducible; every scored rule needs an effective weight. | Prototype scoring after architecture examples stabilize. |
 | D-028 | Open | Severity-derived default weights, exact numeric mapping, and exceptional per-rule overrides. | Compare mappings against representative STIGs and seek OVAL/DISA feedback. |
 | D-029 | Open | Compliance scoring treatment of error/indeterminate/not-evaluated and whether assessment coverage is separately mandatory. | Prototype score + coverage results before external review. |
+| D-030 | Accepted requirement | Every supported human-authoring syntax must be generatable from the same SCAP 1.4 faithful semantic conversion model. | Compare original and Ansible-inspired renderings of the same real OVAL cases and compile both to equivalent canonical semantics. |
+| D-031 | Accepted direction | SCAP 1.4 conversion should use a faithful semantic intermediate representation before optional authoring-style rendering or reviewed normalization. | Prevent authoring syntax from driving migration semantics. |
+| D-032 | Accepted requirement | Conversion must preserve policy, applicability, variables/parameters, automation logic, manual procedures, profiles, identifiers, and provenance when represented in the source datastream; unsupported or lossy constructs receive explicit migration status. | Expand converter fixtures across real datastreams. |

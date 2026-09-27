@@ -80,6 +80,12 @@ Reviewers do not need to answer every question. Please preserve the question IDs
 
 **MIG-006** — What differential-test evidence should be required before a real-world prototype translation can move from `prototype_native_translation` to `exact_native` or `exact_normalized`?
 
+**MIG-007** — Given that SCAP 1.4 forward conversion is a hard requirement, what datastream/XCCDF/OVAL/OCIL/CPE constructs should be added to the conversion corpus before the information model can be considered sufficiently complete?
+
+**MIG-008** — Is a common faithful semantic intermediate representation the right way to guarantee that multiple authoring renderings compile to equivalent SCAP-NG semantics?
+
+**MIG-009** — What canonical-equivalence checks should be required when the same SCAP 1.4 source is rendered into the original and Ansible-inspired authoring forms?
+
 ## Scoring
 
 **SCORE-001** — Should severity determine the default effective rule weight rather than requiring policy authors to populate a separate weight value?

@@ -5,6 +5,8 @@
 
 Iteration 001 is intentionally **not a draft specification** and remains our internal working iteration until deliberately shared outside the project.
 
+**SCAP 1.4 forward conversion is a hard requirement.** Every architecture and authoring-syntax experiment in this iteration must remain capable of representing content converted from existing SCAP 1.4 datastreams through the same faithful semantic model.
+
 ## Contents
 
 - `preliminary-architecture-discussion.md` — consolidated architecture discussion and rationale.

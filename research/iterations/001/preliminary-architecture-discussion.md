@@ -10,7 +10,9 @@ This document preserves the initial SCAP-NG architecture discussion so that subs
 
 The goal is not to replace SCAP by discarding its investment. The goal is to preserve the useful semantics, trusted content, and vendor-neutral assessment model while removing architectural characteristics that make modern authoring, efficient execution, explainable reporting, and enterprise-scale aggregation unnecessarily difficult.
 
-A key requirement is a practical migration path from existing SCAP 1.4 content. Reverse conversion from SCAP-NG to SCAP 1.4 is not a primary design constraint and may be impossible or lossy for new language features.
+Forward conversion from existing SCAP 1.4 datastream content into SCAP-NG is a **non-negotiable hard requirement**. A candidate SCAP-NG information model or authoring syntax is not acceptable if existing XCCDF/OVAL/OCIL/CPE/datastream semantics cannot be represented faithfully, with unsupported or review-required cases identified explicitly rather than silently changed or dropped.
+
+Reverse conversion from SCAP-NG to SCAP 1.4 is not a primary design constraint and may be impossible or lossy for new language features.
 
 SCAP-NG does not have to use XML, and it does not have to preserve the current separation between XCCDF, OVAL, OCIL, CPE, ARF, and datastream structures.
 
@@ -94,6 +96,8 @@ The initial discussion established the following objectives.
 
 Existing SCAP/OVAL content contains years of authoring, testing, operational deployment, and institutional trust. Migration must be able to preserve existing behavior before content is simplified or refactored.
 
+**Forward conversion from SCAP 1.4 is a conformance requirement, not an optional migration utility.** The design must be continuously tested against real datastream content. Any native NG syntax feature proposed for the core language should be evaluated for whether a converter can emit it deterministically from existing SCAP 1.4 semantics when appropriate.
+
 The initial importer should distinguish exact native translations, normalized-but-equivalent translations, legacy-compatible checks, items requiring review, and unsupported constructs. Nothing should be silently dropped or approximately translated.
 
 ### 4.2 Make policy useful without automation
@@ -171,6 +175,34 @@ The current preferred direction is:
 **Redistribution:** signed ZIP-based SCAP-NG package
 
 The YAML form should map predictably to the canonical JSON model. Scanners should not be required to implement multiple authoring syntaxes.
+
+Iteration 001 may compare more than one **authoring spelling**—including the original research syntax and an Ansible-inspired syntax—but every candidate authoring form must map to the same canonical semantic model. The experiment is about author usability, not competing runtime semantics.
+
+A hard acceptance criterion for every candidate authoring syntax is that it can be generated from existing SCAP 1.4 datastream semantics through a common faithful conversion pipeline. Hand-authoring convenience is not sufficient if the syntax cannot represent migrated content.
+
+The intended migration architecture is:
+
+```text
+SCAP 1.4 datastream
+  XCCDF / OVAL / OCIL / CPE / variables / profiles
+                    |
+                    v
+      faithful semantic intermediate model
+                    |
+          +---------+---------+
+          |                   |
+          v                   v
+ original NG YAML     alternate authoring YAML
+          \                   /
+           \                 /
+            v               v
+          canonical SCAP-NG model
+                    |
+                    v
+            signed .scapng package
+```
+
+Both authoring outputs must preserve the same policy, applicability, parameters, automation semantics, provenance, and migration status. Their compiled canonical semantics should be equivalent.
 
 The restricted YAML profile should avoid ambiguous or surprising features that could cause two implementations to interpret identical source differently.
 
@@ -677,6 +709,14 @@ A29. OVAL set/filter constructs should be normalized to clearer population scope
 A30. Semantic collection capabilities introduced to simplify content must have standardized request/evidence/completeness contracts and conformance tests.
 
 A31. Migration may normalize OVAL Boolean structures into explicit applicability only when policy semantics prove the mapping preserves the intended policy outcome.
+
+A32. Forward conversion from SCAP 1.4 datastream content into SCAP-NG is a hard conformance requirement for the information model and every supported authoring syntax.
+
+A33. Multiple human-authoring syntaxes, if explored, must compile to one canonical semantic model; they must not define competing assessment semantics.
+
+A34. SCAP 1.4 conversion should pass through a faithful semantic intermediate representation so the same source content can be rendered into different authoring forms and compared for canonical equivalence.
+
+A35. Unsupported, ambiguous, lossy, or review-required SCAP 1.4 constructs must be surfaced explicitly with migration status; they must never be silently omitted or approximated.
 
 ## Appendix B — Questions that must be answered before a specification can stabilize
 

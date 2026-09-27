@@ -121,7 +121,17 @@ Two PostgreSQL rules and four RHEL audit syscall rules collapse naturally into p
 
 **Lesson:** Reuse should be demonstrated and validated against existing content, not just synthetic examples.
 
-## 18. Questions carried forward
+## 18. SCAP 1.4 conversion constrains every authoring experiment
+
+SCAP-NG is intended to inherit the existing SCAP content investment rather than require a clean-sheet rewrite.
+
+**Lesson:** Forward conversion from SCAP 1.4 is a hard requirement. A human-friendly syntax is not viable if real XCCDF/OVAL/datastream semantics cannot be emitted into it deterministically.
+
+The original research syntax and the Ansible-inspired syntax should therefore be treated as two renderings of one faithful semantic model. Both should be generated from the same migrated source cases and compiled back to canonical semantics for equivalence comparison.
+
+This also prevents syntax preference from contaminating migration logic: faithful interpretation of SCAP 1.4 happens first; authoring presentation happens second.
+
+## 19. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 
