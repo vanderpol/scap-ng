@@ -344,11 +344,17 @@ def main() -> int:
     dump_yaml(combined_root / "profiles.yaml", {
         "scap_ng": SPEC, "prototype": True, "profiles": source.get("profiles", [])
     })
+    dump_yaml(combined_root / "groups.yaml", {
+        "scap_ng": SPEC, "prototype": True, "groups": source.get("groups", [])
+    })
     dump_yaml(combined_root / "values.yaml", {
         "scap_ng": SPEC, "prototype": True, "values": source.get("values", [])
     })
     dump_yaml(split_root / "profiles.yaml", {
         "scap_ng": SPEC, "prototype": True, "profiles": source.get("profiles", [])
+    })
+    dump_yaml(split_root / "groups.yaml", {
+        "scap_ng": SPEC, "prototype": True, "groups": source.get("groups", [])
     })
     dump_yaml(split_root / "values.yaml", {
         "scap_ng": SPEC, "prototype": True, "values": source.get("values", [])
@@ -463,6 +469,7 @@ def main() -> int:
         "source": source.get("source"),
         "benchmark": source.get("benchmark"),
         "profiles": source.get("profiles", []),
+        "groups": source.get("groups", []),
         "values": source.get("values", []),
         "rules": canonical_rules,
     }
@@ -470,6 +477,9 @@ def main() -> int:
 
     summary = {
         "source_rules": len(source.get("rules", [])),
+        "source_groups":len(source.get("groups",[])),
+        "source_profiles":len(source.get("profiles",[])),
+        "source_values":len(source.get("values",[])),
         "canonical_rules": len(canonical_rules),
         "automated_rules": len(automated),
         "manual_or_external_rules": len(manual),
