@@ -364,6 +364,11 @@ def main() -> int:
 
     dump_yaml(combined_root / "benchmark.yaml", render_benchmark_doc(source, "combined-rule"))
     dump_yaml(split_root / "benchmark.yaml", render_benchmark_doc(source, "split-policy-assessment-binding"))
+    dump_yaml(combined_root / "processing.yaml", {
+        "scap_ng": SPEC,
+        "prototype": True,
+        "processing_plan": source.get("processing_plan"),
+    })
     dump_yaml(combined_root / "platforms.yaml", {
         "scap_ng": SPEC,
         "prototype": True,
@@ -380,6 +385,11 @@ def main() -> int:
     })
     dump_yaml(combined_root / "values.yaml", {
         "scap_ng": SPEC, "prototype": True, "values": source.get("values", [])
+    })
+    dump_yaml(split_root / "processing.yaml", {
+        "scap_ng": SPEC,
+        "prototype": True,
+        "processing_plan": source.get("processing_plan"),
     })
     dump_yaml(split_root / "platforms.yaml", {
         "scap_ng": SPEC,
@@ -507,6 +517,7 @@ def main() -> int:
         "format": "scap-ng-converted-benchmark-canonical-0.1",
         "source": source.get("source"),
         "benchmark": source.get("benchmark"),
+        "processing_plan": source.get("processing_plan"),
         "platform_definitions": source.get("platform_definitions", []),
         "profiles": source.get("profiles", []),
         "resolved_profiles": source.get("resolved_profiles", []),
@@ -518,6 +529,7 @@ def main() -> int:
 
     summary = {
         "source_rules": len(source.get("rules", [])),
+        "traversal_items":len((source.get("processing_plan") or {}).get("traversal",[])),
         "platform_definitions":len(source.get("platform_definitions",[])),
         "source_groups":len(source.get("groups",[])),
         "source_profiles":len(source.get("profiles",[])),
