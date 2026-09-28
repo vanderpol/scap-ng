@@ -1,0 +1,54 @@
+# OVAL -> SCAP-NG Assessment Design Review Samples
+
+These five samples are intentionally **provisional**. They are derived from real
+RHEL 9 V2R9 STIG OVAL and exist to expose design problems before the Assessment
+schema is stabilized.
+
+The goal is not to transliterate OVAL XML. The goal is to preserve OVAL's
+semantics while replacing its Definition/Test/Object/State/Variable authoring
+graph with explicit, readable collection, derivation, assertion, and result
+semantics.
+
+## Samples
+
+| Sample | RHEL 9 Rule | OVAL closure | Design pressure |
+| --- | --- | --- | --- |
+| 01 | RHEL-09-253070 | 2 defs, 1 test, 1 object, 1 state | simple scalar comparison; expose formerly hidden existence/check behavior |
+| 02 | RHEL-09-215020 | 2 defs, 1 test, 1 object | pure absence/existence assertion |
+| 03 | RHEL-09-232190 | 1 def, 1 test, 1 object, 3 filter states, 1 variable | multi-item universal assertion; bounded failure evidence |
+| 04 | RHEL-09-653030 | 2 defs, 2 tests, 3 objects, 1 state, 2 variables | named intermediate data and derived values |
+| 05 | RHEL-09-654025 | 7 defs, 24 tests, 24 objects, 17 variables | large repeated logic; candidate structured capability + Cartesian assertion matrix |
+
+## Working principles exercised
+
+- No hidden authoring defaults for existence/cardinality or comparison quantifiers.
+- Collection semantics and assertion semantics are separate and visible.
+- Named intermediate data replaces opaque variable/object reference chains.
+- Result evidence limits do not change compliance truth.
+- The content author can request bounded concrete failure examples.
+- A scanner may optimize execution internally without forcing authors to model the engine's execution graph.
+- Lossless source conversion and semantic/native refactoring are separate concerns.
+
+## Important finding from sample 05
+
+The source OVAL for RHEL-09-654025 appears to contain duplicated 32-bit root
+patterns for the \`lsetxattr\` and \`removexattr\` cases where the surrounding
+structure suggests corresponding 64-bit cases may have been intended.
+
+That is exactly why an aggressive converter must not silently infer and
+"repair" intent.
+
+A conservative conversion SHALL preserve the source behavior. A later semantic
+refactoring pass MAY propose a cleaner structured form, but any behavior change
+requires explicit review/provenance.
+
+## Questions these samples intentionally leave open
+
+- Whether \`fields\` belongs under collection, results, or both.
+- Final vocabulary for explicit existence/cardinality.
+- Final expression syntax for named derived data.
+- Whether common derived properties such as partition \`total_bytes\` belong in the capability data model.
+- Whether SCAP-NG should add structured domain capabilities such as \`linux.audit_rule\` rather than requiring regex parsing of configuration text.
+- Final syntax for a Cartesian assertion matrix such as sample 05.
+
+Do not treat these files as final schema fixtures.
