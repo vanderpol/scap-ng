@@ -35,6 +35,14 @@ seq=oval_ir.oval_apply_filters(
 )
 assert seq==[a,b],seq
 
+# Six-state/error-like values must never be coerced to a Boolean filter match.
+try:
+    oval_ir.oval_apply_filters([a],[("exclude",lambda item:"error")])
+except ValueError:
+    pass
+else:
+    raise AssertionError("non-Boolean filter predicate outcome was silently coerced")
+
 # Nested set pattern from Self-Assertion: ((A-B) INTERSECTION (A UNION B)) == {a}
 nested=oval_ir.oval_set_items(
     "INTERSECTION",
