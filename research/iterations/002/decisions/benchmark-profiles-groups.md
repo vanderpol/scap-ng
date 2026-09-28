@@ -19,13 +19,37 @@ than embedding executable implementation into policy structure.
 
 ## Profiles
 
-A Profile is a publisher-defined policy selection within a Benchmark.
+A Profile is a publisher-defined policy variation within a Benchmark.
 
-A Profile MAY:
-- select or deselect Rules;
-- select or deselect Groups as authoring shorthand;
+Benchmark membership establishes the Rule-selection baseline: every Rule
+contained in a Benchmark SHALL be enabled by default.
+
+The Rule-selection function of a Profile SHALL be **subtractive only**. A
+Profile MAY disable Rules, but SHALL NOT explicitly enable Rules or introduce
+Rules that are not contained in the Benchmark.
+
+A Profile that does not change Rule selection SHALL contain no Rule-selection
+state.
+
+Native syntax SHOULD expose only the disable delta, for example:
+
+    profile:
+      id: disa.cat-i-only
+      disabled_rules:
+        - RHEL-09-211015
+        - RHEL-09-211020
+
+Native Profile syntax SHALL NOT provide a generic Boolean Rule-selection map
+that permits authors to restate inherited enablement.
+
+A Profile MAY also:
 - bind publisher-resolved policy Parameters;
-- refine policy attributes explicitly declared tailorable by the Benchmark.
+- refine policy attributes explicitly declared tailorable by the Benchmark;
+- extend one other Profile in the same Benchmark when inheritance is useful.
+
+For Rule selection, Profile inheritance SHALL remain monotonic and
+subtractive: a child MAY disable additional Rules but SHALL NOT re-enable a
+Rule disabled by an ancestor. Multiple inheritance SHOULD NOT be supported.
 
 A Profile SHALL NOT:
 - replace Assessment Methods;
@@ -33,6 +57,11 @@ A Profile SHALL NOT:
 - alter collectors, queries, operations, privileges, or other scanner behavior.
 
 Profiles are part of the Benchmark because they represent publisher policy.
+
+The complete normative rationale, canonical serialization rules, XCCDF
+up-conversion behavior, validation requirements, and DISA RHEL 9 migration
+evidence are recorded in
+[`profile-rule-selection.md`](profile-rule-selection.md).
 
 ## Groups
 
@@ -109,6 +138,6 @@ the common STIG pattern of mechanically wrapping each Rule in its own Group.
 | SCAP-NG concept | SCAP 1.4 analog | Relationship |
 | --- | --- | --- |
 | Benchmark | XCCDF Benchmark | direct descendant, with assessment implementation separated |
-| Profile | XCCDF Profile | direct descendant with tighter policy/execution boundary |
+| Profile | XCCDF Profile | direct descendant with subtractive Rule selection and tighter policy/execution boundary |
 | Group | XCCDF Group | direct descendant, restored to meaningful multi-Rule organization |
 | needs-grouping | none | NG migration/review convention |
