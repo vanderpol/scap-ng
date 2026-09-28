@@ -40,6 +40,7 @@ def combined_members(root: Path, package_type: str):
     members={
         "benchmark.json":load(root/"benchmark.yaml"),
         "profiles.json":load(root/"profiles.yaml"),
+        "groups.json":load(root/"groups.yaml"),
         "values.json":load(root/"values.yaml"),
     }
     for path in sorted((root/"rules").glob("*.yaml")):
