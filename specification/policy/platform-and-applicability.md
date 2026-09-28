@@ -251,3 +251,123 @@ lossless condition for review rather than silently inventing a split.
 
 Legacy CPE names MAY remain as identifiers/provenance, but SCAP-NG execution
 SHALL NOT depend on a scanner possessing hard-coded knowledge of those names.
+
+
+## 14. Applicability processing algorithm
+
+For each effectively selected Rule, a processor SHALL evaluate applicability
+in the following order:
+
+1. evaluate the Benchmark Platform expression;
+2. if the Benchmark Platform expression is false, do not execute Rule
+   compliance Assessments;
+3. if the Benchmark Platform expression is indeterminate or errors, propagate
+   an appropriate non-compliance result state rather than treating the
+   Benchmark as simply not applicable;
+4. if the Platform expression is true and the Rule has no `when` expression,
+   the Rule is applicable;
+5. if the Rule has a `when` expression, resolve every named condition through
+   the Benchmark applicability catalog;
+6. evaluate the Boolean `when` expression;
+7. execute the Rule compliance Assessment only when the effective Rule
+   applicability is true.
+
+Rule selection SHALL be resolved before this algorithm. A disabled Rule does
+not require applicability evaluation.
+
+## 15. Applicability truth semantics
+
+Applicability truth SHALL be distinct from compliance truth.
+
+For an enabled Rule:
+
+| Platform | Rule `when` | Effective applicability | Compliance Assessment |
+| --- | --- | --- | --- |
+| true | absent | applicable | execute |
+| true | true | applicable | execute |
+| true | false | not applicable | do not execute |
+| false | any | Benchmark out of scope | do not execute |
+| error/indeterminate | any | indeterminate | do not coerce to N/A |
+| true | error/indeterminate | indeterminate | do not coerce to N/A |
+
+The final result-state names for Benchmark-out-of-scope and indeterminate
+applicability remain subject to the common results vocabulary.
+
+## 16. Applicability Assessment contract
+
+An applicability catalog entry SHALL resolve to an Assessment Method whose
+result can be interpreted as Boolean applicability truth or an explicit
+indeterminate/error state.
+
+An applicability Assessment:
+
+- MAY use any normal SCAP-NG collection capability;
+- MAY use derived values and Boolean assertions;
+- MAY consume typed expected-state Parameters when genuinely necessary;
+- SHALL NOT determine compliance for the consuming Rule;
+- SHALL NOT change Rule selection;
+- SHALL NOT mutate Benchmark or Tailoring policy.
+
+The same applicability Assessment MAY be reused by multiple Rules.
+
+## 17. Applicability catalog example
+
+Illustrative catalog:
+
+    applicability:
+      windows.member-workstation:
+        assessment: assessments/automated/applicability/windows-member-workstation.assessment.yaml
+
+      windows.camera-installed:
+        assessment: assessments/automated/applicability/windows-camera-installed.assessment.yaml
+
+Illustrative Rule:
+
+    rule:
+      id: WN11-EXAMPLE
+      when:
+        all_of:
+          - windows.member-workstation
+          - windows.camera-installed
+
+The Rule does not repeat either Assessment path.
+
+## 18. Shared condition evaluation
+
+When multiple Rules reference the same applicability condition during one run,
+a processor SHOULD evaluate the condition once and reuse the result when:
+
+- the Assessment is deterministic for the run;
+- its effective inputs are identical;
+- its target scope is identical; and
+- reuse cannot alter error or evidence semantics.
+
+A processor that reuses the result SHALL preserve enough result information to
+show which Rules depended on the condition.
+
+## 19. Applicability evidence
+
+When a Rule is reported as not applicable, the result SHOULD identify the
+condition or Boolean branch that made it inapplicable.
+
+Example:
+
+    applicability:
+      outcome: false
+      decisive_condition: windows.camera-installed
+      message: Camera feature is not installed.
+
+For complex Boolean expressions, the result SHOULD preserve the decisive
+applicability explanation without duplicating the complete static Assessment
+definition.
+
+## 20. Applicability versus exceptions
+
+Applicability SHALL describe whether a requirement logically applies to the
+target.
+
+Applicability SHALL NOT be used as a generic waiver or exception mechanism.
+
+An organization wishing to omit an otherwise applicable Rule from its local
+policy SHALL use Tailoring Rule selection or another explicitly standardized
+policy-exception mechanism rather than falsifying target applicability.
