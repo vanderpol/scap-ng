@@ -299,12 +299,23 @@ def oval_apply_filter(items, matches, action="exclude"):
 def oval_apply_filters(items, filters):
     """Apply OVAL filters sequentially before the enclosing set operator.
 
-    Each filter is a pair of action and predicate; predicate(item) returns
-    True when the item matches the filter's referenced OVAL state.
+    Each filter is a pair of action and predicate. The predicate must return
+    an explicit bool indicating whether the item matches the referenced state.
+    Six-state/error outcomes are deliberately rejected here until collection
+    flag propagation for failed filter-state evaluation is modeled exactly;
+    they must never be coerced through host-language truthiness.
     """
     current=list(items)
     for action,predicate in filters:
-        matches=[bool(predicate(item)) for item in current]
+        matches=[]
+        for item in current:
+            matched=predicate(item)
+            if not isinstance(matched,bool):
+                raise ValueError(
+                    "OVAL filter predicate must return explicit bool; "
+                    f"got {matched!r}"
+                )
+            matches.append(matched)
         current=oval_apply_filter(current,matches,action or "exclude")
     return current
 
