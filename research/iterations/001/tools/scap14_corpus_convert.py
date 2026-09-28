@@ -216,17 +216,39 @@ def oval_feature_inventory(root: ET.Element) -> dict:
     }
 
 
-def inventory_oval(root: ET.Element) -> dict:
+def inventory_oval(root: ET.Element, deprecated_tests: dict[str, dict] | None = None) -> dict:
+    deprecated_tests = deprecated_tests or {}
     definitions = []
     tests = []
     objects = []
     states = []
     variables = []
 
+    test_elements = {}
+    for e in root.iter():
+        name = local(e.tag)
+        if name.endswith("_test") and e.attrib.get("id"):
+            test_elements[e.attrib["id"]] = e
+
     for e in root.iter():
         name = local(e.tag)
         if name == "definition":
-            definitions.append({
+            deprecated_refs = []
+            for node in e.iter():
+                test_ref = node.attrib.get("test_ref")
+                if not test_ref:
+                    continue
+                test_element = test_elements.get(test_ref)
+                if test_element is None:
+                    continue
+                qname = f"{namespace(test_element.tag)}#{local(test_element.tag)}"
+                if qname in deprecated_tests:
+                    deprecated_refs.append({
+                        "test_ref": test_ref,
+                        "qualified_type": qname,
+                        "replacement_evidence": deprecated_tests[qname].get("deprecation_evidence"),
+                    })
+            definition = {
                 "id": e.attrib.get("id"),
                 "class": e.attrib.get("class"),
                 "version": e.attrib.get("version"),
@@ -235,13 +257,27 @@ def inventory_oval(root: ET.Element) -> dict:
                 "criteria": [
                     xml_tree(c) for c in list(e) if local(c.tag) == "criteria"
                 ],
-                "migration_status": "requires_review",
-            })
+                "migration_status": "unsupported" if deprecated_refs else "requires_review",
+            }
+            if deprecated_refs:
+                definition["conversion_error"] = {
+                    "code": "deprecated_oval_test",
+                    "message": (
+                        "SCAP-NG does not support deprecated OVAL tests. "
+                        "Update the SCAP 1.4 source to a supported OVAL test before conversion."
+                    ),
+                    "deprecated_tests": deprecated_refs,
+                }
+            definitions.append(definition)
         elif name.endswith("_test"):
+            qname = f"{namespace(e.tag)}#{name}"
             tests.append({
                 "type": name,
+                "qualified_type": qname,
                 "id": e.attrib.get("id"),
                 "attributes": dict(e.attrib),
+                "deprecated": qname in deprecated_tests,
+                "deprecation_evidence": deprecated_tests.get(qname, {}).get("deprecation_evidence"),
             })
         elif name.endswith("_object"):
             objects.append({
@@ -286,7 +322,12 @@ def embedded_datastream_components(root: ET.Element) -> list[tuple[str, bytes]]:
     return found
 
 
-def parse_xml(label: str, data: bytes, parent: str | None = None) -> list[dict]:
+def parse_xml(
+    label: str,
+    data: bytes,
+    parent: str | None = None,
+    deprecated_tests: dict[str, dict] | None = None,
+) -> list[dict]:
     digest = sha256(data)
     try:
         root = ET.fromstring(data)
@@ -315,12 +356,17 @@ def parse_xml(label: str, data: bytes, parent: str | None = None) -> list[dict]:
     if kind == "xccdf":
         record["inventory"] = inventory_xccdf(root)
     elif kind == "oval-definitions":
-        record["inventory"] = inventory_oval(root)
+        record["inventory"] = inventory_oval(root, deprecated_tests)
 
     records = [record]
     if kind.startswith("datastream"):
         for cid, payload in embedded_datastream_components(root):
-            records.extend(parse_xml(f"{label}#component:{cid}", payload, parent=label))
+            records.extend(parse_xml(
+                f"{label}#component:{cid}",
+                payload,
+                parent=label,
+                deprecated_tests=deprecated_tests,
+            ))
     return records
 
 
@@ -331,7 +377,7 @@ def safe_zip_member(name: str) -> bool:
     return ".." not in path.parts
 
 
-def discover_file(path: Path) -> list[dict]:
+def discover_file(path: Path, deprecated_tests: dict[str, dict] | None = None) -> list[dict]:
     data = path.read_bytes()
     if zipfile.is_zipfile(io.BytesIO(data)):
         records = [{
@@ -364,11 +410,16 @@ def discover_file(path: Path) -> list[dict]:
                         "error": str(exc),
                     })
                     continue
-                records.extend(parse_xml(f"{path}!{info.filename}", payload, parent=str(path)))
+                records.extend(parse_xml(
+                    f"{path}!{info.filename}",
+                    payload,
+                    parent=str(path),
+                    deprecated_tests=deprecated_tests,
+                ))
         return records
 
     if path.suffix.lower() in KNOWN_EXTENSIONS:
-        return parse_xml(str(path), data)
+        return parse_xml(str(path), data, deprecated_tests=deprecated_tests)
     return []
 
 
@@ -449,19 +500,38 @@ def gate(name: str, records: list[dict]) -> list[str]:
     return failures
 
 
+def load_deprecated_tests(path: Path | None) -> dict[str, dict]:
+    if path is None:
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return {
+        f'{row.get("namespace","")}#{row.get("name","")}': row
+        for row in data.get("test_elements", [])
+        if row.get("deprecated")
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("inputs", nargs="+", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--gate", choices=["none", "ingest", "native"], default="none")
+    default_catalog = Path(__file__).resolve().parent.parent / "generated" / "oval-schema-semantic-catalog.json"
+    parser.add_argument(
+        "--oval-schema-catalog",
+        type=Path,
+        default=default_catalog if default_catalog.exists() else None,
+        help="Schema-derived OVAL catalog used to reject deprecated OVAL tests.",
+    )
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
+    deprecated_tests = load_deprecated_tests(args.oval_schema_catalog)
     source_files = discover(args.inputs)
     records = []
     for path in source_files:
-        records.extend(discover_file(path))
+        records.extend(discover_file(path, deprecated_tests=deprecated_tests))
 
     report = {
         "tool": "scap14_corpus_convert.py",
@@ -469,6 +539,16 @@ def main() -> int:
         "source_files": [str(p) for p in source_files],
         "summary": summary(records),
         "documents": records,
+        "deprecated_oval_test_policy": {
+            "supported_in_scap_ng": False,
+            "catalog": str(args.oval_schema_catalog) if args.oval_schema_catalog else None,
+            "deprecated_test_types_known": len(deprecated_tests),
+            "conversion_behavior": (
+                "Definitions referencing deprecated OVAL tests are marked unsupported "
+                "with error code deprecated_oval_test. Source content must be updated "
+                "before SCAP-NG conversion."
+            ),
+        },
     }
 
     (args.output_dir / "corpus-report.json").write_text(
