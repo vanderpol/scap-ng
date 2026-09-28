@@ -1,0 +1,229 @@
+name: Full NIWC corpus SCAP-NG reuse analysis
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/full-corpus-reuse-analysis.yml"
+      - "tools/oval_semantic_ir.py"
+      - "tools/scap14_rule_splitter.py"
+      - "tools/scap14_benchmark_ir.py"
+      - "tools/scap14_to_scapng.py"
+      - "tools/analyze_scapng_assessment_reuse.py"
+      - "tools/scap14_benchmark_reuse_inventory.py"
+      - "tools/aggregate_scapng_reuse_inventories.py"
+      - "tools/build_oval_schema_semantic_catalog.py"
+      - "research/iterations/001/oval-test-support-overrides.json"
+      - "third_party/scap-1.4-schemas/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-corpus-reuse-analysis-main
+  cancel-in-progress: true
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        batch: [0, 1, 2, 3]
+
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC published corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check lxml PyYAML
+
+      - name: Build effective OVAL schema catalog
+        run: |
+          mkdir -p work/inventories
+          python scap-ng/tools/build_oval_schema_semantic_catalog.py \
+            scap-ng/third_party/scap-1.4-schemas/oval_5.12.3 \
+            --parser scap-ng/tools/oval_semantic_ir.py \
+            --support-overrides scap-ng/research/iterations/001/oval-test-support-overrides.json \
+            --output work/oval-schema-semantic-catalog.json
+
+      - name: Select benchmark batch
+        env:
+          BATCH: ${{ matrix.batch }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          batch=int(os.environ["BATCH"])
+          files=sorted(p.name for p in Path("niwc/Current").glob("*-signed.zip"))
+          if len(files)!=65:
+              raise SystemExit(
+                  f"Expected 65 individual signed benchmark ZIPs, found {len(files)}"
+              )
+          selected=[name for i,name in enumerate(files) if i % 4 == batch]
+          Path("work/batch.txt").write_text("\n".join(selected)+"\n",encoding="utf-8")
+          print(f"Batch {batch}: {len(selected)} benchmarks")
+          for name in selected:
+              print(name)
+          PY
+
+      - name: Build compact reuse inventories
+        shell: bash
+        run: |
+          set -euo pipefail
+          index=0
+          while IFS= read -r artifact; do
+            [[ -n "$artifact" ]] || continue
+            index=$((index+1))
+            stem="${artifact%.zip}"
+            key="$(printf '%s' "$stem" | sed -E 's/[^A-Za-z0-9._-]+/_/g')"
+            split_dir="work/split-${{ matrix.batch }}-$index"
+            echo "=== [${{ matrix.batch }}:$index] $artifact ==="
+
+            python scap-ng/tools/scap14_rule_splitter.py \
+              "niwc/Current/$artifact" \
+              --output-dir "$split_dir" \
+              --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+              --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+              --source-repository-path "Current/$artifact" \
+              --benchmark-key "$key" \
+              --fail-on-unresolved
+
+            python scap-ng/tools/scap14_benchmark_reuse_inventory.py \
+              "niwc/Current/$artifact" \
+              --split-root "$split_dir" \
+              --schema-catalog work/oval-schema-semantic-catalog.json \
+              --output "work/inventories/$key.json"
+
+            rm -rf "$split_dir"
+          done < work/batch.txt
+
+      - name: Upload compact inventory batch
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-corpus-reuse-batch-${{ matrix.batch }}
+          path: work/inventories/*.json
+          if-no-files-found: error
+          compression-level: 6
+
+  aggregate:
+    needs: inventory
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Download inventory batches
+        uses: actions/download-artifact@v4
+        with:
+          pattern: full-corpus-reuse-batch-*
+          path: downloads
+          merge-multiple: false
+
+      - name: Aggregate full-corpus reuse
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t inventories < <(find downloads -type f -name '*.json' | sort)
+          if [[ "${#inventories[@]}" -ne 65 ]]; then
+            echo "Expected 65 benchmark inventories, found ${#inventories[@]}" >&2
+            exit 1
+          fi
+          mkdir -p scap-ng/research/iterations/001/generated/full-corpus-reuse
+          python scap-ng/tools/aggregate_scapng_reuse_inventories.py \
+            "${inventories[@]}" \
+            --output scap-ng/research/iterations/001/generated/full-corpus-reuse/reuse-analysis.json
+
+      - name: Build compact review summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path("scap-ng/research/iterations/001/generated/full-corpus-reuse")
+          data=json.loads((root/"reuse-analysis.json").read_text())
+          s=data["summary"]
+          b=data["source_remediation_blockers"]
+          lines=[
+              "# Full pinned NIWC corpus assessment reuse",
+              "",
+              "Measured across all 65 individual published `*-signed.zip` benchmarks in the pinned NIWC `Current/` corpus.",
+              "",
+              "This is a compact semantic-fingerprint survey. It does not generate three full YAML renderings for every benchmark.",
+              "",
+              "## Exact assessment reuse",
+              "",
+              f"- Benchmarks: **{s['benchmarks']}**",
+              f"- XCCDF rules: **{s['source_rules']}**",
+              f"- Supported automated assessments: **{s['supported_automated_assessments']}**",
+              f"- Unique exact technical assessments: **{s['exact_unique_assessments']}**",
+              f"- Duplicate assessment maintenance units avoidable: **{s['exact_duplicate_assessment_units_avoided']}**",
+              f"- Exact maintenance-unit reduction: **{s['exact_maintenance_unit_reduction_pct']}%**",
+              f"- Cross-benchmark exact-reuse groups: **{s['cross_benchmark_exact_reuse_groups']}**",
+              f"- Cross-benchmark assessment instances in those groups: **{s['cross_benchmark_exact_reuse_instances']}**",
+              "",
+              "## Rule mapping and parameterization",
+              "",
+              f"- Cross-benchmark identical Check Text groups: **{s['check_text_alignment_groups']}**",
+              f"- Unique semantic shapes after literal abstraction: **{s['shape_unique_assessments']}**",
+              f"- Parameterization candidate reduction upper bound: **{s['parameterization_candidate_reduction_pct_upper_bound']}%**",
+              "",
+              "The parameterization figure is an upper bound only; it is not counted as proven reuse.",
+              "",
+              "## Source-remediation debt",
+              "",
+              f"- Automated rules blocked by effectively deprecated tests: **{b['rules']}**",
+          ]
+          for name,count in b["by_effectively_deprecated_test"].items():
+              lines.append(f"- {name}: **{count}** blocked-rule references")
+          lines += [
+              "",
+              "## Cost interpretation",
+              "",
+              "The measured duplicate-unit count can be multiplied by organization-specific review/test hours, change frequency, and loaded labor rate. No universal labor assumptions are embedded in the evidence.",
+              "",
+              "See `reuse-analysis.json` for fan-out distributions and the 100 largest cross-benchmark exact-reuse and Check-Text alignment groups.",
+              "",
+          ]
+          (root/"README.md").write_text("\n".join(lines),encoding="utf-8")
+          PY
+
+      - name: Upload full-corpus reuse report
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-niwc-corpus-reuse-report
+          path: scap-ng/research/iterations/001/generated/full-corpus-reuse
+          if-no-files-found: error
+
+      - name: Commit full-corpus reuse evidence
+        working-directory: scap-ng
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/iterations/001/generated/full-corpus-reuse
+          if git diff --cached --quiet; then
+            echo "Full-corpus reuse evidence already matches."
+            exit 0
+          fi
+          git commit -m "Measure full NIWC corpus SCAP-NG assessment reuse"
+          git pull --rebase origin main
+          git push
