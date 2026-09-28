@@ -18,6 +18,8 @@ Iteration-specific data and conclusions belong under `research/iterations/<NNN>/
 - `analyze_scapng_assessment_reuse.py` — maps rules across converted benchmarks using normalized Check Text and full OVAL semantic equivalence, measures exact reuse and parameterization candidates, and reports maintenance-unit savings.
 - `render_scapng_reuse_views.py` — renders measured exact reuse groups as combined shared-rule overlays, split shared assessments/bindings, and Ansible-inspired shared assessments/bindings.
 - `test_scapng_assessment_reuse.py` — regression tests for exact semantic fingerprints, literal-only parameterization candidates, and rule-alignment evidence.
+- `scap14_benchmark_reuse_inventory.py` — compact per-benchmark Check Text / exact semantic / parameterization-shape / deprecated-test inventory for corpus-scale analysis without rendering full YAML.
+- `aggregate_scapng_reuse_inventories.py` — aggregates compact benchmark inventories into corpus-wide exact reuse, fan-out, mapping, source-remediation debt, and maintenance-unit metrics.
 
 The migration tools are shared infrastructure rather than iteration-001-only experiments. Iteration-specific workflows and evidence may invoke them, but later iterations should reuse the same implementations rather than fork them.
 
