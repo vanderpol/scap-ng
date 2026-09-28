@@ -41,6 +41,14 @@ def main() -> int:
     if len(rules)!=summary["source_rules"]:
         failures.append("canonical rule count differs from summary")
 
+    combined_platforms=load_yaml(root/"combined-rule"/"platforms.yaml")
+    split_platforms=load_yaml(root/"split-policy-assessment-binding"/"platforms.yaml")
+    expected_platform_definitions=canonical.get("platform_definitions",[])
+    if combined_platforms.get("platform_definitions")!=expected_platform_definitions:
+        failures.append("combined platform definitions differ from canonical")
+    if split_platforms.get("platform_definitions")!=expected_platform_definitions:
+        failures.append("split platform definitions differ from canonical")
+
     combined_profiles=load_yaml(root/"combined-rule"/"profiles.yaml")
     split_profiles=load_yaml(root/"split-policy-assessment-binding"/"profiles.yaml")
     for name,doc in (("combined",combined_profiles),("split",split_profiles)):
@@ -52,10 +60,15 @@ def main() -> int:
     combined_benchmark=load_yaml(root/"combined-rule"/"benchmark.yaml")["benchmark"]
     split_benchmark=load_yaml(root/"split-policy-assessment-binding"/"benchmark.yaml")["benchmark"]
     expected_platforms=canonical.get("benchmark",{}).get("platforms",[])
+    expected_effective_platforms=canonical.get("benchmark",{}).get("effective_platforms",[])
     if combined_benchmark.get("platforms",[])!=expected_platforms:
         failures.append("combined benchmark platforms differ from canonical")
     if split_benchmark.get("platforms",[])!=expected_platforms:
         failures.append("split benchmark platforms differ from canonical")
+    if combined_benchmark.get("effective_platforms",[])!=expected_effective_platforms:
+        failures.append("combined benchmark effective platforms differ from canonical")
+    if split_benchmark.get("effective_platforms",[])!=expected_effective_platforms:
+        failures.append("split benchmark effective platforms differ from canonical")
 
     combined_groups=load_yaml(root/"combined-rule"/"groups.yaml")
     split_groups=load_yaml(root/"split-policy-assessment-binding"/"groups.yaml")
