@@ -200,10 +200,13 @@ def rule_instance(label: str, row: dict) -> dict | None:
 
     exact, shape = assessment_fingerprints(assessment)
     policy = row.get("policy") or {}
+    check_text=normalize_check_text(policy.get("check"))
     return {
         "benchmark": label,
         "rule_id": policy.get("id"),
         "title": policy.get("title"),
+        "check_text": check_text,
+        "check_text_fingerprint": digest(check_text) if check_text else None,
         "migration_status": migration.get("status"),
         "exact_fingerprint": exact,
         "shape_fingerprint": shape,
@@ -240,6 +243,94 @@ def group_instances(instances: list[dict], key: str) -> list[dict]:
             x["fingerprint"],
         ),
     )
+
+
+def normalize_check_text(value: str | None) -> str | None:
+    if not value:
+        return None
+    # Check Text comparisons intentionally normalize presentation whitespace only.
+    # Wording, punctuation, commands, paths, thresholds, and other content remain
+    # significant so this does not become a fuzzy semantic claim.
+    normalized=" ".join(value.split())
+    return normalized or None
+
+
+def alignment_groups(instances: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
+    by_check: dict[str,list[dict]]=defaultdict(list)
+    by_oval: dict[str,list[dict]]=defaultdict(list)
+    for row in instances:
+        check_fp=row.get("check_text_fingerprint")
+        if check_fp:
+            by_check[check_fp].append(row)
+        by_oval[row["exact_fingerprint"]].append(row)
+
+    def cross(groups: dict[str,list[dict]], fingerprint_kind: str) -> list[dict]:
+        out=[]
+        for fp,rows in groups.items():
+            benchmarks=sorted({x["benchmark"] for x in rows})
+            if len(benchmarks)<2:
+                continue
+            out.append({
+                "fingerprint":fp,
+                "fingerprint_kind":fingerprint_kind,
+                "instance_count":len(rows),
+                "benchmark_count":len(benchmarks),
+                "benchmarks":benchmarks,
+                "instances":sorted(
+                    rows,key=lambda x:(x["benchmark"],x.get("rule_id") or "")
+                ),
+            })
+        return sorted(
+            out,
+            key=lambda x:(-x["instance_count"],-x["benchmark_count"],x["fingerprint"]),
+        )
+
+    check_groups=cross(by_check,"normalized_check_text")
+    oval_groups=cross(by_oval,"equivalent_oval_semantics")
+
+    # Build pair-level evidence so a review can see how rules were aligned.
+    pair_evidence={}
+    def add_pairs(groups: list[dict], basis: str):
+        for group in groups:
+            rows=group["instances"]
+            for i,left in enumerate(rows):
+                for right in rows[i+1:]:
+                    if left["benchmark"]==right["benchmark"]:
+                        continue
+                    ordered=sorted(
+                        [left,right],
+                        key=lambda x:(x["benchmark"],x.get("rule_id") or ""),
+                    )
+                    key=(
+                        ordered[0]["benchmark"],ordered[0].get("rule_id"),
+                        ordered[1]["benchmark"],ordered[1].get("rule_id"),
+                    )
+                    item=pair_evidence.setdefault(key,{
+                        "left":{
+                            "benchmark":ordered[0]["benchmark"],
+                            "rule_id":ordered[0].get("rule_id"),
+                            "title":ordered[0].get("title"),
+                        },
+                        "right":{
+                            "benchmark":ordered[1]["benchmark"],
+                            "rule_id":ordered[1].get("rule_id"),
+                            "title":ordered[1].get("title"),
+                        },
+                        "evidence":[],
+                    })
+                    if basis not in item["evidence"]:
+                        item["evidence"].append(basis)
+
+    add_pairs(check_groups,"same_normalized_check_text")
+    add_pairs(oval_groups,"equivalent_oval_semantics")
+    pairs=sorted(
+        pair_evidence.values(),
+        key=lambda x:(
+            x["left"]["benchmark"],x["right"]["benchmark"],
+            x["left"].get("rule_id") or "",x["right"].get("rule_id") or "",
+        ),
+    )
+    return check_groups,oval_groups,pairs
 
 
 def pct(numerator: int, denominator: int) -> float:
@@ -285,6 +376,7 @@ def main() -> int:
 
     exact_groups = group_instances(instances, "exact_fingerprint")
     shape_groups = group_instances(instances, "shape_fingerprint")
+    check_alignment_groups,oval_alignment_groups,alignment_pairs=alignment_groups(instances)
 
     exact_unique = len(exact_groups)
     shape_unique = len(shape_groups)
@@ -302,6 +394,12 @@ def main() -> int:
     result = {
         "format": "scap-ng-assessment-reuse-analysis-0.1",
         "classification": {
+            "rule_alignment": (
+                "Rules are treated as corresponding when either normalized XCCDF Check "
+                "Text is identical or their complete normalized OVAL assessment semantics "
+                "are equivalent. OVAL equivalence compares the full logic graph, not merely "
+                "test-family names."
+            ),
             "exact_reuse": (
                 "Same normalized technical assessment semantics after removing "
                 "source identifiers, provenance, comments, metadata, and versions."
@@ -325,6 +423,20 @@ def main() -> int:
             "parameterization_candidate_instances_avoided_upper_bound": shape_avoided,
             "parameterization_candidate_reduction_pct_upper_bound": pct(shape_avoided, total),
             "cross_benchmark_parameterization_candidate_groups": len(shape_cross),
+            "cross_benchmark_same_check_text_groups": len(check_alignment_groups),
+            "cross_benchmark_equivalent_oval_groups": len(oval_alignment_groups),
+            "cross_benchmark_aligned_rule_pairs": len(alignment_pairs),
+            "aligned_pairs_by_evidence": {
+                "same_check_text_only": sum(
+                    1 for x in alignment_pairs
+                    if x["evidence"]==["same_normalized_check_text"]
+                ),
+                "equivalent_oval_only": sum(
+                    1 for x in alignment_pairs
+                    if x["evidence"]==["equivalent_oval_semantics"]
+                ),
+                "both": sum(1 for x in alignment_pairs if len(x["evidence"])==2),
+            },
         },
         "maintenance_cost_model": {
             "baseline_definition_units": total,
@@ -349,6 +461,11 @@ def main() -> int:
                 "specific values to measured units rather than presenting speculative "
                 "dollar savings as observed fact."
             ),
+        },
+        "rule_alignment": {
+            "cross_benchmark_same_check_text_groups": check_alignment_groups,
+            "cross_benchmark_equivalent_oval_groups": oval_alignment_groups,
+            "aligned_rule_pairs": alignment_pairs,
         },
         "exact_reuse_groups": [x for x in exact_groups if x["instance_count"] > 1],
         "cross_benchmark_exact_reuse_groups": exact_cross,
