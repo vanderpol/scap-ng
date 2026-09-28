@@ -1,0 +1,38 @@
+# Source: Windows 11 STIG V2R10.
+# XCCDF Rule: xccdf_mil.disa.stig_rule_SV-253286r958478_rule
+rule:
+  id: WN11-00-000160
+  title: The Server Message Block (SMB) v1 protocol must be disabled on the system.
+  severity: medium
+
+  identifiers:
+    - scheme: disa-vuln-id
+      value: V-253286
+    - scheme: disa-rule-id
+      value: SV-253286r958478_rule
+    - scheme: cci
+      value: CCI-000381
+
+  discussion: |-
+    SMBv1 is a legacy protocol that uses the MD5 algorithm as part of SMB. MD5 is known to be vulnerable to a number of attacks such as collision and preimage attacks as well as not being FIPS compliant.
+
+    Disabling SMBv1 support may prevent access to file or print sharing resources with systems or devices that only support SMBv1. File shares and print services hosted on Windows Server 2003 are an example, however Windows Server 2003 is no longer a supported operating system. Some older Network Attached Storage (NAS) devices may only support SMBv1.
+
+  remediation: |-
+    Disable the SMBv1 protocol.
+
+    Run "Windows PowerShell" with elevated privileges (run as administrator).
+
+    Enter the following:
+    Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol
+
+    Alternately:
+    Search for "Features".
+
+    Select "Turn Windows features on or off".
+
+    De-select "SMB 1.0/CIFS File Sharing Support".
+
+  assessments:
+    - ../assessments/manual/WN11-00-000160.manual.assessment.yaml
+    - ../assessments/automated/WN11-00-000160.lossless.automated.assessment.yaml
