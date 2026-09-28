@@ -1,5 +1,8 @@
 # SCAP-NG Research Iteration 001
 
+**Status:** complete research archive — native source design continues in `../002/`.
+
+
 **Status:** Preliminary research / architecture exploration  
 **Purpose:** Preserve the initial design discussion and provide concrete prototypes for review by the OVAL Board, NIST SCAP participants, DISA, scanner developers, and content authors.
 
@@ -8,6 +11,9 @@ Iteration 001 is intentionally **not a draft specification** and remains our int
 **SCAP 1.4 forward conversion is a hard requirement for supported, non-obsolete source semantics.** SCAP-NG deliberately excludes OVAL tests whose **effective current status remains deprecated** after applying documented OVAL Community reinstatement decisions; affected definitions must be corrected in SCAP 1.4 before conversion. A historical OVAL 5.12.x `deprecated_info` annotation alone is not sufficient when later governance explicitly reinstated a test. Every architecture and authoring-syntax experiment must otherwise remain capable of representing converted SCAP 1.4 content through the same faithful semantic model.
 
 Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content-library/Current` corpus. The first depth pass focuses on RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025; the final conversion gate covers every individual benchmark in the pinned `Current/` tree.
+
+> The generated YAML in iteration 001 is fidelity-first migration evidence, not proposed final SCAP-NG authoring syntax. Iteration 002 is the clean native-source design effort.
+
 
 ## Contents
 
