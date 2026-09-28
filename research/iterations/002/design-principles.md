@@ -20,14 +20,29 @@ Examples:
 The suffix `_test` is removed because NG capabilities are not modeled as
 OVAL XML tests.
 
-### Versioned test names
+### Historical numeric/version suffixes — OVAL Board decision
 
-Do not automatically remove numeric/version suffixes such as `53`, `54`,
-`55`, or `511`.
+Names such as `fileeffectiverights53`, `textfilecontent54`,
+`user_sid55`, and `plist511` often encode the OVAL release in which a
+replacement or semantic correction was introduced.
 
-If two OVAL test generations have materially different data models or
-semantics, the NG capability name keeps the distinguishing suffix until a
-reviewed NG-native unification proves lossless.
+SCAP-NG should not prejudge whether those historical suffixes remain part of
+the native capability name.
+
+For iteration 002:
+
+- preserve the source-derived supported test basename when demonstrating or
+  up-converting content so no semantic distinction is accidentally hidden;
+- do not treat that spelling as final NG syntax;
+- document whether the suffixed and unsuffixed generations have materially
+  different data/result semantics;
+- present the naming choice to the OVAL Board.
+
+The Board may choose, for example, to retain `macos.plist511` for explicit
+lineage, or establish a new NG baseline such as `macos.plist` if only the
+corrected semantics are admitted into NG.
+
+The same decision applies consistently across historical numeric suffixes.
 
 ### Deprecated tests
 
