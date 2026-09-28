@@ -34,6 +34,7 @@ def classify(key, schema_row, self_counts, prod_counts, prod_examples):
         "deprecated":bool(schema_row.get("deprecated",False)),
         "deprecation_evidence":schema_row.get("deprecation_evidence"),
         "status":status,
+        "scap_ng_in_scope": not (key.endswith("_test") and bool(schema_row.get("deprecated",False))),
     }
 
 
@@ -88,6 +89,7 @@ def main():
             "production_only":counts["production_only"],
             "schema_only":counts["schema_only"],
             "deprecated_total":sum(1 for x in rows if x["deprecated"]),
+            "scap_ng_in_scope_total":sum(1 for x in rows if x["scap_ng_in_scope"]),
             "production_only_deprecated":sum(
                 1 for x in rows if x["status"]=="production_only" and x["deprecated"]
             ),
@@ -113,6 +115,12 @@ def main():
         "summary":summary,
         "by_namespace":{k:dict(sorted(v.items())) for k,v in sorted(by_namespace.items())},
         "ledger":ledger,
+        "scap_ng_scope":{
+            "deprecated_oval_tests_supported":False,
+            "supported_test_type_count":summary["tests"]["scap_ng_in_scope_total"],
+            "deprecated_test_type_count":summary["tests"]["deprecated_total"],
+            "note":"Deprecated OVAL tests are excluded from SCAP-NG even when present in schema, Self-Assertion, or production evidence.",
+        },
         "gate":{
             "all_observed_types_declared_by_schema":not any(
                 summary[c]["observed_not_in_schema"] for c in summary
