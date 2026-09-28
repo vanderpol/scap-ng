@@ -190,6 +190,7 @@ written differently or allowed more reuse than another.
 
 ## Supporting evidence
 
+- `high-fanout-reuse.md` — exact reuse examples spanning 6, 12, and 13 published benchmarks.
 - `../four-anchor-reuse-methodology.md` — mapping/reuse/cost methodology.
 - `../generated/four-anchor-reuse/assessment-reuse.json` — complete machine-readable reuse analysis.
 - `../generated/four-anchor-reuse/reuse-views/` — six exact reuse groups rendered in all three YAML designs.
