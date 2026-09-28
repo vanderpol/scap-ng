@@ -97,5 +97,7 @@ for that one semantic check. A single reviewed correction or collector
 migration can therefore replace up to 12 repeated technical updates while all
 13 policy identities remain independently reviewable.
 
-This is the kind of multiplier represented in the full-corpus result of
-**3,671 duplicate assessment-definition maintenance units avoided**.
+This is the kind of multiplier represented in the full-corpus result:
+**3,639 duplicate assessment-definition units are avoided specifically through
+cross-benchmark reuse**. Counting the additional exact duplicates found within
+individual benchmarks raises the total avoidable duplicate units to **3,671**.
