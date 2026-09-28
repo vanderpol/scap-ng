@@ -371,3 +371,20 @@ Applicability SHALL NOT be used as a generic waiver or exception mechanism.
 An organization wishing to omit an otherwise applicable Rule from its local
 policy SHALL use Tailoring Rule selection or another explicitly standardized
 policy-exception mechanism rather than falsifying target applicability.
+
+
+## 21. Worked source example
+
+The Windows 11 source example demonstrates a Benchmark-scoped applicability
+catalog and reusable Rule applicability Assessments:
+
+    source/examples/windows11/applicability.yaml
+    source/examples/windows11/assessments/automated/applicability/
+
+The RHEL 9 source example demonstrates a Benchmark with multiple alternative
+Platform identities sharing the same Rule policy set:
+
+    source/examples/rhel9/benchmark.yaml
+    source/examples/rhel9/assessments/automated/platforms/
+
+These examples are design-review source and do not freeze final serialization.
