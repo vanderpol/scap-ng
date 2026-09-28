@@ -97,8 +97,16 @@ applicability assessment, for example conceptually:
     applies_to:
       - windows-member-workstation
 
-with the platform definition referencing NG-native assessment/evaluation
-identifiers.
+with the platform definition referencing an ordinary NG assessment.
+
+Applicability does not get a weaker or scanner-defined test model. Anything
+that can be expressed by the assessment language may be used to determine
+applicability. The scanner supplies only the collector capabilities required by
+the content; the content author decides which facts mean that a platform
+applies.
+
+A CPE name may remain useful as a standardized identifier, but it is not
+executable evidence and must not be treated as a scanner-side platform oracle.
 
 The exact final syntax remains subject to Board review, but legacy checking
 systems must not be required at runtime.
