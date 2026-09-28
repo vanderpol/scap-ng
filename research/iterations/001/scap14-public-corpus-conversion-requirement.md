@@ -5,7 +5,7 @@
 
 ## Requirement
 
-Before the SCAP-NG specification is considered ready to finalize, the project must demonstrate repeatable forward conversion of the declared public SCAP 1.4 corpus.
+Before the SCAP-NG specification is considered ready to finalize, the project must demonstrate repeatable forward conversion of the declared public SCAP 1.4 corpus **after excluding definitions that still use deprecated OVAL tests as explicit source-remediation blockers**.
 
 This is not satisfied by hand-converting representative examples. For iteration 001, the authoritative public corpus is the pinned NIWC Atlantic `scap-content-library/Current` tree recorded in `public-corpus-manifest.yaml`.
 
@@ -83,6 +83,19 @@ Statuses must be machine-readable and accompanied by construct-level reasons.
 
 No construct may be silently discarded, replaced with a weaker check, or treated as compliant because conversion was incomplete.
 
+### Deprecated OVAL test boundary
+
+SCAP-NG intentionally excludes every OVAL test type marked deprecated in the SCAP 1.4 / OVAL 5.12.3 schema.
+
+If a definition references a deprecated OVAL test:
+
+- conversion of that definition must stop with `unsupported` and reason `deprecated_oval_test`;
+- the converter must identify the offending test type and supported replacement when documented;
+- the converter must not automatically rewrite the test;
+- the source SCAP 1.4 content must be updated and validated before conversion is retried.
+
+These blockers are source-remediation requirements, not SCAP-NG specification blockers and not native-runtime coverage requirements. The corpus report must count and identify them separately.
+
 ## Gates
 
 ### Gate 1 — corpus ingestion
@@ -116,7 +129,7 @@ Before specification finalization, configuration-assessment content should reach
 
 `legacy_compatible` is a migration safety valve, not evidence that the native language is complete.
 
-Any remaining `requires_review` or `unsupported` construct is a specification blocker unless the standards group explicitly determines that the construct is out of scope.
+Any remaining `requires_review` or `unsupported` construct is a specification blocker unless the standards group explicitly determines that the construct is out of scope. Definitions blocked specifically by `deprecated_oval_test` are already declared out of SCAP-NG scope and instead block conversion of that source content until the publisher updates it.
 
 ### Gate 4 — differential equivalence
 
