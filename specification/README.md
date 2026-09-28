@@ -77,3 +77,10 @@ documented rationale.
 Unresolved design questions SHOULD remain in `research/` or be explicitly
 marked open in the specification rather than being silently converted into
 normative requirements.
+
+### OVAL 5.12.3 migration
+
+- `migration/oval-5.12.3-to-ng.md` — normative construct mapping from OVAL
+  Definition/Test/Object/State/Variable semantics into SCAP-NG.
+- `migration/oval-5.12.3-capability-crosswalk.md` — OVAL 5.12.3 Test-type to
+  provisional SCAP-NG Capability inventory.
