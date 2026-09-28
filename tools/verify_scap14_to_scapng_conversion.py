@@ -41,6 +41,13 @@ def main() -> int:
     if len(rules)!=summary["source_rules"]:
         failures.append("canonical rule count differs from summary")
 
+    combined_groups=load_yaml(root/"combined-rule"/"groups.yaml")
+    split_groups=load_yaml(root/"split-policy-assessment-binding"/"groups.yaml")
+    if combined_groups.get("groups")!=canonical.get("groups",[]):
+        failures.append("combined groups differ from canonical")
+    if split_groups.get("groups")!=canonical.get("groups",[]):
+        failures.append("split groups differ from canonical")
+
     bindings_doc=load_yaml(root/"split-policy-assessment-binding"/"automation"/"bindings.yaml")
     bindings={x["rule"]:x for x in bindings_doc.get("bindings",[])}
 
