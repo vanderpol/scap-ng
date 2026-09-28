@@ -272,6 +272,8 @@ def policy_rule(rule: dict) -> dict:
         "description": rule.get("description"),
         "discussion": rule.get("rationale"),
         "platforms": copy.deepcopy(rule.get("platforms", [])),
+        "effective_platform_refs": copy.deepcopy(rule.get("effective_platform_refs", [])),
+        "effective_platforms": copy.deepcopy(rule.get("effective_platforms", [])),
         "references": copy.deepcopy(rule.get("references", [])),
         "idents": copy.deepcopy(rule.get("idents", [])),
         "requires": copy.deepcopy(rule.get("requires", [])),
@@ -323,6 +325,7 @@ def render_benchmark_doc(ir: dict, model: str) -> dict:
             "profile_count": benchmark.get("profile_count"),
             "value_count": benchmark.get("value_count"),
             "platforms": copy.deepcopy(benchmark.get("platforms", [])),
+            "effective_platforms": copy.deepcopy(benchmark.get("effective_platforms", [])),
             "references": copy.deepcopy(benchmark.get("references", [])),
             "source_status": copy.deepcopy(benchmark.get("status", [])),
             "rules": [x["id"] for x in ir.get("rules", [])],
@@ -356,6 +359,11 @@ def main() -> int:
 
     dump_yaml(combined_root / "benchmark.yaml", render_benchmark_doc(source, "combined-rule"))
     dump_yaml(split_root / "benchmark.yaml", render_benchmark_doc(source, "split-policy-assessment-binding"))
+    dump_yaml(combined_root / "platforms.yaml", {
+        "scap_ng": SPEC,
+        "prototype": True,
+        "platform_definitions": source.get("platform_definitions", []),
+    })
     dump_yaml(combined_root / "profiles.yaml", {
         "scap_ng": SPEC,
         "prototype": True,
@@ -367,6 +375,11 @@ def main() -> int:
     })
     dump_yaml(combined_root / "values.yaml", {
         "scap_ng": SPEC, "prototype": True, "values": source.get("values", [])
+    })
+    dump_yaml(split_root / "platforms.yaml", {
+        "scap_ng": SPEC,
+        "prototype": True,
+        "platform_definitions": source.get("platform_definitions", []),
     })
     dump_yaml(split_root / "profiles.yaml", {
         "scap_ng": SPEC,
@@ -489,6 +502,7 @@ def main() -> int:
         "format": "scap-ng-converted-benchmark-canonical-0.1",
         "source": source.get("source"),
         "benchmark": source.get("benchmark"),
+        "platform_definitions": source.get("platform_definitions", []),
         "profiles": source.get("profiles", []),
         "resolved_profiles": source.get("resolved_profiles", []),
         "groups": source.get("groups", []),
@@ -499,6 +513,7 @@ def main() -> int:
 
     summary = {
         "source_rules": len(source.get("rules", [])),
+        "platform_definitions":len(source.get("platform_definitions",[])),
         "source_groups":len(source.get("groups",[])),
         "source_profiles":len(source.get("profiles",[])),
         "resolved_profiles":len(source.get("resolved_profiles",[])),
