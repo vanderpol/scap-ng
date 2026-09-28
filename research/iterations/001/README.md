@@ -29,6 +29,8 @@ Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content
 - `tools/` — iteration-specific package build, splitting, semantic-IR, normalization, and rendering tooling.
 - `generated/niwc-rule-splits/` — 1,333 schema-valid per-rule OVAL splits plus semantic IR for the four published priority benchmarks.
 - `generated/native-normalizations/` — generated native-semantic normalization examples and cross-platform semantic-fingerprint comparisons.
+- `generated/four-anchor-reuse/` — deep reuse analysis and representative three-format reuse views for RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025.
+- `generated/full-corpus-reuse/` — compact reuse/fan-out, Check Text mapping, parameterization-candidate, and deprecated-source-debt evidence across all 65 individual signed benchmarks in the pinned NIWC corpus.
 - `showcases/rhel9-sv-258179/` — flagship complex published OVAL case, including the distinction between faithful conversion and a policy-review normalization candidate.
 
 ## Current benchmark scope
