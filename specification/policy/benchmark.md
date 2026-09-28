@@ -248,3 +248,134 @@ one XML component architecture.
 SCAP-NG preserves the high-level requirements that a Benchmark have stable
 identity/version, target scope, policy Rules, and deterministic processing,
 while moving implementation details into explicit referenced objects.
+
+
+## 15. Benchmark processing model
+
+A processor SHALL treat Benchmark processing as a deterministic sequence.
+
+For a requested Benchmark execution, the processor SHALL conceptually:
+
+1. identify the exact Benchmark identity and version;
+2. resolve all Rule members;
+3. resolve the Benchmark Platform expression and Platform Assessment bindings;
+4. resolve the applicability catalog, when present;
+5. resolve the selected publisher Profile, when present;
+6. resolve Tailoring, when present;
+7. resolve effective Parameter values and required Organizational Input;
+8. freeze the effective Rule-selection state;
+9. evaluate the Benchmark Platform expression;
+10. evaluate Rule applicability only for effectively selected Rules;
+11. execute compliance Assessment Methods only for applicable Rules; and
+12. produce results that identify the exact effective policy used.
+
+A build/compiler MAY perform source resolution and normalization before run
+time, but the observable semantics SHALL be equivalent to this processing
+model.
+
+## 16. Benchmark validation requirements
+
+A Benchmark SHALL fail validation when:
+
+- its logical identity is missing or ambiguous;
+- its publication version is missing when version binding is required;
+- a Rule reference cannot be resolved;
+- two Rule references resolve to the same logical Rule identity;
+- a Platform Assessment reference cannot be resolved;
+- a referenced applicability catalog cannot be resolved;
+- a Profile references a Rule not contained in the Benchmark;
+- a Group references an unknown Rule or child Group;
+- a Parameter reference cannot be resolved;
+- source references resolve ambiguously.
+
+A validator SHOULD warn about:
+
+- unused applicability catalog entries;
+- empty Groups;
+- metadata-only Profiles that are semantically identical and appear accidental;
+- Rule membership that is not represented in any meaningful Group when the
+  publisher normally uses grouping.
+
+Warnings SHALL NOT silently change policy.
+
+## 17. Benchmark source example
+
+Illustrative source:
+
+    benchmark:
+      id: disa.windows11.stig
+      title: Microsoft Windows 11 Security Technical Implementation Guide
+      version: V2R10
+
+      publisher:
+        name: Defense Information Systems Agency
+        short_name: DISA
+
+      platforms:
+        any_of:
+          - id: windows.11
+            assessment: assessments/automated/platforms/windows-11.assessment.yaml
+
+      applicability: applicability.yaml
+
+      rules:
+        - policy/WN11-00-000020.policy.yaml
+        - policy/WN11-00-000050.policy.yaml
+        - policy/WN11-CC-000005.policy.yaml
+
+      profiles:
+        - profiles/cat-i-only.profile.yaml
+
+The example is illustrative. Exact serialization remains subject to schema
+stabilization.
+
+## 18. Source-tree organization
+
+A Benchmark source tree SHOULD make policy ownership obvious.
+
+A typical source tree is:
+
+    benchmark.yaml
+    applicability.yaml
+    policy/
+      <rule>.policy.yaml
+    profiles/
+      <profile>.profile.yaml
+    assessments/
+      manual/
+      automated/
+
+Shared reusable content MAY live outside the Benchmark tree.
+
+Repository layout is an authoring convention. A processor SHALL NOT infer
+object type, identity, or semantics solely from the directory structure.
+
+## 19. Benchmark execution identity
+
+Results SHALL identify the exact Benchmark publication that was executed.
+
+A Benchmark result reference SHOULD include:
+
+- stable Benchmark logical identity;
+- publication version/revision;
+- immutable compiled-package identity when available;
+- selected Profile identity, if any;
+- Tailoring identity/version, if any.
+
+This information SHALL be sufficient to distinguish two executions that used
+different policy publications even when the Benchmark logical identity is the
+same.
+
+## 20. Benchmark replacement and supersession
+
+A new Benchmark publication MAY supersede an older publication while retaining
+the same logical Benchmark identity.
+
+Supersession SHALL NOT mutate historical result meaning.
+
+Profiles and Tailoring bound to an older publication SHALL NOT silently
+retarget to the newer publication.
+
+Rebase/migration tooling MAY produce a new Profile or Tailoring artifact for
+the newer Benchmark after validating every referenced Rule, Group, and
+Parameter decision.
