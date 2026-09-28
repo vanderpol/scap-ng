@@ -206,7 +206,15 @@ Exact equality should be required for normative semantics. Differences caused on
 
 The converter and current IR should therefore continue exposing stable execution boundaries (collectors, derived values, predicates, result algebra, applicability, and processing plans) so the later reference scanner can implement them without redesigning the content model.
 
-## 29. Questions carried forward
+## 29. Windows migration blockers are useful adoption evidence
+
+The published Windows 11 benchmark contains an automated rule that still uses an effectively deprecated OVAL `user_test`, while other rules in the same benchmark use supported Windows constructs such as `userright_test` and `wmi57_test`.
+
+**Lesson:** the Windows demonstration should make source-remediation debt visible and actionable rather than silently carrying obsolete OVAL into SCAP-NG. For each blocked rule, report the exact rule identifier, deprecated test family, supported replacement when one exists, and the fact that the remainder of the benchmark converts independently.
+
+This is particularly useful for standards/content-author review because it demonstrates a practical upgrade path: repair the published SCAP 1.4 source using supported OVAL semantics, validate it there, then rerun the deterministic SCAP-NG conversion. The demonstration should frame these findings as migration-readiness feedback, not as criticism of the original content authors.
+
+## 30. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 
