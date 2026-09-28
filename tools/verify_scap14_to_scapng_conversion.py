@@ -19,6 +19,7 @@ def main() -> int:
     ap.add_argument("--expected-rules",type=int)
     ap.add_argument("--expected-automated",type=int)
     ap.add_argument("--expected-manual",type=int)
+    ap.add_argument("--expected-applicability-definitions",type=int)
     args=ap.parse_args()
 
     root=args.conversion_dir
@@ -36,10 +37,38 @@ def main() -> int:
         failures.append(
             f'expected {args.expected_manual} manual rules, got {summary["manual_or_external_rules"]}'
         )
+    if (
+        args.expected_applicability_definitions is not None
+        and summary.get("applicability_definition_count")!=args.expected_applicability_definitions
+    ):
+        failures.append(
+            "expected "
+            f"{args.expected_applicability_definitions} applicability definitions, "
+            f"got {summary.get('applicability_definition_count')}"
+        )
+    if summary.get("applicability_blocked"):
+        failures.append("applicability conversion is blocked")
 
     rules=canonical["rules"]
     if len(rules)!=summary["source_rules"]:
         failures.append("canonical rule count differs from summary")
+
+    combined_applicability_path=root/"combined-rule"/"applicability.yaml"
+    split_applicability_path=root/"split-policy-assessment-binding"/"applicability.yaml"
+    expected_applicability=canonical.get("applicability",{})
+    if expected_applicability.get("assessment") is not None:
+        if not combined_applicability_path.exists():
+            failures.append("combined applicability assessment missing")
+        if not split_applicability_path.exists():
+            failures.append("split applicability assessment missing")
+        if combined_applicability_path.exists() and split_applicability_path.exists():
+            combined_applicability=load_yaml(combined_applicability_path)
+            split_applicability=load_yaml(split_applicability_path)
+            expected_assessment=expected_applicability.get("assessment")
+            if combined_applicability.get("assessment")!=expected_assessment:
+                failures.append("combined applicability assessment differs from canonical")
+            if split_applicability.get("assessment")!=expected_assessment:
+                failures.append("split applicability assessment differs from canonical")
 
     combined_processing=load_yaml(root/"combined-rule"/"processing.yaml")
     split_processing=load_yaml(root/"split-policy-assessment-binding"/"processing.yaml")
@@ -153,6 +182,8 @@ def main() -> int:
         "rules":len(rules),
         "assessment_equivalence_checked":checked,
         "blocked_rules":summary["blocked_rules"],
+        "applicability_definition_count":summary.get("applicability_definition_count",0),
+        "applicability_migration_status":summary.get("applicability_migration_status"),
         "migration_status":summary["migration_status"],
         "failures":failures[:100],
     }
