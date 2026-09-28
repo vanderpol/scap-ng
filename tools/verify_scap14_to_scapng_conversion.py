@@ -74,6 +74,7 @@ def main() -> int:
     ap.add_argument("--expected-automated",type=int)
     ap.add_argument("--expected-manual",type=int)
     ap.add_argument("--expected-applicability-definitions",type=int)
+    ap.add_argument("--expected-blocked-rules",type=int)
     ap.add_argument("--ansible-inspired-dir",type=Path)
     args=ap.parse_args()
 
@@ -103,6 +104,14 @@ def main() -> int:
         )
     if summary.get("applicability_blocked"):
         failures.append("applicability conversion is blocked")
+    if (
+        args.expected_blocked_rules is not None
+        and summary.get("blocked_rules")!=args.expected_blocked_rules
+    ):
+        failures.append(
+            f'expected {args.expected_blocked_rules} blocked rules, '
+            f'got {summary.get("blocked_rules")}'
+        )
 
     rules=canonical["rules"]
     if len(rules)!=summary["source_rules"]:
