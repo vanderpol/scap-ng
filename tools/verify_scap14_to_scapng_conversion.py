@@ -41,6 +41,22 @@ def main() -> int:
     if len(rules)!=summary["source_rules"]:
         failures.append("canonical rule count differs from summary")
 
+    combined_profiles=load_yaml(root/"combined-rule"/"profiles.yaml")
+    split_profiles=load_yaml(root/"split-policy-assessment-binding"/"profiles.yaml")
+    for name,doc in (("combined",combined_profiles),("split",split_profiles)):
+        if doc.get("profiles")!=canonical.get("profiles",[]):
+            failures.append(f"{name} raw profiles differ from canonical")
+        if doc.get("resolved_profiles")!=canonical.get("resolved_profiles",[]):
+            failures.append(f"{name} resolved profiles differ from canonical")
+
+    combined_benchmark=load_yaml(root/"combined-rule"/"benchmark.yaml")["benchmark"]
+    split_benchmark=load_yaml(root/"split-policy-assessment-binding"/"benchmark.yaml")["benchmark"]
+    expected_platforms=canonical.get("benchmark",{}).get("platforms",[])
+    if combined_benchmark.get("platforms",[])!=expected_platforms:
+        failures.append("combined benchmark platforms differ from canonical")
+    if split_benchmark.get("platforms",[])!=expected_platforms:
+        failures.append("split benchmark platforms differ from canonical")
+
     combined_groups=load_yaml(root/"combined-rule"/"groups.yaml")
     split_groups=load_yaml(root/"split-policy-assessment-binding"/"groups.yaml")
     if combined_groups.get("groups")!=canonical.get("groups",[]):
