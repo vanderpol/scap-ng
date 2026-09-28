@@ -595,6 +595,25 @@ def cpe_platform_definitions(benchmark) -> list[dict]:
     return out
 
 
+def bind_applicability_check_facts(node: dict | None, definition_ids: set[str]) -> dict | None:
+    if node is None:
+        return None
+    out=json.loads(json.dumps(node))
+    if out.get("kind")=="check_fact":
+        definition_id=out.get("id_ref")
+        if out.get("system")=="http://oval.mitre.org/XMLSchema/oval-definitions-5":
+            out["definition_binding"]={
+                "source":"applicability_oval_ir",
+                "definition_id":definition_id,
+                "status":"resolved" if definition_id in definition_ids else "unresolved",
+            }
+    for child in out.get("children",[]):
+        bound=bind_applicability_check_facts(child,definition_ids)
+        child.clear()
+        child.update(bound or {})
+    return out
+
+
 def bind_platform_refs(refs: list[str], definitions: list[dict]) -> list[dict]:
     by_id={x["id"]:x for x in definitions if x.get("id")}
     out=[]
@@ -756,6 +775,14 @@ def main() -> int:
     manifest_path = args.split_root / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     oval_ir, split_diag = load_rule_ir(args.split_root, manifest)
+    applicability_diag=manifest.get("applicability",{})
+    applicability_ir=None
+    if applicability_diag.get("status")=="split_valid":
+        app_path=args.split_root/Path(applicability_diag["path"]).parent/"oval-ir.json"
+        if not app_path.exists():
+            raise FileNotFoundError(f"missing applicability OVAL IR: {app_path}")
+        applicability_ir=json.loads(app_path.read_text(encoding="utf-8"))
+    applicability_definition_ids=set(applicability_diag.get("definition_ids",[]))
 
     component_id, benchmark = benchmarks[0]
     benchmark_platform_refs=platforms(benchmark)
@@ -777,6 +804,23 @@ def main() -> int:
         profile["effective_platform_refs"]=(
             profile["platforms"] if profile["platforms"] else list(benchmark_platform_refs)
         )
+        profile["effective_platforms"]=bind_platform_refs(
+            profile["effective_platform_refs"],platform_definitions
+        )
+    for rule in rules:
+        rule["effective_platforms"]=bind_platform_refs(
+            rule["effective_platform_refs"],platform_definitions
+        )
+    for group in groups:
+        group["effective_platforms"]=bind_platform_refs(
+            group["effective_platform_refs"],platform_definitions
+        )
+    for platform in platform_definitions:
+        platform["expression"]=bind_applicability_check_facts(
+            platform.get("expression"),applicability_definition_ids
+        )
+    # Refresh effective bound platform expressions after check-fact annotation.
+    for profile in profiles:
         profile["effective_platforms"]=bind_platform_refs(
             profile["effective_platform_refs"],platform_definitions
         )
@@ -858,6 +902,10 @@ def main() -> int:
             "source_tree": split.xccdf_node(benchmark),
         },
         "platform_definitions":platform_definitions,
+        "applicability":{
+            "diagnostic":applicability_diag,
+            "oval_ir":applicability_ir,
+        },
         "processing_plan":processing_plan,
         "profiles": profiles,
         "resolved_profiles": resolved_profiles,
@@ -868,6 +916,8 @@ def main() -> int:
             "rules": len(joined_rules),
             "groups":len(groups),
             "platform_definitions":len(platform_definitions),
+            "applicability_oval_definitions":len(applicability_definition_ids),
+            "applicability_ir_present":applicability_ir is not None,
             "traversal_items":len(traversal),
             "local_platform_refs":sum(
                 1 for ref in benchmark_platform_refs if ref.startswith("#")
