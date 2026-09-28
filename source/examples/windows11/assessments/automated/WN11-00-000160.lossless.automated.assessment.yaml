@@ -1,0 +1,105 @@
+# Stage-1 lossless conversion of the source OVAL behavior.
+# Root OVAL definition: oval:mil.disa.stig.windows11:def:253286
+# The nested Boolean structure below intentionally preserves the source
+# Definition/extend_definition logic instead of algebraically simplifying it.
+assessment:
+  id: windows11.WN11-00-000160.lossless
+  mode: automated
+
+  collect:
+    smb1_optional_feature:
+      capability: windows.wmi57
+      select:
+        namespace:
+          equals: 'root\cimv2'
+        wql:
+          equals: "SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'"
+      fields:
+        - installstate
+      # Source OVAL test: oval:mil.disa.stig.win:tst:25328600
+      # Source OVAL object: oval:mil.disa.stig.win:obj:25328600
+
+    smb1_server_registry:
+      capability: windows.registry
+      select:
+        hive:
+          equals: HKEY_LOCAL_MACHINE
+        key:
+          equals: 'SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters'
+        name:
+          equals: SMB1
+      fields: [hive, key, name, type, value]
+      # Source OVAL test: oval:mil.disa.stig.win:tst:25328700
+      # Source OVAL object: oval:mil.disa.stig.win:obj:25328700
+
+    smb1_client_driver_registry:
+      capability: windows.registry
+      select:
+        hive:
+          equals: HKEY_LOCAL_MACHINE
+        key:
+          equals: 'SYSTEM\CurrentControlSet\Services\mrxsmb10'
+        name:
+          equals: Start
+      fields: [hive, key, name, type, value]
+      # Source OVAL test: oval:mil.disa.stig.win:tst:25328800
+      # Source OVAL object: oval:mil.disa.stig.win:obj:25328800
+
+  assertions:
+    feature_not_installed:
+      source: smb1_optional_feature
+      existence: all_exist
+      check: all
+      condition:
+        record:
+          fields:
+            installstate:
+              datatype: string
+              entity_check: at_least_one
+              equals: '2'
+      # Source OVAL state: oval:mil.disa.stig.win:ste:25328600
+
+    server_disabled:
+      source: smb1_server_registry
+      existence: at_least_one_exists
+      check: all
+      condition:
+        all_of:
+          - field: type
+            equals: reg_dword
+          - field: value
+            datatype: integer
+            equals: 0
+      # Source OVAL state: oval:mil.disa.stig.win:ste:20000000
+
+    client_driver_disabled:
+      source: smb1_client_driver_registry
+      existence: at_least_one_exists
+      check: all
+      condition:
+        all_of:
+          - field: type
+            equals: reg_dword
+          - field: value
+            datatype: integer
+            equals: 4
+      # Source OVAL state: oval:mil.disa.stig.win:ste:20000004
+
+  assert:
+    # oval:mil.disa.stig.defs:def:253286
+    any_of:
+      - assertion: feature_not_installed
+      - all_of:
+          # oval:mil.disa.stig.defs:def:253287
+          - any_of:
+              - assertion: feature_not_installed
+              - assertion: server_disabled
+          # oval:mil.disa.stig.defs:def:253288
+          - any_of:
+              - assertion: feature_not_installed
+              - assertion: client_driver_disabled
+
+  results:
+    failure_examples:
+      maximum: 10
+      include_reason: true
