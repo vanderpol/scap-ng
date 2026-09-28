@@ -45,6 +45,12 @@ def combined_members(root: Path, package_type: str):
         "groups.json":load(root/"groups.yaml"),
         "values.json":load(root/"values.yaml"),
     }
+    applicability_path=root/"applicability.yaml"
+    if applicability_path.exists():
+        applicability=load(applicability_path)
+        if applicability.get("migration",{}).get("status")=="unsupported":
+            raise ValueError("unsupported applicability assessment cannot enter package")
+        members["applicability.json"]=applicability
     for path in sorted((root/"rules").glob("*.yaml")):
         doc=load(path)
         if package_type=="policy-only":
@@ -64,6 +70,13 @@ def split_members(root: Path, package_type: str):
         "groups.json":load(root/"groups.yaml"),
         "values.json":load(root/"values.yaml"),
     }
+    applicability_path=root/"applicability.yaml"
+    if applicability_path.exists():
+        applicability=load(applicability_path)
+        if applicability.get("migration",{}).get("status")=="unsupported":
+            raise ValueError("unsupported applicability assessment cannot enter package")
+        members["applicability.json"]=applicability
+
     rule_ids=set()
     for path in sorted((root/"policy"/"rules").glob("*.yaml")):
         doc=load(path)
