@@ -21,10 +21,43 @@ SCAP-NG SHALL separate:
 
 These concepts SHALL NOT be conflated.
 
+## Compliance threshold versus evidence target
+
+The number of retained or characterized failure examples SHALL NOT be interpreted
+as the number of failures required for the Assessment to fail.
+
+For an assertion such as "all matching files must be owned by root", the
+compliance threshold is zero failures. The first real failure is sufficient to
+establish a fail result.
+
+A separate evidence target MAY request additional failing examples for human
+diagnosis and result reporting.
+
+For example:
+
+    assert:
+      all:
+        ...
+
+    results:
+      failure_examples:
+        target: 20
+
+The value `20` above means "attempt to retain up to 20 useful failure
+examples." It does NOT mean "fail only after 20 failures."
+
+A native syntax SHOULD avoid names such as `stop_after_failures` when they can
+be misread as a compliance threshold.
+
+If the policy itself legitimately permits a non-zero number or percentage of
+violations, that tolerance SHALL be expressed explicitly in the assertion
+semantics, not in evidence-retention settings.
+
 ## Short-circuit evaluation
 
 A scanner MAY stop evaluating additional items once the logical result is
-decisively known and any required evidence-retention threshold has been met.
+decisively known and any requested characterization/evidence target has been
+met.
 
 For an `all` assertion, one failure can prove the assertion false.
 
@@ -42,13 +75,14 @@ valid and the result records that evaluation was truncated.
 
 Hidden defaults are prohibited.
 
-If an Assessment requests a failure-characterization threshold, that threshold
-SHALL be explicit in source.
+If an Assessment requests a number of failure examples for characterization,
+that number SHALL be explicit in source.
 
 Illustrative source:
 
-    evaluation:
-      stop_after_failures: 20
+    results:
+      failure_examples:
+        target: 20
 
 The exact final syntax remains under design.
 
@@ -98,8 +132,9 @@ message suitable for:
 Example:
 
     message: >
-      At least 20 files are not owned by root; evaluation stopped after the
-      configured failure limit.
+      FAIL: The requirement allows zero ownership failures. At least 20 files
+      were found not owned by root; additional population evaluation was not
+      required to establish failure.
 
 The message SHALL be derived from authoritative Assessment/result data.
 
@@ -127,7 +162,7 @@ For example:
 
     evidence:
       failures:
-        total:
+        known:
           at_least: 20
         returned: 3
         truncated: true
@@ -155,18 +190,17 @@ For example:
 
 The exact result serialization remains under design.
 
-## Evidence threshold
+## Evidence target
 
 Assessment content SHOULD be able to request:
 
 - which fields are useful to retain as evidence;
 - how many passing examples, if any, are useful;
-- how many failing examples SHOULD be retained before short-circuiting or
-  truncating characterization.
+- how many failing examples SHOULD be retained for diagnosis.
 
 The scanner/runtime MAY enforce a stricter result-size or resource safety cap.
 
-If the scanner reduces the requested evidence count, it SHALL report the
+If the scanner reduces the requested evidence target, it SHALL report the
 effective cap and truncation reason.
 
 A failure caused by an item-level assertion SHOULD normally retain multiple
@@ -225,17 +259,18 @@ For an assertion that all matching files must be owned by root:
 
     result: fail
     message: >
-      At least 20 files are not owned by root; evaluation stopped after the
-      configured failure limit.
+      FAIL: The requirement allows zero ownership failures. At least 20 files
+      were found not owned by root; 20 examples were retained.
 
     evaluation:
       logical_complete: true
       population_complete: false
-      stop_reason: failure_limit
+      stop_reason: evidence_target_satisfied
       evaluated: 1847
 
     summary:
-      failed:
+      permitted_failures: 0
+      observed_failures:
         at_least: 20
 
     evidence:
@@ -256,6 +291,8 @@ because it participated in evaluation.
 Assessment authors SHOULD be able to state the minimum useful evidence contract,
 while scanner/runtime policy retains authority to enforce resource safety
 limits.
+
+Evidence targets SHALL NOT be used to encode compliance thresholds.
 
 This design is intended to support both high-volume compliance scanning and
 concise operational integrations such as SCC -> Splunk / Elastic.
