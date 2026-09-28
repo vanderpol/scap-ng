@@ -15,6 +15,9 @@ Iteration-specific data and conclusions belong under `research/iterations/<NNN>/
 - `scap14_to_scapng.py` — generic benchmark compiler that renders the same migrated semantics into combined-rule and split policy/assessment/binding candidate layouts.
 - `verify_scap14_to_scapng_conversion.py` — checks rule accounting and semantic equivalence between the candidate renderings.
 - `build_oval_schema_semantic_catalog.py` — schema-derived OVAL construct/deprecation catalog with checked-in OVAL governance reinstatement overrides.
+- `analyze_scapng_assessment_reuse.py` — maps rules across converted benchmarks using normalized Check Text and full OVAL semantic equivalence, measures exact reuse and parameterization candidates, and reports maintenance-unit savings.
+- `render_scapng_reuse_views.py` — renders measured exact reuse groups as combined shared-rule overlays, split shared assessments/bindings, and Ansible-inspired shared assessments/bindings.
+- `test_scapng_assessment_reuse.py` — regression tests for exact semantic fingerprints, literal-only parameterization candidates, and rule-alignment evidence.
 
 The migration tools are shared infrastructure rather than iteration-001-only experiments. Iteration-specific workflows and evidence may invoke them, but later iterations should reuse the same implementations rather than fork them.
 
