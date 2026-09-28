@@ -20,6 +20,7 @@ Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content
 - `oval-self-assertion-findings.md` — separate OVAL 5.12.3 language-conformance findings from the pinned Self-Assertion corpus.
 - `scap14-public-corpus-conversion-requirement.md` — hard pre-specification conversion gates for the versioned public SCAP 1.4 corpus.
 - `semantic-ir.md` — one faithful SCAP 1.4 semantic model feeding all authoring/rendering formats.
+- `four-anchor-reuse-methodology.md` — rule mapping, exact assessment reuse, parameterization-candidate, and maintenance-cost methodology across RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025.
 - `public-corpus-manifest.yaml` — pinned public sources used for repeatable conversion coverage.
 - `prototypes/full-benchmarks/` — primary file-oriented benchmark prototypes, results, and signed bundles.
 - `feedback/` — questionnaire, response template, response evidence, and decision register.
