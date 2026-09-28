@@ -8,6 +8,7 @@ on:
       - "tools/oval_semantic_ir.py"
       - "tools/scap14_rule_splitter.py"
       - "tools/scap14_benchmark_ir.py"
+      - "tools/test_xccdf_profile_resolution.py"
       - "tools/scap14_to_scapng.py"
       - "tools/verify_scap14_to_scapng_conversion.py"
       - "tools/build_scapng_from_converted_source.py"
@@ -78,6 +79,9 @@ jobs:
               --fail-on-unresolved
           done < <(find work/rhel9-split -name oval.xml -print0 | sort -z)
 
+      - name: Test XCCDF profile resolution semantics
+        run: python scap-ng/tools/test_xccdf_profile_resolution.py
+
       - name: Build unified XCCDF plus OVAL benchmark IR
         run: |
           python scap-ng/tools/scap14_benchmark_ir.py \
@@ -122,6 +126,7 @@ jobs:
           cp work/rhel9-packages/package-metrics.json "$dst/"
           cp work/rhel9-scapng/combined-rule/benchmark.yaml "$dst/combined-benchmark.yaml"
           cp work/rhel9-scapng/split-policy-assessment-binding/benchmark.yaml "$dst/split-benchmark.yaml"
+          cp work/rhel9-scapng/combined-rule/profiles.yaml "$dst/profiles.yaml"
 
           simple="xccdf_mil.disa.stig_rule_SV-257777r1155676_rule"
           complex="xccdf_mil.disa.stig_rule_SV-258179r1155601_rule"
