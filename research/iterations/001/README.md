@@ -23,6 +23,7 @@ Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content
 - `four-anchor-reuse-methodology.md` — rule mapping, exact assessment reuse, parameterization-candidate, and maintenance-cost methodology across RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025.
 - `public-corpus-manifest.yaml` — pinned public sources used for repeatable conversion coverage.
 - `prototypes/full-benchmarks/` — primary file-oriented benchmark prototypes, results, and signed bundles.
+- `board-review/` — internal evidence package for comparing the three candidate YAML forms using four real published benchmarks, measured reuse, Windows migration blockers, and decision questions.
 - `feedback/` — questionnaire, response template, response evidence, and decision register.
 - `notes/` — supporting observations.
 - `tools/` — iteration-specific package build, splitting, semantic-IR, normalization, and rendering tooling.
