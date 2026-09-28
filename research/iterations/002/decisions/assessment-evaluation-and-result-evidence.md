@@ -21,14 +21,13 @@ SCAP-NG SHALL separate:
 
 These concepts SHALL NOT be conflated.
 
-## Compliance threshold versus evidence target
+## Compliance semantics versus evidence target
 
 The number of retained or characterized failure examples SHALL NOT be interpreted
 as the number of failures required for the Assessment to fail.
 
-For an assertion such as "all matching files must be owned by root", the
-compliance threshold is zero failures. The first real failure is sufficient to
-establish a fail result.
+For an assertion such as "all matching files must be owned by root", the first
+real violation establishes a fail result.
 
 A separate evidence target MAY request additional failing examples for human
 diagnosis and result reporting.
@@ -101,21 +100,34 @@ Example:
     population_complete: false
     evidence_complete: false
 
-A short-circuited result SHALL NOT report an exact total failure count when the
-remaining population was not evaluated.
+## Observed versus actual failure counts
 
-Instead, it SHALL express a lower bound or otherwise make incompleteness clear.
+SCAP-NG SHALL distinguish the number of violations actually encountered from
+the total number of violations in the complete in-scope population.
 
-Example:
+`observed_failures` is the exact number of failing items encountered before
+evaluation ended.
 
-    failed:
-      at_least: 20
+`actual_failures` is the exact total number of failing items in the complete
+population. If the population was not fully evaluated, `actual_failures`
+SHALL be `unknown`.
 
-not:
+Example after short-circuiting on an evidence target:
 
-    failed: 20
+    summary:
+      observed_failures: 20
+      actual_failures: unknown
 
-unless 20 is known to be the complete count.
+Example after complete population evaluation:
+
+    summary:
+      observed_failures: 19
+      actual_failures: 19
+
+The result SHALL NOT imply that the evidence target is a pass/fail threshold.
+If even one observed violation is sufficient to prove the assertion false, the
+result is `fail` regardless of whether the requested evidence target was
+reached.
 
 ## Concise deterministic result message
 
@@ -129,12 +141,21 @@ message suitable for:
 - STIG Viewer comments;
 - API clients.
 
-Example:
+The specification SHOULD define deterministic message-generation requirements
+for standard assertion/result patterns so scanner implementations do not invent
+incompatible interpretations.
+
+Example for short-circuited failure:
 
     message: >
-      FAIL: The requirement allows zero ownership failures. At least 20 files
-      were found not owned by root; additional population evaluation was not
-      required to establish failure.
+      FAIL: 20 files were observed with incorrect ownership; total failures are
+      unknown because evaluation stopped after the requested evidence sample was
+      collected.
+
+Example when the complete population contains 19 failures:
+
+    message: >
+      FAIL: 19 files were found with incorrect ownership.
 
 The message SHALL be derived from authoritative Assessment/result data.
 
@@ -162,8 +183,6 @@ For example:
 
     evidence:
       failures:
-        known:
-          at_least: 20
         returned: 3
         truncated: true
         items:
@@ -215,10 +234,11 @@ aggregate counters such as:
 
 - evaluated items;
 - passing items;
-- failing items;
+- observed failing items;
+- actual failing items, when known;
 - retained evidence items.
 
-Counts SHALL identify whether they are exact or lower bounds.
+Counts SHALL distinguish observations from complete-population totals.
 
 ## Structured evidence versus human-readable explanation
 
@@ -259,8 +279,9 @@ For an assertion that all matching files must be owned by root:
 
     result: fail
     message: >
-      FAIL: The requirement allows zero ownership failures. At least 20 files
-      were found not owned by root; 20 examples were retained.
+      FAIL: 20 files were observed with incorrect ownership; total failures are
+      unknown because evaluation stopped after the requested evidence sample
+      was collected.
 
     evaluation:
       logical_complete: true
@@ -269,9 +290,8 @@ For an assertion that all matching files must be owned by root:
       evaluated: 1847
 
     summary:
-      permitted_failures: 0
-      observed_failures:
-        at_least: 20
+      observed_failures: 20
+      actual_failures: unknown
 
     evidence:
       failures:
