@@ -1,0 +1,42 @@
+# Design-review sample derived from RHEL 9 V2R9 / RHEL-09-253070.
+# Source OVAL: oval:mil.disa.stig.rhel9os:def:257969
+# OVAL closure: 2 definitions, 1 test, 1 object, 1 state, 0 variables.
+
+assessment:
+  id: rhel9.RHEL-09-253070
+  mode: automated
+
+  collect:
+    redirect_default:
+      capability: unix.sysctl
+
+      select:
+        name:
+          equals: net.ipv4.conf.default.send_redirects
+
+      fields:
+        - name
+        - value
+
+  assert:
+    source: redirect_default
+
+    # OVAL omitted check_existence, whose inherited/default behavior is
+    # effectively "at least one". NG makes that visible.
+    existence: at_least_one
+
+    # OVAL check="all".
+    quantifier: all
+
+    condition:
+      field: value
+      datatype: integer
+      equals: 0
+
+  results:
+    failure_examples:
+      maximum: 3
+      fields:
+        - name
+        - value
+      include_reason: true

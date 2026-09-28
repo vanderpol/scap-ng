@@ -1,0 +1,296 @@
+# Provisional canonical SCAP-NG result-package example.
+# Rule/Assessment semantics are derived from the RHEL 9 V2R9 design-review
+# samples. Target, scanner, timestamps, and collected values are simulated.
+
+results:
+  run:
+    id: 8f0a4d62-91a9-4f4c-9d38-7ec4938a1701
+    started: 2026-09-28T13:40:00-04:00
+    completed: 2026-09-28T13:40:47-04:00
+
+  scanner:
+    name: scap-ng-design-simulator
+    version: 0.0-prototype
+
+  target:
+    primary_id:
+      type: smbios_uuid
+      value: 11111111-2222-3333-4444-555555555555
+
+    identifiers:
+      - type: smbios_uuid
+        value: 11111111-2222-3333-4444-555555555555
+
+    hostname: rhel9-test01.example.mil
+    addresses:
+      - 192.0.2.25
+      - 2001:db8::25
+
+    os:
+      family: linux
+      product: Red Hat Enterprise Linux
+      major_version: 9
+      version: "9.6"
+      architecture: x86_64
+
+    platform:
+      id: rhel.9
+
+  benchmark:
+    id: disa.rhel9.stig
+    title: Red Hat Enterprise Linux 9 Security Technical Implementation Guide
+    version: V2R9
+    source_revision: 13
+    publisher:
+      name: Defense Information Systems Agency
+      short_name: DISA
+
+    selection:
+      type: explicit_rules
+      rules:
+        - RHEL-09-215020
+        - RHEL-09-232190
+
+  summary:
+    rules:
+      total: 2
+      pass: 1
+      fail: 1
+      not_applicable: 0
+      not_checked: 0
+      error: 0
+
+    failures_by_severity:
+      high: 0
+      medium: 1
+      low: 0
+
+    outcomes_by_severity:
+      medium:
+        pass: 1
+        fail: 1
+
+    publisher_summary:
+      disa:
+        cat_i_failures: 0
+        cat_ii_failures: 1
+        cat_iii_failures: 0
+
+    failure_reasons:
+      value_mismatch: 1
+
+  rule_results:
+    - rule:
+        id: RHEL-09-215020
+        title: RHEL 9 must not have the sendmail package installed.
+        severity: medium
+        identifiers:
+          - scheme: disa-vuln-id
+            value: V-257827
+          - scheme: disa-rule-id
+            value: SV-257827r1044892_rule
+          - scheme: cci
+            value: CCI-000381
+
+      assessment:
+        id: rhel9.RHEL-09-215020
+        mode: automated
+
+      outcome: pass
+      message: "PASS: The sendmail package is not installed."
+
+      evaluation:
+        logical_complete: true
+        population_complete: true
+        evidence_complete: true
+        evaluated_items: 0
+
+      summary:
+        observed_failures: 0
+        actual_failures: 0
+
+    - rule:
+        id: RHEL-09-232190
+        title: RHEL 9 system commands must be owned by root.
+        severity: medium
+        identifiers:
+          - scheme: disa-vuln-id
+            value: V-257918
+          - scheme: disa-rule-id
+            value: SV-257918r1044977_rule
+          - scheme: cci
+            value: CCI-001499
+
+      assessment:
+        id: rhel9.RHEL-09-232190
+        mode: automated
+
+      outcome: fail
+      message: >-
+        FAIL: 20 system-command files were observed with non-root ownership;
+        total failures are unknown because evaluation stopped after the maximum
+        requested failure evidence was collected.
+
+      failure_reason:
+        kind: value_mismatch
+        source: system_commands
+        field: user_id
+        expected:
+          equals: 0
+
+      evaluation:
+        logical_complete: true
+        population_complete: false
+        evidence_complete: false
+        stop_reason: evidence_maximum_reached
+        evaluated_items: 1847
+
+      summary:
+        observed_failures: 20
+        actual_failures: unknown
+
+      evidence:
+        failures:
+          returned: 20
+          truncated_population: true
+          items:
+          - path: /usr/local/bin/example-command-01
+            filename: example-command-01
+            actual:
+              user_id: 1001
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-02
+            filename: example-command-02
+            actual:
+              user_id: 1002
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-03
+            filename: example-command-03
+            actual:
+              user_id: 1003
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-04
+            filename: example-command-04
+            actual:
+              user_id: 1004
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-05
+            filename: example-command-05
+            actual:
+              user_id: 1005
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-06
+            filename: example-command-06
+            actual:
+              user_id: 1006
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-07
+            filename: example-command-07
+            actual:
+              user_id: 1007
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-08
+            filename: example-command-08
+            actual:
+              user_id: 1008
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-09
+            filename: example-command-09
+            actual:
+              user_id: 1009
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-10
+            filename: example-command-10
+            actual:
+              user_id: 1010
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-11
+            filename: example-command-11
+            actual:
+              user_id: 1011
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-12
+            filename: example-command-12
+            actual:
+              user_id: 1012
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-13
+            filename: example-command-13
+            actual:
+              user_id: 1013
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-14
+            filename: example-command-14
+            actual:
+              user_id: 1014
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-15
+            filename: example-command-15
+            actual:
+              user_id: 1015
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-16
+            filename: example-command-16
+            actual:
+              user_id: 1016
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-17
+            filename: example-command-17
+            actual:
+              user_id: 1017
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-18
+            filename: example-command-18
+            actual:
+              user_id: 1018
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-19
+            filename: example-command-19
+            actual:
+              user_id: 1019
+            expected:
+              user_id: 0
+            reason: file owner is not root
+          - path: /usr/local/bin/example-command-20
+            filename: example-command-20
+            actual:
+              user_id: 1020
+            expected:
+              user_id: 0
+            reason: file owner is not root

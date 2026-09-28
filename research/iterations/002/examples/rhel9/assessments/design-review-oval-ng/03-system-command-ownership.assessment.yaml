@@ -1,0 +1,67 @@
+# Design-review sample derived from RHEL 9 V2R9 / RHEL-09-232190.
+# Source OVAL: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257918
+# OVAL closure: 1 definition, 1 test, 1 object, 3 filter states, 1 variable.
+#
+# The source OVAL collects only violating files (it filters out root-owned
+# files, directories, and symbolic links) and then requires none to exist.
+# This NG candidate expresses the policy directly: inspect in-scope files and
+# require every one to be owned by root.
+
+assessment:
+  id: rhel9.RHEL-09-232190
+  mode: automated
+
+  collect:
+    system_commands:
+      capability: unix.file
+
+      select:
+        roots:
+          any_of:
+            - /bin
+            - /sbin
+            - /usr/bin
+            - /usr/libexec
+            - /usr/sbin
+            - /usr/local/bin
+            - /usr/local/sbin
+
+        recursive: true
+
+        filename:
+          pattern: ".*"
+
+        exclude:
+          - field: type
+            equals: directory
+          - field: type
+            equals: symbolic_link
+
+      fields:
+        - path
+        - filename
+        - type
+        - user_id
+
+  assert:
+    source: system_commands
+
+    # The source OVAL passes if no violating files exist, including the
+    # degenerate case where no in-scope files are found. Make that explicit.
+    existence: zero_or_more
+
+    quantifier: all
+
+    condition:
+      field: user_id
+      datatype: integer
+      equals: 0
+
+  results:
+    failure_examples:
+      maximum: 20
+      fields:
+        - path
+        - filename
+        - user_id
+      include_reason: true

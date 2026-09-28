@@ -1,0 +1,67 @@
+# Review prototype: a small RHEL 9 policy model used to exercise
+# Benchmark/Profile/Group/Parameter semantics. It is not a replacement for the
+# complete DISA RHEL 9 STIG benchmark.
+
+benchmark:
+  id: disa.rhel9.stig
+  version: V2R9
+  title: Red Hat Enterprise Linux 9 Security Technical Implementation Guide
+  status: review-prototype
+
+  publisher:
+    name: Defense Information Systems Agency
+    short_name: DISA
+
+  platform: rhel.9
+
+  identifiers:
+    - scheme: disa-benchmark
+      value: RHEL_9_STIG
+
+  parameters:
+    password_minimum_length:
+      title: Required minimum password length
+      type: integer
+      requirement: publisher
+      value: 15
+      constraints:
+        minimum: 1
+
+    approved_time_sources:
+      title: Organization-approved time sources
+      type: set<string>
+      requirement: organizational
+      required: true
+      value: unresolved
+
+  groups:
+    - id: boot-security
+      title: Boot Security
+      rules:
+        - RHEL-09-212030
+
+    - id: authentication
+      title: Authentication
+      groups:
+        - id: password-policy
+          title: Password Policy
+          rules:
+            - example.password-minimum-length
+
+    - id: time-synchronization
+      title: Time Synchronization
+      rules:
+        - example.approved-time-sources
+
+    - id: needs-grouping
+      title: Needs Manual Grouping
+      review_required: true
+      rules: []
+
+  rules:
+    - file: policy/RHEL-09-212030.yaml
+    - file: policy/example-password-minimum-length.yaml
+    - file: policy/example-approved-time-sources.yaml
+
+  profiles:
+    - file: profiles/disa-stig.yaml

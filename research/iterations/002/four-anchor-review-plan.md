@@ -1,7 +1,7 @@
 # Iteration 002 Four-Anchor Source Review Plan
 
 **Status:** active  
-**Scope:** source design only
+**Scope:** complete benchmark-layer conversion; assessment conversion deferred
 
 Iteration 002 keeps four real STIG anchors:
 
@@ -10,8 +10,10 @@ Iteration 002 keeps four real STIG anchors:
 - Windows 11
 - Windows Server 2025
 
-The anchors are used to design and review native SCAP-NG source. They are not
-being regenerated as complete distributable benchmarks during this phase.
+The anchors are used to design and review native SCAP-NG source. The complete
+XCCDF benchmark/policy layer for each anchor is now in scope. Complete
+Assessment Method conversion, final packaging, and signing remain out of scope
+for this checkpoint.
 
 ## Why keep all four
 
@@ -24,32 +26,58 @@ They also exercise different mature OVAL families and applicability patterns.
 
 This lets us review:
 
-- shared assessments across related benchmarks;
-- benchmark-level applicability;
+- complete Benchmark and Rule inventories;
+- Profile normalization and selection semantics;
+- meaningful versus mechanically inherited Group structure;
+- benchmark-level platform targeting;
 - rule-level applicability;
-- Unix/Linux collectors;
-- Windows collectors;
-- simple assertions;
-- complex variable/data-flow cases;
-- manual checks;
-- policy-to-assessment bindings.
+- shared applicability concepts across related benchmarks;
+- Rule identity and revision normalization;
+- Parameter/Value migration where present;
+- future shared assessments across related benchmarks;
+- Unix/Linux and Windows assessment families once that layer is addressed.
 
-## Source-selection rule
+## Benchmark-layer conversion rule
 
-Only include an example when it teaches us something about the authoring model.
+Each anchor SHALL be converted completely at the XCCDF policy layer.
 
-Do not generate hundreds of files for completeness.
+The benchmark conversion SHOULD include, as applicable:
 
-For each anchor, select a small set covering:
+1. Benchmark identity, publisher, version/revision, and external identifiers;
+2. every source Rule represented by stable native Rule identity;
+3. Rule title, severity, revision, external identifiers, and required
+   applicability references needed to review the Benchmark model;
+4. every publisher Profile, normalized to canonical SCAP-NG semantics;
+5. source Values mapped to Parameters where present;
+6. meaningful Groups when the source contains them or when conservative
+   grouping can be justified;
+7. source platform/applicability distinctions necessary to avoid changing
+   effective policy.
 
-1. one very simple assessment;
-2. one moderately complex assessment;
-3. one complex OVAL variable/data-flow case where applicable;
-4. benchmark-level applicability;
-5. rule-level applicability;
-6. at least one assessment shared with its paired benchmark;
-7. one case where policy aligns but the technical assessment differs;
-8. one manual assessment where useful.
+Executable compliance Assessment Methods are not required at this checkpoint.
+
+Source constructs that cannot yet be represented without deciding
+assessment-language semantics SHALL be identified for later conversion rather
+than silently guessed.
+
+## Profile rule-selection rule
+
+Benchmark membership enables a Rule by default.
+
+Profiles SHALL describe Rule-selection differences only. Native Profile
+Rule-selection is subtractive:
+
+- a Profile MAY disable Benchmark Rules;
+- a Profile SHALL NOT explicitly enable a Rule;
+- a Profile SHALL NOT introduce a Rule not already in the Benchmark;
+- a Profile with no Rule-selection difference contains no Rule-selection state;
+- source XCCDF positive selections that merely restate Benchmark defaults are
+  removed during up-conversion.
+
+See
+[`decisions/profile-rule-selection.md`](decisions/profile-rule-selection.md)
+for the complete normative rule, inheritance constraints, migration behavior,
+and RHEL 9 evidence.
 
 ## Working layout
 
@@ -84,19 +112,25 @@ applicability condition reusable across Windows versions. Likewise,
 `windows.server-2025` is a platform and `windows.domain-controller` is a
 separate reusable applicability condition.
 
+When legacy source logic combines platform identity with another condition and
+the assessment semantics have not yet been reviewed, preserve the distinction
+as requiring classification rather than inventing a decomposition.
+
 ## Native-source rules
 
 - Keep executable source free of XCCDF/OVAL/OCIL runtime references.
-- Use OVAL-aligned capability families such as `unix.file`,
-  `windows.registry`, and `linux.rpminfo`.
-- Treat historical numeric suffixes as an OVAL Board naming decision.
-- Applicability uses the same assessment language as compliance checks.
-- Platform/CPE names are identifiers, not scanner-side truth.
-- Use meaningful local identifiers.
+- Keep machine migration provenance outside executable source.
+- Use stable native Rule identities with source identifiers preserved as
+  identifiers/provenance rather than overloaded runtime IDs.
 - Prefer concise defaults over repeating obvious mechanics.
-- Preserve complex semantics only where the actual assessment requires them.
-- Human provenance comments are optional.
-- Machine provenance stays outside executable source.
+- Benchmark membership implies Rule enablement.
+- Profiles serialize only actual disable deltas.
+- Do not recreate one-Rule XCCDF wrapper Groups merely for structural fidelity.
+- Preserve required platform and applicability meaning even when executable
+  implementations are deferred.
+- Use OVAL-aligned capability families when Assessment Methods are added.
+- Preserve complex semantics only where the underlying assessment actually
+  requires them.
 
 ## Explicitly out of scope for now
 
@@ -105,9 +139,9 @@ Until the source model is approved:
 - final distribution packages;
 - signing;
 - package manifests;
-- full benchmark regeneration;
+- complete OVAL-to-NG compliance Assessment Method conversion;
 - reference scanner implementation;
-- broad-corpus generation.
+- broad-corpus generation beyond the four anchor benchmarks.
 
 ## Design authority during iteration 002
 
@@ -116,13 +150,15 @@ The source format is intentionally open to redesign.
 The working approach is:
 
 1. start from the real semantic requirement;
-2. preserve OVAL lessons that still matter;
-3. remove legacy structure that does not improve clarity or correctness;
+2. preserve OVAL/XCCDF lessons that still matter;
+3. remove legacy structure and expansion that do not improve clarity or
+   correctness;
 4. choose the smallest readable native syntax that remains deterministic;
-5. compare simple and complex cases side by side;
-6. change the syntax freely while 002 is still a design iteration.
+5. validate decisions against the complete four-anchor benchmark layer;
+6. compare simple and complex cases side by side;
+7. change the syntax freely while 002 is still a design iteration.
 
-Questions should be escalated only when a choice materially changes semantics,
+Questions should be escalated when a choice materially changes semantics,
 authoring power, compatibility expectations, or the eventual specification.
 Routine syntax and organization decisions should be made within the iteration
 and demonstrated with concrete examples.

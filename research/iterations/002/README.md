@@ -63,10 +63,16 @@ Design source files that are:
    distinctions reflect years of deployed content. Reuse those lessons
    intentionally.
 
+8. **Profiles describe differences, not snapshots.**
+   Benchmark membership enables Rules by default. Native Profile Rule selection
+   is subtractive only and serializes only actual disable deltas. See
+   `decisions/profile-rule-selection.md`.
+
 ## Working areas
 
 - `design-principles.md` — normative direction for this iteration.
-- `examples/` — intentionally small native source examples.
+- `examples/` — native source examples, including complete benchmark-layer
+  conversions for the four anchor STIGs.
 - `decisions/` — design decisions as they stabilize.
 - `provenance/` — migration/source linkage for review examples only.
 
@@ -74,21 +80,30 @@ Nothing enters iteration 002 merely because a converter can generate it.
 Every example should be understandable and defensible as potential native
 SCAP-NG source.
 
-
 ## Source-only checkpoint
 
-Iteration 002 is currently limited to native source-language design.
+Iteration 002 remains limited to native source-language design.
 
-Until the project owner explicitly ends this checkpoint:
+The project owner has explicitly expanded this checkpoint to include complete
+**XCCDF benchmark/policy-layer conversions** of the four anchor STIGs so that
+Benchmark, Rule identity, Profile, Group, Parameter, platform, and applicability
+design can be reviewed against realistic full content.
+
+During this checkpoint:
 
 - do not build final SCAP-NG distribution packages;
 - do not add signing/release work;
 - do not build the reference scanner;
-- do not regenerate complete benchmark trees;
-- do not run broad corpus conversions merely to increase coverage;
-- use RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025 only to select
-  representative source examples, applicability cases, and reuse mappings;
-- keep examples hand-reviewable and intentionally small.
+- do not convert compliance Assessment Methods merely to complete the anchor
+  benchmarks;
+- do convert the complete XCCDF benchmark layer for RHEL 9, Oracle Linux 9,
+  Windows 11, and Windows Server 2025;
+- preserve required platform and rule applicability information, while
+  deferring the executable NG implementation of those conditions until the
+  assessment-language work;
+- use the complete anchor conversions to expose unnecessary duplication and
+  validate canonical native-source rules;
+- do not run broader corpus conversions merely to increase coverage.
 
-The current goal is agreement on what authors should write, not production of
-the final distributable form.
+The current goal remains agreement on what authors should write, not production
+of the final distributable form.
