@@ -184,6 +184,50 @@ Presentation and repository tools MAY derive convenient labels such as
 Methods. Such labels are derived views, not authoritative Rule properties.
 
 
+
+## Minimum publisher input and default manual interaction
+
+SCAP-NG SHALL assume that many publishers, including current DISA STIG
+publication workflows, may provide only human-readable Check Text for a manual
+assessment.
+
+A portable Manual Assessment therefore SHALL NOT require publisher-authored
+questionnaires, typed fields, branching logic, or explicit per-Rule choice
+mappings.
+
+The minimum Manual Assessment is:
+
+    assessment:
+      id: ...
+      mode: manual
+      procedure: >
+        ...
+
+A conforming scanner SHALL be able to present that procedure and collect a
+standard manual result without additional interaction metadata.
+
+The standard manual-result interaction SHOULD provide at least:
+
+- pass;
+- fail;
+- not_applicable.
+
+A not-yet-reviewed/not-evaluated state SHOULD also exist in the result model,
+but SHOULD NOT require the operator to select it as a completed assessment
+decision.
+
+This default interaction is part of the SCAP-NG Manual Assessment contract, not
+publisher-authored questionnaire content.
+
+Publishers or downstream content maintainers MAY add richer interaction
+metadata, including constrained choices or typed human observations, when they
+have authoritative information to do so.
+
+Converters SHALL NOT infer typed observations, choice semantics, or automated
+pass/fail logic from unstructured Check Text unless that transformation is
+explicitly reviewed. Lossless migration from XCCDF Check Text therefore
+normally produces a procedure-only Manual Assessment.
+
 ## Historical OCIL context in SCC STIG content
 
 The OCIL found in the SCC-enhanced DISA STIG SCAP packages used by this
