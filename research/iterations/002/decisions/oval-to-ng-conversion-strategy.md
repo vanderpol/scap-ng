@@ -45,7 +45,8 @@ The Stage 1 output SHOULD:
   so does not alter semantics;
 - preserve OVAL result behavior and error states;
 - preserve source anomalies and redundancies when required for equivalence;
-- retain provenance sufficient to trace native constructs back to source OVAL.
+- retain authoring-time provenance sufficient to trace native constructs back
+  to source OVAL without making historical lineage part of scanner semantics.
 
 The Stage 1 artifact establishes a regression-testable semantic baseline.
 
@@ -127,25 +128,41 @@ Stage 2 refactoring SHOULD be regression-tested against the Stage 1 baseline.
 When the source OVAL appears internally inconsistent or likely incorrect, the
 converter SHALL preserve the source behavior and record the anomaly.
 
-Tooling MAY emit a review finding such as:
+For authoring source, a concise anomaly note SHOULD normally be preserved as a
+comment adjacent to the affected content.
 
-    source_anomaly:
-      suspected: true
-      description: >
-        Repeated pattern suggests a missing b64 case, but source behavior was
-        preserved.
+Tooling SHOULD also be able to emit a separate conversion/review report with
+full machine-readable lineage and anomaly detail.
 
 A source anomaly SHALL NOT be silently corrected during lossless conversion.
 
-## Provenance
+## Historical provenance
 
-Converted NG SHOULD retain enough provenance to answer:
+Historical conversion lineage is useful for authors, reviewers, regression
+testing, and migration tooling, but it is not normally scanner semantics.
 
-- which source OVAL definition produced this Assessment;
-- which source tests/objects/states/variables contributed;
-- which OVAL defaults were made explicit;
-- whether native refactoring has occurred;
-- whether any reviewed semantic change was intentionally accepted.
+SCAP-NG authoring source SHOULD preserve concise historical provenance as
+comments where it materially helps review, for example:
+
+    # Source OVAL test: oval:...:tst:25303503
+    # Source OVAL object: oval:...:obj:25303503
+    # Source anomaly preserved: nominal b64 case resolves to b32.
+
+A converter SHOULD be able to emit a separate machine-readable conversion
+report containing complete lineage such as source Definitions, Tests, Objects,
+States, Variables, defaulted OVAL behavior, anomalies, and transformation
+history.
+
+Historical OVAL/XCCDF lineage SHALL NOT be required in the compiled
+scanner-facing Assessment object merely because the content was converted from
+legacy SCAP.
+
+The compiler SHOULD discard authoring comments from canonical scanner packages.
+
+Runtime/result provenance is a separate concern. Compiled packages and results
+MAY carry provenance needed to identify what actually executed, such as stable
+Assessment identity/version, Benchmark identity/version, scanner identity,
+effective inputs, execution timestamps, and result producer.
 
 ## Relationship to current design samples
 
