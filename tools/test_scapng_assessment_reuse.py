@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import copy
 
-from analyze_scapng_assessment_reuse import assessment_fingerprints
+from analyze_scapng_assessment_reuse import (
+    alignment_groups,
+    assessment_fingerprints,
+    digest,
+    normalize_check_text,
+)
 
 
 def assessment(prefix: str, literal: str) -> dict:
@@ -95,7 +100,34 @@ def main() -> int:
     assert d_exact!=a_exact
     assert d_shape!=a_shape, "existence semantics must not be abstracted as parameters"
 
-    print("PASS: exact reuse and parameterization-candidate fingerprints")
+    instances=[
+        {
+            "benchmark":"a","rule_id":"A-1","title":"A",
+            "check_text":normalize_check_text("Verify   setting X.\nIf not set, this is a finding."),
+            "exact_fingerprint":a_exact,
+        },
+        {
+            "benchmark":"b","rule_id":"B-1","title":"B",
+            "check_text":normalize_check_text("Verify setting X. If not set, this is a finding."),
+            "exact_fingerprint":b_exact,
+        },
+        {
+            "benchmark":"c","rule_id":"C-1","title":"C",
+            "check_text":normalize_check_text("Different check text."),
+            "exact_fingerprint":c_exact,
+        },
+    ]
+    for row in instances:
+        row["check_text_fingerprint"]=digest(row["check_text"])
+    check_groups,oval_groups,pairs=alignment_groups(instances)
+    assert len(check_groups)==1
+    assert len(oval_groups)==1
+    assert len(pairs)==1
+    assert set(pairs[0]["evidence"])=={
+        "same_normalized_check_text","equivalent_oval_semantics"
+    }
+
+    print("PASS: exact reuse, parameterization candidates, and rule alignment")
     return 0
 
 
