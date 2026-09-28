@@ -87,6 +87,8 @@ Broad benchmark expansion is paused while the native SCAP-NG authoring model is 
 - Before adding more benchmark families, agree on concise native source using the review corpus in `research/iterations/001/native-source-design-review.md`.
 - Keep XCCDF/OVAL/OCIL/CPE XML identifiers, namespaces, hrefs, and source trees in migration provenance rather than executable native source.
 - Prefer meaningful NG-local names and concise typed collect/derive/evaluate syntax.
+- Applicability is content-authored ordinary assessment logic. Anything supported by the NG assessment language may be used for applicability; do not introduce scanner-side `os_info` or other opinionated platform classification as a normative dependency.
+- CPE/platform identifiers are naming/mapping metadata unless explicitly backed by an NG applicability assessment; a CPE name alone never determines applicability.
 - Preserve exact canonical semantics behind the authoring source so simplification never weakens result accuracy.
 - Keep the four-anchor conversion workflow manual-only during this checkpoint.
 
