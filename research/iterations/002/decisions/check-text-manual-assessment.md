@@ -22,6 +22,14 @@ Assessment Methods**.
 A Rule MAY bind to one or more Assessment Methods, including manual and
 automated methods.
 
+The Rule policy SHALL NOT duplicate the Assessment Method's modality. Whether
+an Assessment Method is automated, manual, or another defined execution mode
+SHALL be declared by the Assessment Method itself.
+
+A Rule therefore references Assessment Methods by source/object reference only;
+processors and authoring tools determine each referenced method's modality by
+resolving that Assessment object.
+
 ## Rationale
 
 Policy and assessment answer different questions:
@@ -47,12 +55,43 @@ result model.
 Separating Check Text from policy allows the verification procedure to evolve
 without necessarily changing the logical Rule requirement.
 
+Keeping modality in the Assessment Method also prevents duplicated metadata
+such as:
+
+    rule:
+      automated: true
+      assessment: ../assessments/example.yaml
+
+where the referenced Assessment could later become manual or hybrid while the
+Rule's duplicated flag becomes stale.
+
 ## Authoring consequence
 
 The separation is intended to improve policy quality.
 
 Content authors SHOULD place normative requirement language in the Rule and
 procedural verification language in Assessment Methods.
+
+A Rule may therefore remain simple:
+
+    rule:
+      id: RHEL-09-000000
+      assessment: ../assessments/RHEL-09-000000.yaml
+
+and the referenced Assessment owns its execution classification, for example:
+
+    assessment:
+      id: rhel9.RHEL-09-000000
+      mode: automated
+
+or:
+
+    assessment:
+      id: rhel9.RHEL-09-000000-manual
+      mode: manual
+
+The exact field name and permitted modality vocabulary remain subject to later
+Assessment Method design review.
 
 A Manual Assessment Method SHALL NOT silently strengthen, weaken, or redefine
 the Rule to which it is bound.
@@ -63,6 +102,10 @@ institutionalize.
 
 Presentation tools MAY render a Rule and its bound Manual Assessment Method
 together so existing STIG authoring and review workflows remain familiar.
+
+Presentation and repository tools MAY derive convenient labels such as
+"automated" or "manual" for a Rule by resolving its referenced Assessment
+Methods. Such labels are derived views, not authoritative Rule properties.
 
 ## Migration from XCCDF
 
@@ -81,6 +124,11 @@ Where policy semantics can be identified deterministically and without
 interpretive repair, the converter MAY normalize them into the policy model
 while preserving the original Check Text as provenance.
 
+When source content provides both automated and manual checking methods, the
+converted Rule MAY reference both. Their execution classifications SHALL remain
+properties of the converted Assessment Methods rather than duplicated Rule
+metadata.
+
 ## SCAP 1.4 analog
 
 | SCAP-NG concept | SCAP 1.4 analog | Relationship |
@@ -88,4 +136,5 @@ while preserving the original Check Text as provenance.
 | Rule requirement | XCCDF Rule policy text | retained as policy |
 | Manual Assessment Method | XCCDF Check Text/manual check procedure | moved to assessment layer |
 | Automated Assessment Method | XCCDF check + OVAL/other checking-system content | moved to assessment layer |
+| Assessment modality | implied by XCCDF checking system / manual check form | normalized into Assessment Method metadata |
 | Rule-to-assessment binding | XCCDF Rule check association | retained with cleaner separation |
