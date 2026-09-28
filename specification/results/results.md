@@ -1,0 +1,147 @@
+# Results and Evidence
+
+**Status:** pre-alpha normative draft
+
+## 1. Separation of concerns
+
+SCAP-NG SHALL distinguish:
+
+- evaluation truth;
+- evaluation completeness;
+- result characterization;
+- retained evidence;
+- optional non-authoritative analysis.
+
+These concepts SHALL NOT be conflated.
+
+## 2. Result package
+
+A complete scan SHOULD produce a normalized result package containing run-,
+target-, Benchmark-, Profile-, scanner-, and summary-level information once per
+run and Rule-specific results for each evaluated Rule.
+
+The canonical result package need not use the same denormalized representation
+used by SIEM exports.
+
+## 3. Target identity
+
+Hostnames and IP addresses SHALL NOT be assumed to be globally unique or
+stable target identifiers.
+
+Results SHOULD support one or more typed target identifiers, such as:
+
+- SMBIOS UUID;
+- cloud instance identifier;
+- hardware serial number;
+- scanner-managed asset identifier;
+- organization-managed asset UUID.
+
+Hostname and relevant addresses SHOULD remain available as descriptive
+correlation data.
+
+## 4. Rule result self-description
+
+A Rule result SHOULD contain enough Rule context for common downstream use
+without requiring the consumer to possess the original Benchmark.
+
+This SHOULD include, as applicable:
+
+- stable Rule identity;
+- important publisher identifiers;
+- title;
+- severity;
+- outcome;
+- concise deterministic message;
+- structured failure reason;
+- bounded evidence;
+- Assessment mode;
+- Tailoring and Organizational Input provenance where relevant.
+
+The full Rule discussion, remediation, Manual Assessment procedure, and
+Assessment implementation SHOULD NOT automatically be copied into every Rule
+result.
+
+## 5. Deterministic message
+
+Every Rule result SHOULD contain a concise deterministic human-readable
+message suitable for logs, APIs, Splunk, Elastic, dashboards, and review tools.
+
+The message SHALL be derived from the same authoritative result data as the
+machine-readable outcome/failure reason.
+
+Heuristic or AI-generated analysis SHALL NOT replace the authoritative
+message.
+
+## 6. Failure reason
+
+Failed results SHOULD provide a machine-readable reason.
+
+Core reason categories SHOULD include at least concepts equivalent to:
+
+- unexpected existence;
+- required item missing;
+- required match missing;
+- value mismatch;
+- cardinality mismatch.
+
+## 7. Concrete evidence
+
+When failure is established by a concrete violating item, at least one concrete
+failing example SHALL be retained unless collection/evaluation failed before
+one could be captured.
+
+Evidence SHOULD identify what failed and why.
+
+A missing required item or condition SHALL be represented as a missing
+requirement, not as a fabricated collected object.
+
+## 8. Evidence limits and short circuiting
+
+Evidence-retention limits SHALL NOT be compliance thresholds.
+
+A scanner MAY short-circuit once the logical result is known and required
+evidence/characterization has been satisfied, provided short-circuiting cannot
+change the result.
+
+Results SHOULD distinguish:
+
+- `logical_complete`;
+- `population_complete`;
+- `evidence_complete`.
+
+If the full population was not evaluated, a total population failure count
+SHALL be reported as unknown rather than inferred from observed failures.
+
+## 9. Summary
+
+A result package SHOULD provide precomputed aggregate counters so common
+consumers are not required to scan every Rule result merely to construct a
+summary.
+
+Useful aggregates include:
+
+- total/pass/fail/not-applicable/not-evaluated/error counts;
+- failures by severity;
+- automated/manual counts;
+- failure-reason counts.
+
+Publisher-specific projections MAY add aliases such as DISA CAT I/II/III
+counts, but core SCAP-NG SHALL NOT require publisher-specific severity labels.
+
+## 10. SIEM projection
+
+A result exporter MAY project the normalized package into denormalized event
+formats such as JSONL.
+
+A SIEM projection MAY emit one scan-summary event followed by one independent
+event per Rule result.
+
+Consumer-specific denormalization SHALL NOT dictate the canonical result model.
+
+## 11. Manual results
+
+Manual Assessment default behavior and completed outcome semantics are defined
+in `../assessment/manual-assessment.md`.
+
+Manual results SHOULD distinguish factual finding/evidence details from general
+reviewer comments.
