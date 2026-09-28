@@ -1,0 +1,362 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'If the following registry value does not exist or is not configured as specified, this is a finding: Registry Hive:
+    HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Control\Lsa\ Value Name: RestrictRemoteSAM Value Type: REG_SZ
+    Value: O:BAG:BAD:(A;;RC;;;BA) If a domain application account such as for a management tool requires this user right,
+    this would not be a finding. Vendor documentation must support the requirement for having the user right. The requirement
+    must be documented with the ISSO.'
+  cluster_id: null
+  conflicts: []
+  description: <VulnDiscussion>The Windows SAM stores users' passwords. Restricting remote rpc connections to the SAM to Administrators
+    helps protect those credentials.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:microsoft:windows_11
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:microsoft:windows_11
+    ref: cpe:/o:microsoft:windows_11
+  extends: null
+  fix: 'Navigate to the policy Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> Security
+    Options >> "Network access: Restrict clients allowed to make remote calls to SAM". Select "Edit Security" to configure
+    the "Security descriptor:". Add "Administrators" in "Group or user names:" if it is not already listed (this is the default).
+    Select "Administrators" in "Group or user names:". Select "Allow" for "Remote Access" in "Permissions for "Administrators".
+    Click "OK". The "Security descriptor:" must be populated with "O:BAG:BAD:(A;;RC;;;BA) for the policy to be enforced.'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-253457
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-253457r1081060_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-002235
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows 11 DISA DPMS Target Microsoft Windows 11 5471
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253457
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253457
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253457
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253457
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:39101
+      exports: []
+      inline_content: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+        Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Control\Lsa\ Value Name: RestrictRemoteSAM
+        Value Type: REG_SZ Value: O:BAG:BAD:(A;;RC;;;BA) If a domain application account such as for a management tool requires
+        this user right, this would not be a finding. Vendor documentation must support the requirement for having the user
+        right. The requirement must be documented with the ISSO.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:39101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SYSTEM\CurrentControlSet\Control\Lsa\
+
+
+            Value Name: RestrictRemoteSAM
+
+
+            Value Type: REG_SZ
+
+            Value: O:BAG:BAD:(A;;RC;;;BA)
+
+
+            If a domain application account such as for a management tool requires this user right, this would not be a finding.
+
+            Vendor documentation must support the requirement for having the user right.
+
+            The requirement must be documented with the ISSO.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      name: oval:mil.disa.stig.windows11:def:253457
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253457
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      name: oval:mil.disa.stig.windows11:def:253457
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253457
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:39101
+    exports: []
+    inline_content: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+      Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Control\Lsa\ Value Name: RestrictRemoteSAM
+      Value Type: REG_SZ Value: O:BAG:BAD:(A;;RC;;;BA) If a domain application account such as for a management tool requires
+      this user right, this would not be a finding. Vendor documentation must support the requirement for having the user
+      right. The requirement must be documented with the ISSO.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:39101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+          Registry Hive: HKEY_LOCAL_MACHINE
+
+          Registry Path: \SYSTEM\CurrentControlSet\Control\Lsa\
+
+
+          Value Name: RestrictRemoteSAM
+
+
+          Value Type: REG_SZ
+
+          Value: O:BAG:BAD:(A;;RC;;;BA)
+
+
+          If a domain application account such as for a management tool requires this user right, this would not be a finding.
+
+          Vendor documentation must support the requirement for having the user right.
+
+          The requirement must be documented with the ISSO.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-253457r1081060_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN11-SO-000167
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Remote calls to the Security Account Manager (SAM) must be restricted to Administrators.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: <VulnDiscussion>The Windows SAM stores users' passwords. Restricting remote rpc connections to the SAM to Administrators
+        helps protect those credentials.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows 11
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows 11
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5471'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002235
+    - attributes:
+        fixref: F-56860r829454_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Navigate to the policy Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> Security
+        Options >> "Network access: Restrict clients allowed to make remote calls to SAM".
+
+
+        Select "Edit Security" to configure the "Security descriptor:".
+
+
+        Add "Administrators" in "Group or user names:" if it is not already listed (this is the default).
+
+
+        Select "Administrators" in "Group or user names:".
+
+
+        Select "Allow" for "Remote Access" in "Permissions for "Administrators".
+
+
+        Click "OK".
+
+
+        The "Security descriptor:" must be populated with "O:BAG:BAD:(A;;RC;;;BA) for the policy to be enforced.'
+    - attributes:
+        id: F-56860r829454_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253457
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253457
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:39101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+          Registry Hive: HKEY_LOCAL_MACHINE
+
+          Registry Path: \SYSTEM\CurrentControlSet\Control\Lsa\
+
+
+          Value Name: RestrictRemoteSAM
+
+
+          Value Type: REG_SZ
+
+          Value: O:BAG:BAD:(A;;RC;;;BA)
+
+
+          If a domain application account such as for a management tool requires this user right, this would not be a finding.
+
+          Vendor documentation must support the requirement for having the user right.
+
+          The requirement must be documented with the ISSO.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: Remote calls to the Security Account Manager (SAM) must be restricted to Administrators.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: b86dcb71d9fcd6ffec4e2119195af669de5d23d56720e97d17ce38a83cb5dac0
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-253457r1081060_rule
+  status: legacy_compatible

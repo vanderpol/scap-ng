@@ -1,0 +1,199 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271480r1091152_rule
+  version: 1
+  description: OL 9 must be configured so that the cryptographic hashes of system files match vendor values.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: OL 9 must be configured so that the cryptographic hashes of system files match vendor values.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:27148001
+    collect:
+      capability: scapng.collect.independent.shellcommand
+      comment: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor values.
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:27148001
+      source_type: shellcommand_object
+      version: '5'
+    register: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:27148001
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:27148001:
+      comment: Confirm no files are identified.
+      entities:
+      - attributes:
+          check_existence: none_exist
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:27148001
+      source_type: shellcommand_state
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor values.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:27148001
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 must be configured so that the cryptographic hashes of system files match vendor values.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The hashes of important files such as system executables should match the information given by the RPM database.
+              Executables with erroneous hashes could be a sign of nefarious activity on the system.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:27148001:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:27148001
+        comment: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor values.
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:27148001
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:27148001
+        source_type: shellcommand_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271480r1091152_rule
+    title: OL 9 must be configured so that the cryptographic hashes of system files match vendor values.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:9701
+      exports: []
+      inline_content: 'Verify that OL 9 is configured so that the cryptographic hashes of system files match vendor values.
+        List files on the system that have file hashes different from what is expected by the RPM database with the following
+        command: $ sudo rpm -Va --noconfig | awk ''$1 ~ /..5/ && $2 != "c"'' If there is output, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:9701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 is configured so that the cryptographic hashes of system files match vendor values.\n \n\
+            List files on the system that have file hashes different from what is expected by the RPM database with the following\
+            \ command:\n\n$ sudo rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != \"c\"' \n\nIf there is output, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.rhel9os:def:271480
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 6e26a1e609a1c73fc66fe0f1cb3a34c9dc391803a663041d521a2445eb9674d4
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271480r1091152_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: f2aad7e03e4e44eb4e4fd5bee35051871cf7029bf9a25629415f15da67d3801f

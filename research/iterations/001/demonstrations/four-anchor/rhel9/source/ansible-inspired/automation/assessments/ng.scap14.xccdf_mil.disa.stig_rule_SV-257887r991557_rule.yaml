@@ -1,0 +1,336 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257887r991557_rule
+  version: 1
+  description: RHEL 9 audit tools must have a mode of 0755 or less permissive.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: RHEL 9 audit tools must have a mode of 0755 or less permissive.
+  steps:
+  - name: Collect oval:mil.disa.stig.unix:obj:23047200
+    collect:
+      capability: scapng.collect.unix.file
+      comment: audit tools
+      query:
+      - attributes:
+          datatype: string
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23047200
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:23047200
+      source_type: file_object
+      version: '1'
+    register: oval:mil.disa.stig.unix:obj:23047200
+  - name: Derive oval:mil.disa.stig.defs:var:23047200
+    derive:
+      comment: audit tools
+      datatype: string
+      evaluation_plan:
+        datatype: string
+        mode: static
+        resolution_status: exact_static
+        values:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/rsyslogd
+        - /sbin/augenrules
+        variable_id: oval:mil.disa.stig.defs:var:23047200
+        variable_type: constant_variable
+      resolution:
+        datatype: string
+        status: exact_static
+        values:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/rsyslogd
+        - /sbin/augenrules
+        variable_type: constant_variable
+      semantic_ast:
+        datatype: string
+        id: oval:mil.disa.stig.defs:var:23047200
+        type: constant_variable
+        values:
+        - datatype: string
+          value: /sbin/auditctl
+        - datatype: string
+          value: /sbin/aureport
+        - datatype: string
+          value: /sbin/ausearch
+        - datatype: string
+          value: /sbin/autrace
+        - datatype: string
+          value: /sbin/auditd
+        - datatype: string
+          value: /sbin/rsyslogd
+        - datatype: string
+          value: /sbin/augenrules
+      source_type: constant_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:23047200
+    register: oval:mil.disa.stig.defs:var:23047200
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000008:
+      comment: mode 0755 or less permissive
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: suid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sgid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sticky
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: gwrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:20000008
+      source_type: file_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230472:
+        class: compliance
+        criteria:
+          children:
+          - comment: audit tools have a mode of 0755 or less permissive.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23047200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system audit tools must have a mode of 0755 or less permissive.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230472
+        version: '1'
+      oval:mil.disa.stig.rhel9os:def:257887:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230472
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-232035 - RHEL 9 audit tools must have a mode of 0755 or less permissive.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Protecting audit information also includes identifying and protecting the tools used to view and manipulate
+              log data. Therefore, protecting audit tools is necessary to prevent unauthorized operation on audit information.
+
+
+              RHEL 9 systems providing tools to interface with audit information will leverage user permissions and roles
+              identifying the user accessing the tools, and the corresponding rights the user enjoys, to make access decisions
+              regarding the access to audit tools.
+
+
+              Audit tools include, but are not limited to, vendor-provided and open source audit tools needed to successfully
+              view and manipulate audit information system activity and records. Audit tools include custom queries and report
+              generators.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:257887
+        version: '1'
+    tests:
+      oval:mil.disa.stig.unix:tst:23047200:
+        check: all
+        check_existence: all_exist
+        collections:
+        - oval:mil.disa.stig.unix:obj:23047200
+        comment: audit tools have a mode of 0755 or less permissive.
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000008
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:23047200
+        source_type: file_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257887
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      name: oval:mil.disa.stig.rhel9os:def:257887
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257887
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      name: oval:mil.disa.stig.rhel9os:def:257887
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-257887r991557_rule
+    title: RHEL 9 audit tools must have a mode of 0755 or less permissive.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257887
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257887
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257887
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257887
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:21701
+      exports: []
+      inline_content: 'Verify the audit tools have a mode of "0755" or less with the following command: $ stat -c "%a %n"
+        /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/rsyslogd /sbin/augenrules 755 /sbin/auditctl
+        755 /sbin/aureport 755 /sbin/ausearch 750 /sbin/autrace 755 /sbin/auditd 755 /sbin/rsyslogd 755 /sbin/augenrules If
+        any of the audit tool files have a mode more permissive than "0755", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:21701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the audit tools have a mode of "0755" or less with the following command:
+
+
+            $ stat -c "%a %n" /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/rsyslogd /sbin/augenrules
+
+
+            755 /sbin/auditctl
+
+            755 /sbin/aureport
+
+            755 /sbin/ausearch
+
+            750 /sbin/autrace
+
+            755 /sbin/auditd
+
+            755 /sbin/rsyslogd
+
+            755 /sbin/augenrules
+
+
+            If any of the audit tool files have a mode more permissive than "0755", this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.rhel9os:def:257887
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 9d07f79fc6d1ebe296369e9e2ee0222e4b6d473aa5a479b7c997a7a373274a00
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257887r991557_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: d8798661584fcbd157b8ccfc415ae32a2f46ec98cb5de01a8a305feda1bbdfa3

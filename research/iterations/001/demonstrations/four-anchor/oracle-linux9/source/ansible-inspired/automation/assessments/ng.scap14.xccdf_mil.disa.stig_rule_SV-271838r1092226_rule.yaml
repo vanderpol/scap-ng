@@ -1,0 +1,272 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271838r1092226_rule
+  version: 1
+  description: OL 9 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: OL 9 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.linux:obj:27183801
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: 'Retrieve configuration from file: /etc/pam.d/password-auth.'
+      query:
+      - attributes:
+          ignore_case: 'false'
+          multiline: 'true'
+          singleline: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/pam.d/password-auth
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .+
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27183801
+      source_type: textfilecontent54_object
+      version: '5'
+    register: oval:navy.navwar.niwcatlantic.scc.linux:obj:27183801
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183801:
+      comment: Check that auth required pam_faillock.so preath line exists.
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth\b
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183801
+      source_type: textfilecontent54_state
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183802:
+      comment: Check that auth required pam_faillock.so authfail line exists.
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*auth\s+required\s+pam_faillock.so\s+authfail\b
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183802
+      source_type: textfilecontent54_state
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183803:
+      comment: Check that account required pam_faillock.so line exists.
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*account\s+required\s+pam_faillock.so\b
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183803
+      source_type: textfilecontent54_state
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183804:
+      comment: Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183804
+      source_type: textfilecontent54_state
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271838:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verify the pam_faillock.so module is present in the '/etc/pam.d/password-auth' file and is appropriately
+              configured.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27183801
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: If the pam_faillock.so module is not loaded, the system will not correctly lockout accounts to prevent password
+              guessing attacks.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27183801:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27183801
+        comment: Verify the pam_faillock.so module is present in the '/etc/pam.d/password-auth' file.
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27183801
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27183802
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27183803
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27183804
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27183801
+        source_type: textfilecontent54_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271838r1092226_rule
+    title: OL 9 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:79101
+      exports: []
+      inline_content: 'Verify that OL 9 configures the pam_faillock.so module to exist in the "/etc/pam.d/password-auth" file
+        with the following command: $ grep pam_faillock.so /etc/pam.d/password-auth auth required pam_faillock.so preauth
+        auth required pam_faillock.so authfail account required pam_faillock.so If the pam_faillock.so module is not present
+        in the "/etc/pam.d/password-auth" file with the "preauth" line listed before pam_unix.so, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:79101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 configures the pam_faillock.so module to exist in the "/etc/pam.d/password-auth" file with
+            the following command:
+
+
+            $ grep pam_faillock.so /etc/pam.d/password-auth
+
+            auth required pam_faillock.so preauth
+
+            auth required pam_faillock.so authfail
+
+            account required pam_faillock.so
+
+
+            If the pam_faillock.so module is not present in the "/etc/pam.d/password-auth" file with the "preauth" line listed
+            before pam_unix.so, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.linux:def:271838
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: fca7e34f4f369e62954045031164675f7bdaa278843f512d86e4d9244ba7b98b
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271838r1092226_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: c6e85b3e52ade1a4d92e7550f0ac223701a1b335470db38b542b864c60d7549d

@@ -1,0 +1,797 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-270180r1184327_rule
+  title: The RHEL 9 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution
+    of authorized software programs.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-270180
+  description: '<VulnDiscussion>The organization must identify authorized software programs and permit execution of authorized
+    software. The process used to identify software programs that are authorized to execute on organizational information
+    systems is commonly referred to as allow listing. Using an allow list provides a configuration management method for allowing
+    the execution of only authorized software. Using only authorized software decreases risk by limiting the number of potential
+    vulnerabilities. Verification of allow listed software occurs prior to execution or at system startup. User home directories/folders
+    may contain information of a sensitive nature. Nonprivileged users should coordinate any sharing of information with an
+    SA through shared resources. RHEL 9 ships with many optional packages. One such package is a file access policy daemon
+    called "fapolicyd". "fapolicyd" is a userspace daemon that determines access rights to files based on attributes of the
+    process and file. It can be used to either block list or allow list processes or file access. Proceed with caution with
+    enforcing the use of this daemon. Improper configuration may render the system nonfunctional. The "fapolicyd" API is not
+    namespace aware and can cause issues when launching or running containers. Satisfies: SRG-OS-000368-GPOS-00154, SRG-OS-000370-GPOS-00155,
+    SRG-OS-000480-GPOS-00232</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:almalinux:almalinux:9
+  - cpe:/o:rocky:rocky:9
+  - cpe:/o:redhat:enterprise_linux:9.0
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:almalinux:almalinux:9
+    ref: cpe:/o:almalinux:almalinux:9
+  - kind: cpe_name
+    name: cpe:/o:rocky:rocky:9
+    ref: cpe:/o:rocky:rocky:9
+  - kind: cpe_name
+    name: cpe:/o:redhat:enterprise_linux:9.0
+    ref: cpe:/o:redhat:enterprise_linux:9.0
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001764
+  requires: []
+  conflicts: []
+  check: 'Verify the RHEL 9 "fapolicyd" employs a deny-all, permit-by-exception policy. Verify "fapolicyd" is in enforcement
+    mode with the following command: $ sudo grep permissive /etc/fapolicyd/fapolicyd.conf permissive = 0 If "fapolicyd" is
+    not running in enforcement mode, this is a finding. Check that "fapolicyd" employs a deny-all policy on system mounts
+    with the following commands: $ sudo tail /etc/fapolicyd/compiled.rules allow exe=/usr/bin/python3.7 : ftype=text/x-python
+    deny_audit perm=any pattern=ld_so : all deny perm=any all : all If "fapolicyd" is not running with a deny-all, permit-by-exception
+    policy, this is a finding. Note: "deny_log" or "deny_audit" options meet the security requirements. These options will
+    generate higher volumes of logs.'
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:270180
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:270180
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:270180
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:270180
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:88301
+    exports: []
+    inline_content: 'Verify the RHEL 9 "fapolicyd" employs a deny-all, permit-by-exception policy. Verify "fapolicyd" is in
+      enforcement mode with the following command: $ sudo grep permissive /etc/fapolicyd/fapolicyd.conf permissive = 0 If
+      "fapolicyd" is not running in enforcement mode, this is a finding. Check that "fapolicyd" employs a deny-all policy
+      on system mounts with the following commands: $ sudo tail /etc/fapolicyd/compiled.rules allow exe=/usr/bin/python3.7
+      : ftype=text/x-python deny_audit perm=any pattern=ld_so : all deny perm=any all : all If "fapolicyd" is not running
+      with a deny-all, permit-by-exception policy, this is a finding. Note: "deny_log" or "deny_audit" options meet the security
+      requirements. These options will generate higher volumes of logs.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:88301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify the RHEL 9 "fapolicyd" employs a deny-all, permit-by-exception policy.
+
+
+          Verify "fapolicyd" is in enforcement mode with the following command:
+
+
+          $ sudo grep permissive /etc/fapolicyd/fapolicyd.conf
+
+
+          permissive = 0
+
+
+          If "fapolicyd" is not running in enforcement mode, this is a finding.
+
+
+          Check that "fapolicyd" employs a deny-all policy on system mounts with the following commands:
+
+
+          $ sudo tail /etc/fapolicyd/compiled.rules
+
+
+          allow exe=/usr/bin/python3.7 : ftype=text/x-python
+
+          deny_audit perm=any pattern=ld_so : all
+
+          deny perm=any all : all
+
+
+          If "fapolicyd" is not running with a deny-all, permit-by-exception policy, this is a finding.
+
+
+          Note: "deny_log" or "deny_audit" options meet the security requirements.  These options will generate higher volumes
+          of logs.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:270180
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:270180
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:270180
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:270180
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:88301
+      exports: []
+      inline_content: 'Verify the RHEL 9 "fapolicyd" employs a deny-all, permit-by-exception policy. Verify "fapolicyd" is
+        in enforcement mode with the following command: $ sudo grep permissive /etc/fapolicyd/fapolicyd.conf permissive =
+        0 If "fapolicyd" is not running in enforcement mode, this is a finding. Check that "fapolicyd" employs a deny-all
+        policy on system mounts with the following commands: $ sudo tail /etc/fapolicyd/compiled.rules allow exe=/usr/bin/python3.7
+        : ftype=text/x-python deny_audit perm=any pattern=ld_so : all deny perm=any all : all If "fapolicyd" is not running
+        with a deny-all, permit-by-exception policy, this is a finding. Note: "deny_log" or "deny_audit" options meet the
+        security requirements. These options will generate higher volumes of logs.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:88301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the RHEL 9 "fapolicyd" employs a deny-all, permit-by-exception policy.
+
+
+            Verify "fapolicyd" is in enforcement mode with the following command:
+
+
+            $ sudo grep permissive /etc/fapolicyd/fapolicyd.conf
+
+
+            permissive = 0
+
+
+            If "fapolicyd" is not running in enforcement mode, this is a finding.
+
+
+            Check that "fapolicyd" employs a deny-all policy on system mounts with the following commands:
+
+
+            $ sudo tail /etc/fapolicyd/compiled.rules
+
+
+            allow exe=/usr/bin/python3.7 : ftype=text/x-python
+
+            deny_audit perm=any pattern=ld_so : all
+
+            deny perm=any all : all
+
+
+            If "fapolicyd" is not running with a deny-all, permit-by-exception policy, this is a finding.
+
+
+            Note: "deny_log" or "deny_audit" options meet the security requirements.  These options will generate higher volumes
+            of logs.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: 'Configure RHEL 9 to employ a deny-all, permit-by-exception application allow listing policy with "fapolicyd". With
+    the "fapolicyd" installed and enabled, configure the daemon to function in permissive mode until the allow list is built
+    correctly to avoid system lockout. Do this by editing the "/etc/fapolicyd/fapolicyd.conf" file with the following line:
+    permissive = 1 Build the allow list in a file within the "/etc/fapolicyd/rules.d" directory, ensuring the last rule implements
+    a deny-all policy, such as "deny perm=any all : all". Once it is determined the allow list is built correctly, set the
+    "fapolicyd" to enforcing mode by editing the "permissive" line in the /etc/fapolicyd/fapolicyd.conf file. permissive =
+    0'
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-270180r1184327_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-433016
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: The RHEL 9 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution
+        of authorized software programs.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>The organization must identify authorized software programs and permit execution of authorized
+        software. The process used to identify software programs that are authorized to execute on organizational information
+        systems is commonly referred to as allow listing.
+
+
+        Using an allow list provides a configuration management method for allowing the execution of only authorized software.
+        Using only authorized software decreases risk by limiting the number of potential vulnerabilities. Verification of
+        allow listed software occurs prior to execution or at system startup.
+
+
+        User home directories/folders may contain information of a sensitive nature. Nonprivileged users should coordinate
+        any sharing of information with an SA through shared resources.
+
+
+        RHEL 9 ships with many optional packages. One such package is a file access policy daemon called "fapolicyd". "fapolicyd"
+        is a userspace daemon that determines access rights to files based on attributes of the process and file. It can be
+        used to either block list or allow list processes or file access.
+
+
+        Proceed with caution with enforcing the use of this daemon. Improper configuration may render the system nonfunctional.
+        The "fapolicyd" API is not namespace aware and can cause issues when launching or running containers.
+
+
+        Satisfies: SRG-OS-000368-GPOS-00154, SRG-OS-000370-GPOS-00155, SRG-OS-000480-GPOS-00232</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001764
+    - attributes:
+        fixref: F-74114r1184326_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure RHEL 9 to employ a deny-all, permit-by-exception application allow listing policy with "fapolicyd".
+
+
+        With the "fapolicyd" installed and enabled, configure the daemon to function in permissive mode until the allow list
+        is built correctly to avoid system lockout. Do this by editing the "/etc/fapolicyd/fapolicyd.conf" file with the following
+        line:
+
+
+        permissive = 1
+
+
+        Build the allow list in a file within the "/etc/fapolicyd/rules.d" directory, ensuring the last rule implements a
+        deny-all policy, such as "deny perm=any all : all".
+
+
+        Once it is determined the allow list is built correctly, set the "fapolicyd" to enforcing mode by editing the "permissive"
+        line in the /etc/fapolicyd/fapolicyd.conf file.
+
+
+        permissive = 0'
+    - attributes:
+        id: F-74114r1184326_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:270180
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:270180
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:88301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify the RHEL 9 "fapolicyd" employs a deny-all, permit-by-exception policy.
+
+
+          Verify "fapolicyd" is in enforcement mode with the following command:
+
+
+          $ sudo grep permissive /etc/fapolicyd/fapolicyd.conf
+
+
+          permissive = 0
+
+
+          If "fapolicyd" is not running in enforcement mode, this is a finding.
+
+
+          Check that "fapolicyd" employs a deny-all policy on system mounts with the following commands:
+
+
+          $ sudo tail /etc/fapolicyd/compiled.rules
+
+
+          allow exe=/usr/bin/python3.7 : ftype=text/x-python
+
+          deny_audit perm=any pattern=ld_so : all
+
+          deny perm=any all : all
+
+
+          If "fapolicyd" is not running with a deny-all, permit-by-exception policy, this is a finding.
+
+
+          Note: "deny_log" or "deny_audit" options meet the security requirements.  These options will generate higher volumes
+          of logs.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  assessment:
+    id: ng.scap14.xccdf_mil.disa.stig_rule_SV-270180r1184327_rule
+    version: 1
+    description: The RHEL 9 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the
+      execution of authorized software programs.
+    semantic_model: scap-ng-generic-assessment-graph-0.1
+    collect:
+      oval:mil.disa.stig.ind:obj:27018001:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27018001
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        comment: The last non-whitespace line of /etc/fapolicyd/compiled.rules
+        query:
+        - attributes:
+            multiline: 'false'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/fapolicyd/compiled.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (.*\S.*)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:27018000:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27018000
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/fapolicyd/fapolicyd.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*permissive\s*=\s*(\d+)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+    derive: {}
+    predicates:
+      oval:mil.disa.stig.ind:ste:20000002:
+        source_state_id: oval:mil.disa.stig.ind:ste:20000002
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: equals
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '0'
+        comment: null
+      oval:mil.disa.stig.ind:ste:27018000:
+        source_state_id: oval:mil.disa.stig.ind:ste:27018000
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?:^|\n)(?:deny|deny_log|deny_audit)[ \t]+perm=any[ \t]+all[ \t]+:[ \t]+all(?:$|\n)
+        comment: null
+    evaluate:
+      tests:
+        oval:mil.disa.stig.ind:tst:27018001:
+          source_test_id: oval:mil.disa.stig.ind:tst:27018001
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: '/etc/fapolicyd/compiled.rules: deny all'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:27018001
+          predicates:
+          - oval:mil.disa.stig.ind:ste:27018000
+          source_other: []
+        oval:mil.disa.stig.ind:tst:27018000:
+          source_test_id: oval:mil.disa.stig.ind:tst:27018000
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: '/etc/fapolicyd/fapolicyd.conf: permissive = 0'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:27018000
+          predicates:
+          - oval:mil.disa.stig.ind:ste:20000002
+          source_other: []
+      definitions:
+        oval:mil.disa.stig.rhel9os:def:270180:
+          source_definition_id: oval:mil.disa.stig.rhel9os:def:270180
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:270180
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: RHEL-09-433016 - The RHEL 9 fapolicy module must be configured to employ a deny-all, permit-by-exception
+                policy to allow the execution of authorized software programs.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Red Hat Enterprise Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: 'The organization must identify authorized software programs and permit execution of authorized software.
+                The process used to identify software programs that are authorized to execute on organizational information
+                systems is commonly referred to as allow listing.
+
+
+                Using an allow list provides a configuration management method for allowing the execution of only authorized
+                software. Using only authorized software decreases risk by limiting the number of potential vulnerabilities.
+                Verification of allow listed software occurs prior to execution or at system startup.
+
+
+                User home directories/folders may contain information of a sensitive nature. Nonprivileged users should coordinate
+                any sharing of information with an SA through shared resources.
+
+
+                RHEL 9 ships with many optional packages. One such package is a file access policy daemon called "fapolicyd".
+                "fapolicyd" is a userspace daemon that determines access rights to files based on attributes of the process
+                and file. It can be used to either block list or allow list processes or file access.
+
+
+                Proceed with caution with enforcing the use of this daemon. Improper configuration may render the system nonfunctional.
+                The "fapolicyd" API is not namespace aware and can cause issues when launching or running containers.
+
+
+                Satisfies: SRG-OS-000368-GPOS-00154, SRG-OS-000370-GPOS-00155, SRG-OS-000480-GPOS-00232'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:270180:
+          source_definition_id: oval:mil.disa.stig.defs:def:270180
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: '/etc/fapolicyd/fapolicyd.conf: permissive = 0'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:27018000
+            - comment: '/etc/fapolicyd/compiled.rules: deny all'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:27018001
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system fapolicy module must be configured to employ a deny-all, permit-by-exception policy
+                to allow the execution of authorized software programs.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    assert:
+      definition_results:
+      - oval:mil.disa.stig.rhel9os:def:270180
+      combination: xccdf_source_check_semantics
+    source_check_context:
+      check_exports: []
+      checks:
+      - definition_id: oval:mil.disa.stig.rhel9os:def:270180
+        exports: []
+        href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.rhel9os:def:270180
+        oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - definition_id: oval:mil.disa.stig.rhel9os:def:270180
+        exports: []
+        href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.rhel9os:def:270180
+        oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+      published_source:
+        datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+        datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+        repository: niwc-atlantic/scap-content-library
+        repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+        revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+        zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+        zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+      rule_id: xccdf_mil.disa.stig_rule_SV-270180r1184327_rule
+      title: The RHEL 9 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution
+        of authorized software programs.
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:270180
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:270180
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:270180
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:270180
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:88301
+        exports: []
+        inline_content: 'Verify the RHEL 9 "fapolicyd" employs a deny-all, permit-by-exception policy. Verify "fapolicyd"
+          is in enforcement mode with the following command: $ sudo grep permissive /etc/fapolicyd/fapolicyd.conf permissive
+          = 0 If "fapolicyd" is not running in enforcement mode, this is a finding. Check that "fapolicyd" employs a deny-all
+          policy on system mounts with the following commands: $ sudo tail /etc/fapolicyd/compiled.rules allow exe=/usr/bin/python3.7
+          : ftype=text/x-python deny_audit perm=any pattern=ld_so : all deny perm=any all : all If "fapolicyd" is not running
+          with a deny-all, permit-by-exception policy, this is a finding. Note: "deny_log" or "deny_audit" options meet the
+          security requirements. These options will generate higher volumes of logs.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:88301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the RHEL 9 "fapolicyd" employs a deny-all, permit-by-exception policy.
+
+
+              Verify "fapolicyd" is in enforcement mode with the following command:
+
+
+              $ sudo grep permissive /etc/fapolicyd/fapolicyd.conf
+
+
+              permissive = 0
+
+
+              If "fapolicyd" is not running in enforcement mode, this is a finding.
+
+
+              Check that "fapolicyd" employs a deny-all policy on system mounts with the following commands:
+
+
+              $ sudo tail /etc/fapolicyd/compiled.rules
+
+
+              allow exe=/usr/bin/python3.7 : ftype=text/x-python
+
+              deny_audit perm=any pattern=ld_so : all
+
+              deny perm=any all : all
+
+
+              If "fapolicyd" is not running with a deny-all, permit-by-exception policy, this is a finding.
+
+
+              Note: "deny_log" or "deny_audit" options meet the security requirements.  These options will generate higher
+              volumes of logs.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    migration: &id001
+      status: legacy_compatible
+      source: SCAP 1.4 / OVAL 5.12.3
+      source_rule: xccdf_mil.disa.stig_rule_SV-270180r1184327_rule
+      semantic_ir_sha256: b682eef59ebce7e4ad7de8b97ab8ff4078ae92d226bf5376e6bd4b6290cacc2f
+      note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_fingerprint_sha256: 9220ce2168948dc016ed8d20c8da1df71126b12e000e82fd0ffad7b7a2773d73
+  migration: *id001

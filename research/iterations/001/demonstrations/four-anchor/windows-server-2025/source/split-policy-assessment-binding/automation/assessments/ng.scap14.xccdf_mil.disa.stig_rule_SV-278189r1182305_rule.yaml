@@ -1,0 +1,255 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278189r1182305_rule
+  version: 1
+  description: The Windows Server 2025 "Enable computer and user accounts to be trusted for delegation" user right must not
+    be assigned to any groups or accounts on domain-joined member servers and stand-alone or nondomain-joined systems.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.win:obj:25349600:
+      capability: scapng.collect.windows.userright
+      source_object_id: oval:mil.disa.stig.win:obj:25349600
+      source_type: userright_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: userright
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SE_ENABLE_DELEGATION_NAME
+  derive: {}
+  predicates:
+    oval:mil.disa.stig.win:ste:20000029:
+      source_state_id: oval:mil.disa.stig.win:ste:20000029
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      comment: null
+  evaluate:
+    tests:
+      oval:mil.disa.stig.win:tst:25349601:
+        source_test_id: oval:mil.disa.stig.win:tst:25349601
+        source_type: userright_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: Enable computer and user accounts to be trusted for delegation - None
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25349600
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000029
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.windows2025:def:278189:
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278189
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253496
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-MS-000130 - The Windows Server 2025 "Enable computer and user accounts to be trusted for delegation"
+              user right must not be assigned to any groups or accounts on domain-joined member servers and stand-alone or
+              nondomain-joined systems.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
+              \n  The \"Enable computer and user accounts to be trusted for delegation\" user right allows the \"Trusted for\
+              \ Delegation\" setting to be changed. This could allow unauthorized users to impersonate other users."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253496:
+        source_definition_id: oval:mil.disa.stig.defs:def:253496
+        class: compliance
+        version: '4'
+        criteria:
+          children:
+          - comment: Enable computer and user accounts to be trusted for delegation - None
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25349601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Enable computer and user accounts to be trusted for delegation" user right must not be assigned to
+              any groups or accounts.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278189
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.windows2025:def:278189
+      exports: []
+      href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      match_count: 1
+      name: oval:mil.disa.stig.windows2025:def:278189
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.windows2025:def:278189
+      exports: []
+      href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      match_count: 1
+      name: oval:mil.disa.stig.windows2025:def:278189
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml
+      datastream_sha256: 52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+      zip_sha256: 2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0
+    rule_id: xccdf_mil.disa.stig_rule_SV-278189r1182305_rule
+    title: The Windows Server 2025 "Enable computer and user accounts to be trusted for delegation" user right must not be
+      assigned to any groups or accounts on domain-joined member servers and stand-alone or nondomain-joined systems.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278189
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278189
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278189
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278189
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:40701
+      exports: []
+      inline_content: 'This applies to member servers and stand-alone or nondomain-joined systems. A separate version applies
+        to domain controllers. Verify the effective setting in Local Group Policy Editor. Run gpedit.msc. Navigate to Local
+        Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights
+        Assignment. If any accounts or groups are granted the "Enable computer and user accounts to be trusted for delegation"
+        user right, this is a finding. For server core installations, run the following command: Secedit /Export /Areas User_Rights
+        /cfg c:\path\filename.txt Review the text file. If any SIDs are granted the "SeEnableDelegationPrivilege" user right,
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:40701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This applies to member servers and stand-alone or nondomain-joined systems. A separate version applies to
+            domain controllers.
+
+
+            Verify the effective setting in Local Group Policy Editor.
+
+
+            Run gpedit.msc.
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If any accounts or groups are granted the "Enable computer and user accounts to be trusted for delegation" user
+            right, this is a finding.
+
+
+            For server core installations, run the following command:
+
+
+            Secedit /Export /Areas User_Rights /cfg c:\path\filename.txt
+
+
+            Review the text file.
+
+
+            If any SIDs are granted the "SeEnableDelegationPrivilege" user right, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-278189r1182305_rule
+    semantic_ir_sha256: 176f27345e24bd8eb511b5877bd6888ae356fee0d6dca42f8caa645f6def40bb
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: ddfc7a5847a54838e8dce480bbd8da1c313f8aee7882df8064453a28f7cb806f

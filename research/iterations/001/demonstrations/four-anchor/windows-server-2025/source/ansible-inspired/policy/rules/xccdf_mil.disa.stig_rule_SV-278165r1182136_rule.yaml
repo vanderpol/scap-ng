@@ -1,0 +1,486 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'This applies to domain controllers. It is not applicable for other systems. Verify the effective setting in Local
+    Group Policy Editor. Run gpedit.msc. Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >>
+    Security Settings >> Local Policies >> User Rights Assignment. If any accounts or groups other than the following are
+    granted the "Access this computer from the network" right, this is a finding: - Administrators. - Authenticated Users.
+    - Enterprise Domain Controllers. For server core installations, run the following command: Secedit /Export /Areas User_Rights
+    /cfg c:\path\filename.txt Review the text file. If any SIDs other than the following are granted the "SeNetworkLogonRight"
+    user right, this is a finding. S-1-5-32-544 (Administrators) S-1-5-11 (Authenticated Users) S-1-5-9 (Enterprise Domain
+    Controllers) If an application requires this user right, this is not a finding. Vendor documentation must support the
+    requirement for having the user right. The requirement must be documented with the information system security officer
+    (ISSO). The application account must meet requirements for application account passwords, such as length (WN25-00-000050)
+    and required frequency of changes (WN25-00-000060).'
+  cluster_id: null
+  conflicts: []
+  description: <VulnDiscussion>Inappropriately granting user rights provides system, administrative, and other high-level
+    capabilities. Accounts with the "Access this computer from the network" right may access resources on the system, and
+    this right must be limited to those requiring it.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - '#xccdf_mil.disa.stig_platform_Windows_DomainController'
+  effective_platforms:
+  - expression:
+      children:
+      - definition_binding:
+          definition_id: oval:mil.disa.stig.win:def:100005
+          source: applicability_oval_ir
+          status: resolved
+        href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        id_ref: oval:mil.disa.stig.win:def:100005
+        kind: check_fact
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      kind: logical_test
+      negate: false
+      operator: AND
+    kind: local_cpe_expression
+    platform_id: xccdf_mil.disa.stig_platform_Windows_DomainController
+    ref: '#xccdf_mil.disa.stig_platform_Windows_DomainController'
+  extends: null
+  fix: 'Configure the policy value for Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >>
+    User Rights Assignment >> Access this computer from the network to include only the following accounts or groups: - Administrators.
+    - Authenticated Users. - Enterprise Domain Controllers.'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-278165
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-278165r1182136_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000213
+  multiple: false
+  platforms:
+  - '#xccdf_mil.disa.stig_platform_Windows_DomainController'
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows Server 2025 DISA DPMS Target Microsoft Windows Server 2025 5719
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278165
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278165
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278165
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278165
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:36101
+      exports: []
+      inline_content: 'This applies to domain controllers. It is not applicable for other systems. Verify the effective setting
+        in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer Policy >> Computer Configuration >> Windows
+        Settings >> Security Settings >> Local Policies >> User Rights Assignment. If any accounts or groups other than the
+        following are granted the "Access this computer from the network" right, this is a finding: - Administrators. - Authenticated
+        Users. - Enterprise Domain Controllers. For server core installations, run the following command: Secedit /Export
+        /Areas User_Rights /cfg c:\path\filename.txt Review the text file. If any SIDs other than the following are granted
+        the "SeNetworkLogonRight" user right, this is a finding. S-1-5-32-544 (Administrators) S-1-5-11 (Authenticated Users)
+        S-1-5-9 (Enterprise Domain Controllers) If an application requires this user right, this is not a finding. Vendor
+        documentation must support the requirement for having the user right. The requirement must be documented with the
+        information system security officer (ISSO). The application account must meet requirements for application account
+        passwords, such as length (WN25-00-000050) and required frequency of changes (WN25-00-000060).'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:36101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+            Verify the effective setting in Local Group Policy Editor.
+
+
+            Run gpedit.msc.
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If any accounts or groups other than the following are granted the "Access this computer from the network" right,
+            this is a finding:
+
+            - Administrators.
+
+            - Authenticated Users.
+
+            - Enterprise Domain Controllers.
+
+
+            For server core installations, run the following command:
+
+
+            Secedit /Export /Areas User_Rights /cfg c:\path\filename.txt
+
+
+            Review the text file.
+
+
+            If any SIDs other than the following are granted the "SeNetworkLogonRight" user right, this is a finding.
+
+
+            S-1-5-32-544 (Administrators)
+
+            S-1-5-11 (Authenticated Users)
+
+            S-1-5-9 (Enterprise Domain Controllers)
+
+
+            If an application requires this user right, this is not a finding.
+
+
+            Vendor documentation must support the requirement for having the user right.
+
+
+            The requirement must be documented with the information system security officer (ISSO).
+
+
+            The application account must meet requirements for application account passwords, such as length (WN25-00-000050)
+            and required frequency of changes (WN25-00-000060).'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      name: oval:mil.disa.stig.windows2025:def:278165
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278165
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      name: oval:mil.disa.stig.windows2025:def:278165
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278165
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:36101
+    exports: []
+    inline_content: 'This applies to domain controllers. It is not applicable for other systems. Verify the effective setting
+      in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer Policy >> Computer Configuration >> Windows
+      Settings >> Security Settings >> Local Policies >> User Rights Assignment. If any accounts or groups other than the
+      following are granted the "Access this computer from the network" right, this is a finding: - Administrators. - Authenticated
+      Users. - Enterprise Domain Controllers. For server core installations, run the following command: Secedit /Export /Areas
+      User_Rights /cfg c:\path\filename.txt Review the text file. If any SIDs other than the following are granted the "SeNetworkLogonRight"
+      user right, this is a finding. S-1-5-32-544 (Administrators) S-1-5-11 (Authenticated Users) S-1-5-9 (Enterprise Domain
+      Controllers) If an application requires this user right, this is not a finding. Vendor documentation must support the
+      requirement for having the user right. The requirement must be documented with the information system security officer
+      (ISSO). The application account must meet requirements for application account passwords, such as length (WN25-00-000050)
+      and required frequency of changes (WN25-00-000060).'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:36101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+          Verify the effective setting in Local Group Policy Editor.
+
+
+          Run gpedit.msc.
+
+
+          Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies
+          >> User Rights Assignment.
+
+
+          If any accounts or groups other than the following are granted the "Access this computer from the network" right,
+          this is a finding:
+
+          - Administrators.
+
+          - Authenticated Users.
+
+          - Enterprise Domain Controllers.
+
+
+          For server core installations, run the following command:
+
+
+          Secedit /Export /Areas User_Rights /cfg c:\path\filename.txt
+
+
+          Review the text file.
+
+
+          If any SIDs other than the following are granted the "SeNetworkLogonRight" user right, this is a finding.
+
+
+          S-1-5-32-544 (Administrators)
+
+          S-1-5-11 (Authenticated Users)
+
+          S-1-5-9 (Enterprise Domain Controllers)
+
+
+          If an application requires this user right, this is not a finding.
+
+
+          Vendor documentation must support the requirement for having the user right.
+
+
+          The requirement must be documented with the information system security officer (ISSO).
+
+
+          The application account must meet requirements for application account passwords, such as length (WN25-00-000050)
+          and required frequency of changes (WN25-00-000060).'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-278165r1182136_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN25-DC-000340
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: The Windows Server 2025 "Access this computer from the network" user right must only be assigned to the Administrators,
+        Authenticated Users, and Enterprise Domain Controllers groups on domain controllers.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Inappropriately granting user rights provides system, administrative, and other high-level capabilities.
+
+
+        Accounts with the "Access this computer from the network" right may access resources on the system, and this right
+        must be limited to those requiring it.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows Server 2025
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows Server 2025
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5719'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        idref: '#xccdf_mil.disa.stig_platform_Windows_DomainController'
+      name: platform
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000213
+    - attributes:
+        fixref: F-82600r1181824_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure the policy value for Computer Configuration >> Windows Settings >> Security Settings >> Local Policies
+        >> User Rights Assignment >> Access this computer from the network to include only the following accounts or groups:
+
+        - Administrators.
+
+        - Authenticated Users.
+
+        - Enterprise Domain Controllers.'
+    - attributes:
+        id: F-82600r1181824_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278165
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278165
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:36101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+          Verify the effective setting in Local Group Policy Editor.
+
+
+          Run gpedit.msc.
+
+
+          Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies
+          >> User Rights Assignment.
+
+
+          If any accounts or groups other than the following are granted the "Access this computer from the network" right,
+          this is a finding:
+
+          - Administrators.
+
+          - Authenticated Users.
+
+          - Enterprise Domain Controllers.
+
+
+          For server core installations, run the following command:
+
+
+          Secedit /Export /Areas User_Rights /cfg c:\path\filename.txt
+
+
+          Review the text file.
+
+
+          If any SIDs other than the following are granted the "SeNetworkLogonRight" user right, this is a finding.
+
+
+          S-1-5-32-544 (Administrators)
+
+          S-1-5-11 (Authenticated Users)
+
+          S-1-5-9 (Enterprise Domain Controllers)
+
+
+          If an application requires this user right, this is not a finding.
+
+
+          Vendor documentation must support the requirement for having the user right.
+
+
+          The requirement must be documented with the information system security officer (ISSO).
+
+
+          The application account must meet requirements for application account passwords, such as length (WN25-00-000050)
+          and required frequency of changes (WN25-00-000060).'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: The Windows Server 2025 "Access this computer from the network" user right must only be assigned to the Administrators,
+    Authenticated Users, and Enterprise Domain Controllers groups on domain controllers.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 5bb323cbc0df66279af697457514a4b12b4575e6c0576ca0600e7bf53e4adaf3
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-278165r1182136_rule
+  status: legacy_compatible

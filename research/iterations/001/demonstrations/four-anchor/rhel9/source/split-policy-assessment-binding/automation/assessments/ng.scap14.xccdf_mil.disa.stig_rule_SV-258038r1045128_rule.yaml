@@ -1,0 +1,218 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258038r1045128_rule
+  version: 1
+  description: RHEL 9 must block unauthorized peripherals before establishing a connection.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25803801:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25803801
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '13'
+      comment: Retrieve usbguard rules list.
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: usbguard list-rules
+  derive: {}
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25803801:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25803801
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          check_existence: at_least_one_exists
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      comment: Confirm the existence of usbguard rules.
+  evaluate:
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25803801:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25803801
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Verify the USBGuard has a policy configured.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25803801
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25803801
+        source_other: []
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038:
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+        class: compliance
+        version: '13'
+        criteria:
+          children:
+          - comment: 'Note: If the system is virtual machine with no virtual or physical USB peripherals attached, this is
+              Not Applicable.'
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25803801
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL 9 must block unauthorized peripherals before establishing a connection.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "The USBguard-daemon is the main component of the USBGuard software framework. It runs as a service in the\
+              \ background and enforces the USB device authorization policy for all USB devices. The policy is defined by\
+              \ a set of rules using a rule language described in the usbguard-rules.conf file. The policy and the authorization\
+              \ state of USB devices can be modified during runtime using the usbguard tool.\n\n\t\t\tThe system administrator\
+              \ (SA) must work with the site information system security officer (ISSO) to determine a list of authorized\
+              \ peripherals and establish rules within the USBGuard software framework to allow only authorized devices."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-258038r1045128_rule
+    title: RHEL 9 must block unauthorized peripherals before establishing a connection.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258038
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:50301
+      exports: []
+      inline_content: 'Note: If the system is virtual machine with no virtual or physical USB peripherals attached, this is
+        Not Applicable. Verify the USBGuard has a policy configured with the following command: $ sudo usbguard list-rules
+        allow id 1d6b:0001 serial If the command does not return results or an error is returned, ask the SA to indicate how
+        unauthorized peripherals are being blocked. If there is no evidence that unauthorized peripherals are being blocked
+        before establishing a connection, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:50301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Note: If the system is virtual machine with no virtual or physical USB peripherals attached, this is Not
+            Applicable.
+
+
+            Verify the USBGuard has a policy configured with the following command:
+
+
+            $ sudo usbguard list-rules
+
+
+            allow id 1d6b:0001 serial
+
+
+            If the command does not return results or an error is returned, ask the SA to indicate how unauthorized peripherals
+            are being blocked.
+
+
+            If there is no evidence that unauthorized peripherals are being blocked before establishing a connection, this
+            is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-258038r1045128_rule
+    semantic_ir_sha256: 19abcc8c8d442af4467d2ff6789b6352905312ce1ab255a50c962a44ddcd19e9
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 0f21ed3106d168de13cfc97785238508deefe031b3b8da302902563c61ef95b7

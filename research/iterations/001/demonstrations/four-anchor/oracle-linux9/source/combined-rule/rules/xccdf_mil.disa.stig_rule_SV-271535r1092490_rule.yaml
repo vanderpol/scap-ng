@@ -1,0 +1,598 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-271535r1092490_rule
+  title: OL 9 must audit all uses of the su command.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-271535
+  description: '<VulnDiscussion>Without generating audit record specific to the security and mission needs of the organization,
+    it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible
+    for one. Audit records can be generated from various components within the information system (e.g., module or policy
+    filter). When a user logs on, the auid is set to the uid of the account being authenticated. Daemons are not user sessions
+    and have the loginuid set to -1. The auid representation is an unsigned 32-bit integer, which equals 4294967295. The audit
+    system interprets -1, 4294967295, and "unset" in the same way. The system call rules are loaded into a matching engine
+    that intercepts each system call made by all programs on the system. Therefore, it is very important to use system call
+    rules only when absolutely necessary since these affect performance. The more rules, the bigger the performance hit. The
+    performance can be helped, however, by combining system calls into one rule whenever possible. Satisfies: SRG-OS-000037-GPOS-00015,
+    SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000064-GPOS-00033, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206,
+    SRG-OS-000471-GPOS-00215, SRG-OS-000466-GPOS-00210</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:oracle:linux:9:-
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:oracle:linux:9:-
+    ref: cpe:/o:oracle:linux:9:-
+  references:
+  - href: null
+    text: DPMS Target Oracle Linux 9 DISA DPMS Target Oracle Linux 9 5680
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000130
+  - system: http://cyber.mil/cci
+    value: CCI-000135
+  - system: http://cyber.mil/cci
+    value: CCI-000169
+  - system: http://cyber.mil/cci
+    value: CCI-000172
+  - system: http://cyber.mil/cci
+    value: CCI-002884
+  requires: []
+  conflicts: []
+  check: 'Verify that OL 9 is configured to audit the execution of the su command with the following command: $ sudo auditctl
+    -l | grep /usr/bin/su -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change
+    If the command does not return a line or the line is commented out, this is a finding.'
+  source_checks:
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271535
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271535
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271535
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271535
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:19901
+    exports: []
+    inline_content: 'Verify that OL 9 is configured to audit the execution of the su command with the following command: $
+      sudo auditctl -l | grep /usr/bin/su -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change
+      If the command does not return a line or the line is commented out, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:19901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify that OL 9 is configured to audit the execution of the su command with the following command:
+
+
+          $ sudo auditctl -l | grep /usr/bin/su
+
+          -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change
+
+
+          If the command does not return a line or the line is commented out, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271535
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271535
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271535
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271535
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:19901
+      exports: []
+      inline_content: 'Verify that OL 9 is configured to audit the execution of the su command with the following command:
+        $ sudo auditctl -l | grep /usr/bin/su -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k
+        privileged-priv_change If the command does not return a line or the line is commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:19901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 is configured to audit the execution of the su command with the following command:
+
+
+            $ sudo auditctl -l | grep /usr/bin/su
+
+            -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change
+
+
+            If the command does not return a line or the line is commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: 'Configure OL 9 to generate audit records upon successful/unsuccessful attempts to use the su command by adding or
+    updating the following rule in "/etc/audit/rules.d/audit.rules": -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000
+    -F auid!=unset -k privileged-priv_change The audit daemon must be restarted for the changes to take effect. Restart auditd:
+    $ sudo service auditd restart'
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-271535r1092490_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL09-00-000540
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL 9 must audit all uses of the su command.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Without generating audit record specific to the security and mission needs of the organization,
+        it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those
+        responsible for one.
+
+
+        Audit records can be generated from various components within the information system (e.g., module or policy filter).
+
+
+        When a user logs on, the auid is set to the uid of the account being authenticated. Daemons are not user sessions
+        and have the loginuid set to -1. The auid representation is an unsigned 32-bit integer, which equals 4294967295. The
+        audit system interprets -1, 4294967295, and "unset" in the same way.
+
+
+        The system call rules are loaded into a matching engine that intercepts each system call made by all programs on the
+        system. Therefore, it is very important to use system call rules only when absolutely necessary since these affect
+        performance. The more rules, the bigger the performance hit. The performance can be helped, however, by combining
+        system calls into one rule whenever possible.
+
+
+        Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000064-GPOS-00033,
+        SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000466-GPOS-00210</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Oracle Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Oracle Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5680'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000130
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000135
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000169
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000172
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002884
+    - attributes:
+        fixref: F-75492r1092489_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure OL 9 to generate audit records upon successful/unsuccessful attempts to use the su command by adding
+        or updating the following rule in "/etc/audit/rules.d/audit.rules":
+
+
+        -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change
+
+
+        The audit daemon must be restarted for the changes to take effect.
+
+
+        Restart auditd:
+
+        $ sudo service auditd restart'
+    - attributes:
+        id: F-75492r1092489_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271535
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271535
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:19901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify that OL 9 is configured to audit the execution of the su command with the following command:
+
+
+          $ sudo auditctl -l | grep /usr/bin/su
+
+          -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change
+
+
+          If the command does not return a line or the line is commented out, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  assessment:
+    id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271535r1092490_rule
+    version: 1
+    description: OL 9 must audit all uses of the su command.
+    semantic_model: scap-ng-generic-assessment-graph-0.1
+    collect:
+      oval:mil.disa.stig.ind:obj:23041200:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23041200
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/bin/su\s+(-F\s+perm=([rwa]*x[rwa]*)\s+)?-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+    derive: {}
+    predicates: {}
+    evaluate:
+      tests:
+        oval:mil.disa.stig.ind:tst:23041200:
+          source_test_id: oval:mil.disa.stig.ind:tst:23041200
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit invocations of /usr/bin/su
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23041200
+          predicates: []
+          source_other: []
+      definitions:
+        oval:mil.disa.stig.defs:def:230412:
+          source_definition_id: oval:mil.disa.stig.defs:def:230412
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit invocations of /usr/bin/su
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23041200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of the su command in the operating system must generate an audit record.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.ol9os:def:271535:
+          source_definition_id: oval:mil.disa.stig.ol9os:def:271535
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:230412
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: OL09-00-000540 - OL 9 must audit all uses of the su command.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Oracle Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: "Without generating audit record specific to the security and mission needs of the organization, it would\
+                \ be difficult to establish, correlate, and investigate the events relating to an incident or identify those\
+                \ responsible for one.\n\n\tAudit records can be generated from various components within the information\
+                \ system (e.g., module or policy filter).\n\n\tWhen a user logs on, the auid is set to the uid of the account\
+                \ being authenticated. Daemons are not user sessions and have the loginuid set to -1. The auid representation\
+                \ is an unsigned 32-bit integer, which equals 4294967295. The audit system interprets -1, 4294967295, and\
+                \ \"unset\" in the same way.\n\n\tThe system call rules are loaded into a matching engine that intercepts\
+                \ each system call made by all programs on the system. Therefore, it is very important to use system call\
+                \ rules only when absolutely necessary since these affect performance. The more rules, the bigger the performance\
+                \ hit. The performance can be helped, however, by combining system calls into one rule whenever possible.\n\
+                \n\tSatisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000064-GPOS-00033,\
+                \ SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000466-GPOS-00210"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    assert:
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271535
+      combination: xccdf_source_check_semantics
+    source_check_context:
+      check_exports: []
+      checks:
+      - definition_id: oval:mil.disa.stig.ol9os:def:271535
+        exports: []
+        href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.ol9os:def:271535
+        oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - definition_id: oval:mil.disa.stig.ol9os:def:271535
+        exports: []
+        href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.ol9os:def:271535
+        oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+      published_source:
+        datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+        datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+        repository: niwc-atlantic/scap-content-library
+        repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+        revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+        zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+        zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+      rule_id: xccdf_mil.disa.stig_rule_SV-271535r1092490_rule
+      title: OL 9 must audit all uses of the su command.
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271535
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271535
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271535
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271535
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:19901
+        exports: []
+        inline_content: 'Verify that OL 9 is configured to audit the execution of the su command with the following command:
+          $ sudo auditctl -l | grep /usr/bin/su -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset
+          -k privileged-priv_change If the command does not return a line or the line is commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:19901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 is configured to audit the execution of the su command with the following command:
+
+
+              $ sudo auditctl -l | grep /usr/bin/su
+
+              -a always,exit -F path=/usr/bin/su -F perm=x -F auid>=1000 -F auid!=unset -k privileged-priv_change
+
+
+              If the command does not return a line or the line is commented out, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    migration: &id001
+      status: legacy_compatible
+      source: SCAP 1.4 / OVAL 5.12.3
+      source_rule: xccdf_mil.disa.stig_rule_SV-271535r1092490_rule
+      semantic_ir_sha256: b793a70de3a647ed259ff42c9e231318bc450df457c7d1d3e526d93d13a3e994
+      note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_fingerprint_sha256: ca46ef44b98fd47db7e8d37844ae24900b5f7f9bf13d25bdd7f74676cea1857f
+  migration: *id001

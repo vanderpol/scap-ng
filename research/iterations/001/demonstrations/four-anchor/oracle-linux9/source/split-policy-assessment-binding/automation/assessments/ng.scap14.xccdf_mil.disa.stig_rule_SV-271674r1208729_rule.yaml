@@ -1,0 +1,241 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271674r1208729_rule
+  version: 1
+  description: OL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27167401:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27167401
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '5'
+      comment: Gather gsettings get org.gnome.desktop.session idle-delay
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: gsettings get org.gnome.desktop.session idle-delay
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: uint32\s+(\d+)
+  derive: {}
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27167401:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27167401
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          datatype: int
+          operation: not equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      comment: idle-delay must not be equal to zero
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          datatype: int
+          operation: less than or equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '600'
+      comment: idle-delay must be less than or equal to 600
+  evaluate:
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27167401:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27167401
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Gnome idle-delay must not be set to 0 or greater than 600
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27167401
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27167401
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27167402
+        source_other: []
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271674:
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+        class: compliance
+        version: '5'
+        criteria:
+          children:
+          - comment: Gnome idle-delay must not be set to 0 or greater than 600
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27167401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271674r1208729_rule
+    title: OL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:47501
+      exports: []
+      inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+        If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify OL
+        9 initiates a session lock after a 10-minute period of inactivity for graphical user interfaces with the following
+        command: $ gsettings get org.gnome.desktop.session idle-delay uint32 600 If "idle-delay" is set to "0" or a value
+        greater than "600", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:47501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+            If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+
+
+            Verify OL 9 initiates a session lock after a 10-minute period of inactivity for graphical user interfaces with
+            the following command:
+
+
+            $ gsettings get org.gnome.desktop.session idle-delay
+
+            uint32 600
+
+
+            If "idle-delay" is set to "0" or a value greater than "600", this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271674r1208729_rule
+    semantic_ir_sha256: 22dd9c5ae459215b6379e67419d0b36711099ea23bcdf2a4b0913f34d7804b63
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: d89f34b9081bfab800ea32852d8450e3f329d98b4dfd0c80b07fab457cf9a1e6

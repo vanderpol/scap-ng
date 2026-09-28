@@ -1,0 +1,483 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271632r1091608_rule
+  version: 1
+  description: OL 9 user account passwords must have a 60-day maximum password lifetime restriction.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: OL 9 user account passwords must have a 60-day maximum password lifetime restriction.
+  steps:
+  - name: Collect oval:mil.disa.stig.unix:obj:23036700
+    collect:
+      capability: scapng.collect.unix.shadow
+      comment: /etc/shadow max password ages for non-system users
+      query:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: username
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: .+
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:23036702
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:23036700
+      source_type: shadow_object
+      version: '3'
+    register: oval:mil.disa.stig.unix:obj:23036700
+  - name: Collect oval:mil.disa.stig.unix:obj:23036701
+    collect:
+      capability: scapng.collect.unix.password
+      comment: interactive non-anonymous users
+      query:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: username
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: .*
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:23036704
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:23036703
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:23036701
+      source_type: password_object
+      version: '3'
+    register: oval:mil.disa.stig.unix:obj:23036701
+  - name: Collect oval:mil.disa.stig.unix:obj:23036702
+    collect:
+      capability: scapng.collect.unix.shadow
+      comment: /etc/shadow max password age for root
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: username
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: root
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:23036702
+      source_type: shadow_object
+      version: '1'
+    register: oval:mil.disa.stig.unix:obj:23036702
+  - name: Derive oval:mil.disa.stig.defs:var:23036700
+    derive:
+      comment: Pattern to match lines starting with usernames of system users
+      datatype: string
+      evaluation_plan:
+        blocked_by:
+          item_field: username
+          object_ref: oval:mil.disa.stig.unix:obj:23036701
+          operation: object_component
+          reason: object_component_requires_collection:password_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.unix:obj:23036701
+          operations:
+          - concat
+          - literal_component
+          - object_component
+          variables: []
+        expression:
+          args:
+          - datatype: string
+            op: literal_component
+            value: ^
+          - item_field: username
+            object_ref: oval:mil.disa.stig.unix:obj:23036701
+            op: object_component
+            record_field: null
+          - datatype: string
+            op: literal_component
+            value: $
+          attributes: {}
+          op: concat
+        mode: target_dependent
+        reason: concat_child_not_static:object_component_requires_collection:password_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23036700
+        variable_type: local_variable
+      resolution:
+        blocked_by:
+          item_field: username
+          object_ref: oval:mil.disa.stig.unix:obj:23036701
+          operation: object_component
+          reason: object_component_requires_collection:password_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        operation: concat
+        reason: concat_child_not_static:object_component_requires_collection:password_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: string
+        expression:
+          args:
+          - datatype: string
+            op: literal_component
+            value: ^
+          - item_field: username
+            object_ref: oval:mil.disa.stig.unix:obj:23036701
+            op: object_component
+            record_field: null
+          - datatype: string
+            op: literal_component
+            value: $
+          attributes: {}
+          op: concat
+        id: oval:mil.disa.stig.defs:var:23036700
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:23036700
+    register: oval:mil.disa.stig.defs:var:23036700
+  - name: Derive oval:mil.disa.stig.defs:var:23036701
+    derive:
+      comment: anonymous UIDs
+      datatype: int
+      evaluation_plan:
+        datatype: int
+        mode: static
+        resolution_status: exact_static
+        values:
+        - '65534'
+        - '65535'
+        - '4294967294'
+        - '4294967295'
+        variable_id: oval:mil.disa.stig.defs:var:23036701
+        variable_type: constant_variable
+      resolution:
+        datatype: int
+        status: exact_static
+        values:
+        - '65534'
+        - '65535'
+        - '4294967294'
+        - '4294967295'
+        variable_type: constant_variable
+      semantic_ast:
+        datatype: int
+        id: oval:mil.disa.stig.defs:var:23036701
+        type: constant_variable
+        values:
+        - datatype: int
+          value: '65534'
+        - datatype: int
+          value: '65535'
+        - datatype: int
+          value: '4294967294'
+        - datatype: int
+          value: '4294967295'
+      source_type: constant_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:23036701
+    register: oval:mil.disa.stig.defs:var:23036701
+  predicates:
+    oval:mil.disa.stig.unix:ste:23036700:
+      comment: greater than zero
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than
+        kind: element
+        name: chg_req
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:23036700
+      source_type: shadow_state
+    oval:mil.disa.stig.unix:ste:23036701:
+      comment: less than or equal to sixty
+      entities:
+      - attributes:
+          datatype: int
+          operation: less than or equal
+        kind: element
+        name: chg_req
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '60'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:23036701
+      source_type: shadow_state
+    oval:mil.disa.stig.unix:ste:23036702:
+      comment: Lines starting with usernames of system users
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23036700
+        kind: element
+        name: username
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:23036702
+      source_type: shadow_state
+    oval:mil.disa.stig.unix:ste:23036703:
+      comment: anonymous users
+      entities:
+      - attributes:
+          datatype: int
+          operation: not equal
+          var_check: all
+          var_ref: oval:mil.disa.stig.defs:var:23036701
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:23036703
+      source_type: password_state
+    oval:mil.disa.stig.unix:ste:23036704:
+      comment: null
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1000'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:23036704
+      source_type: password_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230367:
+        class: compliance
+        criteria:
+          children:
+          - comment: No password in /etc/shadow has a maximum password age of 0 or greater than 60
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23036700
+          - comment: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23036701
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system user account passwords must be configured so that existing passwords are restricted
+              to a 60-day maximum lifetime.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230367
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271632:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230367
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-001100 - OL 9 user account passwords must have a 60-day maximum password lifetime restriction.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Any password, no matter how complex, can eventually be cracked; therefore, passwords need to be changed
+              periodically. If OL 9 does not limit the lifetime of passwords and force users to change their passwords, there
+              is the risk that OL 9 passwords could be compromised.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271632
+        version: '1'
+    tests:
+      oval:mil.disa.stig.unix:tst:23036700:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.unix:obj:23036700
+        comment: No password in /etc/shadow has a maximum password age of 0 or greater than 60
+        predicates:
+        - oval:mil.disa.stig.unix:ste:23036700
+        - oval:mil.disa.stig.unix:ste:23036701
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:23036700
+        source_type: shadow_test
+        state_operator: AND
+      oval:mil.disa.stig.unix:tst:23036701:
+        check: all
+        check_existence: all_exist
+        collections:
+        - oval:mil.disa.stig.unix:obj:23036702
+        comment: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
+        predicates:
+        - oval:mil.disa.stig.unix:ste:23036700
+        - oval:mil.disa.stig.unix:ste:23036701
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:23036701
+        source_type: shadow_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.ol9os:def:271632
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      name: oval:mil.disa.stig.ol9os:def:271632
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.ol9os:def:271632
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      name: oval:mil.disa.stig.ol9os:def:271632
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271632r1091608_rule
+    title: OL 9 user account passwords must have a 60-day maximum password lifetime restriction.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271632
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271632
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271632
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271632
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:39301
+      exports: []
+      inline_content: 'Verify that OL 9 user account passwords have a 60-day maximum password lifetime restriction with the
+        following commands: $ sudo awk -F: ''$5 > 60 {print $1 "" "" $5}'' /etc/shadow $ sudo awk -F: ''$5 <= 0 {print $1
+        "" "" $5}'' /etc/shadow If any results are returned that are not associated with a system account, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:39301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 user account passwords have a 60-day maximum password lifetime restriction with the following
+            commands:
+
+
+            $ sudo awk -F: ''$5 > 60 {print $1 "" "" $5}'' /etc/shadow
+
+
+            $ sudo awk -F: ''$5 <= 0 {print $1 "" "" $5}'' /etc/shadow
+
+
+            If any results are returned that are not associated with a system account, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271632
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 50fa5e3663a7a78a7895224f3ccf9f34299357b1c2821e3221e1ee5fd0cdb2f4
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271632r1091608_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 49a866abc27b5d3bd7032f6994c7d3c1bde505ad1d019a15e08da07c5b9cc327

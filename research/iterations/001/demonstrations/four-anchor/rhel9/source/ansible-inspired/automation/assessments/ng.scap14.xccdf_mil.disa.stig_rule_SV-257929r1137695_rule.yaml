@@ -1,0 +1,240 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+  version: 1
+  description: A sticky bit must be set on all RHEL 9 public directories.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: A sticky bit must be set on all RHEL 9 public directories.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.linux:obj:25792901
+    collect:
+      capability: scapng.collect.unix.file
+      comment: Check to see that all world-writable directories have the sticky bit set. Gather world-writable directories.
+      query:
+      - attributes:
+          max_depth: '-1'
+          recurse: directories
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25792901
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25792902
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:25792901
+      source_type: file_object
+      version: '13'
+    register: oval:navy.navwar.niwcatlantic.scc.linux:obj:25792901
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:25792901:
+      comment: Filter exclude directories that are not world writable.
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25792901
+      source_type: file_state
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:25792902:
+      comment: Filter exclude any with sticky bit.
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sticky
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25792902
+      source_type: file_state
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:257929:
+        class: compliance
+        criteria:
+          children:
+          - comment: A sticky bit must be set on all public directories to prevent unauthorized and unintended information
+              transferred via shared system resources.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:25792901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: A sticky bit must be set on all RHEL 9 public directories.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: A sticky bit must be set on all public directories to prevent unauthorized and unintended information transferred
+              via shared system resources.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+        version: '13'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:25792901:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:25792901
+        comment: Check that all world-writable directories have the sticky bit set.
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:25792901
+        source_type: file_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+    title: A sticky bit must be set on all RHEL 9 public directories.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:30101
+      exports: []
+      inline_content: 'Verify that all world-writable directories have the sticky bit set. Determine if all world-writable
+        directories have the sticky bit set by running the following command: $ sudo find / -type d \( -perm -0002 -a ! -perm
+        -1000 \) -print 2>/dev/null drwxrwxrwt 7 root root 4096 Jul 26 11:19 /tmp If any of the returned directories are world-writable
+        and do not have the sticky bit set, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:30101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that all world-writable directories have the sticky bit set.
+
+
+            Determine if all world-writable directories have the sticky bit set by running the following command:
+
+
+            $ sudo find / -type d \( -perm -0002 -a ! -perm -1000 \) -print 2>/dev/null
+
+
+            drwxrwxrwt 7 root root 4096 Jul 26 11:19 /tmp
+
+
+            If any of the returned directories are world-writable and do not have the sticky bit set, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: a8c51bf614a59138430f5f51de5c5da63d36e381c9b1b82b3000d4a38e3805f9
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: c56b6d5519a83022b4e67b45d3bb99b9f1dd3b010dea4ee71725c0b5b876728f

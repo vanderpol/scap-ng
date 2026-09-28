@@ -1,0 +1,309 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Verify that OL 9 clears the page allocator to prevent use-after-free attacks. Verify that GRUB 2 is configured to
+    enable page poisoning to mitigate use-after-free vulnerabilities. Check that the current GRUB 2 configuration has page
+    poisoning enabled with the following command: $ sudo grubby --info=ALL | grep args | grep -v ''page_poison=1'' If any
+    output is returned, this is a finding. Check that page poisoning is enabled by default to persist in kernel updates with
+    the following command: $ grep page_poison /etc/default/grub GRUB_CMDLINE_LINUX="page_poison=1" If "page_poison" is not
+    set to "1", is missing or commented out, this is a finding.'
+  cluster_id: null
+  conflicts: []
+  description: <VulnDiscussion>Poisoning writes an arbitrary value to freed pages, so any modification or reference to that
+    page after being freed or before being initialized will be detected and prevented. This prevents many types of use-after-free
+    vulnerabilities at little performance cost. Also prevents leak of data and detection of corrupted memory.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:oracle:linux:9:-
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:oracle:linux:9:-
+    ref: cpe:/o:oracle:linux:9:-
+  extends: null
+  fix: 'Configure OL 9 to enable page poisoning with the following commands: $ sudo grubby --update-kernel=ALL --args="page_poison=1"
+    Add or modify the following line in "/etc/default/grub" to ensure the configuration survives kernel updates: GRUB_CMDLINE_LINUX="page_poison=1"'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-271738
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-271738r1092600_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001084
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Oracle Linux 9 DISA DPMS Target Oracle Linux 9 5680
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271738
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271738
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271738
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271738
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59701
+      exports: []
+      inline_content: 'Verify that OL 9 clears the page allocator to prevent use-after-free attacks. Verify that GRUB 2 is
+        configured to enable page poisoning to mitigate use-after-free vulnerabilities. Check that the current GRUB 2 configuration
+        has page poisoning enabled with the following command: $ sudo grubby --info=ALL | grep args | grep -v ''page_poison=1''
+        If any output is returned, this is a finding. Check that page poisoning is enabled by default to persist in kernel
+        updates with the following command: $ grep page_poison /etc/default/grub GRUB_CMDLINE_LINUX="page_poison=1" If "page_poison"
+        is not set to "1", is missing or commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 clears the page allocator to prevent use-after-free attacks.\n\nVerify that GRUB 2 is configured\
+            \ to enable page poisoning to mitigate use-after-free vulnerabilities.\n\nCheck that the current GRUB 2 configuration\
+            \ has page poisoning enabled with the following command:\n\n$ sudo grubby --info=ALL | grep args | grep -v 'page_poison=1'\n\
+            \nIf any output is returned, this is a finding.\n\nCheck that page poisoning is enabled by default to persist\
+            \ in kernel updates with the following command: \n\n$ grep page_poison /etc/default/grub\nGRUB_CMDLINE_LINUX=\"\
+            page_poison=1\"\n\nIf \"page_poison\" is not set to \"1\", is missing or commented out, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271738
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271738
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271738
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271738
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59701
+    exports: []
+    inline_content: 'Verify that OL 9 clears the page allocator to prevent use-after-free attacks. Verify that GRUB 2 is configured
+      to enable page poisoning to mitigate use-after-free vulnerabilities. Check that the current GRUB 2 configuration has
+      page poisoning enabled with the following command: $ sudo grubby --info=ALL | grep args | grep -v ''page_poison=1''
+      If any output is returned, this is a finding. Check that page poisoning is enabled by default to persist in kernel updates
+      with the following command: $ grep page_poison /etc/default/grub GRUB_CMDLINE_LINUX="page_poison=1" If "page_poison"
+      is not set to "1", is missing or commented out, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify that OL 9 clears the page allocator to prevent use-after-free attacks.\n\nVerify that GRUB 2 is configured\
+          \ to enable page poisoning to mitigate use-after-free vulnerabilities.\n\nCheck that the current GRUB 2 configuration\
+          \ has page poisoning enabled with the following command:\n\n$ sudo grubby --info=ALL | grep args | grep -v 'page_poison=1'\n\
+          \nIf any output is returned, this is a finding.\n\nCheck that page poisoning is enabled by default to persist in\
+          \ kernel updates with the following command: \n\n$ grep page_poison /etc/default/grub\nGRUB_CMDLINE_LINUX=\"page_poison=1\"\
+          \n\nIf \"page_poison\" is not set to \"1\", is missing or commented out, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-271738r1092600_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL09-00-002394
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL 9 must clear the page allocator to prevent use-after-free attacks.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: <VulnDiscussion>Poisoning writes an arbitrary value to freed pages, so any modification or reference to that page
+        after being freed or before being initialized will be detected and prevented. This prevents many types of use-after-free
+        vulnerabilities at little performance cost. Also prevents leak of data and detection of corrupted memory.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Oracle Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Oracle Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5680'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001084
+    - attributes:
+        fixref: F-75695r1091925_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure OL 9 to enable page poisoning with the following commands:
+
+
+        $ sudo grubby --update-kernel=ALL --args="page_poison=1"
+
+
+        Add or modify the following line in "/etc/default/grub" to ensure the configuration survives kernel updates:
+
+
+        GRUB_CMDLINE_LINUX="page_poison=1"'
+    - attributes:
+        id: F-75695r1091925_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271738
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271738
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify that OL 9 clears the page allocator to prevent use-after-free attacks.\n\nVerify that GRUB 2 is configured\
+          \ to enable page poisoning to mitigate use-after-free vulnerabilities.\n\nCheck that the current GRUB 2 configuration\
+          \ has page poisoning enabled with the following command:\n\n$ sudo grubby --info=ALL | grep args | grep -v 'page_poison=1'\n\
+          \nIf any output is returned, this is a finding.\n\nCheck that page poisoning is enabled by default to persist in\
+          \ kernel updates with the following command: \n\n$ grep page_poison /etc/default/grub\nGRUB_CMDLINE_LINUX=\"page_poison=1\"\
+          \n\nIf \"page_poison\" is not set to \"1\", is missing or commented out, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: OL 9 must clear the page allocator to prevent use-after-free attacks.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: dcd33b99354e7fdc7841cfc7a5ad219abac0a31c5389779f91633f6bcd930d05
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-271738r1092600_rule
+  status: legacy_compatible

@@ -1,0 +1,391 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Verify RHEL 9 logs IPv4 martian packets by default. Check the value of the "default.log_martians" variable with
+    the following command: $ sudo sysctl net.ipv4.conf.default.log_martians net.ipv4.conf.default.log_martians = 1 If "net.ipv4.conf.default.log_martians"
+    is not set to "1" or is missing, this is a finding.'
+  cluster_id: null
+  conflicts: []
+  description: <VulnDiscussion>The presence of "martian" packets (which have impossible addresses) as well as spoofed packets,
+    source-routed packets, and redirects could be a sign of nefarious network activity. Logging these packets enables this
+    activity to be detected. Preventing unauthorized information transfers mitigates the risk of information, including encrypted
+    representations of information, produced by the actions of prior users/roles (or the actions of processes acting on behalf
+    of prior users/roles) from being available to any current users/roles (or current processes) that obtain access to shared
+    system resources (e.g., registers, main memory, hard disks) after those resources have been released back to information
+    systems. The control of information in shared resources is also commonly referred to as object reuse and residual information
+    protection. This requirement generally applies to the design of an information technology product, but it can also apply
+    to the configuration of particular information system components that are, or use, such products. This can be verified
+    by acceptance/validation processes in DOD or other government agencies. There may be shared resources with configurable
+    protections (e.g., files in storage) that may be assessed on specific information system components. Restricting access
+    to the kernel message buffer limits access to only root. This prevents attackers from gaining additional system information
+    as a nonprivileged user. The sysctl --system command will load settings from all system configuration files. All configuration
+    files are sorted by their filename in lexicographical order, regardless of the directories in which they reside. If multiple
+    files specify the same option, the entry in the file with the lexicographically latest name will take precedence. Files
+    are read from directories in the following list from top to bottom. Once a file of a given filename is loaded, any file
+    of the same name in subsequent directories is ignored. /etc/sysctl.d/*.conf /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf
+    /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:almalinux:almalinux:9
+  - cpe:/o:rocky:rocky:9
+  - cpe:/o:redhat:enterprise_linux:9.0
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:almalinux:almalinux:9
+    ref: cpe:/o:almalinux:almalinux:9
+  - kind: cpe_name
+    name: cpe:/o:rocky:rocky:9
+    ref: cpe:/o:rocky:rocky:9
+  - kind: cpe_name
+    name: cpe:/o:redhat:enterprise_linux:9.0
+    ref: cpe:/o:redhat:enterprise_linux:9.0
+  extends: null
+  fix: 'Configure RHEL 9 to log martian packets on IPv4 interfaces by default. Create a configuration file if it does not
+    already exist: $ sudo vi /etc/sysctl.d/99-ipv4_log_martians.conf Add the following line to the file: net.ipv4.conf.default.log_martians=1
+    Reload settings from all system configuration files with the following command: $ sudo sysctl --system'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-257961
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-257961r1155730_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000366
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257961
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257961
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257961
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257961
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:35901
+      exports: []
+      inline_content: 'Verify RHEL 9 logs IPv4 martian packets by default. Check the value of the "default.log_martians" variable
+        with the following command: $ sudo sysctl net.ipv4.conf.default.log_martians net.ipv4.conf.default.log_martians =
+        1 If "net.ipv4.conf.default.log_martians" is not set to "1" or is missing, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:35901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify RHEL 9 logs IPv4 martian packets by default.
+
+
+            Check the value of the "default.log_martians" variable with the following command:
+
+
+            $ sudo sysctl net.ipv4.conf.default.log_martians
+
+            net.ipv4.conf.default.log_martians = 1
+
+
+            If "net.ipv4.conf.default.log_martians" is not set to "1" or is missing, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:257961
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257961
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:257961
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257961
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:35901
+    exports: []
+    inline_content: 'Verify RHEL 9 logs IPv4 martian packets by default. Check the value of the "default.log_martians" variable
+      with the following command: $ sudo sysctl net.ipv4.conf.default.log_martians net.ipv4.conf.default.log_martians = 1
+      If "net.ipv4.conf.default.log_martians" is not set to "1" or is missing, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:35901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify RHEL 9 logs IPv4 martian packets by default.
+
+
+          Check the value of the "default.log_martians" variable with the following command:
+
+
+          $ sudo sysctl net.ipv4.conf.default.log_martians
+
+          net.ipv4.conf.default.log_martians = 1
+
+
+          If "net.ipv4.conf.default.log_martians" is not set to "1" or is missing, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-257961r1155730_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-253030
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL 9 must log IPv4 packets with impossible addresses by default.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>The presence of "martian" packets (which have impossible addresses) as well as spoofed packets,
+        source-routed packets, and redirects could be a sign of nefarious network activity. Logging these packets enables
+        this activity to be detected.
+
+
+        Preventing unauthorized information transfers mitigates the risk of information, including encrypted representations
+        of information, produced by the actions of prior users/roles (or the actions of processes acting on behalf of prior
+        users/roles) from being available to any current users/roles (or current processes) that obtain access to shared system
+        resources (e.g., registers, main memory, hard disks) after those resources have been released back to information
+        systems. The control of information in shared resources is also commonly referred to as object reuse and residual
+        information protection.
+
+
+        This requirement generally applies to the design of an information technology product, but it can also apply to the
+        configuration of particular information system components that are, or use, such products. This can be verified by
+        acceptance/validation processes in DOD or other government agencies.
+
+
+        There may be shared resources with configurable protections (e.g., files in storage) that may be assessed on specific
+        information system components.
+
+
+        Restricting access to the kernel message buffer limits access to only root. This prevents attackers from gaining additional
+        system information as a nonprivileged user.
+
+
+        The sysctl --system command will load settings from all system configuration files. All configuration files are sorted
+        by their filename in lexicographical order, regardless of the directories in which they reside. If multiple files
+        specify the same option, the entry in the file with the lexicographically latest name will take precedence. Files
+        are read from directories in the following list from top to bottom. Once a file of a given filename is loaded, any
+        file of the same name in subsequent directories is ignored.
+
+
+        /etc/sysctl.d/*.conf
+
+        /run/sysctl.d/*.conf
+
+        /usr/local/lib/sysctl.d/*.conf
+
+        /usr/lib/sysctl.d/*.conf
+
+        /lib/sysctl.d/*.conf
+
+        /etc/sysctl.conf</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000366
+    - attributes:
+        fixref: F-61626r1155729_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure RHEL 9 to log martian packets on IPv4 interfaces by default.
+
+
+        Create a configuration file if it does not already exist:
+
+
+        $ sudo vi /etc/sysctl.d/99-ipv4_log_martians.conf
+
+
+        Add the following line to the file:
+
+        net.ipv4.conf.default.log_martians=1
+
+
+        Reload settings from all system configuration files with the following command:
+
+
+        $ sudo sysctl --system'
+    - attributes:
+        id: F-61626r1155729_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257961
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257961
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:35901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify RHEL 9 logs IPv4 martian packets by default.
+
+
+          Check the value of the "default.log_martians" variable with the following command:
+
+
+          $ sudo sysctl net.ipv4.conf.default.log_martians
+
+          net.ipv4.conf.default.log_martians = 1
+
+
+          If "net.ipv4.conf.default.log_martians" is not set to "1" or is missing, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: RHEL 9 must log IPv4 packets with impossible addresses by default.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: cb886a3d28e4e19acac73fdbbdd976c43a2c26fe8aebba1d5136d48b6693d3ef
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-257961r1155730_rule
+  status: legacy_compatible

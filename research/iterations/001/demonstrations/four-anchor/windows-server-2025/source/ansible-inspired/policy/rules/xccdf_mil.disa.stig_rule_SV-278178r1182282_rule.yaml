@@ -1,0 +1,383 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'This applies to member servers. For domain controllers and stand-alone or nondomain-joined systems, this is not
+    applicable. If the following registry value does not exist or is not configured as specified, this is a finding: Registry
+    HiveHKEY_LOCAL_MACHINE Registry Path\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System Value NameLocalAccountTokenFilterPolicy
+    TypeREG_DWORD Value: 0x00000000 (0) This setting may cause issues with some network scanning tools if local administrative
+    accounts are used remotely. Scans must use domain accounts where possible. If a local administrative account must be used,
+    temporarily enabling the privileged token by configuring the registry value to "1" may be required.'
+  cluster_id: null
+  conflicts: []
+  description: <VulnDiscussion>A compromised local administrator account can provide means for an attacker to move laterally
+    between domain systems. With User Account Control enabled, filtering the privileged token for local administrator accounts
+    will prevent the elevated privileges of these accounts from being used over the network.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - '#xccdf_mil.disa.stig_platform_Windows_MemberServer'
+  effective_platforms:
+  - expression:
+      children:
+      - definition_binding:
+          definition_id: oval:mil.disa.stig.win:def:100004
+          source: applicability_oval_ir
+          status: resolved
+        href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        id_ref: oval:mil.disa.stig.win:def:100004
+        kind: check_fact
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      kind: logical_test
+      negate: false
+      operator: AND
+    kind: local_cpe_expression
+    platform_id: xccdf_mil.disa.stig_platform_Windows_MemberServer
+    ref: '#xccdf_mil.disa.stig_platform_Windows_MemberServer'
+  extends: null
+  fix: Configure the policy value for Computer Configuration >> Administrative Templates >> MS Security Guide >> Apply UAC
+    restrictions to local accounts on network logons to "Enabled". This policy setting requires the installation of the SecGuide
+    custom templates included with the STIG package. "SecGuide.admx" and " SecGuide.adml" must be copied to the \Windows\PolicyDefinitions
+    and \Windows\PolicyDefinitions\en-US directories respectively.
+  group_path:
+  - xccdf_mil.disa.stig_group_V-278178
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-278178r1182282_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001084
+  multiple: false
+  platforms:
+  - '#xccdf_mil.disa.stig_platform_Windows_MemberServer'
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows Server 2025 DISA DPMS Target Microsoft Windows Server 2025 5719
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278178
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278178
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278178
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278178
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:38501
+      exports: []
+      inline_content: 'This applies to member servers. For domain controllers and stand-alone or nondomain-joined systems,
+        this is not applicable. If the following registry value does not exist or is not configured as specified, this is
+        a finding: Registry HiveHKEY_LOCAL_MACHINE Registry Path\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+        Value NameLocalAccountTokenFilterPolicy TypeREG_DWORD Value: 0x00000000 (0) This setting may cause issues with some
+        network scanning tools if local administrative accounts are used remotely. Scans must use domain accounts where possible.
+        If a local administrative account must be used, temporarily enabling the privileged token by configuring the registry
+        value to "1" may be required.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:38501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This applies to member servers. For domain controllers and stand-alone or nondomain-joined systems, this
+            is not applicable.
+
+
+            If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+            Registry HiveHKEY_LOCAL_MACHINE
+
+            Registry Path\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+
+
+            Value NameLocalAccountTokenFilterPolicy
+
+
+            TypeREG_DWORD
+
+            Value: 0x00000000 (0)
+
+
+            This setting may cause issues with some network scanning tools if local administrative accounts are used remotely.
+            Scans must use domain accounts where possible. If a local administrative account must be used, temporarily enabling
+            the privileged token by configuring the registry value to "1" may be required.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      name: oval:mil.disa.stig.windows2025:def:278178
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278178
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      name: oval:mil.disa.stig.windows2025:def:278178
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278178
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:38501
+    exports: []
+    inline_content: 'This applies to member servers. For domain controllers and stand-alone or nondomain-joined systems, this
+      is not applicable. If the following registry value does not exist or is not configured as specified, this is a finding:
+      Registry HiveHKEY_LOCAL_MACHINE Registry Path\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System Value NameLocalAccountTokenFilterPolicy
+      TypeREG_DWORD Value: 0x00000000 (0) This setting may cause issues with some network scanning tools if local administrative
+      accounts are used remotely. Scans must use domain accounts where possible. If a local administrative account must be
+      used, temporarily enabling the privileged token by configuring the registry value to "1" may be required.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:38501
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This applies to member servers. For domain controllers and stand-alone or nondomain-joined systems, this is
+          not applicable.
+
+
+          If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+          Registry HiveHKEY_LOCAL_MACHINE
+
+          Registry Path\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+
+
+          Value NameLocalAccountTokenFilterPolicy
+
+
+          TypeREG_DWORD
+
+          Value: 0x00000000 (0)
+
+
+          This setting may cause issues with some network scanning tools if local administrative accounts are used remotely.
+          Scans must use domain accounts where possible. If a local administrative account must be used, temporarily enabling
+          the privileged token by configuring the registry value to "1" may be required.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-278178r1182282_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN25-MS-000020
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Windows Server 2025 local administrator accounts must have their privileged token filtered to prevent elevated
+        privileges from being used over the network on domain-joined member servers.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>A compromised local administrator account can provide means for an attacker to move laterally
+        between domain systems.
+
+
+        With User Account Control enabled, filtering the privileged token for local administrator accounts will prevent the
+        elevated privileges of these accounts from being used over the network.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows Server 2025
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows Server 2025
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5719'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        idref: '#xccdf_mil.disa.stig_platform_Windows_MemberServer'
+      name: platform
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001084
+    - attributes:
+        fixref: F-82613r1181239_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure the policy value for Computer Configuration >> Administrative Templates >> MS Security Guide >> Apply
+        UAC restrictions to local accounts on network logons to "Enabled".
+
+
+        This policy setting requires the installation of the SecGuide custom templates included with the STIG package. "SecGuide.admx"
+        and " SecGuide.adml" must be copied to the \Windows\PolicyDefinitions and \Windows\PolicyDefinitions\en-US directories
+        respectively.'
+    - attributes:
+        id: F-82613r1181239_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278178
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278178
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:38501
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This applies to member servers. For domain controllers and stand-alone or nondomain-joined systems, this is
+          not applicable.
+
+
+          If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+          Registry HiveHKEY_LOCAL_MACHINE
+
+          Registry Path\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+
+
+          Value NameLocalAccountTokenFilterPolicy
+
+
+          TypeREG_DWORD
+
+          Value: 0x00000000 (0)
+
+
+          This setting may cause issues with some network scanning tools if local administrative accounts are used remotely.
+          Scans must use domain accounts where possible. If a local administrative account must be used, temporarily enabling
+          the privileged token by configuring the registry value to "1" may be required.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: Windows Server 2025 local administrator accounts must have their privileged token filtered to prevent elevated privileges
+    from being used over the network on domain-joined member servers.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 6b2d751947e3927f2fe064d6ecceeb36538d22786f28a053d9aac1f1b52cbf55
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-278178r1182282_rule
+  status: legacy_compatible

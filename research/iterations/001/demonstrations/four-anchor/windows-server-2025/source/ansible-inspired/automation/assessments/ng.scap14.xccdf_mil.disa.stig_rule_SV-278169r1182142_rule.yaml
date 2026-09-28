@@ -1,0 +1,267 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278169r1182142_rule
+  version: 1
+  description: The Windows Server 2025 "Deny log on as a batch job" user right on domain controllers must be configured to
+    prevent unauthenticated access.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: The Windows Server 2025 "Deny log on as a batch job" user right on domain controllers must be configured to prevent
+    unauthenticated access.
+  steps:
+  - name: Collect oval:mil.disa.stig.win:obj:25349200
+    collect:
+      capability: scapng.collect.windows.userright
+      comment: null
+      query:
+      - kind: element
+        name: userright
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SE_DENY_BATCH_LOGON_NAME
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25349200
+      source_type: userright_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:25349200
+  predicates:
+    oval:mil.disa.stig.win:ste:20000033:
+      comment: null
+      entities:
+      - attributes:
+          operation: case insensitive equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Guests
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000033
+      source_type: userright_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:254422:
+        class: compliance
+        criteria:
+          children:
+          - comment: Deny log on as a batch job - Guests
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25443601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows Deny log on as a batch job user right on domain controllers must be configured to prevent unauthenticated
+              access.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:254422
+        version: '4'
+      oval:mil.disa.stig.windows2025:def:278169:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:254422
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-DC-000380 - The Windows Server 2025 "Deny log on as a batch job" user right on domain controllers must
+              be configured to prevent unauthenticated access.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
+              \n  The \"Deny log on as a batch job\" user right defines accounts that are prevented from logging on to the\
+              \ system as a batch job, such as Task Scheduler.\n\n  The Guests group must be assigned to prevent unauthenticated\
+              \ access."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278169
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25443601:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349200
+        comment: Deny log on as a batch job - Guests
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000033
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25443601
+        source_type: userright_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.windows2025:def:278169
+      exports: []
+      href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      match_count: 1
+      name: oval:mil.disa.stig.windows2025:def:278169
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.windows2025:def:278169
+      exports: []
+      href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      match_count: 1
+      name: oval:mil.disa.stig.windows2025:def:278169
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml
+      datastream_sha256: 52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+      zip_sha256: 2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0
+    rule_id: xccdf_mil.disa.stig_rule_SV-278169r1182142_rule
+    title: The Windows Server 2025 "Deny log on as a batch job" user right on domain controllers must be configured to prevent
+      unauthenticated access.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278169
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278169
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278169
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278169
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:36901
+      exports: []
+      inline_content: 'This applies to domain controllers. A separate version applies to other systems. Verify the effective
+        setting in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer Policy >> Computer Configuration
+        >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment. If the following accounts or
+        groups are not defined for the "Deny log on as a batch job" user right, this is a finding: - Guests Group. For server
+        core installations, run the following command: Secedit /Export /Areas User_Rights /cfg c:\path\filename.txt Review
+        the text file. If the following SID(s) are not defined for the "SeDenyBatchLogonRight" user right, this is a finding:
+        S-1-5-32-546 (Guests)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:36901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This applies to domain controllers. A separate version applies to other systems.
+
+
+            Verify the effective setting in Local Group Policy Editor.
+
+
+            Run gpedit.msc.
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If the following accounts or groups are not defined for the "Deny log on as a batch job" user right, this is a
+            finding:
+
+            - Guests Group.
+
+
+            For server core installations, run the following command:
+
+
+            Secedit /Export /Areas User_Rights /cfg c:\path\filename.txt
+
+
+            Review the text file.
+
+
+            If the following SID(s) are not defined for the "SeDenyBatchLogonRight" user right, this is a finding:
+
+
+            S-1-5-32-546 (Guests)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.windows2025:def:278169
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 63d4816d125afcc3bbb72b51f4d1d192b0ba82707c82fa84acf465db2b949209
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-278169r1182142_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: bea256ee3e116c78cbbd52fd20b0b5c80262c7d809cadceedfdd3fb8455645a7

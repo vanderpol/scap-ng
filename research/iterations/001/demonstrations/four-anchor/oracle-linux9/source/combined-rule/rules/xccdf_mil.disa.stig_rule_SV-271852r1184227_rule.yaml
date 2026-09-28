@@ -1,0 +1,798 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-271852r1184227_rule
+  title: OL 9 must be configured to forward audit records via TCP to a different system or media from the system being audited
+    via rsyslog.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-271852
+  description: '<VulnDiscussion>Information stored in one location is vulnerable to accidental or incidental deletion or alteration.
+    Offloading is a common process in information systems with limited audit storage capacity. OL 9 installation media provides
+    "rsyslogd", a system utility providing support for message logging. Support for both internet and Unix domain sockets
+    enables this utility to support both local and remote logging. Coupling this utility with "gnutls" (a secure communications
+    library implementing the SSL, TLS, and DTLS protocols) creates a method to securely encrypt and offload auditing. Rsyslog
+    provides three ways to forward message: the traditional UDP transport, which is extremely lossy but standard; the plain
+    TCP based transport, which loses messages only during certain situations but is widely available; and the RELP transport,
+    which does not lose messages but is currently available only as part of the rsyslogd 3.15.0 and above. Examples of each
+    configuration: UDP *.* @remotesystemname TCP *.* @@remotesystemname RELP *.* :omrelp:remotesystemname:2514 Note that a
+    port number was given as there is no standard port for RELP. Satisfies: SRG-OS-000479-GPOS-00224, SRG-OS-000342-GPOS-00133</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:oracle:linux:9:-
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:oracle:linux:9:-
+    ref: cpe:/o:oracle:linux:9:-
+  references:
+  - href: null
+    text: DPMS Target Oracle Linux 9 DISA DPMS Target Oracle Linux 9 5680
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001851
+  requires: []
+  conflicts: []
+  check: 'Verify OL 9 audit system offloads audit records onto a different system or media from the system being audited via
+    rsyslog using TCP with the following commands: To check for legacy configuration syntax, perform the following: $ sudo
+    grep -ir ''@@'' /etc/rsyslog.conf /etc/rsyslog.d/ To check for Rainer script syntax, perform the following: $ sudo grep
+    -rq ''type="omfwd"'' /etc/rsyslog.conf /etc/rsyslog.d/ If a remote server is not configured, or the line is commented
+    out, ask the system administrator (SA) to indicate how the audit logs are offloaded to a different system or media. If
+    there is no evidence that the audit logs are being offloaded to another system or media, this is a finding.'
+  source_checks:
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271852
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271852
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271852
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271852
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:81901
+    exports: []
+    inline_content: 'Verify OL 9 audit system offloads audit records onto a different system or media from the system being
+      audited via rsyslog using TCP with the following commands: To check for legacy configuration syntax, perform the following:
+      $ sudo grep -ir ''@@'' /etc/rsyslog.conf /etc/rsyslog.d/ To check for Rainer script syntax, perform the following: $
+      sudo grep -rq ''type="omfwd"'' /etc/rsyslog.conf /etc/rsyslog.d/ If a remote server is not configured, or the line is
+      commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded to a different system
+      or media. If there is no evidence that the audit logs are being offloaded to another system or media, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:81901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify OL 9 audit system offloads audit records onto a different system or media from the system being audited\
+          \ via rsyslog using TCP with the following commands:\n\nTo check for legacy configuration syntax, perform the following:\n\
+          $ sudo grep -ir '@@' /etc/rsyslog.conf /etc/rsyslog.d/\n\nTo check for Rainer script syntax, perform the following:\n\
+          $ sudo grep -rq 'type=\"omfwd\"' /etc/rsyslog.conf /etc/rsyslog.d/\n\nIf a remote server is not configured, or the\
+          \ line is commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded to a different\
+          \ system or media. \n\nIf there is no evidence that the audit logs are being offloaded to another system or media,\
+          \ this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271852
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271852
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271852
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271852
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:81901
+      exports: []
+      inline_content: 'Verify OL 9 audit system offloads audit records onto a different system or media from the system being
+        audited via rsyslog using TCP with the following commands: To check for legacy configuration syntax, perform the following:
+        $ sudo grep -ir ''@@'' /etc/rsyslog.conf /etc/rsyslog.d/ To check for Rainer script syntax, perform the following:
+        $ sudo grep -rq ''type="omfwd"'' /etc/rsyslog.conf /etc/rsyslog.d/ If a remote server is not configured, or the line
+        is commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded to a different system
+        or media. If there is no evidence that the audit logs are being offloaded to another system or media, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:81901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify OL 9 audit system offloads audit records onto a different system or media from the system being audited\
+            \ via rsyslog using TCP with the following commands:\n\nTo check for legacy configuration syntax, perform the\
+            \ following:\n$ sudo grep -ir '@@' /etc/rsyslog.conf /etc/rsyslog.d/\n\nTo check for Rainer script syntax, perform\
+            \ the following:\n$ sudo grep -rq 'type=\"omfwd\"' /etc/rsyslog.conf /etc/rsyslog.d/\n\nIf a remote server is\
+            \ not configured, or the line is commented out, ask the system administrator (SA) to indicate how the audit logs\
+            \ are offloaded to a different system or media. \n\nIf there is no evidence that the audit logs are being offloaded\
+            \ to another system or media, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: 'Configure OL 9 to offload audit records onto a different system or media from the system being audited via TCP using
+    rsyslog by specifying the remote logging server in "/etc/rsyslog.conf" or "/etc/rsyslog.d/[customfile].conf" with the
+    name or IP address of the log aggregation server. Following are examples of the configuration for the legacy syntax and
+    for the newer Rainer script. Only one should be used. Using legacy ''@host:port" syntax example: *.* @@[remoteloggingserver]:[port]
+    Using Rainer script example: action( type="omfwd" target="logserver.example.com" port="514" protocol="tcp" action.resumeRetryCount="-1"
+    queue.type="linkedList" que.size="10000" ) Note: The Rainer Script above does not contain the required encryption settings.'
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-271852r1184227_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL09-00-005005
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL 9 must be configured to forward audit records via TCP to a different system or media from the system being
+        audited via rsyslog.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Information stored in one location is vulnerable to accidental or incidental deletion or alteration.
+
+
+        Offloading is a common process in information systems with limited audit storage capacity.
+
+
+        OL 9 installation media provides "rsyslogd", a system utility providing support for message logging. Support for both
+        internet and Unix domain sockets enables this utility to support both local and remote logging. Coupling this utility
+        with "gnutls" (a secure communications library implementing the SSL, TLS, and DTLS protocols) creates a method to
+        securely encrypt and offload auditing.
+
+
+        Rsyslog provides three ways to forward message: the traditional UDP transport, which is extremely lossy but standard;
+        the plain TCP based transport, which loses messages only during certain situations but is widely available; and the
+        RELP transport, which does not lose messages but is currently available only as part of the rsyslogd 3.15.0 and above.
+
+
+        Examples of each configuration:
+
+        UDP *.* @remotesystemname
+
+        TCP *.* @@remotesystemname
+
+        RELP *.* :omrelp:remotesystemname:2514
+
+        Note that a port number was given as there is no standard port for RELP.
+
+
+        Satisfies: SRG-OS-000479-GPOS-00224, SRG-OS-000342-GPOS-00133</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Oracle Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Oracle Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5680'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001851
+    - attributes:
+        fixref: F-75809r1184226_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: "Configure OL 9 to offload audit records onto a different system or media from the system being audited via TCP\
+        \ using rsyslog by specifying the remote logging server in \"/etc/rsyslog.conf\" or \"/etc/rsyslog.d/[customfile].conf\"\
+        \ with the name or IP address of the log aggregation server.  Following are examples of the configuration for the\
+        \ legacy syntax and for the newer Rainer script. Only one should be used.\n\nUsing legacy '@host:port\" syntax example:\n\
+        *.* @@[remoteloggingserver]:[port]\n\nUsing Rainer script example:\naction(\n    type=\"omfwd\"\n    target=\"logserver.example.com\"\
+        \n    port=\"514\"\n    protocol=\"tcp\"\n    action.resumeRetryCount=\"-1\"\n    queue.type=\"linkedList\"\n    que.size=\"\
+        10000\"\n)\n\nNote: The Rainer Script above does not contain the required encryption settings."
+    - attributes:
+        id: F-75809r1184226_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271852
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271852
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:81901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify OL 9 audit system offloads audit records onto a different system or media from the system being audited\
+          \ via rsyslog using TCP with the following commands:\n\nTo check for legacy configuration syntax, perform the following:\n\
+          $ sudo grep -ir '@@' /etc/rsyslog.conf /etc/rsyslog.d/\n\nTo check for Rainer script syntax, perform the following:\n\
+          $ sudo grep -rq 'type=\"omfwd\"' /etc/rsyslog.conf /etc/rsyslog.d/\n\nIf a remote server is not configured, or the\
+          \ line is commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded to a different\
+          \ system or media. \n\nIf there is no evidence that the audit logs are being offloaded to another system or media,\
+          \ this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  assessment:
+    id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271852r1184227_rule
+    version: 1
+    description: OL 9 must be configured to forward audit records via TCP to a different system or media from the system being
+      audited via rsyslog.
+    semantic_model: scap-ng-generic-assessment-graph-0.1
+    collect:
+      oval:mil.disa.stig.ind:obj:25814902:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25814902
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog.d/*.conf: remote TCP logging'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.*\.conf$
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\*\.\*\s+@@(\S+)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:20000002:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000002
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog: action for all messages'
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:20000003
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:20000004
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
+      oval:mil.disa.stig.ind:obj:25814901:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25814901
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog.conf: remote TCP logging'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - attributes:
+            datatype: string
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\*\.\*\s+@@(\S+)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:20000003:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000003
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        comment: 'rsyslog.conf: action for all messages'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - attributes:
+            datatype: string
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:25814900:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25814900
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: remote TCP logging
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:25814901
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:25814902
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
+      oval:mil.disa.stig.ind:obj:20000004:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000004
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        comment: 'rsyslog.d/*.conf: action for all messages'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.*\.conf$
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+    derive: {}
+    predicates:
+      oval:mil.disa.stig.ind:ste:20000027:
+        source_state_id: oval:mil.disa.stig.ind:ste:20000027
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+        comment: null
+      oval:mil.disa.stig.ind:ste:25814902:
+        source_state_id: oval:mil.disa.stig.ind:ste:25814902
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?i)(?:^|\n)[^#]*\bprotocol\s*=\s*"tcp"
+        comment: null
+      oval:mil.disa.stig.ind:ste:25814900:
+        source_state_id: oval:mil.disa.stig.ind:ste:25814900
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.+$
+        comment: null
+    evaluate:
+      tests:
+        oval:mil.disa.stig.ind:tst:25814900:
+          source_test_id: oval:mil.disa.stig.ind:tst:25814900
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: remote TCP logging
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25814900
+          predicates:
+          - oval:mil.disa.stig.ind:ste:25814900
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25814901:
+          source_test_id: oval:mil.disa.stig.ind:tst:25814901
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: remote TCP logging (advanced syntax)
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:20000002
+          predicates:
+          - oval:mil.disa.stig.ind:ste:20000027
+          - oval:mil.disa.stig.ind:ste:25814902
+          source_other: []
+      definitions:
+        oval:mil.disa.stig.ol9os:def:271852:
+          source_definition_id: oval:mil.disa.stig.ol9os:def:271852
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:258149
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: OL09-00-005005 - OL 9 must be configured to forward audit records via TCP to a different system or media
+                from the system being audited via rsyslog.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Oracle Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: "Information stored in one location is vulnerable to accidental or incidental deletion or alteration.\n\
+                \n\tOffloading is a common process in information systems with limited audit storage capacity.\n\n\tOL 9 installation\
+                \ media provides \"rsyslogd\", a system utility providing support for message logging. Support for both internet\
+                \ and Unix domain sockets enables this utility to support both local and remote logging. Coupling this utility\
+                \ with \"gnutls\" (a secure communications library implementing the SSL, TLS, and DTLS protocols) creates\
+                \ a method to securely encrypt and offload auditing.\n\n\tRsyslog provides three ways to forward message:\
+                \ the traditional UDP transport, which is extremely lossy but standard; the plain TCP based transport, which\
+                \ loses messages only during certain situations but is widely available; and the RELP transport, which does\
+                \ not lose messages but is currently available only as part of the rsyslogd 3.15.0 and above.\n\n\tExamples\
+                \ of each configuration:\n\tUDP *.* @remotesystemname\n\tTCP *.* @@remotesystemname\n\tRELP *.* :omrelp:remotesystemname:2514\n\
+                \tNote that a port number was given as there is no standard port for RELP.\n\n\tSatisfies: SRG-OS-000479-GPOS-00224,\
+                \ SRG-OS-000342-GPOS-00133"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258149:
+          source_definition_id: oval:mil.disa.stig.defs:def:258149
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: remote TCP logging (basic syntax)
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25814900
+            - comment: remote TCP logging (advanced syntax)
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25814901
+            comment: null
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system audit records must be off-loaded onto a different system or storage media from the
+                system being audited.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    assert:
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271852
+      combination: xccdf_source_check_semantics
+    source_check_context:
+      check_exports: []
+      checks:
+      - definition_id: oval:mil.disa.stig.ol9os:def:271852
+        exports: []
+        href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.ol9os:def:271852
+        oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - definition_id: oval:mil.disa.stig.ol9os:def:271852
+        exports: []
+        href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.ol9os:def:271852
+        oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+      published_source:
+        datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+        datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+        repository: niwc-atlantic/scap-content-library
+        repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+        revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+        zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+        zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+      rule_id: xccdf_mil.disa.stig_rule_SV-271852r1184227_rule
+      title: OL 9 must be configured to forward audit records via TCP to a different system or media from the system being
+        audited via rsyslog.
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271852
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271852
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271852
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271852
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:81901
+        exports: []
+        inline_content: 'Verify OL 9 audit system offloads audit records onto a different system or media from the system
+          being audited via rsyslog using TCP with the following commands: To check for legacy configuration syntax, perform
+          the following: $ sudo grep -ir ''@@'' /etc/rsyslog.conf /etc/rsyslog.d/ To check for Rainer script syntax, perform
+          the following: $ sudo grep -rq ''type="omfwd"'' /etc/rsyslog.conf /etc/rsyslog.d/ If a remote server is not configured,
+          or the line is commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded to
+          a different system or media. If there is no evidence that the audit logs are being offloaded to another system or
+          media, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:81901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify OL 9 audit system offloads audit records onto a different system or media from the system being\
+              \ audited via rsyslog using TCP with the following commands:\n\nTo check for legacy configuration syntax, perform\
+              \ the following:\n$ sudo grep -ir '@@' /etc/rsyslog.conf /etc/rsyslog.d/\n\nTo check for Rainer script syntax,\
+              \ perform the following:\n$ sudo grep -rq 'type=\"omfwd\"' /etc/rsyslog.conf /etc/rsyslog.d/\n\nIf a remote\
+              \ server is not configured, or the line is commented out, ask the system administrator (SA) to indicate how\
+              \ the audit logs are offloaded to a different system or media. \n\nIf there is no evidence that the audit logs\
+              \ are being offloaded to another system or media, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    migration: &id001
+      status: legacy_compatible
+      source: SCAP 1.4 / OVAL 5.12.3
+      source_rule: xccdf_mil.disa.stig_rule_SV-271852r1184227_rule
+      semantic_ir_sha256: 61b4cdd7f6347f882b43fa08c9e2243647d23ad7a1fddaadb0ca3623481396aa
+      note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_fingerprint_sha256: f31067cac5de6e4adeeb150a5971ac772b8130f28033655e52c2417fed3fc344
+  migration: *id001

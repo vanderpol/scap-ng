@@ -1,0 +1,315 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253446r958586_rule
+  version: 1
+  description: The Windows message title for the legal notice must be configured.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: The Windows message title for the legal notice must be configured.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:25344601
+    collect:
+      capability: scapng.collect.windows.registry
+      comment: LegalNoticeCaption Setting
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: LegalNoticeCaption
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25344601
+      source_type: registry_object
+      version: '18'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:25344601
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25344601:
+      comment: Logon Banner - DoD Notice and Consent Banner.
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: DoD Notice and Consent Banner
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25344601
+      source_type: registry_state
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25344602:
+      comment: Logon Banner - US Department of Defense Warning Statement.
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: US Department of Defense Warning Statement
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25344602
+      source_type: registry_state
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25344603:
+      comment: Logon Banner - DoW Notice and Consent Banner.
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: DoW Notice and Consent Banner
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25344603
+      source_type: registry_state
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25344604:
+      comment: Logon Banner - US Department of War Warning Statement.
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: US Department of War Warning Statement
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25344604
+      source_type: registry_state
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.windows:def:253446:
+        class: compliance
+        criteria:
+          children:
+          - comment: The Windows dialog box title for the legal banner must be configured. Title Option 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25344601
+          - comment: The Windows dialog box title for the legal banner must be configured. Title Option 2
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25344602
+          - comment: The Windows dialog box title for the legal banner must be configured. Title Option 3
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25344603
+          - comment: The Windows dialog box title for the legal banner must be configured. Title Option 4
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25344604
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The Windows message title for the legal notice must be configured.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Failure to display the logon banner prior to a logon attempt will negate legal proceedings resulting from
+              unauthorized access to system resources.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+        version: '18'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25344601:
+        check: only one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25344601
+        comment: The Windows dialog box title for the legal banner must be configured. Title Option 1
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25344601
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25344601
+        source_type: registry_test
+        state_operator: AND
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25344602:
+        check: only one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25344601
+        comment: The Windows dialog box title for the legal banner must be configured. Title Option 2
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25344602
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25344602
+        source_type: registry_test
+        state_operator: AND
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25344603:
+        check: only one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25344601
+        comment: The Windows dialog box title for the legal banner must be configured. Title Option 3
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25344603
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25344603
+        source_type: registry_test
+        state_operator: AND
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25344604:
+        check: only one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25344601
+        comment: The Windows dialog box title for the legal banner must be configured. Title Option 4
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25344604
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25344604
+        source_type: registry_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-253446r958586_rule
+    title: The Windows message title for the legal notice must be configured.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:36901
+      exports: []
+      inline_content: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+        Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\ Value
+        Name: LegalNoticeCaption Value Type: REG_SZ Value: See message title above "DoD Notice and Consent Banner", "US Department
+        of Defense Warning Statement" or a site-defined equivalent, this is a finding. If a site-defined title is used, it
+        can in no case contravene or modify the language of the banner text required in WN11-SO-000075.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:36901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\
+
+
+            Value Name: LegalNoticeCaption
+
+
+            Value Type: REG_SZ
+
+            Value: See message title above
+
+
+            "DoD Notice and Consent Banner", "US Department of Defense Warning Statement" or a site-defined equivalent, this
+            is a finding.
+
+
+            If a site-defined title is used, it can in no case contravene or modify the language of the banner text required
+            in WN11-SO-000075.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.windows:def:253446
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 81537a2f21daa2a476e566e71eec91d05d923a5c85eb8c339b5960a74346d52b
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-253446r958586_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 2d70af1cb5cf425aa10ec401e9813a40ea28f1d344b518ac3636937aecd625c2

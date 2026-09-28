@@ -1,0 +1,295 @@
+scap_ng: 0.1-prototype
+prototype: true
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-278003r1182254_rule
+  title: Outdated or unused accounts on Windows Server 2025 must be removed or disabled.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-278003
+  description: '<VulnDiscussion>Outdated or unused accounts provide penetration points that may go undetected. Inactive accounts
+    must be deleted if no longer necessary or, if still required, disabled until needed. Satisfies: SRG-OS-000118-GPOS-00060,
+    SRG-OS-000590-GPOS-00110</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+    ref: cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows Server 2025 DISA DPMS Target Microsoft Windows Server 2025 5719
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-003627
+  - system: http://cyber.mil/cci
+    value: CCI-003628
+  requires: []
+  conflicts: []
+  check: 'Open Windows PowerShell. Domain Controllers: Enter "Search-ADAccount -AccountInactive -UsersOnly -TimeSpan 35.00:00:00".
+    This will return accounts that have not been logged on to for 35 days, along with various attributes such as the Enabled
+    status and LastLogonDate. Member servers and stand-alone or nondomain-joined systems: Copy or enter the lines below to
+    the PowerShell window and enter. (Entering twice may be required.) ([ADSI](''WinNT://{0}'' -f $env:COMPUTERNAME)).Children
+    | Where { $_.SchemaClassName -eq ''user'' } | ForEach { $user = ([ADSI]$_.Path) $lastLogin = $user.Properties.LastLogin.Value
+    $enabled = ($user.Properties.UserFlags.Value -band 0x2) -ne 0x2 if ($lastLogin -eq $null) { $lastLogin = ''Never'' } Write-Host
+    $user.Name $lastLogin $enabled } This will return a list of local accounts with the account name, last logon, and if the
+    account is enabled (True/False). For example: User1 10/31/2015 5:49:56 AM True Review the list of accounts returned by
+    the above queries to determine the finding validity for each account reported. Exclude the following accounts: - Built-in
+    administrator account (Renamed, SID ending in 500). - Built-in guest account (Renamed, Disabled, SID ending in 501). -
+    Application accounts. If any enabled accounts have not been logged on to within the past 35 days, this is a finding. Inactive
+    accounts that have been reviewed and deemed to be required must be documented with the information system security officer
+    (ISSO).'
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+    exports: []
+    inline_content: 'Open Windows PowerShell. Domain Controllers: Enter "Search-ADAccount -AccountInactive -UsersOnly -TimeSpan
+      35.00:00:00". This will return accounts that have not been logged on to for 35 days, along with various attributes such
+      as the Enabled status and LastLogonDate. Member servers and stand-alone or nondomain-joined systems: Copy or enter the
+      lines below to the PowerShell window and enter. (Entering twice may be required.) ([ADSI](''WinNT://{0}'' -f $env:COMPUTERNAME)).Children
+      | Where { $_.SchemaClassName -eq ''user'' } | ForEach { $user = ([ADSI]$_.Path) $lastLogin = $user.Properties.LastLogin.Value
+      $enabled = ($user.Properties.UserFlags.Value -band 0x2) -ne 0x2 if ($lastLogin -eq $null) { $lastLogin = ''Never'' }
+      Write-Host $user.Name $lastLogin $enabled } This will return a list of local accounts with the account name, last logon,
+      and if the account is enabled (True/False). For example: User1 10/31/2015 5:49:56 AM True Review the list of accounts
+      returned by the above queries to determine the finding validity for each account reported. Exclude the following accounts:
+      - Built-in administrator account (Renamed, SID ending in 500). - Built-in guest account (Renamed, Disabled, SID ending
+      in 501). - Application accounts. If any enabled accounts have not been logged on to within the past 35 days, this is
+      a finding. Inactive accounts that have been reviewed and deemed to be required must be documented with the information
+      system security officer (ISSO).'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Open Windows PowerShell.\n\nDomain Controllers:\n\nEnter \"Search-ADAccount -AccountInactive -UsersOnly -TimeSpan\
+          \ 35.00:00:00\".\n\nThis will return accounts that have not been logged on to for 35 days, along with various attributes\
+          \ such as the Enabled status and LastLogonDate.\n\nMember servers and stand-alone or nondomain-joined systems:\n\
+          \nCopy or enter the lines below to the PowerShell window and enter. (Entering twice may be required.) \n\n([ADSI]('WinNT://{0}'\
+          \ -f $env:COMPUTERNAME)).Children | Where { $_.SchemaClassName -eq 'user' } | ForEach {\n $user = ([ADSI]$_.Path)\n\
+          \ $lastLogin = $user.Properties.LastLogin.Value\n $enabled = ($user.Properties.UserFlags.Value -band 0x2) -ne 0x2\n\
+          \ if ($lastLogin -eq $null) {\n $lastLogin = 'Never'\n }\n Write-Host $user.Name $lastLogin $enabled \n}\n\nThis\
+          \ will return a list of local accounts with the account name, last logon, and if the account is enabled (True/False).\n\
+          For example: User1 10/31/2015 5:49:56 AM True\n\nReview the list of accounts returned by the above queries to determine\
+          \ the finding validity for each account reported.\n\nExclude the following accounts:\n- Built-in administrator account\
+          \ (Renamed, SID ending in 500).\n- Built-in guest account (Renamed, Disabled, SID ending in 501).\n- Application\
+          \ accounts.\n\nIf any enabled accounts have not been logged on to within the past 35 days, this is a finding.\n\n\
+          Inactive accounts that have been reviewed and deemed to be required must be documented with the information system\
+          \ security officer (ISSO)."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+      exports: []
+      inline_content: 'Open Windows PowerShell. Domain Controllers: Enter "Search-ADAccount -AccountInactive -UsersOnly -TimeSpan
+        35.00:00:00". This will return accounts that have not been logged on to for 35 days, along with various attributes
+        such as the Enabled status and LastLogonDate. Member servers and stand-alone or nondomain-joined systems: Copy or
+        enter the lines below to the PowerShell window and enter. (Entering twice may be required.) ([ADSI](''WinNT://{0}''
+        -f $env:COMPUTERNAME)).Children | Where { $_.SchemaClassName -eq ''user'' } | ForEach { $user = ([ADSI]$_.Path) $lastLogin
+        = $user.Properties.LastLogin.Value $enabled = ($user.Properties.UserFlags.Value -band 0x2) -ne 0x2 if ($lastLogin
+        -eq $null) { $lastLogin = ''Never'' } Write-Host $user.Name $lastLogin $enabled } This will return a list of local
+        accounts with the account name, last logon, and if the account is enabled (True/False). For example: User1 10/31/2015
+        5:49:56 AM True Review the list of accounts returned by the above queries to determine the finding validity for each
+        account reported. Exclude the following accounts: - Built-in administrator account (Renamed, SID ending in 500). -
+        Built-in guest account (Renamed, Disabled, SID ending in 501). - Application accounts. If any enabled accounts have
+        not been logged on to within the past 35 days, this is a finding. Inactive accounts that have been reviewed and deemed
+        to be required must be documented with the information system security officer (ISSO).'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Open Windows PowerShell.\n\nDomain Controllers:\n\nEnter \"Search-ADAccount -AccountInactive -UsersOnly -TimeSpan\
+            \ 35.00:00:00\".\n\nThis will return accounts that have not been logged on to for 35 days, along with various\
+            \ attributes such as the Enabled status and LastLogonDate.\n\nMember servers and stand-alone or nondomain-joined\
+            \ systems:\n\nCopy or enter the lines below to the PowerShell window and enter. (Entering twice may be required.) \n\
+            \n([ADSI]('WinNT://{0}' -f $env:COMPUTERNAME)).Children | Where { $_.SchemaClassName -eq 'user' } | ForEach {\n\
+            \ $user = ([ADSI]$_.Path)\n $lastLogin = $user.Properties.LastLogin.Value\n $enabled = ($user.Properties.UserFlags.Value\
+            \ -band 0x2) -ne 0x2\n if ($lastLogin -eq $null) {\n $lastLogin = 'Never'\n }\n Write-Host $user.Name $lastLogin\
+            \ $enabled \n}\n\nThis will return a list of local accounts with the account name, last logon, and if the account\
+            \ is enabled (True/False).\nFor example: User1 10/31/2015 5:49:56 AM True\n\nReview the list of accounts returned\
+            \ by the above queries to determine the finding validity for each account reported.\n\nExclude the following accounts:\n\
+            - Built-in administrator account (Renamed, SID ending in 500).\n- Built-in guest account (Renamed, Disabled, SID\
+            \ ending in 501).\n- Application accounts.\n\nIf any enabled accounts have not been logged on to within the past\
+            \ 35 days, this is a finding.\n\nInactive accounts that have been reviewed and deemed to be required must be documented\
+            \ with the information system security officer (ISSO)."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: Regularly review accounts to determine if they are still active. Remove or disable accounts that have not been used
+    in the last 35 days.
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-278003r1182254_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN25-00-000190
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Outdated or unused accounts on Windows Server 2025 must be removed or disabled.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Outdated or unused accounts provide penetration points that may go undetected. Inactive accounts
+        must be deleted if no longer necessary or, if still required, disabled until needed.
+
+
+        Satisfies: SRG-OS-000118-GPOS-00060, SRG-OS-000590-GPOS-00110</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows Server 2025
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows Server 2025
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5719'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-003627
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-003628
+    - attributes:
+        fixref: F-82438r1180714_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Regularly review accounts to determine if they are still active. Remove or disable accounts that have not been
+        used in the last 35 days.
+    - attributes:
+        id: F-82438r1180714_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Open Windows PowerShell.\n\nDomain Controllers:\n\nEnter \"Search-ADAccount -AccountInactive -UsersOnly -TimeSpan\
+          \ 35.00:00:00\".\n\nThis will return accounts that have not been logged on to for 35 days, along with various attributes\
+          \ such as the Enabled status and LastLogonDate.\n\nMember servers and stand-alone or nondomain-joined systems:\n\
+          \nCopy or enter the lines below to the PowerShell window and enter. (Entering twice may be required.) \n\n([ADSI]('WinNT://{0}'\
+          \ -f $env:COMPUTERNAME)).Children | Where { $_.SchemaClassName -eq 'user' } | ForEach {\n $user = ([ADSI]$_.Path)\n\
+          \ $lastLogin = $user.Properties.LastLogin.Value\n $enabled = ($user.Properties.UserFlags.Value -band 0x2) -ne 0x2\n\
+          \ if ($lastLogin -eq $null) {\n $lastLogin = 'Never'\n }\n Write-Host $user.Name $lastLogin $enabled \n}\n\nThis\
+          \ will return a list of local accounts with the account name, last logon, and if the account is enabled (True/False).\n\
+          For example: User1 10/31/2015 5:49:56 AM True\n\nReview the list of accounts returned by the above queries to determine\
+          \ the finding validity for each account reported.\n\nExclude the following accounts:\n- Built-in administrator account\
+          \ (Renamed, SID ending in 500).\n- Built-in guest account (Renamed, Disabled, SID ending in 501).\n- Application\
+          \ accounts.\n\nIf any enabled accounts have not been logged on to within the past 35 days, this is a finding.\n\n\
+          Inactive accounts that have been reviewed and deemed to be required must be documented with the information system\
+          \ security officer (ISSO)."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2

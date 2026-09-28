@@ -1,0 +1,351 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-268318r1210288_rule
+  version: 1
+  description: Windows 11 systems must use either Group Policy or an approved Mobile Device Management (MDM) product to enforce
+    STIG compliance.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: Windows 11 systems must use either Group Policy or an approved Mobile Device Management (MDM) product to enforce STIG
+    compliance.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801
+    collect:
+      capability: scapng.collect.windows.cmdlet
+      comment: Computer GPO's applied
+      query:
+      - attributes:
+          operation: equals
+        kind: element
+        name: module_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: CimCmdlets
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: module_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: version
+          nil: 'true'
+        kind: element
+        name: module_version
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - kind: element
+        name: verb
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Get
+      - kind: element
+        name: noun
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: CimInstance
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: classname
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: RSOP_GPLink
+        - attributes:
+            name: namespace
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: ROOT\RSOP\Computer
+        kind: element
+        name: parameters
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: property
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: appliedOrder,enabled,GPO,SOM
+        kind: element
+        name: select
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801
+      source_type: cmdlet_object
+      version: '18'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
+    collect:
+      capability: scapng.collect.independent.shellcommand
+      comment: MDM is managing the device
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Get-Service -name IntuneManagementExtension
+      - kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: IntuneManagementExtension
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
+      source_type: shellcommand_object
+      version: '18'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:26831801:
+      comment: At least one enabled must be True
+      entities:
+      - attributes:
+          datatype: record
+          entity_check: at least one
+        children:
+        - attributes:
+            name: enabled
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: 'True'
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:26831801
+      source_type: cmdlet_state
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802:
+      comment: stdout_line must contain the output running
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Running
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802
+      source_type: shellcommand_state
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.windows:def:268318:
+        class: compliance
+        criteria:
+          children:
+          - comment: Windows systems must use either Group Policy or an approved Mobile Device Management (MDM) product to
+              enforce STIG compliance.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:26831801
+          - comment: Windows systems must use either Group Policy or an approved Mobile Device Management (MDM) product to
+              enforce STIG compliance.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:26831802
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows 11 systems must use either Group Policy or an approved Mobile Device Management (MDM) product to
+              enforce STIG compliance.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows systems must use either Group Policy or an approved Mobile Device Management (MDM) product to enforce
+              STIG compliance.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+        version: '18'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:26831801:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801
+        comment: Test to ensure that at least one GPO applied is enabled
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:26831801
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:26831801
+        source_type: cmdlet_test
+        state_operator: AND
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:26831802:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
+        comment: Run a PowerShell command to determine if a Mobile Device Management (MDM) product is in use to enforce STIG
+          compliance
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:26831802
+        source_type: shellcommand_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-268318r1210288_rule
+    title: Windows 11 systems must use either Group Policy or an approved Mobile Device Management (MDM) product to enforce
+      STIG compliance.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:49901
+      exports: []
+      inline_content: 'Verify the Windows 11 system is receiving policy from either group Policy or an MDM with the following
+        steps: From a command line or PowerShell: gpresult /R OS Configuration: Member Workstation If the system OS Configuration
+        is set to "Member Workstation", the system is being managed by GPO. If the system OS Configuration is set to "Standalone
+        Workstation" and is not being managed by GPO, ask the administrator to indicate which MDM is managing the device.
+        Issue to the following for Intune. Note: Intune must be running at time of command. From PowerShell: Get-Service -Name
+        "IntuneManagementExtension" This should return the following result: Status = Running, Name = IntuneManagementExtension,
+        DisplayName = Microsoft Intune Management Extension If Intune is not installed, the response will include "ObjectNotFound"
+        and/or "NoServiceFoundForGivenName". If the Windows 11 system is not receiving policy from either group Policy or
+        an MDM (that is running), this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:49901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the Windows 11 system is receiving policy from either group Policy or an MDM with the following steps:
+
+
+            From a command line or PowerShell:
+
+
+            gpresult /R
+
+            OS Configuration: Member Workstation
+
+
+            If the system OS Configuration is set to "Member Workstation", the system is being managed by GPO.
+
+
+            If the system OS Configuration is set to "Standalone Workstation" and is not being managed by GPO, ask the administrator
+            to indicate which MDM is managing the device.
+
+
+            Issue to the following for Intune. Note: Intune must be running at time of command.
+
+
+            From PowerShell: Get-Service -Name "IntuneManagementExtension"
+
+
+            This should return the following result:
+
+
+            Status = Running, Name = IntuneManagementExtension, DisplayName = Microsoft Intune Management Extension
+
+
+            If Intune is not installed, the response will include "ObjectNotFound" and/or "NoServiceFoundForGivenName".
+
+
+            If the Windows 11 system is not receiving policy from either group Policy or an MDM (that is running), this is
+            a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.windows:def:268318
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 79cfe9a94f753d2c0afb6af46cd9acfe1075861b4979c14a24233c28e69106c5
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-268318r1210288_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 5457af5d926238f85d8d0407018c5e7cb12b6bf8631b229ff7fdd64e9bc085e3

@@ -1,0 +1,323 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Verify that OL 9 disables virtual system calls. Check the current GRUB 2 configuration with the following command:
+    $ sudo grubby --info=ALL | grep args | grep -v ''vsyscall=none'' If any output is returned, this is a finding. Check that
+    virtual system calls are disabled by default to persist in kernel updates with the following command: $ grep vsyscall
+    /etc/default/grub GRUB_CMDLINE_LINUX="vsyscall=none" If "vsyscall" is not set to "none", is missing or commented out,
+    and is not documented with the information system security officer (ISSO) as an operational requirement, this is a finding.'
+  cluster_id: null
+  conflicts: []
+  description: <VulnDiscussion>System calls are special routines in the Linux kernel, which userspace applications ask to
+    do privileged tasks. Invoking a system call is an expensive operation because the processor must interrupt the currently
+    executing task and switch context to kernel mode and then back to userspace after the system call completes. Virtual system
+    calls map into user space a page that contains some variables and the implementation of some system calls. This allows
+    the system calls to be executed in userspace to alleviate the context switching expense. Virtual system calls provide
+    an opportunity of attack for a user who has control of the return instruction pointer. Disabling virtual system calls
+    help to prevent return-oriented programming (ROP) attacks via buffer overflows and overruns. If the system intends to
+    run containers based on OL 6 components, virtual system calls will have to be enabled so the components function properly.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:oracle:linux:9:-
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:oracle:linux:9:-
+    ref: cpe:/o:oracle:linux:9:-
+  extends: null
+  fix: 'Document the use of virtual system calls with the ISSO as an operational requirement or disable them with the following
+    command: $ sudo grubby --update-kernel=ALL --args="vsyscall=none" Add or modify the following line in "/etc/default/grub"
+    to ensure the configuration survives kernel updates: GRUB_CMDLINE_LINUX="vsyscall=none"'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-271737
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-271737r1094967_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001084
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Oracle Linux 9 DISA DPMS Target Oracle Linux 9 5680
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271737
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271737
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271737
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271737
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59501
+      exports: []
+      inline_content: 'Verify that OL 9 disables virtual system calls. Check the current GRUB 2 configuration with the following
+        command: $ sudo grubby --info=ALL | grep args | grep -v ''vsyscall=none'' If any output is returned, this is a finding.
+        Check that virtual system calls are disabled by default to persist in kernel updates with the following command: $
+        grep vsyscall /etc/default/grub GRUB_CMDLINE_LINUX="vsyscall=none" If "vsyscall" is not set to "none", is missing
+        or commented out, and is not documented with the information system security officer (ISSO) as an operational requirement,
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 disables virtual system calls. \n\nCheck the current GRUB 2 configuration with the following\
+            \ command:\n\n$ sudo grubby --info=ALL | grep args | grep -v 'vsyscall=none'\n\nIf any output is returned, this\
+            \ is a finding.\n\nCheck that virtual system calls are disabled by default to persist in kernel updates with the\
+            \ following command: \n\n$ grep vsyscall /etc/default/grub\nGRUB_CMDLINE_LINUX=\"vsyscall=none\"\n\nIf \"vsyscall\"\
+            \ is not set to \"none\", is missing or commented out, and is not documented with the information system security\
+            \ officer (ISSO) as an operational requirement, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271737
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271737
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271737
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271737
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59501
+    exports: []
+    inline_content: 'Verify that OL 9 disables virtual system calls. Check the current GRUB 2 configuration with the following
+      command: $ sudo grubby --info=ALL | grep args | grep -v ''vsyscall=none'' If any output is returned, this is a finding.
+      Check that virtual system calls are disabled by default to persist in kernel updates with the following command: $ grep
+      vsyscall /etc/default/grub GRUB_CMDLINE_LINUX="vsyscall=none" If "vsyscall" is not set to "none", is missing or commented
+      out, and is not documented with the information system security officer (ISSO) as an operational requirement, this is
+      a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59501
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify that OL 9 disables virtual system calls. \n\nCheck the current GRUB 2 configuration with the following\
+          \ command:\n\n$ sudo grubby --info=ALL | grep args | grep -v 'vsyscall=none'\n\nIf any output is returned, this\
+          \ is a finding.\n\nCheck that virtual system calls are disabled by default to persist in kernel updates with the\
+          \ following command: \n\n$ grep vsyscall /etc/default/grub\nGRUB_CMDLINE_LINUX=\"vsyscall=none\"\n\nIf \"vsyscall\"\
+          \ is not set to \"none\", is missing or commented out, and is not documented with the information system security\
+          \ officer (ISSO) as an operational requirement, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-271737r1094967_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL09-00-002393
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL 9 must disable virtual system calls.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>System calls are special routines in the Linux kernel, which userspace applications ask to do
+        privileged tasks. Invoking a system call is an expensive operation because the processor must interrupt the currently
+        executing task and switch context to kernel mode and then back to userspace after the system call completes. Virtual
+        system calls map into user space a page that contains some variables and the implementation of some system calls.
+        This allows the system calls to be executed in userspace to alleviate the context switching expense.
+
+
+        Virtual system calls provide an opportunity of attack for a user who has control of the return instruction pointer.
+        Disabling virtual system calls help to prevent return-oriented programming (ROP) attacks via buffer overflows and
+        overruns. If the system intends to run containers based on OL 6 components, virtual system calls will have to be enabled
+        so the components function properly.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Oracle Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Oracle Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5680'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001084
+    - attributes:
+        fixref: F-75694r1091922_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Document the use of virtual system calls with the ISSO as an operational requirement or disable them with the
+        following command:
+
+
+        $ sudo grubby --update-kernel=ALL --args="vsyscall=none"
+
+
+        Add or modify the following line in "/etc/default/grub" to ensure the configuration survives kernel updates:
+
+
+        GRUB_CMDLINE_LINUX="vsyscall=none"'
+    - attributes:
+        id: F-75694r1091922_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271737
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271737
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:59501
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify that OL 9 disables virtual system calls. \n\nCheck the current GRUB 2 configuration with the following\
+          \ command:\n\n$ sudo grubby --info=ALL | grep args | grep -v 'vsyscall=none'\n\nIf any output is returned, this\
+          \ is a finding.\n\nCheck that virtual system calls are disabled by default to persist in kernel updates with the\
+          \ following command: \n\n$ grep vsyscall /etc/default/grub\nGRUB_CMDLINE_LINUX=\"vsyscall=none\"\n\nIf \"vsyscall\"\
+          \ is not set to \"none\", is missing or commented out, and is not documented with the information system security\
+          \ officer (ISSO) as an operational requirement, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: OL 9 must disable virtual system calls.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 4f1415aeed1d1afcb2508f841d53fc711f0bfbc5de32672811b92d97de5dc623
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-271737r1094967_rule
+  status: legacy_compatible

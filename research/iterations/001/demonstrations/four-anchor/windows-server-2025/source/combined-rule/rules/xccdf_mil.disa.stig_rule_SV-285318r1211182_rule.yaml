@@ -1,0 +1,649 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-285318r1211182_rule
+  title: Windows Server 2025 OpenSSH must be configured so that all network connections associated with SSH traffic terminate
+    after becoming unresponsive.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-285318
+  description: '<VulnDiscussion>Terminating an unresponsive SSH session within a short time period reduces the window of opportunity
+    for unauthorized personnel to take control of a management session enabled on the console or console port that has been
+    left unattended. Quickly terminating an idle SSH session will also free up resources committed by the managed network
+    element. Terminating network connections associated with communications sessions includes, for example, deallocating associated
+    TCP/IP address/port pairs at the operating system level and deallocating networking assignments at the application level
+    if multiple application sessions are using a single operating system-level network connection. This does not mean the
+    operating system terminates all sessions or network access; it only ends the unresponsive session and releases the resources
+    associated with that session. Windows Server 2025 uses $env:ProgramData/ssh/sshd_config for configurations of OpenSSH.
+    Within the sshd_config, the product of the values of "ClientAliveInterval" and "ClientAliveCountMax" are used to establish
+    the inactivity threshold. The "ClientAliveInterval" is a timeout interval in seconds, after which if no data has been
+    received from the client, sshd will send a message through the encrypted channel to request a response from the client.
+    The "ClientAliveCountMax" is the number of client alive messages that may be sent without sshd receiving any messages
+    back from the client. If this threshold is met, sshd will disconnect the client. For more information on these settings
+    and others, refer to the sshd_config man pages. Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000279-GPOS-00110</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  platforms:
+  - '#xccdf_mil.disa.stig_platform_Windows_OpenSSH'
+  effective_platform_refs:
+  - '#xccdf_mil.disa.stig_platform_Windows_OpenSSH'
+  effective_platforms:
+  - expression:
+      children:
+      - definition_binding:
+          definition_id: oval:mil.disa.stig.win:def:100025
+          source: applicability_oval_ir
+          status: resolved
+        href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        id_ref: oval:mil.disa.stig.win:def:100025
+        kind: check_fact
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      kind: logical_test
+      negate: false
+      operator: AND
+    kind: local_cpe_expression
+    platform_id: xccdf_mil.disa.stig_platform_Windows_OpenSSH
+    ref: '#xccdf_mil.disa.stig_platform_Windows_OpenSSH'
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows Server 2025 DISA DPMS Target Microsoft Windows Server 2025 5719
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001133
+  - system: http://cyber.mil/cci
+    value: CCI-002361
+  requires: []
+  conflicts: []
+  check: 'If OpenSSH is not installed on the system, this requirement is not applicable. Verify the "ClientAliveCountMax"
+    is set to "1" by performing the following command: C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String
+    -Pattern ''^\s*ClientAliveCountMax'' ClientAliveCountMax 1 If "ClientAliveCountMax" does not exist, is not set to a value
+    of "1", or is commented out, this is a finding.'
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      name: oval:mil.disa.stig.windows2025:def:285318
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285318
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      name: oval:mil.disa.stig.windows2025:def:285318
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285318
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:57101
+    exports: []
+    inline_content: 'If OpenSSH is not installed on the system, this requirement is not applicable. Verify the "ClientAliveCountMax"
+      is set to "1" by performing the following command: C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String
+      -Pattern ''^\s*ClientAliveCountMax'' ClientAliveCountMax 1 If "ClientAliveCountMax" does not exist, is not set to a
+      value of "1", or is commented out, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:57101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'If OpenSSH is not installed on the system, this requirement is not applicable.
+
+
+          Verify the "ClientAliveCountMax" is set to "1" by performing the following command:
+
+
+          C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String -Pattern ''^\s*ClientAliveCountMax''
+
+
+          ClientAliveCountMax 1
+
+
+          If "ClientAliveCountMax" does not exist, is not set to a value of "1", or is commented out, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:285318
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:285318
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:285318
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:285318
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:57101
+      exports: []
+      inline_content: 'If OpenSSH is not installed on the system, this requirement is not applicable. Verify the "ClientAliveCountMax"
+        is set to "1" by performing the following command: C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String
+        -Pattern ''^\s*ClientAliveCountMax'' ClientAliveCountMax 1 If "ClientAliveCountMax" does not exist, is not set to
+        a value of "1", or is commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:57101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'If OpenSSH is not installed on the system, this requirement is not applicable.
+
+
+            Verify the "ClientAliveCountMax" is set to "1" by performing the following command:
+
+
+            C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String -Pattern ''^\s*ClientAliveCountMax''
+
+
+            ClientAliveCountMax 1
+
+
+            If "ClientAliveCountMax" does not exist, is not set to a value of "1", or is commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: 'To configure the system, add or modify the following line in the "$env:ProgramData/ssh/sshd_config" file: ClientAliveCountMax
+    1 Restart the OpenSSH service for the settings to take effect.'
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-285318r1211182_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN25-SH-000060
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Windows Server 2025 OpenSSH must be configured so that all network connections associated with SSH traffic terminate
+        after becoming unresponsive.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Terminating an unresponsive SSH session within a short time period reduces the window of opportunity
+        for unauthorized personnel to take control of a management session enabled on the console or console port that has
+        been left unattended. Quickly terminating an idle SSH session will also free up resources committed by the managed
+        network element.
+
+
+        Terminating network connections associated with communications sessions includes, for example, deallocating associated
+        TCP/IP address/port pairs at the operating system level and deallocating networking assignments at the application
+        level if multiple application sessions are using a single operating system-level network connection. This does not
+        mean the operating system terminates all sessions or network access; it only ends the unresponsive session and releases
+        the resources associated with that session.
+
+
+        Windows Server 2025 uses $env:ProgramData/ssh/sshd_config for configurations of OpenSSH. Within the sshd_config, the
+        product of the values of "ClientAliveInterval" and "ClientAliveCountMax" are used to establish the inactivity threshold.
+        The "ClientAliveInterval" is a timeout interval in seconds, after which if no data has been received from the client,
+        sshd will send a message through the encrypted channel to request a response from the client. The "ClientAliveCountMax"
+        is the number of client alive messages that may be sent without sshd receiving any messages back from the client.
+        If this threshold is met, sshd will disconnect the client. For more information on these settings and others, refer
+        to the sshd_config man pages.
+
+
+        Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000279-GPOS-00110</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows Server 2025
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows Server 2025
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5719'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        idref: '#xccdf_mil.disa.stig_platform_Windows_OpenSSH'
+      name: platform
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001133
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002361
+    - attributes:
+        fixref: F-89793r1211181_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'To configure the system, add or modify the following line in the "$env:ProgramData/ssh/sshd_config" file:
+
+
+        ClientAliveCountMax 1
+
+
+        Restart the OpenSSH service for the settings to take effect.'
+    - attributes:
+        id: F-89793r1211181_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285318
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285318
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:57101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'If OpenSSH is not installed on the system, this requirement is not applicable.
+
+
+          Verify the "ClientAliveCountMax" is set to "1" by performing the following command:
+
+
+          C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String -Pattern ''^\s*ClientAliveCountMax''
+
+
+          ClientAliveCountMax 1
+
+
+          If "ClientAliveCountMax" does not exist, is not set to a value of "1", or is commented out, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  assessment:
+    id: ng.scap14.xccdf_mil.disa.stig_rule_SV-285318r1211182_rule
+    version: 1
+    description: Windows Server 2025 OpenSSH must be configured so that all network connections associated with SSH traffic
+      terminate after becoming unresponsive.
+    semantic_model: scap-ng-generic-assessment-graph-0.1
+    collect:
+      oval:mil.disa.stig.ind:obj:28531800:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:28531800
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: C:\ProgramData\ssh\sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+    derive: {}
+    predicates:
+      oval:mil.disa.stig.ind:ste:20000003:
+        source_state_id: oval:mil.disa.stig.ind:ste:20000003
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: equals
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+        comment: null
+    evaluate:
+      tests:
+        oval:mil.disa.stig.ind:tst:28531800:
+          source_test_id: oval:mil.disa.stig.ind:tst:28531800
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: C:\ProgramData\ssh\sshd_config:ClientAliveCountMax = 1
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:28531800
+          predicates:
+          - oval:mil.disa.stig.ind:ste:20000003
+          source_other: []
+      definitions:
+        oval:mil.disa.stig.defs:def:285318:
+          source_definition_id: oval:mil.disa.stig.defs:def:285318
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: C:\ProgramData\ssh\sshd_config:ClientAliveCountMax = 1
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:28531800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system OpenSSH must be configured so that all network connections associated with SSH traffic
+                terminate after becoming unresponsive.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.windows2025:def:285318:
+          source_definition_id: oval:mil.disa.stig.windows2025:def:285318
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:285318
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: WN25-SH-000060 - Windows Server 2025 OpenSSH must be configured so that all network connections associated
+                with SSH traffic terminate after becoming unresponsive.
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows Server 2025
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: 'Terminating an unresponsive SSH session within a short time period reduces the window of opportunity
+                for unauthorized personnel to take control of a management session enabled on the console or console port
+                that has been left unattended. Quickly terminating an idle SSH session will also free up resources committed
+                by the managed network element.
+
+
+                Terminating network connections associated with communications sessions includes, for example, deallocating
+                associated TCP/IP address/port pairs at the operating system level and deallocating networking assignments
+                at the application level if multiple application sessions are using a single operating system-level network
+                connection. This does not mean the operating system terminates all sessions or network access; it only ends
+                the unresponsive session and releases the resources associated with that session.
+
+
+                Windows Server 2025 uses $env:ProgramData/ssh/sshd_config for configurations of OpenSSH. Within the sshd_config,
+                the product of the values of "ClientAliveInterval" and "ClientAliveCountMax" are used to establish the inactivity
+                threshold. The "ClientAliveInterval" is a timeout interval in seconds, after which if no data has been received
+                from the client, sshd will send a message through the encrypted channel to request a response from the client.
+                The "ClientAliveCountMax" is the number of client alive messages that may be sent without sshd receiving any
+                messages back from the client. If this threshold is met, sshd will disconnect the client. For more information
+                on these settings and others, refer to the sshd_config man pages.
+
+
+                Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000279-GPOS-00110'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    assert:
+      definition_results:
+      - oval:mil.disa.stig.windows2025:def:285318
+      combination: xccdf_source_check_semantics
+    source_check_context:
+      check_exports: []
+      checks:
+      - definition_id: oval:mil.disa.stig.windows2025:def:285318
+        exports: []
+        href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.windows2025:def:285318
+        oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - definition_id: oval:mil.disa.stig.windows2025:def:285318
+        exports: []
+        href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.windows2025:def:285318
+        oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
+      published_source:
+        datastream_member: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml
+        datastream_sha256: 52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440
+        repository: niwc-atlantic/scap-content-library
+        repository_path: Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+        revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+        zip_filename: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+        zip_sha256: 2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0
+      rule_id: xccdf_mil.disa.stig_rule_SV-285318r1211182_rule
+      title: Windows Server 2025 OpenSSH must be configured so that all network connections associated with SSH traffic terminate
+        after becoming unresponsive.
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285318
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:285318
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285318
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:285318
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:57101
+        exports: []
+        inline_content: 'If OpenSSH is not installed on the system, this requirement is not applicable. Verify the "ClientAliveCountMax"
+          is set to "1" by performing the following command: C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String
+          -Pattern ''^\s*ClientAliveCountMax'' ClientAliveCountMax 1 If "ClientAliveCountMax" does not exist, is not set to
+          a value of "1", or is commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:57101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'If OpenSSH is not installed on the system, this requirement is not applicable.
+
+
+              Verify the "ClientAliveCountMax" is set to "1" by performing the following command:
+
+
+              C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String -Pattern ''^\s*ClientAliveCountMax''
+
+
+              ClientAliveCountMax 1
+
+
+              If "ClientAliveCountMax" does not exist, is not set to a value of "1", or is commented out, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    migration: &id001
+      status: legacy_compatible
+      source: SCAP 1.4 / OVAL 5.12.3
+      source_rule: xccdf_mil.disa.stig_rule_SV-285318r1211182_rule
+      semantic_ir_sha256: fd35609e31e542c92393d9d7b096e76c90f62a45f58c31e8b56be83227ca33bf
+      note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_fingerprint_sha256: 325573070a490d08aac1302818bb33e321f0252dbefcd25b0faee68455bd7e30
+  migration: *id001

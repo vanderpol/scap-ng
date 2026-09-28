@@ -1,0 +1,857 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-253429r1256662_rule
+  title: The DoW Interoperability Root CA cross-certificates must be installed in the Untrusted Certificates Store on unclassified
+    systems.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-253429
+  description: <VulnDiscussion>To ensure users do not experience denial of service when performing certificate-based authentication
+    to DoW websites due to the system chaining to a root other than DoW Root CAs, the DoW Interoperability Root CA cross-certificates
+    must be installed in the Untrusted Certificate Store. This requirement only applies to unclassified systems.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:microsoft:windows_11
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:microsoft:windows_11
+    ref: cpe:/o:microsoft:windows_11
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows 11 DISA DPMS Target Microsoft Windows 11 5471
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-002470
+  requires: []
+  conflicts: []
+  check: 'Verify the DoW Interoperability cross-certificates are installed on unclassified systems as Untrusted Certificates.
+    Run "PowerShell" as an administrator. Execute the following command: Get-ChildItem -Path Cert:Localmachine\disallowed
+    | Where {$_.Issuer -Like "*DoD Interoperability*" -and $_.Subject -Like "*DoD*"} | FL Subject, NotAfter If valid DoW Interoperability
+    cross-certificates (such as those below) are not displayed, this is a finding. Subject: CN=DoD Interoperability Root CA
+    2, OU=PKI, OU=DoD, O=U.S. Government, C=US NotAfter: 11/24/2030 Alternately, use the Certificates MMC snap-in: Run "MMC".
+    Select "File", "Add/Remove Snap-in". Select "Certificates", click "Add". Select "Computer account", click "Next". Select
+    "Local computer: (the computer this console is running on)", click "Finish". Click "OK". Expand "Certificates" and navigate
+    to Untrusted Certificates >> Certificates. For each DoW Interoperability Root CA certificate displayed: Right-click on
+    the certificate and select "Open". Select the "Details" tab. Verify the Expiration Date is a future date. Scroll to the
+    bottom and select "Subject". If any of the certificates listed do not include "DoD Interoperability Root CA" in the name
+    or are expired, this is a finding. Note: This should not be relied upon as a complete list of possible DoW Interoperability
+    Root CA certificates. DoD Interoperability Root CA 2 Note: Interoperability cross certificates will have a different value
+    (such as "...Root CA 6") in the ''Issued To'' field than in the ''Subject'' and ''Issuer'' fields.'
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      name: oval:mil.disa.stig.windows11:def:253429
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253429
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      name: oval:mil.disa.stig.windows11:def:253429
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253429
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:33701
+    exports: []
+    inline_content: 'Verify the DoW Interoperability cross-certificates are installed on unclassified systems as Untrusted
+      Certificates. Run "PowerShell" as an administrator. Execute the following command: Get-ChildItem -Path Cert:Localmachine\disallowed
+      | Where {$_.Issuer -Like "*DoD Interoperability*" -and $_.Subject -Like "*DoD*"} | FL Subject, NotAfter If valid DoW
+      Interoperability cross-certificates (such as those below) are not displayed, this is a finding. Subject: CN=DoD Interoperability
+      Root CA 2, OU=PKI, OU=DoD, O=U.S. Government, C=US NotAfter: 11/24/2030 Alternately, use the Certificates MMC snap-in:
+      Run "MMC". Select "File", "Add/Remove Snap-in". Select "Certificates", click "Add". Select "Computer account", click
+      "Next". Select "Local computer: (the computer this console is running on)", click "Finish". Click "OK". Expand "Certificates"
+      and navigate to Untrusted Certificates >> Certificates. For each DoW Interoperability Root CA certificate displayed:
+      Right-click on the certificate and select "Open". Select the "Details" tab. Verify the Expiration Date is a future date.
+      Scroll to the bottom and select "Subject". If any of the certificates listed do not include "DoD Interoperability Root
+      CA" in the name or are expired, this is a finding. Note: This should not be relied upon as a complete list of possible
+      DoW Interoperability Root CA certificates. DoD Interoperability Root CA 2 Note: Interoperability cross certificates
+      will have a different value (such as "...Root CA 6") in the ''Issued To'' field than in the ''Subject'' and ''Issuer''
+      fields.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:33701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify the DoW Interoperability cross-certificates are installed on unclassified systems as Untrusted Certificates.\n\
+          \nRun \"PowerShell\" as an administrator.\n\nExecute the following command:\n\nGet-ChildItem -Path Cert:Localmachine\\\
+          disallowed | Where {$_.Issuer -Like \"*DoD Interoperability*\" -and $_.Subject -Like \"*DoD*\"} | FL Subject, NotAfter\n\
+          \nIf valid DoW Interoperability cross-certificates (such as those below) are not displayed, this is a finding.\n\
+          \  \nSubject: CN=DoD Interoperability Root CA 2, OU=PKI, OU=DoD, O=U.S. Government, C=US\nNotAfter: 11/24/2030 \n\
+          \           \nAlternately, use the Certificates MMC snap-in:\n\nRun \"MMC\".\n\nSelect \"File\", \"Add/Remove Snap-in\"\
+          .\n\nSelect \"Certificates\", click \"Add\".\n\nSelect \"Computer account\", click \"Next\".\n\nSelect \"Local computer:\
+          \ (the computer this console is running on)\", click \"Finish\".\n\nClick \"OK\".\n\nExpand \"Certificates\" and\
+          \ navigate to Untrusted Certificates >> Certificates.\n\nFor each DoW Interoperability Root CA certificate displayed:\n\
+          \nRight-click on the certificate and select \"Open\".\n\nSelect the \"Details\" tab.\n\nVerify the Expiration Date\
+          \ is a future date.\n\nScroll to the bottom and select \"Subject\".\n\nIf any of the certificates listed do not\
+          \ include \"DoD Interoperability Root CA\" in the name or are expired, this is a finding.\n\nNote: This should not\
+          \ be relied upon as a complete list of possible DoW Interoperability Root CA certificates.\n\nDoD Interoperability\
+          \ Root CA 2\n\nNote: Interoperability cross certificates will have a different value (such as \"...Root CA 6\")\
+          \ in the 'Issued To'  field than in the 'Subject' and 'Issuer' fields."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253429
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253429
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253429
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253429
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:33701
+      exports: []
+      inline_content: 'Verify the DoW Interoperability cross-certificates are installed on unclassified systems as Untrusted
+        Certificates. Run "PowerShell" as an administrator. Execute the following command: Get-ChildItem -Path Cert:Localmachine\disallowed
+        | Where {$_.Issuer -Like "*DoD Interoperability*" -and $_.Subject -Like "*DoD*"} | FL Subject, NotAfter If valid DoW
+        Interoperability cross-certificates (such as those below) are not displayed, this is a finding. Subject: CN=DoD Interoperability
+        Root CA 2, OU=PKI, OU=DoD, O=U.S. Government, C=US NotAfter: 11/24/2030 Alternately, use the Certificates MMC snap-in:
+        Run "MMC". Select "File", "Add/Remove Snap-in". Select "Certificates", click "Add". Select "Computer account", click
+        "Next". Select "Local computer: (the computer this console is running on)", click "Finish". Click "OK". Expand "Certificates"
+        and navigate to Untrusted Certificates >> Certificates. For each DoW Interoperability Root CA certificate displayed:
+        Right-click on the certificate and select "Open". Select the "Details" tab. Verify the Expiration Date is a future
+        date. Scroll to the bottom and select "Subject". If any of the certificates listed do not include "DoD Interoperability
+        Root CA" in the name or are expired, this is a finding. Note: This should not be relied upon as a complete list of
+        possible DoW Interoperability Root CA certificates. DoD Interoperability Root CA 2 Note: Interoperability cross certificates
+        will have a different value (such as "...Root CA 6") in the ''Issued To'' field than in the ''Subject'' and ''Issuer''
+        fields.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:33701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify the DoW Interoperability cross-certificates are installed on unclassified systems as Untrusted Certificates.\n\
+            \nRun \"PowerShell\" as an administrator.\n\nExecute the following command:\n\nGet-ChildItem -Path Cert:Localmachine\\\
+            disallowed | Where {$_.Issuer -Like \"*DoD Interoperability*\" -and $_.Subject -Like \"*DoD*\"} | FL Subject,\
+            \ NotAfter\n\nIf valid DoW Interoperability cross-certificates (such as those below) are not displayed, this is\
+            \ a finding.\n  \nSubject: CN=DoD Interoperability Root CA 2, OU=PKI, OU=DoD, O=U.S. Government, C=US\nNotAfter:\
+            \ 11/24/2030 \n           \nAlternately, use the Certificates MMC snap-in:\n\nRun \"MMC\".\n\nSelect \"File\"\
+            , \"Add/Remove Snap-in\".\n\nSelect \"Certificates\", click \"Add\".\n\nSelect \"Computer account\", click \"\
+            Next\".\n\nSelect \"Local computer: (the computer this console is running on)\", click \"Finish\".\n\nClick \"\
+            OK\".\n\nExpand \"Certificates\" and navigate to Untrusted Certificates >> Certificates.\n\nFor each DoW Interoperability\
+            \ Root CA certificate displayed:\n\nRight-click on the certificate and select \"Open\".\n\nSelect the \"Details\"\
+            \ tab.\n\nVerify the Expiration Date is a future date.\n\nScroll to the bottom and select \"Subject\".\n\nIf any\
+            \ of the certificates listed do not include \"DoD Interoperability Root CA\" in the name or are expired, this\
+            \ is a finding.\n\nNote: This should not be relied upon as a complete list of possible DoW Interoperability Root\
+            \ CA certificates.\n\nDoD Interoperability Root CA 2\n\nNote: Interoperability cross certificates will have a\
+            \ different value (such as \"...Root CA 6\") in the 'Issued To'  field than in the 'Subject' and 'Issuer' fields."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: Install valid (unexpired) DoW Interoperability Root CA cross-certificates on unclassified systems. The list below is
+    not to be treated as exhaustive. The STIG should not be used as a definitive resource for the organizationally approved
+    certificates for the systems. DoD Interoperability Root CA 2 The certificates can be installed using the InstallRoot tool.
+    The tool and user guide are available on Cyber Exchange at https://cyber.mil/pki-pke/tools-configuration-files. Certificate
+    bundles published by the PKI can be found at https://crl.gds.disa.mil/.
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-253429r1256662_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN11-PK-000015
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: The DoW Interoperability Root CA cross-certificates must be installed in the Untrusted Certificates Store on unclassified
+        systems.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: <VulnDiscussion>To ensure users do not experience denial of service when performing certificate-based authentication
+        to DoW websites due to the system chaining to a root other than DoW Root CAs, the DoW Interoperability Root CA cross-certificates
+        must be installed in the Untrusted Certificate Store. This requirement only applies to unclassified systems.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows 11
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows 11
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5471'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002470
+    - attributes:
+        fixref: F-56832r1256661_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: "Install valid (unexpired) DoW Interoperability Root CA cross-certificates on unclassified systems.  \n\nThe list\
+        \ below is not to be treated as exhaustive. The STIG should not be used as a definitive resource for the organizationally\
+        \ approved certificates for the systems.\n\nDoD Interoperability Root CA 2                                       \
+        \    \n\nThe certificates can be installed using the InstallRoot tool. The tool and user guide are available on Cyber\
+        \ Exchange at https://cyber.mil/pki-pke/tools-configuration-files. Certificate bundles published by the PKI can be\
+        \ found at https://crl.gds.disa.mil/."
+    - attributes:
+        id: F-56832r1256661_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253429
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253429
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:33701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify the DoW Interoperability cross-certificates are installed on unclassified systems as Untrusted Certificates.\n\
+          \nRun \"PowerShell\" as an administrator.\n\nExecute the following command:\n\nGet-ChildItem -Path Cert:Localmachine\\\
+          disallowed | Where {$_.Issuer -Like \"*DoD Interoperability*\" -and $_.Subject -Like \"*DoD*\"} | FL Subject, NotAfter\n\
+          \nIf valid DoW Interoperability cross-certificates (such as those below) are not displayed, this is a finding.\n\
+          \  \nSubject: CN=DoD Interoperability Root CA 2, OU=PKI, OU=DoD, O=U.S. Government, C=US\nNotAfter: 11/24/2030 \n\
+          \           \nAlternately, use the Certificates MMC snap-in:\n\nRun \"MMC\".\n\nSelect \"File\", \"Add/Remove Snap-in\"\
+          .\n\nSelect \"Certificates\", click \"Add\".\n\nSelect \"Computer account\", click \"Next\".\n\nSelect \"Local computer:\
+          \ (the computer this console is running on)\", click \"Finish\".\n\nClick \"OK\".\n\nExpand \"Certificates\" and\
+          \ navigate to Untrusted Certificates >> Certificates.\n\nFor each DoW Interoperability Root CA certificate displayed:\n\
+          \nRight-click on the certificate and select \"Open\".\n\nSelect the \"Details\" tab.\n\nVerify the Expiration Date\
+          \ is a future date.\n\nScroll to the bottom and select \"Subject\".\n\nIf any of the certificates listed do not\
+          \ include \"DoD Interoperability Root CA\" in the name or are expired, this is a finding.\n\nNote: This should not\
+          \ be relied upon as a complete list of possible DoW Interoperability Root CA certificates.\n\nDoD Interoperability\
+          \ Root CA 2\n\nNote: Interoperability cross certificates will have a different value (such as \"...Root CA 6\")\
+          \ in the 'Issued To'  field than in the 'Subject' and 'Issuer' fields."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  assessment:
+    id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253429r1256662_rule
+    version: 1
+    description: The DoW Interoperability Root CA cross-certificates must be installed in the Untrusted Certificates Store
+      on unclassified systems.
+    semantic_model: scap-ng-generic-assessment-graph-0.1
+    collect:
+      oval:mil.disa.stig.win:obj:27819300:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819300
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.win:obj:27819301
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.win:obj:27819304
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: false
+      oval:mil.disa.stig.win:obj:27819305:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819305
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.win:obj:27819306
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.win:obj:27819309
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: false
+      oval:mil.disa.stig.win:obj:27819304:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819304
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '2'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Policies\Microsoft\SystemCertificates\Disallowed\Certificates\EC3C9B8B017892CAC3A13C7C9AAD52E7F7B0ABE4
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^.+$
+      oval:mil.disa.stig.win:obj:27819303:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819303
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '2'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Microsoft\EnterpriseCertificates\Disallowed\Certificates\EC3C9B8B017892CAC3A13C7C9AAD52E7F7B0ABE4
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^.+$
+      oval:mil.disa.stig.win:obj:27819301:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819301
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.win:obj:27819302
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.win:obj:27819303
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: false
+      oval:mil.disa.stig.win:obj:27819309:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819309
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Policies\Microsoft\SystemCertificates\Disallowed\Certificates\F3EE5E2442ADB5B246CAA286C29F6349F4202EC5
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^.+$
+      oval:mil.disa.stig.win:obj:27819302:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819302
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '2'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Microsoft\SystemCertificates\Disallowed\Certificates\EC3C9B8B017892CAC3A13C7C9AAD52E7F7B0ABE4
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^.+$
+      oval:mil.disa.stig.win:obj:27819307:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819307
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Microsoft\SystemCertificates\Disallowed\Certificates\F3EE5E2442ADB5B246CAA286C29F6349F4202EC5
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^.+$
+      oval:mil.disa.stig.win:obj:27819306:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819306
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.win:obj:27819307
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.win:obj:27819308
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: false
+      oval:mil.disa.stig.win:obj:27819308:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:27819308
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Microsoft\EnterpriseCertificates\Disallowed\Certificates\F3EE5E2442ADB5B246CAA286C29F6349F4202EC5
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^.+$
+    derive: {}
+    predicates: {}
+    evaluate:
+      tests:
+        oval:mil.disa.stig.win:tst:27819300:
+          source_test_id: oval:mil.disa.stig.win:tst:27819300
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: DoD Interoperability Root CA 2 certificate expiring 10/9/2027 is installed in the Untrusted Certificates
+            Store
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:27819300
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.win:tst:27819301:
+          source_test_id: oval:mil.disa.stig.win:tst:27819301
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: DoD Interoperability Root CA 2 certificate expiring 6/9/2029 is installed in the Untrusted Certificates
+            Store
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:27819305
+          predicates: []
+          source_other: []
+      definitions:
+        oval:mil.disa.stig.windows11:def:253429:
+          source_definition_id: oval:mil.disa.stig.windows11:def:253429
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:278193
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: WN11-PK-000015 - The DoW Interoperability Root CA cross-certificates must be installed in the Untrusted
+                Certificates Store on unclassified systems.
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows 11
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: To ensure users do not experience denial of service when performing certificate-based authentication to
+                DoW websites due to the system chaining to a root other than DoW Root CAs, the DoW Interoperability Root CA
+                cross-certificates must be installed in the Untrusted Certificate Store. This requirement only applies to
+                unclassified systems.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:278193:
+          source_definition_id: oval:mil.disa.stig.defs:def:278193
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: DoD Interoperability Root CA 2 certificate expiring 10/9/2027 is installed in the Untrusted Certificates
+                Store
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:27819300
+            - comment: DoD Interoperability Root CA 2 certificate expiring 6/9/2029 is installed in the Untrusted Certificates
+                Store
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:27819301
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The DoW Interoperability Root CA cross-certificates must be installed in the Untrusted Certificates Store
+                on unclassified systems.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    assert:
+      definition_results:
+      - oval:mil.disa.stig.windows11:def:253429
+      combination: xccdf_source_check_semantics
+    source_check_context:
+      check_exports: []
+      checks:
+      - definition_id: oval:mil.disa.stig.windows11:def:253429
+        exports: []
+        href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.windows11:def:253429
+        oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - definition_id: oval:mil.disa.stig.windows11:def:253429
+        exports: []
+        href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.windows11:def:253429
+        oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+      published_source:
+        datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+        datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+        repository: niwc-atlantic/scap-content-library
+        repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+        revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+        zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+        zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+      rule_id: xccdf_mil.disa.stig_rule_SV-253429r1256662_rule
+      title: The DoW Interoperability Root CA cross-certificates must be installed in the Untrusted Certificates Store on
+        unclassified systems.
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253429
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253429
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253429
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253429
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:33701
+        exports: []
+        inline_content: 'Verify the DoW Interoperability cross-certificates are installed on unclassified systems as Untrusted
+          Certificates. Run "PowerShell" as an administrator. Execute the following command: Get-ChildItem -Path Cert:Localmachine\disallowed
+          | Where {$_.Issuer -Like "*DoD Interoperability*" -and $_.Subject -Like "*DoD*"} | FL Subject, NotAfter If valid
+          DoW Interoperability cross-certificates (such as those below) are not displayed, this is a finding. Subject: CN=DoD
+          Interoperability Root CA 2, OU=PKI, OU=DoD, O=U.S. Government, C=US NotAfter: 11/24/2030 Alternately, use the Certificates
+          MMC snap-in: Run "MMC". Select "File", "Add/Remove Snap-in". Select "Certificates", click "Add". Select "Computer
+          account", click "Next". Select "Local computer: (the computer this console is running on)", click "Finish". Click
+          "OK". Expand "Certificates" and navigate to Untrusted Certificates >> Certificates. For each DoW Interoperability
+          Root CA certificate displayed: Right-click on the certificate and select "Open". Select the "Details" tab. Verify
+          the Expiration Date is a future date. Scroll to the bottom and select "Subject". If any of the certificates listed
+          do not include "DoD Interoperability Root CA" in the name or are expired, this is a finding. Note: This should not
+          be relied upon as a complete list of possible DoW Interoperability Root CA certificates. DoD Interoperability Root
+          CA 2 Note: Interoperability cross certificates will have a different value (such as "...Root CA 6") in the ''Issued
+          To'' field than in the ''Subject'' and ''Issuer'' fields.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:33701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify the DoW Interoperability cross-certificates are installed on unclassified systems as Untrusted Certificates.\n\
+              \nRun \"PowerShell\" as an administrator.\n\nExecute the following command:\n\nGet-ChildItem -Path Cert:Localmachine\\\
+              disallowed | Where {$_.Issuer -Like \"*DoD Interoperability*\" -and $_.Subject -Like \"*DoD*\"} | FL Subject,\
+              \ NotAfter\n\nIf valid DoW Interoperability cross-certificates (such as those below) are not displayed, this\
+              \ is a finding.\n  \nSubject: CN=DoD Interoperability Root CA 2, OU=PKI, OU=DoD, O=U.S. Government, C=US\nNotAfter:\
+              \ 11/24/2030 \n           \nAlternately, use the Certificates MMC snap-in:\n\nRun \"MMC\".\n\nSelect \"File\"\
+              , \"Add/Remove Snap-in\".\n\nSelect \"Certificates\", click \"Add\".\n\nSelect \"Computer account\", click \"\
+              Next\".\n\nSelect \"Local computer: (the computer this console is running on)\", click \"Finish\".\n\nClick\
+              \ \"OK\".\n\nExpand \"Certificates\" and navigate to Untrusted Certificates >> Certificates.\n\nFor each DoW\
+              \ Interoperability Root CA certificate displayed:\n\nRight-click on the certificate and select \"Open\".\n\n\
+              Select the \"Details\" tab.\n\nVerify the Expiration Date is a future date.\n\nScroll to the bottom and select\
+              \ \"Subject\".\n\nIf any of the certificates listed do not include \"DoD Interoperability Root CA\" in the name\
+              \ or are expired, this is a finding.\n\nNote: This should not be relied upon as a complete list of possible\
+              \ DoW Interoperability Root CA certificates.\n\nDoD Interoperability Root CA 2\n\nNote: Interoperability cross\
+              \ certificates will have a different value (such as \"...Root CA 6\") in the 'Issued To'  field than in the\
+              \ 'Subject' and 'Issuer' fields."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    migration: &id001
+      status: legacy_compatible
+      source: SCAP 1.4 / OVAL 5.12.3
+      source_rule: xccdf_mil.disa.stig_rule_SV-253429r1256662_rule
+      semantic_ir_sha256: 4632bf5183858a90837ea5b2a6d486730094dad11661dbd0b8b86687f0b39258
+      note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_fingerprint_sha256: ce5032696e14e9bf5ec33b0ee9b164da6488592ff4cb76a0c9179d750366ed52
+  migration: *id001

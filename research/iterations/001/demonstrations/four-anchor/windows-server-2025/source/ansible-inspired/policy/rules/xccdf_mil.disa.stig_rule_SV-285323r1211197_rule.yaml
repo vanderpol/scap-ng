@@ -1,0 +1,342 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'If OpenSSH is not installed on the system, this requirement is not applicable. Verify the system does not allow
+    GSSAPI authentication with the following command: C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String
+    -Pattern ''^\s*GSSAPIAuthentication'' GSSAPIAuthentication no If the value is returned as "yes", the returned line is
+    commented out, or no output is returned, this is a finding.'
+  cluster_id: null
+  conflicts: []
+  description: '<VulnDiscussion>Generic Security Service Application Program Interface (GSSAPI) authentication is used to
+    provide additional authentication mechanisms to applications. Allowing GSSAPI authentication through SSH exposes the system''s
+    GSSAPI to remote hosts, increasing the attack surface of the system. Satisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00228</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  effective_platform_refs:
+  - '#xccdf_mil.disa.stig_platform_Windows_OpenSSH'
+  effective_platforms:
+  - expression:
+      children:
+      - definition_binding:
+          definition_id: oval:mil.disa.stig.win:def:100025
+          source: applicability_oval_ir
+          status: resolved
+        href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        id_ref: oval:mil.disa.stig.win:def:100025
+        kind: check_fact
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      kind: logical_test
+      negate: false
+      operator: AND
+    kind: local_cpe_expression
+    platform_id: xccdf_mil.disa.stig_platform_Windows_OpenSSH
+    ref: '#xccdf_mil.disa.stig_platform_Windows_OpenSSH'
+  extends: null
+  fix: 'To configure the system, add or modify the following line in the "$env:ProgramData/ssh/sshd_config" file: GSSAPIAuthentication
+    no Restart the OpenSSH service for the settings to take effect.'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-285323
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-285323r1211197_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001813
+  multiple: false
+  platforms:
+  - '#xccdf_mil.disa.stig_platform_Windows_OpenSSH'
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows Server 2025 DISA DPMS Target Microsoft Windows Server 2025 5719
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:285323
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:285323
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:285323
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:285323
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:58101
+      exports: []
+      inline_content: 'If OpenSSH is not installed on the system, this requirement is not applicable. Verify the system does
+        not allow GSSAPI authentication with the following command: C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" |
+        Select-String -Pattern ''^\s*GSSAPIAuthentication'' GSSAPIAuthentication no If the value is returned as "yes", the
+        returned line is commented out, or no output is returned, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:58101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'If OpenSSH is not installed on the system, this requirement is not applicable.
+
+
+            Verify the system does not allow GSSAPI authentication with the following command:
+
+
+            C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String -Pattern ''^\s*GSSAPIAuthentication''
+
+
+            GSSAPIAuthentication no
+
+
+            If the value is returned as "yes", the returned line is commented out, or no output is returned, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      name: oval:mil.disa.stig.windows2025:def:285323
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285323
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      name: oval:mil.disa.stig.windows2025:def:285323
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285323
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:58101
+    exports: []
+    inline_content: 'If OpenSSH is not installed on the system, this requirement is not applicable. Verify the system does
+      not allow GSSAPI authentication with the following command: C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String
+      -Pattern ''^\s*GSSAPIAuthentication'' GSSAPIAuthentication no If the value is returned as "yes", the returned line is
+      commented out, or no output is returned, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:58101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'If OpenSSH is not installed on the system, this requirement is not applicable.
+
+
+          Verify the system does not allow GSSAPI authentication with the following command:
+
+
+          C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String -Pattern ''^\s*GSSAPIAuthentication''
+
+
+          GSSAPIAuthentication no
+
+
+          If the value is returned as "yes", the returned line is commented out, or no output is returned, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-285323r1211197_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN25-SH-000110
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Windows Server 2025 OpenSSH must not allow GSSAPI authentication.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Generic Security Service Application Program Interface (GSSAPI) authentication is used to provide
+        additional authentication mechanisms to applications. Allowing GSSAPI authentication through SSH exposes the system''s
+        GSSAPI to remote hosts, increasing the attack surface of the system.
+
+
+        Satisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00228</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows Server 2025
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows Server 2025
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5719'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        idref: '#xccdf_mil.disa.stig_platform_Windows_OpenSSH'
+      name: platform
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001813
+    - attributes:
+        fixref: F-89798r1211196_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'To configure the system, add or modify the following line in the "$env:ProgramData/ssh/sshd_config" file:
+
+
+        GSSAPIAuthentication no
+
+
+        Restart the OpenSSH service for the settings to take effect.'
+    - attributes:
+        id: F-89798r1211196_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285323
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:285323
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:58101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'If OpenSSH is not installed on the system, this requirement is not applicable.
+
+
+          Verify the system does not allow GSSAPI authentication with the following command:
+
+
+          C:\ > Get-Content "$env:ProgramData\ssh\sshd_config" | Select-String -Pattern ''^\s*GSSAPIAuthentication''
+
+
+          GSSAPIAuthentication no
+
+
+          If the value is returned as "yes", the returned line is commented out, or no output is returned, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: Windows Server 2025 OpenSSH must not allow GSSAPI authentication.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: a61306e9bcbc58daa36bfc581ce9eb348871a59e453c6a579c90535b1b64a40f
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-285323r1211197_rule
+  status: legacy_compatible

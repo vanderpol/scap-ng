@@ -1,0 +1,246 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257592r991589_rule
+  version: 1
+  description: Windows 11 must not have portproxy enabled or in use.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: Windows 11 must not have portproxy enabled or in use.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:25759201
+    collect:
+      capability: scapng.collect.windows.registry
+      comment: Ensure no portproxies are configured.
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SYSTEM\\CurrentControlSet\\Services\\PortProxy\\v.tov.\\.*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: .*
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25759201
+      source_type: registry_object
+      version: '18'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:25759201
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:25759202
+    collect:
+      capability: scapng.collect.windows.registry
+      comment: Check registry for existence of v4tov4\tcp
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SYSTEM\CurrentControlSet\Services\PortProxy\v4tov4\tcp
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25759202
+      source_type: registry_object
+      version: '18'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:25759202
+  predicates: {}
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.windows:def:257592:
+        class: compliance
+        criteria:
+          children:
+          - comment: Ensure no portproxies are configured.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25759201
+          - children:
+            - comment: Check registry for existence of v4tov4\tcp
+              kind: test_ref
+              negate: false
+              test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25759202
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows 11 must not have portproxy enabled or in use.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Having portproxy enabled or configured in Windows 10 could allow a man-in-the-middle attack.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+        version: '18'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25759201:
+        check: only one
+        check_existence: none_exist
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25759201
+        comment: Windows 11 must not have portproxy enabled or in use.
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25759201
+        source_type: registry_test
+        state_operator: AND
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25759202:
+        check: only one
+        check_existence: none_exist
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25759202
+        comment: Windows 11 must not have portproxy enabled or in use.
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25759202
+        source_type: registry_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-257592r991589_rule
+    title: Windows 11 must not have portproxy enabled or in use.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:49301
+      exports: []
+      inline_content: 'Check the registry key for existence of proxied ports: HKLM\SYSTEM\CurrentControlSet\Services\PortProxy\.
+        If the key contains v4tov4\tcp\ or is populated v4tov4\tcp\, this is a finding. Run "netsh interface portproxy show
+        all". If the command displays any results, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:49301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Check the registry key for existence of proxied ports:
+
+            HKLM\SYSTEM\CurrentControlSet\Services\PortProxy\.
+
+
+            If the key contains v4tov4\tcp\ or is populated v4tov4\tcp\, this is a finding.
+
+
+            Run "netsh interface portproxy show all".
+
+
+            If the command displays any results, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.windows:def:257592
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 6f8922efdcee8c6dd6eb577368aa824011e6f4966469834e76f881766eceb801
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257592r991589_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 8cef8604b39659def36e441285dd7a77c149e351c08d434a7c9b0795d6d8702c

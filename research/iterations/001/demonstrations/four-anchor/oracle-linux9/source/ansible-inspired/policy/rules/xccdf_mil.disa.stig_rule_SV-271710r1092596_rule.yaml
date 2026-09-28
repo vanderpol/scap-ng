@@ -1,0 +1,389 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Verify that OL 9 is configured so that all network connections associated with SSH traffic are terminated after
+    10 minutes of becoming unresponsive. Verify that the "ClientAliveInterval" variable is set to a value of "600" or less
+    by performing the following command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr
+    ''\n'' '' '' | xargs sudo grep -iH ''^\s*clientaliveinterval'' ClientAliveInterval 600 If "ClientAliveInterval" does not
+    exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or is commented out, this is a finding.'
+  cluster_id: null
+  conflicts: []
+  description: '<VulnDiscussion>Terminating an unresponsive SSH session within a short time period reduces the window of opportunity
+    for unauthorized personnel to take control of a management session enabled on the console or console port that has been
+    left unattended. In addition, quickly terminating an idle SSH session will also free up resources committed by the managed
+    network element. Terminating network connections associated with communications sessions includes, for example, deallocating
+    associated TCP/IP address/port pairs at the operating system level and deallocating networking assignments at the application
+    level if multiple application sessions are using a single operating system-level network connection. This does not mean
+    the operating system terminates all sessions or network access; it only ends the unresponsive session and releases the
+    resources associated with that session. OL 9 uses /etc/ssh/sshd_config for configurations of OpenSSH. Within the sshd_config,
+    the product of the values of "ClientAliveInterval" and "ClientAliveCountMax" are used to establish the inactivity threshold.
+    The "ClientAliveInterval" is a timeout interval in seconds, after which if no data has been received from the client,
+    SSHD will send a message through the encrypted channel to request a response from the client. The "ClientAliveCountMax"
+    is the number of client alive messages that may be sent without SSHD receiving any messages back from the client. If this
+    threshold is met, SSHD will disconnect the client. For more information on these settings and others, refer to the sshd_config
+    man pages. Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000279-GPOS-00109, SRG-OS-000395-GPOS-00175</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:oracle:linux:9:-
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:oracle:linux:9:-
+    ref: cpe:/o:oracle:linux:9:-
+  extends: null
+  fix: 'Note: This setting must be applied in conjunction with ClientAliveCountMax" setting to function correctly. Configure
+    the SSH server to terminate a user session automatically after the SSH client has been unresponsive for 10 minutes. Modify
+    or append the following lines in the "/etc/ssh/sshd_config" or in a file in "/etc/ssh/sshd_config.d": ClientAliveInterval
+    600 In order for the changes to take effect, the SSH daemon must be restarted. $ sudo systemctl restart sshd.service'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-271710
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-271710r1092596_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001133
+  - system: http://cyber.mil/cci
+    value: CCI-002361
+  - system: http://cyber.mil/cci
+    value: CCI-002891
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Oracle Linux 9 DISA DPMS Target Oracle Linux 9 5680
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271710
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271710
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271710
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271710
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:54301
+      exports: []
+      inline_content: 'Verify that OL 9 is configured so that all network connections associated with SSH traffic are terminated
+        after 10 minutes of becoming unresponsive. Verify that the "ClientAliveInterval" variable is set to a value of "600"
+        or less by performing the following command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d
+        ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*clientaliveinterval'' ClientAliveInterval 600 If "ClientAliveInterval"
+        does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or is commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:54301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 is configured so that all network connections associated with SSH traffic are terminated
+            after 10 minutes of becoming unresponsive.
+
+
+            Verify that the "ClientAliveInterval" variable is set to a value of "600" or less by performing the following
+            command:
+
+
+            $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep
+            -iH ''^\s*clientaliveinterval''
+
+            ClientAliveInterval 600
+
+
+            If "ClientAliveInterval" does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or
+            is commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271710
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271710
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.ol9os:def:271710
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271710
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:54301
+    exports: []
+    inline_content: 'Verify that OL 9 is configured so that all network connections associated with SSH traffic are terminated
+      after 10 minutes of becoming unresponsive. Verify that the "ClientAliveInterval" variable is set to a value of "600"
+      or less by performing the following command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d
+      ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*clientaliveinterval'' ClientAliveInterval 600 If "ClientAliveInterval"
+      does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or is commented out, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:54301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify that OL 9 is configured so that all network connections associated with SSH traffic are terminated after
+          10 minutes of becoming unresponsive.
+
+
+          Verify that the "ClientAliveInterval" variable is set to a value of "600" or less by performing the following command:
+
+
+          $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep
+          -iH ''^\s*clientaliveinterval''
+
+          ClientAliveInterval 600
+
+
+          If "ClientAliveInterval" does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or is
+          commented out, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-271710r1092596_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL09-00-002347
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL 9 must be configured so that all network connections associated with SSH traffic are terminated after 10 minutes
+        of becoming unresponsive.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Terminating an unresponsive SSH session within a short time period reduces the window of opportunity
+        for unauthorized personnel to take control of a management session enabled on the console or console port that has
+        been left unattended. In addition, quickly terminating an idle SSH session will also free up resources committed by
+        the managed network element.
+
+
+        Terminating network connections associated with communications sessions includes, for example, deallocating associated
+        TCP/IP address/port pairs at the operating system level and deallocating networking assignments at the application
+        level if multiple application sessions are using a single operating system-level network connection. This does not
+        mean the operating system terminates all sessions or network access; it only ends the unresponsive session and releases
+        the resources associated with that session.
+
+
+        OL 9 uses /etc/ssh/sshd_config for configurations of OpenSSH. Within the sshd_config, the product of the values of
+        "ClientAliveInterval" and "ClientAliveCountMax" are used to establish the inactivity threshold. The "ClientAliveInterval"
+        is a timeout interval in seconds, after which if no data has been received from the client, SSHD will send a message
+        through the encrypted channel to request a response from the client. The "ClientAliveCountMax" is the number of client
+        alive messages that may be sent without SSHD receiving any messages back from the client. If this threshold is met,
+        SSHD will disconnect the client. For more information on these settings and others, refer to the sshd_config man pages.
+
+
+        Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000279-GPOS-00109, SRG-OS-000395-GPOS-00175</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Oracle Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Oracle Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5680'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001133
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002361
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002891
+    - attributes:
+        fixref: F-75667r1092595_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Note: This setting must be applied in conjunction with ClientAliveCountMax" setting to function correctly.
+
+
+        Configure the SSH server to terminate a user session automatically after the SSH client has been unresponsive for
+        10 minutes.
+
+
+        Modify or append the following lines in the "/etc/ssh/sshd_config" or in a file in "/etc/ssh/sshd_config.d":
+
+
+        ClientAliveInterval 600
+
+
+        In order for the changes to take effect, the SSH daemon must be restarted.
+
+
+        $ sudo systemctl restart sshd.service'
+    - attributes:
+        id: F-75667r1092595_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271710
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271710
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:54301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify that OL 9 is configured so that all network connections associated with SSH traffic are terminated after
+          10 minutes of becoming unresponsive.
+
+
+          Verify that the "ClientAliveInterval" variable is set to a value of "600" or less by performing the following command:
+
+
+          $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep
+          -iH ''^\s*clientaliveinterval''
+
+          ClientAliveInterval 600
+
+
+          If "ClientAliveInterval" does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or is
+          commented out, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: OL 9 must be configured so that all network connections associated with SSH traffic are terminated after 10 minutes
+    of becoming unresponsive.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 0f52d660ef9dcca09ae64f9ff83cee7e6262ecedd9c9d4242fa5cd2d0cc367fe
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-271710r1092596_rule
+  status: legacy_compatible

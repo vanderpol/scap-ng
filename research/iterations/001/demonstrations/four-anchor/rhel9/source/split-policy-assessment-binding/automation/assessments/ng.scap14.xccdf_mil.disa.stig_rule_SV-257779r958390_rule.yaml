@@ -1,0 +1,255 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257779r958390_rule
+  version: 1
+  description: RHEL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote access
+    to the system via a command line user logon.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:25777901:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:25777901
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '13'
+      comment: This textfilecontent54_object retrieves all lines that match the regular expression 'OVAL Interpreter' in the
+        file where the path equals '/opt/support/txt/txtfile', the filename equals 'build.win32.txt', and the instance is
+        greater than or equal to '1'.
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/issue
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: You\s+are\s+accessing\s+a\s+U.S.\s+Government\s+\(USG\)\s+Information\s+System\s+\(IS\)\s+that\s+is\s+provided\s+for\s+USG-authorized\s+use\s+only.[\n\r
+          \t]+By\s+using\s+this\s+IS\s+\(which\s+includes\s+any\s+device\s+attached\s+to\s+this\s+IS\),\s+you\s+consent\s+to\s+the\s+following\s+conditions:[\n\r
+          \t]+-The\s+USG\s+routinely\s+intercepts\s+and\s+monitors\s+communications\s+on\s+this\s+IS\s+for\s+purposes\s+including,\s+but\s+not\s+limited\s+to,\s+penetration\s+testing,\s+COMSEC\s+monitoring,\s+network\s+operations\s+and\s+defense,\s+personnel\s+misconduct\s+\(PM\),\s+law\s+enforcement\s+\(LE\),\s+and\s+counterintelligence\s+\(CI\)\s+investigations.[\n\r
+          \t]+-At\s+any\s+time,\s+the\s+USG\s+may\s+inspect\s+and\s+seize\s+data\s+stored\s+on\s+this\s+IS.[\n\r \t]+-Communications\s+using,\s+or\s+data\s+stored\s+on,\s+this\s+IS\s+are\s+not\s+private,\s+are\s+subject\s+to\s+routine\s+monitoring,\s+interception,\s+and\s+search,\s+and\s+may\s+be\s+disclosed\s+or\s+used\s+for\s+any\s+USG-authorized\s+purpose.[\n\r
+          \t]+-This\s+IS\s+includes\s+security\s+measures\s+\(e.g.,\s+authentication\s+and\s+access\s+controls\)\s+to\s+protect\s+USG\s+interests\s*-\-\s*not\s+for\s+your\s+personal\s+benefit\s+or\s+privacy.[\n\r
+          \t]+-Notwithstanding\s+the\s+above,\s+using\s+this\s+IS\s+does\s+not\s+constitute\s+consent\s+to\s+PM,\s+LE\s+or\s+CI\s+investigative\s+searching\s+or\s+monitoring\s+of\s+the\s+content\s+of\s+privileged\s+communications,\s+or\s+work\s+product,\s+related\s+to\s+personal\s+representation\s+or\s+services\s+by\s+attorneys,\s+psychotherapists,\s+or\s+clergy,\s+and\s+their\s+assistants.\s+Such\s+communications\s+and\s+work\s+product\s+are\s+private\s+and\s+confidential.\s+See\s+User\s+Agreement\s+for\s+details.[\n\r]*
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive: {}
+  predicates: {}
+  evaluate:
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:25777901:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:25777901
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: The system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote
+          access to the system via a command line user logon.
+        check: all
+        check_existence: only_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:25777901
+        predicates: []
+        source_other: []
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:257779:
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+        class: compliance
+        version: '13'
+        criteria:
+          children:
+          - comment: The system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or
+              remote access to the system via a command line user logon.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:25777901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote
+              access to the system via a command line user logon.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote
+              access to the system via a command line user logon.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      match_count: 1
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-257779r958390_rule
+    title: RHEL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote access
+      to the system via a command line user logon.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:257779
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:501
+      exports: []
+      inline_content: 'Verify RHEL 9 displays the Standard Mandatory DOD Notice and Consent Banner before granting access
+        to the operating system via a command line user logon. Check that a banner is displayed at the command line login
+        screen with the following command: $ sudo cat /etc/issue If the banner is set correctly it will return the following
+        text: "You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
+        By using this IS (which includes any device attached to this IS), you consent to the following conditions: -The USG
+        routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration
+        testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence
+        (CI) investigations. -At any time, the USG may inspect and seize data stored on this IS. -Communications using, or
+        data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed
+        or used for any USG-authorized purpose. -This IS includes security measures (e.g., authentication and access controls)
+        to protect USG interests--not for your personal benefit or privacy. -Notwithstanding the above, using this IS does
+        not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications,
+        or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their
+        assistants. Such communications and work product are private and confidential. See User Agreement for details." If
+        the banner text does not match the Standard Mandatory DOD Notice and Consent Banner exactly, or the line is commented
+        out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify RHEL 9 displays the Standard Mandatory DOD Notice and Consent Banner before granting access to the
+            operating system via a command line user logon.
+
+
+            Check that a banner is displayed at the command line login screen with the following command:
+
+
+            $ sudo cat /etc/issue
+
+
+            If the banner is set correctly it will return the following text:
+
+
+            "You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
+
+
+            By using this IS (which includes any device attached to this IS), you consent to the following conditions:
+
+
+            -The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to,
+            penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement
+            (LE), and counterintelligence (CI) investigations.
+
+
+            -At any time, the USG may inspect and seize data stored on this IS.
+
+
+            -Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception,
+            and search, and may be disclosed or used for any USG-authorized purpose.
+
+
+            -This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for
+            your personal benefit or privacy.
+
+
+            -Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching
+            or monitoring of the content of privileged communications, or work product, related to personal representation
+            or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product
+            are private and confidential. See User Agreement for details."
+
+
+            If the banner text does not match the Standard Mandatory DOD Notice and Consent Banner exactly, or the line is
+            commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257779r958390_rule
+    semantic_ir_sha256: 8013b61ce3b59a1703114653292f4c2ab8dce415e4967ca7e22ab12e4cdbad48
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 720d069889c86f5365f0c4bb63e6b58878e5e086d1665d751d5b9c0514d22461

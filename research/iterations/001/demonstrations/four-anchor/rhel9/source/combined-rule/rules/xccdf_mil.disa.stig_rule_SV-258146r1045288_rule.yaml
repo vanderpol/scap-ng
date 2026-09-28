@@ -1,0 +1,931 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-258146r1045288_rule
+  title: RHEL 9 must authenticate the remote logging server for offloading audit logs via rsyslog.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-258146
+  description: '<VulnDiscussion>Information stored in one location is vulnerable to accidental or incidental deletion or alteration.
+    Offloading is a common process in information systems with limited audit storage capacity. RHEL 9 installation media provides
+    "rsyslogd", a system utility providing support for message logging. Support for both internet and Unix domain sockets
+    enables this utility to support both local and remote logging. Coupling this utility with "gnutls" (a secure communications
+    library implementing the SSL, TLS and DTLS protocols) creates a method to securely encrypt and offload auditing. "Rsyslog"
+    supported authentication modes include: anon - anonymous authentication x509/fingerprint - certificate fingerprint authentication
+    x509/certvalid - certificate validation only x509/name - certificate validation and subject name authentication Satisfies:
+    SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:almalinux:almalinux:9
+  - cpe:/o:rocky:rocky:9
+  - cpe:/o:redhat:enterprise_linux:9.0
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:almalinux:almalinux:9
+    ref: cpe:/o:almalinux:almalinux:9
+  - kind: cpe_name
+    name: cpe:/o:rocky:rocky:9
+    ref: cpe:/o:rocky:rocky:9
+  - kind: cpe_name
+    name: cpe:/o:redhat:enterprise_linux:9.0
+    ref: cpe:/o:redhat:enterprise_linux:9.0
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001851
+  requires: []
+  conflicts: []
+  check: 'Verify RHEL 9 authenticates the remote logging server for offloading audit logs with the following command: $ grep
+    -i ''StreamDriver[\.]*AuthMode'' /etc/rsyslog.conf /etc/rsyslog.d/*.conf /etc/rsyslog.conf:$ActionSendStreamDriverAuthMode
+    x509/name If the variable name "StreamDriverAuthMode" is present in an omfwd statement block, this is not a finding. However,
+    if the "StreamDriverAuthMode" variable is in a module block, this is a finding. If the value of the "$ActionSendStreamDriverAuthMode
+    or StreamDriver.AuthMode" option is not set to "x509/name" or the line is commented out, ask the system administrator
+    (SA) to indicate how the audit logs are offloaded to a different system or media. If there is no evidence that the transfer
+    of the audit logs being offloaded to another system or media is encrypted, this is a finding.'
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:258146
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258146
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:258146
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258146
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:69301
+    exports: []
+    inline_content: 'Verify RHEL 9 authenticates the remote logging server for offloading audit logs with the following command:
+      $ grep -i ''StreamDriver[\.]*AuthMode'' /etc/rsyslog.conf /etc/rsyslog.d/*.conf /etc/rsyslog.conf:$ActionSendStreamDriverAuthMode
+      x509/name If the variable name "StreamDriverAuthMode" is present in an omfwd statement block, this is not a finding.
+      However, if the "StreamDriverAuthMode" variable is in a module block, this is a finding. If the value of the "$ActionSendStreamDriverAuthMode
+      or StreamDriver.AuthMode" option is not set to "x509/name" or the line is commented out, ask the system administrator
+      (SA) to indicate how the audit logs are offloaded to a different system or media. If there is no evidence that the transfer
+      of the audit logs being offloaded to another system or media is encrypted, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:69301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify RHEL 9 authenticates the remote logging server for offloading audit logs with the following command:\n\
+          \n$ grep -i 'StreamDriver[\\.]*AuthMode' /etc/rsyslog.conf /etc/rsyslog.d/*.conf\n\n/etc/rsyslog.conf:$ActionSendStreamDriverAuthMode\
+          \ x509/name \n\nIf the variable name \"StreamDriverAuthMode\" is present in an omfwd statement block, this is not\
+          \ a finding. However, if the \"StreamDriverAuthMode\" variable is in a module block, this is a finding.\n\nIf the\
+          \ value of the \"$ActionSendStreamDriverAuthMode or StreamDriver.AuthMode\" option is not set to \"x509/name\" or\
+          \ the line is commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded to a\
+          \ different system or media. \n\nIf there is no evidence that the transfer of the audit logs being offloaded to\
+          \ another system or media is encrypted, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258146
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258146
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258146
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258146
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:69301
+      exports: []
+      inline_content: 'Verify RHEL 9 authenticates the remote logging server for offloading audit logs with the following
+        command: $ grep -i ''StreamDriver[\.]*AuthMode'' /etc/rsyslog.conf /etc/rsyslog.d/*.conf /etc/rsyslog.conf:$ActionSendStreamDriverAuthMode
+        x509/name If the variable name "StreamDriverAuthMode" is present in an omfwd statement block, this is not a finding.
+        However, if the "StreamDriverAuthMode" variable is in a module block, this is a finding. If the value of the "$ActionSendStreamDriverAuthMode
+        or StreamDriver.AuthMode" option is not set to "x509/name" or the line is commented out, ask the system administrator
+        (SA) to indicate how the audit logs are offloaded to a different system or media. If there is no evidence that the
+        transfer of the audit logs being offloaded to another system or media is encrypted, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:69301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify RHEL 9 authenticates the remote logging server for offloading audit logs with the following command:\n\
+            \n$ grep -i 'StreamDriver[\\.]*AuthMode' /etc/rsyslog.conf /etc/rsyslog.d/*.conf\n\n/etc/rsyslog.conf:$ActionSendStreamDriverAuthMode\
+            \ x509/name \n\nIf the variable name \"StreamDriverAuthMode\" is present in an omfwd statement block, this is\
+            \ not a finding. However, if the \"StreamDriverAuthMode\" variable is in a module block, this is a finding.\n\n\
+            If the value of the \"$ActionSendStreamDriverAuthMode or StreamDriver.AuthMode\" option is not set to \"x509/name\"\
+            \ or the line is commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded\
+            \ to a different system or media. \n\nIf there is no evidence that the transfer of the audit logs being offloaded\
+            \ to another system or media is encrypted, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: 'Configure RHEL 9 to authenticate the remote logging server for offloading audit logs by setting the following option
+    in "/etc/rsyslog.conf" or "/etc/rsyslog.d/[customfile].conf": $ActionSendStreamDriverAuthMode x509/name'
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-258146r1045288_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-652040
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL 9 must authenticate the remote logging server for offloading audit logs via rsyslog.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Information stored in one location is vulnerable to accidental or incidental deletion or alteration.
+
+
+        Offloading is a common process in information systems with limited audit storage capacity.
+
+
+        RHEL 9 installation media provides "rsyslogd", a system utility providing support for message logging. Support for
+        both internet and Unix domain sockets enables this utility to support both local and remote logging. Coupling this
+        utility with "gnutls" (a secure communications library implementing the SSL, TLS and DTLS protocols) creates a method
+        to securely encrypt and offload auditing.
+
+
+        "Rsyslog" supported authentication modes include:
+
+        anon - anonymous authentication
+
+        x509/fingerprint - certificate fingerprint authentication
+
+        x509/certvalid - certificate validation only
+
+        x509/name - certificate validation and subject name authentication
+
+
+        Satisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001851
+    - attributes:
+        fixref: F-61811r926424_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure RHEL 9 to authenticate the remote logging server for offloading audit logs by setting the following
+        option in "/etc/rsyslog.conf" or "/etc/rsyslog.d/[customfile].conf":
+
+
+        $ActionSendStreamDriverAuthMode x509/name'
+    - attributes:
+        id: F-61811r926424_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258146
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258146
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:69301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify RHEL 9 authenticates the remote logging server for offloading audit logs with the following command:\n\
+          \n$ grep -i 'StreamDriver[\\.]*AuthMode' /etc/rsyslog.conf /etc/rsyslog.d/*.conf\n\n/etc/rsyslog.conf:$ActionSendStreamDriverAuthMode\
+          \ x509/name \n\nIf the variable name \"StreamDriverAuthMode\" is present in an omfwd statement block, this is not\
+          \ a finding. However, if the \"StreamDriverAuthMode\" variable is in a module block, this is a finding.\n\nIf the\
+          \ value of the \"$ActionSendStreamDriverAuthMode or StreamDriver.AuthMode\" option is not set to \"x509/name\" or\
+          \ the line is commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded to a\
+          \ different system or media. \n\nIf there is no evidence that the transfer of the audit logs being offloaded to\
+          \ another system or media is encrypted, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  assessment:
+    id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258146r1045288_rule
+    version: 1
+    description: RHEL 9 must authenticate the remote logging server for offloading audit logs via rsyslog.
+    semantic_model: scap-ng-generic-assessment-graph-0.1
+    collect:
+      oval:mil.disa.stig.ind:obj:25814600:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25814600
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: ActionSendStreamDriverAuthMode
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:25814601
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:25814602
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
+      oval:mil.disa.stig.ind:obj:20000004:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000004
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        comment: 'rsyslog.d/*.conf: action for all messages'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.*\.conf$
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:20000006:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000006
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog.conf: module blocks'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - attributes:
+            datatype: string
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:25814601:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25814601
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog.conf: ActionSendStreamDriverAuthMode'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - attributes:
+            datatype: string
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:20000003:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000003
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        comment: 'rsyslog.conf: action for all messages'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - attributes:
+            datatype: string
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:20000005:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000005
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog: module blocks'
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:20000006
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:20000007
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
+      oval:mil.disa.stig.ind:obj:25814602:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25814602
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog.d/*.conf: ActionSendStreamDriverAuthMode'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.*\.conf$
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:20000002:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000002
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog: action for all messages'
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:20000003
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:20000004
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
+      oval:mil.disa.stig.ind:obj:20000007:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:20000007
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 'rsyslog.d/*.conf: module blocks'
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/rsyslog.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.*\.conf$
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+    derive: {}
+    predicates:
+      oval:mil.disa.stig.ind:ste:20000027:
+        source_state_id: oval:mil.disa.stig.ind:ste:20000027
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+        comment: null
+      oval:mil.disa.stig.ind:ste:25814600:
+        source_state_id: oval:mil.disa.stig.ind:ste:25814600
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: x509/name
+        comment: null
+      oval:mil.disa.stig.ind:ste:25814601:
+        source_state_id: oval:mil.disa.stig.ind:ste:25814601
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\s*=\s*"x509/name"
+        comment: null
+      oval:mil.disa.stig.ind:ste:25814602:
+        source_state_id: oval:mil.disa.stig.ind:ste:25814602
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\b
+        comment: null
+    evaluate:
+      tests:
+        oval:mil.disa.stig.ind:tst:25814602:
+          source_test_id: oval:mil.disa.stig.ind:tst:25814602
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: StreamDriverAuthMode is not set in a module block (advanced syntax)
+          check: none satisfy
+          check_existence: any_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:20000005
+          predicates:
+          - oval:mil.disa.stig.ind:ste:25814602
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25814600:
+          source_test_id: oval:mil.disa.stig.ind:tst:25814600
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: ActionSendStreamDriverAuthMode == x509/name
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25814600
+          predicates:
+          - oval:mil.disa.stig.ind:ste:25814600
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25814601:
+          source_test_id: oval:mil.disa.stig.ind:tst:25814601
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: StreamDriverAuthMode is set to x509/name (advanced syntax)
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:20000002
+          predicates:
+          - oval:mil.disa.stig.ind:ste:20000027
+          - oval:mil.disa.stig.ind:ste:25814601
+          source_other: []
+      definitions:
+        oval:mil.disa.stig.rhel9os:def:258146:
+          source_definition_id: oval:mil.disa.stig.rhel9os:def:258146
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:258146
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: RHEL-09-652040 - RHEL 9 must authenticate the remote logging server for offloading audit logs via rsyslog.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Red Hat Enterprise Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: 'Information stored in one location is vulnerable to accidental or incidental deletion or alteration.
+
+
+                Offloading is a common process in information systems with limited audit storage capacity.
+
+
+                RHEL 9 installation media provides "rsyslogd", a system utility providing support for message logging. Support
+                for both internet and Unix domain sockets enables this utility to support both local and remote logging. Coupling
+                this utility with "gnutls" (a secure communications library implementing the SSL, TLS and DTLS protocols)
+                creates a method to securely encrypt and offload auditing.
+
+
+                "Rsyslog" supported authentication modes include:
+
+                anon - anonymous authentication
+
+                x509/fingerprint - certificate fingerprint authentication
+
+                x509/certvalid - certificate validation only
+
+                x509/name - certificate validation and subject name authentication
+
+
+                Satisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258146:
+          source_definition_id: oval:mil.disa.stig.defs:def:258146
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - children:
+              - comment: ActionSendStreamDriverAuthMode is set to x509/name (legacy syntax)
+                kind: test_ref
+                negate: false
+                test_ref: oval:mil.disa.stig.ind:tst:25814600
+              - comment: StreamDriverAuthMode is set to x509/name (advanced syntax)
+                kind: test_ref
+                negate: false
+                test_ref: oval:mil.disa.stig.ind:tst:25814601
+              comment: null
+              kind: boolean
+              negate: false
+              operator: OR
+            - comment: StreamDriverAuthMode is not set in a module block (advanced syntax)
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25814602
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must authenticate the remote logging server for off-loading audit logs.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    assert:
+      definition_results:
+      - oval:mil.disa.stig.rhel9os:def:258146
+      combination: xccdf_source_check_semantics
+    source_check_context:
+      check_exports: []
+      checks:
+      - definition_id: oval:mil.disa.stig.rhel9os:def:258146
+        exports: []
+        href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.rhel9os:def:258146
+        oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - definition_id: oval:mil.disa.stig.rhel9os:def:258146
+        exports: []
+        href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        match_count: 1
+        name: oval:mil.disa.stig.rhel9os:def:258146
+        oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+      published_source:
+        datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+        datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+        repository: niwc-atlantic/scap-content-library
+        repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+        revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+        zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+        zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+      rule_id: xccdf_mil.disa.stig_rule_SV-258146r1045288_rule
+      title: RHEL 9 must authenticate the remote logging server for offloading audit logs via rsyslog.
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258146
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258146
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258146
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258146
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:69301
+        exports: []
+        inline_content: 'Verify RHEL 9 authenticates the remote logging server for offloading audit logs with the following
+          command: $ grep -i ''StreamDriver[\.]*AuthMode'' /etc/rsyslog.conf /etc/rsyslog.d/*.conf /etc/rsyslog.conf:$ActionSendStreamDriverAuthMode
+          x509/name If the variable name "StreamDriverAuthMode" is present in an omfwd statement block, this is not a finding.
+          However, if the "StreamDriverAuthMode" variable is in a module block, this is a finding. If the value of the "$ActionSendStreamDriverAuthMode
+          or StreamDriver.AuthMode" option is not set to "x509/name" or the line is commented out, ask the system administrator
+          (SA) to indicate how the audit logs are offloaded to a different system or media. If there is no evidence that the
+          transfer of the audit logs being offloaded to another system or media is encrypted, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:69301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify RHEL 9 authenticates the remote logging server for offloading audit logs with the following command:\n\
+              \n$ grep -i 'StreamDriver[\\.]*AuthMode' /etc/rsyslog.conf /etc/rsyslog.d/*.conf\n\n/etc/rsyslog.conf:$ActionSendStreamDriverAuthMode\
+              \ x509/name \n\nIf the variable name \"StreamDriverAuthMode\" is present in an omfwd statement block, this is\
+              \ not a finding. However, if the \"StreamDriverAuthMode\" variable is in a module block, this is a finding.\n\
+              \nIf the value of the \"$ActionSendStreamDriverAuthMode or StreamDriver.AuthMode\" option is not set to \"x509/name\"\
+              \ or the line is commented out, ask the system administrator (SA) to indicate how the audit logs are offloaded\
+              \ to a different system or media. \n\nIf there is no evidence that the transfer of the audit logs being offloaded\
+              \ to another system or media is encrypted, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    migration: &id001
+      status: legacy_compatible
+      source: SCAP 1.4 / OVAL 5.12.3
+      source_rule: xccdf_mil.disa.stig_rule_SV-258146r1045288_rule
+      semantic_ir_sha256: 874f88f5b44f73c755a0c4d829054ddc4fbbf071b21f6ebc83595605ad733883
+      note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_fingerprint_sha256: 1e43278b29db4af6e8f5295deb82e439224f87c4b466cb24ab2c3dd86f4a5d0b
+  migration: *id001

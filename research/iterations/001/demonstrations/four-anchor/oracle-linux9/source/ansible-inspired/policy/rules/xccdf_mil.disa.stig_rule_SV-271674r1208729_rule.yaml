@@ -1,0 +1,379 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment. If
+    the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify OL 9 initiates
+    a session lock after a 10-minute period of inactivity for graphical user interfaces with the following command: $ gsettings
+    get org.gnome.desktop.session idle-delay uint32 600 If "idle-delay" is set to "0" or a value greater than "600", this
+    is a finding.'
+  cluster_id: null
+  conflicts: []
+  description: '<VulnDiscussion>A session timeout lock is a temporary action taken when a user stops work and moves away from
+    the immediate physical vicinity of the information system but does not logout because of the temporary nature of the absence.
+    Rather than relying on the user to manually lock their operating system session prior to vacating the vicinity, the GNOME
+    desktop can be configured to identify when a user''s session has idled and take action to initiate a session lock. Satisfies:
+    SRG-OS-000029-GPOS-00010, SRG-OS-000031-GPOS-00012</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  effective_platform_refs:
+  - '#xccdf_navy.navwar.niwcatlantic.scc_platform_LinuxGnome'
+  effective_platforms:
+  - expression:
+      children:
+      - definition_binding:
+          definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:101
+          source: applicability_oval_ir
+          status: resolved
+        href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        id_ref: oval:navy.navwar.niwcatlantic.scc.linux:def:101
+        kind: check_fact
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      kind: logical_test
+      negate: false
+      operator: AND
+    kind: local_cpe_expression
+    platform_id: xccdf_navy.navwar.niwcatlantic.scc_platform_LinuxGnome
+    ref: '#xccdf_navy.navwar.niwcatlantic.scc_platform_LinuxGnome'
+  extends: null
+  fix: 'Configure OL 9 to initiate a screensaver after a 10-minute period of inactivity for graphical user interfaces. Create
+    a database to contain the systemwide screensaver settings (if it does not already exist) with the following command: $
+    sudo touch /etc/dconf/db/local.d/00-screensaver Edit /etc/dconf/db/local.d/00-screensaver and add or update the following
+    lines: [org/gnome/desktop/session] # Set the lock time out to 600 seconds before the session is considered idle idle-delay=uint32
+    600 Update the system databases: $ sudo dconf update'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-271674
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-271674r1208729_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000057
+  - system: http://cyber.mil/cci
+    value: CCI-000060
+  multiple: false
+  platforms:
+  - '#xccdf_navy.navwar.niwcatlantic.scc_platform_LinuxGnome'
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Oracle Linux 9 DISA DPMS Target Oracle Linux 9 5680
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:47501
+      exports: []
+      inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+        If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify OL
+        9 initiates a session lock after a 10-minute period of inactivity for graphical user interfaces with the following
+        command: $ gsettings get org.gnome.desktop.session idle-delay uint32 600 If "idle-delay" is set to "0" or a value
+        greater than "600", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:47501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+            If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+
+
+            Verify OL 9 initiates a session lock after a 10-minute period of inactivity for graphical user interfaces with
+            the following command:
+
+
+            $ gsettings get org.gnome.desktop.session idle-delay
+
+            uint32 600
+
+
+            If "idle-delay" is set to "0" or a value greater than "600", this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:47501
+    exports: []
+    inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+      If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify OL 9
+      initiates a session lock after a 10-minute period of inactivity for graphical user interfaces with the following command:
+      $ gsettings get org.gnome.desktop.session idle-delay uint32 600 If "idle-delay" is set to "0" or a value greater than
+      "600", this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:47501
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+          If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+
+
+          Verify OL 9 initiates a session lock after a 10-minute period of inactivity for graphical user interfaces with the
+          following command:
+
+
+          $ gsettings get org.gnome.desktop.session idle-delay
+
+          uint32 600
+
+
+          If "idle-delay" is set to "0" or a value greater than "600", this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-271674r1208729_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL09-00-002104
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>A session timeout lock is a temporary action taken when a user stops work and moves away from
+        the immediate physical vicinity of the information system but does not logout because of the temporary nature of the
+        absence. Rather than relying on the user to manually lock their operating system session prior to vacating the vicinity,
+        the GNOME desktop can be configured to identify when a user''s session has idled and take action to initiate a session
+        lock.
+
+
+        Satisfies: SRG-OS-000029-GPOS-00010, SRG-OS-000031-GPOS-00012</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Oracle Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Oracle Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5680'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        idref: '#xccdf_navy.navwar.niwcatlantic.scc_platform_LinuxGnome'
+      name: platform
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000057
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000060
+    - attributes:
+        fixref: F-75631r1155331_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure OL 9 to initiate a screensaver after a 10-minute period of inactivity for graphical user interfaces.
+
+
+        Create a database to contain the systemwide screensaver settings (if it does not already exist) with the following
+        command:
+
+
+        $ sudo touch /etc/dconf/db/local.d/00-screensaver
+
+
+        Edit /etc/dconf/db/local.d/00-screensaver and add or update the following lines:
+
+
+        [org/gnome/desktop/session]
+
+        # Set the lock time out to 600 seconds before the session is considered idle
+
+        idle-delay=uint32 600
+
+
+        Update the system databases:
+
+
+        $ sudo dconf update'
+    - attributes:
+        id: F-75631r1155331_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:271674
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:47501
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+          If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+
+
+          Verify OL 9 initiates a session lock after a 10-minute period of inactivity for graphical user interfaces with the
+          following command:
+
+
+          $ gsettings get org.gnome.desktop.session idle-delay
+
+          uint32 600
+
+
+          If "idle-delay" is set to "0" or a value greater than "600", this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: OL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 22dd9c5ae459215b6379e67419d0b36711099ea23bcdf2a4b0913f34d7804b63
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-271674r1208729_rule
+  status: legacy_compatible

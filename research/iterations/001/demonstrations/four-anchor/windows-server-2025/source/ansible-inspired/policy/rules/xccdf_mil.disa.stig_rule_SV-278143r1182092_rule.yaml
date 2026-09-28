@@ -1,0 +1,367 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: This applies to domain controllers. It is not applicable for other systems. Run "Regedit". Navigate to "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters".
+    Note the directory locations in the values for "DSA Database file". Open a command prompt. Enter "net share". Note the
+    logical drive(s) or file system partition for any organization-created data shares. Ignore system shares (e.g., NETLOGON,
+    SYSVOL, and administrative shares ending in $). User shares that are hidden (ending with $) must not be ignored. If user
+    shares are located on the same logical partition as the directory server data files, this is a finding.
+  cluster_id: null
+  conflicts: []
+  description: <VulnDiscussion>When directory service data files, especially for directories used for identification, authentication,
+    or authorization, reside on the same logical partition as user-owned files, the directory service data may be more vulnerable
+    to unauthorized access or other availability compromises. Directory service and user-owned data files sharing a partition
+    may be configured with less restrictive permissions to allow access to the user data. The directory service may be vulnerable
+    to a denial-of-service (DoS) attack when user-owned files on a common partition are expanded to an extent preventing the
+    directory service from acquiring more space for directory or audit data.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+  effective_platforms:
+  - kind: cpe_name
+    name: cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+    ref: cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+  extends: null
+  fix: Move shares used to store files owned by users to a different logical partition than the directory server data files.
+  group_path:
+  - xccdf_mil.disa.stig_group_V-278143
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-278143r1182092_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001090
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows Server 2025 DISA DPMS Target Microsoft Windows Server 2025 5719
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:31701
+      exports: []
+      inline_content: This applies to domain controllers. It is not applicable for other systems. Run "Regedit". Navigate
+        to "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters". Note the directory locations in the values
+        for "DSA Database file". Open a command prompt. Enter "net share". Note the logical drive(s) or file system partition
+        for any organization-created data shares. Ignore system shares (e.g., NETLOGON, SYSVOL, and administrative shares
+        ending in $). User shares that are hidden (ending with $) must not be ignored. If user shares are located on the same
+        logical partition as the directory server data files, this is a finding.
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:31701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+            Run "Regedit".
+
+
+            Navigate to "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters".
+
+
+            Note the directory locations in the values for "DSA Database file".
+
+
+            Open a command prompt.
+
+
+            Enter "net share".
+
+
+            Note the logical drive(s) or file system partition for any organization-created data shares.
+
+
+            Ignore system shares (e.g., NETLOGON, SYSVOL, and administrative shares ending in $). User shares that are hidden
+            (ending with $) must not be ignored.
+
+
+            If user shares are located on the same logical partition as the directory server data files, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:31701
+    exports: []
+    inline_content: This applies to domain controllers. It is not applicable for other systems. Run "Regedit". Navigate to
+      "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters". Note the directory locations in the values for
+      "DSA Database file". Open a command prompt. Enter "net share". Note the logical drive(s) or file system partition for
+      any organization-created data shares. Ignore system shares (e.g., NETLOGON, SYSVOL, and administrative shares ending
+      in $). User shares that are hidden (ending with $) must not be ignored. If user shares are located on the same logical
+      partition as the directory server data files, this is a finding.
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:31701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+          Run "Regedit".
+
+
+          Navigate to "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters".
+
+
+          Note the directory locations in the values for "DSA Database file".
+
+
+          Open a command prompt.
+
+
+          Enter "net share".
+
+
+          Note the logical drive(s) or file system partition for any organization-created data shares.
+
+
+          Ignore system shares (e.g., NETLOGON, SYSVOL, and administrative shares ending in $). User shares that are hidden
+          (ending with $) must not be ignored.
+
+
+          If user shares are located on the same logical partition as the directory server data files, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-278143r1182092_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN25-DC-000120
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Windows Server 2025 data files owned by users must be on a different logical partition from the directory server
+        data files.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: "<VulnDiscussion>When directory service data files, especially for directories used for identification, authentication,\
+        \ or authorization, reside on the same logical partition as user-owned files, the directory service data may be more\
+        \ vulnerable to unauthorized access or other availability compromises. Directory service and user-owned data files\
+        \ sharing a partition may be configured with less restrictive permissions to allow access to the user data. \n\nThe\
+        \ directory service may be vulnerable to a denial-of-service (DoS) attack when user-owned files on a common partition\
+        \ are expanded to an extent preventing the directory service from acquiring more space for directory or audit data.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>"
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows Server 2025
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows Server 2025
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5719'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001090
+    - attributes:
+        fixref: F-82578r1181134_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Move shares used to store files owned by users to a different logical partition than the directory server data
+        files.
+    - attributes:
+        id: F-82578r1181134_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:278143
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:31701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+          Run "Regedit".
+
+
+          Navigate to "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NTDS\Parameters".
+
+
+          Note the directory locations in the values for "DSA Database file".
+
+
+          Open a command prompt.
+
+
+          Enter "net share".
+
+
+          Note the logical drive(s) or file system partition for any organization-created data shares.
+
+
+          Ignore system shares (e.g., NETLOGON, SYSVOL, and administrative shares ending in $). User shares that are hidden
+          (ending with $) must not be ignored.
+
+
+          If user shares are located on the same logical partition as the directory server data files, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: Windows Server 2025 data files owned by users must be on a different logical partition from the directory server
+    data files.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 3ebfb0a18324c178a7c8fd0200eb45ca09c890333af55a3aaaa624779f4dfd55
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-278143r1182092_rule
+  status: legacy_compatible

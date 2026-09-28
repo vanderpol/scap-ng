@@ -1,0 +1,333 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop environment.
+    If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that users
+    cannot enable the Ctrl-Alt-Del sequence in the GNOME desktop with the following command: $ gsettings writable org.gnome.settings-daemon.plugins.media-keys
+    logout false If "logout" is writable and the result is "true", this is a finding.'
+  cluster_id: null
+  conflicts: []
+  description: <VulnDiscussion>A locally logged-in user who presses Ctrl-Alt-Del, when at the console, can reboot the system.
+    If accidentally pressed, as could happen in the case of mixed OS environment, this can create the risk of short-term loss
+    of availability of systems due to unintentional reboot.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - '#xccdf_mil.disa.stig_platform_LinuxGnome'
+  effective_platforms:
+  - expression:
+      children:
+      - definition_binding:
+          definition_id: oval:mil.disa.stig.linux:def:100005
+          source: applicability_oval_ir
+          status: resolved
+        href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        id_ref: oval:mil.disa.stig.linux:def:100005
+        kind: check_fact
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      kind: logical_test
+      negate: false
+      operator: AND
+    kind: local_cpe_expression
+    platform_id: xccdf_mil.disa.stig_platform_LinuxGnome
+    ref: '#xccdf_mil.disa.stig_platform_LinuxGnome'
+  extends: null
+  fix: 'Configure RHEL 9 to disallow the user changing the Ctrl-Alt-Del sequence in the GNOME desktop. Create a database to
+    contain the systemwide graphical user logon settings (if it does not already exist) with the following command: $ sudo
+    touch /etc/dconf/db/local.d/locks/session Add the following line to the session locks file to prevent nonprivileged users
+    from modifying the Ctrl-Alt-Del setting: /org/gnome/settings-daemon/plugins/media-keys/logout Run the following command
+    to update the database: $ sudo dconf update'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-258032
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-258032r1045117_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000366
+  multiple: false
+  platforms:
+  - '#xccdf_mil.disa.stig_platform_LinuxGnome'
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258032
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258032
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258032
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258032
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:49101
+      exports: []
+      inline_content: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop
+        environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+        Verify that users cannot enable the Ctrl-Alt-Del sequence in the GNOME desktop with the following command: $ gsettings
+        writable org.gnome.settings-daemon.plugins.media-keys logout false If "logout" is writable and the result is "true",
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:49101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop\
+            \ environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\
+            \nVerify that users cannot enable the Ctrl-Alt-Del sequence in the GNOME desktop with the following command:\n\
+            \n$ gsettings writable org.gnome.settings-daemon.plugins.media-keys logout\n \nfalse\n \nIf \"logout\" is writable\
+            \ and the result is \"true\", this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:258032
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258032
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:258032
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258032
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:49101
+    exports: []
+    inline_content: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop
+      environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+      Verify that users cannot enable the Ctrl-Alt-Del sequence in the GNOME desktop with the following command: $ gsettings
+      writable org.gnome.settings-daemon.plugins.media-keys logout false If "logout" is writable and the result is "true",
+      this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:49101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop environment.\
+          \ If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\nVerify\
+          \ that users cannot enable the Ctrl-Alt-Del sequence in the GNOME desktop with the following command:\n\n$ gsettings\
+          \ writable org.gnome.settings-daemon.plugins.media-keys logout\n \nfalse\n \nIf \"logout\" is writable and the result\
+          \ is \"true\", this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-258032r1045117_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-271110
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL 9 must prevent a user from overriding the Ctrl-Alt-Del sequence settings for the graphical user interface.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: <VulnDiscussion>A locally logged-in user who presses Ctrl-Alt-Del, when at the console, can reboot the system.
+        If accidentally pressed, as could happen in the case of mixed OS environment, this can create the risk of short-term
+        loss of availability of systems due to unintentional reboot.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        idref: '#xccdf_mil.disa.stig_platform_LinuxGnome'
+      name: platform
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000366
+    - attributes:
+        fixref: F-61697r1045116_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure RHEL 9 to disallow the user changing the Ctrl-Alt-Del sequence in the GNOME desktop.
+
+
+        Create a database to contain the systemwide graphical user logon settings (if it does not already exist) with the
+        following command:
+
+
+        $ sudo touch /etc/dconf/db/local.d/locks/session
+
+
+        Add the following line to the session locks file to prevent nonprivileged users from modifying the Ctrl-Alt-Del setting:
+
+
+        /org/gnome/settings-daemon/plugins/media-keys/logout
+
+
+        Run the following command to update the database:
+
+
+        $ sudo dconf update'
+    - attributes:
+        id: F-61697r1045116_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258032
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258032
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:49101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop environment.\
+          \ If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\nVerify\
+          \ that users cannot enable the Ctrl-Alt-Del sequence in the GNOME desktop with the following command:\n\n$ gsettings\
+          \ writable org.gnome.settings-daemon.plugins.media-keys logout\n \nfalse\n \nIf \"logout\" is writable and the result\
+          \ is \"true\", this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: RHEL 9 must prevent a user from overriding the Ctrl-Alt-Del sequence settings for the graphical user interface.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 01e8c70ae5bc3c507b4c20c2d772192d5a5a92af2cab4f08775dd10d76060ff6
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-258032r1045117_rule
+  status: legacy_compatible
