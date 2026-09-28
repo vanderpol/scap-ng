@@ -36,6 +36,16 @@ Requirements:
 - Prefer small focused Self-Assertion cases when implementing or debugging individual OVAL language features.
 - Add regression tests when a Self-Assertion case exposes an importer/evaluator defect or ambiguity.
 
+## Deprecated OVAL migration rule
+
+Deprecated OVAL 5.12.3 constructs that are still present in published SCAP 1.4 content remain part of the forward-conversion requirement.
+
+- Import and preserve their exact source semantics and provenance.
+- Prefer a `legacy_compatible` migration treatment when a reviewed successor exists, rather than making the deprecated construct a preferred new SCAP-NG authoring primitive.
+- Do not silently rewrite a deprecated construct to its successor unless semantic equivalence has been demonstrated for the specific source usage.
+- Keep the original construct identifiable in source accounting even when a native normalized form is approved.
+- Production use of a deprecated construct makes compatibility support higher priority than an unobserved schema-only construct, but does not by itself justify carrying the deprecated design forward into new authoring syntax.
+
 ## OVAL 5.12.3 importer expectations
 
 The SCAP-NG importer must aim for lossless dependency and semantic representation before native lowering.
