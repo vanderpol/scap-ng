@@ -40,7 +40,7 @@ For example:
 
     results:
       failure_examples:
-        target: 20
+        maximum: 20
 
 The value `20` above means "attempt to retain up to 20 useful failure
 examples." It does NOT mean "fail only after 20 failures."
@@ -81,7 +81,7 @@ Illustrative source:
 
     results:
       failure_examples:
-        target: 20
+        maximum: 20
 
 The exact final syntax remains under design.
 
@@ -161,6 +161,73 @@ The message SHALL be derived from authoritative Assessment/result data.
 
 An AI-generated or heuristic explanation SHALL NOT replace the authoritative
 result message.
+
+
+## Failure reason semantics
+
+A failed compliance result SHOULD include a concise machine-readable failure
+reason in addition to the human-readable `message`.
+
+Existence and non-existence failures are common enough to be first-class reason
+types rather than being represented only as free-form text.
+
+Illustrative reason kinds include:
+
+- `unexpected_existence` — one or more prohibited items exist;
+- `required_item_missing` — an item required to exist was not found;
+- `required_match_missing` — collected data exists, but no item satisfies a
+  required condition;
+- `value_mismatch` — a collected value does not satisfy the expected value;
+- `cardinality_mismatch` — the observed population does not satisfy an
+  explicit count/cardinality requirement.
+
+Example: prohibited package exists:
+
+    outcome: fail
+    message: >
+      FAIL: The sendmail package is installed; this requirement requires it to
+      be absent.
+
+    failure_reason:
+      kind: unexpected_existence
+      source: sendmail_packages
+      observed_items: 1
+      expected_existence: none
+
+Example: required sysctl item missing:
+
+    outcome: fail
+    message: >
+      FAIL: No net.ipv4.conf.default.send_redirects item was found; at least
+      one is required.
+
+    failure_reason:
+      kind: required_item_missing
+      source: redirect_default
+      observed_items: 0
+      expected_existence: at_least_one
+
+Example: required audit-rule combination missing:
+
+    outcome: fail
+    message: >
+      FAIL: Required audit-rule combination fsetxattr / b64 / root was not
+      found.
+
+    failure_reason:
+      kind: required_match_missing
+      expected:
+        syscall: fsetxattr
+        architecture: b64
+        identity_class: root
+
+The `message` remains the primary concise human explanation. The
+`failure_reason` object exists so downstream systems such as Splunk and
+Elastic can categorize, filter, and aggregate failures without parsing prose.
+
+A scanner SHALL derive the human-readable message and structured reason from
+the same authoritative Assessment outcome so they cannot contradict one
+another.
 
 ## Concrete failure evidence
 
