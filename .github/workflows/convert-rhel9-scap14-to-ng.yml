@@ -1,0 +1,186 @@
+name: Convert RHEL 9 SCAP 1.4 to SCAP-NG
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/convert-rhel9-scap14-to-ng.yml"
+      - "tools/oval_semantic_ir.py"
+      - "tools/scap14_rule_splitter.py"
+      - "tools/scap14_benchmark_ir.py"
+      - "tools/scap14_to_scapng.py"
+      - "tools/verify_scap14_to_scapng_conversion.py"
+      - "tools/build_oval_schema_semantic_catalog.py"
+      - "research/iterations/001/oval-test-support-overrides.json"
+      - "third_party/scap-1.4-schemas/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: convert-rhel9-scap14-to-ng-main
+  cancel-in-progress: true
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC published corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install converter dependencies
+        run: python -m pip install --disable-pip-version-check lxml PyYAML
+
+      - name: Build effective OVAL schema catalog
+        run: |
+          mkdir -p work
+          python scap-ng/tools/build_oval_schema_semantic_catalog.py \
+            scap-ng/third_party/scap-1.4-schemas/oval_5.12.3 \
+            --parser scap-ng/tools/oval_semantic_ir.py \
+            --support-overrides scap-ng/research/iterations/001/oval-test-support-overrides.json \
+            --output work/oval-schema-semantic-catalog.json
+
+      - name: Split RHEL 9 rules from published SCAP 1.4
+        run: |
+          python scap-ng/tools/scap14_rule_splitter.py \
+            niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip \
+            --output-dir work/rhel9-split \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+            --source-repository-path Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip \
+            --benchmark-key rhel9 \
+            --fail-on-unresolved
+
+      - name: Build faithful OVAL IR for every automated rule
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' oval; do
+            python scap-ng/tools/oval_semantic_ir.py "$oval" \
+              --provenance "$(dirname "$oval")/provenance.json" \
+              --output "$(dirname "$oval")/oval-ir.json" \
+              --fail-on-unresolved
+          done < <(find work/rhel9-split -name oval.xml -print0 | sort -z)
+
+      - name: Build unified XCCDF plus OVAL benchmark IR
+        run: |
+          python scap-ng/tools/scap14_benchmark_ir.py \
+            niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip \
+            --split-root work/rhel9-split \
+            --output work/rhel9-benchmark-ir.json
+
+      - name: Compile both SCAP-NG candidate layouts
+        run: |
+          python scap-ng/tools/scap14_to_scapng.py \
+            work/rhel9-benchmark-ir.json \
+            --schema-catalog work/oval-schema-semantic-catalog.json \
+            --output-dir work/rhel9-scapng
+
+      - name: Verify full conversion accounting and renderer equivalence
+        run: |
+          python scap-ng/tools/verify_scap14_to_scapng_conversion.py \
+            work/rhel9-scapng \
+            --expected-rules 445 \
+            --expected-automated 418 \
+            --expected-manual 27
+
+      - name: Build compact committed evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dst="scap-ng/research/iterations/001/generated/rhel9-full-conversion"
+          rm -rf "$dst"
+          mkdir -p "$dst/samples/simple" "$dst/samples/complex"
+
+          cp work/rhel9-scapng/conversion-summary.json "$dst/"
+          cp work/rhel9-scapng/conversion-blockers.json "$dst/"
+          cp work/rhel9-scapng/combined-rule/benchmark.yaml "$dst/combined-benchmark.yaml"
+          cp work/rhel9-scapng/split-policy-assessment-binding/benchmark.yaml "$dst/split-benchmark.yaml"
+
+          simple="xccdf_mil.disa.stig_rule_SV-257777r1155676_rule"
+          complex="xccdf_mil.disa.stig_rule_SV-258179r1155601_rule"
+          cp "work/rhel9-scapng/combined-rule/rules/$simple.yaml" "$dst/samples/simple/combined-rule.yaml"
+          cp "work/rhel9-scapng/split-policy-assessment-binding/policy/rules/$simple.yaml" "$dst/samples/simple/policy-rule.yaml"
+          cp "work/rhel9-scapng/split-policy-assessment-binding/automation/assessments/ng.scap14.$simple.yaml" "$dst/samples/simple/assessment.yaml"
+          cp "work/rhel9-scapng/combined-rule/rules/$complex.yaml" "$dst/samples/complex/combined-rule.yaml"
+          cp "work/rhel9-scapng/split-policy-assessment-binding/policy/rules/$complex.yaml" "$dst/samples/complex/policy-rule.yaml"
+          cp "work/rhel9-scapng/split-policy-assessment-binding/automation/assessments/ng.scap14.$complex.yaml" "$dst/samples/complex/assessment.yaml"
+
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path("work/rhel9-scapng")
+          rows=[]
+          for p in sorted(x for x in root.rglob("*") if x.is_file()):
+              data=p.read_bytes()
+              rows.append({
+                  "path":p.relative_to(root).as_posix(),
+                  "bytes":len(data),
+                  "sha256":hashlib.sha256(data).hexdigest(),
+              })
+          out=Path("scap-ng/research/iterations/001/generated/rhel9-full-conversion/conversion-file-manifest.json")
+          out.write_text(json.dumps({
+              "format":"scap-ng-rhel9-full-conversion-file-manifest-0.1",
+              "files":rows,
+              "file_count":len(rows),
+              "total_bytes":sum(x["bytes"] for x in rows),
+          },indent=2,sort_keys=True)+"\n")
+          PY
+
+          cat > "$dst/README.md" <<'EOF'
+          # RHEL 9 full SCAP 1.4 -> SCAP-NG conversion evidence
+
+          Generated from the pinned published NIWC RHEL 9 SCAP 1.4 benchmark.
+
+          This directory intentionally commits compact, reviewable evidence rather than
+          duplicating the complete generated 445-rule source tree in Git. The workflow
+          artifact contains the full converted output for both candidate source layouts.
+
+          The generic automated assessments are currently marked `legacy_compatible`:
+          OVAL XML has been lowered to a structured SCAP-NG assessment graph, but native
+          collector/capability mappings have not all been independently promoted to
+          `exact_native` / `exact_normalized`.
+
+          The simple and complex sample directories show the same source rule rendered
+          as combined-rule and split policy/assessment/binding layouts.
+          EOF
+
+      - name: Archive full converted source tree
+        run: tar -C work -czf work/rhel9-scapng-converted-sources.tar.gz rhel9-scapng
+
+      - name: Upload full conversion artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-scap14-to-scapng-full-conversion
+          path: work/rhel9-scapng-converted-sources.tar.gz
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Commit reproducible conversion evidence
+        working-directory: scap-ng
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/iterations/001/generated/rhel9-full-conversion
+          if git diff --cached --quiet; then
+            echo "RHEL 9 conversion evidence already matches."
+            exit 0
+          fi
+          git commit -m "Generate full RHEL 9 SCAP-NG conversion evidence"
+          git pull --rebase origin main
+          git push
