@@ -52,3 +52,49 @@ requires explicit review/provenance.
 - Final syntax for a Cartesian assertion matrix such as sample 05.
 
 Do not treat these files as final schema fixtures.
+
+
+## Simulated result fixtures
+
+The \`results/\` directory contains three provisional result fixtures for each
+Assessment sample. These are intentionally not a finalized result schema; they
+exist to stress the relationship between Assessment semantics and operational
+reporting.
+
+| Assessment | Result fixtures |
+| --- | --- |
+| 01 sysctl scalar | pass, wrong-value fail, missing-required-item fail |
+| 02 package absent | pass, prohibited-package fail, collection error |
+| 03 command ownership | pass, complete fail, short-circuit fail |
+| 04 derived audit storage | pass, size fail, source collection error |
+| 05 audit syscall matrix | pass, missing-required-combination fail, collection error |
+
+The fixtures test:
+
+- concise deterministic \`message\` values suitable for SIEM/log consumers;
+- exact versus unknown total failure counts;
+- short-circuit evaluation;
+- item-level concrete evidence;
+- missing-item/missing-match evidence;
+- rich \`error\` outcomes instead of flattening collection failures into
+  compliance failure;
+- derived/intermediate evidence;
+- aggregate matrix/completeness summaries.
+
+### Important result-model finding
+
+Not every compliance failure has a concrete "bad object."
+
+Two distinct evidence shapes are already necessary:
+
+1. **offending collected item**, for example a file whose owner is not root;
+2. **missing required condition**, for example no audit rule exists for a
+   required syscall/architecture/identity combination.
+
+The final result model SHOULD represent both without pretending that a missing
+required object was itself collected.
+
+The result payload boundary—how much Rule policy metadata, Assessment metadata,
+source lineage, and evidence belongs in each result versus a surrounding run
+package—remains intentionally open pending review of real operational
+consumers such as Splunk/Elastic JSONL output.
