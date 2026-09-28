@@ -10,10 +10,12 @@ This is a compact semantic-fingerprint survey. It does not generate three full Y
 - XCCDF rules: **8892**
 - Supported automated assessments: **7084**
 - Unique exact technical assessments: **3413**
-- Duplicate assessment maintenance units avoidable: **3671**
-- Exact maintenance-unit reduction: **51.82%**
+- Duplicate assessment maintenance units avoidable, total exact reuse: **3671**
+- Total exact maintenance-unit reduction: **51.82%**
 - Cross-benchmark exact-reuse groups: **1701**
 - Cross-benchmark assessment instances in those groups: **5340**
+- Duplicate units avoidable specifically through cross-benchmark reuse: **3639**
+- Cross-benchmark reduction over supported automated assessments: **51.37%**
 
 ## Rule mapping and parameterization
 
