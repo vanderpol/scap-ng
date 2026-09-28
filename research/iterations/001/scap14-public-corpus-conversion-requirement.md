@@ -85,16 +85,16 @@ No construct may be silently discarded, replaced with a weaker check, or treated
 
 ### Deprecated OVAL test boundary
 
-SCAP-NG intentionally excludes every OVAL test type marked deprecated in the SCAP 1.4 / OVAL 5.12.3 schema.
+SCAP-NG intentionally excludes every OVAL test type whose effective status remains deprecated after accounting for later OVAL Community governance decisions. Historical `deprecated_info` is retained as provenance, but explicit reinstatement decisions override the raw 5.12 annotation for scope classification.
 
-If a definition references a deprecated OVAL test:
+If a definition references an effectively deprecated OVAL test:
 
 - conversion of that definition must stop with `unsupported` and reason `deprecated_oval_test`;
 - the converter must identify the offending test type and supported replacement when documented;
 - the converter must not automatically rewrite the test;
 - the source SCAP 1.4 content must be updated and validated before conversion is retried.
 
-These blockers are source-remediation requirements, not SCAP-NG specification blockers and not native-runtime coverage requirements. The corpus report must count and identify them separately.
+These blockers are source-remediation requirements, not SCAP-NG specification blockers and not native-runtime coverage requirements. The corpus report must count and identify them separately. The support decision must also preserve evidence for any reinstatement override so reviewers can distinguish historical deprecation from current OVAL governance.
 
 ## Gates
 
