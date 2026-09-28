@@ -1,0 +1,92 @@
+# Design-review sample based on RHEL 9 V2R9 / RHEL-09-654025.
+# Source OVAL: oval:mil.disa.stig.rhel9os:def:258179
+# OVAL closure: 7 definitions, 24 tests, 24 objects, 0 states, 17 variables.
+#
+# IMPORTANT: this is an AGGRESSIVE NATIVE-NG candidate, not yet a lossless
+# mechanical conversion. The source OVAL appears to contain duplicated b32
+# root patterns for lsetxattr and removexattr where a full semantic matrix
+# would normally contain b64 cases. A converter MUST preserve source behavior
+# until that discrepancy is explicitly adjudicated.
+#
+# The point of this sample is to ask whether a structured audit-rule capability
+# and explicit Cartesian requirement matrix are preferable to 24 regex tests
+# assembled through constant/local-variable chains.
+
+assessment:
+  id: rhel9.RHEL-09-654025
+  mode: automated
+
+  collect:
+    audit_rules:
+      capability: linux.audit_rule
+
+      select:
+        source_file:
+          equals: /etc/audit/audit.rules
+
+      fields:
+        - action
+        - architecture
+        - syscalls
+        - auid
+        - key
+        - raw_rule
+
+  assert:
+    each_combination:
+      syscall:
+        - setxattr
+        - fsetxattr
+        - lsetxattr
+        - removexattr
+        - fremovexattr
+        - lremovexattr
+
+      architecture:
+        - b32
+        - b64
+
+      identity_class:
+        - name: interactive_user
+          auid:
+            greater_than_or_equal: 1000
+            not_in:
+              - 4294967295
+              - -1
+              - unset
+
+        - name: root
+          auid:
+            equals: 0
+
+    require:
+      source: audit_rules
+
+      # For every explicit syscall x architecture x identity_class
+      # combination above, at least one audit rule must match.
+      matching_items: at_least_one
+
+      where:
+        action:
+          any_of:
+            - always,exit
+            - exit,always
+
+        architecture:
+          equals: $architecture
+
+        syscalls:
+          contains: $syscall
+
+        auid:
+          satisfies: $identity_class.auid
+
+  results:
+    failure_examples:
+      maximum: 20
+      fields:
+        - raw_rule
+        - architecture
+        - syscalls
+        - auid
+      include_reason: true
