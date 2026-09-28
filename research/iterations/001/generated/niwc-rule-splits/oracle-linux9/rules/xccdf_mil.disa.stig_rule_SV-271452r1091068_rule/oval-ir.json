@@ -130,16 +130,16 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.linux:tst:23024000",
+      "from": "oval:mil.disa.stig.ind:tst:23024001",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.linux:obj:23024000"
+      "to": "oval:mil.disa.stig.ind:obj:23024001"
     },
     {
       "attribute": "state_ref",
       "element": "state",
-      "from": "oval:mil.disa.stig.linux:tst:23024000",
+      "from": "oval:mil.disa.stig.ind:tst:23024001",
       "kind": "test_state",
-      "to": "oval:mil.disa.stig.linux:ste:23024000"
+      "to": "oval:mil.disa.stig.ind:ste:23024001"
     },
     {
       "attribute": "object_ref",
@@ -158,16 +158,16 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23024001",
+      "from": "oval:mil.disa.stig.linux:tst:23024000",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23024001"
+      "to": "oval:mil.disa.stig.linux:obj:23024000"
     },
     {
       "attribute": "state_ref",
       "element": "state",
-      "from": "oval:mil.disa.stig.ind:tst:23024001",
+      "from": "oval:mil.disa.stig.linux:tst:23024000",
       "kind": "test_state",
-      "to": "oval:mil.disa.stig.ind:ste:23024001"
+      "to": "oval:mil.disa.stig.linux:ste:23024000"
     }
   ],
   "dependency_integrity": {
@@ -268,6 +268,40 @@
           "kind": "element",
           "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/selinux/config"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^SELINUX=(.*)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "/etc/selinux/config:SELINUX value",
+      "id": "oval:mil.disa.stig.ind:obj:23024001",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/sys/fs/selinux/enforce"
         },
         {
@@ -310,40 +344,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
       "type": "partition_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/selinux/config"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^SELINUX=(.*)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "/etc/selinux/config:SELINUX value",
-      "id": "oval:mil.disa.stig.ind:obj:23024001",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "2"
     }
   ],
   "parser_contract": {
@@ -381,12 +381,12 @@
       "oval:mil.disa.stig.defs:def:230240"
     ]
   },
-  "semantic_ir_sha256": "b6cb69f62bc99eac6b635d55f510bf85f5ad5831863095acefdcd2fe85453b34",
+  "semantic_ir_sha256": "024fbb13d3efa8d3d2c52a232670a936bd29e446a040847023a135dcc48861be",
   "source": {
     "bytes": 5799,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271452r1091068_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271452r1091068_rule/provenance.json",
-    "sha256": "c04eb180e1435773a0840c3e55fb006faf5d26b763a6394dc5ff150c5468bacd"
+    "sha256": "16ca83ca29b9a94b9ce8b09d6d9e83e0608b9cff4ea7575578e4453af270de08"
   },
   "states": [
     {
@@ -448,16 +448,16 @@
   "tests": [
     {
       "check": "all",
-      "check_existence": "at_least_one_exists",
-      "comment": "selinux is active",
-      "id": "oval:mil.disa.stig.linux:tst:23024000",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
+      "check_existence": "only_one_exists",
+      "comment": "/etc/selinux/config:SELINUX=enforcing",
+      "id": "oval:mil.disa.stig.ind:tst:23024001",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.linux:obj:23024000"
+            "object_ref": "oval:mil.disa.stig.ind:obj:23024001"
           },
-          "object_ref": "oval:mil.disa.stig.linux:obj:23024000"
+          "object_ref": "oval:mil.disa.stig.ind:obj:23024001"
         }
       ],
       "other": [],
@@ -465,13 +465,13 @@
       "states": [
         {
           "attributes": {
-            "state_ref": "oval:mil.disa.stig.linux:ste:23024000"
+            "state_ref": "oval:mil.disa.stig.ind:ste:23024001"
           },
-          "state_ref": "oval:mil.disa.stig.linux:ste:23024000"
+          "state_ref": "oval:mil.disa.stig.ind:ste:23024001"
         }
       ],
-      "type": "partition_test",
-      "version": "1"
+      "type": "textfilecontent54_test",
+      "version": "2"
     },
     {
       "check": "all",
@@ -502,16 +502,16 @@
     },
     {
       "check": "all",
-      "check_existence": "only_one_exists",
-      "comment": "/etc/selinux/config:SELINUX=enforcing",
-      "id": "oval:mil.disa.stig.ind:tst:23024001",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "check_existence": "at_least_one_exists",
+      "comment": "selinux is active",
+      "id": "oval:mil.disa.stig.linux:tst:23024000",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23024001"
+            "object_ref": "oval:mil.disa.stig.linux:obj:23024000"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23024001"
+          "object_ref": "oval:mil.disa.stig.linux:obj:23024000"
         }
       ],
       "other": [],
@@ -519,13 +519,13 @@
       "states": [
         {
           "attributes": {
-            "state_ref": "oval:mil.disa.stig.ind:ste:23024001"
+            "state_ref": "oval:mil.disa.stig.linux:ste:23024000"
           },
-          "state_ref": "oval:mil.disa.stig.ind:ste:23024001"
+          "state_ref": "oval:mil.disa.stig.linux:ste:23024000"
         }
       ],
-      "type": "textfilecontent54_test",
-      "version": "2"
+      "type": "partition_test",
+      "version": "1"
     }
   ],
   "unresolved_references": [],

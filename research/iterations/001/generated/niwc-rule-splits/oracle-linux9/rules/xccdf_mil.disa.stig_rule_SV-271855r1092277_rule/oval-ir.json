@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "ActionSendStreamDriverMode == 1",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23048100"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:271855",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must encrypt the transfer of audit records offloaded onto a different system or media from the system being audited via rsyslog."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:271855",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "ActionSendStreamDriverMode == 1",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23048100"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:271855",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must encrypt the transfer of audit records offloaded onto a different system or media from the system being audited via rsyslog."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:271855",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.ind:tst:23048100"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.ol9os:def:271855",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:271855"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:271855",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.ind:tst:23048100"
     },
     {
       "attribute": "object_ref",
@@ -234,13 +234,19 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
         },
         {
+          "kind": "element",
+          "name": "path",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/rsyslog.d"
+        },
+        {
           "attributes": {
-            "datatype": "string"
+            "operation": "pattern match"
           },
           "kind": "element",
-          "name": "filepath",
+          "name": "filename",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.conf"
+          "value": "^.*\\.conf$"
         },
         {
           "attributes": {
@@ -262,8 +268,8 @@
           "value": "1"
         }
       ],
-      "comment": "rsyslog.conf: ActionSendStreamDriverMode",
-      "id": "oval:mil.disa.stig.ind:obj:23048101",
+      "comment": "rsyslog.d/*.conf: ActionSendStreamDriverMode",
+      "id": "oval:mil.disa.stig.ind:obj:23048102",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -309,19 +315,13 @@
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
         },
         {
-          "kind": "element",
-          "name": "path",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/rsyslog.d"
-        },
-        {
           "attributes": {
-            "operation": "pattern match"
+            "datatype": "string"
           },
           "kind": "element",
-          "name": "filename",
+          "name": "filepath",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^.*\\.conf$"
+          "value": "/etc/rsyslog.conf"
         },
         {
           "attributes": {
@@ -343,8 +343,8 @@
           "value": "1"
         }
       ],
-      "comment": "rsyslog.d/*.conf: ActionSendStreamDriverMode",
-      "id": "oval:mil.disa.stig.ind:obj:23048102",
+      "comment": "rsyslog.conf: ActionSendStreamDriverMode",
+      "id": "oval:mil.disa.stig.ind:obj:23048101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -376,12 +376,12 @@
       "oval:mil.disa.stig.defs:def:271855"
     ]
   },
-  "semantic_ir_sha256": "bd22d88ee11627b6eee6e32c1ae8a0fce99cf27bbb865b937dd8bdbf4ec4c423",
+  "semantic_ir_sha256": "e2da3c4c26f1ac5efee07be877ed551d023f053555256c3e8b242e79f125e579",
   "source": {
     "bytes": 4910,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271855r1092277_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271855r1092277_rule/provenance.json",
-    "sha256": "0439f772679c82c2cfe3620df8edb299e17363201eb83d1a56ae494f066d194b"
+    "sha256": "a799f0dcd8e8907cf839c50d38303b5260e381c4dcb5c6d7b49305a3a12d84ce"
   },
   "states": [
     {

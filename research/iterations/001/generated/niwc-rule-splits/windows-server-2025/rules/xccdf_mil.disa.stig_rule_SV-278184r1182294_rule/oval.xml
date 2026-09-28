@@ -4,16 +4,26 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.win:def:100003" version="2" class="inventory">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:254435" version="5" class="compliance">
           <metadata>
-            <title>The system is a Windows Standalone Server</title>
-            <affected family="windows">
-              <platform>Microsoft Windows Server</platform>
-            </affected>
+            <title>Windows Deny access to this computer from the network user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and local accounts and from unauthenticated access on all systems.</title>
             <description/>
           </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:10000300"/>
+          <criteria operator="OR">
+            <criteria>
+              <extend_definition definition_ref="oval:mil.disa.stig.win:def:100004" comment="System is a domain-joined member server"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349105" comment="Deny access to this computer from the network - Guests"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349106" comment="Deny access to this computer from the network - Domain Admins"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349107" comment="Deny access to this computer from the network - Enterprise Admins"/>
+              <criteria operator="OR">
+                <criterion test_ref="oval:mil.disa.stig.win:tst:25349104" comment="Deny access to this computer from the network - Local account"/>
+                <criterion test_ref="oval:mil.disa.stig.win:tst:25443501" comment="Deny access to this computer from the network - Local account and member of Administrators"/>
+              </criteria>
+            </criteria>
+            <criteria>
+              <extend_definition definition_ref="oval:mil.disa.stig.win:def:100003" comment="System is a standalone server"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349105" comment="Deny access to this computer from the network - Guests"/>
+            </criteria>
           </criteria>
         </definition>
         <definition id="oval:mil.disa.stig.windows2025:def:278184" version="1" class="compliance">
@@ -36,28 +46,6 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254435"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:254435" version="5" class="compliance">
-          <metadata>
-            <title>Windows Deny access to this computer from the network user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and local accounts and from unauthenticated access on all systems.</title>
-            <description/>
-          </metadata>
-          <criteria operator="OR">
-            <criteria>
-              <extend_definition definition_ref="oval:mil.disa.stig.win:def:100004" comment="System is a domain-joined member server"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349105" comment="Deny access to this computer from the network - Guests"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349106" comment="Deny access to this computer from the network - Domain Admins"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349107" comment="Deny access to this computer from the network - Enterprise Admins"/>
-              <criteria operator="OR">
-                <criterion test_ref="oval:mil.disa.stig.win:tst:25349104" comment="Deny access to this computer from the network - Local account"/>
-                <criterion test_ref="oval:mil.disa.stig.win:tst:25443501" comment="Deny access to this computer from the network - Local account and member of Administrators"/>
-              </criteria>
-            </criteria>
-            <criteria>
-              <extend_definition definition_ref="oval:mil.disa.stig.win:def:100003" comment="System is a standalone server"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349105" comment="Deny access to this computer from the network - Guests"/>
-            </criteria>
-          </criteria>
-        </definition>
         <definition id="oval:mil.disa.stig.win:def:100004" version="2" class="inventory">
           <metadata>
             <title>The system is a Windows Domain Member Server</title>
@@ -70,26 +58,38 @@
             <criterion test_ref="oval:mil.disa.stig.win:tst:10000400"/>
           </criteria>
         </definition>
-        </definitions><tests><userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349105" version="4" check="at least one" comment="Deny access to this computer from the network - Guests">
-          <object object_ref="oval:mil.disa.stig.win:obj:25349100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000033"/>
-        </userright_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000300" version="1" check="all" comment="The system is a Windows Standalone Server">
+        <definition id="oval:mil.disa.stig.win:def:100003" version="2" class="inventory">
+          <metadata>
+            <title>The system is a Windows Standalone Server</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server</platform>
+            </affected>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:10000300"/>
+          </criteria>
+        </definition>
+        </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000300" version="1" check="all" comment="The system is a Windows Standalone Server">
           <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
           <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
         </wmi57_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000400" version="1" check="all" comment="The system is a Windows Domain Member Server">
-          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000400"/>
-        </wmi57_test>
-        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25443501" version="2" check="at least one" comment="Deny access to this computer from the network - Local account and member of Administrators">
-          <object object_ref="oval:mil.disa.stig.win:obj:25349100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000035"/>
-        </userright_test>
         <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349106" version="1" check="at least one" comment="Deny access to this computer from the network - Domain Admins">
           <object object_ref="oval:mil.disa.stig.win:obj:25349100"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000040"/>
         </userright_test>
+        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25443501" version="2" check="at least one" comment="Deny access to this computer from the network - Local account and member of Administrators">
+          <object object_ref="oval:mil.disa.stig.win:obj:25349100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000035"/>
+        </userright_test>
+        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349105" version="4" check="at least one" comment="Deny access to this computer from the network - Guests">
+          <object object_ref="oval:mil.disa.stig.win:obj:25349100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000033"/>
+        </userright_test>
+        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000400" version="1" check="all" comment="The system is a Windows Domain Member Server">
+          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000400"/>
+        </wmi57_test>
         <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349104" version="5" check="at least one" comment="Deny access to this computer from the network - Local account">
           <object object_ref="oval:mil.disa.stig.win:obj:25349100"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000034"/>
@@ -108,26 +108,26 @@
         </objects><states><userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000033" version="1">
           <trustee_name operation="case insensitive equals">Guests</trustee_name>
         </userright_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000041" version="1">
-          <trustee_name operation="pattern match">^(?i)(.+\\)?Enterprise Admins$</trustee_name>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000035" version="2">
+          <trustee_name operation="pattern match">^(?i)(NT Authority\\)?Local account and member of Administrators group$</trustee_name>
+        </userright_state>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000040" version="1">
+          <trustee_name operation="pattern match">^(?i)(.+\\)?Domain Admins$</trustee_name>
         </userright_state>
         <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000034" version="2">
           <trustee_name operation="pattern match">^(?i)(NT Authority\\)?Local account$</trustee_name>
         </userright_state>
-        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000300" version="1" comment="Standalone Server">
-          <result datatype="record" operation="equals">
-            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">2</field>
-          </result>
-        </wmi57_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000035" version="2">
-          <trustee_name operation="pattern match">^(?i)(NT Authority\\)?Local account and member of Administrators group$</trustee_name>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000041" version="1">
+          <trustee_name operation="pattern match">^(?i)(.+\\)?Enterprise Admins$</trustee_name>
         </userright_state>
         <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000400" version="1" comment="Domain Member Server">
           <result datatype="record" operation="equals">
             <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">3</field>
           </result>
         </wmi57_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000040" version="1">
-          <trustee_name operation="pattern match">^(?i)(.+\\)?Domain Admins$</trustee_name>
-        </userright_state>
+        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000300" version="1" comment="Standalone Server">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">2</field>
+          </result>
+        </wmi57_state>
         </states></oval_definitions>

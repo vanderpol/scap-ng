@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "/etc/modprobe.d contains a file that contains 'install usb-storage /bin/false'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23050300"
-          },
-          {
-            "comment": "/etc/modprobe.d contains a file that contains 'blacklist usb-storage'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23050301"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230503",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must be configured to disable USB mass storage."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230503",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "/etc/modprobe.d contains a file that contains 'install usb-storage /bin/false'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23050300"
+          },
+          {
+            "comment": "/etc/modprobe.d contains a file that contains 'blacklist usb-storage'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23050301"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230503",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must be configured to disable USB mass storage."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258034",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230503"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -106,13 +113,6 @@
       "from": "oval:mil.disa.stig.defs:def:230503",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23050301"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258034",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230503"
     },
     {
       "attribute": "object_ref",
@@ -230,7 +230,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*install[ \\t]+usb-storage[ \\t]+/bin/false[ \\t]*$"
+          "value": "^[ \\t]*blacklist[ \\t]+usb-storage[ \\t]*$"
         },
         {
           "attributes": {
@@ -244,10 +244,10 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23050300",
+      "id": "oval:mil.disa.stig.ind:obj:23050301",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "2"
+      "version": "1"
     },
     {
       "children": [
@@ -273,7 +273,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^[ \\t]*blacklist[ \\t]+usb-storage[ \\t]*$"
+          "value": "^[ \\t]*install[ \\t]+usb-storage[ \\t]+/bin/false[ \\t]*$"
         },
         {
           "attributes": {
@@ -287,10 +287,10 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:23050301",
+      "id": "oval:mil.disa.stig.ind:obj:23050300",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
-      "version": "1"
+      "version": "2"
     }
   ],
   "parser_contract": {
@@ -317,12 +317,12 @@
       "oval:mil.disa.stig.defs:def:230503"
     ]
   },
-  "semantic_ir_sha256": "d4908fca06b9685b4a687d4cdcf06b6ebcf1e36b877b745a8e2778c5912e7d16",
+  "semantic_ir_sha256": "57dd32ef7c195474532ff94d9413eb924b336066cb1c3374812879d774b506b7",
   "source": {
     "bytes": 3588,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258034r1051267_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258034r1051267_rule/provenance.json",
-    "sha256": "9e27c97246bb2867e729b47b06936504a8543878816b7fede5fc5b0cf8dcd125"
+    "sha256": "b5df4eb13e1e9cf3adcdc72e81c2a88388e6ae8133d58362e2a950944f676ddd"
   },
   "states": [],
   "tests": [

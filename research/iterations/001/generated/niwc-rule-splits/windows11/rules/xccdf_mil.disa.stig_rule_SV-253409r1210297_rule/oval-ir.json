@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "AllowIndexingEncryptedStoresOrItems is disabled",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25340910"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:25340900",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Indexing of encrypted files must be turned off."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:25340900",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "AllowIndexingEncryptedStoresOrItems is disabled",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25340910"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:25340900",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Indexing of encrypted files must be turned off."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:25340900",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.win:tst:25340910"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.windows11:def:253409",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:25340900"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:25340900",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.win:tst:25340910"
     },
     {
       "attribute": "object_ref",
@@ -216,35 +216,29 @@
     {
       "children": [
         {
-          "attributes": {
-            "datatype": "string"
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.win:obj:25340911"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.win:obj:25340912"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
           },
-          "kind": "element",
-          "name": "hive",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "HKEY_LOCAL_MACHINE"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search"
-        },
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "AllowIndexingEncryptedStoresOrItems"
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
         }
       ],
-      "comment": "Registry entry for AllowIndexingEncryptedStoresOrItems used by Group Policy",
-      "id": "oval:mil.disa.stig.win:obj:25340911",
+      "comment": "Registry entries for AllowIndexingEncryptedStoresOrItems",
+      "id": "oval:mil.disa.stig.win:obj:25340910",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
       "version": "1"
@@ -288,29 +282,35 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.win:obj:25340911"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.win:obj:25340912"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
+          "attributes": {
+            "datatype": "string"
           },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
+          "kind": "element",
+          "name": "hive",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "HKEY_LOCAL_MACHINE"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "key",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search"
+        },
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
+          "name": "name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "AllowIndexingEncryptedStoresOrItems"
         }
       ],
-      "comment": "Registry entries for AllowIndexingEncryptedStoresOrItems",
-      "id": "oval:mil.disa.stig.win:obj:25340910",
+      "comment": "Registry entry for AllowIndexingEncryptedStoresOrItems used by Group Policy",
+      "id": "oval:mil.disa.stig.win:obj:25340911",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
       "version": "1"
@@ -342,12 +342,12 @@
       "oval:mil.disa.stig.defs:def:25340900"
     ]
   },
-  "semantic_ir_sha256": "65a25673b0ab437a0acf52831f69f37a70a3464884f01d9a4d34e29ccc616556",
+  "semantic_ir_sha256": "7bcf0df1398a18048635bf4cf24ed93ffed6a1ceaee249ac29d703b72ea82552",
   "source": {
     "bytes": 3854,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253409r1210297_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253409r1210297_rule/provenance.json",
-    "sha256": "517de86ac784db99696ffe74adc7cb09ed7530ad8cd08a50f9584f67edce8d0d"
+    "sha256": "cf6390128fe2ab30236246c5479b3fd3ad29c205642ec533f6823418657fd42d"
   },
   "states": [
     {

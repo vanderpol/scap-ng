@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:258232",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:258232",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-671020 - RHEL 9 IP tunnels must use FIPS 140-2/140-3 approved cryptographic algorithms."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Overriding the system crypto policy makes the behavior of the Libreswan service violate expectations, and makes system configuration more fragmented."
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": "ipsec.conf includes crypto-policy",
             "kind": "test_ref",
             "negate": false,
@@ -54,59 +104,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:258232",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:258232",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-671020 - RHEL 9 IP tunnels must use FIPS 140-2/140-3 approved cryptographic algorithms."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Overriding the system crypto policy makes the behavior of the Libreswan service violate expectations, and makes system configuration more fragmented."
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258232",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:258232"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -127,13 +134,6 @@
       "from": "oval:mil.disa.stig.defs:def:258232",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:25823202"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258232",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:258232"
     },
     {
       "attribute": "object_ref",
@@ -270,6 +270,40 @@
       "children": [
         {
           "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/ipsec.conf"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*include\\s+(.*)\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "/etc/ipsec.conf includes",
+      "id": "oval:mil.disa.stig.ind:obj:25823200",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/etc/ipsec.d"
@@ -308,40 +342,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ipsec.conf"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*include\\s+(.*)\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "/etc/ipsec.conf includes",
-      "id": "oval:mil.disa.stig.ind:obj:25823200",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -377,12 +377,12 @@
       "oval:mil.disa.stig.defs:def:258232"
     ]
   },
-  "semantic_ir_sha256": "68d0efbb3d7a69de988948bd43615a8fc7b50de45faa0586d99e174b1d7f44b5",
+  "semantic_ir_sha256": "0359662904ac4f226e443c5764637f0773840aee865079d4723180241ae81580",
   "source": {
     "bytes": 4830,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258232r1184335_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258232r1184335_rule/provenance.json",
-    "sha256": "f61b82f3f77f4e949ee90bf8d0245ee91c010fe7e9773ac15d1919b57fc03977"
+    "sha256": "f2a4cd4ebf9e8f1f99a481f5264699c133e987de57fc440734e2da0543aa5d2e"
   },
   "states": [
     {
@@ -392,10 +392,10 @@
           "kind": "element",
           "name": "subexpression",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/crypto-policies/back-ends/libreswan.config"
+          "value": "/etc/ipsec.d/*.conf"
         }
       ],
-      "id": "oval:mil.disa.stig.ind:ste:25823200",
+      "id": "oval:mil.disa.stig.ind:ste:25823201",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",
@@ -408,10 +408,10 @@
           "kind": "element",
           "name": "subexpression",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/ipsec.d/*.conf"
+          "value": "/etc/crypto-policies/back-ends/libreswan.config"
         }
       ],
-      "id": "oval:mil.disa.stig.ind:ste:25823201",
+      "id": "oval:mil.disa.stig.ind:ste:25823200",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "operator": "AND",
       "type": "textfilecontent54_state",

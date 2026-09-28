@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:258091" version="1" class="compliance">
-          <metadata>
-            <title>Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25809100" comment="/etc/security/pwquality.conf:retry not greater than 3 and not 0"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:258091" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258091" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-611010 - RHEL 9 must ensure the password complexity module in the system-auth file is configured for three retries or less.</title>
             <affected family="unix">
@@ -31,27 +22,36 @@ By limiting the number of attempts to meet the pwquality module complexity requi
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258091"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:258091" version="1" class="compliance">
+          <metadata>
+            <title>Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25809100" comment="/etc/security/pwquality.conf:retry not greater than 3 and not 0"/>
+          </criteria>
+        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25809100" version="1" check_existence="at_least_one_exists" check="all" comment="/etc/security/pwquality.conf:retry not greater than 3 and not 0">
           <object object_ref="oval:mil.disa.stig.ind:obj:25809100"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000018"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25809102" version="2" comment="in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value">
-          <behaviors recurse_direction="down"/>
-          <path>/etc/security/pwquality.conf.d</path>
-          <filename operation="pattern match">\.conf$</filename>
-          <pattern operation="pattern match">^\s*retry\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
-          <instance datatype="int">1</instance>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25809100" version="1">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.stig.ind:obj:25809101</object_reference>
+            <object_reference>oval:mil.disa.stig.ind:obj:25809102</object_reference>
+          </set>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25809101" version="2" comment="in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value">
           <filepath>/etc/security/pwquality.conf</filepath>
           <pattern operation="pattern match">^\s*retry\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
           <instance datatype="int">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25809100" version="1">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
-            <object_reference>oval:mil.disa.stig.ind:obj:25809101</object_reference>
-            <object_reference>oval:mil.disa.stig.ind:obj:25809102</object_reference>
-          </set>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25809102" version="2" comment="in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value">
+          <behaviors recurse_direction="down"/>
+          <path>/etc/security/pwquality.conf.d</path>
+          <filename operation="pattern match">\.conf$</filename>
+          <pattern operation="pattern match">^\s*retry\s*=\s*(-?\d*)\s*(?:#.*)?$</pattern>
+          <instance datatype="int">1</instance>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:20000018" version="1">
           <subexpression datatype="string" operation="pattern match">^[123]$</subexpression>

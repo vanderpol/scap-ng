@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:25346600" version="1" class="compliance">
-          <metadata>
-            <title>The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25346610" comment="FIPS-compliant algorithms are enabled"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.windows11:def:253466" version="3" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.windows11:def:253466" version="3" class="compliance">
           <metadata>
             <title>WN11-SO-000230 - The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing.</title>
             <affected family="windows">
@@ -27,11 +18,25 @@ Note: A different registry location is needed when systems are managed by Intune
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:25346600"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:25346600" version="1" class="compliance">
+          <metadata>
+            <title>The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25346610" comment="FIPS-compliant algorithms are enabled"/>
+          </criteria>
+        </definition>
         </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25346610" version="1" check="all" comment="FIPS-compliant algorithms are enabled">
           <object object_ref="oval:mil.disa.stig.win:obj:25346610"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
         </registry_test>
-        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25346611" version="2" comment="GPO registry entry for FIPS-compliant algorithms">
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25346612" version="2" comment="Intune registry entry for FIPS-compliant algorithms">
+          <hive>HKEY_LOCAL_MACHINE</hive>
+          <key>SOFTWARE\Microsoft\PolicyManager\current\device\Cryptography</key>
+          <name>AllowFipsAlgorithmPolicy_ProviderSet</name>
+        </registry_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25346611" version="2" comment="GPO registry entry for FIPS-compliant algorithms">
           <hive>HKEY_LOCAL_MACHINE</hive>
           <key>SYSTEM\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy</key>
           <name>Enabled</name>
@@ -41,11 +46,6 @@ Note: A different registry location is needed when systems are managed by Intune
             <object_reference>oval:mil.disa.stig.win:obj:25346611</object_reference>
             <object_reference>oval:mil.disa.stig.win:obj:25346612</object_reference>
           </set>
-        </registry_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25346612" version="2" comment="Intune registry entry for FIPS-compliant algorithms">
-          <hive>HKEY_LOCAL_MACHINE</hive>
-          <key>SOFTWARE\Microsoft\PolicyManager\current\device\Cryptography</key>
-          <name>AllowFipsAlgorithmPolicy_ProviderSet</name>
         </registry_object>
         </objects><states><registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
           <type>reg_dword</type>

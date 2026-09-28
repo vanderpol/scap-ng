@@ -5,41 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "FIPS-compliant algorithms are enabled",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25346610"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:25346600",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:25346600",
             "kind": "definition_ref",
@@ -84,22 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "FIPS-compliant algorithms are enabled",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25346610"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:25346600",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "test_ref",
-      "element": "criterion",
-      "from": "oval:mil.disa.stig.defs:def:25346600",
-      "kind": "criterion_test",
-      "to": "oval:mil.disa.stig.win:tst:25346610"
-    },
     {
       "attribute": "definition_ref",
       "element": "extend_definition",
       "from": "oval:mil.disa.stig.windows11:def:253466",
       "kind": "extend_definition",
       "to": "oval:mil.disa.stig.defs:def:25346600"
+    },
+    {
+      "attribute": "test_ref",
+      "element": "criterion",
+      "from": "oval:mil.disa.stig.defs:def:25346600",
+      "kind": "criterion_test",
+      "to": "oval:mil.disa.stig.win:tst:25346610"
     },
     {
       "attribute": "object_ref",
@@ -221,6 +221,33 @@
           "kind": "element",
           "name": "key",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Cryptography"
+        },
+        {
+          "kind": "element",
+          "name": "name",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "AllowFipsAlgorithmPolicy_ProviderSet"
+        }
+      ],
+      "comment": "Intune registry entry for FIPS-compliant algorithms",
+      "id": "oval:mil.disa.stig.win:obj:25346612",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "registry_object",
+      "version": "2"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "hive",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "HKEY_LOCAL_MACHINE"
+        },
+        {
+          "kind": "element",
+          "name": "key",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
           "value": "SYSTEM\\CurrentControlSet\\Control\\Lsa\\FIPSAlgorithmPolicy"
         },
         {
@@ -265,33 +292,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "hive",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "HKEY_LOCAL_MACHINE"
-        },
-        {
-          "kind": "element",
-          "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Cryptography"
-        },
-        {
-          "kind": "element",
-          "name": "name",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "AllowFipsAlgorithmPolicy_ProviderSet"
-        }
-      ],
-      "comment": "Intune registry entry for FIPS-compliant algorithms",
-      "id": "oval:mil.disa.stig.win:obj:25346612",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "registry_object",
-      "version": "2"
     }
   ],
   "parser_contract": {
@@ -320,12 +320,12 @@
       "oval:mil.disa.stig.defs:def:25346600"
     ]
   },
-  "semantic_ir_sha256": "04b355b11ad3ca8d2c402555c89e777cbef31cd3b64094e09454a7ee018b1126",
+  "semantic_ir_sha256": "93805338f47ce62af8fdd4d0670dfa7936fbcd46a071410ff60bd83ef93202fe",
   "source": {
     "bytes": 3888,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253466r1210303_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253466r1210303_rule/provenance.json",
-    "sha256": "1920f31a22ed2897f71669024b3180c9a952e15decc13e60c529bfb3642d0bf2"
+    "sha256": "d490c2d77cd189041fb7f7908fa400cb6af0508b49953a698d78b8e1924aa173"
   },
   "states": [
     {

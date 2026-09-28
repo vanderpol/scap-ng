@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23034600"
+          },
+          {
+            "comment": "limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:23034601"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230346",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must limit the number of concurrent sessions to ten for all accounts and/or account types."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230346",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23034600"
-          },
-          {
-            "comment": "limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:23034601"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230346",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must limit the number of concurrent sessions to ten for all accounts and/or account types."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.ol9os:def:271753",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230346"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:230346",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:23034601"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.ol9os:def:271753",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230346"
     },
     {
       "attribute": "object_ref",
@@ -373,36 +373,6 @@
     {
       "children": [
         {
-          "children": [
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23034601"
-            },
-            {
-              "kind": "object_ref",
-              "object_ref": "oval:mil.disa.stig.ind:obj:23034602"
-            }
-          ],
-          "evaluation_semantics": {
-            "complement_is_relative": true,
-            "filter_default_action": "exclude",
-            "filters_apply_before_set_operator": true,
-            "unique_items": true
-          },
-          "kind": "set",
-          "operator": "UNION",
-          "operator_explicit": true
-        }
-      ],
-      "comment": "all default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf",
-      "id": "oval:mil.disa.stig.ind:obj:23034600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
           "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
@@ -439,6 +409,36 @@
       ],
       "comment": "default maxlogins in /etc/security/limits.d/*.conf",
       "id": "oval:mil.disa.stig.ind:obj:23034602",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23034601"
+            },
+            {
+              "kind": "object_ref",
+              "object_ref": "oval:mil.disa.stig.ind:obj:23034602"
+            }
+          ],
+          "evaluation_semantics": {
+            "complement_is_relative": true,
+            "filter_default_action": "exclude",
+            "filters_apply_before_set_operator": true,
+            "unique_items": true
+          },
+          "kind": "set",
+          "operator": "UNION",
+          "operator_explicit": true
+        }
+      ],
+      "comment": "all default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf",
+      "id": "oval:mil.disa.stig.ind:obj:23034600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -515,12 +515,12 @@
       "oval:mil.disa.stig.defs:def:230346"
     ]
   },
-  "semantic_ir_sha256": "8e65ebf34a46c5e4b8e72a3a8189e0f2e9ab7c6a8cc1e710e48a2f33893ae8da",
+  "semantic_ir_sha256": "75dd4006b1c037ee28f1eafafb9f9838b24eae2a8d80fd61a66ff9917e007ad0",
   "source": {
     "bytes": 6893,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271753r1091971_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/oracle-linux9/rules/xccdf_mil.disa.stig_rule_SV-271753r1091971_rule/provenance.json",
-    "sha256": "17ba623166038246937036595732ee1e1e28bda55200303c3bc5d396b1fadc02"
+    "sha256": "ceb202acc640a2dd530eb4ec5f37099e6ed6cc4f55d9ee68d8b2ae5a4ee4f91c"
   },
   "states": [
     {

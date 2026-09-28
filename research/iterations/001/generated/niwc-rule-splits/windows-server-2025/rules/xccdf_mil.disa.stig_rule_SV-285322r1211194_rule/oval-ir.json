@@ -5,6 +5,53 @@
       "criteria": {
         "children": [
           {
+            "comment": "C:\\ProgramData\\ssh\\*key.pub: NT Authority\\SYSTEM (F)",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:28532200"
+          },
+          {
+            "comment": "C:\\ProgramData\\ssh\\*key.pub: BUILTIN\\Administrators (F)",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:28532201"
+          },
+          {
+            "comment": "C:\\ProgramData\\ssh\\*key.pub: Other accounts",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:28532202"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:285322",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system OpenSSH public host key files must conform to minimum requirements."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:285322",
             "kind": "definition_ref",
@@ -49,63 +96,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "C:\\ProgramData\\ssh\\*key.pub: NT Authority\\SYSTEM (F)",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:28532200"
-          },
-          {
-            "comment": "C:\\ProgramData\\ssh\\*key.pub: BUILTIN\\Administrators (F)",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:28532201"
-          },
-          {
-            "comment": "C:\\ProgramData\\ssh\\*key.pub: Other accounts",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:28532202"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:285322",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system OpenSSH public host key files must conform to minimum requirements."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows2025:def:285322",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:285322"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -126,6 +119,13 @@
       "from": "oval:mil.disa.stig.defs:def:285322",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.win:tst:28532202"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows2025:def:285322",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:285322"
     },
     {
       "attribute": "object_ref",
@@ -340,16 +340,29 @@
         },
         {
           "attributes": {
-            "datatype": "string"
+            "datatype": "string",
+            "operation": "pattern match"
           },
           "kind": "element",
           "name": "trustee_sid",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "S-1-5-18"
+          "value": ".*"
+        },
+        {
+          "kind": "element",
+          "name": "filter",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "oval:mil.disa.stig.win:ste:20000012"
+        },
+        {
+          "kind": "element",
+          "name": "filter",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "value": "oval:mil.disa.stig.win:ste:20000013"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:28532200",
+      "id": "oval:mil.disa.stig.win:obj:28532202",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "fileeffectiverights53_object",
       "version": "1"
@@ -378,29 +391,16 @@
         },
         {
           "attributes": {
-            "datatype": "string",
-            "operation": "pattern match"
+            "datatype": "string"
           },
           "kind": "element",
           "name": "trustee_sid",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": ".*"
-        },
-        {
-          "kind": "element",
-          "name": "filter",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "oval:mil.disa.stig.win:ste:20000012"
-        },
-        {
-          "kind": "element",
-          "name": "filter",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-          "value": "oval:mil.disa.stig.win:ste:20000013"
+          "value": "S-1-5-18"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:28532202",
+      "id": "oval:mil.disa.stig.win:obj:28532200",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "fileeffectiverights53_object",
       "version": "1"
@@ -443,16 +443,16 @@
       "oval:mil.disa.stig.defs:def:285322"
     ]
   },
-  "semantic_ir_sha256": "77cc621c07545364c03507fbe3ca9efdd1a27e85b6eeac8d18a496ec114e1b80",
+  "semantic_ir_sha256": "905dfd4010672cfa7b6258dbf1ef9b3a5b145adf7ca93795f2513155fd1818b5",
   "source": {
     "bytes": 6806,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-285322r1211194_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows-server-2025/rules/xccdf_mil.disa.stig_rule_SV-285322r1211194_rule/provenance.json",
-    "sha256": "67d92895783148a62627eb8488ef35ad9a229ebe50b1c960d598c52a7e7ea9c5"
+    "sha256": "5828b2029e087c0963860defa73539553c3495ff7226ee69d266061cea09a6fb"
   },
   "states": [
     {
-      "comment": "Administrators account.",
+      "comment": "SYSTEM account.",
       "entities": [
         {
           "attributes": {
@@ -461,10 +461,10 @@
           "kind": "element",
           "name": "trustee_sid",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "S-1-5-32-544"
+          "value": "S-1-5-18"
         }
       ],
-      "id": "oval:mil.disa.stig.win:ste:20000013",
+      "id": "oval:mil.disa.stig.win:ste:20000012",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "fileeffectiverights53_state",
@@ -634,7 +634,7 @@
       "version": "1"
     },
     {
-      "comment": "SYSTEM account.",
+      "comment": "Administrators account.",
       "entities": [
         {
           "attributes": {
@@ -643,10 +643,10 @@
           "kind": "element",
           "name": "trustee_sid",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "S-1-5-18"
+          "value": "S-1-5-32-544"
         }
       ],
-      "id": "oval:mil.disa.stig.win:ste:20000012",
+      "id": "oval:mil.disa.stig.win:ste:20000013",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "fileeffectiverights53_state",

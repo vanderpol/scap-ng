@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Audit 32-bit invocations of /etc/group",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:28115600"
-          },
-          {
-            "comment": "Audit 64-bit invocations of /etc/group",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:28115601"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:281156",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/group."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:281156",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Audit 32-bit invocations of /etc/group",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:28115600"
+          },
+          {
+            "comment": "Audit 64-bit invocations of /etc/group",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:28115601"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:281156",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/group."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258219",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:281156"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,11 @@
       "to": "oval:mil.disa.stig.ind:tst:28115601"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258219",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:281156"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:28115601",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:28115601"
     },
     {
       "attribute": "object_ref",
@@ -120,13 +127,6 @@
       "from": "oval:mil.disa.stig.ind:tst:28115600",
       "kind": "test_object",
       "to": "oval:mil.disa.stig.ind:obj:28115600"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:28115601",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:28115601"
     }
   ],
   "dependency_integrity": {
@@ -223,7 +223,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64?\\s+-F\\s+path=/etc/group\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32?\\s+-F\\s+path=/etc/group\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
         },
         {
           "attributes": {
@@ -237,7 +237,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:28115601",
+      "id": "oval:mil.disa.stig.ind:obj:28115600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -257,7 +257,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32?\\s+-F\\s+path=/etc/group\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64?\\s+-F\\s+path=/etc/group\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
         },
         {
           "attributes": {
@@ -271,7 +271,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:28115600",
+      "id": "oval:mil.disa.stig.ind:obj:28115601",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
@@ -301,35 +301,15 @@
       "oval:mil.disa.stig.defs:def:281156"
     ]
   },
-  "semantic_ir_sha256": "0eff0b58bd38b3460dfabab10e6a95de8157810223c316f3c9de044d0c95c815",
+  "semantic_ir_sha256": "0764a087f5619ddf54489129ee46a11b56ec1ffe1ebfc8265c0d430de5cdfa4d",
   "source": {
     "bytes": 4206,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258219r1210921_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258219r1210921_rule/provenance.json",
-    "sha256": "29fe72aa599945645475597fe8ee77825224d22d64cf322a27c917e41f0f79bb"
+    "sha256": "7ccdea78f6a5cb81cd7cffbb7fe31bd55fa39d3ca5228adcd25c73eca1fa6f65"
   },
   "states": [],
   "tests": [
-    {
-      "check": "all",
-      "check_existence": "all_exist",
-      "comment": "Audit 32-bit invocations of /etc/group",
-      "id": "oval:mil.disa.stig.ind:tst:28115600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "objects": [
-        {
-          "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:28115600"
-          },
-          "object_ref": "oval:mil.disa.stig.ind:obj:28115600"
-        }
-      ],
-      "other": [],
-      "state_operator": "AND",
-      "states": [],
-      "type": "textfilecontent54_test",
-      "version": "2"
-    },
     {
       "check": "all",
       "check_existence": "all_exist",
@@ -342,6 +322,26 @@
             "object_ref": "oval:mil.disa.stig.ind:obj:28115601"
           },
           "object_ref": "oval:mil.disa.stig.ind:obj:28115601"
+        }
+      ],
+      "other": [],
+      "state_operator": "AND",
+      "states": [],
+      "type": "textfilecontent54_test",
+      "version": "2"
+    },
+    {
+      "check": "all",
+      "check_existence": "all_exist",
+      "comment": "Audit 32-bit invocations of /etc/group",
+      "id": "oval:mil.disa.stig.ind:tst:28115600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "objects": [
+        {
+          "attributes": {
+            "object_ref": "oval:mil.disa.stig.ind:obj:28115600"
+          },
+          "object_ref": "oval:mil.disa.stig.ind:obj:28115600"
         }
       ],
       "other": [],
