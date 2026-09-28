@@ -1,0 +1,39 @@
+# Design-review sample derived from RHEL 9 V2R9 / RHEL-09-215020.
+# Source OVAL: oval:mil.disa.stig.rhel9os:def:257827
+# OVAL closure: 2 definitions, 1 test, 1 object, 0 states, 0 variables.
+
+assessment:
+  id: rhel9.RHEL-09-215020
+  mode: automated
+
+  collect:
+    sendmail_packages:
+      capability: linux.rpminfo
+
+      select:
+        name:
+          equals: sendmail
+
+      fields:
+        - name
+        - epoch
+        - version
+        - release
+        - architecture
+
+  assert:
+    source: sendmail_packages
+
+    # OVAL check_existence="none_exist".
+    # No state comparison is needed: any collected package is a violation.
+    existence: none
+
+  results:
+    failure_examples:
+      maximum: 3
+      fields:
+        - name
+        - version
+        - release
+        - architecture
+      include_reason: true
