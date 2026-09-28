@@ -243,6 +243,29 @@ Questions still to settle:
 
 ### Collection
 
+#### Collector taxonomy and OVAL lessons
+
+Use OVAL's long operational history as a design input rather than starting from
+a blank abstraction. OVAL often separated platform families because the
+underlying collected data really is different.
+
+For example, keep `unix.file` and `windows.file` as distinct native
+collector families unless conformance evidence demonstrates that a common
+model can preserve all required semantics. Unix file information naturally
+includes concepts such as uid/gid ownership, POSIX mode bits, and Unix file
+types, while Windows file assessment commonly needs Windows-specific security
+and filesystem semantics such as SIDs/ACLs and Windows path/attribute behavior.
+
+The goal is not to copy OVAL's XML object/test/state structure. The goal is to
+retain the **lessons encoded in its platform boundaries** while presenting a
+smaller, clearer NG authoring model.
+
+Default design rule:
+
+> Reuse an established OVAL platform-family boundary when the collected data
+> model or evaluation semantics materially differ. Collapse boundaries only
+> when we can show the NG data model is truly portable and lossless.
+
 - What are the native collector capability names?
 - Should common platforms expose typed fields rather than generic entity lists?
 - How are collection cardinality and collection errors represented?
