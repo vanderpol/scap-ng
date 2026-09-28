@@ -1,0 +1,124 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.shared.da10d697e0f8f467c8cb1706
+  version: 1
+  description: OL 9 systemd-journald service must be enabled.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: OL 9 systemd-journald service must be enabled.
+  steps:
+  - name: Collect oval:mil.disa.stig.linux:obj:25778300
+    collect:
+      capability: scapng.collect.linux.systemdunitproperty
+      comment: null
+      query:
+      - kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: systemd-journald.service
+      - kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: ActiveState
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:25778300
+      source_type: systemdunitproperty_object
+      version: '1'
+    register: oval:mil.disa.stig.linux:obj:25778300
+  predicates:
+    oval:mil.disa.stig.linux:ste:20000003:
+      comment: null
+      entities:
+      - kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: active
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:20000003
+      source_type: systemdunitproperty_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:257783:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25778300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system systemd-journald service must be enabled.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:257783
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271739:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257783
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002400 - OL 9 systemd-journald service must be enabled.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: In the event of a system failure, OL 9 must preserve any information necessary to determine cause of failure
+              and any information necessary to return to operations with least disruption to system processes.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271739
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:25778300:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.linux:obj:25778300
+        comment: The systemd-journald service is active.
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000003
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:25778300
+        source_type: systemdunitproperty_test
+        state_operator: AND
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271739
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence

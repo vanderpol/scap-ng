@@ -1,0 +1,355 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+overlay:
+  extends_shared_rule: ng.shared.469de3fc5eacc5f109d552dd
+  benchmark: windows-server-2025
+  policy:
+    abstract: false
+    check: 'Verify the effective setting in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer Policy >>
+      Computer Configuration >> Windows Settings >> Security Settings >> Account Policies >> Account Lockout Policy. If the
+      "Account lockout duration" is less than "15" minutes (excluding "0"), this is a finding. For server core installations,
+      run the following command: Secedit /Export /Areas SecurityPolicy /CFG C:\Path\FileName.Txt If "LockoutDuration" is less
+      than "15" (excluding "0") in the file, this is a finding. Configuring this to "0", requiring an administrator to unlock
+      the account, is more restrictive and is not a finding.'
+    cluster_id: null
+    conflicts: []
+    description: <VulnDiscussion>When enabled, the account lockout feature prevents brute-force password attacks on the system.
+      This parameter specifies the period of time that an account will remain locked after the specified number of failed
+      logon attempts.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+    discussion: null
+    effective_platform_refs:
+    - cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+    effective_platforms:
+    - kind: cpe_name
+      name: cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+      ref: cpe:/o:microsoft:windows_server_2025:-::~~~~x64~
+    extends: null
+    fix: Configure the policy value for Computer Configuration >> Windows Settings >> Security Settings >> Account Policies
+      >> Account Lockout Policy. Set "Account lockout duration" to "15" minutes or greater. A value of "0" is also acceptable,
+      requiring an administrator to unlock the account.
+    group_path:
+    - xccdf_mil.disa.stig_group_V-278033
+    hidden: false
+    id: xccdf_mil.disa.stig_rule_SV-278033r1180805_rule
+    idents:
+    - system: http://cyber.mil/cci
+      value: CCI-002238
+    multiple: false
+    platforms: []
+    prohibit_changes: false
+    references:
+    - href: null
+      text: DPMS Target Microsoft Windows Server 2025 DISA DPMS Target Microsoft Windows Server 2025 5719
+    requires: []
+    role: null
+    selected: null
+    selected_default: true
+    severity: medium
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278033
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278033
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278033
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278033
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:9901
+        exports: []
+        inline_content: 'Verify the effective setting in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer
+          Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies >> Account Lockout
+          Policy. If the "Account lockout duration" is less than "15" minutes (excluding "0"), this is a finding. For server
+          core installations, run the following command: Secedit /Export /Areas SecurityPolicy /CFG C:\Path\FileName.Txt If
+          "LockoutDuration" is less than "15" (excluding "0") in the file, this is a finding. Configuring this to "0", requiring
+          an administrator to unlock the account, is more restrictive and is not a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:9901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+              Run gpedit.msc.
+
+
+              Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account
+              Policies >> Account Lockout Policy.
+
+
+              If the "Account lockout duration" is less than "15" minutes (excluding "0"), this is a finding.
+
+
+              For server core installations, run the following command:
+
+
+              Secedit /Export /Areas SecurityPolicy /CFG C:\Path\FileName.Txt
+
+
+              If "LockoutDuration" is less than "15" (excluding "0") in the file, this is a finding.
+
+
+              Configuring this to "0", requiring an administrator to unlock the account, is more restrictive and is not a
+              finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278033
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278033
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        name: oval:mil.disa.stig.windows2025:def:278033
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278033
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:9901
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies >> Account Lockout Policy.
+        If the "Account lockout duration" is less than "15" minutes (excluding "0"), this is a finding. For server core installations,
+        run the following command: Secedit /Export /Areas SecurityPolicy /CFG C:\Path\FileName.Txt If "LockoutDuration" is
+        less than "15" (excluding "0") in the file, this is a finding. Configuring this to "0", requiring an administrator
+        to unlock the account, is more restrictive and is not a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:9901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+            Run gpedit.msc.
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account
+            Policies >> Account Lockout Policy.
+
+
+            If the "Account lockout duration" is less than "15" minutes (excluding "0"), this is a finding.
+
+
+            For server core installations, run the following command:
+
+
+            Secedit /Export /Areas SecurityPolicy /CFG C:\Path\FileName.Txt
+
+
+            If "LockoutDuration" is less than "15" (excluding "0") in the file, this is a finding.
+
+
+            Configuring this to "0", requiring an administrator to unlock the account, is more restrictive and is not a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_xccdf_tree:
+      attributes:
+        id: xccdf_mil.disa.stig_rule_SV-278033r1180805_rule
+        severity: medium
+        weight: '10.0'
+      children:
+      - name: version
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: WN25-AC-000010
+      - name: title
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: Windows Server 2025 account lockout duration must be configured to 15 minutes or greater.
+      - name: description
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: <VulnDiscussion>When enabled, the account lockout feature prevents brute-force password attacks on the system.
+          This parameter specifies the period of time that an account will remain locked after the specified number of failed
+          logon attempts.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+      - children:
+        - name: title
+          namespace: http://purl.org/dc/elements/1.1/
+          text: DPMS Target Microsoft Windows Server 2025
+        - name: publisher
+          namespace: http://purl.org/dc/elements/1.1/
+          text: DISA
+        - name: type
+          namespace: http://purl.org/dc/elements/1.1/
+          text: DPMS Target
+        - name: subject
+          namespace: http://purl.org/dc/elements/1.1/
+          text: Microsoft Windows Server 2025
+        - name: identifier
+          namespace: http://purl.org/dc/elements/1.1/
+          text: '5719'
+        name: reference
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - attributes:
+          system: http://cyber.mil/cci
+        name: ident
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: CCI-002238
+      - attributes:
+          fixref: F-82468r1180804_fix
+        name: fixtext
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Configure the policy value for Computer Configuration >> Windows Settings >> Security Settings >> Account Policies
+          >> Account Lockout Policy. Set "Account lockout duration" to "15" minutes or greater.
+
+
+          A value of "0" is also acceptable, requiring an administrator to unlock the account.'
+      - attributes:
+          id: F-82468r1180804_fix
+        name: fix
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278033
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+            name: oval:mil.disa.stig.windows2025:def:278033
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:9901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+            Run gpedit.msc.
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account
+            Policies >> Account Lockout Policy.
+
+
+            If the "Account lockout duration" is less than "15" minutes (excluding "0"), this is a finding.
+
+
+            For server core installations, run the following command:
+
+
+            Secedit /Export /Areas SecurityPolicy /CFG C:\Path\FileName.Txt
+
+
+            If "LockoutDuration" is less than "15" (excluding "0") in the file, this is a finding.
+
+
+            Configuring this to "0", requiring an administrator to unlock the account, is more restrictive and is not a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: Rule
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    title: Windows Server 2025 account lockout duration must be configured to 15 minutes or greater.
+    weight: '10.0'
+  reuse_evidence: equivalent_oval_semantics
