@@ -4,19 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-11T02:45:56</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.win:def:100003" version="2" class="inventory">
-          <metadata>
-            <title>The system is a Windows Standalone Server</title>
-            <affected family="windows">
-              <platform>Microsoft Windows Server</platform>
-            </affected>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:10000300"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.defs:def:254436" version="6" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:254436" version="6" class="compliance">
           <metadata>
             <title>Windows Deny log on as a batch job user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts and from unauthenticated access on all systems.</title>
             <description/>
@@ -52,6 +40,18 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:254436"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.win:def:100003" version="2" class="inventory">
+          <metadata>
+            <title>The system is a Windows Standalone Server</title>
+            <affected family="windows">
+              <platform>Microsoft Windows Server</platform>
+            </affected>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:10000300"/>
+          </criteria>
+        </definition>
         <definition id="oval:mil.disa.stig.win:def:100004" version="2" class="inventory">
           <metadata>
             <title>The system is a Windows Domain Member Server</title>
@@ -64,7 +64,11 @@
             <criterion test_ref="oval:mil.disa.stig.win:tst:10000400"/>
           </criteria>
         </definition>
-        </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000400" version="1" check="all" comment="The system is a Windows Domain Member Server">
+        </definitions><tests><wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000300" version="1" check="all" comment="The system is a Windows Standalone Server">
+          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
+        </wmi57_test>
+        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000400" version="1" check="all" comment="The system is a Windows Domain Member Server">
           <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
           <state state_ref="oval:mil.disa.stig.win:ste:10000400"/>
         </wmi57_test>
@@ -72,10 +76,6 @@
           <object object_ref="oval:mil.disa.stig.win:obj:25349200"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000041"/>
         </userright_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10000300" version="1" check="all" comment="The system is a Windows Standalone Server">
-          <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
-        </wmi57_test>
         <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349202" version="5" check="at least one" comment="Deny log on as a batch job - Domain Admins">
           <object object_ref="oval:mil.disa.stig.win:obj:25349200"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000040"/>
@@ -84,25 +84,14 @@
           <object object_ref="oval:mil.disa.stig.win:obj:25349200"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000033"/>
         </userright_test>
-        </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
+        </tests><objects><userright_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25349200" version="1">
+          <userright>SE_DENY_BATCH_LOGON_NAME</userright>
+        </userright_object>
+        <wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
           <namespace>root\cimv2</namespace>
           <wql>SELECT DomainRole FROM win32_computersystem</wql>
         </wmi57_object>
-        <userright_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25349200" version="1">
-          <userright>SE_DENY_BATCH_LOGON_NAME</userright>
-        </userright_object>
-        </objects><states><userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000033" version="1">
-          <trustee_name operation="case insensitive equals">Guests</trustee_name>
-        </userright_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000041" version="1">
-          <trustee_name operation="pattern match">^(?i)(.+\\)?Enterprise Admins$</trustee_name>
-        </userright_state>
-        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000400" version="1" comment="Domain Member Server">
-          <result datatype="record" operation="equals">
-            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">3</field>
-          </result>
-        </wmi57_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000040" version="1">
+        </objects><states><userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000040" version="1">
           <trustee_name operation="pattern match">^(?i)(.+\\)?Domain Admins$</trustee_name>
         </userright_state>
         <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000300" version="1" comment="Standalone Server">
@@ -110,4 +99,15 @@
             <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">2</field>
           </result>
         </wmi57_state>
+        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000400" version="1" comment="Domain Member Server">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">3</field>
+          </result>
+        </wmi57_state>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000033" version="1">
+          <trustee_name operation="case insensitive equals">Guests</trustee_name>
+        </userright_state>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000041" version="1">
+          <trustee_name operation="pattern match">^(?i)(.+\\)?Enterprise Admins$</trustee_name>
+        </userright_state>
         </states></oval_definitions>

@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258051" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258051" version="1" class="compliance">
+          <metadata>
+            <title>All the operating system local interactive users must have a home directory assigned in the /etc/passwd file.</title>
+            <description/>
+          </metadata>
+          <criteria operator="AND">
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:25805100" comment="Check for local non-system users in /etc/passwd without a home directory defined"/>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:25805101" comment="Check /etc/passwd if root has a home directory defined"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:258051" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-411060 - All RHEL 9 local interactive users must have a home directory assigned in the /etc/passwd file.</title>
             <affected family="unix">
@@ -16,25 +26,21 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258051"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:258051" version="1" class="compliance">
-          <metadata>
-            <title>All the operating system local interactive users must have a home directory assigned in the /etc/passwd file.</title>
-            <description/>
-          </metadata>
-          <criteria operator="AND">
-            <criterion test_ref="oval:mil.disa.stig.unix:tst:25805100" comment="Check for local non-system users in /etc/passwd without a home directory defined"/>
-            <criterion test_ref="oval:mil.disa.stig.unix:tst:25805101" comment="Check /etc/passwd if root has a home directory defined"/>
-          </criteria>
-        </definition>
-        </definitions><tests><password_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:25805100" version="1" check_existence="all_exist" check="all" comment="check for users without a home directory not defined">
-          <object object_ref="oval:mil.disa.stig.unix:obj:20000017"/>
-          <state state_ref="oval:mil.disa.stig.unix:ste:20000016"/>
-        </password_test>
-        <password_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:25805101" version="1" check_existence="all_exist" check="all" comment="check if root's home directory is not defined">
+        </definitions><tests><password_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:25805101" version="1" check_existence="all_exist" check="all" comment="check if root's home directory is not defined">
           <object object_ref="oval:mil.disa.stig.unix:obj:20000018"/>
           <state state_ref="oval:mil.disa.stig.unix:ste:20000016"/>
         </password_test>
-        </tests><objects><password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000016" version="1" comment="Users with an username">
+        <password_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:25805100" version="1" check_existence="all_exist" check="all" comment="check for users without a home directory not defined">
+          <object object_ref="oval:mil.disa.stig.unix:obj:20000017"/>
+          <state state_ref="oval:mil.disa.stig.unix:ste:20000016"/>
+        </password_test>
+        </tests><objects><password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000018" version="1" comment="only root users (uid=0) home-dirs">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="COMPLEMENT">
+            <object_reference>oval:mil.disa.stig.unix:obj:20000016</object_reference>
+            <filter>oval:mil.disa.stig.unix:ste:20000018</filter>
+          </set>
+        </password_object>
+        <password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000016" version="1" comment="Users with an username">
           <username datatype="string" operation="pattern match">[\w]+</username>
         </password_object>
         <password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000017" version="1" comment="only non-system users (uid&gt;999) home-dirs">
@@ -43,19 +49,13 @@
             <filter>oval:mil.disa.stig.unix:ste:20000017</filter>
           </set>
         </password_object>
-        <password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:20000018" version="1" comment="only root users (uid=0) home-dirs">
-          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="COMPLEMENT">
-            <object_reference>oval:mil.disa.stig.unix:obj:20000016</object_reference>
-            <filter>oval:mil.disa.stig.unix:ste:20000018</filter>
-          </set>
-        </password_object>
         </objects><states><password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000018" version="1" comment="only uids &gt; 0">
           <user_id entity_check="all" datatype="int" operation="greater than">0</user_id>
         </password_state>
-        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000016" version="1" comment="only users with the home directory defined">
-          <home_dir datatype="string" operation="pattern match">.+</home_dir>
-        </password_state>
         <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000017" version="1" comment="only uids &lt; 1000">
           <user_id entity_check="all" datatype="int" operation="less than">1000</user_id>
+        </password_state>
+        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000016" version="1" comment="only users with the home directory defined">
+          <home_dir datatype="string" operation="pattern match">.+</home_dir>
         </password_state>
         </states></oval_definitions>

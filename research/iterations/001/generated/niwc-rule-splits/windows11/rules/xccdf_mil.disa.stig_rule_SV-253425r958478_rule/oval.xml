@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.windows11:def:253425" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:253425" version="1" class="compliance">
+          <metadata>
+            <title>Windows must be configured to prevent users from receiving suggestions for third-party or additional applications.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25342500" comment="'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'."/>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25342501" comment="For the current user, 'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'."/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.windows11:def:253425" version="2" class="compliance">
           <metadata>
             <title>WN11-CC-000390 - Windows 11 must be configured to prevent users from receiving suggestions for third-party or additional applications.</title>
             <affected family="windows">
@@ -16,47 +26,37 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253425"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:253425" version="1" class="compliance">
-          <metadata>
-            <title>Windows must be configured to prevent users from receiving suggestions for third-party or additional applications.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25342500" comment="'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'."/>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25342501" comment="For the current user, 'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'."/>
-          </criteria>
-        </definition>
-        </definitions><tests><registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25342501" version="1" check="all" comment="For the current user, 'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'">
-          <object object_ref="oval:mil.disa.stig.win:obj:25342501"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
-        </registry_test>
-        <ntuser_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25342500" version="2" check_existence="all_exist" check="all" comment="'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'">
+        </definitions><tests><ntuser_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25342500" version="2" check_existence="all_exist" check="all" comment="'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'">
           <object object_ref="oval:mil.disa.stig.win:obj:25342500"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000022"/>
         </ntuser_test>
-        </tests><objects><ntuser_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25342500" version="1">
+        <registry_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25342501" version="1" check="all" comment="For the current user, 'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'">
+          <object object_ref="oval:mil.disa.stig.win:obj:25342501"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000001"/>
+        </registry_test>
+        </tests><objects><registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25342501" version="1">
+          <hive>HKEY_CURRENT_USER</hive>
+          <key>SOFTWARE\Policies\Microsoft\Windows\CloudContent</key>
+          <name>DisableThirdPartySuggestions</name>
+        </registry_object>
+        <ntuser_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25342500" version="1">
           <key>SOFTWARE\Policies\Microsoft\Windows\CloudContent</key>
           <name>DisableThirdPartySuggestions</name>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.win:ste:20000026</filter>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5">oval:mil.disa.stig.win:ste:20000027</filter>
         </ntuser_object>
-        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25342501" version="1">
-          <hive>HKEY_CURRENT_USER</hive>
-          <key>SOFTWARE\Policies\Microsoft\Windows\CloudContent</key>
-          <name>DisableThirdPartySuggestions</name>
-        </registry_object>
-        </objects><states><ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000026" version="1">
-          <enabled datatype="boolean">false</enabled>
-        </ntuser_state>
-        <ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000022" version="1">
+        </objects><states><ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000022" version="1">
           <type>reg_dword</type>
           <value datatype="int">1</value>
+        </ntuser_state>
+        <ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000027" version="1">
+          <days_since_modified datatype="int" operation="greater than">35</days_since_modified>
+        </ntuser_state>
+        <ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000026" version="1">
+          <enabled datatype="boolean">false</enabled>
         </ntuser_state>
         <registry_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000001" version="1">
           <type>reg_dword</type>
           <value datatype="int">1</value>
         </registry_state>
-        <ntuser_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000027" version="1">
-          <days_since_modified datatype="int" operation="greater than">35</days_since_modified>
-        </ntuser_state>
         </states></oval_definitions>

@@ -5,6 +5,56 @@
       "criteria": {
         "children": [
           {
+            "comment": null,
+            "definition_ref": "oval:mil.disa.stig.defs:def:230456",
+            "kind": "definition_ref",
+            "negate": false
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.rhel9os:def:258177",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "RHEL-09-654015 - RHEL 9 must audit all uses of the chmod, fchmod, and fchmodat system calls."
+          },
+          {
+            "attributes": {
+              "family": "unix"
+            },
+            "children": [
+              {
+                "name": "platform",
+                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+                "text": "Red Hat Enterprise Linux 9"
+              }
+            ],
+            "name": "affected",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Without generating audit records that are specific to the security and mission needs of the organization, it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.\n\nAudit records can be generated from various components within the information system (e.g., module or policy filter).\n\nWhen a user logs on, the auid is set to the uid of the account being authenticated. Daemons are not user sessions and have the loginuid set to -1. The auid representation is an unsigned 32-bit integer, which equals 4294967295. The audit system interprets -1, 4294967295, and \"unset\" in the same way.\n\nThe system call rules are loaded into a matching engine that intercepts each system call made by all programs on the system. Therefore, it is very important to use system call rules only when absolutely necessary since these affect performance. The more rules, the bigger the performance hit. The performance can be helped, however, by combining system calls into one rule whenever possible.\n\nSatisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000064-GPOS-00033, SRG-OS-000466-GPOS-00210, SRG-OS-000458-GPOS-00203"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": "Audit 32-bit invocations of chmod syscall",
             "kind": "test_ref",
             "negate": false,
@@ -64,59 +114,16 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": null,
-            "definition_ref": "oval:mil.disa.stig.defs:def:230456",
-            "kind": "definition_ref",
-            "negate": false
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.rhel9os:def:258177",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "RHEL-09-654015 - RHEL 9 must audit all uses of the chmod, fchmod, and fchmodat system calls."
-          },
-          {
-            "attributes": {
-              "family": "unix"
-            },
-            "children": [
-              {
-                "name": "platform",
-                "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-                "text": "Red Hat Enterprise Linux 9"
-              }
-            ],
-            "name": "affected",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Without generating audit records that are specific to the security and mission needs of the organization, it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible for one.\n\nAudit records can be generated from various components within the information system (e.g., module or policy filter).\n\nWhen a user logs on, the auid is set to the uid of the account being authenticated. Daemons are not user sessions and have the loginuid set to -1. The auid representation is an unsigned 32-bit integer, which equals 4294967295. The audit system interprets -1, 4294967295, and \"unset\" in the same way.\n\nThe system call rules are loaded into a matching engine that intercepts each system call made by all programs on the system. Therefore, it is very important to use system call rules only when absolutely necessary since these affect performance. The more rules, the bigger the performance hit. The performance can be helped, however, by combining system calls into one rule whenever possible.\n\nSatisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000064-GPOS-00033, SRG-OS-000466-GPOS-00210, SRG-OS-000458-GPOS-00203"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258177",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230456"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -160,13 +167,6 @@
       "to": "oval:mil.disa.stig.ind:tst:23045605"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258177",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230456"
-    },
-    {
       "attribute": "object_ref",
       "element": "object",
       "from": "oval:mil.disa.stig.ind:tst:23045601",
@@ -176,9 +176,9 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23045604",
+      "from": "oval:mil.disa.stig.ind:tst:23045605",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23045604"
+      "to": "oval:mil.disa.stig.ind:obj:23045605"
     },
     {
       "attribute": "object_ref",
@@ -197,16 +197,16 @@
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23045605",
+      "from": "oval:mil.disa.stig.ind:tst:23045600",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23045605"
+      "to": "oval:mil.disa.stig.ind:obj:23045600"
     },
     {
       "attribute": "object_ref",
       "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:23045600",
+      "from": "oval:mil.disa.stig.ind:tst:23045604",
       "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:23045600"
+      "to": "oval:mil.disa.stig.ind:obj:23045604"
     }
   ],
   "dependency_integrity": {
@@ -371,74 +371,6 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+(?:.*(-S\\s+chmod\\s+|(\\s+|,)chmod(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "64-bit chmod syscall",
-      "id": "oval:mil.disa.stig.ind:obj:23045601",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/audit/audit.rules"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+(?:.*(-S\\s+fchmod\\s+|(\\s+|,)fchmod(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "32-bit fchmod syscall",
-      "id": "oval:mil.disa.stig.ind:obj:23045602",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/audit/audit.rules"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+(?:.*(-S\\s+fchmod\\s+|(\\s+|,)fchmod(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
         },
         {
@@ -491,6 +423,74 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/audit/audit.rules"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64\\s+(?:.*(-S\\s+chmod\\s+|(\\s+|,)chmod(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "64-bit chmod syscall",
+      "id": "oval:mil.disa.stig.ind:obj:23045601",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/audit/audit.rules"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32\\s+(?:.*(-S\\s+fchmod\\s+|(\\s+|,)fchmod(\\s+|,))).*-F\\s+auid>=1000\\s+-F\\s+auid!=(4294967295|-1|unset)(\\s+(-k\\s+|-F\\s+key=)[-\\w]+)*\\s*$"
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "32-bit fchmod syscall",
+      "id": "oval:mil.disa.stig.ind:obj:23045602",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
     }
   ],
   "parser_contract": {
@@ -537,12 +537,12 @@
       "oval:mil.disa.stig.defs:def:230456"
     ]
   },
-  "semantic_ir_sha256": "784df8208d2aad6cc6810412bfc3b23332e29247d1e43b551ca5943ec42a6349",
+  "semantic_ir_sha256": "3a0bdeb7ac0c9b2fdb17e95da9dee675dc51bd0f61787fd9bb8384cc4302e203",
   "source": {
     "bytes": 9292,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258177r1155597_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258177r1155597_rule/provenance.json",
-    "sha256": "39bb039006926050601183edbcd6f0e52b4e8b992194616dc69e71c1d0ef2a07"
+    "sha256": "32ad0223b14f00f011c94c67466528095443c613c3bc3ec1a6fec2e9226af522"
   },
   "states": [],
   "tests": [
@@ -569,15 +569,15 @@
     {
       "check": "all",
       "check_existence": "all_exist",
-      "comment": "Audit 32-bit invocations of fchmodat syscall",
-      "id": "oval:mil.disa.stig.ind:tst:23045604",
+      "comment": "Audit 64-bit invocations of fchmodat syscall",
+      "id": "oval:mil.disa.stig.ind:tst:23045605",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23045604"
+            "object_ref": "oval:mil.disa.stig.ind:obj:23045605"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23045604"
+          "object_ref": "oval:mil.disa.stig.ind:obj:23045605"
         }
       ],
       "other": [],
@@ -629,15 +629,15 @@
     {
       "check": "all",
       "check_existence": "all_exist",
-      "comment": "Audit 64-bit invocations of fchmodat syscall",
-      "id": "oval:mil.disa.stig.ind:tst:23045605",
+      "comment": "Audit 32-bit invocations of chmod syscall",
+      "id": "oval:mil.disa.stig.ind:tst:23045600",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23045605"
+            "object_ref": "oval:mil.disa.stig.ind:obj:23045600"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23045605"
+          "object_ref": "oval:mil.disa.stig.ind:obj:23045600"
         }
       ],
       "other": [],
@@ -649,15 +649,15 @@
     {
       "check": "all",
       "check_existence": "all_exist",
-      "comment": "Audit 32-bit invocations of chmod syscall",
-      "id": "oval:mil.disa.stig.ind:tst:23045600",
+      "comment": "Audit 32-bit invocations of fchmodat syscall",
+      "id": "oval:mil.disa.stig.ind:tst:23045604",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:23045600"
+            "object_ref": "oval:mil.disa.stig.ind:obj:23045604"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:23045600"
+          "object_ref": "oval:mil.disa.stig.ind:obj:23045604"
         }
       ],
       "other": [],

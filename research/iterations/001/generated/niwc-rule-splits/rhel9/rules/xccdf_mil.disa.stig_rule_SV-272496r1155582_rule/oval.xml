@@ -4,16 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:272496" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must elevate the SELinux context when an administrator calls the sudo command.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:27249600" comment="elevate the SELinux context when an administrator calls the sudo command"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:272496" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:272496" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-431016 - RHEL 9 must elevate the SELinux context when an administrator calls the sudo command.</title>
             <affected family="unix">
@@ -31,11 +22,27 @@ Privileged functions include, for example, establishing accounts, performing sys
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:272496"/>
           </criteria>
         </definition>
-      </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:27249600" version="2" check_existence="at_least_one_exists" check="all" comment="elevate the SELinux context when an administrator calls the sudo command">
+      <definition id="oval:mil.disa.stig.defs:def:272496" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must elevate the SELinux context when an administrator calls the sudo command.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:27249600" comment="elevate the SELinux context when an administrator calls the sudo command"/>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:27249600" version="2" check_existence="at_least_one_exists" check="all" comment="elevate the SELinux context when an administrator calls the sudo command">
           <object object_ref="oval:mil.disa.stig.ind:obj:27249602"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:27249600"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27249600" version="1">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27249601" version="1">
+          <behaviors ignore_case="true" max_depth="-1" recurse_direction="down"/>
+          <path>/etc/sudoers.d</path>
+          <filename operation="pattern match">.*</filename>
+          <pattern operation="pattern match">^(.*\bsysadm_r\b.*)$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27249600" version="1">
           <filepath>/etc/sudoers</filepath>
           <pattern operation="pattern match">^(.*\bsysadm_r\b.*)$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
@@ -45,13 +52,6 @@ Privileged functions include, for example, establishing accounts, performing sys
             <object_reference>oval:mil.disa.stig.ind:obj:27249600</object_reference>
             <object_reference>oval:mil.disa.stig.ind:obj:27249601</object_reference>
           </set>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:27249601" version="1">
-          <behaviors ignore_case="true" max_depth="-1" recurse_direction="down"/>
-          <path>/etc/sudoers.d</path>
-          <filename operation="pattern match">.*</filename>
-          <pattern operation="pattern match">^(.*\bsysadm_r\b.*)$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:27249600" version="1">
           <subexpression operation="pattern match">^[ \t]*%[a-zA-Z0-9_-]+[ \t]+ALL=\(ALL\)[ \t]+TYPE=sysadm_t[ \t]+ROLE=sysadm_r[ \t]+ALL[ \t]*$</subexpression>

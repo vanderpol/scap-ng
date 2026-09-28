@@ -4,23 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:257807" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must disable the stream control transmission protocol (SCTP).</title>
-            <description/>
-          </metadata>
-          <criteria operator="OR">
-            <criteria>
-              <criterion test_ref="oval:mil.disa.stig.ind:tst:23049600" comment="/etc/modprobe.d contains a file that contains 'install sctp /bin/false'"/>
-              <criterion test_ref="oval:mil.disa.stig.ind:tst:23049601" comment="/etc/modprobe.d contains a file that contains 'blacklist sctp'"/>
-            </criteria>
-            <criteria>
-              <criterion test_ref="oval:mil.disa.stig.ind:tst:25780700" comment="/etc/modprobe.conf contains 'install sctp /bin/false'"/>
-              <criterion test_ref="oval:mil.disa.stig.ind:tst:25780701" comment="/etc/modprobe.conf contains 'blacklist sctp'"/>
-            </criteria>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.rhel9os:def:257807" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257807" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-213060 - RHEL 9 must disable the Stream Control Transmission Protocol (SCTP) kernel module.</title>
             <affected family="unix">
@@ -36,21 +20,43 @@ The Stream Control Transmission Protocol (SCTP) is a transport layer protocol, d
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257807"/>
           </criteria>
         </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25780700" version="1" check="all" comment="/etc/modprobe.conf contains 'install sctp /bin/false'">
-          <object object_ref="oval:mil.disa.stig.ind:obj:25780700"/>
-        </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049601" version="1" check="all" comment="/etc/modprobe.d contains a file that contains 'blacklist sctp'">
+        <definition id="oval:mil.disa.stig.defs:def:257807" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must disable the stream control transmission protocol (SCTP).</title>
+            <description/>
+          </metadata>
+          <criteria operator="OR">
+            <criteria>
+              <criterion test_ref="oval:mil.disa.stig.ind:tst:23049600" comment="/etc/modprobe.d contains a file that contains 'install sctp /bin/false'"/>
+              <criterion test_ref="oval:mil.disa.stig.ind:tst:23049601" comment="/etc/modprobe.d contains a file that contains 'blacklist sctp'"/>
+            </criteria>
+            <criteria>
+              <criterion test_ref="oval:mil.disa.stig.ind:tst:25780700" comment="/etc/modprobe.conf contains 'install sctp /bin/false'"/>
+              <criterion test_ref="oval:mil.disa.stig.ind:tst:25780701" comment="/etc/modprobe.conf contains 'blacklist sctp'"/>
+            </criteria>
+          </criteria>
+        </definition>
+        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049601" version="1" check="all" comment="/etc/modprobe.d contains a file that contains 'blacklist sctp'">
           <object object_ref="oval:mil.disa.stig.ind:obj:23049601"/>
         </textfilecontent54_test>
-        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049600" version="2" check="all" comment="/etc/modprobe.d contains a file that contains 'install sctp /bin/false'">
-          <object object_ref="oval:mil.disa.stig.ind:obj:23049600"/>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25780700" version="1" check="all" comment="/etc/modprobe.conf contains 'install sctp /bin/false'">
+          <object object_ref="oval:mil.disa.stig.ind:obj:25780700"/>
         </textfilecontent54_test>
         <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25780701" version="1" check="all" comment="/etc/modprobe.conf contains 'blacklist sctp'">
           <object object_ref="oval:mil.disa.stig.ind:obj:25780701"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25780701" version="1">
-          <filepath>/etc/modprobe.conf</filepath>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23049600" version="2" check="all" comment="/etc/modprobe.d contains a file that contains 'install sctp /bin/false'">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23049600"/>
+        </textfilecontent54_test>
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23049601" version="1">
+          <path>/etc/modprobe.d</path>
+          <filename operation="pattern match">.*</filename>
           <pattern operation="pattern match">^[ \t]*blacklist[ \t]+sctp[ \t]*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25780700" version="1">
+          <filepath>/etc/modprobe.conf</filepath>
+          <pattern operation="pattern match">^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$</pattern>
           <instance datatype="int">1</instance>
         </textfilecontent54_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23049600" version="2">
@@ -59,15 +65,9 @@ The Stream Control Transmission Protocol (SCTP) is a transport layer protocol, d
           <pattern operation="pattern match">^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25780700" version="1">
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25780701" version="1">
           <filepath>/etc/modprobe.conf</filepath>
-          <pattern operation="pattern match">^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$</pattern>
-          <instance datatype="int">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23049601" version="1">
-          <path>/etc/modprobe.d</path>
-          <filename operation="pattern match">.*</filename>
           <pattern operation="pattern match">^[ \t]*blacklist[ \t]+sctp[ \t]*$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
+          <instance datatype="int">1</instance>
         </textfilecontent54_object>
         </objects></oval_definitions>

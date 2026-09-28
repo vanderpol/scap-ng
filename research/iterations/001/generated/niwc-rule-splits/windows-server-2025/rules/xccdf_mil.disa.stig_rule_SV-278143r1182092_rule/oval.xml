@@ -18,16 +18,16 @@
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27814301"/>
           <independent-def:state state_ref="oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302"/>
         </independent-def:shellcommand_test>
-        </tests><objects><win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301" version="1" comment="DSA Database file location via registry">
-          <win-def:hive>HKEY_LOCAL_MACHINE</win-def:hive>
-          <win-def:key>SYSTEM\CurrentControlSet\Services\NTDS\Parameters</win-def:key>
-          <win-def:name>DSA Database file</win-def:name>
-        </win-def:registry_object>
-        <independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27814303" version="1" comment="get local shares via get-smbshare, exclude NETLOGON AND SYSVOL and admin shares">
+        </tests><objects><independent-def:shellcommand_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27814303" version="1" comment="get local shares via get-smbshare, exclude NETLOGON AND SYSVOL and admin shares">
           <independent-def:shell>powershell</independent-def:shell>
           <independent-def:command var_ref="oval:navy.navwar.niwcatlantic.scc.windows:var:27814302"/>
           <independent-def:pattern> ([a-zA-Z]):\\</independent-def:pattern>
         </independent-def:shellcommand_object>
+        <win-def:registry_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301" version="1" comment="DSA Database file location via registry">
+          <win-def:hive>HKEY_LOCAL_MACHINE</win-def:hive>
+          <win-def:key>SYSTEM\CurrentControlSet\Services\NTDS\Parameters</win-def:key>
+          <win-def:name>DSA Database file</win-def:name>
+        </win-def:registry_object>
         <win-def:wmi_object id="oval:navy.navwar.niwcatlantic.scc.windows:obj:27814302" version="1" comment="All 'Local Disk' Volumes">
           <win-def:namespace datatype="string">root\cimv2</win-def:namespace>
           <win-def:wql datatype="string">SELECT name FROM win32_logicaldisk WHERE drivetype=3</win-def:wql>
@@ -39,12 +39,7 @@
         <independent-def:shellcommand_state id="oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302" version="1" comment="stdout_line does not exist">
           <independent-def:stdout_line check_existence="none_exist"/>
         </independent-def:shellcommand_state>
-        </states><variables><local_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27814301" version="1" datatype="string" comment="Drive Letter that DSA Database file is found on">
-          <substring substring_start="1" substring_length="1">
-            <object_component object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301" item_field="value"/>
-          </substring>
-        </local_variable>
-        <local_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27814302" version="1" datatype="string" comment="get-smbshare, exclude NETLOGON AND SYSVOL IPC$ ADMIN$ and admin shares">
+        </states><variables><local_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27814302" version="1" datatype="string" comment="get-smbshare, exclude NETLOGON AND SYSVOL IPC$ ADMIN$ and admin shares">
           <concat>
             <literal_component>get-smbshare | where-object {$_.Name -notin 'NETLOGON','SYSVOL','IPC$','ADMIN$','</literal_component>
             <merge delimiter=",'" sort="document">
@@ -57,5 +52,10 @@
             </merge>
             <literal_component>} | Select-Object -property name,PATH</literal_component>
           </concat>
+        </local_variable>
+        <local_variable id="oval:navy.navwar.niwcatlantic.scc.windows:var:27814301" version="1" datatype="string" comment="Drive Letter that DSA Database file is found on">
+          <substring substring_start="1" substring_length="1">
+            <object_component object_ref="oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301" item_field="value"/>
+          </substring>
         </local_variable>
         </variables></oval_definitions>

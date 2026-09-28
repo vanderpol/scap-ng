@@ -4,27 +4,7 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-08-12T04:19:28</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.defs:def:253495" version="7" class="compliance">
-          <metadata>
-            <title>The "Deny log on through Remote Desktop Services" user right on Windows workstations must be configured to prevent access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access on all systems.</title>
-            <description/>
-          </metadata>
-          <criteria operator="OR">
-            <criteria>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:10002300" comment="System is a member of a domain"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349506" comment="Deny log on through Remote Desktop Services - Local Account"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349507" comment="Deny log on through Remote Desktop Services - Guests"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349509" comment="Deny log on through Remote Desktop Services - Domain Admins"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349510" comment="Deny log on through Remote Desktop Services - Enterprise Admins"/>
-            </criteria>
-            <criteria>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:10002200" comment="System is not a member of a domain"/>
-              <criterion test_ref="oval:mil.disa.stig.win:tst:25349507" comment="Deny log on through Remote Desktop Services - Guests"/>
-            </criteria>
-            <criterion test_ref="oval:mil.disa.stig.win:tst:25349508" comment="Deny log on through Remote Desktop Services - Everyone"/>
-          </criteria>
-        </definition>
-        <definition id="oval:mil.disa.stig.windows11:def:253495" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.windows11:def:253495" version="2" class="compliance">
           <metadata>
             <title>WN11-UR-000090 - The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations must be configured to prevent access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access on all systems.</title>
             <affected family="windows">
@@ -46,14 +26,38 @@ The Guests group must be assigned this right to prevent unauthenticated access.<
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:253495"/>
           </criteria>
         </definition>
+        <definition id="oval:mil.disa.stig.defs:def:253495" version="7" class="compliance">
+          <metadata>
+            <title>The "Deny log on through Remote Desktop Services" user right on Windows workstations must be configured to prevent access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access on all systems.</title>
+            <description/>
+          </metadata>
+          <criteria operator="OR">
+            <criteria>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:10002300" comment="System is a member of a domain"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349506" comment="Deny log on through Remote Desktop Services - Local Account"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349507" comment="Deny log on through Remote Desktop Services - Guests"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349509" comment="Deny log on through Remote Desktop Services - Domain Admins"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349510" comment="Deny log on through Remote Desktop Services - Enterprise Admins"/>
+            </criteria>
+            <criteria>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:10002200" comment="System is not a member of a domain"/>
+              <criterion test_ref="oval:mil.disa.stig.win:tst:25349507" comment="Deny log on through Remote Desktop Services - Guests"/>
+            </criteria>
+            <criterion test_ref="oval:mil.disa.stig.win:tst:25349508" comment="Deny log on through Remote Desktop Services - Everyone"/>
+          </criteria>
+        </definition>
         </definitions><tests><userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349510" version="1" check="at least one" comment="Deny log on through Remote Desktop Services - Enterprise Admins">
           <object object_ref="oval:mil.disa.stig.win:obj:25349500"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000041"/>
         </userright_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10002200" version="1" check="all" state_operator="OR" comment="The system is a standalone Windows server or workstation">
+        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349508" version="4" check="at least one" comment="Deny log on through Remote Desktop Services - Everyone">
+          <object object_ref="oval:mil.disa.stig.win:obj:25349500"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:20000032"/>
+        </userright_test>
+        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10002300" version="1" check="all" state_operator="OR" comment="The system is a non-DC domain-joined Windows server or workstation">
           <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000200"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000400"/>
         </wmi57_test>
         <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349509" version="1" check="at least one" comment="Deny log on through Remote Desktop Services - Domain Admins">
           <object object_ref="oval:mil.disa.stig.win:obj:25349500"/>
@@ -63,18 +67,14 @@ The Guests group must be assigned this right to prevent unauthenticated access.<
           <object object_ref="oval:mil.disa.stig.win:obj:25349500"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000033"/>
         </userright_test>
-        <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349508" version="4" check="at least one" comment="Deny log on through Remote Desktop Services - Everyone">
-          <object object_ref="oval:mil.disa.stig.win:obj:25349500"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:20000032"/>
-        </userright_test>
         <userright_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:25349506" version="4" check="at least one" comment="Deny log on through Remote Desktop Services - Local account">
           <object object_ref="oval:mil.disa.stig.win:obj:25349500"/>
           <state state_ref="oval:mil.disa.stig.win:ste:20000034"/>
         </userright_test>
-        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10002300" version="1" check="all" state_operator="OR" comment="The system is a non-DC domain-joined Windows server or workstation">
+        <wmi57_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:tst:10002200" version="1" check="all" state_operator="OR" comment="The system is a standalone Windows server or workstation">
           <object object_ref="oval:mil.disa.stig.win:obj:10000100"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000200"/>
-          <state state_ref="oval:mil.disa.stig.win:ste:10000400"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000100"/>
+          <state state_ref="oval:mil.disa.stig.win:ste:10000300"/>
         </wmi57_test>
         </tests><objects><wmi57_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:10000100" version="1">
           <namespace>root\cimv2</namespace>
@@ -83,9 +83,20 @@ The Guests group must be assigned this right to prevent unauthenticated access.<
         <userright_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:obj:25349500" version="1">
           <userright>SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME</userright>
         </userright_object>
-        </objects><states><wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000100" version="1" comment="Standalone Workstation">
+        </objects><states><userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000041" version="1">
+          <trustee_name operation="pattern match">^(?i)(.+\\)?Enterprise Admins$</trustee_name>
+        </userright_state>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000040" version="1">
+          <trustee_name operation="pattern match">^(?i)(.+\\)?Domain Admins$</trustee_name>
+        </userright_state>
+        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000300" version="1" comment="Standalone Server">
           <result datatype="record" operation="equals">
-            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">0</field>
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">2</field>
+          </result>
+        </wmi57_state>
+        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000400" version="1" comment="Domain Member Server">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">3</field>
           </result>
         </wmi57_state>
         <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000200" version="1" comment="Domain Member Workstation">
@@ -93,29 +104,18 @@ The Guests group must be assigned this right to prevent unauthenticated access.<
             <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">1</field>
           </result>
         </wmi57_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000033" version="1">
-          <trustee_name operation="case insensitive equals">Guests</trustee_name>
-        </userright_state>
-        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000300" version="1" comment="Standalone Server">
-          <result datatype="record" operation="equals">
-            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">2</field>
-          </result>
-        </wmi57_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000040" version="1">
-          <trustee_name operation="pattern match">^(?i)(.+\\)?Domain Admins$</trustee_name>
-        </userright_state>
-        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000400" version="1" comment="Domain Member Server">
-          <result datatype="record" operation="equals">
-            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">3</field>
-          </result>
-        </wmi57_state>
         <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000034" version="2">
           <trustee_name operation="pattern match">^(?i)(NT Authority\\)?Local account$</trustee_name>
+        </userright_state>
+        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000033" version="1">
+          <trustee_name operation="case insensitive equals">Guests</trustee_name>
         </userright_state>
         <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000032" version="1">
           <trustee_name operation="case insensitive equals">Everyone</trustee_name>
         </userright_state>
-        <userright_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:20000041" version="1">
-          <trustee_name operation="pattern match">^(?i)(.+\\)?Enterprise Admins$</trustee_name>
-        </userright_state>
+        <wmi57_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.stig.win:ste:10000100" version="1" comment="Standalone Workstation">
+          <result datatype="record" operation="equals">
+            <field xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" name="domainrole">0</field>
+          </result>
+        </wmi57_state>
         </states></oval_definitions>

@@ -5,6 +5,47 @@
       "criteria": {
         "children": [
           {
+            "comment": "Audit 32-bit invocations of /etc/sudoers",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:28115400"
+          },
+          {
+            "comment": "Audit 64-bit invocations of /etc/sudoers",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:28115401"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:281154",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:281154",
             "kind": "definition_ref",
@@ -49,57 +90,9 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Audit 32-bit invocations of /etc/sudoers",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:28115400"
-          },
-          {
-            "comment": "Audit 64-bit invocations of /etc/sudoers",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:28115401"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:281154",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:258217",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:281154"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -113,6 +106,13 @@
       "from": "oval:mil.disa.stig.defs:def:281154",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.ind:tst:28115401"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:258217",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:281154"
     },
     {
       "attribute": "object_ref",
@@ -223,7 +223,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32?\\s+-F\\s+path=/etc/sudoers\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64?\\s+-F\\s+path=/etc/sudoers\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
         },
         {
           "attributes": {
@@ -237,7 +237,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:28115400",
+      "id": "oval:mil.disa.stig.ind:obj:28115401",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "3"
@@ -257,7 +257,7 @@
           "kind": "element",
           "name": "pattern",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b64?\\s+-F\\s+path=/etc/sudoers\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
+          "value": "^\\s*-a\\s+(always,exit|exit,always)\\s+-F\\s+arch=b32?\\s+-F\\s+path=/etc/sudoers\\s+-F\\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\\s+(-k\\s+|-F\\s+key=)\\S+)?\\s*$"
         },
         {
           "attributes": {
@@ -271,7 +271,7 @@
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.ind:obj:28115401",
+      "id": "oval:mil.disa.stig.ind:obj:28115400",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "3"
@@ -301,12 +301,12 @@
       "oval:mil.disa.stig.defs:def:281154"
     ]
   },
-  "semantic_ir_sha256": "481eea192a6ea072cb0534cfc32d32df3f9fe5a24ae5e1ff3860cb00eb82e104",
+  "semantic_ir_sha256": "1b9870bfb4c6e2e2fb7a52e05980cc9e9accc135282890e2acbf4de503a4251d",
   "source": {
     "bytes": 4329,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258217r1210919_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-258217r1210919_rule/provenance.json",
-    "sha256": "f095a5633c33b526dafc0c02058dfa219f3c7f08ca465747e61e1b7497833eeb"
+    "sha256": "7632db4b29210acd73af9dfd2512bbb0be7eec0c8c992ee8b98f2b64531a5471"
   },
   "states": [],
   "tests": [
