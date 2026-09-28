@@ -214,7 +214,28 @@ The published Windows 11 benchmark contains an automated rule that still uses an
 
 This is particularly useful for standards/content-author review because it demonstrates a practical upgrade path: repair the published SCAP 1.4 source using supported OVAL semantics, validate it there, then rerun the deterministic SCAP-NG conversion. The demonstration should frame these findings as migration-readiness feedback, not as criticism of the original content authors.
 
-## 30. Questions carried forward
+## 30. Benchmark-to-benchmark mapping should use Check Text and OVAL semantics
+
+Cross-benchmark rule identity should not depend on STIG rule IDs, titles, or CCI identifiers being the same.
+
+**Lesson:** use two independent mapping signals:
+
+1. **Normalized Check Text equality.** If two rules have the same Check Text after presentation-only whitespace normalization, treat them as corresponding policy requirements.
+2. **Equivalent full OVAL semantics.** If the complete normalized OVAL definition/test/object/state/variable logic is semantically equivalent, treat the rules as corresponding even when their policy wording or identifiers differ.
+
+"Equivalent OVAL" means equivalent assessment logic, not merely use of the same OVAL test family. Two unrelated rules that both use `registry_test` are not considered equivalent.
+
+Keep rule alignment separate from automation reuse. A Check Text match can establish policy alignment even when the implementations differ. Equivalent OVAL semantics establishes alignment and is evidence for exact assessment reuse. Parameterized reuse remains a separate reviewed classification.
+
+## 31. Reuse savings should be measured in maintenance units before dollars
+
+Cross-STIG assessment reuse can reduce authoring, review, regression-test, and maintenance work, but a universal dollar value would require unsupported labor assumptions.
+
+**Lesson:** first report observable units: assessment instances, unique reusable assessments, duplicate definitions avoided, reuse fan-out, and maintenance-unit reduction percentage. Then provide formulas so organizations can apply their own average review hours, change frequency, and loaded labor rate.
+
+This keeps the economic argument evidence-based while still allowing the Board and implementers to estimate savings at their own scale.
+
+## 32. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 
