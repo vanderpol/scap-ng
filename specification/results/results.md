@@ -145,3 +145,30 @@ in `../assessment/manual-assessment.md`.
 
 Manual results SHOULD distinguish factual finding/evidence details from general
 reviewer comments.
+
+## 12. Decisive outcome explanation
+
+For nontrivial automated results, the result model SHOULD support a structured
+decisive outcome explanation: the smallest evaluated expression subtree, or set
+of subtrees, sufficient to justify the reported outcome.
+
+This explanation SHALL represent logical/evidentiary cause, not speculate about
+the operational or human reason a system became misconfigured.
+
+For example:
+
+- a failed `all` expression may require one decisive failed child;
+- a failed `any` expression requires the failed alternatives necessary to
+  prove that no acceptable alternative succeeded;
+- a failed `none` expression may require one prohibited matching item;
+- a branch/conditional result should distinguish branch-selection evidence from
+  the decisive result inside the selected branch.
+
+Additional independently useful failures MAY be retained as bounded diagnostics
+without being confused with the minimal proof of the result.
+
+Collection errors, unsupported capabilities, and applicability decisions SHALL
+use structured reason/applicability data rather than pretending to be
+compliance failures.
+
+The final exact explanation serialization remains under design.
