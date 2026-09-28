@@ -5,7 +5,7 @@
 
 Iteration 001 is intentionally **not a draft specification** and remains our internal working iteration until deliberately shared outside the project.
 
-**SCAP 1.4 forward conversion is a hard requirement for supported, non-deprecated source semantics.** SCAP-NG deliberately excludes OVAL tests marked deprecated in OVAL 5.12.3; affected definitions must be corrected in SCAP 1.4 before conversion. Every architecture and authoring-syntax experiment must otherwise remain capable of representing converted SCAP 1.4 content through the same faithful semantic model.
+**SCAP 1.4 forward conversion is a hard requirement for supported, non-obsolete source semantics.** SCAP-NG deliberately excludes OVAL tests whose **effective current status remains deprecated** after applying documented OVAL Community reinstatement decisions; affected definitions must be corrected in SCAP 1.4 before conversion. A historical OVAL 5.12.x `deprecated_info` annotation alone is not sufficient when later governance explicitly reinstated a test. Every architecture and authoring-syntax experiment must otherwise remain capable of representing converted SCAP 1.4 content through the same faithful semantic model.
 
 Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content-library/Current` corpus. The first depth pass focuses on RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025; the final conversion gate covers every individual benchmark in the pinned `Current/` tree.
 
@@ -33,17 +33,38 @@ Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content
 - `generated/full-corpus-reuse/` — compact reuse/fan-out, Check Text mapping, parameterization-candidate, and deprecated-source-debt evidence across all 65 individual signed benchmarks in the pinned NIWC corpus.
 - `showcases/rhel9-sv-258179/` — flagship complex published OVAL case, including the distinction between faithful conversion and a policy-review normalization candidate.
 
-## Current benchmark scope
+## Current benchmark evidence
 
-Three seven-rule benchmark families are represented:
+Iteration 001 now uses two complementary evidence sets.
 
-1. Windows Client STIG-like policy
-2. Windows Server STIG-like policy
-3. Linux STIG-like policy
+### Deep four-anchor conversion
 
-Each exists in both the combined-rule and split policy/assessment/binding candidates, and each produces policy-only and automated packages: **12 total `.scapng` bundles**.
+The published RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025
+benchmarks are converted from pinned signed SCAP 1.4 packages into one canonical
+SCAP-NG semantic model and rendered in all three YAML forms:
 
-The two Windows benchmarks intentionally demonstrate cross-STIG automation reuse. Five technical assessments are shared or parameterized across different policy rule IDs, titles, and references; one automated assessment in each Windows benchmark is benchmark-specific.
+1. combined rule with shared technical bases / policy overlays;
+2. split policy / assessment / binding;
+3. Ansible-inspired authoring with no Ansible runtime dependency.
+
+All four pass rule/accounting and three-rendering semantic-equivalence checks.
+Representative exact-reuse groups are committed for Linux and Windows.
+
+### Full signed-benchmark reuse survey
+
+All 65 individual signed benchmark ZIPs in the pinned NIWC `Current/` corpus
+are processed through the same OVAL semantic fingerprint model for compact
+reuse/mapping analysis.
+
+The survey covers 8,892 XCCDF rules and 7,084 supported automated assessments.
+It finds 3,413 unique exact technical assessments, with 3,671 total duplicate
+assessment-definition units avoidable (51.82%). Of those, 3,639 units are
+avoidable specifically through cross-benchmark reuse.
+
+The original three seven-rule Windows Client, Windows Server, and Linux
+prototype families remain useful controlled fixtures for result-model and
+language experiments, but they are no longer the primary evidence for the
+format decision.
 
 ## Source rule
 
