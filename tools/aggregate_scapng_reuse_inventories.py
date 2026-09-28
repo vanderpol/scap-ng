@@ -131,10 +131,16 @@ def main() -> int:
     )
 
     blocker_types: Counter[str] = Counter()
+    blocker_by_benchmark: dict[str, Counter[str]] = defaultdict(Counter)
+    blocked_rule_count_by_benchmark: Counter[str] = Counter()
     for row in blocked_rows:
+        benchmark_key=row["benchmark_key"]
+        blocked_rule_count_by_benchmark[benchmark_key] += 1
         migration = row.get("migration") or {}
         for item in migration.get("deprecated_tests", []) or []:
-            blocker_types[item.get("qualified_type") or "<unknown>"] += 1
+            qtype=item.get("qualified_type") or "<unknown>"
+            blocker_types[qtype] += 1
+            blocker_by_benchmark[benchmark_key][qtype] += 1
 
     fanout_by_benchmark_count = Counter()
     fanout_by_instance_count = Counter()
@@ -205,6 +211,22 @@ def main() -> int:
         "source_remediation_blockers": {
             "rules": len(blocked_rows),
             "by_effectively_deprecated_test": dict(blocker_types.most_common()),
+            "by_benchmark": [
+                {
+                    "benchmark": benchmark,
+                    "blocked_rules": blocked_rule_count_by_benchmark[benchmark],
+                    "deprecated_test_references": dict(
+                        blocker_by_benchmark[benchmark].most_common()
+                    ),
+                }
+                for benchmark in sorted(
+                    blocked_rule_count_by_benchmark,
+                    key=lambda x:(
+                        -blocked_rule_count_by_benchmark[x],
+                        x,
+                    ),
+                )
+            ],
         },
         "maintenance_cost_model": {
             "duplicate_assessment_units_avoided": exact_avoided,
