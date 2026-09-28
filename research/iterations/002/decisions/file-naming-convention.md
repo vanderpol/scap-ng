@@ -91,23 +91,49 @@ The file still declares its authoritative identity internally.
 
 ## Assessment files
 
+Benchmark-specific Assessment Methods SHOULD reside under the Benchmark's
+`assessments/` tree.
+
+When Assessment modality is known, repositories SHOULD separate Assessment
+Methods by modality:
+
+    assessments/
+      manual/
+        RHEL-09-232190.manual.assessment.yaml
+      automated/
+        RHEL-09-232190.automated.assessment.yaml
+
+A Rule with both a manual and automated method therefore has two peer
+Assessment objects rather than one file that mixes both procedures.
+
 Benchmark-specific Assessments SHOULD normally use a Rule-oriented descriptive
 basename when the Assessment is unique to that Rule.
 
-Example:
-
-    assessments/
-      RHEL-09-232190.assessment.yaml
-
-Reusable shared Assessments SHOULD use semantic names.
+Reusable shared Assessments SHOULD use semantic names under the corresponding
+shared modality tree.
 
 Example:
 
     shared/
       assessments/
-        linux/
-          sshd/
-            root-login-disabled.assessment.yaml
+        manual/
+          linux/
+            account-review.manual.assessment.yaml
+        automated/
+          linux/
+            sshd/
+              root-login-disabled.automated.assessment.yaml
+
+Future Assessment modalities MAY define corresponding subdirectories when that
+improves repository navigation.
+
+The modality directory and filename are authoring conventions only. The
+Assessment object's declared `mode` remains authoritative. Processors SHALL
+NOT infer Assessment semantics solely from a path or filename.
+
+Inline Manual Assessment shorthand remains permitted where defined by the
+manual-assessment authoring model; an inline object naturally has no external
+manual-assessment file path.
 
 The directory hierarchy and filename aid authors but do not define identity.
 
