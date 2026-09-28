@@ -79,6 +79,18 @@ Benchmark-to-benchmark mapping and automation reuse must be evidence-based.
 - Report reuse first in observable maintenance units: assessment instances, unique exact assessments, duplicate definitions avoided, fan-out, and percentage reduction. Apply organization-specific labor/time/rate assumptions separately.
 - Effectively deprecated OVAL tests remain source-remediation blockers and are excluded from reusable SCAP-NG automated-assessment counts until the SCAP 1.4 source is corrected.
 
+## Open-source up-conversion tool direction
+
+The SCAP 1.4 conversion tooling is expected to evolve into a standalone open-source up-conversion tool.
+
+- Keep reusable parsing, semantic IR, migration analysis, validation, rendering, and packaging logic general-purpose and independent of NIWC/DISA-specific filenames or benchmark IDs.
+- Isolate research-only orchestration, evidence generation, and iteration-specific paths from reusable converter logic.
+- Prefer importable modules with thin CLI wrappers over scripts that depend on implicit working-directory state.
+- Preserve complete provenance, migration status, blocker diagnostics, and loss accounting; never silently drop or repair source semantics.
+- Keep the semantic IR versioned independently from external SCAP-NG source syntax so future format changes do not require rewriting SCAP 1.4 ingestion.
+- New converter functionality should be designed so it can eventually live under an installable `scap_upconvert` package and be exercised locally without GitHub Actions.
+- The roadmap is documented in `research/iterations/001/upconversion-tool-roadmap.md`.
+
 ## Reference scanner sequencing
 
 A SCAP-NG reference scanner is a post-format-stabilization milestone.
