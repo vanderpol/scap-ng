@@ -53,8 +53,11 @@ def combined_members(root: Path, package_type: str):
     applicability_path=root/"applicability.yaml"
     if applicability_path.exists():
         applicability=load(applicability_path)
-        if applicability.get("migration",{}).get("status")=="unsupported":
-            raise ValueError("unsupported applicability assessment cannot enter package")
+        if (
+            package_type!="policy-only"
+            and applicability.get("migration",{}).get("status")=="unsupported"
+        ):
+            raise ValueError("unsupported applicability assessment cannot enter automated package")
         members["applicability.json"]=applicability
     for path in sorted((root/"rules").glob("*.yaml")):
         doc=load(path)
