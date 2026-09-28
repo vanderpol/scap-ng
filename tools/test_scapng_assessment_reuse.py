@@ -9,6 +9,7 @@ from analyze_scapng_assessment_reuse import (
     assessment_fingerprints,
     digest,
     normalize_check_text,
+    pair_summaries,
 )
 
 
@@ -127,7 +128,24 @@ def main() -> int:
         "same_normalized_check_text","equivalent_oval_semantics"
     }
 
-    print("PASS: exact reuse, parameterization candidates, and rule alignment")
+    pair=pair_summaries(
+        [
+            {"benchmark":"a","generic_automated_assessments":1},
+            {"benchmark":"b","generic_automated_assessments":1},
+        ],
+        instances[:2],
+        pairs,
+        [{
+            "instances":instances[:2],
+            "cross_benchmark":True,
+        }],
+    )[0]
+    assert pair["equivalent_oval_rule_pairs"]==1
+    assert pair["left_exact_reuse_coverage_pct"]==100.0
+    assert pair["right_exact_reuse_coverage_pct"]==100.0
+    assert pair["duplicate_assessment_definitions_avoided"]==1
+
+    print("PASS: exact reuse, parameterization candidates, rule alignment, and pair coverage")
     return 0
 
 
