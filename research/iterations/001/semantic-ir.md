@@ -39,6 +39,8 @@ The IR should represent benchmark/profile membership, policy text, applicability
 
 A separate source-accounting tree preserves every SCAP 1.4 element/reference for loss accounting.
 
+Deprecated OVAL tests are a deliberate exception to native semantic lowering: the IR may record them for diagnostics and provenance, but a definition referencing a deprecated OVAL 5.12.3 test is marked `unsupported: deprecated_oval_test` and is not rendered as SCAP-NG. The source SCAP 1.4 content must first be upgraded to supported OVAL.
+
 ## Renderer equivalence
 
 For a successful conversion of one IR object:
@@ -123,6 +125,7 @@ Before finalizing SCAP-NG:
 
 - the pinned NIWC public corpus is source-accounted;
 - every in-scope assessment maps to IR or an explicitly approved exception;
+- every definition that still references a deprecated OVAL test is reported as source-remediation debt and excluded from successful NG conversion until its SCAP 1.4 source is updated;
 - retained authoring renderers cover the same IR corpus;
 - renderer round-trips have equivalent semantic digests;
 - representative differential execution reproduces source applicability/outcome/error semantics.
