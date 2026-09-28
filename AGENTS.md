@@ -66,6 +66,19 @@ Whole-benchmark migration work must be automated and reproducible.
 - Reusable conversion/parser/validation/package utilities belong under repository-level `tools/`. Iteration directories may contain experiments, regression fixtures, reports, and generated evidence but should not become the only home of reusable infrastructure.
 - Large complete generated conversion trees may be retained as reproducible CI artifacts when committing every duplicated rendering would add unnecessary repository weight. Commit the tools, workflow, compact counts/blockers/hashes, representative conversions, and lessons learned.
 
+## Cross-benchmark mapping and assessment reuse
+
+Benchmark-to-benchmark mapping and automation reuse must be evidence-based.
+
+- Use normalized XCCDF Check Text equality as one policy-rule alignment signal. Normalize presentation whitespace only; do not use fuzzy title/CCI similarity as proof.
+- Use equivalent **complete normalized OVAL semantics** as a second alignment signal and as evidence for exact technical-assessment reuse. Sharing an OVAL test family is not sufficient.
+- Keep policy alignment separate from automation reuse. Same Check Text can align two rules even when their OVAL implementations differ.
+- Exact reusable-assessment identity must be independent of source-local OVAL IDs, comments, metadata, and provenance while preserving effective technical semantics: criteria, tests, objects, states, variables, literal values, collection/filter/set behavior, check/check-existence/state operators, and referenced logic.
+- Preserve independent policy identities and provenance for every binding to a shared assessment. Exact technical reuse must not erase policy wording differences or source defects.
+- Treat literal-abstracted semantic-shape matches only as **parameterization candidates**. Do not count them as proven reuse until typed parameters and semantic equivalence are reviewed/tested.
+- Report reuse first in observable maintenance units: assessment instances, unique exact assessments, duplicate definitions avoided, fan-out, and percentage reduction. Apply organization-specific labor/time/rate assumptions separately.
+- Effectively deprecated OVAL tests remain source-remediation blockers and are excluded from reusable SCAP-NG automated-assessment counts until the SCAP 1.4 source is corrected.
+
 ## Reference scanner sequencing
 
 A SCAP-NG reference scanner is a post-format-stabilization milestone.
