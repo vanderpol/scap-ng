@@ -1,0 +1,70 @@
+# Design-review sample derived from RHEL 9 V2R9 / RHEL-09-653030.
+# Source OVAL: oval:mil.disa.stig.rhel9os:def:258155
+# OVAL closure: 2 definitions, 2 tests, 3 objects, 1 state, 2 variables.
+#
+# The OVAL extracts the audit log directory from auditd.conf, uses it to find
+# the containing partition, multiplies block_size * total_space in a local
+# variable, then compares the result with 10 GiB.
+#
+# This candidate tests two NG simplifications:
+#   1. named intermediate data instead of Object/Variable reference chains;
+#   2. a native partition total_bytes field so authors do not need to rebuild
+#      a common derived property with arithmetic.
+
+assessment:
+  id: rhel9.RHEL-09-653030
+  mode: automated
+
+  collect:
+    audit_log_setting:
+      capability: independent.textfilecontent54
+
+      select:
+        filepath:
+          equals: /etc/audit/auditd.conf
+
+        pattern:
+          matches: '^\\s*log_file\\s*=\\s*(\\S+)/\\S+\\s*$'
+
+        instance:
+          minimum: 1
+
+      fields:
+        - subexpression
+
+    audit_partition:
+      capability: linux.partition
+
+      select:
+        mount_point:
+          any_of:
+            from: audit_log_directories
+
+      fields:
+        - mount_point
+        - total_bytes
+
+  derive:
+    audit_log_directories:
+      source: audit_log_setting
+      field: subexpression
+      values: all
+
+  assert:
+    source: audit_partition
+
+    existence: at_least_one
+    quantifier: all
+
+    condition:
+      field: total_bytes
+      datatype: integer
+      greater_than_or_equal: 10737418240
+
+  results:
+    failure_examples:
+      maximum: 5
+      fields:
+        - mount_point
+        - total_bytes
+      include_reason: true
