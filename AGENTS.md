@@ -79,6 +79,17 @@ Benchmark-to-benchmark mapping and automation reuse must be evidence-based.
 - Report reuse first in observable maintenance units: assessment instances, unique exact assessments, duplicate definitions avoided, fan-out, and percentage reduction. Apply organization-specific labor/time/rate assumptions separately.
 - Effectively deprecated OVAL tests remain source-remediation blockers and are excluded from reusable SCAP-NG automated-assessment counts until the SCAP 1.4 source is corrected.
 
+## Native source design checkpoint
+
+Broad benchmark expansion is paused while the native SCAP-NG authoring model is reviewed.
+
+- Treat current fidelity-first YAML as migration evidence, not normative native syntax.
+- Before adding more benchmark families, agree on concise native source using the review corpus in `research/iterations/001/native-source-design-review.md`.
+- Keep XCCDF/OVAL/OCIL/CPE XML identifiers, namespaces, hrefs, and source trees in migration provenance rather than executable native source.
+- Prefer meaningful NG-local names and concise typed collect/derive/evaluate syntax.
+- Preserve exact canonical semantics behind the authoring source so simplification never weakens result accuracy.
+- Keep the four-anchor conversion workflow manual-only during this checkpoint.
+
 ## Open-source up-conversion tool direction
 
 The SCAP 1.4 conversion tooling is expected to evolve into a standalone open-source up-conversion tool.
