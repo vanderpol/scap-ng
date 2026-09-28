@@ -24,14 +24,17 @@ Design source files that are:
    The default NG capability namespace is the OVAL family namespace plus the
    OVAL test basename.
 
-   Examples:
+   Examples with unversioned OVAL names map naturally:
 
        unix.file
        windows.registry
        linux.rpminfo
        solaris.package
-       macos.plist511
-       independent.textfilecontent54
+
+   Historical suffixes such as `53`, `54`, `55`, and `511` remain an
+   explicit OVAL Board naming decision. Until that decision, conversion
+   prototypes preserve the supported source basename rather than silently
+   rebasing it.
 
    Do not invent a parallel taxonomy without a demonstrated semantic reason.
 
