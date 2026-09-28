@@ -1,0 +1,21 @@
+# Manual Assessment Method preserving the source STIG Check Text.
+assessment:
+  id: rhel9.RHEL-09-654025.manual
+  mode: manual
+
+  procedure: |-
+    Verify RHEL 9 is configured to audit the execution of the "setxattr", "fsetxattr", "lsetxattr", "removexattr", "fremovexattr", and "lremovexattr" system calls with the following command:
+
+    $ sudo auditctl -l | grep xattr
+
+    -a always,exit -F arch=b32 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>=1000 -F auid!=-1 -F key=perm_mod
+    -a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid>=1000 -F auid!=-1 -F key=perm_mod
+    -a always,exit -F arch=b32 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid=0 -F key=perm_mod
+    -a always,exit -F arch=b64 -S setxattr,lsetxattr,fsetxattr,removexattr,lremovexattr,fremovexattr -F auid=0 -F key=perm_mod
+
+    If both the "b32" and "b64" audit rules are not defined for the "setxattr", "fsetxattr", "lsetxattr", "removexattr", "fremovexattr", and "lremovexattr" system calls, or any of the lines returned are commented out, this is a finding.
+
+  provenance:
+    xccdf_rule: xccdf_mil.disa.stig_rule_SV-258179r1155601_rule
+    xccdf_selector: manual
+    ocil_questionnaire: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:75701
