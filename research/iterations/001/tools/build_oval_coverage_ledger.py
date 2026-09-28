@@ -32,9 +32,15 @@ def classify(key, schema_row, self_counts, prod_counts, prod_examples):
         "niwc_priority_stig_count":p,
         "niwc_example_ir_paths":list(prod_examples.get(key,[])),
         "deprecated":bool(schema_row.get("deprecated",False)),
+        "effective_deprecated":bool(schema_row.get("effective_deprecated",schema_row.get("deprecated",False))),
+        "reinstated":bool(schema_row.get("reinstated",False)),
+        "support_override":schema_row.get("support_override"),
         "deprecation_evidence":schema_row.get("deprecation_evidence"),
         "status":status,
-        "scap_ng_in_scope": not (key.endswith("_test") and bool(schema_row.get("deprecated",False))),
+        "scap_ng_in_scope": not (
+            key.endswith("_test")
+            and bool(schema_row.get("effective_deprecated",schema_row.get("deprecated",False)))
+        ),
     }
 
 
@@ -89,9 +95,11 @@ def main():
             "production_only":counts["production_only"],
             "schema_only":counts["schema_only"],
             "deprecated_total":sum(1 for x in rows if x["deprecated"]),
+            "effective_deprecated_total":sum(1 for x in rows if x["effective_deprecated"]),
+            "reinstated_total":sum(1 for x in rows if x["reinstated"]),
             "scap_ng_in_scope_total":sum(1 for x in rows if x["scap_ng_in_scope"]),
             "production_only_deprecated":sum(
-                1 for x in rows if x["status"]=="production_only" and x["deprecated"]
+                1 for x in rows if x["status"]=="production_only" and x["effective_deprecated"]
             ),
             "observed_not_in_schema":sorted(observed_extra),
         }
@@ -118,7 +126,9 @@ def main():
         "scap_ng_scope":{
             "deprecated_oval_tests_supported":False,
             "supported_test_type_count":summary["tests"]["scap_ng_in_scope_total"],
-            "deprecated_test_type_count":summary["tests"]["deprecated_total"],
+            "raw_deprecated_test_type_count":summary["tests"]["deprecated_total"],
+            "reinstated_test_type_count":summary["tests"]["reinstated_total"],
+            "effective_deprecated_test_type_count":summary["tests"]["effective_deprecated_total"],
             "note":"Deprecated OVAL tests are excluded from SCAP-NG even when present in schema, Self-Assertion, or production evidence.",
         },
         "gate":{
