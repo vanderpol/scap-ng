@@ -56,29 +56,33 @@ For each anchor, select a small set covering:
     research/iterations/002/
       examples/
         shared/
-          assessments/
           platforms/
+          applicability/
+          assessments/
         rhel9/
           benchmark.yaml
           policy/
-          platforms/
         oracle-linux9/
           benchmark.yaml
           policy/
-          platforms/
         windows11/
           benchmark.yaml
           policy/
-          platforms/
         windows-server-2025/
           benchmark.yaml
           policy/
-          platforms/
       provenance/
       decisions/
 
-Shared technical assessments should live once under `examples/shared/` when
-the review establishes exact semantic reuse.
+Shared platform identity assessments, applicability conditions, and technical
+compliance assessments should each live once under `examples/shared/` when
+the review establishes reuse.
+
+Do not combine platform identity with reusable rule conditions. For example,
+`windows.11` is a platform, while `windows.member-workstation` is an
+applicability condition reusable across Windows versions. Likewise,
+`windows.server-2025` is a platform and `windows.domain-controller` is a
+separate reusable applicability condition.
 
 ## Native-source rules
 
