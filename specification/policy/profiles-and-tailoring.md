@@ -240,3 +240,138 @@ SCAP-NG Rule-selection and Parameter changes when this can be done losslessly.
 A legacy Tailoring construct that changes policy in a way the native SCAP-NG
 model does not support SHALL be reported for review rather than silently
 discarded or converted into Assessment execution logic.
+
+
+## 15. Minimal Tailoring example
+
+A Tailoring artifact SHOULD express only local differences from the referenced
+publisher policy.
+
+Illustrative source:
+
+    tailoring:
+      id: org.example.windows11.production
+      version: 1
+
+      benchmark:
+        id: disa.windows11.stig
+        version: V2R10
+
+      profile: disa.mac-2_classified
+
+      disabled_rules:
+        - WN11-EXAMPLE-001
+
+      parameters:
+        password_minimum_length: 16
+
+A Tailoring artifact SHOULD NOT serialize a full copy of the Benchmark or
+Profile.
+
+## 16. Tailoring resolution algorithm
+
+A processor SHALL resolve effective policy in this order:
+
+1. load the exact Benchmark publication;
+2. enable every Benchmark Rule;
+3. apply the selected publisher Profile and its ancestors;
+4. resolve publisher Parameter values;
+5. apply Tailoring parent layers, if any;
+6. apply the requested Tailoring layer;
+7. resolve resulting effective Rule selection;
+8. resolve resulting effective tailorable Parameter values;
+9. validate required Organizational Input separately;
+10. freeze the effective policy for the Assessment Request.
+
+After policy is frozen, subsequent evaluation SHALL NOT mutate that effective
+policy.
+
+## 17. Tailoring validation
+
+A Tailoring artifact SHALL fail validation when:
+
+- the referenced Benchmark identity cannot be resolved;
+- the referenced Benchmark version does not match;
+- the referenced Profile does not exist;
+- a referenced Rule is not a Benchmark member;
+- a Rule is both enabled and disabled in the same layer;
+- a Parameter does not exist;
+- a Parameter is not tailorable;
+- Tailoring attempts to change an Assessment Method or applicability mapping;
+- Tailoring inheritance is cyclic;
+- Group operations are ambiguous;
+- a parent Tailoring targets a different Benchmark publication.
+
+## 18. Tailoring rebase to a new Benchmark
+
+Tailoring SHALL be version-bound.
+
+When a new Benchmark publication is released, existing Tailoring SHALL NOT be
+silently reused against it.
+
+A rebase tool MAY create a candidate Tailoring for the new Benchmark.
+
+A rebase operation SHOULD classify each previous local decision as:
+
+- unchanged and still valid;
+- automatically mapped to a stable Rule/Parameter identity;
+- affected by publisher policy change;
+- removed because the referenced object no longer exists;
+- requiring human review.
+
+The rebased Tailoring SHALL receive its own identity/version or revision and
+SHALL record the new Benchmark publication binding.
+
+## 19. Tailoring and Rule applicability
+
+Tailoring Rule selection and Rule applicability solve different problems.
+
+Tailoring answers:
+
+    Should this Rule be part of the organization's effective policy?
+
+Applicability answers:
+
+    Given that the Rule is selected, does it apply to this target?
+
+A Tailoring artifact SHALL NOT change a Rule's `when` expression merely to
+exclude a target.
+
+A selected but inapplicable Rule is reported as not applicable.
+
+A Tailoring-disabled Rule is outside the effective assessment selection and
+SHOULD be reported distinctly from an inapplicable Rule when the result format
+records excluded policy.
+
+## 20. Tailoring result requirements
+
+Results SHALL make the effective local policy reconstructable without requiring
+the Tailoring source artifact to remain externally available forever.
+
+At minimum, a complete run result SHOULD identify:
+
+- Benchmark identity/version;
+- publisher Profile identity;
+- Tailoring identity/version;
+- effective selected/disabled Rule state;
+- effective tailored Parameter values or their protected references;
+- which values came from Organizational Input rather than Tailoring.
+
+Sensitive Parameter values MAY require redaction according to the future
+results-security profile.
+
+## 21. Tailoring authorization metadata
+
+Tailoring content MAY carry organization-specific approval metadata such as:
+
+- approval authority;
+- ticket/change identifier;
+- exception identifier;
+- effective date;
+- expiration/review date;
+- justification.
+
+These values describe local policy governance.
+
+They SHALL NOT change evaluation semantics unless a future specification
+explicitly defines such behavior.
