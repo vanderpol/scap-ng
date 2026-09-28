@@ -6,6 +6,18 @@ Iteration-specific data and conclusions belong under `research/iterations/<NNN>/
 
 ## Current tools
 
+### SCAP 1.4 migration toolchain
+
+- `oval_semantic_ir.py` — faithful OVAL 5.12.3 semantic importer, dependency graph, variable/function evaluation planning, set/filter/result algebra, and source accounting.
+- `scap14_rule_splitter.py` — extracts one schema-valid standalone OVAL document per XCCDF rule with fixed-point dependency closure.
+- `scap14_corpus_convert.py` — broad SCAP 1.4 corpus ingestion/accounting and deprecated-test remediation reporting.
+- `scap14_benchmark_ir.py` — joins XCCDF policy/profile/value/check semantics to the per-rule OVAL IR into one benchmark conversion model.
+- `scap14_to_scapng.py` — generic benchmark compiler that renders the same migrated semantics into combined-rule and split policy/assessment/binding candidate layouts.
+- `verify_scap14_to_scapng_conversion.py` — checks rule accounting and semantic equivalence between the candidate renderings.
+- `build_oval_schema_semantic_catalog.py` — schema-derived OVAL construct/deprecation catalog with checked-in OVAL governance reinstatement overrides.
+
+The migration tools are shared infrastructure rather than iteration-001-only experiments. Iteration-specific workflows and evidence may invoke them, but later iterations should reuse the same implementations rather than fork them.
+
 ### inventory_xsd_semantics.py
 
 Recursively inventories XSD files, named elements/types, imports/includes, target namespaces, and documentation containing deprecation language.
@@ -22,4 +34,4 @@ Useful for measuring result bloat and element populations while avoiding committ
 
 Creates the stable directory skeleton for a future numbered research iteration.
 
-These scripts currently use only the Python standard library so they remain easy to run in restricted development environments.
+Some migration tools require `lxml` and/or `PyYAML`; smaller inventory/scaffolding utilities remain standard-library-only.
