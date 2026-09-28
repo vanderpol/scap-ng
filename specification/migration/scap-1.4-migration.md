@@ -83,3 +83,44 @@ published SCAP 1.4 content before declaring the format stable.
 
 Migration tooling SHOULD report unsupported constructs and conversion status
 explicitly.
+
+## 9. Public-corpus migration gate
+
+Before the SCAP-NG specification is considered stable for final publication,
+the project SHALL demonstrate repeatable forward conversion of a declared,
+versioned public SCAP 1.4 corpus.
+
+The corpus SHALL be defined by a checked-in manifest that identifies immutable
+source revisions/artifacts and digests.
+
+The migration process SHALL provide construct-level accounting sufficient to
+demonstrate:
+
+- zero silently ignored Rules/checks/definitions;
+- zero silently discarded source constructs;
+- explicit status for every migrated policy/check component;
+- explicit unsupported or review-required reasons;
+- traceability from NG source back to the legacy source through authoring
+  comments and/or conversion reports.
+
+Representative differential testing SHOULD compare legacy and NG execution for:
+
+- Platform/applicability decisions;
+- per-Rule outcome;
+- missing-input/not-evaluated/error behavior;
+- effective Profile and Parameter resolution;
+- decisive evidence/explanation where comparable.
+
+A deprecated or intentionally unsupported legacy construct MAY block conversion
+of that source content without blocking the NG specification when the standards
+process has explicitly declared the construct out of scope. The converter SHALL
+report such blockers rather than rewriting them silently.
+
+## 10. Reference implementation timing
+
+A reference scanner SHOULD eventually be used for conformance and differential
+testing.
+
+The scanner implementation SHALL NOT be allowed to define or constrain
+language semantics merely because it was implemented before the source and
+semantic model stabilized.
