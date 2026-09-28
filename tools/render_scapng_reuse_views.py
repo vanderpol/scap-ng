@@ -50,6 +50,9 @@ def stripped_shared_assessment(assessment: dict, shared_id: str, members: list[d
     migration.pop("semantic_ir_sha256", None)
     migration["reuse_scope"] = "cross-benchmark-exact-semantic-equivalence"
     out["migration"] = migration
+    out.pop("semantic_fingerprint_sha256", None)
+    if members:
+        out["exact_reuse_fingerprint_sha256"] = members[0]["exact_fingerprint"]
     out.pop("source_check_context", None)
     out.pop("source_check_logic", None)
     out["reuse_provenance"] = [
@@ -268,18 +271,18 @@ def main() -> int:
             },
             "combined_rule": {
                 "shared_base_bytes": combined_base_bytes,
-                "overlay_bytes": combined_overlay_bytes,
-                "reuse_source_bytes": combined_base_bytes + combined_overlay_bytes,
+                "overlay_bytes_including_policy_content": combined_overlay_bytes,
+                "illustrative_source_bytes": combined_base_bytes + combined_overlay_bytes,
             },
             "split_policy_assessment_binding": {
                 "shared_assessment_bytes": split_assessment_bytes,
                 "binding_bytes": split_binding_bytes,
-                "reuse_source_bytes": split_assessment_bytes + split_binding_bytes,
+                "illustrative_automation_bytes_excluding_policy_files": split_assessment_bytes + split_binding_bytes,
             },
             "ansible_inspired": {
                 "shared_assessment_bytes": ansible_assessment_bytes,
                 "binding_bytes": ansible_binding_bytes,
-                "reuse_source_bytes": ansible_assessment_bytes + ansible_binding_bytes,
+                "illustrative_automation_bytes_excluding_policy_files": ansible_assessment_bytes + ansible_binding_bytes,
             },
         }
         metrics.append(metric)
@@ -323,6 +326,11 @@ def main() -> int:
             {
                 "summary": summary,
                 "groups": manifest_groups,
+                "metrics_scope_note": (
+                    "Byte counts are descriptive, not a direct total-source-size comparison: "
+                    "combined overlays include policy content while split/Ansible policy files "
+                    "are external to these reuse views."
+                ),
                 "metrics": metrics,
             },
             indent=2,
