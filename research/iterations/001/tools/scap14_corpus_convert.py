@@ -447,6 +447,8 @@ def summary(records: list[dict]) -> dict:
     xccdf_rules = 0
     oval_definitions = 0
     errors = []
+    deprecated_oval_definition_blockers = 0
+    deprecated_oval_test_types: dict[str, int] = {}
 
     for r in records:
         kind = r.get("kind", "unknown")
@@ -462,6 +464,13 @@ def summary(records: list[dict]) -> dict:
             xccdf_rules += len(inv.get("rules", []))
         elif kind == "oval-definitions":
             oval_definitions += len(inv.get("definitions", []))
+            for definition in inv.get("definitions", []):
+                error = definition.get("conversion_error", {})
+                if error.get("code") == "deprecated_oval_test":
+                    deprecated_oval_definition_blockers += 1
+                    for test in error.get("deprecated_tests", []):
+                        qname = test.get("qualified_type", "unknown")
+                        deprecated_oval_test_types[qname] = deprecated_oval_test_types.get(qname, 0) + 1
 
     return {
         "documents": len(records),
@@ -470,6 +479,8 @@ def summary(records: list[dict]) -> dict:
         "xccdf_rules": xccdf_rules,
         "oval_definitions": oval_definitions,
         "ingest_errors": errors,
+        "deprecated_oval_definition_blockers": deprecated_oval_definition_blockers,
+        "deprecated_oval_test_types": dict(sorted(deprecated_oval_test_types.items())),
     }
 
 
