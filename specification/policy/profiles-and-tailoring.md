@@ -375,3 +375,21 @@ These values describe local policy governance.
 
 They SHALL NOT change evaluation semantics unless a future specification
 explicitly defines such behavior.
+
+
+## 22. Worked-source expectation
+
+Before Profile/Tailoring serialization is considered stable, the project
+SHOULD add worked source examples covering at least:
+
+- Tailoring a Benchmark baseline with no Profile;
+- Tailoring a publisher Profile;
+- disabling a publisher-selected Rule;
+- re-enabling a Benchmark Rule disabled by a publisher Profile;
+- overriding a tailorable publisher Parameter;
+- supplying Organizational Input without creating Tailoring;
+- rebasing Tailoring to a newer Benchmark version;
+- result provenance showing publisher policy versus local modifications.
+
+These examples SHOULD use the same `source/examples/` organization as the
+current RHEL 9 and Windows 11 Benchmark examples.
