@@ -73,3 +73,22 @@ Design source files that are:
 Nothing enters iteration 002 merely because a converter can generate it.
 Every example should be understandable and defensible as potential native
 SCAP-NG source.
+
+
+## Source-only checkpoint
+
+Iteration 002 is currently limited to native source-language design.
+
+Until the project owner explicitly ends this checkpoint:
+
+- do not build final SCAP-NG distribution packages;
+- do not add signing/release work;
+- do not build the reference scanner;
+- do not regenerate complete benchmark trees;
+- do not run broad corpus conversions merely to increase coverage;
+- use RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025 only to select
+  representative source examples, applicability cases, and reuse mappings;
+- keep examples hand-reviewable and intentionally small.
+
+The current goal is agreement on what authors should write, not production of
+the final distributable form.
