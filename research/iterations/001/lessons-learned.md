@@ -187,7 +187,26 @@ A complete converted benchmark may contain hundreds of large generated source fi
 
 **Lesson:** shared tools, schemas/overrides, workflows, lessons, compact summaries, blockers, hashes, and representative converted cases belong in Git. Complete large conversion trees can be retained as reproducible CI artifacts when committing every duplicated rendering would add repository weight without additional review value.
 
-## 28. Questions carried forward
+## 28. Reference scanner belongs after format stabilization
+
+A reference SCAP-NG scanner will eventually be necessary to prove that migrated content produces the same assessment outcomes as its SCAP 1.4 source on the same target system.
+
+**Lesson:** do not let an early scanner implementation prematurely constrain the language while the OVAL Board is still choosing and stabilizing the SCAP-NG representation. First finalize the semantic model and source/package format, then build a small reference implementation against that stable contract.
+
+The reference scanner's primary role should be conformance and differential testing rather than product competition. For each migrated benchmark, run the legacy SCAP 1.4 content and the SCAP-NG content against the same target and compare:
+
+- applicability decisions;
+- per-rule outcome;
+- incomplete/error/not-evaluated states;
+- decisive evidence and collected facts where comparison is meaningful;
+- profile/value resolution and effective rule selection;
+- scoring inputs separately from scanner-specific presentation.
+
+Exact equality should be required for normative semantics. Differences caused only by intentionally improved NG diagnostics or bounded evidence presentation should be classified separately from semantic differences.
+
+The converter and current IR should therefore continue exposing stable execution boundaries (collectors, derived values, predicates, result algebra, applicability, and processing plans) so the later reference scanner can implement them without redesigning the content model.
+
+## 29. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 
