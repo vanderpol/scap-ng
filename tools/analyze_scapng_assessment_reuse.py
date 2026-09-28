@@ -255,13 +255,17 @@ def normalize_check_text(value: str | None) -> str | None:
     return normalized or None
 
 
-def alignment_groups(instances: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
+def alignment_groups(
+    policy_instances: list[dict],
+    assessment_instances: list[dict],
+) -> tuple[list[dict], list[dict], list[dict]]:
     by_check: dict[str,list[dict]]=defaultdict(list)
     by_oval: dict[str,list[dict]]=defaultdict(list)
-    for row in instances:
+    for row in policy_instances:
         check_fp=row.get("check_text_fingerprint")
         if check_fp:
             by_check[check_fp].append(row)
+    for row in assessment_instances:
         by_oval[row["exact_fingerprint"]].append(row)
 
     def cross(groups: dict[str,list[dict]], fingerprint_kind: str) -> list[dict]:
@@ -414,6 +418,7 @@ def main() -> int:
     args = ap.parse_args()
 
     instances = []
+    policy_instances = []
     benchmark_summaries = []
     for label, path in args.benchmarks:
         doc = json.loads(path.read_text(encoding="utf-8"))
@@ -421,6 +426,16 @@ def main() -> int:
         blocked = 0
         generic = 0
         for row in doc.get("rules", []):
+            policy=row.get("policy") or {}
+            check_text=normalize_check_text(policy.get("check"))
+            policy_instances.append({
+                "benchmark":label,
+                "rule_id":policy.get("id"),
+                "title":policy.get("title"),
+                "check_text":check_text,
+                "check_text_fingerprint":digest(check_text) if check_text else None,
+            })
+
             migration = row.get("migration") or {}
             if migration.get("status") == "unsupported":
                 blocked += 1
@@ -441,7 +456,10 @@ def main() -> int:
 
     exact_groups = group_instances(instances, "exact_fingerprint")
     shape_groups = group_instances(instances, "shape_fingerprint")
-    check_alignment_groups,oval_alignment_groups,alignment_pairs=alignment_groups(instances)
+    check_alignment_groups,oval_alignment_groups,alignment_pairs=alignment_groups(
+        policy_instances,
+        instances,
+    )
 
     exact_unique = len(exact_groups)
     shape_unique = len(shape_groups)
@@ -542,6 +560,10 @@ def main() -> int:
         "exact_reuse_groups": [x for x in exact_groups if x["instance_count"] > 1],
         "cross_benchmark_exact_reuse_groups": exact_cross,
         "cross_benchmark_parameterization_candidates": shape_cross,
+        "policy_instances": sorted(
+            policy_instances,
+            key=lambda x: (x["benchmark"], x.get("rule_id") or ""),
+        ),
         "instances": sorted(
             instances,
             key=lambda x: (x["benchmark"], x.get("rule_id") or ""),
