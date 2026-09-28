@@ -34,7 +34,7 @@ def main():
                 continue
             row={"category":category,**item}
             if row.get("status")=="production_only" and row.get("deprecated"):
-                row["recommended_treatment"]="legacy_compatible_migration_support"
+                row["recommended_treatment"]="source_content_remediation_blocker"
             elif row.get("status")=="production_only":
                 row["recommended_treatment"]="focused_conformance_and_native_mapping"
             elif row.get("status")=="schema_only" and row.get("deprecated"):
@@ -65,7 +65,7 @@ def main():
             "then conformance-only constructs",
             "then schema-only constructs",
             "within a status, higher NIWC occurrence count first",
-            "deprecated production constructs require faithful legacy migration support but need not become preferred new authoring primitives",
+            "deprecated OVAL test families are outside SCAP-NG and are source-remediation blockers, not runtime implementation backlog",
         ],
         "counts":{k:len(v) for k,v in sorted(by_status.items())},
         "production_only":by_status.get("production_only",[]),
