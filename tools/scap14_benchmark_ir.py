@@ -166,7 +166,12 @@ def fix_entries(rule) -> list[dict]:
     return rows
 
 
-def rule_semantics(rule, group_path: list[str]) -> dict:
+def effective_platform_refs(element, inherited: list[str]) -> list[str]:
+    own=platforms(element)
+    return own if own else list(inherited)
+
+
+def rule_semantics(rule, group_path: list[str], inherited_platforms: list[str]) -> dict:
     return {
         "id": rule.get("id"),
         "title": child_text(rule, "title"),
@@ -185,6 +190,7 @@ def rule_semantics(rule, group_path: list[str]) -> dict:
         "multiple": boolean_attribute(rule.get("multiple"), False),
         "group_path": list(group_path),
         "platforms": platforms(rule),
+        "effective_platform_refs": effective_platform_refs(rule,inherited_platforms),
         "requires": requires_conditions(rule),
         "conflicts": idrefs(rule, "conflicts"),
         "idents": idents(rule),
@@ -195,20 +201,34 @@ def rule_semantics(rule, group_path: list[str]) -> dict:
     }
 
 
-def walk_rules(node, group_path: list[str] | None = None) -> Iterable[dict]:
+def walk_rules(
+    node,
+    group_path: list[str] | None = None,
+    inherited_platforms: list[str] | None = None,
+) -> Iterable[dict]:
     group_path = list(group_path or [])
+    inherited_platforms=list(inherited_platforms or [])
     for child in node:
         if not isinstance(child.tag, str):
             continue
         name = split.local(child.tag)
         if name == "Group":
             gid = child.get("id") or child_text(child, "title") or "unnamed-group"
-            yield from walk_rules(child, group_path + [gid])
+            group_platforms=effective_platform_refs(child,inherited_platforms)
+            yield from walk_rules(
+                child,
+                group_path + [gid],
+                group_platforms,
+            )
         elif name == "Rule":
-            yield rule_semantics(child, group_path)
+            yield rule_semantics(child, group_path, inherited_platforms)
 
 
-def group_semantics(group, parent_path: list[str]) -> dict:
+def group_semantics(
+    group,
+    parent_path: list[str],
+    inherited_platforms: list[str],
+) -> dict:
     gid=group.get("id")
     current_path=parent_path+([gid] if gid else [])
     child_groups=[]
@@ -240,6 +260,7 @@ def group_semantics(group, parent_path: list[str]) -> dict:
         "prohibit_changes":boolean_attribute(group.get("prohibitChanges"),False),
         "weight":group.get("weight"),
         "platforms":platforms(group),
+        "effective_platform_refs":effective_platform_refs(group,inherited_platforms),
         "requires":requires_conditions(group),
         "conflicts":idrefs(group,"conflicts"),
         "references":references(group),
@@ -255,14 +276,23 @@ def group_semantics(group, parent_path: list[str]) -> dict:
     }
 
 
-def walk_groups(node, parent_path: list[str] | None=None):
+def walk_groups(
+    node,
+    parent_path: list[str] | None=None,
+    inherited_platforms: list[str] | None=None,
+):
     parent_path=list(parent_path or [])
+    inherited_platforms=list(inherited_platforms or [])
     for child in node:
         if not isinstance(child.tag,str) or split.local(child.tag)!="Group":
             continue
-        row=group_semantics(child,parent_path)
+        row=group_semantics(child,parent_path,inherited_platforms)
         yield row
-        yield from walk_groups(child,row["path"])
+        yield from walk_groups(
+            child,
+            row["path"],
+            row["effective_platform_refs"],
+        )
 
 
 def walk_values(node, group_path: list[str] | None=None):
@@ -347,6 +377,95 @@ def profile_semantics(profile) -> dict:
         "actions": actions,
         "source_tree": split.xccdf_node(profile),
     }
+
+
+def cpe_expression(node) -> dict:
+    name=split.local(node.tag)
+    if name=="logical-test":
+        return {
+            "kind":"logical_test",
+            "operator":node.get("operator"),
+            "negate":boolean_attribute(node.get("negate"),False),
+            "children":[
+                cpe_expression(child)
+                for child in node
+                if isinstance(child.tag,str)
+                and split.local(child.tag) in {"logical-test","fact-ref","check-fact-ref"}
+            ],
+        }
+    if name=="fact-ref":
+        return {
+            "kind":"cpe_name",
+            "name":node.get("name"),
+        }
+    if name=="check-fact-ref":
+        return {
+            "kind":"check_fact",
+            "system":node.get("system"),
+            "href":node.get("href"),
+            "id_ref":node.get("id-ref"),
+        }
+    return {
+        "kind":"preserved_unknown_cpe_node",
+        "source_tree":split.xccdf_node(node),
+    }
+
+
+def cpe_platform_definitions(benchmark) -> list[dict]:
+    out=[]
+    for spec in benchmark:
+        if not isinstance(spec.tag,str) or split.local(spec.tag)!="platform-specification":
+            continue
+        for platform in spec:
+            if not isinstance(platform.tag,str) or split.local(platform.tag)!="platform":
+                continue
+            logical=next(
+                (
+                    child for child in platform
+                    if isinstance(child.tag,str) and split.local(child.tag)=="logical-test"
+                ),
+                None,
+            )
+            out.append({
+                "id":platform.get("id"),
+                "titles":[
+                    {
+                        "lang":child.get("{http://www.w3.org/XML/1998/namespace}lang"),
+                        "text":text_content(child),
+                    }
+                    for child in platform
+                    if isinstance(child.tag,str) and split.local(child.tag)=="title"
+                ],
+                "remarks":[
+                    text_content(child)
+                    for child in platform
+                    if isinstance(child.tag,str) and split.local(child.tag)=="remark"
+                ],
+                "expression":cpe_expression(logical) if logical is not None else None,
+                "source_tree":split.xccdf_node(platform),
+            })
+    return out
+
+
+def bind_platform_refs(refs: list[str], definitions: list[dict]) -> list[dict]:
+    by_id={x["id"]:x for x in definitions if x.get("id")}
+    out=[]
+    for ref in refs:
+        local_id=ref[1:] if ref.startswith("#") else None
+        if local_id and local_id in by_id:
+            out.append({
+                "ref":ref,
+                "kind":"local_cpe_expression",
+                "platform_id":local_id,
+                "expression":by_id[local_id].get("expression"),
+            })
+        else:
+            out.append({
+                "ref":ref,
+                "kind":"cpe_name",
+                "name":ref,
+            })
+    return out
 
 
 def resolve_profiles(profiles: list[dict], rules: list[dict], groups: list[dict], values: list[dict]) -> list[dict]:
@@ -491,13 +610,36 @@ def main() -> int:
     oval_ir, split_diag = load_rule_ir(args.split_root, manifest)
 
     component_id, benchmark = benchmarks[0]
-    rules = list(walk_rules(benchmark))
-    groups=list(walk_groups(benchmark))
+    benchmark_platform_refs=platforms(benchmark)
+    platform_definitions=cpe_platform_definitions(benchmark)
+    rules = list(walk_rules(
+        benchmark,
+        inherited_platforms=benchmark_platform_refs,
+    ))
+    groups=list(walk_groups(
+        benchmark,
+        inherited_platforms=benchmark_platform_refs,
+    ))
     values=list(walk_values(benchmark))
     profiles = [
         profile_semantics(e) for e in benchmark.iter()
         if isinstance(e.tag, str) and split.local(e.tag) == "Profile"
     ]
+    for profile in profiles:
+        profile["effective_platform_refs"]=(
+            profile["platforms"] if profile["platforms"] else list(benchmark_platform_refs)
+        )
+        profile["effective_platforms"]=bind_platform_refs(
+            profile["effective_platform_refs"],platform_definitions
+        )
+    for rule in rules:
+        rule["effective_platforms"]=bind_platform_refs(
+            rule["effective_platform_refs"],platform_definitions
+        )
+    for group in groups:
+        group["effective_platforms"]=bind_platform_refs(
+            group["effective_platform_refs"],platform_definitions
+        )
     resolved_profiles=resolve_profiles(profiles,rules,groups,values)
 
     joined_rules = []
@@ -554,7 +696,10 @@ def main() -> int:
                 for child in benchmark
                 if isinstance(child.tag, str) and split.local(child.tag) == "status"
             ],
-            "platforms": platforms(benchmark),
+            "platforms": benchmark_platform_refs,
+            "effective_platforms": bind_platform_refs(
+                benchmark_platform_refs,platform_definitions
+            ),
             "references": references(benchmark),
             "rule_count": len(rules),
             "profile_count": len(profiles),
@@ -562,6 +707,7 @@ def main() -> int:
             "group_count": len(groups),
             "source_tree": split.xccdf_node(benchmark),
         },
+        "platform_definitions":platform_definitions,
         "profiles": profiles,
         "resolved_profiles": resolved_profiles,
         "values": values,
@@ -570,6 +716,10 @@ def main() -> int:
         "summary": {
             "rules": len(joined_rules),
             "groups":len(groups),
+            "platform_definitions":len(platform_definitions),
+            "local_platform_refs":sum(
+                1 for ref in benchmark_platform_refs if ref.startswith("#")
+            ),
             "profiles":len(profiles),
             "resolved_profiles":len(resolved_profiles),
             "profile_resolution_requires_review":sum(
