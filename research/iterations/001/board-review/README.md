@@ -74,17 +74,66 @@ Two independent signals are retained:
 
 Across the four anchors:
 
-- rule pairs aligned by either signal: **529**
+- rule pairs aligned by either signal: **530**
 - exact OVAL-equivalent groups: **525**
-- identical-Check-Text groups: **8**
+- identical-Check-Text groups: **9**
 - pairs supported by both signals: **7**
-- Check-Text-only pairs: **1**
+- Check-Text-only pairs: **2**
 - OVAL-equivalence-only pairs: **521**
 
 The Check-Text-only case is important: RHEL 9 and Oracle Linux 9 contain a
 "library files must be owned by root" pair with identical Check Text but
 different OVAL filename/filter semantics. The rules align as policy, but their
 automation is **not** counted as exact reuse.
+
+## Full-corpus reuse at scale
+
+The same exact-semantic fingerprinting method was then applied to all **65**
+individual published signed benchmark ZIPs in the pinned NIWC `Current/` corpus.
+This larger survey is intentionally lightweight: it measures Check Text mappings,
+OVAL semantic fingerprints, parameterization shapes, and migration blockers
+without generating three complete YAML renderings for every rule.
+
+Across those 65 benchmarks:
+
+- XCCDF rules: **8,892**
+- supported automated assessments: **7,084**
+- unique exact technical assessments: **3,413**
+- duplicate assessment definitions avoidable through exact reuse: **3,671**
+- exact assessment-definition maintenance reduction: **51.82%**
+- cross-benchmark exact-reuse groups: **1,701**
+- assessment instances participating in cross-benchmark exact reuse: **5,340**
+- cross-benchmark identical-Check-Text groups: **1,295**
+
+This means more than half of the independently maintained supported automated
+assessment definitions in this published benchmark population are exact semantic
+duplicates under the current fingerprint model.
+
+The reuse is not limited to pairs. The measured fan-out includes:
+
+- **899** exact groups shared by 2 benchmarks;
+- **265** shared by 3 benchmarks;
+- **220** shared by 4 benchmarks;
+- **210** shared by 5 benchmarks;
+- **66** shared by 6 benchmarks;
+- **22** shared by 7 benchmarks;
+- **8** shared by 8 benchmarks;
+- **3** shared by 9 benchmarks;
+- **1** shared by 11 benchmarks;
+- **6** shared by 12 benchmarks;
+- **1** shared by **13 benchmarks**.
+
+The 13-benchmark example is the requirement to limit concurrent sessions to ten.
+Its exact technical assessment is shared across Amazon Linux 2023, Ubuntu
+18.04/20.04/22.04/24.04, Oracle Linux 7/8/9, RHEL 7/8/9, and SLES 12/15.
+
+Several password-complexity assessments are exact semantic matches across
+12 published Linux benchmarks. Windows also shows multi-generation reuse across
+Windows client/server STIGs and Server 2012/2016/2019/2022/2025.
+
+The full-corpus survey therefore supports treating reusable assessment identity
+as a first-class SCAP-NG design concern rather than an optimization for a few
+closely related benchmarks.
 
 ## Representative reuse examples
 
@@ -144,6 +193,7 @@ written differently or allowed more reuse than another.
 - `../four-anchor-reuse-methodology.md` — mapping/reuse/cost methodology.
 - `../generated/four-anchor-reuse/assessment-reuse.json` — complete machine-readable reuse analysis.
 - `../generated/four-anchor-reuse/reuse-views/` — six exact reuse groups rendered in all three YAML designs.
+- `../generated/full-corpus-reuse/` — exact reuse, fan-out, Check Text mapping, parameterization-candidate, and deprecation-debt measurements across all 65 signed benchmarks.
 - `../generated/windows11-full-conversion/` — complete Windows 11 conversion evidence and source-remediation blockers.
 - `../generated/rhel9-full-conversion/` — complete RHEL 9 conversion evidence.
 - `../scap14-public-corpus-conversion-requirement.md` — required migration gates before specification finalization.
