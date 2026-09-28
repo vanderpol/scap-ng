@@ -1,0 +1,34 @@
+# Stage-1 lossless conversion of the source OVAL behavior.
+# Root OVAL definition: oval:mil.disa.stig.rhel9os:def:257969
+assessment:
+  id: rhel9.RHEL-09-253070.lossless
+  mode: automated
+
+  collect:
+    redirect_default:
+      capability: unix.sysctl
+      select:
+        name:
+          equals: net.ipv4.conf.default.send_redirects
+      fields:
+        - name
+        - value
+      # Source OVAL test: oval:mil.disa.stig.unix:tst:23054300
+      # Source OVAL object: oval:mil.disa.stig.unix:obj:23054300
+
+  assert:
+    source: redirect_default
+    # Source OVAL omitted check_existence; make its default explicit.
+    existence: at_least_one_exists
+    check: all
+    condition:
+      field: value
+      datatype: integer
+      equals: 0
+    # Source OVAL state: oval:mil.disa.stig.unix:ste:20000009
+
+  results:
+    failure_examples:
+      maximum: 3
+      fields: [name, value]
+      include_reason: true
