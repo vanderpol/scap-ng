@@ -129,6 +129,13 @@ listed as a candidate.
 | `family_test` | `independent.family` | self-assertion:1 | candidate |
 | `filehash58_test` | `independent.filehash58` | self-assertion:6 | candidate; name-review |
 | `shellcommand_test` | `independent.shellcommand` | production:80, self-assertion:11 | candidate |
+
+**`independent.shellcommand` note:** this capability is intentionally in the
+OVAL/NG **independent** family. The Assessment supplies the shell/interpreter to
+use; the capability is not inherently Unix-specific. For example, selecting
+`bash` makes a particular Assessment operationally Unix/Linux-oriented, while
+the capability itself remains platform-independent. SCAP-NG SHALL NOT rename
+this capability to `unix.command` merely because a common use invokes Bash.
 | `sql512_test` | `independent.sql512` | schema-only | candidate; name-review |
 | `sqlext_test` | `independent.sqlext` | schema-only | candidate |
 | `textfilecontent54_test` | `independent.textfilecontent54` | production:797, self-assertion:21 | candidate; name-review |
