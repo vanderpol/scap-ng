@@ -36,15 +36,18 @@ Requirements:
 - Prefer small focused Self-Assertion cases when implementing or debugging individual OVAL language features.
 - Add regression tests when a Self-Assertion case exposes an importer/evaluator defect or ambiguity.
 
-## Deprecated OVAL migration rule
+## Deprecated OVAL test exclusion rule
 
-Deprecated OVAL 5.12.3 constructs that are still present in published SCAP 1.4 content remain part of the forward-conversion requirement.
+SCAP-NG contains **no deprecated OVAL tests from SCAP 1.4 / OVAL 5.12.3**.
 
-- Import and preserve their exact source semantics and provenance.
-- Prefer a `legacy_compatible` migration treatment when a reviewed successor exists, rather than making the deprecated construct a preferred new SCAP-NG authoring primitive.
-- Do not silently rewrite a deprecated construct to its successor unless semantic equivalence has been demonstrated for the specific source usage.
-- Keep the original construct identifiable in source accounting even when a native normalized form is approved.
-- Production use of a deprecated construct makes compatibility support higher priority than an unobserved schema-only construct, but does not by itself justify carrying the deprecated design forward into new authoring syntax.
+- A definition that references any OVAL test marked deprecated by the OVAL 5.12.3 schema is not convertible to SCAP-NG.
+- The converter may ingest and source-account the definition so it can produce a precise diagnostic, but it must mark conversion `unsupported` with reason `deprecated_oval_test`.
+- Deprecated tests are not eligible for `legacy_compatible`, `exact_normalized`, or silent automatic replacement.
+- The diagnostic should identify the deprecated test and, when the schema provides one, its supported replacement.
+- The SCAP 1.4 content author must update and validate the source content using supported OVAL tests before SCAP-NG conversion can succeed.
+- Deprecated objects/states that are reachable only through a deprecated test therefore do not create SCAP-NG runtime requirements.
+- Production use of deprecated tests is measured as source-remediation debt, not as evidence that SCAP-NG must implement the deprecated collector.
+- Example: Windows `accesstoken_test` is deprecated as of OVAL 5.11 and replaced by `userright_test`; SCAP-NG accepts the supported `userright_test` model, not `accesstoken_test`.
 
 ## OVAL 5.12.3 importer expectations
 
