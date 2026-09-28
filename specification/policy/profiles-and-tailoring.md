@@ -391,5 +391,5 @@ SHOULD add worked source examples covering at least:
 - rebasing Tailoring to a newer Benchmark version;
 - result provenance showing publisher policy versus local modifications.
 
-These examples SHOULD use the same `source/examples/` organization as the
+These examples SHOULD use the same `research/iterations/002/examples/source/` organization as the
 current RHEL 9 and Windows 11 Benchmark examples.
