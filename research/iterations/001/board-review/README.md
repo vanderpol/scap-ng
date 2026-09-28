@@ -192,6 +192,11 @@ written differently or allowed more reuse than another.
 
 ## Supporting evidence
 
+- `example-index.md` — direct index to the six exact-reuse examples in all three YAML representations.
+- `format-decision-questions.md` — neutral review questions for choosing a source representation.
+- `high-fanout-reuse.md` — measured reuse spanning as many as 13 published benchmarks.
+- `source-remediation-debt.md` — actionable deprecated-test modernization backlog by benchmark.
+- `alignment-without-reuse.md` — control example where identical Check Text aligns policy but differing OVAL prevents exact assessment reuse.
 - `high-fanout-reuse.md` — exact reuse examples spanning 6, 12, and 13 published benchmarks.
 - `../four-anchor-reuse-methodology.md` — mapping/reuse/cost methodology.
 - `../generated/four-anchor-reuse/assessment-reuse.json` — complete machine-readable reuse analysis.
