@@ -120,7 +120,7 @@ def main() -> int:
     ]
     for row in instances:
         row["check_text_fingerprint"]=digest(row["check_text"])
-    check_groups,oval_groups,pairs=alignment_groups(instances)
+    check_groups,oval_groups,pairs=alignment_groups(instances,instances)
     assert len(check_groups)==1
     assert len(oval_groups)==1
     assert len(pairs)==1
