@@ -200,6 +200,8 @@ def compile_oval_assessment(rule: dict, ir: dict, catalog: dict[str, dict]) -> t
             "combination": "xccdf_source_check_semantics",
         },
         "source_check_context": copy.deepcopy(ir.get("xccdf_context", {})),
+        "source_check_logic": copy.deepcopy(rule.get("check_model")),
+        "source_result_algebra": "xccdf-1.2-complex-check-eight-state",
         "migration": {
             "status": "legacy_compatible",
             "source": "SCAP 1.4 / OVAL 5.12.3",
@@ -226,6 +228,8 @@ def manual_assessment(rule: dict) -> tuple[dict, dict]:
         "description": rule.get("title"),
         "method": "manual_or_external_check",
         "source_checks": checks,
+        "source_check_logic": copy.deepcopy(rule.get("check_model")),
+        "source_result_algebra": "xccdf-1.2-complex-check-eight-state",
         "procedure": next(
             (
                 check.get("inline_content")
@@ -287,6 +291,7 @@ def policy_rule(rule: dict) -> dict:
             None,
         ),
         "source_checks": copy.deepcopy(rule.get("checks", [])),
+        "source_check_logic": copy.deepcopy(rule.get("check_model")),
         "fix": "\n\n".join(x["text"] for x in fixes) if fixes else None,
         "source_xccdf_tree": copy.deepcopy(rule.get("source_tree")),
     }
@@ -522,6 +527,13 @@ def main() -> int:
             if x.get("resolution_status")!="resolved"
         ),
         "source_values":len(source.get("values",[])),
+        "rules_with_complex_check":sum(
+            1 for x in source.get("rules",[])
+            if x.get("check_model",{}).get("kind")=="complex_check"
+        ),
+        "rules_with_item_extends":sum(1 for x in source.get("rules",[]) if x.get("extends")),
+        "groups_with_item_extends":sum(1 for x in source.get("groups",[]) if x.get("extends")),
+        "values_with_item_extends":sum(1 for x in source.get("values",[]) if x.get("extends")),
         "canonical_rules": len(canonical_rules),
         "automated_rules": len(automated),
         "manual_or_external_rules": len(manual),
