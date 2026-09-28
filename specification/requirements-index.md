@@ -20,6 +20,8 @@ under design.
 | Results and evidence | `results/results.md` | draft |
 | Source, compilation, packaging, integrity | `package/package-and-integrity.md` | draft |
 | SCAP 1.4 migration | `migration/scap-1.4-migration.md` | draft |
+| OVAL 5.12.3 construct migration | `migration/oval-5.12.3-to-ng.md` | draft |
+| OVAL 5.12.3 capability crosswalk | `migration/oval-5.12.3-capability-crosswalk.md` | informative appendix |
 | Security considerations | `security/security-considerations.md` | initial draft |
 | SCAP 1.4 / SP 800-126r4 concept review | `crosswalk/sp800-126r4-concept-review.md` | informative |
 
