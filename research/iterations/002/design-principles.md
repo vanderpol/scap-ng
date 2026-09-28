@@ -83,21 +83,25 @@ Reusing OVAL capability names does **not** require retaining:
 The capability vocabulary and data semantics can remain familiar while the
 authoring language becomes substantially smaller.
 
-## Applicability
+## Platform, applicability, and compliance
 
-Applicability is an ordinary NG assessment used in an applicability role.
+All three use the same NG assessment language, but they have different
+authoring roles.
 
-Therefore the same OVAL-aligned capability vocabulary applies equally to:
+- **Platform** identifies the product/OS target of a benchmark, such as
+  `windows.11`, `windows.server-2025`, `rhel.9`, or `oracle-linux.9`.
+- **Applicability condition** is an additional reusable fact about a target,
+  such as `windows.member-workstation`, `windows.domain-controller`,
+  `linux.gnome-installed`, or `linux.fips-enabled`.
+- **Compliance assessment** determines whether the actual security requirement
+  is satisfied.
 
-- compliance checks;
-- inventory/platform checks;
-- feature/package applicability;
-- role-based applicability;
-- configuration-based applicability.
+A benchmark supplies the platform. Rules inherit it and add only the extra
+applicability conditions they need.
 
-A scanner implements capabilities such as `unix.file` or
-`windows.registry`. It does not need special knowledge that a particular
-combination means "Linux Mint", "Windows 11 workstation", or another platform.
+A scanner implements capabilities such as `unix.file`, `windows.registry`,
+or `windows.wmi`. Content authors combine those capabilities to establish
+platform identity and reusable applicability conditions.
 
 ## Design review rule
 
