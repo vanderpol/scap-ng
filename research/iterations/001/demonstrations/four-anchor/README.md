@@ -123,3 +123,47 @@ A future content developer should be able to run one conversion command,
 review the generated/updated YAML in Git, edit or remediate source where
 required, validate it, and build the same distribution package in CI or
 locally.
+
+
+## Suggested variable-semantics review cases
+
+These Windows 11 rules are useful starting points for reviewing how faithful
+OVAL variable/function semantics currently lower into SCAP-NG and for discussing
+whether the future specification can express the same behavior more directly.
+
+- `SV-253363r971535` — OVAL `merge` over a registry multi-string
+  `object_component` (SSL/ECC curve ordering). This is a compact example of
+  target-collected values feeding a local variable expression.
+- `SV-253340r958434`, `SV-253341r958434`, and
+  `SV-253342r958434` — OVAL `concat` expressions with target-dependent
+  variable/object inputs.
+- `SV-253401r1210296` — another target-dependent `concat` case useful for
+  comparing the canonical graph with the Ansible-inspired ordered-step view.
+- `SV-253435r991589` and `SV-253436r991589` — smaller `concat` cases
+  suitable for side-by-side source-format review.
+
+For each rule, compare:
+
+    windows11/source/combined-rule/rules/<rule-id>.yaml
+
+with:
+
+    windows11/source/split-policy-assessment-binding/
+      policy/rules/<rule-id>.yaml
+      automation/assessments/ng.scap14.<rule-id>.yaml
+
+and:
+
+    windows11/source/ansible-inspired/
+      policy/rules/<rule-id>.yaml
+      automation/assessments/ng.scap14.<rule-id>.yaml
+
+The original faithful OVAL semantic IR remains available under:
+
+    research/iterations/001/generated/niwc-rule-splits/windows11/rules/<rule-id>/
+      oval.xml
+      oval-ir.json
+      provenance.json
+
+This gives a direct lineage from the SCAP 1.4 OVAL source, through the semantic
+IR, into each candidate NG authoring form.
