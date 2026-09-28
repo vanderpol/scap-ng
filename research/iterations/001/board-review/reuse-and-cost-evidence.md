@@ -95,24 +95,28 @@ Measured at that scale:
 | XCCDF rules | 8,892 |
 | Supported automated assessment instances | 7,084 |
 | Unique exact technical assessments | 3,413 |
-| Duplicate assessment definitions avoided | **3,671** |
-| Exact maintenance-unit reduction | **51.82%** |
+| Duplicate assessment definitions avoided, total exact reuse | **3,671** |
+| Total exact maintenance-unit reduction | **51.82%** |
 | Cross-benchmark exact-reuse groups | 1,701 |
 | Cross-benchmark exact-reuse instances | 5,340 |
+| Duplicate definitions avoided specifically across benchmarks | **3,639** |
+| Cross-benchmark reduction over supported automated assessments | **51.37%** |
 
-The cost-model variable **D** is therefore **3,671** for the full 65-benchmark
-survey, compared with 527 in the four-anchor deep demonstration.
+For a broad "deduplicate all identical assessments" cost model, **D = 3,671**.
+For the narrower cross-STIG/cross-benchmark reuse argument, **D = 3,639**.
+The remaining 32 avoidable units are duplicates found within individual
+benchmarks. The four-anchor deep demonstration has D = 527 in either framing.
 
 ### Full-corpus effort-only illustration
 
 If a complete assessment author/review/test event averages:
 
-| Hours per duplicated assessment event | Full-corpus hours avoided |
-| ---: | ---: |
-| 1 | 3,671 |
-| 2 | 7,342 |
-| 4 | 14,684 |
-| 8 | 29,368 |
+| Hours per duplicated assessment event | All exact duplicates (D=3,671) | Cross-benchmark only (D=3,639) |
+| ---: | ---: | ---: |
+| 1 | 3,671 | 3,639 |
+| 2 | 7,342 | 7,278 |
+| 4 | 14,684 | 14,556 |
+| 8 | 29,368 | 29,112 |
 
 These remain arithmetic scenarios, not observed labor measurements. They show
 how measured reuse units can be translated into an organization's own labor
