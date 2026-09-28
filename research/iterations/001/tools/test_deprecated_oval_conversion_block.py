@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 HERE=Path(__file__).resolve().parent
 spec=importlib.util.spec_from_file_location("converter",HERE/"scap14_corpus_convert.py")
@@ -61,3 +63,32 @@ assert tests["oval:test:tst:1"]["deprecated"] is True
 assert tests["oval:test:tst:2"]["deprecated"] is False
 
 print("PASS: deprecated OVAL tests block conversion; supported replacements remain eligible")
+
+
+# Historical deprecated_info does not block a test that OVAL governance later reinstated.
+with TemporaryDirectory() as td:
+    catalog_path=Path(td)/"catalog.json"
+    catalog_path.write_text(json.dumps({
+        "test_elements":[
+            {
+                "namespace":"http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris",
+                "name":"package511_test",
+                "deprecated":True,
+                "effective_deprecated":False,
+                "reinstated":True,
+            },
+            {
+                "namespace":WIN,
+                "name":"accesstoken_test",
+                "deprecated":True,
+                "effective_deprecated":True,
+                "reinstated":False,
+            },
+        ]
+    }),encoding="utf-8")
+    effective=converter.load_deprecated_tests(catalog_path)
+
+assert "http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris#package511_test" not in effective
+assert f"{WIN}#accesstoken_test" in effective
+
+print("PASS: OVAL governance reinstatement overrides historical deprecated_info")
