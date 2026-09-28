@@ -12,11 +12,11 @@ Measured from the pinned NIWC SCAP 1.4 RHEL 9, Oracle Linux 9, Windows 11, and W
 
 ## Rule alignment evidence
 
-- Groups aligned by identical normalized Check Text: **8**
+- Groups aligned by identical normalized Check Text: **9**
 - Groups aligned by equivalent full OVAL semantics: **525**
-- Total aligned cross-benchmark rule pairs: **529**
+- Total aligned cross-benchmark rule pairs: **530**
 - Pairs supported by both Check Text and OVAL equivalence: **7**
-- Check Text-only aligned pairs: **1**
+- Check Text-only aligned pairs: **2**
 - OVAL-equivalence-only aligned pairs: **521**
 
 Check Text equality establishes policy alignment. Equivalent full OVAL semantics establishes alignment and exact automation-reuse evidence.
