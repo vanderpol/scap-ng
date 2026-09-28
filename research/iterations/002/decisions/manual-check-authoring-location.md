@@ -147,6 +147,57 @@ inherit a standard manual-result contract supporting at least:
 The exact final result vocabulary and STIG Viewer mapping remain a separate
 results-model decision.
 
+## Open manual-assessment questions
+
+The major architectural decision is settled, but several result/workflow
+details remain for later review:
+
+- the exact normative result vocabulary and deterministic mapping to STIG
+  Viewer/CKL-style statuses;
+- whether comments are optional for every result or required for selected
+  outcomes such as fail, not_applicable, or not_checked;
+- whether evidence attachments/references are part of the core result model or
+  an extension;
+- operator/reviewer identity, timestamp, and attestation/provenance
+  requirements;
+- how partially completed manual assessments are represented;
+- whether one Rule may legitimately bind multiple manual Assessment Methods and
+  how those results combine;
+- whether manual procedures need independent revision metadata when their
+  procedure changes without changing Rule policy;
+- privacy/redaction requirements for comments and evidence.
+
+These are important, but they do not currently require changing the
+policy/assessment separation.
+
+## Deferred mixed manual-input / automated-evaluation case
+
+Iteration 002 SHALL retain an explicit deferred requirement for cases where
+human- or organization-supplied input is consumed by otherwise automated
+evaluation.
+
+The SQL Server 2016/2022 SCC experiment is a motivating example: OCIL collected
+a tightly constrained expected-state value, which was then supplied to fixed
+OVAL logic as an external value while the collection/query behavior remained
+hard-coded.
+
+This case SHALL be revisited when typed Assessment inputs and automated
+Assessment Methods are designed.
+
+The future design SHOULD distinguish at least:
+
+- Organizational Input: human/organization supplies expected policy state;
+- Manual Evidence: human supplies observed target/environment data;
+- Manual Assessment: human determines the compliance outcome.
+
+A new "hybrid" Assessment mode SHOULD NOT be added merely because legacy SCAP
+required multiple technologies to express one logically automated assessment.
+
+If mixed human-input/automation is supported, content SHALL define a typed
+input contract sufficient for tools to generate safe input forms/templates,
+including type, cardinality, validation constraints, and human-readable
+instructions.
+
 ## Migration from XCCDF
 
 An XCCDF converter MAY choose either source-authoring form according to project
