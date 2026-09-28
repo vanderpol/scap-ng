@@ -205,10 +205,41 @@ those defaults must be normative.
 
 ### Applicability
 
-- Is applicability just another assessment returning a Boolean/applicability
-  result?
+**Working design rule:** applicability is ordinary NG assessment logic used in
+an applicability role. Anything supported by the assessment portion of the
+language is eligible for applicability.
+
+The content author owns the determination. The scanner must not infer or
+normalize a platform into an opinionated `os_info` object and thereby decide
+what the target "is" on behalf of content.
+
+A platform definition should therefore bind a human/standard identifier to an
+explicit NG assessment. That assessment can use the same collectors,
+derivations, predicates, existence/cardinality rules, Boolean logic, and error
+semantics available to compliance assessments.
+
+The scanner's responsibility is limited to stable, well-defined collection
+capabilities. The content author combines those raw facts into applicability.
+
+This preserves a key SCAP 1.4/OVAL property: content for a new, obscure, or
+custom platform can be authored without waiting for scanner vendors to add a
+special platform-recognition feature. For example, Linux Mint or a custom
+distribution could be identified using ordinary file/package/kernel collectors
+and authored logic over `/etc/os-release`, release files, package metadata, or
+any other supported assessment evidence.
+
+CPE may remain a standard identifier/dictionary name, but CPE alone does not
+produce truth. A CPE/platform name used by policy must ultimately be backed by
+explicit NG applicability assessment logic.
+
+Questions still to settle:
+
 - How are reusable platform definitions named and referenced?
-- Which applicability constructs deserve concise native syntax?
+- Should applicability assessments return strictly Boolean, or the normal NG
+  result algebra with a defined conversion to applicable/not-applicable/error?
+- How should multiple applicability assessments combine?
+- Which common applicability patterns deserve concise authoring shortcuts
+  without reducing the underlying assessment power?
 
 ### Collection
 
