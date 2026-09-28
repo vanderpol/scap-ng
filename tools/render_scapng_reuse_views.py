@@ -74,6 +74,12 @@ def main() -> int:
         help="LABEL=path/to/canonical-benchmark.json",
     )
     ap.add_argument("--output-dir", type=Path, required=True)
+    ap.add_argument(
+        "--include-rule",
+        action="append",
+        default=[],
+        help="Render only exact-reuse groups containing this rule ID. Repeatable.",
+    )
     args = ap.parse_args()
 
     report = json.loads(args.reuse_report.read_text(encoding="utf-8"))
@@ -89,6 +95,22 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     groups = report.get("cross_benchmark_exact_reuse_groups", [])
+    if args.include_rule:
+        wanted=set(args.include_rule)
+        groups=[
+            group for group in groups
+            if any(x.get("rule_id") in wanted for x in group.get("instances",[]))
+        ]
+        missing=wanted-{
+            x.get("rule_id")
+            for group in groups
+            for x in group.get("instances",[])
+        }
+        if missing:
+            raise ValueError(
+                "requested rule IDs were not found in exact cross-benchmark reuse groups: "
+                + ", ".join(sorted(missing))
+            )
     metrics = []
     manifest_groups = []
 
@@ -290,9 +312,9 @@ def main() -> int:
             if total_instances else 0.0
         ),
         "important_scope_note": (
-            "This percentage covers only assessment instances participating in "
-            "cross-benchmark exact-reuse groups; corpus-wide reduction is reported "
-            "separately by the reuse analyzer."
+            "This directory is an illustrative subset of exact reuse groups selected "
+            "for review. Corpus-wide reduction is reported separately by the reuse "
+            "analyzer."
         ),
     }
 
