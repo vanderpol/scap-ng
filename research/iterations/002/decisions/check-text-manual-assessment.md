@@ -40,9 +40,12 @@ A Rule may reference a separate Assessment source file:
 
     rule:
       id: RHEL-09-000000
-      assessment: ../assessments/RHEL-09-000000-manual.yaml
+      assessments:
+        - ../assessments/manual/RHEL-09-000000.manual.assessment.yaml
+        - ../assessments/automated/RHEL-09-000000.automated.assessment.yaml
 
-and the referenced file contains:
+When only the Manual Assessment is being illustrated, its referenced file
+contains:
 
     assessment:
       id: rhel9.RHEL-09-000000-manual
@@ -52,6 +55,14 @@ and the referenced file contains:
 
 This layout is preferred when the Assessment is reused, independently
 maintained, unusually complex, or one of several methods bound to the Rule.
+
+External Manual Assessment Methods SHOULD reside under an
+`assessments/manual/` tree. Automated Assessment Methods SHOULD reside under
+`assessments/automated/`. Reusable shared methods SHOULD follow the same
+modality separation beneath `shared/assessments/`.
+
+The directory is an authoring convention, not semantic identity; the
+Assessment's declared `mode` remains authoritative.
 
 ### Inline Manual Assessment
 
