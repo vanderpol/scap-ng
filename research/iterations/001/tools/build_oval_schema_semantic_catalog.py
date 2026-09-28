@@ -40,9 +40,22 @@ def main():
     ap.add_argument("schema_root",type=Path)
     ap.add_argument("--parser",type=Path,required=True)
     ap.add_argument("--output",type=Path,required=True)
+    default_overrides = Path(__file__).resolve().parent.parent / "oval-test-support-overrides.json"
+    ap.add_argument(
+        "--support-overrides",
+        type=Path,
+        default=default_overrides if default_overrides.exists() else None,
+    )
     args=ap.parse_args()
 
     parser=load_parser(args.parser)
+    support_overrides={}
+    if args.support_overrides:
+        override_doc=json.loads(args.support_overrides.read_text(encoding="utf-8"))
+        support_overrides={
+            row["qualified_name"]:row
+            for row in override_doc.get("overrides",[])
+        }
     global_elements=[]
     substitution_groups=defaultdict(list)
     enums=defaultdict(set)
@@ -64,14 +77,23 @@ def main():
                 deprecation_evidence=" ".join(
                     text(n) for n in deprecated_nodes
                 ) or None
+                qname=f"{target or ''}#{child.get('name')}"
+                override=support_overrides.get(qname)
+                raw_deprecated=bool(deprecated_nodes)
+                reinstated=bool(
+                    override and override.get("effective_status")=="supported_reinstated"
+                )
                 row={
                     "name":child.get("name"),
                     "namespace":target,
                     "type":child.get("type"),
                     "substitution_group":child.get("substitutionGroup"),
                     "schema":rel,
-                    "deprecated":bool(deprecated_nodes),
+                    "deprecated":raw_deprecated,
                     "deprecation_evidence":deprecation_evidence,
+                    "support_override":override,
+                    "reinstated":reinstated,
+                    "effective_deprecated":raw_deprecated and not reinstated,
                 }
                 global_elements.append(row)
                 sub=qlocal(child.get("substitutionGroup"))
@@ -172,6 +194,8 @@ def main():
         "complex_types":complex_types,
         "platform_surface_by_namespace":dict(sorted(by_ns.items())),
         "deprecated_annotation_count":len(deprecated),
+        "support_override_file":args.support_overrides.as_posix() if args.support_overrides else None,
+        "support_override_count":len(support_overrides),
         "coverage_assertions":{
             "all_component_group_operations_modeled":not missing_components,
             "generic_test_semantics_modeled":True,
