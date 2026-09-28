@@ -80,7 +80,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install converter dependencies
-        run: python -m pip install --disable-pip-version-check lxml PyYAML
+        run: python -m pip install --disable-pip-version-check lxml PyYAML cryptography
 
       - name: Test assessment reuse fingerprinting
         run: |
@@ -148,6 +148,31 @@ jobs:
             --expected-applicability-status "${{ matrix.applicability_status }}" \
             --ansible-inspired-dir "work/${{ matrix.id }}-scapng/ansible-inspired"
 
+      - name: Build and verify distribution packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scap-ng/tools/build_scapng_from_converted_source.py \
+            "work/${{ matrix.id }}-scapng" \
+            --output-dir "work/${{ matrix.id }}-packages" \
+            --artifact-prefix "${{ matrix.id }}-scap14-converted" \
+            --skip-automated-if-blocked
+
+          mkdir -p "work/${{ matrix.id }}-distribution/manifests"
+          mkdir -p "work/${{ matrix.id }}-distribution/signatures"
+          cp "work/${{ matrix.id }}-packages/package-metrics.json" \
+             "work/${{ matrix.id }}-distribution/package-metrics.json"
+
+          shopt -s nullglob
+          for bundle in work/${{ matrix.id }}-packages/*.scapng; do
+            python scap-ng/tools/verify_scapng_prototype_bundle.py "$bundle"
+            stem="$(basename "$bundle" .scapng)"
+            unzip -p "$bundle" META-INF/manifest.json \
+              > "work/${{ matrix.id }}-distribution/manifests/$stem.manifest.json"
+            unzip -p "$bundle" META-INF/signature.prototype.json \
+              > "work/${{ matrix.id }}-distribution/signatures/$stem.signature.json"
+          done
+
       - name: Archive three-format benchmark
         run: |
           tar -C work -czf "work/${{ matrix.id }}-three-format-conversion.tar.gz" \
@@ -162,6 +187,8 @@ jobs:
             work/${{ matrix.id }}-scapng/conversion-summary.json
             work/${{ matrix.id }}-scapng/conversion-blockers.json
             work/${{ matrix.id }}-three-format-conversion.tar.gz
+            work/${{ matrix.id }}-distribution/**
+            work/${{ matrix.id }}-packages/*.scapng
           if-no-files-found: error
           compression-level: 0
 
@@ -180,6 +207,23 @@ jobs:
           pattern: four-anchor-*
           path: downloads
           merge-multiple: false
+
+      - name: Publish complete authoring source trees for Git review
+        shell: bash
+        run: |
+          set -euo pipefail
+          demo="scap-ng/research/iterations/001/demonstrations/four-anchor"
+          for id in rhel9 oracle-linux9 windows11 windows-server-2025; do
+            src="downloads/four-anchor-$id"
+            rm -rf "$demo/$id/source" "$demo/$id/distribution"
+            mkdir -p "$demo/$id"
+
+            mkdir -p "work/extracted-$id"
+            tar -C "work/extracted-$id" -xzf "$src/$id-three-format-conversion.tar.gz"
+            cp -a "work/extracted-$id/$id-scapng" "$demo/$id/source"
+
+            cp -a "$src/$id-distribution" "$demo/$id/distribution"
+          done
 
       - name: Analyze exact and parameterizable reuse
         run: |
@@ -277,6 +321,20 @@ jobs:
           (root/"README.md").write_text("\n".join(lines),encoding="utf-8")
           PY
 
+      - name: Publish shared mapping and reuse source
+        shell: bash
+        run: |
+          set -euo pipefail
+          demo="scap-ng/research/iterations/001/demonstrations/four-anchor"
+          rm -rf "$demo/shared-reuse"
+          mkdir -p "$demo/shared-reuse"
+          cp scap-ng/research/iterations/001/generated/four-anchor-reuse/assessment-reuse.json \
+             "$demo/shared-reuse/assessment-reuse.json"
+          cp -a scap-ng/research/iterations/001/generated/four-anchor-reuse/reuse-views \
+             "$demo/shared-reuse/reuse-views"
+          cp scap-ng/research/iterations/001/four-anchor-reuse-methodology.md \
+             "$demo/shared-reuse/METHODOLOGY.md"
+
       - name: Upload reuse report
         uses: actions/upload-artifact@v4
         with:
@@ -291,6 +349,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add research/iterations/001/generated/four-anchor-reuse
+          git add research/iterations/001/demonstrations/four-anchor
           if git diff --cached --quiet; then
             echo "Four-anchor reuse evidence already matches."
             exit 0
