@@ -66,6 +66,16 @@ Whole-benchmark migration work must be automated and reproducible.
 - Reusable conversion/parser/validation/package utilities belong under repository-level `tools/`. Iteration directories may contain experiments, regression fixtures, reports, and generated evidence but should not become the only home of reusable infrastructure.
 - Large complete generated conversion trees may be retained as reproducible CI artifacts when committing every duplicated rendering would add unnecessary repository weight. Commit the tools, workflow, compact counts/blockers/hashes, representative conversions, and lessons learned.
 
+## Reference scanner sequencing
+
+A SCAP-NG reference scanner is a post-format-stabilization milestone.
+
+- Do not make the reference scanner the mechanism for deciding the final SCAP-NG source organization while the OVAL Board is still reviewing candidate formats.
+- Keep converter IR and generated NG assessments execution-oriented so they can later be consumed by a scanner without semantic redesign.
+- After the format stabilizes, build a minimal reference scanner focused on normative correctness and conformance, not production-scale product features.
+- Differentially execute SCAP 1.4 and converted SCAP-NG content against the same systems and compare applicability, effective rule selection, per-rule results, error/incomplete states, and decisive evidence.
+- Treat semantic mismatches as converter/specification/scanner defects until explained; presentation-only differences must not be confused with semantic equivalence.
+
 ## OVAL 5.12.3 importer expectations
 
 The SCAP-NG importer must aim for lossless dependency and semantic representation before native lowering.
