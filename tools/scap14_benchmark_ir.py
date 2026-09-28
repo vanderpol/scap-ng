@@ -52,6 +52,22 @@ def idrefs(element, name: str) -> list[str]:
     return out
 
 
+def requires_conditions(element) -> list[list[str]]:
+    """Preserve XCCDF requires grouping: OR within an element, AND across elements."""
+    out=[]
+    for raw in idrefs(element,"requires"):
+        refs=[x for x in raw.split() if x]
+        if refs:
+            out.append(refs)
+    return out
+
+
+def boolean_attribute(value, default=None):
+    if value is None:
+        return default
+    return str(value).strip().lower() in {"1","true"}
+
+
 def references(element) -> list[dict]:
     out = []
     for child in element:
@@ -160,9 +176,16 @@ def rule_semantics(rule, group_path: list[str]) -> dict:
         "weight": rule.get("weight"),
         "role": rule.get("role"),
         "selected": rule.get("selected"),
+        "selected_default": boolean_attribute(rule.get("selected"), True),
+        "cluster_id": rule.get("cluster-id"),
+        "extends": rule.get("extends"),
+        "abstract": boolean_attribute(rule.get("abstract"), False),
+        "hidden": boolean_attribute(rule.get("hidden"), False),
+        "prohibit_changes": boolean_attribute(rule.get("prohibitChanges"), False),
+        "multiple": boolean_attribute(rule.get("multiple"), False),
         "group_path": list(group_path),
         "platforms": platforms(rule),
-        "requires": idrefs(rule, "requires"),
+        "requires": requires_conditions(rule),
         "conflicts": idrefs(rule, "conflicts"),
         "idents": idents(rule),
         "references": references(rule),
@@ -209,9 +232,15 @@ def group_semantics(group, parent_path: list[str]) -> dict:
         "parent_path":list(parent_path),
         "path":current_path,
         "selected":group.get("selected"),
+        "selected_default":boolean_attribute(group.get("selected"),True),
+        "cluster_id":group.get("cluster-id"),
+        "extends":group.get("extends"),
+        "abstract":boolean_attribute(group.get("abstract"),False),
+        "hidden":boolean_attribute(group.get("hidden"),False),
+        "prohibit_changes":boolean_attribute(group.get("prohibitChanges"),False),
         "weight":group.get("weight"),
         "platforms":platforms(group),
-        "requires":idrefs(group,"requires"),
+        "requires":requires_conditions(group),
         "conflicts":idrefs(group,"conflicts"),
         "references":references(group),
         "attributes":{
@@ -275,6 +304,11 @@ def value_semantics(value, group_path: list[str] | None=None) -> dict:
         "type": value.get("type"),
         "operator": value.get("operator"),
         "interactive": value.get("interactive"),
+        "cluster_id": value.get("cluster-id"),
+        "extends": value.get("extends"),
+        "abstract": boolean_attribute(value.get("abstract"),False),
+        "hidden": boolean_attribute(value.get("hidden"),False),
+        "prohibit_changes": boolean_attribute(value.get("prohibitChanges"),False),
         "group_path":list(group_path or []),
         "attributes":{
             etree.QName(k).localname:v for k,v in value.attrib.items()
@@ -298,6 +332,7 @@ def profile_semantics(profile) -> dict:
                     etree.QName(k).localname: v for k, v in child.attrib.items()
                 },
                 "value": text_content(child),
+                "source_tree": split.xccdf_node(child),
             })
     return {
         "id": profile.get("id"),
@@ -312,6 +347,100 @@ def profile_semantics(profile) -> dict:
         "actions": actions,
         "source_tree": split.xccdf_node(profile),
     }
+
+
+def resolve_profiles(profiles: list[dict], rules: list[dict], groups: list[dict], values: list[dict]) -> list[dict]:
+    """Resolve XCCDF profile extension and expand selector targets without flattening traversal semantics.
+
+    XCCDF 1.2 appends inherited selectors before the extending profile's own
+    selectors. The effective action sequence is therefore parent actions first,
+    child actions last. Target expansion understands direct ids and cluster-id
+    membership but leaves requires/conflicts and group traversal to the policy
+    processing plan.
+    """
+    by_profile={p["id"]:p for p in profiles if p.get("id")}
+    item_sets={
+        "rule":rules,
+        "group":groups,
+        "value":values,
+    }
+
+    def target_rows(action):
+        idref=action.get("attributes",{}).get("idref")
+        if not idref:
+            return [],"missing_idref"
+        kinds=(
+            ("rule","group")
+            if action["kind"] in {"select","refine-rule"}
+            else ("value",)
+        )
+        direct=[]
+        clustered=[]
+        for kind in kinds:
+            for row in item_sets[kind]:
+                if row.get("id")==idref:
+                    direct.append({"kind":kind,"id":row["id"],"match":"id"})
+                if row.get("cluster_id")==idref:
+                    clustered.append({"kind":kind,"id":row["id"],"match":"cluster-id"})
+        if direct and clustered:
+            return direct+clustered,"ambiguous_id_and_cluster"
+        targets=direct or clustered
+        return targets,("resolved" if targets else "unresolved_idref")
+
+    cache={}
+    stack=[]
+
+    def resolve(pid):
+        if pid in cache:
+            return cache[pid]
+        if pid in stack:
+            cycle=stack[stack.index(pid):]+[pid]
+            raise ValueError("profile extends cycle: "+" -> ".join(cycle))
+        profile=by_profile.get(pid)
+        if profile is None:
+            raise ValueError(f"profile extends unknown profile: {pid}")
+        stack.append(pid)
+        chain=[]
+        inherited=[]
+        if profile.get("extends"):
+            parent=resolve(profile["extends"])
+            chain.extend(parent["inheritance_chain"])
+            inherited.extend(parent["effective_actions"])
+        chain.append(pid)
+        own=[]
+        for action in profile.get("actions",[]):
+            expanded=dict(action)
+            targets,status=target_rows(action)
+            expanded["source_profile_id"]=pid
+            expanded["targets"]=targets
+            expanded["target_resolution"]=status
+            own.append(expanded)
+        effective=[dict(a) for a in inherited]+own
+        for index,action in enumerate(effective):
+            action["effective_order"]=index
+        unresolved=[
+            {
+                "effective_order":a["effective_order"],
+                "kind":a["kind"],
+                "idref":a.get("attributes",{}).get("idref"),
+                "status":a.get("target_resolution"),
+            }
+            for a in effective
+            if a.get("target_resolution")!="resolved"
+        ]
+        result={
+            "id":pid,
+            "extends":profile.get("extends"),
+            "inheritance_chain":chain,
+            "effective_actions":effective,
+            "resolution_status":"resolved" if not unresolved else "requires_review",
+            "unresolved_targets":unresolved,
+        }
+        cache[pid]=result
+        stack.pop()
+        return result
+
+    return [resolve(p["id"]) for p in profiles if p.get("id")]
 
 
 def sha256_file(path: Path) -> str:
@@ -369,6 +498,7 @@ def main() -> int:
         profile_semantics(e) for e in benchmark.iter()
         if isinstance(e.tag, str) and split.local(e.tag) == "Profile"
     ]
+    resolved_profiles=resolve_profiles(profiles,rules,groups,values)
 
     joined_rules = []
     missing_manifest = []
@@ -433,6 +563,7 @@ def main() -> int:
             "source_tree": split.xccdf_node(benchmark),
         },
         "profiles": profiles,
+        "resolved_profiles": resolved_profiles,
         "values": values,
         "groups": groups,
         "rules": joined_rules,
@@ -440,6 +571,10 @@ def main() -> int:
             "rules": len(joined_rules),
             "groups":len(groups),
             "profiles":len(profiles),
+            "resolved_profiles":len(resolved_profiles),
+            "profile_resolution_requires_review":sum(
+                1 for x in resolved_profiles if x["resolution_status"]!="resolved"
+            ),
             "values":len(values),
             "rules_with_oval_ir": sum(
                 1 for x in joined_rules
