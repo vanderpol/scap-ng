@@ -1,0 +1,697 @@
+# Stage-1 lossless SCAP-NG design sample.
+# Derived directly from RHEL 9 V2R9 / RHEL-09-654025.
+# This file intentionally preserves the source OVAL behavior, including
+# duplicated b32 root patterns that appear likely to have been intended as b64.
+# It is NOT the cleaner native audit-rule model.
+
+assessment:
+  id: rhel9.RHEL-09-654025.lossless
+  mode: automated
+
+  conversion:
+    stage: 1
+    semantics: lossless
+    source_language: OVAL 5.11.2
+
+  provenance:
+    xccdf_rule: xccdf_mil.disa.stig_rule_SV-258179r1155601_rule
+    oval_root_definition: oval:mil.disa.stig.rhel9os:def:258179
+    oval_definitions:
+      - oval:mil.disa.stig.defs:def:230413
+      - oval:mil.disa.stig.defs:def:253034
+      - oval:mil.disa.stig.defs:def:253035
+      - oval:mil.disa.stig.defs:def:253036
+      - oval:mil.disa.stig.defs:def:253037
+      - oval:mil.disa.stig.defs:def:253038
+      - oval:mil.disa.stig.rhel9os:def:258179
+    oval_variables:
+      - oval:mil.disa.stig.defs:var:20000006
+      - oval:mil.disa.stig.defs:var:20000007
+      - oval:mil.disa.stig.defs:var:20000008
+      - oval:mil.disa.stig.defs:var:20000009
+      - oval:mil.disa.stig.defs:var:20000010
+      - oval:mil.disa.stig.defs:var:20000011
+      - oval:mil.disa.stig.defs:var:20000012
+      - oval:mil.disa.stig.defs:var:20000013
+      - oval:mil.disa.stig.defs:var:20000016
+      - oval:mil.disa.stig.defs:var:25303500
+      - oval:mil.disa.stig.defs:var:25303501
+      - oval:mil.disa.stig.defs:var:25303502
+      - oval:mil.disa.stig.defs:var:25303503
+      - oval:mil.disa.stig.defs:var:25303800
+      - oval:mil.disa.stig.defs:var:25303801
+      - oval:mil.disa.stig.defs:var:25303802
+      - oval:mil.disa.stig.defs:var:25303803
+
+  source_anomalies:
+    - id: lsetxattr-root-b64-duplicates-b32
+      preserved: true
+      description: >-
+        OVAL test 25303503 is described as the 64-bit root case, but its
+        source variable uses the b32 architecture fragment. Stage 1 preserves
+        the resulting b32 regex exactly.
+    - id: removexattr-root-b64-duplicates-b32
+      preserved: true
+      description: >-
+        OVAL test 25303803 is described as the 64-bit root case, but its
+        source variable uses the b32 architecture fragment. Stage 1 preserves
+        the resulting b32 regex exactly.
+
+  collect:
+    fsetxattr_b32_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fsetxattr\s+|(\s+|,)fsetxattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303400
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303400
+        oval_object_version: 1
+
+    fsetxattr_b64_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fsetxattr\s+|(\s+|,)fsetxattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303401
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303401
+        oval_object_version: 1
+
+    fsetxattr_b32_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fsetxattr\s+|(\s+|,)fsetxattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303402
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303402
+        oval_object_version: 1
+
+    fsetxattr_b64_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fsetxattr\s+|(\s+|,)fsetxattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303403
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303403
+        oval_object_version: 1
+
+    lsetxattr_b32_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=b32\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\blsetxattr\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid>=1000\s+-F\s+auid!=(?:4294967295|-1|unset)(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$'
+          resolved_from: oval:mil.disa.stig.defs:var:25303500
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303500
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303500
+        oval_object_version: 1
+
+    lsetxattr_b64_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=b64\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\blsetxattr\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid>=1000\s+-F\s+auid!=(?:4294967295|-1|unset)(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$'
+          resolved_from: oval:mil.disa.stig.defs:var:25303501
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303501
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303501
+        oval_object_version: 1
+
+    lsetxattr_b32_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=b32\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\blsetxattr\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid=0(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$'
+          resolved_from: oval:mil.disa.stig.defs:var:25303502
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303502
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303502
+        oval_object_version: 1
+
+    lsetxattr_b64_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=b32\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\blsetxattr\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid=0(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$'
+          resolved_from: oval:mil.disa.stig.defs:var:25303503
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303503
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303503
+        oval_object_version: 1
+
+    fremovexattr_b32_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fremovexattr\s+|(\s+|,)fremovexattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303600
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303600
+        oval_object_version: 1
+
+    fremovexattr_b64_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fremovexattr\s+|(\s+|,)fremovexattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303601
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303601
+        oval_object_version: 1
+
+    fremovexattr_b32_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fremovexattr\s+|(\s+|,)fremovexattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303602
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303602
+        oval_object_version: 1
+
+    fremovexattr_b64_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fremovexattr\s+|(\s+|,)fremovexattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303603
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303603
+        oval_object_version: 1
+
+    lremovexattr_b32_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+lremovexattr\s+|(\s+|,)lremovexattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303700
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303700
+        oval_object_version: 3
+
+    lremovexattr_b64_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+lremovexattr\s+|(\s+|,)lremovexattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303701
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303701
+        oval_object_version: 3
+
+    lremovexattr_b32_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+lremovexattr\s+|(\s+|,)lremovexattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303702
+        oval_test_version: 2
+        oval_object: oval:mil.disa.stig.ind:obj:25303702
+        oval_object_version: 3
+
+    lremovexattr_b64_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+lremovexattr\s+|(\s+|,)lremovexattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303703
+        oval_test_version: 2
+        oval_object: oval:mil.disa.stig.ind:obj:25303703
+        oval_object_version: 3
+
+    removexattr_b32_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=b32\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\bremovexattr\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid>=1000\s+-F\s+auid!=(?:4294967295|-1|unset)(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$'
+          resolved_from: oval:mil.disa.stig.defs:var:25303800
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303800
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303800
+        oval_object_version: 1
+
+    removexattr_b64_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=b64\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\bremovexattr\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid>=1000\s+-F\s+auid!=(?:4294967295|-1|unset)(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$'
+          resolved_from: oval:mil.disa.stig.defs:var:25303801
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303801
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303801
+        oval_object_version: 1
+
+    removexattr_b32_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=b32\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\bremovexattr\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid=0(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$'
+          resolved_from: oval:mil.disa.stig.defs:var:25303802
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303802
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303802
+        oval_object_version: 1
+
+    removexattr_b64_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(?:always,exit|exit,always)\s+-F\s+arch=b32\s+(?:-S\s+[,\w]+\s+)*-S\s+[,\w]*\bremovexattr\b[,\w]*\s+(?:-S\s+[,\w]+\s+)*-F\s+auid=0(?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$'
+          resolved_from: oval:mil.disa.stig.defs:var:25303803
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:25303803
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:25303803
+        oval_object_version: 1
+
+    setxattr_b32_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+setxattr\s+|(\s+|,)setxattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:23041300
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:23041300
+        oval_object_version: 1
+
+    setxattr_b64_interactive_user:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+setxattr\s+|(\s+|,)setxattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:23041301
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:23041301
+        oval_object_version: 1
+
+    setxattr_b32_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+setxattr\s+|(\s+|,)setxattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:23041302
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:23041302
+        oval_object_version: 1
+
+    setxattr_b64_root:
+      capability: independent.textfilecontent54
+      select:
+        filepath:
+          equals: /etc/audit/audit.rules
+        pattern:
+          operation: pattern_match
+          value: '^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+setxattr\s+|(\s+|,)setxattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$'
+        instance:
+          datatype: integer
+          operation: greater_than_or_equal
+          value: 1
+      fields:
+        - filepath
+        - text
+        - instance
+      provenance:
+        oval_test: oval:mil.disa.stig.ind:tst:23041303
+        oval_test_version: 1
+        oval_object: oval:mil.disa.stig.ind:obj:23041303
+        oval_object_version: 1
+
+  assert:
+    # Every containing OVAL criteria node omits operator; OVAL defaults it to AND.
+    # Preserve that explicitly as all_of across all 24 source tests.
+    all_of:
+      - source: fsetxattr_b32_interactive_user
+        existence: all_exist
+        check: all
+      - source: fsetxattr_b64_interactive_user
+        existence: all_exist
+        check: all
+      - source: fsetxattr_b32_root
+        existence: all_exist
+        check: all
+      - source: fsetxattr_b64_root
+        existence: all_exist
+        check: all
+      - source: lsetxattr_b32_interactive_user
+        existence: at_least_one_exists
+        check: all
+        provenance:
+          check_existence_was_defaulted_in_oval: true
+      - source: lsetxattr_b64_interactive_user
+        existence: at_least_one_exists
+        check: all
+        provenance:
+          check_existence_was_defaulted_in_oval: true
+      - source: lsetxattr_b32_root
+        existence: at_least_one_exists
+        check: all
+        provenance:
+          check_existence_was_defaulted_in_oval: true
+      - source: lsetxattr_b64_root
+        existence: at_least_one_exists
+        check: all
+        provenance:
+          check_existence_was_defaulted_in_oval: true
+      - source: fremovexattr_b32_interactive_user
+        existence: all_exist
+        check: all
+      - source: fremovexattr_b64_interactive_user
+        existence: all_exist
+        check: all
+      - source: fremovexattr_b32_root
+        existence: all_exist
+        check: all
+      - source: fremovexattr_b64_root
+        existence: all_exist
+        check: all
+      - source: lremovexattr_b32_interactive_user
+        existence: all_exist
+        check: all
+      - source: lremovexattr_b64_interactive_user
+        existence: all_exist
+        check: all
+      - source: lremovexattr_b32_root
+        existence: all_exist
+        check: all
+      - source: lremovexattr_b64_root
+        existence: all_exist
+        check: all
+      - source: removexattr_b32_interactive_user
+        existence: at_least_one_exists
+        check: all
+        provenance:
+          check_existence_was_defaulted_in_oval: true
+      - source: removexattr_b64_interactive_user
+        existence: at_least_one_exists
+        check: all
+        provenance:
+          check_existence_was_defaulted_in_oval: true
+      - source: removexattr_b32_root
+        existence: at_least_one_exists
+        check: all
+        provenance:
+          check_existence_was_defaulted_in_oval: true
+      - source: removexattr_b64_root
+        existence: at_least_one_exists
+        check: all
+        provenance:
+          check_existence_was_defaulted_in_oval: true
+      - source: setxattr_b32_interactive_user
+        existence: all_exist
+        check: all
+      - source: setxattr_b64_interactive_user
+        existence: all_exist
+        check: all
+      - source: setxattr_b32_root
+        existence: all_exist
+        check: all
+      - source: setxattr_b64_root
+        existence: all_exist
+        check: all
+
+  results:
+    failure_examples:
+      maximum: 20
+      fields:
+        - filepath
+        - text
+        - instance
+      include_reason: true
