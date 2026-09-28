@@ -30,10 +30,17 @@ def canonicalize_ansible_assessment(rendered: dict) -> dict:
             collect[register]=step["collect"]
         elif "derive" in step:
             derive[register]=step["derive"]
-    if collect:
+    if rendered.get("semantic_model")=="scap-ng-generic-assessment-graph-0.1":
+        # The Ansible-inspired spelling intentionally omits empty step groups,
+        # but the canonical generic graph retains collect/derive as explicit
+        # (possibly empty) semantic sections.
         out["collect"]=collect
-    if derive:
         out["derive"]=derive
+    else:
+        if collect:
+            out["collect"]=collect
+        if derive:
+            out["derive"]=derive
 
     for key in (
         "predicates",
