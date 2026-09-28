@@ -260,6 +260,15 @@ def policy_rule(rule: dict) -> dict:
         "severity": rule.get("severity"),
         "weight": rule.get("weight"),
         "role": rule.get("role"),
+        "selected": rule.get("selected"),
+        "selected_default": rule.get("selected_default", True),
+        "cluster_id": rule.get("cluster_id"),
+        "extends": rule.get("extends"),
+        "abstract": rule.get("abstract", False),
+        "hidden": rule.get("hidden", False),
+        "prohibit_changes": rule.get("prohibit_changes", False),
+        "multiple": rule.get("multiple", False),
+        "group_path": copy.deepcopy(rule.get("group_path", [])),
         "description": rule.get("description"),
         "discussion": rule.get("rationale"),
         "platforms": copy.deepcopy(rule.get("platforms", [])),
@@ -310,6 +319,12 @@ def render_benchmark_doc(ir: dict, model: str) -> dict:
             "status": "converted-research-prototype",
             "source_component": benchmark.get("component_id"),
             "rule_count": benchmark.get("rule_count"),
+            "group_count": benchmark.get("group_count"),
+            "profile_count": benchmark.get("profile_count"),
+            "value_count": benchmark.get("value_count"),
+            "platforms": copy.deepcopy(benchmark.get("platforms", [])),
+            "references": copy.deepcopy(benchmark.get("references", [])),
+            "source_status": copy.deepcopy(benchmark.get("status", [])),
             "rules": [x["id"] for x in ir.get("rules", [])],
             "source": copy.deepcopy(ir.get("source")),
         },
@@ -342,7 +357,10 @@ def main() -> int:
     dump_yaml(combined_root / "benchmark.yaml", render_benchmark_doc(source, "combined-rule"))
     dump_yaml(split_root / "benchmark.yaml", render_benchmark_doc(source, "split-policy-assessment-binding"))
     dump_yaml(combined_root / "profiles.yaml", {
-        "scap_ng": SPEC, "prototype": True, "profiles": source.get("profiles", [])
+        "scap_ng": SPEC,
+        "prototype": True,
+        "profiles": source.get("profiles", []),
+        "resolved_profiles": source.get("resolved_profiles", []),
     })
     dump_yaml(combined_root / "groups.yaml", {
         "scap_ng": SPEC, "prototype": True, "groups": source.get("groups", [])
@@ -351,7 +369,10 @@ def main() -> int:
         "scap_ng": SPEC, "prototype": True, "values": source.get("values", [])
     })
     dump_yaml(split_root / "profiles.yaml", {
-        "scap_ng": SPEC, "prototype": True, "profiles": source.get("profiles", [])
+        "scap_ng": SPEC,
+        "prototype": True,
+        "profiles": source.get("profiles", []),
+        "resolved_profiles": source.get("resolved_profiles", []),
     })
     dump_yaml(split_root / "groups.yaml", {
         "scap_ng": SPEC, "prototype": True, "groups": source.get("groups", [])
@@ -469,6 +490,7 @@ def main() -> int:
         "source": source.get("source"),
         "benchmark": source.get("benchmark"),
         "profiles": source.get("profiles", []),
+        "resolved_profiles": source.get("resolved_profiles", []),
         "groups": source.get("groups", []),
         "values": source.get("values", []),
         "rules": canonical_rules,
@@ -479,6 +501,11 @@ def main() -> int:
         "source_rules": len(source.get("rules", [])),
         "source_groups":len(source.get("groups",[])),
         "source_profiles":len(source.get("profiles",[])),
+        "resolved_profiles":len(source.get("resolved_profiles",[])),
+        "profile_resolution_requires_review":sum(
+            1 for x in source.get("resolved_profiles",[])
+            if x.get("resolution_status")!="resolved"
+        ),
         "source_values":len(source.get("values",[])),
         "canonical_rules": len(canonical_rules),
         "automated_rules": len(automated),
