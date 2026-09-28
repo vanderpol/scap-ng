@@ -102,47 +102,103 @@ def platforms(element) -> list[str]:
     ]
 
 
-def checks(element) -> list[dict]:
-    rows = []
-    for check in element:
-        if not isinstance(check.tag, str) or split.local(check.tag) != "check":
+def check_semantics(check) -> dict:
+    exports=[]
+    refs=[]
+    for node in check.iter():
+        if not isinstance(node.tag,str):
             continue
-        exports = []
-        refs = []
-        for node in check.iter():
-            if not isinstance(node.tag, str):
-                continue
-            name = split.local(node.tag)
-            if name == "check-export":
-                exports.append({
-                    "export_name": node.get("export-name"),
-                    "value_id": node.get("value-id"),
-                })
-            elif name == "check-content-ref":
-                refs.append({
-                    "name": node.get("name"),
-                    "href": node.get("href") or node.get("{http://www.w3.org/1999/xlink}href"),
-                })
-        rows.append({
-            "system": check.get("system"),
-            "selector": check.get("selector"),
-            "negate": check.get("negate"),
-            "multi_check": check.get("multi-check"),
-            "exports": exports,
-            "content_refs": refs,
-            "inline_content": next(
-                (
-                    text_content(node)
-                    for node in check
-                    if isinstance(node.tag, str)
-                    and split.local(node.tag) == "check-content"
-                ),
-                None,
+        name=split.local(node.tag)
+        if name=="check-export":
+            exports.append({
+                "export_name":node.get("export-name"),
+                "value_id":node.get("value-id"),
+            })
+        elif name=="check-content-ref":
+            refs.append({
+                "name":node.get("name"),
+                "href":node.get("href") or node.get("{http://www.w3.org/1999/xlink}href"),
+            })
+    return {
+        "system":check.get("system"),
+        "selector":check.get("selector"),
+        "negate":check.get("negate"),
+        "multi_check":check.get("multi-check"),
+        "exports":exports,
+        "content_refs":refs,
+        "inline_content":next(
+            (
+                text_content(node)
+                for node in check
+                if isinstance(node.tag,str)
+                and split.local(node.tag)=="check-content"
             ),
-            "source_tree": split.xccdf_node(check),
-        })
-    return rows
+            None,
+        ),
+        "source_tree":split.xccdf_node(check),
+    }
 
+
+def complex_check_semantics(node) -> dict:
+    children=[]
+    for child in node:
+        if not isinstance(child.tag,str):
+            continue
+        name=split.local(child.tag)
+        if name=="check":
+            children.append({
+                "kind":"check",
+                "check":check_semantics(child),
+            })
+        elif name=="complex-check":
+            children.append(complex_check_semantics(child))
+    return {
+        "kind":"complex_check",
+        "operator":node.get("operator"),
+        "negate":boolean_attribute(node.get("negate"),False),
+        "children":children,
+        "source_tree":split.xccdf_node(node),
+    }
+
+
+def rule_check_model(rule) -> dict:
+    complex_nodes=[
+        child for child in rule
+        if isinstance(child.tag,str) and split.local(child.tag)=="complex-check"
+    ]
+    if complex_nodes:
+        if len(complex_nodes)!=1:
+            return {
+                "kind":"invalid_complex_check_count",
+                "count":len(complex_nodes),
+                "source_tree":split.xccdf_node(rule),
+            }
+        return complex_check_semantics(complex_nodes[0])
+    return {
+        "kind":"check_candidates",
+        "checks":[
+            check_semantics(child)
+            for child in rule
+            if isinstance(child.tag,str) and split.local(child.tag)=="check"
+        ],
+    }
+
+
+def flatten_check_model(model: dict) -> list[dict]:
+    if model.get("kind")=="check_candidates":
+        return list(model.get("checks",[]))
+    if model.get("kind")=="check":
+        return [model["check"]]
+    if model.get("kind")=="complex_check":
+        out=[]
+        for child in model.get("children",[]):
+            out.extend(flatten_check_model(child))
+        return out
+    return []
+
+
+def checks(element) -> list[dict]:
+    return flatten_check_model(rule_check_model(element))
 
 def fix_entries(rule) -> list[dict]:
     rows = []
@@ -196,6 +252,7 @@ def rule_semantics(rule, group_path: list[str], inherited_platforms: list[str]) 
         "idents": idents(rule),
         "references": references(rule),
         "checks": checks(rule),
+        "check_model": rule_check_model(rule),
         "fixes": fix_entries(rule),
         "source_tree": split.xccdf_node(rule),
     }
@@ -726,6 +783,13 @@ def main() -> int:
                 1 for x in resolved_profiles if x["resolution_status"]!="resolved"
             ),
             "values":len(values),
+            "rules_with_complex_check":sum(
+                1 for x in joined_rules
+                if x.get("check_model",{}).get("kind")=="complex_check"
+            ),
+            "rules_with_item_extends":sum(1 for x in joined_rules if x.get("extends")),
+            "groups_with_item_extends":sum(1 for x in groups if x.get("extends")),
+            "values_with_item_extends":sum(1 for x in values if x.get("extends")),
             "rules_with_oval_ir": sum(
                 1 for x in joined_rules
                 if x["assessment_source"]
