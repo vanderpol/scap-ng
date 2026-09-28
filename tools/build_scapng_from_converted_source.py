@@ -7,6 +7,7 @@ import base64
 import hashlib
 import json
 from pathlib import Path
+import re
 import zipfile
 
 import yaml
@@ -21,6 +22,10 @@ TEST_SEED=bytes.fromhex(
 
 def load(path: Path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def safe_name(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9._-]+","_",value).strip("_") or "scapng"
 
 
 def canonical(obj) -> bytes:
@@ -195,25 +200,46 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("conversion_dir",type=Path)
     ap.add_argument("--output-dir",type=Path,required=True)
+    ap.add_argument("--artifact-prefix")
+    ap.add_argument("--skip-automated-if-blocked",action="store_true")
     args=ap.parse_args()
 
     root=args.conversion_dir
     out=args.output_dir
     metrics=[]
+    conversion_summary={}
+    summary_path=root/"conversion-summary.json"
+    if summary_path.exists():
+        conversion_summary=json.loads(summary_path.read_text(encoding="utf-8"))
+    blocked_rules=int(conversion_summary.get("blocked_rules",0) or 0)
 
     for model in ("combined-rule","split-policy-assessment-binding"):
         source=root/model
         benchmark=load(source/"benchmark.yaml")
+        prefix=args.artifact_prefix or safe_name(benchmark["benchmark"]["id"])
         for package_type in ("policy-only","automated"):
+            if (
+                package_type=="automated"
+                and blocked_rules
+                and args.skip_automated_if_blocked
+            ):
+                metrics.append({
+                    "model":model,
+                    "type":package_type,
+                    "status":"skipped",
+                    "reason":"source_remediation_blockers",
+                    "blocked_rules":blocked_rules,
+                })
+                continue
             members=(
                 combined_members(source,package_type)
                 if model=="combined-rule"
                 else split_members(source,package_type)
             )
-            filename=f"rhel9-scap14-converted-{model}-{package_type}.scapng"
-            metrics.append(
-                write_bundle(out/filename,model,package_type,members,benchmark)
-            )
+            filename=f"{prefix}-{model}-{package_type}.scapng"
+            row=write_bundle(out/filename,model,package_type,members,benchmark)
+            row["status"]="built"
+            metrics.append(row)
 
     out.mkdir(parents=True,exist_ok=True)
     (out/"package-metrics.json").write_text(
