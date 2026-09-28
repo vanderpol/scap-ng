@@ -41,6 +41,14 @@ def main() -> int:
     if len(rules)!=summary["source_rules"]:
         failures.append("canonical rule count differs from summary")
 
+    combined_processing=load_yaml(root/"combined-rule"/"processing.yaml")
+    split_processing=load_yaml(root/"split-policy-assessment-binding"/"processing.yaml")
+    expected_processing=canonical.get("processing_plan")
+    if combined_processing.get("processing_plan")!=expected_processing:
+        failures.append("combined processing plan differs from canonical")
+    if split_processing.get("processing_plan")!=expected_processing:
+        failures.append("split processing plan differs from canonical")
+
     combined_platforms=load_yaml(root/"combined-rule"/"platforms.yaml")
     split_platforms=load_yaml(root/"split-policy-assessment-binding"/"platforms.yaml")
     expected_platform_definitions=canonical.get("platform_definitions",[])
