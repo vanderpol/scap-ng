@@ -57,19 +57,21 @@ def main():
         for child in root:
             kind=child.tag.rsplit("}",1)[-1]
             if kind=="element" and child.get("name"):
-                annotation_text=" ".join(
-                    text(n)
-                    for n in child
-                    if n.tag.rsplit("}",1)[-1]=="annotation"
-                )
+                deprecated_nodes=[
+                    n for n in child.iter()
+                    if n.tag.rsplit("}",1)[-1]=="deprecated_info"
+                ]
+                deprecation_evidence=" ".join(
+                    text(n) for n in deprecated_nodes
+                ) or None
                 row={
                     "name":child.get("name"),
                     "namespace":target,
                     "type":child.get("type"),
                     "substitution_group":child.get("substitutionGroup"),
                     "schema":rel,
-                    "deprecated":"deprecat" in annotation_text.lower(),
-                    "deprecation_evidence":annotation_text if "deprecat" in annotation_text.lower() else None,
+                    "deprecated":bool(deprecated_nodes),
+                    "deprecation_evidence":deprecation_evidence,
                 }
                 global_elements.append(row)
                 sub=qlocal(child.get("substitutionGroup"))
@@ -181,7 +183,8 @@ def main():
         "limitations":[
             "Schema presence proves structural language coverage, not native SCAP-NG capability equivalence.",
             "Platform-specific test/object/state payloads are faithfully preserved generically until a reviewed native translator exists.",
-            "Schematron constraints are validated separately and are not reduced to this catalog."
+            "Schematron constraints are validated separately and are not reduced to this catalog.",
+            "Element deprecation is recognized only from explicit oval:deprecated_info metadata, not incidental annotation text."
         ],
     }
     args.output.parent.mkdir(parents=True,exist_ok=True)
