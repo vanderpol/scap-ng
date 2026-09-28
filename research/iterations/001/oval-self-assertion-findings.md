@@ -136,6 +136,19 @@ Therefore the current unexercised schema surface is:
 
 These unexercised entries are an explicit coverage backlog. They are **not** assumed to be semantically validated merely because the generic importer can preserve them.
 
+## Finding 6 — the current production-only gap is legacy Windows OVAL
+
+The combined schema/conformance/production ledger found only one production-only test type in the four priority STIG benchmarks: Windows `user_test`. Its `user_object` and `user_state` are likewise production-only, and one production rule uses the older `wmi_object`.
+
+OVAL 5.12.3 documentation marks these constructs deprecated:
+
+- `user_test`, `user_object`, and `user_state` were deprecated as of OVAL 5.11 and replaced by the SID-based `user_sid55_*` family because trustee names are not unique.
+- `wmi_object` was deprecated as of OVAL 5.7 and replaced by `wmi57_object`, which supports multiple selected fields through record semantics.
+
+Both successor families are exercised by the Self-Assertion corpus.
+
+**Implication:** these production-only gaps are forward-compatibility requirements, not evidence that SCAP-NG needs new preferred authoring primitives modeled directly on the deprecated OVAL forms. Their source semantics must remain faithfully importable, with reviewed native normalization or `legacy_compatible` handling where exact equivalence to the successor/native capability can be demonstrated.
+
 ## Current confidence boundary
 
 The current evidence supports the following claims:
