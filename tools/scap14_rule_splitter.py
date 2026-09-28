@@ -279,6 +279,30 @@ def xccdf_node(element):
     return out
 
 
+def effective_rule_check_nodes(rule):
+    """Return XCCDF checks that participate in rule processing.
+
+    If a Rule contains complex-check, XCCDF 1.2 processes its nested checks.
+    Otherwise direct check children are candidates. This helper is used only
+    for dependency seeding; the benchmark IR preserves the Boolean tree.
+    """
+    complex_checks=[
+        child for child in rule
+        if isinstance(child.tag,str) and local(child.tag)=="complex-check"
+    ]
+    if complex_checks:
+        return [
+            node
+            for complex_check in complex_checks
+            for node in complex_check.iter()
+            if isinstance(node.tag,str) and local(node.tag)=="check"
+        ]
+    return [
+        child for child in rule
+        if isinstance(child.tag,str) and local(child.tag)=="check"
+    ]
+
+
 def rule_oval_refs(benchmark):
     values = {
         e.get("id"): xccdf_node(e)
@@ -293,9 +317,7 @@ def rule_oval_refs(benchmark):
         if not rule_id:
             continue
         checks = []
-        for check in rule:
-            if local(check.tag) != "check":
-                continue
+        for check in effective_rule_check_nodes(rule):
             system = check.get("system")
             exports = []
             for child in check.iter():
