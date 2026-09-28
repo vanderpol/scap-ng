@@ -379,3 +379,20 @@ retarget to the newer publication.
 Rebase/migration tooling MAY produce a new Profile or Tailoring artifact for
 the newer Benchmark after validating every referenced Rule, Group, and
 Parameter decision.
+
+
+## 21. Worked source examples
+
+The current five-Rule design-review source trees demonstrate this Benchmark
+model:
+
+    source/examples/rhel9/
+    source/examples/windows11/
+
+They include Benchmark Platform bindings, Rule membership, policy files,
+Manual Assessments, Automated Assessments, and, for Windows 11, a
+Benchmark-scoped applicability catalog.
+
+These examples are non-normative syntax demonstrations. Where example syntax
+and normative requirements diverge during pre-alpha development, the
+specification requirement controls.
