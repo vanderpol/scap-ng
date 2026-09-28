@@ -21,7 +21,7 @@ SCAP-NG SHALL separate:
 
 These concepts SHALL NOT be conflated.
 
-## Compliance semantics versus evidence target
+## Compliance semantics versus evidence maximum
 
 The number of retained or characterized failure examples SHALL NOT be interpreted
 as the number of failures required for the Assessment to fail.
@@ -29,7 +29,7 @@ as the number of failures required for the Assessment to fail.
 For an assertion such as "all matching files must be owned by root", the first
 real violation establishes a fail result.
 
-A separate evidence target MAY request additional failing examples for human
+A separate evidence maximum MAY request additional failing examples for human
 diagnosis and result reporting.
 
 For example:
@@ -55,7 +55,7 @@ semantics, not in evidence-retention settings.
 ## Short-circuit evaluation
 
 A scanner MAY stop evaluating additional items once the logical result is
-decisively known and any requested characterization/evidence target has been
+decisively known and any requested characterization/evidence maximum has been
 met.
 
 For an `all` assertion, one failure can prove the assertion false.
@@ -112,7 +112,7 @@ evaluation ended.
 population. If the population was not fully evaluated, `actual_failures`
 SHALL be `unknown`.
 
-Example after short-circuiting on an evidence target:
+Example after short-circuiting on an evidence maximum:
 
     summary:
       observed_failures: 20
@@ -124,9 +124,9 @@ Example after complete population evaluation:
       observed_failures: 19
       actual_failures: 19
 
-The result SHALL NOT imply that the evidence target is a pass/fail threshold.
+The result SHALL NOT imply that the evidence maximum is a pass/fail threshold.
 If even one observed violation is sufficient to prove the assertion false, the
-result is `fail` regardless of whether the requested evidence target was
+result is `fail` regardless of whether the requested evidence maximum was
 reached.
 
 ## Concise deterministic result message
@@ -209,7 +209,7 @@ For example:
 
 The exact result serialization remains under design.
 
-## Evidence target
+## Evidence maximum
 
 Assessment content SHOULD be able to request:
 
@@ -219,7 +219,7 @@ Assessment content SHOULD be able to request:
 
 The scanner/runtime MAY enforce a stricter result-size or resource safety cap.
 
-If the scanner reduces the requested evidence target, it SHALL report the
+If the scanner reduces the requested evidence maximum, it SHALL report the
 effective cap and truncation reason.
 
 A failure caused by an item-level assertion SHOULD normally retain multiple
@@ -286,7 +286,7 @@ For an assertion that all matching files must be owned by root:
     evaluation:
       logical_complete: true
       population_complete: false
-      stop_reason: evidence_target_satisfied
+      stop_reason: evidence_maximum_reached
       evaluated: 1847
 
     summary:
@@ -312,7 +312,7 @@ Assessment authors SHOULD be able to state the minimum useful evidence contract,
 while scanner/runtime policy retains authority to enforce resource safety
 limits.
 
-Evidence targets SHALL NOT be used to encode compliance thresholds.
+Evidence maximums SHALL NOT be used to encode compliance thresholds.
 
 This design is intended to support both high-volume compliance scanning and
 concise operational integrations such as SCC -> Splunk / Elastic.
