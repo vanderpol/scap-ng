@@ -19,6 +19,37 @@ semantics.
 | 04 | RHEL-09-653030 | 2 defs, 2 tests, 3 objects, 1 state, 2 variables | named intermediate data and derived values |
 | 05 | RHEL-09-654025 | 7 defs, 24 tests, 24 objects, 17 variables | large repeated logic; candidate structured capability + Cartesian assertion matrix |
 
+
+## Formal Stage-1 / Stage-2 paired sample
+
+RHEL-09-654025 is now the first explicit paired conversion example.
+
+**Rule policy and traditional Check Text**
+
+- Rule policy:
+  `../../policy/RHEL-09-654025.policy.yaml`
+- Manual Assessment preserving the source STIG Check Text:
+  `../manual/RHEL-09-654025.manual.assessment.yaml`
+
+**Automated Assessment variants**
+
+- **Stage 1 lossless baseline**:
+  `../automated/RHEL-09-654025.lossless.automated.assessment.yaml`
+- **Stage 2 aggressive/native candidate**:
+  `05-audit-syscall-matrix-native-candidate.assessment.yaml`
+
+The Stage-1 file preserves all 24 OVAL tests, exact regular expressions,
+explicit OVAL existence/check behavior, the defaulted
+`at_least_one_exists` cases, and both source anomalies in which the nominal
+64-bit root case actually resolves to a duplicated `b32` regular expression.
+
+The Stage-2 candidate intentionally does not preserve that implementation
+shape. It demonstrates the possible future `linux.audit_rule` capability and
+a Cartesian assertion model.
+
+Review the Stage-1 file when evaluating conversion fidelity. Review Stage 2
+when evaluating whether native SCAP-NG authoring is substantially easier.
+
 ## Working principles exercised
 
 - No hidden authoring defaults for existence/cardinality or comparison quantifiers.
