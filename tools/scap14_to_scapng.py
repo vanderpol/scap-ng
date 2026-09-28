@@ -359,11 +359,36 @@ def main() -> int:
     manual = []
     automated = []
 
+    applicability_source=source.get("applicability",{})
+    applicability_assessment=None
+    applicability_migration=None
+    if applicability_source.get("oval_ir") is not None:
+        applicability_assessment,applicability_migration=compile_oval_assessment(
+            {
+                "id":"applicability",
+                "title":"SCAP 1.4 CPE applicability checks",
+                "check_model":{"kind":"applicability_check_facts"},
+            },
+            applicability_source["oval_ir"],
+            catalog,
+        )
+
     combined_root = out / "combined-rule"
     split_root = out / "split-policy-assessment-binding"
 
     dump_yaml(combined_root / "benchmark.yaml", render_benchmark_doc(source, "combined-rule"))
     dump_yaml(split_root / "benchmark.yaml", render_benchmark_doc(source, "split-policy-assessment-binding"))
+    if applicability_assessment is not None or applicability_migration is not None:
+        applicability_doc={
+            "scap_ng":SPEC,
+            "prototype":True,
+            "assessment":applicability_assessment,
+            "migration":applicability_migration,
+            "source_diagnostic":applicability_source.get("diagnostic"),
+        }
+        dump_yaml(combined_root/"applicability.yaml",applicability_doc)
+        dump_yaml(split_root/"applicability.yaml",applicability_doc)
+
     dump_yaml(combined_root / "processing.yaml", {
         "scap_ng": SPEC,
         "prototype": True,
@@ -373,6 +398,10 @@ def main() -> int:
         "scap_ng": SPEC,
         "prototype": True,
         "platform_definitions": source.get("platform_definitions", []),
+        "applicability_assessment": (
+            applicability_assessment.get("id")
+            if applicability_assessment is not None else None
+        ),
     })
     dump_yaml(combined_root / "profiles.yaml", {
         "scap_ng": SPEC,
@@ -395,6 +424,10 @@ def main() -> int:
         "scap_ng": SPEC,
         "prototype": True,
         "platform_definitions": source.get("platform_definitions", []),
+        "applicability_assessment": (
+            applicability_assessment.get("id")
+            if applicability_assessment is not None else None
+        ),
     })
     dump_yaml(split_root / "profiles.yaml", {
         "scap_ng": SPEC,
@@ -517,6 +550,11 @@ def main() -> int:
         "format": "scap-ng-converted-benchmark-canonical-0.1",
         "source": source.get("source"),
         "benchmark": source.get("benchmark"),
+        "applicability":{
+            "assessment":applicability_assessment,
+            "migration":applicability_migration,
+            "source_diagnostic":applicability_source.get("diagnostic"),
+        },
         "processing_plan": source.get("processing_plan"),
         "platform_definitions": source.get("platform_definitions", []),
         "profiles": source.get("profiles", []),
@@ -529,6 +567,14 @@ def main() -> int:
 
     summary = {
         "source_rules": len(source.get("rules", [])),
+        "applicability_definition_count":len(
+            applicability_source.get("diagnostic",{}).get("definition_ids",[])
+        ),
+        "applicability_assessment_present":applicability_assessment is not None,
+        "applicability_migration_status":(
+            applicability_migration.get("status")
+            if applicability_migration is not None else None
+        ),
         "traversal_items":len((source.get("processing_plan") or {}).get("traversal",[])),
         "platform_definitions":len(source.get("platform_definitions",[])),
         "source_groups":len(source.get("groups",[])),
@@ -559,6 +605,16 @@ def main() -> int:
     for item in canonical_rules:
         status = item["migration"]["status"]
         summary["migration_status"][status] = summary["migration_status"].get(status, 0) + 1
+
+    if applicability_migration and applicability_migration.get("status")=="unsupported":
+        blocked.append({
+            "kind":"applicability",
+            "migration":applicability_migration,
+        })
+        summary["applicability_blocked"]=True
+    else:
+        summary["applicability_blocked"]=False
+    summary["blocked_rules"]=sum(1 for x in blocked if x.get("rule_id"))
 
     dump_json(out / "conversion-summary.json", summary)
     dump_json(out / "conversion-blockers.json", blocked)
