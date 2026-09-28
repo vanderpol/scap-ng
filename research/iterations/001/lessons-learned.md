@@ -235,7 +235,54 @@ Cross-STIG assessment reuse can reduce authoring, review, regression-test, and m
 
 This keeps the economic argument evidence-based while still allowing the Board and implementers to estimate savings at their own scale.
 
-## 32. Questions carried forward
+## 32. Exact assessment reuse is a first-class requirement at corpus scale
+
+The compact reuse survey processed all 65 individual signed benchmarks in the
+pinned NIWC `Current/` corpus: 8,892 XCCDF rules and 7,084 supported automated
+assessment instances.
+
+Exact normalized OVAL semantics reduce those 7,084 instances to 3,413 unique
+technical assessments. That is **3,671 duplicate assessment definitions
+avoided**, or a **51.82% reduction in assessment-definition maintenance units**.
+
+The measured reuse is not merely pairwise. There are 1,701 cross-benchmark
+exact-reuse groups, including groups spanning 8, 9, 11, 12, and as many as
+13 distinct published benchmarks.
+
+**Lesson:** assessment reuse is not a niche authoring convenience. The chosen
+SCAP-NG source model must make high-fan-out reuse, provenance, impact analysis,
+versioning, and deterministic package resolution straightforward. A design that
+can express reuse only awkwardly would impose measurable maintenance cost at
+real corpus scale.
+
+## 33. Shared technical semantics can expose policy-text drift
+
+Full-corpus exact semantic groups sometimes span policy rules whose titles or
+wording have evolved differently even though their published OVAL technical
+assessment remains identical.
+
+**Lesson:** exact OVAL equivalence proves technical assessment identity under
+the migration model; it does not eliminate policy review. Every reuse binding
+must retain the independent policy identity and provenance. This makes wording
+or intent drift easier to identify instead of silently allowing one policy
+record to overwrite another.
+
+A shared assessment can therefore improve defect visibility as well as reduce
+maintenance: changes to technical logic become centralized while the separate
+policy bindings remain reviewable.
+
+## 34. Full-corpus parameterization remains an upper bound, not a claim
+
+Literal abstraction reduces the 7,084 supported automated assessment instances
+to 1,593 semantic shapes, which would imply a **77.51%** reduction if every
+shape were safely parameterizable.
+
+**Lesson:** do not treat that figure as achieved or proven reuse. Paths,
+thresholds, account names, package names, registry values, and other literals
+can carry policy meaning. Exact reuse is evidence; parameterization requires
+typed, case-by-case semantic review and conformance tests.
+
+## 35. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 
