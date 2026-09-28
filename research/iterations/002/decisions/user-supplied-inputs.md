@@ -1,192 +1,171 @@
-# OVAL Board Decision: User-Supplied Inputs / Organizational Values
+# User-Supplied Inputs / Organizational Values
 
-**Status:** open design decision for OVAL Board review  
+**Status:** working design decision for OVAL Board review  
 **Iteration:** 002  
 **Scope:** split policy / assessment source model
 
-## Why this needs a Board decision
+Normative terms in this research note are provisional but intentionally use
+SHALL, SHALL NOT, SHOULD, SHOULD NOT, and MAY in the sense expected for a
+future standards specification.
 
-SCAP-NG should preserve and improve the useful intent behind XCCDF Values and
-interactive/tailoring inputs: content authors need a way to automate checks
-whose expected value is defined by an organization rather than by the benchmark
-author.
+## Core distinction
 
-This becomes especially important when an otherwise manual requirement can be
-automated if the scanner is given organization-defined data.
+SCAP-NG SHALL distinguish **Tailoring** from **Organizational Input**.
 
-The old SCAP/XCCDF-to-OVAL model did not provide a clean general-purpose bridge
-for rich typed data. SCAP-NG has an opportunity to make this a first-class,
-shared language feature rather than a special policy-to-assessment stovepipe.
+- **Tailoring** changes an already-resolved publisher policy decision.
+- **Organizational Input** supplies a value the publisher intentionally left
+  unresolved because the organization must define it.
 
-## Working direction for discussion
+Supplying a required Organizational Input is not, by itself, Tailoring and
+SHALL NOT cause a rule to be reported as publisher-policy-modified.
 
-An NG assessment should be able to declare typed external inputs, conceptually:
+A user SHALL NOT be required to create a Tailoring artifact merely to execute
+a Profile containing unresolved organizational Parameters.
 
-    inputs:
-      approved_admins:
-        type: list<string>
-        required: true
-        on_missing: not_checked
+Example:
 
-The same declared input could be supplied by:
+    publisher value: password_minimum_length = 15
+    local value:     password_minimum_length = 18
 
-- a benchmark profile;
-- a tailoring or override file;
-- an interactive scanner UI;
-- a scanner-supported external data file;
-- an API or other integration.
+This is Tailoring.
 
-The assessment should consume the same typed value regardless of the delivery
-mechanism.
+By contrast:
 
-## Important design goal
+    publisher value: approved_time_sources = unresolved
+    local value:     [ntp1.example.mil, ntp2.example.mil]
 
-Do not limit user-supplied values to single text strings.
+This is Organizational Input.
 
-Potential input types should include, at minimum, discussion of:
+## Parameter definition, Assessment Method, and Assessment Request
 
-- string
-- boolean
-- integer / decimal
-- version
-- path
-- list<T>
-- set<T>
-- map<K,V>
-- structured record/object
+SCAP-NG SHOULD distinguish three responsibilities.
 
-Inputs may also need validation constraints such as allowed values, regex,
-numeric ranges, uniqueness, and field-level requirements.
-
-This allows organizational data to match the complexity actually needed by the
-assessment language.
-
-## Open Board question: what happens when required input is missing?
-
-This behavior must be normative and content-controlled rather than left to
-individual scanner implementations.
-
-Two important patterns need to be supported or deliberately ruled on.
-
-### Option A — not checked / not evaluated
-
-The assessment cannot make a meaningful determination without the
-organizational value.
+1. The **Benchmark/policy layer** defines the semantic Parameter: identity,
+   description, type constraints, whether it is publisher-defined or
+   organization-defined, and any publisher value/default.
+2. The **Assessment Method** declares a typed expected-state input slot that it
+   consumes. It does not contain local organizational values.
+3. The **Assessment Request** (run manifest) binds a Benchmark/Profile and
+   optional Tailoring and supplies or references Organizational Input values.
 
 Conceptually:
 
-    inputs:
-      approved_admins:
-        type: list<string>
+    benchmark parameter:
+      approved_time_sources:
+        type: set<string>
+        requirement: organizational
         required: true
-        on_missing: not_checked
 
-If the user provides no value, the scanner reports that the rule was not
-checked/evaluated because required input was missing.
+    rule binding:
+      assessment_input: expected_sources
+      parameter: approved_time_sources
 
-### Option B — compare against an explicit empty/default value
+    assessment method:
+      inputs:
+        expected_sources:
+          type: set<string>
+          role: expected_state
 
-For some requirements, absence of supplied data may intentionally resolve to an
-empty or declared default value:
+    assessment request:
+      organizational_inputs:
+        approved_time_sources:
+          - ntp1.example.mil
+          - ntp2.example.mil
 
-    inputs:
-      approved_exceptions:
-        type: list<string>
-        default: []
+An Assessment Request MAY embed Organizational Input values directly or
+reference a separately managed Organizational Input set. Interactive scanner
+entry, an API, or another authorized input mechanism MAY populate the same
+logical bindings at run time.
 
-Normal assessment logic then executes.
+## Policy-data isolation
 
-If collected system data does not satisfy the requirement when compared with
-that empty/default value, the assessment can fail normally.
+Values originating from Profiles, Tailoring, Organizational Input, interactive
+input, APIs, or external input files SHALL be treated solely as typed policy
+data.
 
-This is different from silently treating all missing required values as empty.
+Such values MAY participate as operands representing expected state.
 
-## Questions for the OVAL Board
+Such values SHALL NOT:
+- select or replace an Assessment Method;
+- alter collection targets or collection behavior;
+- supply commands, scripts, SQL, XPath, shell fragments, interpreter input, or
+  other executable/query language;
+- choose collectors, plugins, operations, comparison operators, or privileges;
+- otherwise alter scanner execution semantics.
 
-1. Should user-supplied inputs be a first-class part of the NG assessment
-   language?
+The assessment schema SHOULD make parameter references legal only in
+State-equivalent expected-value positions.
 
-2. Which primitive and structured input types must the first NG specification
-   support?
+This is intentionally stricter than historical OVAL, where external variables
+could participate in broader object/component structures.
 
-3. Should the assessment declaration own the type, validation constraints,
-   required/optional status, default, and missing-value semantics?
+## Typed values
 
-4. Which missing-input result behaviors should be normative?
-   Candidates include:
-   - not_checked / not_evaluated;
-   - error;
-   - use declared default;
-   - explicit empty value followed by normal comparison.
+SCAP-NG SHALL NOT limit Organizational Input to a single text string.
 
-5. Should profiles bind values directly to assessment inputs, or should a
-   separate tailoring/binding object mediate that relationship?
+The type system SHOULD support, at minimum, consideration of:
+- string;
+- boolean;
+- integer / decimal;
+- version;
+- path as a data value, not a collection target;
+- list<T>;
+- set<T>;
+- map<K,V>;
+- structured record/object.
 
-6. Should interactive entry, file-based input, profiles, and APIs all resolve
-   into the same typed input model?
+Validation MAY include allowed values, numeric ranges, uniqueness, and
+field-level requirements. Expression-bearing values require separate security
+review because a regex or similar mini-language is executable semantics, not
+merely passive data.
 
-7. What standard serialization should external input files use? YAML and/or
-   JSON are obvious candidates because they support structured data.
+## Missing required Organizational Input
 
-8. How should scanners report the source of a resolved value: profile,
-   tailoring file, interactive entry, API, or default?
+A required Organizational Input with no effective value SHALL NOT be guessed.
 
-9. What redaction/privacy requirements are needed when organizational inputs
-   may contain sensitive names, accounts, paths, or other local information?
+Unless a declared policy default applies, an assessment dependent on the
+missing value SHALL return a result that clearly identifies unresolved policy
+input, such as `not_evaluated` / `not_checked`, according to the final NG
+result vocabulary.
 
-10. Should input definitions be reusable independently of a single assessment,
-    allowing multiple assessments to consume the same organizational value?
+Content MAY explicitly declare an empty/default value when an empty value has
+real policy meaning. Missing required input SHALL NOT silently become empty.
 
-## Board demonstration requirement
+## Provenance
 
-Iteration 002 should eventually demonstrate at least two examples for Board
-review:
+The source of every effective Parameter value SHALL be retained.
 
-### Required organizational value
+At minimum, result provenance SHOULD distinguish:
+- publisher Benchmark value;
+- publisher Profile value;
+- Tailoring override;
+- persistent Organizational Input set;
+- interactive run-time entry;
+- API/integration supplied value;
+- declared default.
 
-- assessment declares a typed organizational input;
-- no value supplied -> proposed `not_checked` behavior;
-- value supplied -> assessment evaluates normally.
+A Rule result SHALL indicate when a Tailoring action modified publisher policy.
+A Rule result SHALL separately indicate when Organizational Input was required
+to complete an otherwise unresolved publisher requirement.
 
-### Optional/defaulted structured value
+These states are semantically different and SHALL NOT be collapsed into a
+single `tailored=true` indicator.
 
-- assessment declares a list/set/record input;
-- no value supplied -> declared empty/default value;
-- normal comparison executes and may pass or fail.
+## SCAP 1.4 analog
 
-At least one example should use structured data rather than a scalar string.
+| SCAP-NG concept | SCAP 1.4 analog | Relationship |
+| --- | --- | --- |
+| Parameter | XCCDF Value + OVAL external variable contract | expanded and strongly typed |
+| Organizational Input | XCCDF interactive Value / check-export / OVAL external variable | separated from Tailoring |
+| Tailoring override | XCCDF Tailoring/Profile set-value/refine-value | direct descendant with stronger provenance |
+| Assessment Method input | OVAL State/external-variable use | restricted to expected-state operands |
+| Assessment Request | no single direct analog | new orchestration artifact |
 
-## Relationship to profiles
+## Open questions for Board review
 
-Profiles belong to the benchmark/policy layer, but the **input contract belongs
-to the assessment**.
-
-A profile may provide a value, but it should not redefine the assessment's
-datatype or semantic expectations.
-
-Conceptually:
-
-    profile:
-      id: enterprise-default
-      values:
-        approved_admins:
-          - DOMAIN\\SecAdmins
-          - DOMAIN\\OpsAdmins
-
-The same assessment could receive that value from another profile, a tailoring
-file, interactive input, or an API without changing its source.
-
-## Design principle to preserve
-
-The scanner provides input mechanisms.
-
-The content defines:
-
-- what input is needed;
-- its type;
-- its validation;
-- its default, if any;
-- what missing input means.
-
-The OVAL Board should decide the normative syntax and result semantics before
-this becomes a locked SCAP-NG feature.
+- Final primitive/structured type set.
+- Final missing-input result vocabulary.
+- Whether a standalone Organizational Input Set is normative or only a
+  reusable serialization used by Assessment Requests.
+- Required privacy/redaction behavior for locally sensitive values.
+- Exact schema restrictions for safe State-equivalent parameter references.
