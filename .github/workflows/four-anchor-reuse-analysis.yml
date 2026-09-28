@@ -1,0 +1,270 @@
+name: Four-anchor SCAP-NG reuse analysis
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/four-anchor-reuse-analysis.yml"
+      - "tools/oval_semantic_ir.py"
+      - "tools/scap14_rule_splitter.py"
+      - "tools/scap14_benchmark_ir.py"
+      - "tools/scap14_to_scapng.py"
+      - "tools/render_ansible_inspired_benchmark.py"
+      - "tools/verify_scap14_to_scapng_conversion.py"
+      - "tools/build_oval_schema_semantic_catalog.py"
+      - "tools/analyze_scapng_assessment_reuse.py"
+      - "tools/test_scapng_assessment_reuse.py"
+      - "research/iterations/001/oval-test-support-overrides.json"
+      - "third_party/scap-1.4-schemas/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: four-anchor-reuse-analysis-main
+  cancel-in-progress: true
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: rhel9
+            artifact: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+            rules: 445
+            automated: 418
+            manual: 27
+            blocked: 0
+            applicability_status: legacy_compatible
+          - id: oracle-linux9
+            artifact: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+            rules: 448
+            automated: 408
+            manual: 40
+            blocked: 0
+            applicability_status: legacy_compatible
+          - id: windows11
+            artifact: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            rules: 257
+            automated: 245
+            manual: 11
+            blocked: 1
+            applicability_status: unsupported
+          - id: windows-server-2025
+            artifact: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+            rules: 291
+            automated: 260
+            manual: 30
+            blocked: 1
+            applicability_status: unsupported
+
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC published corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install converter dependencies
+        run: python -m pip install --disable-pip-version-check lxml PyYAML
+
+      - name: Test assessment reuse fingerprinting
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/test_scapng_assessment_reuse.py
+
+      - name: Build effective OVAL schema catalog
+        run: |
+          mkdir -p work
+          python scap-ng/tools/build_oval_schema_semantic_catalog.py \
+            scap-ng/third_party/scap-1.4-schemas/oval_5.12.3 \
+            --parser scap-ng/tools/oval_semantic_ir.py \
+            --support-overrides scap-ng/research/iterations/001/oval-test-support-overrides.json \
+            --output work/oval-schema-semantic-catalog.json
+
+      - name: Split published SCAP 1.4 rules
+        run: |
+          python scap-ng/tools/scap14_rule_splitter.py \
+            "niwc/Current/${{ matrix.artifact }}" \
+            --output-dir "work/${{ matrix.id }}-split" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+            --source-repository-path "Current/${{ matrix.artifact }}" \
+            --benchmark-key "${{ matrix.id }}" \
+            --fail-on-unresolved
+
+      - name: Build faithful OVAL IR for every automated rule
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' oval; do
+            python scap-ng/tools/oval_semantic_ir.py "$oval" \
+              --provenance "$(dirname "$oval")/provenance.json" \
+              --output "$(dirname "$oval")/oval-ir.json" \
+              --fail-on-unresolved
+          done < <(find "work/${{ matrix.id }}-split" -name oval.xml -print0 | sort -z)
+
+      - name: Build unified benchmark IR
+        run: |
+          python scap-ng/tools/scap14_benchmark_ir.py \
+            "niwc/Current/${{ matrix.artifact }}" \
+            --split-root "work/${{ matrix.id }}-split" \
+            --output "work/${{ matrix.id }}-benchmark-ir.json"
+
+      - name: Compile combined and split SCAP-NG layouts
+        run: |
+          python scap-ng/tools/scap14_to_scapng.py \
+            "work/${{ matrix.id }}-benchmark-ir.json" \
+            --schema-catalog work/oval-schema-semantic-catalog.json \
+            --output-dir "work/${{ matrix.id }}-scapng"
+
+      - name: Render Ansible-inspired layout
+        run: |
+          python scap-ng/tools/render_ansible_inspired_benchmark.py \
+            "work/${{ matrix.id }}-scapng/canonical-benchmark.json" \
+            --output-dir "work/${{ matrix.id }}-scapng/ansible-inspired"
+
+      - name: Verify all three renderings
+        run: |
+          python scap-ng/tools/verify_scap14_to_scapng_conversion.py \
+            "work/${{ matrix.id }}-scapng" \
+            --expected-rules "${{ matrix.rules }}" \
+            --expected-automated "${{ matrix.automated }}" \
+            --expected-manual "${{ matrix.manual }}" \
+            --expected-blocked-rules "${{ matrix.blocked }}" \
+            --expected-applicability-status "${{ matrix.applicability_status }}" \
+            --ansible-inspired-dir "work/${{ matrix.id }}-scapng/ansible-inspired"
+
+      - name: Archive three-format benchmark
+        run: |
+          tar -C work -czf "work/${{ matrix.id }}-three-format-conversion.tar.gz" \
+            "${{ matrix.id }}-scapng"
+
+      - name: Upload converted benchmark
+        uses: actions/upload-artifact@v4
+        with:
+          name: four-anchor-${{ matrix.id }}
+          path: |
+            work/${{ matrix.id }}-scapng/canonical-benchmark.json
+            work/${{ matrix.id }}-scapng/conversion-summary.json
+            work/${{ matrix.id }}-scapng/conversion-blockers.json
+            work/${{ matrix.id }}-three-format-conversion.tar.gz
+          if-no-files-found: error
+          compression-level: 0
+
+  reuse:
+    needs: convert
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Download four converted anchors
+        uses: actions/download-artifact@v4
+        with:
+          pattern: four-anchor-*
+          path: downloads
+          merge-multiple: false
+
+      - name: Analyze exact and parameterizable reuse
+        run: |
+          mkdir -p scap-ng/research/iterations/001/generated/four-anchor-reuse
+          python scap-ng/tools/analyze_scapng_assessment_reuse.py \
+            rhel9=downloads/four-anchor-rhel9/canonical-benchmark.json \
+            oracle-linux9=downloads/four-anchor-oracle-linux9/canonical-benchmark.json \
+            windows11=downloads/four-anchor-windows11/canonical-benchmark.json \
+            windows-server-2025=downloads/four-anchor-windows-server-2025/canonical-benchmark.json \
+            --output scap-ng/research/iterations/001/generated/four-anchor-reuse/assessment-reuse.json
+
+      - name: Build review summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path("scap-ng/research/iterations/001/generated/four-anchor-reuse")
+          data=json.loads((root/"assessment-reuse.json").read_text())
+          s=data["summary"]
+          lines=[
+              "# Four-anchor SCAP-NG assessment reuse",
+              "",
+              "Measured from the pinned NIWC SCAP 1.4 RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025 benchmarks after conversion to the common canonical SCAP-NG semantic model.",
+              "",
+              "## Measured exact reuse",
+              "",
+              f"- Generic automated assessment instances: **{s['generic_automated_assessment_instances']}**",
+              f"- Unique exact technical assessments: **{s['exact_unique_assessments']}**",
+              f"- Duplicate assessment definitions avoidable through exact reuse: **{s['exact_duplicate_instances_avoided']}**",
+              f"- Exact maintenance-unit reduction in this four-benchmark sample: **{s['exact_maintenance_unit_reduction_pct']}%**",
+              f"- Cross-benchmark exact-reuse groups: **{s['exact_cross_benchmark_reuse_groups']}**",
+              "",
+              "## Parameterization candidates",
+              "",
+              f"- Unique semantic shapes after abstracting literals: **{s['shape_unique_assessments']}**",
+              f"- Candidate duplicate definitions avoidable if every candidate is proven safely parameterizable: **{s['parameterization_candidate_instances_avoided_upper_bound']}**",
+              f"- Candidate reduction upper bound: **{s['parameterization_candidate_reduction_pct_upper_bound']}%**",
+              "",
+              "Parameterization numbers are an upper bound, not a reuse claim. Each candidate must be reviewed before being treated as one reusable assessment.",
+              "",
+              "## Cost model",
+              "",
+              "The report intentionally uses maintenance units rather than invented dollar assumptions. Organizations can apply their own review hours, change frequency, and loaded labor rate to the measured duplicate units avoided.",
+              "",
+              "## Largest cross-benchmark exact-reuse groups",
+              "",
+          ]
+          groups=data["cross_benchmark_exact_reuse_groups"][:20]
+          if not groups:
+              lines.append("No cross-benchmark exact groups were detected.")
+          for g in groups:
+              lines.append(
+                  f"- **{g['instance_count']} instances across {g['benchmark_count']} benchmarks** — "
+                  + ", ".join(g["benchmarks"])
+              )
+              for i in g["instances"][:8]:
+                  lines.append(f"  - {i['benchmark']}: {i['rule_id']} — {i.get('title') or ''}")
+              if len(g["instances"])>8:
+                  lines.append(f"  - … {len(g['instances'])-8} more")
+          lines += [
+              "",
+              "See `assessment-reuse.json` for all exact groups, parameterization candidates, rule mappings, and the organization-specific cost formulas.",
+              "",
+          ]
+          (root/"README.md").write_text("\n".join(lines),encoding="utf-8")
+          PY
+
+      - name: Upload reuse report
+        uses: actions/upload-artifact@v4
+        with:
+          name: four-anchor-assessment-reuse-report
+          path: scap-ng/research/iterations/001/generated/four-anchor-reuse
+          if-no-files-found: error
+
+      - name: Commit four-anchor reuse evidence
+        working-directory: scap-ng
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/iterations/001/generated/four-anchor-reuse
+          if git diff --cached --quiet; then
+            echo "Four-anchor reuse evidence already matches."
+            exit 0
+          fi
+          git commit -m "Measure four-anchor SCAP-NG assessment reuse"
+          git pull --rebase origin main
+          git push
