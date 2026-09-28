@@ -303,6 +303,30 @@ def effective_rule_check_nodes(rule):
     ]
 
 
+def applicability_oval_refs(benchmark):
+    """Return OVAL definitions referenced by CPE applicability check-fact-ref nodes."""
+    rows=[]
+    for platform in benchmark.iter():
+        if not isinstance(platform.tag,str) or local(platform.tag)!="platform":
+            continue
+        platform_id=platform.get("id")
+        # XCCDF Rule/Group platform elements also use the local name "platform";
+        # only CPE platform definitions contain check-fact-ref descendants.
+        for ref in platform.iter():
+            if not isinstance(ref.tag,str) or local(ref.tag)!="check-fact-ref":
+                continue
+            system=ref.get("system")
+            definition_id=ref.get("id-ref")
+            href=ref.get("href") or ref.get(f"{{{XLINK_NS}}}href")
+            rows.append({
+                "platform_id":platform_id,
+                "system":system,
+                "definition_id":definition_id,
+                "href":href,
+            })
+    return rows
+
+
 def rule_oval_refs(benchmark):
     values = {
         e.get("id"): xccdf_node(e)
@@ -490,7 +514,157 @@ def main() -> int:
         "schema_invalid": 0,
         "unresolved_references": 0,
         "ambiguous_definition_references": 0,
+        "applicability_check_fact_refs": 0,
+        "applicability_oval_definition_refs": 0,
+        "applicability_unique_oval_definitions": 0,
+        "applicability_unresolved_references": 0,
+        "applicability_schema_invalid": 0,
     }
+
+    # CPE applicability uses the same OVAL language as Rule checks, but those
+    # definitions are not necessarily reachable from any Rule check. Build one
+    # standalone fixed-point OVAL closure so applicability is executable in NG.
+    applicability_refs=[]
+    for benchmark_component_id, benchmark in benchmarks:
+        for ref in applicability_oval_refs(benchmark):
+            applicability_refs.append({
+                **ref,
+                "xccdf_component":benchmark_component_id,
+            })
+    stats["applicability_check_fact_refs"]=len(applicability_refs)
+    oval_app_refs=[
+        ref for ref in applicability_refs
+        if ref.get("system")==OVAL_DEF_NS
+        and ref.get("definition_id")
+        and OVAL_ID_RE.match(ref["definition_id"])
+    ]
+    stats["applicability_oval_definition_refs"]=len(oval_app_refs)
+    stats["applicability_unique_oval_definitions"]=len({
+        ref["definition_id"] for ref in oval_app_refs
+    })
+    manifest["applicability"]={
+        "references":applicability_refs,
+        "status":"not_present" if not oval_app_refs else "pending",
+    }
+
+    if oval_app_refs:
+        grouped={}
+        resolved=[]
+        applicability_errors=[]
+        for ref in oval_app_refs:
+            definition_id=ref["definition_id"]
+            matches=[c for c in oval_components if c.has_definition(definition_id)]
+            if len(matches)!=1:
+                applicability_errors.append({
+                    **ref,
+                    "match_count":len(matches),
+                    "status":"unresolved" if not matches else "ambiguous",
+                })
+                continue
+            component=matches[0]
+            grouped.setdefault(component,set()).add(definition_id)
+            resolved.append({
+                **ref,
+                "match_count":1,
+                "status":"resolved",
+                "oval_component":component.component_id,
+            })
+
+        component_closures=[]
+        unresolved=set()
+        dependency_edges=[]
+        closure_ids=[]
+        if not applicability_errors:
+            for component,definition_ids in grouped.items():
+                closure,missing,edges=component.closure(sorted(definition_ids))
+                component_closures.append((component,closure))
+                unresolved |= missing
+                closure_ids.extend(sorted(closure))
+                dependency_edges.extend({
+                    **edge,
+                    "oval_component":component.component_id,
+                } for edge in edges)
+
+        stats["applicability_unresolved_references"]=(
+            len(applicability_errors)+len(unresolved)
+        )
+        if applicability_errors or unresolved:
+            manifest["applicability"]={
+                "references":resolved+applicability_errors,
+                "status":"resolution_error",
+                "unresolved":sorted(unresolved),
+            }
+        else:
+            applicability_tree,counts=merge_rule_closures(component_closures)
+            xml_bytes=etree.tostring(
+                applicability_tree,
+                encoding="UTF-8",
+                xml_declaration=True,
+                pretty_print=True,
+            )
+            exact_tree=etree.ElementTree(etree.fromstring(xml_bytes))
+            schema_errors=validate_schema(exact_tree,schema)
+            app_dir=out/"applicability"
+            app_dir.mkdir(parents=True,exist_ok=True)
+            oval_path=app_dir/"oval.xml"
+            oval_path.write_bytes(xml_bytes)
+            provenance={
+                "generated_artifact":True,
+                "authoritative_source":"published_signed_niwc_scap14_zip",
+                "kind":"xccdf_cpe_applicability",
+                "source":manifest["source"],
+                "xccdf_rule_id":None,
+                "xccdf_title":"CPE applicability definitions",
+                "xccdf_component":None,
+                "checks":[
+                    {
+                        "system":ref.get("system"),
+                        "href":ref.get("href"),
+                        "name":ref.get("definition_id"),
+                        "definition_id":ref.get("definition_id"),
+                        "platform_id":ref.get("platform_id"),
+                        "status":ref.get("status"),
+                        "oval_component":ref.get("oval_component"),
+                        "exports":[],
+                    }
+                    for ref in resolved
+                ],
+                "check_exports":[],
+                "definition_ids":sorted({
+                    ref["definition_id"] for ref in resolved
+                }),
+                "oval_component_ids":sorted(c.component_id for c in grouped),
+                "closure":{
+                    "counts":counts,
+                    "ids":sorted(set(closure_ids)),
+                    "unresolved":[],
+                    "dependency_edges":dependency_edges,
+                    "fixed_point_complete":True,
+                },
+                "split_oval":{
+                    "path":oval_path.relative_to(out).as_posix(),
+                    "sha256":sha256(xml_bytes),
+                    "bytes":len(xml_bytes),
+                    "omni_schema_valid":not schema_errors,
+                    "schema_errors":schema_errors,
+                },
+            }
+            (app_dir/"provenance.json").write_text(
+                json.dumps(provenance,indent=2,sort_keys=True)+"\n",
+                encoding="utf-8",
+            )
+            if schema_errors:
+                stats["applicability_schema_invalid"]=1
+            manifest["applicability"]={
+                "references":resolved,
+                "status":"schema_invalid" if schema_errors else "split_valid",
+                "path":oval_path.relative_to(out).as_posix(),
+                "sha256":sha256(xml_bytes),
+                "definition_ids":provenance["definition_ids"],
+                "closure_counts":counts,
+                "dependency_edge_count":len(dependency_edges),
+                "schema_errors":schema_errors,
+            }
 
     for benchmark_component_id, benchmark in benchmarks:
         for row in rule_oval_refs(benchmark):
@@ -699,7 +873,12 @@ def main() -> int:
     failures = (
         stats["schema_invalid"]
         + stats["ambiguous_definition_references"]
-        + (stats["unresolved_references"] if args.fail_on_unresolved else 0)
+        + stats["applicability_schema_invalid"]
+        + (
+            stats["unresolved_references"]
+            + stats["applicability_unresolved_references"]
+            if args.fail_on_unresolved else 0
+        )
     )
     return 1 if failures else 0
 
