@@ -33,6 +33,16 @@ def main():
             if ns not in PRIORITY_NAMESPACES:
                 continue
             row={"category":category,**item}
+            if row.get("status")=="production_only" and row.get("deprecated"):
+                row["recommended_treatment"]="legacy_compatible_migration_support"
+            elif row.get("status")=="production_only":
+                row["recommended_treatment"]="focused_conformance_and_native_mapping"
+            elif row.get("status")=="schema_only" and row.get("deprecated"):
+                row["recommended_treatment"]="defer_unless_encountered_in_migration"
+            elif row.get("status")=="schema_only":
+                row["recommended_treatment"]="coverage_backlog"
+            else:
+                row["recommended_treatment"]="maintain_evidence"
             row["priority_key"]=[
                 STATUS_PRIORITY[item["status"]],
                 -int(item.get("niwc_priority_stig_count",0)),
@@ -55,6 +65,7 @@ def main():
             "then conformance-only constructs",
             "then schema-only constructs",
             "within a status, higher NIWC occurrence count first",
+            "deprecated production constructs require faithful legacy migration support but need not become preferred new authoring primitives",
         ],
         "counts":{k:len(v) for k,v in sorted(by_status.items())},
         "production_only":by_status.get("production_only",[]),
