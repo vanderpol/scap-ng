@@ -79,6 +79,15 @@ Benchmark-to-benchmark mapping and automation reuse must be evidence-based.
 - Report reuse first in observable maintenance units: assessment instances, unique exact assessments, duplicate definitions avoided, fan-out, and percentage reduction. Apply organization-specific labor/time/rate assumptions separately.
 - Effectively deprecated OVAL tests remain source-remediation blockers and are excluded from reusable SCAP-NG automated-assessment counts until the SCAP 1.4 source is corrected.
 
+## Iteration 002 source-only checkpoint
+
+Iteration 002 is source-design only until the project owner explicitly says the source model is ready.
+
+- Do not spend compute on final package generation, signing, complete benchmark regeneration, reference-scanner work, or broad corpus expansion.
+- Use the four anchors only to select and validate representative authoring examples, applicability cases, and shared-assessment mappings.
+- Optimize for concise, understandable native source that an experienced SCAP/OVAL author can review directly.
+- Treat packaging and runtime implementation as downstream work after source syntax/semantics are agreed.
+
 ## OVAL-aligned NG capability taxonomy
 
 Iteration 002 uses OVAL's supported platform-family/test vocabulary as the default SCAP-NG capability taxonomy.
