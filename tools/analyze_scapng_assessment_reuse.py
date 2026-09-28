@@ -333,6 +333,71 @@ def alignment_groups(instances: list[dict]) -> tuple[list[dict], list[dict], lis
     return check_groups,oval_groups,pairs
 
 
+def pair_summaries(
+    benchmark_summaries: list[dict],
+    instances: list[dict],
+    alignment_pairs: list[dict],
+    exact_groups: list[dict],
+) -> list[dict]:
+    totals={
+        row["benchmark"]:row["generic_automated_assessments"]
+        for row in benchmark_summaries
+    }
+    labels=sorted(totals)
+    out=[]
+    for i,left in enumerate(labels):
+        for right in labels[i+1:]:
+            pair_name={left,right}
+            pairs=[
+                x for x in alignment_pairs
+                if {x["left"]["benchmark"],x["right"]["benchmark"]}==pair_name
+            ]
+            same_check=[x for x in pairs if "same_normalized_check_text" in x["evidence"]]
+            same_oval=[x for x in pairs if "equivalent_oval_semantics" in x["evidence"]]
+            both=[x for x in pairs if len(x["evidence"])==2]
+
+            left_reused=set()
+            right_reused=set()
+            exact_pair_groups=0
+            exact_pair_instances=0
+            duplicate_units_avoided=0
+            for group in exact_groups:
+                members=[
+                    x for x in group["instances"]
+                    if x["benchmark"] in pair_name
+                ]
+                benches={x["benchmark"] for x in members}
+                if benches!=pair_name:
+                    continue
+                exact_pair_groups+=1
+                exact_pair_instances+=len(members)
+                duplicate_units_avoided+=len(members)-1
+                for member in members:
+                    if member["benchmark"]==left:
+                        left_reused.add(member["rule_id"])
+                    elif member["benchmark"]==right:
+                        right_reused.add(member["rule_id"])
+
+            out.append({
+                "left":left,
+                "right":right,
+                "left_generic_automated_assessments":totals[left],
+                "right_generic_automated_assessments":totals[right],
+                "aligned_rule_pairs_union":len(pairs),
+                "same_check_text_rule_pairs":len(same_check),
+                "equivalent_oval_rule_pairs":len(same_oval),
+                "alignment_pairs_supported_by_both":len(both),
+                "exact_reuse_groups":exact_pair_groups,
+                "exact_reuse_instances":exact_pair_instances,
+                "duplicate_assessment_definitions_avoided":duplicate_units_avoided,
+                "left_rules_reusing_exact_assessment":len(left_reused),
+                "right_rules_reusing_exact_assessment":len(right_reused),
+                "left_exact_reuse_coverage_pct":pct(len(left_reused),totals[left]),
+                "right_exact_reuse_coverage_pct":pct(len(right_reused),totals[right]),
+            })
+    return out
+
+
 def pct(numerator: int, denominator: int) -> float:
     return round(100.0 * numerator / denominator, 2) if denominator else 0.0
 
@@ -385,6 +450,12 @@ def main() -> int:
     shape_avoided = max(0, total - shape_unique)
 
     exact_cross = [x for x in exact_groups if x["cross_benchmark"]]
+    pair_summary=pair_summaries(
+        benchmark_summaries,
+        instances,
+        alignment_pairs,
+        exact_cross,
+    )
     shape_cross = [
         x for x in shape_groups
         if x["cross_benchmark"]
@@ -438,6 +509,7 @@ def main() -> int:
                 "both": sum(1 for x in alignment_pairs if len(x["evidence"])==2),
             },
         },
+        "benchmark_pair_summary": pair_summary,
         "maintenance_cost_model": {
             "baseline_definition_units": total,
             "exact_reuse_definition_units": exact_unique,
