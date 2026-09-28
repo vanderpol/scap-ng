@@ -83,8 +83,8 @@ Benchmark-to-benchmark mapping and automation reuse must be evidence-based.
 
 Iteration 002 uses OVAL's supported platform-family/test vocabulary as the default SCAP-NG capability taxonomy.
 
-- Canonical default naming is `<oval-family>.<oval-test-basename>`, removing only the trailing `_test`; examples include `unix.file`, `windows.registry`, `linux.rpminfo`, `solaris.package`, `macos.plist511`, and `independent.textfilecontent54`.
-- Preserve numeric/version suffixes when they distinguish materially different supported OVAL semantics; do not normalize them away automatically.
+- Canonical default naming starts from `<oval-family>.<oval-test-basename>`, removing only the trailing `_test`; unversioned examples include `unix.file`, `windows.registry`, `linux.rpminfo`, and `solaris.package`.
+- Historical numeric/version suffixes such as `53`, `54`, `55`, and `511` are an explicit OVAL Board design decision. Preserve the supported source basename in migration prototypes until the Board decides whether NG retains those suffixes or rebases corrected semantics to unsuffixed names.
 - Reuse OVAL's family boundaries as accumulated design evidence, especially where collected data models differ by platform.
 - Reusing OVAL capability vocabulary does not require retaining OVAL XML definition/test/object/state authoring structure.
 - Effectively deprecated OVAL tests do not become NG capabilities unless governance has reinstated them.
