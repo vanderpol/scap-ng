@@ -378,13 +378,13 @@ policy-exception mechanism rather than falsifying target applicability.
 The Windows 11 source example demonstrates a Benchmark-scoped applicability
 catalog and reusable Rule applicability Assessments:
 
-    source/examples/windows11/applicability.yaml
-    source/examples/windows11/assessments/automated/applicability/
+    research/iterations/002/examples/source/windows11/applicability.yaml
+    research/iterations/002/examples/source/windows11/assessments/automated/applicability/
 
 The RHEL 9 source example demonstrates a Benchmark with multiple alternative
 Platform identities sharing the same Rule policy set:
 
-    source/examples/rhel9/benchmark.yaml
-    source/examples/rhel9/assessments/automated/platforms/
+    research/iterations/002/examples/source/rhel9/benchmark.yaml
+    research/iterations/002/examples/source/rhel9/assessments/automated/platforms/
 
 These examples are design-review source and do not freeze final serialization.
