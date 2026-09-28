@@ -1,0 +1,29 @@
+# Stage-1 lossless conversion of the CPE applicability condition
+# xccdf_mil.disa.stig_platform_Windows_MemberWorkstation.
+# Root OVAL definition: oval:mil.disa.stig.win:def:100002
+assessment:
+  id: windows.member-workstation
+  mode: automated
+
+  collect:
+    computer_system_domain_role:
+      capability: windows.wmi57
+      select:
+        namespace:
+          equals: 'root\cimv2'
+        wql:
+          equals: 'SELECT DomainRole FROM win32_computersystem'
+      fields:
+        - result
+      # Source OVAL test: oval:mil.disa.stig.win:tst:10000200
+      # Source OVAL object: oval:mil.disa.stig.win:obj:10000100
+
+  assert:
+    source: computer_system_domain_role
+    # Source OVAL omitted check_existence; make the default explicit.
+    existence: at_least_one_exists
+    check: all
+    condition:
+      field: result.domainrole
+      equals: '1'
+    # Source OVAL state: oval:mil.disa.stig.win:ste:10000200
