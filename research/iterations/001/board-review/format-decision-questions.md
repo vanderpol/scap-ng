@@ -13,6 +13,8 @@ candidate formats.
 ## Assessment reuse
 
 - How is one technical assessment shared by multiple STIG rules?
+- Does the source model remain understandable when one exact assessment is reused by 6, 12, or 13 independent benchmark rules?
+- Can tooling show the full impact set before a high-fan-out shared assessment is changed?
 - Is the reuse relationship explicit or inherited?
 - Can policy identity remain independent from assessment identity?
 - Can the shared assessment be versioned independently when appropriate?
