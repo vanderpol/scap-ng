@@ -107,3 +107,18 @@ During this checkpoint:
 
 The current goal remains agreement on what authors should write, not production
 of the final distributable form.
+
+
+## Source-style five-rule examples
+
+Current source-layout review examples:
+
+- `examples/source/rhel9/` — five RHEL 9 Rules with policy, Manual Assessments,
+  lossless Automated Assessments, and Platform Assessments.
+- `examples/source/windows11/` — five Windows 11 Rules with policy, Manual
+  Assessments, lossless Automated Assessments, Platform Assessment, and
+  applicability catalog/Assessments.
+
+These trees are intended to show how the current split policy/assessment model
+looks as a coherent authoring source layout. They are design-review examples,
+not frozen schema.
