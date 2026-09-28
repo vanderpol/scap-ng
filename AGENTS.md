@@ -53,6 +53,19 @@ Raw `oval:deprecated_info` in a historical 5.12 schema is not sufficient by itse
 - Example: Windows `accesstoken_test` is deprecated as of OVAL 5.11 and replaced by `userright_test`; SCAP-NG accepts the supported `userright_test` model, not `accesstoken_test`.
 - Counterexample: Solaris `package_test` and `package511_test` were marked deprecated in OVAL 5.12, but OVAL Community issue #225 / PR #226 restored them to OVAL 6.0 and issue #300 records that their restoration to the 5.x line was intended but overlooked. They are therefore supported, not SCAP-NG blockers.
 
+## Full-datastream conversion workflow
+
+Whole-benchmark migration work must be automated and reproducible.
+
+- Start from a pinned published SCAP 1.4 datastream/package, not hand-copied rule fragments.
+- Build one unified XCCDF + OVAL benchmark IR before rendering any SCAP-NG source organization.
+- Render combined-rule and split policy/assessment/binding candidates from that same benchmark IR.
+- Verify policy and assessment equivalence between renderings rule-by-rule.
+- Preserve complete source-accounting trees for constructs that do not yet have dedicated normalized NG fields.
+- Treat faithful generic lowering and native normalization as separate gates. Generic migrated assessments may remain `legacy_compatible` until reviewed collector/capability mappings and differential tests justify `exact_native` or `exact_normalized`.
+- Reusable conversion/parser/validation/package utilities belong under repository-level `tools/`. Iteration directories may contain experiments, regression fixtures, reports, and generated evidence but should not become the only home of reusable infrastructure.
+- Large complete generated conversion trees may be retained as reproducible CI artifacts when committing every duplicated rendering would add unnecessary repository weight. Commit the tools, workflow, compact counts/blockers/hashes, representative conversions, and lessons learned.
+
 ## OVAL 5.12.3 importer expectations
 
 The SCAP-NG importer must aim for lossless dependency and semantic representation before native lowering.
