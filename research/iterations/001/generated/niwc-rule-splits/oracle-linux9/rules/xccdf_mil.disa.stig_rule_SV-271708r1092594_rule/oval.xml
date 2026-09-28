@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271708" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230296" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must not permit direct logons to the root account using remote access via SSH.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23029600" comment="/etc/ssh/sshd_config:PermitRootLogin == no"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271708" version="1" class="compliance">
           <metadata>
             <title>OL09-00-002345 - OL 9 must not permit direct logons to the root account using remote access via SSH.</title>
             <affected family="unix">
@@ -16,25 +25,11 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230296"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:230296" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must not permit direct logons to the root account using remote access via SSH.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23029600" comment="/etc/ssh/sshd_config:PermitRootLogin == no"/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23029600" version="2" check_existence="at_least_one_exists" check="all" comment="/etc/ssh/sshd_config:PermitRootLogin == no">
           <object object_ref="oval:mil.disa.stig.ind:obj:23029602"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:20000017"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23029600" version="1">
-          <filepath>/etc/ssh/sshd_config</filepath>
-          <pattern operation="pattern match">^\s*(?i)PermitRootLogin(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23029602" version="2" comment="all sshd_config and sshd_config.d/* files">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23029602" version="2" comment="all sshd_config and sshd_config.d/* files">
           <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
             <object_reference>oval:mil.disa.stig.ind:obj:23029600</object_reference>
             <object_reference>oval:mil.disa.stig.ind:obj:23029601</object_reference>
@@ -43,6 +38,11 @@
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23029601" version="1">
           <path>/etc/ssh/sshd_config.d</path>
           <filename operation="pattern match">.+</filename>
+          <pattern operation="pattern match">^\s*(?i)PermitRootLogin(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23029600" version="1">
+          <filepath>/etc/ssh/sshd_config</filepath>
           <pattern operation="pattern match">^\s*(?i)PermitRootLogin(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>

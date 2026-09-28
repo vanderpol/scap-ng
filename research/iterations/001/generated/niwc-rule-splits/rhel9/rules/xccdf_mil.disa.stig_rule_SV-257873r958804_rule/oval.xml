@@ -4,7 +4,18 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257873" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230517" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must mount /var/log/audit with the nodev option.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.linux:tst:23051700"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23051701"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23051702"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257873" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-231160 - RHEL 9 must mount /var/log/audit with the nodev option.</title>
             <affected family="unix">
@@ -18,45 +29,34 @@ The only legitimate location for device files is the "/dev" directory located on
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230517"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:230517" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must mount /var/log/audit with the nodev option.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.linux:tst:23051700"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23051701"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23051702"/>
-          </criteria>
-        </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23051702" version="1" check="all" comment="/var/log/audit is configured in /etc/fstab">
-          <object object_ref="oval:mil.disa.stig.ind:obj:23051702"/>
-        </textfilecontent54_test>
+        </definitions><tests><variable_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23051701" version="1" check="all" comment="/var/log/audit is configured with the nodev option in /etc/fstab">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23051701"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23051700"/>
+        </variable_test>
         <partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23051700" version="1" check="all" comment="/var/log/audit is mounted with the nodev option">
           <object object_ref="oval:mil.disa.stig.linux:obj:23051700"/>
           <state state_ref="oval:mil.disa.stig.linux:ste:20000001"/>
         </partition_test>
-        <variable_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23051701" version="1" check="all" comment="/var/log/audit is configured with the nodev option in /etc/fstab">
-          <object object_ref="oval:mil.disa.stig.ind:obj:23051701"/>
-          <state state_ref="oval:mil.disa.stig.ind:ste:23051700"/>
-        </variable_test>
-        </tests><objects><variable_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23051701" version="1">
-          <var_ref>oval:mil.disa.stig.linux:var:23051700</var_ref>
-        </variable_object>
-        <partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23051700" version="1">
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23051702" version="1" check="all" comment="/var/log/audit is configured in /etc/fstab">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23051702"/>
+        </textfilecontent54_test>
+        </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23051700" version="1">
           <mount_point>/var/log/audit</mount_point>
         </partition_object>
+        <variable_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23051701" version="1">
+          <var_ref>oval:mil.disa.stig.linux:var:23051700</var_ref>
+        </variable_object>
         <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23051702" version="1">
           <filepath>/etc/fstab</filepath>
           <pattern operation="pattern match">^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$</pattern>
           <instance datatype="int">1</instance>
         </textfilecontent54_object>
-        </objects><states><variable_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23051700" version="1">
-          <value entity_check="at least one">nodev</value>
-        </variable_state>
-        <partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
+        </objects><states><partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
           <mount_options entity_check="at least one">nodev</mount_options>
         </partition_state>
+        <variable_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23051700" version="1">
+          <value entity_check="at least one">nodev</value>
+        </variable_state>
         </states><variables><local_variable id="oval:mil.disa.stig.linux:var:23051700" version="1" datatype="string" comment="Mount options for /var/log/audit in /etc/fstab">
           <split delimiter=",">
             <object_component object_ref="oval:mil.disa.stig.ind:obj:23051702" item_field="subexpression"/>

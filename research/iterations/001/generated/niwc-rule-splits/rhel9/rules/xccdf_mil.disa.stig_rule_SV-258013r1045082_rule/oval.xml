@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:258013" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:258013" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must prevent a user from overriding the banner-message-enable setting for the graphical user interface.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25802600" comment="dconf user database(s) exist"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:25801300" comment="/org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:258013" version="1" class="compliance">
           <metadata>
             <title>RHEL-09-271015 - RHEL 9 must prevent a user from overriding the banner-message-enable setting for the graphical user interface.</title>
             <affected family="unix">
@@ -20,31 +30,21 @@ Satisfies: SRG-OS-000023-GPOS-00006, SRG-OS-000228-GPOS-00088</description>
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:258013"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:258013" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must prevent a user from overriding the banner-message-enable setting for the graphical user interface.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25802600" comment="dconf user database(s) exist"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:25801300" comment="/org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists"/>
-          </criteria>
-        </definition>
         </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25801300" version="1" check_existence="at_least_one_exists" check="all" comment="/org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists">
           <object object_ref="oval:mil.disa.stig.ind:obj:25801300"/>
         </textfilecontent54_test>
         <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:25802600" version="1" check_existence="at_least_one_exists" check="all" comment="dconf user database(s) exist">
           <object object_ref="oval:mil.disa.stig.ind:obj:25802600"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25801300" version="1" comment="/org/gnome/login-screen/banner-message-enable in dconf user database locks directories">
+        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25802600" version="2" comment="dconf user databases">
+          <filepath>/etc/dconf/profile/user</filepath>
+          <pattern operation="pattern match">^system-db:(\S+)\s*$</pattern>
+          <instance datatype="int" operation="greater than or equal">1</instance>
+        </textfilecontent54_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25801300" version="1" comment="/org/gnome/login-screen/banner-message-enable in dconf user database locks directories">
           <path var_ref="oval:mil.disa.stig.defs:var:25802600" var_check="at least one"/>
           <filename operation="pattern match">.*</filename>
           <pattern operation="pattern match">^/org/gnome/login-screen/banner-message-enable$</pattern>
-          <instance datatype="int" operation="greater than or equal">1</instance>
-        </textfilecontent54_object>
-        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:25802600" version="2" comment="dconf user databases">
-          <filepath>/etc/dconf/profile/user</filepath>
-          <pattern operation="pattern match">^system-db:(\S+)\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
         </objects><variables><local_variable id="oval:mil.disa.stig.defs:var:25802600" version="2" datatype="string" comment="dconf user database locks directories">

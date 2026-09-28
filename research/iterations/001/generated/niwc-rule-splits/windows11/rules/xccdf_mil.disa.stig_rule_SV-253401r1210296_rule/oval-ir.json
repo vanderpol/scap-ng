@@ -5,6 +5,41 @@
       "criteria": {
         "children": [
           {
+            "comment": "Minimum PIN length is 6 or greater",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25340100"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:253401",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Windows must be configured to require a minimum pin length of six characters or greater."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "3"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:253401",
             "kind": "definition_ref",
@@ -49,57 +84,22 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "3"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
-            "comment": "Minimum PIN length is 6 or greater",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25340100"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:253401",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Windows must be configured to require a minimum pin length of six characters or greater."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "3"
     }
   ],
   "dependency_edges": [
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows11:def:253401",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253401"
-    },
     {
       "attribute": "test_ref",
       "element": "criterion",
       "from": "oval:mil.disa.stig.defs:def:253401",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.win:tst:25340100"
+    },
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows11:def:253401",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253401"
     },
     {
       "attribute": "object_ref",
@@ -116,6 +116,13 @@
       "to": "oval:mil.disa.stig.win:ste:25340100"
     },
     {
+      "attribute": "var_ref",
+      "element": "key",
+      "from": "oval:mil.disa.stig.win:obj:25340102",
+      "kind": "variable_reference",
+      "to": "oval:mil.disa.stig.defs:var:25340100"
+    },
+    {
       "attribute": null,
       "element": "object_reference",
       "from": "oval:mil.disa.stig.win:obj:25340100",
@@ -128,13 +135,6 @@
       "from": "oval:mil.disa.stig.win:obj:25340100",
       "kind": "set_object_reference",
       "to": "oval:mil.disa.stig.win:obj:25340102"
-    },
-    {
-      "attribute": "var_ref",
-      "element": "key",
-      "from": "oval:mil.disa.stig.win:obj:25340102",
-      "kind": "variable_reference",
-      "to": "oval:mil.disa.stig.defs:var:25340100"
     },
     {
       "attribute": "object_ref",
@@ -256,12 +256,13 @@
         },
         {
           "attributes": {
-            "datatype": "string"
+            "datatype": "string",
+            "var_check": "at least one",
+            "var_ref": "oval:mil.disa.stig.defs:var:25340100"
           },
           "kind": "element",
           "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity"
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
         },
         {
           "attributes": {
@@ -273,11 +274,11 @@
           "value": "MinimumPINLength"
         }
       ],
-      "comment": "Group Policy registry entry for MinimumPINLength",
-      "id": "oval:mil.disa.stig.win:obj:25340101",
+      "comment": "Intune registry entry for MinimumPINLength",
+      "id": "oval:mil.disa.stig.win:obj:25340102",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "1"
+      "version": "4"
     },
     {
       "children": [
@@ -322,13 +323,12 @@
         },
         {
           "attributes": {
-            "datatype": "string",
-            "var_check": "at least one",
-            "var_ref": "oval:mil.disa.stig.defs:var:25340100"
+            "datatype": "string"
           },
           "kind": "element",
           "name": "key",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows"
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity"
         },
         {
           "attributes": {
@@ -340,11 +340,11 @@
           "value": "MinimumPINLength"
         }
       ],
-      "comment": "Intune registry entry for MinimumPINLength",
-      "id": "oval:mil.disa.stig.win:obj:25340102",
+      "comment": "Group Policy registry entry for MinimumPINLength",
+      "id": "oval:mil.disa.stig.win:obj:25340101",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "4"
+      "version": "1"
     },
     {
       "children": [
@@ -415,12 +415,12 @@
       "oval:mil.disa.stig.defs:def:253401"
     ]
   },
-  "semantic_ir_sha256": "92e65eee5af18295bca369ec7d7854ef42178cfb474740ab35a5ac094cce558c",
+  "semantic_ir_sha256": "00d21632c18faa18a4fab99b71b004e8279167916b4b504ca7fa19003a68b739",
   "source": {
     "bytes": 5212,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253401r1210296_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253401r1210296_rule/provenance.json",
-    "sha256": "d9883c929bcc33f436f21b2a85d5ff885a00b4667843b3a4f71a7999dac5a273"
+    "sha256": "479b67d547822047ed9f30dd05ca44d1acee4e380349aae2e8397379d6ef52eb"
   },
   "states": [
     {

@@ -4,7 +4,17 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:42:07</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.ol9os:def:271663" version="1" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:230520" version="1" class="compliance">
+          <metadata>
+            <title>The operating system must mount /var/tmp with the nodev option.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.linux:tst:23052000"/>
+            <criterion test_ref="oval:mil.disa.stig.ind:tst:23052001"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.ol9os:def:271663" version="1" class="compliance">
           <metadata>
             <title>OL09-00-002067 - OL 9 must mount /var/tmp with the nodev option.</title>
             <affected family="unix">
@@ -18,16 +28,6 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230520"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:230520" version="1" class="compliance">
-          <metadata>
-            <title>The operating system must mount /var/tmp with the nodev option.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.linux:tst:23052000"/>
-            <criterion test_ref="oval:mil.disa.stig.ind:tst:23052001"/>
-          </criteria>
-        </definition>
         </definitions><tests><partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23052000" version="1" check_existence="any_exist" check="all" comment="If /var/tmp is mounted, it is mounted with the nodev option">
           <object object_ref="oval:mil.disa.stig.linux:obj:23052000"/>
           <state state_ref="oval:mil.disa.stig.linux:ste:20000001"/>
@@ -36,18 +36,18 @@
           <object object_ref="oval:mil.disa.stig.ind:obj:23052001"/>
           <state state_ref="oval:mil.disa.stig.ind:ste:23052000"/>
         </textfilecontent54_test>
-        </tests><objects><textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23052001" version="1">
+        </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23052000" version="1">
+          <mount_point>/var/tmp</mount_point>
+        </partition_object>
+        <textfilecontent54_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:obj:23052001" version="1">
           <filepath>/etc/fstab</filepath>
           <pattern operation="pattern match">^\s*[^#\s]+\s+/var/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$</pattern>
           <instance datatype="int">1</instance>
         </textfilecontent54_object>
-        <partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23052000" version="1">
-          <mount_point>/var/tmp</mount_point>
-        </partition_object>
-        </objects><states><textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23052000" version="1">
-          <subexpression operation="pattern match">(?:^nodev$|^nodev,|,nodev$|,nodev,)</subexpression>
-        </textfilecontent54_state>
-        <partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
+        </objects><states><partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
           <mount_options entity_check="at least one">nodev</mount_options>
         </partition_state>
+        <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23052000" version="1">
+          <subexpression operation="pattern match">(?:^nodev$|^nodev,|,nodev$|,nodev,)</subexpression>
+        </textfilecontent54_state>
         </states></oval_definitions>

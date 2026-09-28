@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25328600"
-          },
-          {
-            "comment": "Verifies 'Configure SMBv1 client driver' is set to 'Enabled' with 'Disable driver (recommended)' selected for 'Configure MrxSmb10 driver'",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25328800"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "OR"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:253288",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The Server Message Block (SMB) v1 protocol must be disabled on the SMB client."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "2"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:253288",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25328600"
+          },
+          {
+            "comment": "Verifies 'Configure SMBv1 client driver' is set to 'Enabled' with 'Disable driver (recommended)' selected for 'Configure MrxSmb10 driver'",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25328800"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "OR"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:253288",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The Server Message Block (SMB) v1 protocol must be disabled on the SMB client."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "2"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows11:def:253288",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253288"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -106,13 +113,6 @@
       "from": "oval:mil.disa.stig.defs:def:253288",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.win:tst:25328800"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows11:def:253288",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253288"
     },
     {
       "attribute": "object_ref",
@@ -249,6 +249,34 @@
             "datatype": "string"
           },
           "kind": "element",
+          "name": "namespace",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "root\\cimv2"
+        },
+        {
+          "attributes": {
+            "datatype": "string",
+            "operation": "equals"
+          },
+          "kind": "element",
+          "name": "wql",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'"
+        }
+      ],
+      "comment": null,
+      "id": "oval:mil.disa.stig.win:obj:25328600",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "type": "wmi57_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "attributes": {
+            "datatype": "string"
+          },
+          "kind": "element",
           "name": "hive",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
           "value": "HKEY_LOCAL_MACHINE"
@@ -276,34 +304,6 @@
       "id": "oval:mil.disa.stig.win:obj:25328800",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "registry_object",
-      "version": "1"
-    },
-    {
-      "children": [
-        {
-          "attributes": {
-            "datatype": "string"
-          },
-          "kind": "element",
-          "name": "namespace",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "root\\cimv2"
-        },
-        {
-          "attributes": {
-            "datatype": "string",
-            "operation": "equals"
-          },
-          "kind": "element",
-          "name": "wql",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'"
-        }
-      ],
-      "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:25328600",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "type": "wmi57_object",
       "version": "1"
     }
   ],
@@ -335,14 +335,39 @@
       "oval:mil.disa.stig.defs:def:253288"
     ]
   },
-  "semantic_ir_sha256": "e1763a5e7c0fabd1e0d69f68980274d95e8814d3b19f3ea8e33c66e0897a08a2",
+  "semantic_ir_sha256": "a912f647e18c093bf96d3f67d87cf5eeae64397ee343815519d58d27b9f358fa",
   "source": {
     "bytes": 4784,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253288r958478_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253288r958478_rule/provenance.json",
-    "sha256": "9278ce49004d4b37cc4fa909bdbc0eecdfa9ccf04078118eecc9677557aafc9a"
+    "sha256": "d907dd1277865247f51b4772a0eab3397db7dedc0bab363bf10e06468ac8a91e"
   },
   "states": [
+    {
+      "comment": "Reg_Dword type and value equals 4",
+      "entities": [
+        {
+          "kind": "element",
+          "name": "type",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "reg_dword"
+        },
+        {
+          "attributes": {
+            "datatype": "int"
+          },
+          "kind": "element",
+          "name": "value",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+          "value": "4"
+        }
+      ],
+      "id": "oval:mil.disa.stig.win:ste:20000004",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
+      "operator": "AND",
+      "type": "registry_state",
+      "version": "1"
+    },
     {
       "comment": "Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2",
       "entities": [
@@ -373,31 +398,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "operator": "AND",
       "type": "wmi57_state",
-      "version": "1"
-    },
-    {
-      "comment": "Reg_Dword type and value equals 4",
-      "entities": [
-        {
-          "kind": "element",
-          "name": "type",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "reg_dword"
-        },
-        {
-          "attributes": {
-            "datatype": "int"
-          },
-          "kind": "element",
-          "name": "value",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "4"
-        }
-      ],
-      "id": "oval:mil.disa.stig.win:ste:20000004",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-      "operator": "AND",
-      "type": "registry_state",
       "version": "1"
     }
   ],

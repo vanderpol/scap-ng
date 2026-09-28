@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "Verifies 'Internet Information Services' feature is not installed",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25327500"
-          },
-          {
-            "comment": "Verifies 'Internet Information Services Hostable Web Core' feature is not installed",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.win:tst:25327501"
-          }
-        ],
-        "comment": "No IIS components are installed",
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:253275",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "Internet Information System (IIS) or its subcomponents must not be installed on a workstation."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:253275",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "2"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "Verifies 'Internet Information Services' feature is not installed",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25327500"
+          },
+          {
+            "comment": "Verifies 'Internet Information Services Hostable Web Core' feature is not installed",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.win:tst:25327501"
+          }
+        ],
+        "comment": "No IIS components are installed",
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:253275",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "Internet Information System (IIS) or its subcomponents must not be installed on a workstation."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.windows11:def:253275",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:253275"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -106,13 +113,6 @@
       "from": "oval:mil.disa.stig.defs:def:253275",
       "kind": "criterion_test",
       "to": "oval:mil.disa.stig.win:tst:25327501"
-    },
-    {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.windows11:def:253275",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:253275"
     },
     {
       "attribute": "object_ref",
@@ -251,11 +251,11 @@
           "kind": "element",
           "name": "wql",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-HostableWebCore'"
+          "value": "SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-WebServerRole'"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:25327501",
+      "id": "oval:mil.disa.stig.win:obj:25327500",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "wmi57_object",
       "version": "1"
@@ -279,11 +279,11 @@
           "kind": "element",
           "name": "wql",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
-          "value": "SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-WebServerRole'"
+          "value": "SELECT installstate FROM win32_optionalfeature WHERE name = 'IIS-HostableWebCore'"
         }
       ],
       "comment": null,
-      "id": "oval:mil.disa.stig.win:obj:25327500",
+      "id": "oval:mil.disa.stig.win:obj:25327501",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
       "type": "wmi57_object",
       "version": "1"
@@ -316,12 +316,12 @@
       "oval:mil.disa.stig.defs:def:253275"
     ]
   },
-  "semantic_ir_sha256": "cc49ffe55e8a3a914fdb31357c356a43182e79791b81c1048997b2af782c5d5e",
+  "semantic_ir_sha256": "aba1336f94fc63efb24e4c617daff609def8ec4b8bcb9c1bfdbead7eb6103518",
   "source": {
     "bytes": 4112,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253275r958478_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/windows11/rules/xccdf_mil.disa.stig_rule_SV-253275r958478_rule/provenance.json",
-    "sha256": "d60dc42657b0eeb9fa92c25c8b1353bb08981265547c012c90ed9e3fa59b6bea"
+    "sha256": "74f6d2eff05eda69c95a2b9159361989d33e06ea33d461348c1a03fe2c0047b7"
   },
   "states": [
     {

@@ -28,14 +28,14 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:230301"/>
           </criteria>
         </definition>
-        </definitions><tests><textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23030101" version="3" check_existence="any_exist" check="all" comment="Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are ignored.">
-          <object object_ref="oval:mil.disa.stig.ind:obj:23030101"/>
-          <state state_ref="oval:mil.disa.stig.ind:ste:23030100"/>
-        </textfilecontent54_test>
-        <partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23030100" version="3" check_existence="any_exist" check="all" comment="Device files are mounted with the nodev option.  Mounts on '/' are ignored.">
+        </definitions><tests><partition_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:tst:23030100" version="3" check_existence="any_exist" check="all" comment="Device files are mounted with the nodev option.  Mounts on '/' are ignored.">
           <object object_ref="oval:mil.disa.stig.linux:obj:23030100"/>
           <state state_ref="oval:mil.disa.stig.linux:ste:20000001"/>
         </partition_test>
+        <textfilecontent54_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:tst:23030101" version="3" check_existence="any_exist" check="all" comment="Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are ignored.">
+          <object object_ref="oval:mil.disa.stig.ind:obj:23030101"/>
+          <state state_ref="oval:mil.disa.stig.ind:ste:23030100"/>
+        </textfilecontent54_test>
         </tests><objects><partition_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:obj:23030100" version="3">
           <mount_point operation="pattern match">^/\S+$</mount_point>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="include">oval:mil.disa.stig.linux:ste:23030102</filter>
@@ -45,13 +45,13 @@
           <pattern operation="pattern match">^\s*/dev\S*\s+/\S+\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$</pattern>
           <instance datatype="int" operation="greater than or equal">1</instance>
         </textfilecontent54_object>
-        </objects><states><partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:23030102" version="1">
+        </objects><states><partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
+          <mount_options entity_check="at least one">nodev</mount_options>
+        </partition_state>
+        <partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:23030102" version="1">
           <device operation="pattern match">^/dev\S*$</device>
         </partition_state>
         <textfilecontent54_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.stig.ind:ste:23030100" version="1">
           <subexpression operation="pattern match">(?:^nodev$|^nodev,|,nodev$|,nodev,)</subexpression>
         </textfilecontent54_state>
-        <partition_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:mil.disa.stig.linux:ste:20000001" version="1">
-          <mount_options entity_check="at least one">nodev</mount_options>
-        </partition_state>
         </states></oval_definitions>

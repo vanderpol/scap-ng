@@ -4,7 +4,16 @@
         <oval:schema_version>5.11</oval:schema_version>
         <oval:timestamp>2026-06-25T09:43:57</oval:timestamp>
       </generator>
-      <definitions><definition id="oval:mil.disa.stig.rhel9os:def:257890" version="2" class="compliance">
+      <definitions><definition id="oval:mil.disa.stig.defs:def:257890" version="1" class="compliance">
+          <metadata>
+            <title>All the operating system local interactive user home directories must have mode 0750 or less permissive.</title>
+            <description/>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.stig.unix:tst:25789000" comment="All local interactive user home directories are 0750 or less"/>
+          </criteria>
+        </definition>
+        <definition id="oval:mil.disa.stig.rhel9os:def:257890" version="2" class="compliance">
           <metadata>
             <title>RHEL-09-232050 - All RHEL 9 local interactive user home directories must have mode 0750 or less permissive.</title>
             <affected family="unix">
@@ -16,30 +25,24 @@
             <extend_definition definition_ref="oval:mil.disa.stig.defs:def:257890"/>
           </criteria>
         </definition>
-        <definition id="oval:mil.disa.stig.defs:def:257890" version="1" class="compliance">
-          <metadata>
-            <title>All the operating system local interactive user home directories must have mode 0750 or less permissive.</title>
-            <description/>
-          </metadata>
-          <criteria>
-            <criterion test_ref="oval:mil.disa.stig.unix:tst:25789000" comment="All local interactive user home directories are 0750 or less"/>
-          </criteria>
-        </definition>
         </definitions><tests><file_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:tst:25789000" version="2" check_existence="any_exist" check="all" comment="All local interactive user home directories are 0750 or less">
           <object object_ref="oval:mil.disa.stig.unix:obj:25789001"/>
           <state state_ref="oval:mil.disa.stig.unix:ste:20000022"/>
         </file_test>
-        </tests><objects><password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:25789000" version="5" comment="Local interactive users without nologin">
+        </tests><objects><file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:25789001" version="1" comment="home directories of local interactive users without nologin">
+          <path var_ref="oval:mil.disa.stig.defs:var:25789000" var_check="at least one"/>
+          <filename xsi:nil="true"/>
+        </file_object>
+        <password_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:25789000" version="5" comment="Local interactive users without nologin">
           <username operation="pattern match">.*</username>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="exclude">oval:mil.disa.stig.unix:ste:25789000</filter>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="exclude">oval:mil.disa.stig.unix:ste:25789002</filter>
           <filter xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" action="exclude">oval:mil.disa.stig.unix:ste:25789003</filter>
         </password_object>
-        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:obj:25789001" version="1" comment="home directories of local interactive users without nologin">
-          <path var_ref="oval:mil.disa.stig.defs:var:25789000" var_check="at least one"/>
-          <filename xsi:nil="true"/>
-        </file_object>
-        </objects><states><file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000022" version="1" comment="mode 0750 or less permissive">
+        </objects><states><password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:25789002" version="2" comment="uid &lt; 1000">
+          <user_id datatype="int" operation="less than">1000</user_id>
+        </password_state>
+        <file_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:20000022" version="1" comment="mode 0750 or less permissive">
           <suid datatype="boolean">false</suid>
           <sgid datatype="boolean">false</sgid>
           <sticky datatype="boolean">false</sticky>
@@ -50,9 +53,6 @@
         </file_state>
         <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:25789003" version="1" comment="uid = 65534 (nobody)">
           <user_id datatype="int">65534</user_id>
-        </password_state>
-        <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:25789002" version="2" comment="uid &lt; 1000">
-          <user_id datatype="int" operation="less than">1000</user_id>
         </password_state>
         <password_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:mil.disa.stig.unix:ste:25789000" version="3" comment="nologin shell">
           <login_shell operation="pattern match">^.*nologin.*$</login_shell>

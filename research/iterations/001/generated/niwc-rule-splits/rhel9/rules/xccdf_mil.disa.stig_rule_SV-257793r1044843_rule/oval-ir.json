@@ -5,47 +5,6 @@
       "criteria": {
         "children": [
           {
-            "comment": "BLS options contain page_poison=1",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25779300"
-          },
-          {
-            "comment": "/etc/default/grub page_poison=1",
-            "kind": "test_ref",
-            "negate": false,
-            "test_ref": "oval:mil.disa.stig.ind:tst:25779301"
-          }
-        ],
-        "comment": null,
-        "kind": "boolean",
-        "negate": false,
-        "operator": "AND"
-      },
-      "deprecated": null,
-      "id": "oval:mil.disa.stig.defs:def:230277",
-      "metadata": {
-        "children": [
-          {
-            "name": "title",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
-            "text": "The operating system must clear the page allocator to prevent use-after-free attacks."
-          },
-          {
-            "name": "description",
-            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-          }
-        ],
-        "name": "metadata",
-        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-      },
-      "version": "1"
-    },
-    {
-      "class": "compliance",
-      "criteria": {
-        "children": [
-          {
             "comment": null,
             "definition_ref": "oval:mil.disa.stig.defs:def:230277",
             "kind": "definition_ref",
@@ -90,9 +49,57 @@
         "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
       },
       "version": "1"
+    },
+    {
+      "class": "compliance",
+      "criteria": {
+        "children": [
+          {
+            "comment": "BLS options contain page_poison=1",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25779300"
+          },
+          {
+            "comment": "/etc/default/grub page_poison=1",
+            "kind": "test_ref",
+            "negate": false,
+            "test_ref": "oval:mil.disa.stig.ind:tst:25779301"
+          }
+        ],
+        "comment": null,
+        "kind": "boolean",
+        "negate": false,
+        "operator": "AND"
+      },
+      "deprecated": null,
+      "id": "oval:mil.disa.stig.defs:def:230277",
+      "metadata": {
+        "children": [
+          {
+            "name": "title",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+            "text": "The operating system must clear the page allocator to prevent use-after-free attacks."
+          },
+          {
+            "name": "description",
+            "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+          }
+        ],
+        "name": "metadata",
+        "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      },
+      "version": "1"
     }
   ],
   "dependency_edges": [
+    {
+      "attribute": "definition_ref",
+      "element": "extend_definition",
+      "from": "oval:mil.disa.stig.rhel9os:def:257793",
+      "kind": "extend_definition",
+      "to": "oval:mil.disa.stig.defs:def:230277"
+    },
     {
       "attribute": "test_ref",
       "element": "criterion",
@@ -108,11 +115,18 @@
       "to": "oval:mil.disa.stig.ind:tst:25779301"
     },
     {
-      "attribute": "definition_ref",
-      "element": "extend_definition",
-      "from": "oval:mil.disa.stig.rhel9os:def:257793",
-      "kind": "extend_definition",
-      "to": "oval:mil.disa.stig.defs:def:230277"
+      "attribute": "object_ref",
+      "element": "object",
+      "from": "oval:mil.disa.stig.ind:tst:25779300",
+      "kind": "test_object",
+      "to": "oval:mil.disa.stig.ind:obj:25779300"
+    },
+    {
+      "attribute": "state_ref",
+      "element": "state",
+      "from": "oval:mil.disa.stig.ind:tst:25779300",
+      "kind": "test_state",
+      "to": "oval:mil.disa.stig.ind:ste:25779300"
     },
     {
       "attribute": "object_ref",
@@ -125,20 +139,6 @@
       "attribute": "state_ref",
       "element": "state",
       "from": "oval:mil.disa.stig.ind:tst:25779301",
-      "kind": "test_state",
-      "to": "oval:mil.disa.stig.ind:ste:25779300"
-    },
-    {
-      "attribute": "object_ref",
-      "element": "object",
-      "from": "oval:mil.disa.stig.ind:tst:25779300",
-      "kind": "test_object",
-      "to": "oval:mil.disa.stig.ind:obj:25779300"
-    },
-    {
-      "attribute": "state_ref",
-      "element": "state",
-      "from": "oval:mil.disa.stig.ind:tst:25779300",
       "kind": "test_state",
       "to": "oval:mil.disa.stig.ind:ste:25779300"
     }
@@ -232,6 +232,40 @@
       "children": [
         {
           "kind": "element",
+          "name": "filepath",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "/etc/default/grub"
+        },
+        {
+          "attributes": {
+            "operation": "pattern match"
+          },
+          "kind": "element",
+          "name": "pattern",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "^GRUB_CMDLINE_LINUX=\"(.*)\""
+        },
+        {
+          "attributes": {
+            "datatype": "int",
+            "operation": "greater than or equal"
+          },
+          "kind": "element",
+          "name": "instance",
+          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+          "value": "1"
+        }
+      ],
+      "comment": "/etc/default/grub GRUB_CMDLINE_LINUX",
+      "id": "oval:mil.disa.stig.ind:obj:25779301",
+      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
+      "type": "textfilecontent54_object",
+      "version": "1"
+    },
+    {
+      "children": [
+        {
+          "kind": "element",
           "name": "path",
           "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
           "value": "/boot/loader/entries"
@@ -270,40 +304,6 @@
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "type": "textfilecontent54_object",
       "version": "1"
-    },
-    {
-      "children": [
-        {
-          "kind": "element",
-          "name": "filepath",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "/etc/default/grub"
-        },
-        {
-          "attributes": {
-            "operation": "pattern match"
-          },
-          "kind": "element",
-          "name": "pattern",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "^GRUB_CMDLINE_LINUX=\"(.*)\""
-        },
-        {
-          "attributes": {
-            "datatype": "int",
-            "operation": "greater than or equal"
-          },
-          "kind": "element",
-          "name": "instance",
-          "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-          "value": "1"
-        }
-      ],
-      "comment": "/etc/default/grub GRUB_CMDLINE_LINUX",
-      "id": "oval:mil.disa.stig.ind:obj:25779301",
-      "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
-      "type": "textfilecontent54_object",
-      "version": "1"
     }
   ],
   "parser_contract": {
@@ -333,12 +333,12 @@
       "oval:mil.disa.stig.defs:def:230277"
     ]
   },
-  "semantic_ir_sha256": "9775a5712c1dd18a1cd9da74d5cedb809ef090703368a2a62ce59141d5e69bcd",
+  "semantic_ir_sha256": "ec6cf52894bcfcbf618ddc0edbc3986bbb894efc7ea6a56e334656897cd95b8a",
   "source": {
     "bytes": 4144,
     "path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257793r1044843_rule/oval.xml",
     "provenance_path": "scap-ng/research/iterations/001/generated/niwc-rule-splits/rhel9/rules/xccdf_mil.disa.stig_rule_SV-257793r1044843_rule/provenance.json",
-    "sha256": "80bf896461bb3e5d8c308472f5fa99909c3233fdb6c1584ad7c3295198b27997"
+    "sha256": "f4399608c5167d85430fd58d894586b5780dfcd86963595c729c7593f431ef69"
   },
   "states": [
     {
@@ -365,15 +365,15 @@
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
-      "comment": "/etc/default/grub page_poison=1",
-      "id": "oval:mil.disa.stig.ind:tst:25779301",
+      "comment": "BLS options contain page_poison=1",
+      "id": "oval:mil.disa.stig.ind:tst:25779300",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25779301"
+            "object_ref": "oval:mil.disa.stig.ind:obj:25779300"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25779301"
+          "object_ref": "oval:mil.disa.stig.ind:obj:25779300"
         }
       ],
       "other": [],
@@ -392,15 +392,15 @@
     {
       "check": "all",
       "check_existence": "at_least_one_exists",
-      "comment": "BLS options contain page_poison=1",
-      "id": "oval:mil.disa.stig.ind:tst:25779300",
+      "comment": "/etc/default/grub page_poison=1",
+      "id": "oval:mil.disa.stig.ind:tst:25779301",
       "namespace": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
       "objects": [
         {
           "attributes": {
-            "object_ref": "oval:mil.disa.stig.ind:obj:25779300"
+            "object_ref": "oval:mil.disa.stig.ind:obj:25779301"
           },
-          "object_ref": "oval:mil.disa.stig.ind:obj:25779300"
+          "object_ref": "oval:mil.disa.stig.ind:obj:25779301"
         }
       ],
       "other": [],
