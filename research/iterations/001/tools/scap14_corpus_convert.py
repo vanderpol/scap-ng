@@ -518,7 +518,7 @@ def load_deprecated_tests(path: Path | None) -> dict[str, dict]:
     return {
         f'{row.get("namespace","")}#{row.get("name","")}': row
         for row in data.get("test_elements", [])
-        if row.get("deprecated")
+        if row.get("effective_deprecated", row.get("deprecated"))
     }
 
 
