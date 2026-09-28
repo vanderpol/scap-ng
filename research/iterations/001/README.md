@@ -5,7 +5,7 @@
 
 Iteration 001 is intentionally **not a draft specification** and remains our internal working iteration until deliberately shared outside the project.
 
-**SCAP 1.4 forward conversion is a hard requirement.** Every architecture and authoring-syntax experiment in this iteration must remain capable of representing content converted from existing SCAP 1.4 datastreams through the same faithful semantic model.
+**SCAP 1.4 forward conversion is a hard requirement for supported, non-deprecated source semantics.** SCAP-NG deliberately excludes OVAL tests marked deprecated in OVAL 5.12.3; affected definitions must be corrected in SCAP 1.4 before conversion. Every architecture and authoring-syntax experiment must otherwise remain capable of representing converted SCAP 1.4 content through the same faithful semantic model.
 
 Published migration evidence is scoped to the pinned NIWC Atlantic `scap-content-library/Current` corpus. The first depth pass focuses on RHEL 9, Oracle Linux 9, Windows 11, and Windows Server 2025; the final conversion gate covers every individual benchmark in the pinned `Current/` tree.
 
