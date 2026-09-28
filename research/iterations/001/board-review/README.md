@@ -99,10 +99,12 @@ Across those 65 benchmarks:
 - XCCDF rules: **8,892**
 - supported automated assessments: **7,084**
 - unique exact technical assessments: **3,413**
-- duplicate assessment definitions avoidable through exact reuse: **3,671**
-- exact assessment-definition maintenance reduction: **51.82%**
+- duplicate assessment definitions avoidable through exact reuse (including within-benchmark duplicates): **3,671**
+- total exact assessment-definition maintenance reduction: **51.82%**
 - cross-benchmark exact-reuse groups: **1,701**
 - assessment instances participating in cross-benchmark exact reuse: **5,340**
+- duplicate assessment definitions avoidable specifically through cross-benchmark reuse: **3,639**
+- cross-benchmark maintenance-unit reduction over all supported automated assessments: **51.37%**
 - cross-benchmark identical-Check-Text groups: **1,295**
 
 This means more than half of the independently maintained supported automated
