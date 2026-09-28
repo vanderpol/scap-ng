@@ -161,7 +161,33 @@ The generated faithful RHEL 9 example is 115 lines in the original NG spelling a
 
 **Lesson:** evaluate Ansible-inspired syntax on comprehension and adoption familiarity, not an assumption that it will reduce authoring size. Both remain renderings of one semantic model.
 
-## 24. Questions carried forward
+## 24. Full-datastream conversion should preserve first, normalize second
+
+The first end-to-end RHEL 9 converter deliberately lowers OVAL into a generic structured SCAP-NG assessment graph before attempting elegant capability-specific normalization.
+
+**Lesson:** conversion correctness and native-language elegance are separate gates. A mechanically faithful graph provides a complete migration path and provenance baseline; reviewed normalizers can then promote repeated patterns to `exact_native` or `exact_normalized` without changing source policy identity.
+
+This avoids making every new OVAL collector pattern a prerequisite for demonstrating whole-benchmark conversion.
+
+## 25. XCCDF needs the same loss-accounting discipline as OVAL
+
+OVAL closure work became reliable only after every reference and construct was explicitly accounted for. Full benchmark conversion exposes the same requirement for XCCDF profiles, Values, checks, references, fixes, group membership, applicability, and less-common rule children.
+
+**Lesson:** the benchmark IR retains both normalized fields and the complete XCCDF subtree for each policy object. Missing dedicated NG syntax therefore remains visible rather than being silently dropped.
+
+## 26. Candidate source organizations must be rendered from one benchmark IR
+
+A fair architecture comparison cannot use separately authored content.
+
+**Lesson:** the full RHEL 9 conversion renders both combined-rule and split policy/assessment/binding layouts from one unified XCCDF+OVAL benchmark IR. A verifier compares policy and assessment semantics rule-by-rule so renderer drift becomes a build failure.
+
+## 27. Generated evidence and reusable tooling have different Git requirements
+
+A complete converted benchmark may contain hundreds of large generated source files, while the converter itself and the architectural conclusions are long-lived assets.
+
+**Lesson:** shared tools, schemas/overrides, workflows, lessons, compact summaries, blockers, hashes, and representative converted cases belong in Git. Complete large conversion trees can be retained as reproducible CI artifacts when committing every duplicated rendering would add repository weight without additional review value.
+
+## 28. Questions carried forward
 
 The most important unresolved questions after these prototypes are:
 
