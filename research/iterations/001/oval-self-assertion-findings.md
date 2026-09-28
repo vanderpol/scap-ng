@@ -149,7 +149,7 @@ Both successor families are exercised by the Self-Assertion corpus.
 
 **Implication:** these production-only gaps are **source-remediation blockers, not SCAP-NG runtime requirements**. SCAP-NG intentionally contains no deprecated OVAL tests. A converter must report the affected definition as `unsupported: deprecated_oval_test` and require the publisher to replace the deprecated test in SCAP 1.4 before conversion. No automatic rewrite or `legacy_compatible` path is allowed.
 
-This also explains why the pinned Self-Assertion corpus is especially useful for defining SCAP-NG's supported OVAL surface: its current OVAL test content does not exercise deprecated test families.
+The pinned Self-Assertion corpus is still useful for defining the supported surface, but it is not entirely free of deprecated OVAL. At the pinned revision it exercises three deprecated test types outside the current Linux/Windows priority scope: IOS `version_test` (4 instances), Solaris `package_test` (3), and Solaris `package511_test` (6). These remain useful as legacy OVAL parser/accounting fixtures, but they are explicitly excluded from the SCAP-NG supported-test surface and must not be counted as SCAP-NG conformance requirements.
 
 ## Current confidence boundary
 
