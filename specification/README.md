@@ -35,6 +35,9 @@ Normative terms **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, and
   Rule applicability, applicability catalogs.
 - `policy/profiles-and-tailoring.md` — publisher Profiles and external
   Tailoring.
+- `policy/policy-resolution.md` — deterministic composition/evaluation order
+  for Benchmark, Profile, Tailoring, inputs, Platform, applicability, and Rule
+  Assessment.
 - `policy/parameters-and-organizational-input.md` — typed policy values,
   Organizational Input, safe Assessment bindings.
 
