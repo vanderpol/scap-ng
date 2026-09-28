@@ -79,6 +79,16 @@ Benchmark-to-benchmark mapping and automation reuse must be evidence-based.
 - Report reuse first in observable maintenance units: assessment instances, unique exact assessments, duplicate definitions avoided, fan-out, and percentage reduction. Apply organization-specific labor/time/rate assumptions separately.
 - Effectively deprecated OVAL tests remain source-remediation blockers and are excluded from reusable SCAP-NG automated-assessment counts until the SCAP 1.4 source is corrected.
 
+## OVAL-aligned NG capability taxonomy
+
+Iteration 002 uses OVAL's supported platform-family/test vocabulary as the default SCAP-NG capability taxonomy.
+
+- Canonical default naming is `<oval-family>.<oval-test-basename>`, removing only the trailing `_test`; examples include `unix.file`, `windows.registry`, `linux.rpminfo`, `solaris.package`, `macos.plist511`, and `independent.textfilecontent54`.
+- Preserve numeric/version suffixes when they distinguish materially different supported OVAL semantics; do not normalize them away automatically.
+- Reuse OVAL's family boundaries as accumulated design evidence, especially where collected data models differ by platform.
+- Reusing OVAL capability vocabulary does not require retaining OVAL XML definition/test/object/state authoring structure.
+- Effectively deprecated OVAL tests do not become NG capabilities unless governance has reinstated them.
+
 ## Native source design checkpoint
 
 Broad benchmark expansion is paused while the native SCAP-NG authoring model is reviewed.
