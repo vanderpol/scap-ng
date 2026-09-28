@@ -38,16 +38,20 @@ Requirements:
 
 ## Deprecated OVAL test exclusion rule
 
-SCAP-NG contains **no deprecated OVAL tests from SCAP 1.4 / OVAL 5.12.3**.
+SCAP-NG contains **no effectively deprecated OVAL tests from SCAP 1.4 / OVAL 5.12.x**.
 
-- A definition that references any OVAL test marked deprecated by the OVAL 5.12.3 schema is not convertible to SCAP-NG.
+Raw `oval:deprecated_info` in a historical 5.12 schema is not sufficient by itself to determine current support. OVAL Community governance may later reinstate a test. The checked-in `oval-test-support-overrides.json` records those explicit reinstatement decisions.
+
+- A definition that references an OVAL test whose **effective** status remains deprecated is not convertible to SCAP-NG.
 - The converter may ingest and source-account the definition so it can produce a precise diagnostic, but it must mark conversion `unsupported` with reason `deprecated_oval_test`.
-- Deprecated tests are not eligible for `legacy_compatible`, `exact_normalized`, or silent automatic replacement.
+- Effectively deprecated tests are not eligible for `legacy_compatible`, `exact_normalized`, or silent automatic replacement.
+- A test explicitly reinstated by later OVAL Community governance is treated as supported even if the source 5.12 schema still contains historical `deprecated_info`.
 - The diagnostic should identify the deprecated test and, when the schema provides one, its supported replacement.
 - The SCAP 1.4 content author must update and validate the source content using supported OVAL tests before SCAP-NG conversion can succeed.
 - Deprecated objects/states that are reachable only through a deprecated test therefore do not create SCAP-NG runtime requirements.
 - Production use of deprecated tests is measured as source-remediation debt, not as evidence that SCAP-NG must implement the deprecated collector.
 - Example: Windows `accesstoken_test` is deprecated as of OVAL 5.11 and replaced by `userright_test`; SCAP-NG accepts the supported `userright_test` model, not `accesstoken_test`.
+- Counterexample: Solaris `package_test` and `package511_test` were marked deprecated in OVAL 5.12, but OVAL Community issue #225 / PR #226 restored them to OVAL 6.0 and issue #300 records that their restoration to the 5.x line was intended but overlooked. They are therefore supported, not SCAP-NG blockers.
 
 ## OVAL 5.12.3 importer expectations
 
