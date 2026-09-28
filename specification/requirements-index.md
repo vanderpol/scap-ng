@@ -13,8 +13,8 @@ under design.
 | Conformance roles and validation | `core/conformance.md` | draft |
 | Benchmark / Rule / Group structure | `policy/benchmark.md` | draft |
 | Platform specification and applicability | `policy/platform-and-applicability.md` | draft |
-| Profiles and Tailoring | `policy/profiles-and-tailoring.md` | draft; tailoring rule-selection details remain open |
-| Parameters and Organizational Input | `policy/parameters-and-organizational-input.md` | draft |
+| Profiles and Tailoring | `policy/profiles-and-tailoring.md` | draft |
+| Policy resolution/evaluation order | `policy/policy-resolution.md` | draft |\n| Parameters and Organizational Input | `policy/parameters-and-organizational-input.md` | draft |
 | Assessment Methods | `assessment/assessment-method.md` | draft |
 | Manual Assessment defaults | `assessment/manual-assessment.md` | draft |
 | Results and evidence | `results/results.md` | draft |
