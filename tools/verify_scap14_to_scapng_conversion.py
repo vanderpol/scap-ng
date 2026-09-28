@@ -75,6 +75,10 @@ def main() -> int:
     ap.add_argument("--expected-manual",type=int)
     ap.add_argument("--expected-applicability-definitions",type=int)
     ap.add_argument("--expected-blocked-rules",type=int)
+    ap.add_argument(
+        "--expected-applicability-status",
+        choices=["legacy_compatible","exact_native","exact_normalized","unsupported"],
+    )
     ap.add_argument("--ansible-inspired-dir",type=Path)
     args=ap.parse_args()
 
@@ -102,7 +106,14 @@ def main() -> int:
             f"{args.expected_applicability_definitions} applicability definitions, "
             f"got {summary.get('applicability_definition_count')}"
         )
-    if summary.get("applicability_blocked"):
+    applicability_status=summary.get("applicability_migration_status")
+    if args.expected_applicability_status is not None:
+        if applicability_status!=args.expected_applicability_status:
+            failures.append(
+                f"expected applicability status {args.expected_applicability_status}, "
+                f"got {applicability_status}"
+            )
+    elif summary.get("applicability_blocked"):
         failures.append("applicability conversion is blocked")
     if (
         args.expected_blocked_rules is not None
