@@ -1,5 +1,7 @@
 # Four-Anchor SCAP-NG Content Development Demonstration
 
+> **Important:** The currently published per-benchmark `source/` trees are fidelity-first migration output, not the intended long-term native SCAP-NG authoring model. They intentionally retain XCCDF/OVAL/OCIL lineage while conversion semantics are being proven. Before Board review, these legacy references will move to `migration-provenance/`, and the Board-facing `source/` tree will contain NG-native constructs only. See `../../native-authoring-boundary.md`.
+
 This directory is intended to be read like a hypothetical SCAP-NG content
 development repository, not merely as generated test evidence.
 
