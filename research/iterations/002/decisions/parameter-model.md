@@ -30,31 +30,43 @@ expected-state input bindings.
 
 ## XCCDF refine-value
 
-XCCDF 1.2 `refine-value` allowed a Profile to select among alternate
-publisher-authored Value selectors/constraints and to refine the Value
-operator. That was a useful attempt to support policy variants without simply
-replacing the Value.
+XCCDF 1.2 `refine-value` is a Profile action. It can select an alternate
+publisher-authored Value selector/constraint and can refine the Value operator.
+In the absence of an applied Profile or Tailoring action, the normal/default
+Value selection is used.
 
 SCAP-NG SHALL NOT initially define a direct native `refine-value` equivalent.
 
 The preferred native model is deliberately smaller:
-- a Profile selects or supplies the effective publisher policy value;
+- a Profile supplies the effective publisher policy value;
 - Tailoring overrides an already-resolved policy value;
 - Organizational Input supplies an intentionally unresolved value;
 - validation constraints remain explicit and typed.
 
-## Migration requirement
+## Migration behavior if refine-value is dropped
 
-An SCAP 1.4 up-converter SHALL preserve the semantics of source
-`refine-value` usage.
+If the OVAL Board decides that native SCAP-NG does not support
+`refine-value`, the up-converter SHALL NOT recreate the historical
+`refine-value` mechanism merely for compatibility.
 
-Where the selected XCCDF Value variant can be represented losslessly as an
-explicit SCAP-NG Profile Parameter binding plus constraints, the converter
-SHOULD normalize it to that simpler form.
+Dormant or otherwise non-effective `refine-value` data does not require a
+native runtime representation.
 
-Where lossless normalization is not possible, the converter SHALL preserve the
-source semantics in migration IR/provenance and SHALL mark the construct for
-review rather than silently dropping or approximating it.
+One compatibility case remains important: when converting an XCCDF Profile
+whose effective behavior actually depends on `refine-value`, silently
+ignoring that action would change the Profile's policy semantics.
+
+For such an applied/effective source Profile, the converter MAY normalize the
+resolved result into an ordinary SCAP-NG Profile Parameter binding when that is
+lossless. For example, a selected XCCDF Value variant may become an explicit
+Parameter value in the converted Profile.
+
+If the Board prefers that even this normalization not be supported, the
+converter SHOULD report that source Profile as requiring review or unsupported
+rather than silently changing its effective policy.
+
+The converter does not need to preserve selectors, `refine-value` syntax, or
+other obsolete mechanism after the effective policy value has been normalized.
 
 ## Reconsideration
 
@@ -63,6 +75,5 @@ production migration evidence or native authoring requirements demonstrate a
 case that cannot be expressed clearly with the smaller Parameter/Profile model.
 
 Because this changes a long-standing XCCDF policy-language feature and affects
-the contract between policy and assessment, promotion of such a construct into
-the native SCAP-NG specification SHOULD be an explicit OVAL Board design
-decision.
+the contract between policy and assessment, retention or removal of the feature
+SHOULD be an explicit OVAL Board design decision.
