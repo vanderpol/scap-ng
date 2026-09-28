@@ -436,6 +436,97 @@ def profile_semantics(profile) -> dict:
     }
 
 
+def build_traversal_plan(benchmark, rules: list[dict], groups: list[dict]) -> list[dict]:
+    by_rule={x["id"]:x for x in rules if x.get("id")}
+    by_group={x["id"]:x for x in groups if x.get("id")}
+    out=[]
+    order=0
+
+    def walk(node,parent_path):
+        nonlocal order
+        for child in node:
+            if not isinstance(child.tag,str):
+                continue
+            name=split.local(child.tag)
+            if name=="Group":
+                gid=child.get("id")
+                row=by_group.get(gid)
+                if row is None:
+                    continue
+                out.append({
+                    "source_order":order,
+                    "kind":"group",
+                    "id":gid,
+                    "parent_path":list(parent_path),
+                    "selected_default":row.get("selected_default",True),
+                    "requires":row.get("requires",[]),
+                    "conflicts":row.get("conflicts",[]),
+                    "effective_platform_refs":row.get("effective_platform_refs",[]),
+                })
+                order+=1
+                walk(child,parent_path+[gid])
+            elif name=="Rule":
+                rid=child.get("id")
+                row=by_rule.get(rid)
+                if row is None:
+                    continue
+                out.append({
+                    "source_order":order,
+                    "kind":"rule",
+                    "id":rid,
+                    "parent_path":list(parent_path),
+                    "selected_default":row.get("selected_default",True),
+                    "role":row.get("role"),
+                    "requires":row.get("requires",[]),
+                    "conflicts":row.get("conflicts",[]),
+                    "effective_platform_refs":row.get("effective_platform_refs",[]),
+                    "check_model_kind":row.get("check_model",{}).get("kind"),
+                })
+                order+=1
+    walk(benchmark,[])
+    return out
+
+
+def policy_processing_model(traversal: list[dict]) -> dict:
+    return {
+        "model":"xccdf-1.2-assessment-processing",
+        "profile_selectors":{
+            "order":"document_order_after_profile_extension_resolution",
+            "inheritance":"extended_profile_actions_precede_extending_profile_actions",
+            "override":"later_actions_override_prior_actions_on_the_same_property",
+            "cluster_targeting":True,
+        },
+        "item_traversal":{
+            "order":"source_document_order",
+            "requires":{
+                "within_clause":"OR",
+                "across_clauses":"AND",
+                "evaluation":"once_when_item_is_processed",
+            },
+            "conflicts":{
+                "within_entry":"single_item",
+                "across_entries":"AND",
+                "evaluation":"once_when_item_is_processed",
+            },
+            "selection_transition":"requires_conflicts_may_only_change_selected_true_to_false",
+            "group_suppression":"an_unprocessed_group_prevents_descendant_processing_without_mutating_descendant_selected_state",
+        },
+        "applicability":{
+            "inheritance":"nearest_ancestor_platforms_when_item_has_no_platform",
+            "runtime_outcome":"nonmatching_rule_is_notapplicable",
+            "platform_skip_does_not_mutate_selected_state":True,
+        },
+        "check_processing":{
+            "complex_check_precedence":"complex_check_tree_if_present",
+            "selector":"matching_selector_else_empty_selector_else_notchecked",
+            "system":"first_candidate_with_supported_checking_system",
+            "content":"first_resolvable_check_content_ref_else_inline_content_else_notchecked",
+            "backtracking":False,
+        },
+        "traversal":traversal,
+    }
+
+
 def cpe_expression(node) -> dict:
     name=split.local(node.tag)
     if name=="logical-test":
@@ -698,6 +789,8 @@ def main() -> int:
             group["effective_platform_refs"],platform_definitions
         )
     resolved_profiles=resolve_profiles(profiles,rules,groups,values)
+    traversal=build_traversal_plan(benchmark,rules,groups)
+    processing_plan=policy_processing_model(traversal)
 
     joined_rules = []
     missing_manifest = []
@@ -765,6 +858,7 @@ def main() -> int:
             "source_tree": split.xccdf_node(benchmark),
         },
         "platform_definitions":platform_definitions,
+        "processing_plan":processing_plan,
         "profiles": profiles,
         "resolved_profiles": resolved_profiles,
         "values": values,
@@ -774,6 +868,7 @@ def main() -> int:
             "rules": len(joined_rules),
             "groups":len(groups),
             "platform_definitions":len(platform_definitions),
+            "traversal_items":len(traversal),
             "local_platform_refs":sum(
                 1 for ref in benchmark_platform_refs if ref.startswith("#")
             ),
