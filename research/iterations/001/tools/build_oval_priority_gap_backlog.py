@@ -33,11 +33,11 @@ def main():
             if ns not in PRIORITY_NAMESPACES:
                 continue
             row={"category":category,**item}
-            if row.get("status")=="production_only" and row.get("deprecated"):
+            if row.get("status")=="production_only" and row.get("effective_deprecated",row.get("deprecated")):
                 row["recommended_treatment"]="source_content_remediation_blocker"
             elif row.get("status")=="production_only":
                 row["recommended_treatment"]="focused_conformance_and_native_mapping"
-            elif row.get("status")=="schema_only" and row.get("deprecated"):
+            elif row.get("status")=="schema_only" and row.get("effective_deprecated",row.get("deprecated")):
                 row["recommended_treatment"]="defer_unless_encountered_in_migration"
             elif row.get("status")=="schema_only":
                 row["recommended_treatment"]="coverage_backlog"
