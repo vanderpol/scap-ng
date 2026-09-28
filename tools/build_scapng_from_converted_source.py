@@ -58,6 +58,7 @@ def combined_members(root: Path, package_type: str):
 def split_members(root: Path, package_type: str):
     members={
         "benchmark.json":load(root/"benchmark.yaml"),
+        "processing.json":load(root/"processing.yaml"),
         "profiles.json":load(root/"profiles.yaml"),
         "platforms.json":load(root/"platforms.yaml"),
         "groups.json":load(root/"groups.yaml"),
