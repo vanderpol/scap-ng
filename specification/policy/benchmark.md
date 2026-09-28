@@ -386,8 +386,8 @@ Parameter decision.
 The current five-Rule design-review source trees demonstrate this Benchmark
 model:
 
-    source/examples/rhel9/
-    source/examples/windows11/
+    research/iterations/002/examples/source/rhel9/
+    research/iterations/002/examples/source/windows11/
 
 They include Benchmark Platform bindings, Rule membership, policy files,
 Manual Assessments, Automated Assessments, and, for Windows 11, a
