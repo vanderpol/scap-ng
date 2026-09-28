@@ -243,11 +243,16 @@ assessment instances.
 
 Exact normalized OVAL semantics reduce those 7,084 instances to 3,413 unique
 technical assessments. That is **3,671 duplicate assessment definitions
-avoided**, or a **51.82% reduction in assessment-definition maintenance units**.
+avoided**, or a **51.82% total reduction in assessment-definition maintenance
+units**.
 
-The measured reuse is not merely pairwise. There are 1,701 cross-benchmark
-exact-reuse groups, including groups spanning 8, 9, 11, 12, and as many as
-13 distinct published benchmarks.
+Of those, **3,639 duplicate units** are avoidable specifically through
+cross-benchmark reuse (51.37% of all supported automated assessment instances);
+32 additional duplicate units occur within individual benchmarks.
+
+The measured cross-benchmark reuse is not merely pairwise. There are 1,701
+cross-benchmark exact-reuse groups, including groups spanning 8, 9, 11, 12,
+and as many as 13 distinct published benchmarks.
 
 **Lesson:** assessment reuse is not a niche authoring convenience. The chosen
 SCAP-NG source model must make high-fan-out reuse, provenance, impact analysis,
