@@ -41,6 +41,17 @@ def child_texts(element, name: str) -> list[str]:
     ]
 
 
+def idrefs(element, name: str) -> list[str]:
+    out=[]
+    for child in element:
+        if not isinstance(child.tag,str) or split.local(child.tag)!=name:
+            continue
+        value=child.get("idref") or text_content(child)
+        if value:
+            out.append(value)
+    return out
+
+
 def references(element) -> list[dict]:
     out = []
     for child in element:
@@ -151,8 +162,8 @@ def rule_semantics(rule, group_path: list[str]) -> dict:
         "selected": rule.get("selected"),
         "group_path": list(group_path),
         "platforms": platforms(rule),
-        "requires": child_texts(rule, "requires"),
-        "conflicts": child_texts(rule, "conflicts"),
+        "requires": idrefs(rule, "requires"),
+        "conflicts": idrefs(rule, "conflicts"),
         "idents": idents(rule),
         "references": references(rule),
         "checks": checks(rule),
@@ -174,7 +185,71 @@ def walk_rules(node, group_path: list[str] | None = None) -> Iterable[dict]:
             yield rule_semantics(child, group_path)
 
 
-def value_semantics(value) -> dict:
+def group_semantics(group, parent_path: list[str]) -> dict:
+    gid=group.get("id")
+    current_path=parent_path+([gid] if gid else [])
+    child_groups=[]
+    child_rules=[]
+    child_values=[]
+    for child in group:
+        if not isinstance(child.tag,str):
+            continue
+        name=split.local(child.tag)
+        if name=="Group" and child.get("id"):
+            child_groups.append(child.get("id"))
+        elif name=="Rule" and child.get("id"):
+            child_rules.append(child.get("id"))
+        elif name=="Value" and child.get("id"):
+            child_values.append(child.get("id"))
+    return {
+        "id":gid,
+        "title":child_text(group,"title"),
+        "description":child_text(group,"description"),
+        "rationale":child_text(group,"rationale"),
+        "parent_path":list(parent_path),
+        "path":current_path,
+        "selected":group.get("selected"),
+        "weight":group.get("weight"),
+        "platforms":platforms(group),
+        "requires":idrefs(group,"requires"),
+        "conflicts":idrefs(group,"conflicts"),
+        "references":references(group),
+        "attributes":{
+            etree.QName(k).localname:v for k,v in group.attrib.items()
+        },
+        "members":{
+            "groups":child_groups,
+            "rules":child_rules,
+            "values":child_values,
+        },
+        "source_tree":split.xccdf_node(group),
+    }
+
+
+def walk_groups(node, parent_path: list[str] | None=None):
+    parent_path=list(parent_path or [])
+    for child in node:
+        if not isinstance(child.tag,str) or split.local(child.tag)!="Group":
+            continue
+        row=group_semantics(child,parent_path)
+        yield row
+        yield from walk_groups(child,row["path"])
+
+
+def walk_values(node, group_path: list[str] | None=None):
+    group_path=list(group_path or [])
+    for child in node:
+        if not isinstance(child.tag,str):
+            continue
+        name=split.local(child.tag)
+        if name=="Value":
+            yield value_semantics(child,group_path)
+        elif name=="Group":
+            gid=child.get("id")
+            yield from walk_values(child,group_path+([gid] if gid else []))
+
+
+def value_semantics(value, group_path: list[str] | None=None) -> dict:
     choices = []
     defaults = []
     for child in value:
@@ -200,6 +275,10 @@ def value_semantics(value) -> dict:
         "type": value.get("type"),
         "operator": value.get("operator"),
         "interactive": value.get("interactive"),
+        "group_path":list(group_path or []),
+        "attributes":{
+            etree.QName(k).localname:v for k,v in value.attrib.items()
+        },
         "defaults": defaults,
         "choices": choices,
         "source_tree": split.xccdf_node(value),
@@ -212,7 +291,7 @@ def profile_semantics(profile) -> dict:
         if not isinstance(child.tag, str):
             continue
         name = split.local(child.tag)
-        if name in {"select", "set-value", "refine-value", "refine-rule"}:
+        if name in {"select", "set-value", "set-complex-value", "refine-value", "refine-rule"}:
             actions.append({
                 "kind": name,
                 "attributes": {
@@ -225,6 +304,11 @@ def profile_semantics(profile) -> dict:
         "title": child_text(profile, "title"),
         "description": child_text(profile, "description"),
         "extends": profile.get("extends"),
+        "abstract":profile.get("abstract"),
+        "prohibit_changes":profile.get("prohibitChanges"),
+        "platforms":platforms(profile),
+        "references":references(profile),
+        "version":child_text(profile,"version"),
         "actions": actions,
         "source_tree": split.xccdf_node(profile),
     }
@@ -279,10 +363,8 @@ def main() -> int:
 
     component_id, benchmark = benchmarks[0]
     rules = list(walk_rules(benchmark))
-    values = [
-        value_semantics(e) for e in benchmark.iter()
-        if isinstance(e.tag, str) and split.local(e.tag) == "Value"
-    ]
+    groups=list(walk_groups(benchmark))
+    values=list(walk_values(benchmark))
     profiles = [
         profile_semantics(e) for e in benchmark.iter()
         if isinstance(e.tag, str) and split.local(e.tag) == "Profile"
@@ -347,13 +429,18 @@ def main() -> int:
             "rule_count": len(rules),
             "profile_count": len(profiles),
             "value_count": len(values),
+            "group_count": len(groups),
             "source_tree": split.xccdf_node(benchmark),
         },
         "profiles": profiles,
         "values": values,
+        "groups": groups,
         "rules": joined_rules,
         "summary": {
             "rules": len(joined_rules),
+            "groups":len(groups),
+            "profiles":len(profiles),
+            "values":len(values),
             "rules_with_oval_ir": sum(
                 1 for x in joined_rules
                 if x["assessment_source"]
