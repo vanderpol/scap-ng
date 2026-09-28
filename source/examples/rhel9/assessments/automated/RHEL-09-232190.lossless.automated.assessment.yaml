@@ -1,0 +1,60 @@
+# Stage-1 lossless conversion of the source OVAL behavior.
+# Root OVAL definition: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257918
+# The source OVAL object filters OUT root-owned files, symbolic links, and
+# directories. The resulting collection therefore contains violations only.
+assessment:
+  id: rhel9.RHEL-09-232190.lossless
+  mode: automated
+
+  collect:
+    noncompliant_system_commands:
+      capability: unix.file
+      select:
+        path:
+          any_of:
+            - /bin
+            - /sbin
+            - /usr/bin
+            - /usr/libexec
+            - /usr/sbin
+            - /usr/local/bin
+            - /usr/local/sbin
+          # Source OVAL constant variable: ...:var:25791801
+          var_check: only_one
+        filename:
+          operation: pattern_match
+          value: '.*'
+        behaviors:
+          recurse_direction: down
+        filters:
+          - action: exclude
+            condition:
+              field: user_id
+              datatype: integer
+              equals: 0
+          - action: exclude
+            condition:
+              field: type
+              equals: symbolic_link
+          - action: exclude
+            condition:
+              field: type
+              equals: directory
+      fields:
+        - path
+        - filename
+        - type
+        - user_id
+      # Source OVAL test: oval:navy.navwar.niwcatlantic.scc.unix:tst:25791802
+      # Source OVAL object: oval:navy.navwar.niwcatlantic.scc.unix:obj:25791802
+
+  assert:
+    source: noncompliant_system_commands
+    existence: none_exist
+    check: all
+
+  results:
+    failure_examples:
+      maximum: 20
+      fields: [path, filename, type, user_id]
+      include_reason: true
