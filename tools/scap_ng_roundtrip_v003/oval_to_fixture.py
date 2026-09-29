@@ -6,7 +6,7 @@ to preserve the semantic graph so the result can be regenerated as OVAL and
 compared against the source.
 """
 from __future__ import annotations
-import argparse, json, re
+import argparse, json, re, hashlib
 from pathlib import Path
 from lxml import etree as E
 
@@ -24,10 +24,22 @@ def ns(el): return E.QName(el).namespace or ""
 def text(el):
     return "" if el.text is None else el.text
 
-def logical(kind, oid):
+def logical(kind, oid, el=None):
     tail=oid.rsplit(":",1)[-1]
     suffix={"def":"definition","tst":"check","obj":"collection","ste":"state","var":"variable"}[kind]
-    return f"{tail}-{suffix}"
+    if el is not None:
+        lname=local(el)
+        for ending in ("_test","_object","_state","_variable"):
+            if lname.endswith(ending):
+                lname=lname[:-len(ending)]
+                break
+        fam=FAMS.get(ns(el), "oval")
+        stem=f"{fam}-{lname}-{tail}"
+    else:
+        stem=f"{kind}-{tail}"
+    digest=hashlib.sha256(oid.encode("utf-8")).hexdigest()[:8]
+    safe=re.sub(r"[^A-Za-z0-9_.-]+","-",stem).strip("-").lower()
+    return f"{safe}-{digest}-{suffix}"
 
 def type_name(el,suffix):
     fam=FAMS.get(ns(el))
@@ -52,11 +64,11 @@ class Converter:
         self.states={e.get("id"):e for sec in self.root.findall(f"{{{OD}}}states") for e in sec}
         self.vars={e.get("id"):e for sec in self.root.findall(f"{{{OD}}}variables") for e in sec}
         self.maps={
-            "def":{x:logical("def",x) for x in self.defs},
-            "tst":{x:logical("tst",x) for x in self.tests},
-            "obj":{x:logical("obj",x) for x in self.objects},
-            "ste":{x:logical("ste",x) for x in self.states},
-            "var":{x:logical("var",x) for x in self.vars},
+            "def":{x:logical("def",x,e) for x,e in self.defs.items()},
+            "tst":{x:logical("tst",x,e) for x,e in self.tests.items()},
+            "obj":{x:logical("obj",x,e) for x,e in self.objects.items()},
+            "ste":{x:logical("ste",x,e) for x,e in self.states.items()},
+            "var":{x:logical("var",x,e) for x,e in self.vars.items()},
         }
         self.diagnostics=[]
 
