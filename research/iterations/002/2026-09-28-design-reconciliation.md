@@ -186,7 +186,12 @@ Changes include:
 - `.github/workflows/check-selector-conformance.yml` runs syntax and selector
   regression checks;
 - `.github/workflows/four-anchor-reuse-analysis.yml` now runs automatically
-  when migration-semantic tooling changes.
+  when migration-semantic tooling changes;
+- `specification/assessment/assessment-method.md`,
+  `specification/core/conformance.md`, and `specification/results/results.md`
+  now carry the expected-state existence truth semantics, mandatory base
+  conformance cases, stable existence failure reasons, effective selector
+  identity, and deterministic-message requirements into the normative draft.
 
 ## Completion rule
 
