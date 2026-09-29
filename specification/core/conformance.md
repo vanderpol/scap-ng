@@ -75,3 +75,25 @@ SHALL report the unsupported capability distinctly from a compliance failure.
 
 The final standardized unsupported/not-evaluated result vocabulary remains
 under design.
+
+
+## 6. Check-selector conformance
+
+Validators SHALL verify that every explicitly selected check selector resolves
+to an alternative exposed by the governing Rule policy.
+
+Processors SHALL NOT silently substitute a default or different selector for an
+unresolved explicit selection.
+
+Conformance tests SHOULD include at least:
+
+- default check resolution when no explicit selector is supplied;
+- explicit selection of an automated alternative;
+- explicit selection of a manual alternative;
+- extensible selector names other than `automated` and `manual`;
+- failure for an unknown selector;
+- preservation of effective selector identity in results; and
+- Stage-1 migration of representative XCCDF selectable-check content.
+
+Unsupported or non-equivalent legacy check-selection semantics SHALL cause an
+explicit conversion failure rather than semantic approximation.
