@@ -62,6 +62,10 @@ class Model:
         if fields:
             return base+("fields",tuple(self.field(f) for f in fields))
         if vr: return base+("var",self.variable(vr))
+        if local=="var_ref":
+            text=sval(e.text).strip()
+            if text in self.vars:
+                return base+("variable_id_value",self.variable(text))
         return base+("value",sval(e.text))
 
     def component(self,e):
