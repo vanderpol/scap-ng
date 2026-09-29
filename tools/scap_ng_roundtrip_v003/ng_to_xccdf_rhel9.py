@@ -58,6 +58,8 @@ def main():
     for p in b.get("profiles") or []:
         pe=E.SubElement(root,q("Profile"),id=profile_xid(p["id"]))
         E.SubElement(pe,q("title")).text=p.get("title") or p["id"]
+        if p.get("description"):
+            E.SubElement(pe,q("description")).text=p["description"]
         for rid in p.get("disabled_rules") or []:
             if rid not in rules: raise ValueError(f"profile {p['id']} references missing {rid}")
             E.SubElement(pe,q("select"),idref=rule_xid(rules[rid]),selected="false")
