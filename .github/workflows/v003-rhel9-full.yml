@@ -33,6 +33,21 @@ jobs:
       - name: Generate full RHEL9 native source and package
         run: python tools/scap_upconvert_v003/build_rhel9_review_slice.py
 
+      - name: Show conversion errors
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("research/iterations/003/evidence/rhel9-full/diagnostics.json")
+          if not p.exists():
+              print("No diagnostics file was produced.")
+          else:
+              doc = json.loads(p.read_text())
+              errors = [x for x in doc.get("diagnostics", []) if x.get("severity") in ("error", "fatal")]
+              print(json.dumps(errors, indent=2, sort_keys=True))
+          PY
+
       - name: Reject legacy residue in native source
         run: |
           python - <<'PY'
