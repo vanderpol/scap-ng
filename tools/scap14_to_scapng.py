@@ -81,7 +81,7 @@ def collector_node(obj: dict) -> dict:
         "source_type": obj.get("type"),
         "source_namespace": obj.get("namespace"),
         "version": obj.get("version"),
-        "comment": obj.get("comment"),
+        "object_title": obj.get("comment"),
         "query": copy.deepcopy(obj.get("children", [])),
     }
 
@@ -93,7 +93,7 @@ def predicate_node(state: dict) -> dict:
         "source_namespace": state.get("namespace"),
         "operator": state.get("operator", "AND"),
         "entities": copy.deepcopy(state.get("entities", [])),
-        "comment": state.get("comment"),
+        "state_title": state.get("comment"),
     }
 
 
@@ -105,7 +105,7 @@ def variable_node(variable: dict, ir: dict) -> dict:
         "source_variable_id": vid,
         "source_type": variable.get("type"),
         "datatype": variable.get("datatype"),
-        "comment": variable.get("comment"),
+        "variable_title": variable.get("comment"),
         "semantic_ast": copy.deepcopy(variable.get("semantic_ast")),
         "resolution": copy.deepcopy(resolution),
         "evaluation_plan": copy.deepcopy(plan),
@@ -117,7 +117,7 @@ def test_node(test: dict) -> dict:
         "source_test_id": test.get("id"),
         "source_type": test.get("type"),
         "source_namespace": test.get("namespace"),
-        "comment": test.get("comment"),
+        "test_title": test.get("comment"),
         "check": test.get("check", "all"),
         "check_existence": test.get("check_existence", "at_least_one_exists"),
         "state_operator": test.get("state_operator", "AND"),
