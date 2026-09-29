@@ -122,3 +122,26 @@ metadata while also ending field overloading in newly authored content.
 | Rule revision | often embedded in DISA XCCDF Rule @id | normalized into a first-class field |
 | identifiers[] | XCCDF id/version/reference conventions | generalized |
 | extensions{} | XCCDF metadata / foreign-namespace extension points | formalized and constrained |
+
+
+## Human-readable internal identifiers
+
+SCAP-NG internal identifiers for Tests, Objects, States, Variables, and similar
+Assessment-local nodes MAY use readable semantic names rather than opaque
+numeric identifiers.
+
+A tool MAY derive an initial identifier from a human-readable title, for
+example by normalizing:
+
+    Verify rngd service is active
+        -> verify_rngd_service_is_active
+
+Once assigned, the identifier SHALL be treated as a stable logical identifier.
+
+Changing a title, discussion, remediation, policy wording, or other
+human-readable text SHALL NOT require the identifier to change.
+
+An identifier MAY be renamed only as an explicit identity-maintenance action,
+with the same care as any other reference-breaking change.
+
+This permits readable authoring without coupling object identity to prose.
