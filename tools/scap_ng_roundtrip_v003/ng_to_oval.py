@@ -114,8 +114,12 @@ def add_entity(parent, ns, name, spec, ids):
                 else:
                     die(f"{name}.{field['name']}: field missing value or variable")
         elif "variable" in spec:
+            if "value" in spec or "variable_id_value" in spec:
+                die(f"{name}: variable attribute reference cannot be combined with a value")
+        elif "variable_id_value" in spec:
             if "value" in spec:
-                die(f"{name}: variable and value both supplied")
+                die(f"{name}: variable ID text reference cannot also contain value")
+            el.text = ids.get("var", spec["variable_id_value"])
         elif "value" in spec:
             el.text = str(spec["value"])
         else:
