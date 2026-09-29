@@ -80,6 +80,89 @@ def load_source_components(files):
         raise RuntimeError("Required Benchmark/OVAL component not found")
     return benchmark, oval, benchmark_source, oval_source
 
+def collect_oval_bundle(files):
+    bundle = ET.Element("assessment-bundle")
+    seen = set()
+    for p in files:
+        if p.suffix.lower() != ".xml":
+            continue
+        try:
+            root = ET.parse(p).getroot()
+        except ET.ParseError:
+            continue
+        candidates = [root] if local(root.tag) == "oval_definitions" else [
+            node for node in root.iter() if local(node.tag) == "oval_definitions"
+        ]
+        for node in candidates:
+            key = ET.tostring(node, encoding="unicode")
+            digest = hashlib.sha256(key.encode()).hexdigest()
+            if digest not in seen:
+                bundle.append(deepcopy(node))
+                seen.add(digest)
+    return bundle
+
+def source_platform_nodes(files):
+    nodes = {}
+    for p in files:
+        if p.suffix.lower() != ".xml":
+            continue
+        try:
+            root = ET.parse(p).getroot()
+        except ET.ParseError:
+            continue
+        for node in root.iter():
+            if local(node.tag) == "platform" and node.get("id"):
+                nodes[node.get("id")] = node
+    return nodes
+
+def native_applicability_id(platform_node):
+    title = (text(next((n for n in platform_node if local(n.tag) == "title"), None)) or "").lower()
+    mapping = [
+        ("gnome", "linux.gnome-installed"),
+        ("nfs mounts configured", "linux.nfs-mounted"),
+        ("no nfs mounts", "linux.nfs-not-mounted"),
+        ("ipv6 enabled", "linux.ipv6-enabled"),
+        ("bios boot", "linux.bios-boot"),
+        ("uefi boot", "linux.uefi-boot"),
+        ("autofs", "linux.autofs-installed"),
+        ("postfix", "linux.postfix-installed"),
+        ("tftp", "linux.tftp-installed"),
+        ("bind", "linux.bind-installed"),
+        ("libreswan", "linux.libreswan-installed"),
+        ("kernel dumps", "linux.kernel-dumps-enabled"),
+        ("not fips", "linux.fips-disabled"),
+        ("bare metal", "hardware.bare-metal"),
+    ]
+    for needle, native in mapping:
+        if needle in title:
+            return native
+    return "applicability." + semantic_id(title, "condition")
+
+def lower_source_platform(platform_node, oval_bundle):
+    logical = next((n for n in platform_node if local(n.tag) == "logical-test"), None)
+    if logical is None:
+        return None, None, "platform_missing_logical_test"
+    children = [n for n in logical if local(n.tag) in ("check-fact-ref", "fact-ref", "logical-test")]
+    if len(children) != 1 or local(children[0].tag) != "check-fact-ref":
+        return None, None, "complex_platform_expression_not_yet_lowered"
+    definition_id = children[0].get("id-ref")
+    if not definition_id:
+        return None, None, "platform_check_missing_definition"
+    app_id = native_applicability_id(platform_node)
+    assessment_id = app_id + ".assessment"
+    assessment, error = lower_definition(oval_bundle, definition_id, assessment_id)
+    if assessment is None:
+        return None, None, error
+    negate = (logical.get("negate") or "false").lower() == "true"
+    if negate:
+        assessment["assessment"]["evaluate"] = {"not": assessment["assessment"]["evaluate"]}
+    assessment["assessment"]["title"] = (
+        text(next((n for n in platform_node if local(n.tag) == "title"), None))
+        or assessment["assessment"].get("title")
+    )
+    assessment["assessment"]["purpose"] = "applicability"
+    return app_id, assessment, None
+
 def native_rule_id(rule):
     version = text(rule.find("x:version", NS))
     return safe_id(version) if version else safe_id(text(rule.find("x:title", NS)) or "rule")
@@ -580,6 +663,42 @@ def build_groups(selected):
         })
     return output, evidence
 
+def compliance_lowerable(rec, oval_bundle):
+    _, fix_error = normalized_fixes(rec["element"])
+    if fix_error:
+        return False
+    refs = automated_refs(rec)
+    if not refs:
+        return False
+    for _, definition_id in {x for x in refs}:
+        assessment, _ = lower_definition(oval_bundle, definition_id, "probe")
+        if assessment is None:
+            return False
+    return True
+
+def applicability_lowerable(rec, platform_nodes, oval_bundle):
+    if len(rec["platforms"]) != 1:
+        return False
+    node = platform_nodes.get(rec["platforms"][0].lstrip("#"))
+    if node is None:
+        return False
+    _, assessment, error = lower_source_platform(node, oval_bundle)
+    return assessment is not None and error is None
+
+def manual_only_lowerable(rec):
+    if rec["platforms"] or rec["requires"] or rec["conflicts"]:
+        return False
+    _, fix_error = normalized_fixes(rec["element"])
+    if fix_error:
+        return False
+    if not rec["checks"]:
+        return False
+    default = next(
+        (c for c in rec["checks"] if not (c.get("selector") or "").strip()),
+        rec["checks"][0],
+    )
+    return check_kind(default) == "manual" and all(check_kind(c) == "manual" for c in rec["checks"])
+
 def main():
     shutil.rmtree(OUT, ignore_errors=True)
     shutil.rmtree(EVIDENCE, ignore_errors=True)
@@ -591,6 +710,8 @@ def main():
         with zipfile.ZipFile(zp) as zf: zf.extractall(td / "pkg")
         files = [p for p in (td / "pkg").rglob("*") if p.is_file()]
         xr, oroot, xsrc, osrc = load_source_components(files)
+        oval_bundle = collect_oval_bundle(files)
+        platform_nodes = source_platform_nodes(files)
         rs = records(xr)
 
         all_xml_roots = []
@@ -648,22 +769,39 @@ def main():
             )) == "manual"
         ]
 
-        # First accepted slice: three Rules for which this checkpoint can
-        # preserve every check-selection and automated-assessment semantic it emits.
-        selected = [r for r in rs if fully_lowerable(r, oroot)][:3]
-        if len(selected) < 3:
-            from collections import Counter
-            reasons = Counter(lowerability_reason(r, oroot) for r in rs)
-            summary = ", ".join(f"{k}={v}" for k, v in reasons.most_common(12))
-            fix_systems = Counter(
-                (fix.get("system") or "<none>")
-                for r in rs
-                for fix in r["element"].findall("x:fix", NS)
-            )
-            fix_summary = ", ".join(f"{k}={v}" for k, v in fix_systems.most_common(8))
+        # Golden review slice:
+        # - three baseline automated Rules;
+        # - one Rule with real source Rule-level applicability;
+        # - one manual/default Rule.
+        baseline = [r for r in rs if fully_lowerable(r, oval_bundle)][:3]
+        applicability_rule = next(
+            (
+                r for r in rs
+                if r["platforms"]
+                and not r["requires"]
+                and not r["conflicts"]
+                and compliance_lowerable(r, oval_bundle)
+                and applicability_lowerable(r, platform_nodes, oval_bundle)
+            ),
+            None,
+        )
+        preferred_manual = ["RHEL-09-251035", "RHEL-09-411095", "RHEL-09-211015"]
+        manual_rule = next(
+            (r for wanted in preferred_manual for r in rs if r["id"] == wanted and manual_only_lowerable(r)),
+            None,
+        )
+        if manual_rule is None:
+            manual_rule = next((r for r in rs if manual_only_lowerable(r)), None)
+
+        selected = []
+        for candidate in baseline + [applicability_rule, manual_rule]:
+            if candidate and candidate["id"] not in {r["id"] for r in selected}:
+                selected.append(candidate)
+
+        if len(selected) < 5 or applicability_rule is None or manual_rule is None:
             raise RuntimeError(
-                f"Only {len(selected)} fully lowerable Rules found; refusing partial review slice. "
-                f"Top rejection reasons: {summary}. Source remediation systems: {fix_summary}"
+                "Golden slice requirements not satisfied: "
+                f"selected={len(selected)}, applicability={bool(applicability_rule)}, manual={bool(manual_rule)}"
             )
 
         selected_ids = [r["id"] for r in selected]
@@ -739,6 +877,8 @@ def main():
         }
         write_yaml(OUT / "benchmark.yaml", benchmark_doc)
 
+        applicability_registry = {}
+        applicability_assessments_written = set()
         evidence = []
         diagnostics = [
             {
@@ -778,6 +918,26 @@ def main():
                 "default_check": None,
             }}
 
+            if rec["platforms"]:
+                if len(rec["platforms"]) != 1:
+                    raise RuntimeError(f"{rid}: multiple Rule applicability predicates not yet supported")
+                source_platform_id = rec["platforms"][0].lstrip("#")
+                platform_node = platform_nodes.get(source_platform_id)
+                if platform_node is None:
+                    raise RuntimeError(f"{rid}: source platform predicate not found")
+                app_id, app_assessment, app_error = lower_source_platform(platform_node, oval_bundle)
+                if app_error:
+                    raise RuntimeError(f"{rid}: applicability lowering failed: {app_error}")
+                policy["policy"]["applicability"] = [app_id]
+                app_assessment_id = app_assessment["assessment"]["id"]
+                applicability_registry[app_id] = app_assessment_id
+                if app_assessment_id not in applicability_assessments_written:
+                    write_yaml(
+                        OUT / "assessments/applicability" / f"{app_assessment_id}.yaml",
+                        app_assessment,
+                    )
+                    applicability_assessments_written.add(app_assessment_id)
+
             checks = {}
             definition_to_assessment = {}
             for c in rec["checks"]:
@@ -802,7 +962,7 @@ def main():
                 aid = definition_to_assessment.get(definition_id)
                 if aid is None:
                     aid = f"{rid}.automated"
-                    assessment, error = lower_definition(oroot, definition_id, aid)
+                    assessment, error = lower_definition(oval_bundle, definition_id, aid)
                     if assessment is None:
                         raise RuntimeError(f"{rid}: automated lowering regressed: {error}")
                     write_yaml(OUT / "assessments/automated" / f"{rid}.automated.assessment.yaml", assessment)
@@ -827,6 +987,16 @@ def main():
                              if c.find("x:check-content-ref", NS) is not None else None),
                 } for c in rec["checks"]],
             })
+
+        write_yaml(
+            OUT / "applicability.yaml",
+            {
+                "applicability": [
+                    {"id": app_id, "assessment": assessment_id}
+                    for app_id, assessment_id in sorted(applicability_registry.items())
+                ]
+            },
+        )
 
         write_json(EVIDENCE / "source-package.json", {
             "source_url": SOURCE_URL, "zip_sha256": sha256(package_bytes),
