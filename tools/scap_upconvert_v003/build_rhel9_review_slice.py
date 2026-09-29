@@ -91,6 +91,58 @@ def records(root):
             })
     return out
 
+def policy_content(rule):
+    out = {}
+    raw = rule.find("x:description", NS)
+    if raw is not None:
+        s = "".join(raw.itertext())
+        fields = {
+            "VulnDiscussion": "discussion",
+            "FalsePositives": "false_positives",
+            "FalseNegatives": "false_negatives",
+            "Mitigations": "mitigations",
+            "PotentialImpacts": "potential_impacts",
+            "Responsibility": "responsibility",
+        }
+        for source_name, native_name in fields.items():
+            m = re.search(rf"<{source_name}>(.*?)</{source_name}>", s, flags=re.I | re.S)
+            if m:
+                value = " ".join(m.group(1).split())
+                if value: out[native_name] = value
+        m = re.search(r"<Documentable>(.*?)</Documentable>", s, flags=re.I | re.S)
+        if m and m.group(1).strip():
+            out["documentable"] = m.group(1).strip().lower() == "true"
+
+    rationale = text(rule.find("x:rationale", NS))
+    if rationale: out["rationale"] = rationale
+
+    warnings = [text(n) for n in rule.findall("x:warning", NS)]
+    warnings = [x for x in warnings if x]
+    if warnings: out["warnings"] = warnings
+
+    identifiers = []
+    for ident in rule.findall("x:ident", NS):
+        value = text(ident)
+        system = (ident.get("system") or "").lower()
+        if value and "cci" in system:
+            identifiers.append({"scheme": "cci", "value": value})
+    if identifiers: out["identifiers"] = identifiers
+
+    references = []
+    for ref in rule.findall("x:reference", NS):
+        item = {}
+        href = ref.get("href")
+        value = text(ref)
+        if href and not any(term in href.lower() for term in ("xccdf", "oval", "ocil", "cpe.mitre.org/language")):
+            item["url"] = href
+        if value: item["text"] = value
+        if item: references.append(item)
+    if references: out["references"] = references
+
+    fixtext = text(rule.find("x:fixtext", NS))
+    if fixtext: out["remediation"] = fixtext
+    return out
+
 def find_by_id(root, item_id, suffix):
     if not item_id: return None
     return next((n for n in root.iter() if n.get("id") == item_id and local(n.tag).endswith(suffix)), None)
@@ -133,27 +185,41 @@ def lower_definition(oroot, definition_id, assessment_id):
                 query[name] = ({"operation": child.get("operation"), "value": value}
                                if child.get("operation") else value)
 
-        expected = []
+            states = []
         for ref in state_refs:
             state = find_by_id(oroot, ref, "_state")
             if state is None: return None, "state_not_found"
+            conditions = []
             for child in state:
                 if child.get("var_ref"): return None, "state_variable_not_yet_lowered"
                 item = {"field": local(child.tag), "operation": child.get("operation") or "equals", "value": text(child)}
                 if child.get("entity_check"): item["entity_check"] = child.get("entity_check")
                 if child.get("datatype"): item["datatype"] = child.get("datatype")
-                expected.append(item)
+                conditions.append(item)
+            if conditions:
+                states.append(conditions[0] if len(conditions) == 1 else {"all": conditions})
 
         counter[0] += 1
         check_id = f"check-{counter[0]}"
         test_to_check[test_ref] = check_id
+        assertion = {
+            "existence": test.get("check_existence") or "at_least_one_exists",
+            "check": test.get("check") or "all",
+        }
+        if states:
+            state_operator = (test.get("state_operator") or "AND").upper()
+            if len(states) == 1:
+                assertion["state"] = states[0]
+            elif state_operator == "AND":
+                assertion["state"] = {"all": states}
+            elif state_operator == "OR":
+                assertion["state"] = {"any": states}
+            else:
+                return None, f"unsupported_state_operator:{state_operator}"
+
         checks[check_id] = {
             "collect": {"capability": capability, "select": query},
-            "assert": {
-                "existence": test.get("check_existence") or "at_least_one_exists",
-                "check": test.get("check") or "all",
-                **({"state": expected} if expected else {}),
-            },
+            "assert": assertion,
         }
         return {"check": check_id}, None
 
@@ -219,7 +285,9 @@ def automated_refs(rec):
     return refs
 
 def fully_lowerable(rec, oroot):
+    rule = rec["element"]
     if rec["platforms"] or rec["requires"] or rec["conflicts"]: return False
+    if rule.findall("x:fix", NS): return False
     refs = automated_refs(rec)
     if not refs: return False
     for _, definition_id in {x for x in refs}:
@@ -259,6 +327,22 @@ def main():
             profile = {"id": safe_id((p.get("id") or "profile").split("_profile_")[-1]),
                        "title": text(p.find("x:title", NS))}
             if disabled: profile["disabled_rules"] = sorted(disabled)
+            selectors = {}
+            for rr in p.findall("x:refine-rule", NS):
+                rid = source_to_native.get(rr.get("idref"))
+                selector = rr.get("selector")
+                if rid in selected_ids and selector:
+                    selectors[rid] = selector
+            if selectors: profile["check_selectors"] = selectors
+            bindings = {}
+            for sv in p.findall("x:set-value", NS):
+                target = sv.get("idref")
+                value = text(sv)
+                if target and value:
+                    bindings[safe_id(target.split("_value_")[-1])] = value
+            if bindings: profile["parameters"] = bindings
+            if p.get("extends"):
+                profile["extends"] = safe_id(p.get("extends").split("_profile_")[-1])
             profiles.append(profile)
 
         write_yaml(OUT / "benchmark.yaml", {"benchmark": {
@@ -276,6 +360,7 @@ def main():
             policy = {"policy": {"id": rid, "title": rec["title"], "severity": rec["severity"]}}
             if rec["role"]: policy["policy"]["role"] = rec["role"]
             if rec["weight"]: policy["policy"]["weight"] = float(rec["weight"])
+            policy["policy"].update(policy_content(rule))
 
             checks = {}
             definition_to_assessment = {}
