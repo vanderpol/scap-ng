@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <generator>
+    <oval:product_name>RHEL 10 STIG SCAP content assembly</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-09-23T15:13:16Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <!--
+OVAL provenance
+Origin: Derived from RHEL 9 benchmark
+Source benchmark: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+Source IDs: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258134
+Basis: Adaptation is documented in OVAL Content\RHEL10_Trusted_Reuse_2026-09-23\lineage.json.
+Last reviewed: 2026-09-24
+Assessment SHA-256: 23c222e57f66cc5dd1c12f3e341e15f3ddc12359c79765ec6d1bc87970fd8c6d
+Change summary: Expanded the native AIDE configuration/database model to support target database_in syntax and absolute database paths as well as the source macro form. Retained database initialization evidence.
+Summary evidence: documented
+-->
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:28097700001" version="1" class="compliance">
+      <metadata>
+        <title>RHEL 10 must have the Advanced Intrusion Detection Environment (AIDE) package installed.</title>
+        <affected family="unix">
+          <platform>Red Hat Enterprise Linux 10</platform>
+        </affected>
+        <reference source="DISA STIG" ref_id="SV-280977"/>
+        <description>RHEL 10 check-text evaluation. Production comparison: RHEL-09-651010. Reuse native AIDE RPM/config/database dependency model, adapting database syntax for the target and checking initialization evidence. Source recursively searches the local filesystem for aide.conf; identify whether existing objects can be shared and avoid redundant scans. Target explicitly adds aide --check initialization evidence.</description>
+      </metadata>
+      <criteria operator="OR" comment="Locate the AIDE database using its configured macro or absolute path">
+        <criteria operator="AND" comment="All listed conditions must be satisfied">
+          <extend_definition definition_ref="oval:navy.navwar.niwcatlantic.scc:def:28097700002" comment="Evaluate the referenced requirement"/>
+        </criteria>
+        <criteria operator="AND" comment="Absolute database path used by current AIDE configurations">
+          <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28097700005" comment="RPM aide is installed"/>
+          <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28097700006" comment="Locate the configured AIDE input database"/>
+        </criteria>
+      </criteria>
+    </definition>
+    <!--
+OVAL provenance
+Origin: Derived from RHEL 9 benchmark
+Source benchmark: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+Source IDs: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258134
+Basis: Adaptation is documented in OVAL Content\RHEL10_Trusted_Reuse_2026-09-23\lineage.json.
+Last reviewed: 2026-09-24
+Assessment SHA-256: 8778f250de35642a564e120b844e70ff81c133c86ecb286366aef8202527073d
+Change summary: Supporting definition used by V-280977. A separate definition-level change summary is not established; retain the source correlation and consult the associated rule-level review.
+Summary evidence: supporting detail not established
+-->
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:28097700002" version="13" class="compliance">
+      <metadata>
+        <title>RHEL 10 must have the Advanced Intrusion Detection Environment (AIDE) package installed.</title>
+        <description>Adapted production dependency for V-280977. Reuse native AIDE RPM/config/database dependency model, adapting database syntax for the target and checking initialization evidence. Source recursively searches the local filesystem for aide.conf; identify whether existing objects can be shared and avoid redundant scans. Target explicitly adds aide --check initialization evidence.</description>
+      </metadata>
+      <criteria>
+        <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28097700003" comment="Confirm the aide file integrity tool package is installed."/>
+        <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28097700004" comment="Verify the working DB file configured in the 'aide.conf file' exists."/>
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <linux:rpminfo_test xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:tst:28097700003" check_existence="at_least_one_exists" check="all" comment="Confirm the aide file integrity tool package is installed." version="13">
+      <linux:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28097700007"/>
+    </linux:rpminfo_test>
+    <unix:file_test xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:tst:28097700004" check_existence="at_least_one_exists" version="13" comment="Verify the working DB file configured in the 'aide.conf file' exists." check="all">
+      <unix:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28097700009"/>
+      <unix:state state_ref="oval:navy.navwar.niwcatlantic.scc:ste:28097700015"/>
+    </unix:file_test>
+    <linux:rpminfo_test xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:tst:28097700005" version="1" comment="RPM aide is installed" check_existence="at_least_one_exists" check="all">
+      <linux:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28097700012"/>
+    </linux:rpminfo_test>
+    <unix:file_test xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:tst:28097700006" version="1" comment="Locate the configured AIDE input database" check_existence="all_exist" check="all">
+      <unix:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28097700014"/>
+    </unix:file_test>
+  </tests>
+  <objects>
+    <linux:rpminfo_object xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:obj:28097700007" version="13" comment="Confirm the aide file integrity tool package is installed.">
+      <linux:name>aide</linux:name>
+    </linux:rpminfo_object>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28097700008" version="13" comment="Find the aide.conf file.">
+      <unix:behaviors recurse_direction="down" recurse="directories" max_depth="-1" recurse_file_system="local"/>
+      <unix:path>/</unix:path>
+      <unix:filename>aide.conf</unix:filename>
+    </unix:file_object>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28097700009" version="13" comment="Retrieve details of the working DB file.">
+      <unix:filepath var_ref="oval:navy.navwar.niwcatlantic.scc:var:28097700017"/>
+    </unix:file_object>
+    <ind:textfilecontent54_object xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:obj:28097700010" version="13" comment="Retrieve path to the working DB file.">
+      <ind:filepath var_ref="oval:navy.navwar.niwcatlantic.scc:var:28097700016"/>
+      <ind:pattern operation="pattern match">^\@\@define\s+DBDIR\s+(\S+)</ind:pattern>
+      <ind:instance datatype="int">1</ind:instance>
+    </ind:textfilecontent54_object>
+    <ind:textfilecontent54_object xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:obj:28097700011" version="13" comment="Retrieve filename of the working DB file.">
+      <ind:filepath var_ref="oval:navy.navwar.niwcatlantic.scc:var:28097700016"/>
+      <ind:pattern operation="pattern match">^[ \t]*database(?:_in)?[ \t]*=[ \t]*file:@@\{DBDIR\}/([^#\s]+)[ \t]*(?:#.*)?$</ind:pattern>
+      <ind:instance datatype="int">1</ind:instance>
+    </ind:textfilecontent54_object>
+    <linux:rpminfo_object xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:obj:28097700012" version="1" comment="Collect installed RPM aide">
+      <linux:name>aide</linux:name>
+    </linux:rpminfo_object>
+    <ind:textfilecontent54_object xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:obj:28097700013" version="1" comment="Collect absolute AIDE input database path from discovered configuration">
+      <ind:filepath var_ref="oval:navy.navwar.niwcatlantic.scc:var:28097700016" var_check="all"/>
+      <ind:pattern operation="pattern match">^[ \t]*database(?:_in)?[ \t]*=[ \t]*file:(/[^#\s]+)[ \t]*(?:#.*)?$</ind:pattern>
+      <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
+    </ind:textfilecontent54_object>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28097700014" version="1" comment="Locate the configured AIDE input database">
+      <unix:filepath var_ref="oval:navy.navwar.niwcatlantic.scc:var:28097700018" var_check="all"/>
+    </unix:file_object>
+  </objects>
+  <states>
+    <unix:file_state xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:ste:28097700015" version="13" comment="Confirm existence of DB file.">
+      <unix:filepath operation="pattern match">.*</unix:filepath>
+    </unix:file_state>
+  </states>
+  <variables>
+    <local_variable id="oval:navy.navwar.niwcatlantic.scc:var:28097700016" datatype="string" version="13" comment="Retrieve location of the aide.conf file.">
+      <object_component object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28097700008" item_field="filepath"/>
+    </local_variable>
+    <local_variable id="oval:navy.navwar.niwcatlantic.scc:var:28097700017" datatype="string" version="13" comment="Retrieve location of the working aide database file.">
+      <concat>
+        <object_component object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28097700010" item_field="subexpression"/>
+        <literal_component datatype="string">/</literal_component>
+        <object_component object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28097700011" item_field="subexpression"/>
+      </concat>
+    </local_variable>
+    <local_variable id="oval:navy.navwar.niwcatlantic.scc:var:28097700018" version="1" comment="Actual absolute AIDE input database pathname" datatype="string">
+      <object_component object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28097700013" item_field="subexpression"/>
+    </local_variable>
+  </variables>
+</oval_definitions>
