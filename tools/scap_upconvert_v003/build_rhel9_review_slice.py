@@ -1103,6 +1103,8 @@ def lower_definition(oroot, definition_id, assessment_id):
 
     def lower_entity_value(node):
         var_ref = node.get("var_ref")
+        if not var_ref and local(node.tag) == "var_ref":
+            var_ref = text(node)
         if var_ref:
             native_id, error = ensure_variable(var_ref)
             if error:
