@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5">
+  <generator>
+    <oval:product_name>SCAP-NG round-trip stress source</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-09-29T00:00:00Z</oval:timestamp>
+  </generator>
+  <variables>
+    <constant_variable id="oval:scap-ng.stress:var:11" version="1" datatype="string" comment="CSV source values">
+      <value>alpha,beta,beta</value>
+      <value>beta,gamma</value>
+    </constant_variable>
+    <local_variable id="oval:scap-ng.stress:var:12" version="1" datatype="string" comment="Split all CSV values">
+      <split delimiter=",">
+        <variable_component var_ref="oval:scap-ng.stress:var:11"/>
+      </split>
+    </local_variable>
+    <local_variable id="oval:scap-ng.stress:var:13" version="1" datatype="string" comment="Remove duplicate split values">
+      <unique>
+        <variable_component var_ref="oval:scap-ng.stress:var:12"/>
+      </unique>
+    </local_variable>
+    <local_variable id="oval:scap-ng.stress:var:14" version="1" datatype="int" comment="Count unique values">
+      <count>
+        <variable_component var_ref="oval:scap-ng.stress:var:13"/>
+      </count>
+    </local_variable>
+  </variables>
+</oval_definitions>
