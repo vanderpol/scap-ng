@@ -46,6 +46,16 @@ SCAP-NG automated assessment semantics SHALL represent existence and
 cardinality explicitly. Expected absence and expected presence SHALL have
 portable truth semantics independent of scanner implementation.
 
+SCAP-NG Assessment Methods SHALL declare an Assessment class independently
+from invocation purpose. The inherited class vocabulary is `compliance`,
+`vulnerability`, `patch`, `inventory`, and `miscellaneous`. A true
+Assessment result SHALL be interpreted according to its declared class rather
+than universally as pass/fail.
+
+Applicability SHALL be modeled as invocation purpose, not as an Assessment
+class. A conforming processor SHALL preserve both the Assessment class and the
+purpose for which it was invoked.
+
 SCAP-NG source organization and filenames MAY aid authors, but semantic
 identity and object type SHALL come from object content rather than path or
 filename.
@@ -60,6 +70,9 @@ The following remain explicitly open and SHALL NOT be treated as settled by
 this index:
 
 - final cross-mode outcome vocabulary;
+- whether to add an `information` Assessment class; this is not an inherited
+  OVAL class and requires affirmative OVAL Board / SCAP-NG governance approval
+  before becoming normative;
 - exact Tailoring rule-selection semantics;
 - final severity and scoring models;
 - final set of SCAP-NG use cases;
