@@ -107,3 +107,37 @@ Do not permit reuse when equivalence cannot be proven.
 
 Permit internal reuse of a broader base collection for multiple filtered views
 only when the implementation can guarantee identical observable semantics.
+
+
+## Scope correction: no snapshot-consistency guarantee
+
+SCAP-NG SHALL NOT require a scanner to provide a coherent snapshot of target
+configuration across an Assessment run.
+
+Target configuration may change at any time. A Collection or Check reflects the
+target state observed at the time that operation is performed.
+
+Two semantically identical Collections evaluated at different times MAY
+therefore legitimately observe different target data if the target changed
+between evaluations.
+
+Collection caching, reuse, deduplication, scheduling, and synchronization are
+implementation concerns unless an optimization changes the correctness of the
+individual operation being evaluated.
+
+The core specification should define the semantics of each Collection, Variable,
+Check, and aggregate result, but SHOULD NOT require:
+
+- collection-result caching;
+- duplicate-collection suppression;
+- assessment-wide snapshot isolation;
+- a shared observation timestamp across independent Checks; or
+- deterministic equality between observations made at different times.
+
+Results SHOULD retain sufficient per-check/per-evidence timing metadata to make
+the observation time understandable where timing is relevant, but timing does
+not imply snapshot consistency.
+
+Accordingly, the earlier proposal for normative semantic collection identity or
+mandatory reuse is downgraded to implementation guidance. Vendors MAY optimize
+collection reuse when safe and useful.
