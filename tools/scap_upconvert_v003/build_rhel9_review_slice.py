@@ -1764,6 +1764,9 @@ def main():
                     if rid in selected_ids: disabled.append(rid)
             profile = {"id": safe_id((p.get("id") or "profile").split("_profile_")[-1]),
                        "title": text(p.find("x:title", NS))}
+            source_profile_description = text(p.find("x:description", NS))
+            if source_profile_description and source_profile_description != "<ProfileDescription></ProfileDescription>":
+                profile["description"] = source_profile_description
             if disabled: profile["disabled_rules"] = sorted(disabled)
             selectors = {}
             for rr in p.findall("x:refine-rule", NS):
