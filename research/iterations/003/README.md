@@ -1,121 +1,104 @@
 # SCAP-NG Research Iteration 003
 
-**Status:** active clean-room conversion redesign
+**Status:** active clean-room conversion redesign  
+**Audience:** project contributors, external reviewers, and potential OVAL Board review
 
-Iteration 003 restarts SCAP 1.4 -> SCAP-NG conversion from the current SCAP-NG
-design rather than attempting to repair the fidelity-first generators created
-during iterations 001 and 002.
+Iteration 003 is organized so a reviewer can understand it without knowing
+iteration 001 or 002.
 
-Iteration 001 remains migration/language research evidence. Iteration 002
-remains the source-design and decision record. The large generated iteration-002
-conversion trees are retained only as forensic/regression evidence and are not
-authoritative native SCAP-NG source.
+Its purpose is to demonstrate a clean, semantically lossless SCAP 1.4 ->
+SCAP-NG conversion approach using the current native design.
 
-## Objective
+## Directory map
 
-Build a conversion process that is:
+    003/
+      README.md
+      design/
+      source/
+        split-policy-assessment/
+      examples/
+      results/
+      evidence/
+      tooling-notes/
 
-- semantically lossless for supported SCAP 1.4 constructs;
-- explicit and loud when source semantics are unsupported;
-- independent of SCAP 1.4 serialization in the resulting native source;
-- concise enough for human authoring and review;
-- based on the accepted iteration-002 Benchmark/Policy/Assessment architecture;
-- suitable to evolve into a public standalone up-conversion tool.
+### design/
 
-## Governing pipeline
+Human-readable architecture and conversion decisions for this iteration.
 
-    pinned SCAP 1.4 source
-        -> semantic extraction
-        -> versioned normalized semantic IR
-        -> semantic accounting / blocker gate
-        -> native SCAP-NG lowering
-        -> equivalence verification
-        -> provenance/evidence report
+Start here after reading this README.
 
-The semantic IR is an internal converter contract. It is not SCAP-NG source
-syntax and SHALL NOT be allowed to define the native authoring model by accident.
+### source/
 
-## Hard boundary: semantics vs provenance
+Native SCAP-NG source examples.
 
-Native SCAP-NG source contains only information required to author or execute the
-NG content.
+Each independently reviewable SCAP-NG architecture gets its own directory.
+Iteration 003 currently implements only:
 
-Legacy XCCDF/OVAL/OCIL/CPE serialization details belong in conversion evidence
-and provenance unless a specific detail is proven to affect behavior.
+    source/split-policy-assessment/
 
-The following are prohibited from native output merely for source fidelity:
+Other architectures SHALL NOT be mixed into that tree.
 
-- raw XML source trees;
-- XML namespace URIs;
-- source component filenames and hrefs;
-- opaque OVAL object/test/state IDs;
-- OCIL questionnaire scaffolding;
-- CPE dictionary XML structure;
-- XCCDF element-shaped mirrors;
-- duplicate inherited profile snapshots.
+### examples/
 
-Losslessness means preservation of behavior, not the ability to reproduce the
-source XML byte-for-byte.
+Small focused examples used to explain individual semantics, edge cases, and
+conversion behavior. These are teaching/review artifacts, not complete
+benchmark source trees.
 
-## 003 acceptance gates
+### results/
 
-Native rendering does not begin with full benchmark regeneration.
+Sample SCAP-NG result artifacts and result-format demonstrations.
 
-First, representative cases SHALL prove the IR and conversion rules for:
+Source and results are deliberately separated so reviewers never have to guess
+whether a file is input content or scanner output.
 
-1. a simple automated Rule;
-2. a manual Rule;
-3. a Rule with default/automated/manual selectable checks;
-4. complex Boolean OVAL logic;
-5. OVAL variables and external/XCCDF-bound input;
-6. Benchmark and Rule applicability;
-7. profile selection/refinement deltas;
-8. reusable/shared Assessment candidates;
-9. existence/non-existence/cardinality semantics;
-10. unsupported or deprecated constructs that must fail loudly.
+### evidence/
 
-Only after those cases are understandable as native SCAP-NG and pass semantic
-accounting should the four anchor benchmarks be regenerated.
+Conversion provenance, equivalence reports, source accounting, migration
+diagnostics, hashes, and other proof material.
 
-## Four anchor corpus
+Legacy SCAP 1.4 identifiers, namespaces, hrefs, and XML-derived lineage MAY
+appear here when needed for traceability. They SHALL NOT appear in native NG
+source.
 
-The standing production migration corpus remains:
+### tooling-notes/
 
-- RHEL 9
-- Oracle Linux 9
-- Windows 11
-- Windows Server 2025
+Iteration-specific implementation notes and converter-development observations.
+Reusable converter code remains under repository-level tools/.
 
-Conversion SHALL begin from pinned original published SCAP 1.4 source artifacts,
-not from iteration-001 or iteration-002 generated YAML.
+## Current architecture under review
 
-## Reuse policy for older code
+Iteration 003 currently covers only the split Policy/Assessment architecture:
 
-Iteration 003 converter code SHALL NOT import the old whole-benchmark conversion
-pipeline or use old generated YAML as an input.
+    Benchmark Rule -> Policy -> selected check -> Assessment
 
-Older code MAY be consulted as research evidence for:
+All native source for that model belongs under:
 
-- source constructs previously encountered;
-- regression cases;
-- known dependency-closure traps;
-- OVAL semantic lessons;
-- diagnostics that should remain covered.
+    source/split-policy-assessment/
 
-Any useful algorithm brought forward must be reimplemented against the 003 IR
-contract and independently tested.
+A future architecture experiment MUST use a separate sibling directory rather
+than adding alternate semantics into this tree.
 
-## Initial implementation
+## Review order
 
-The first implementation lives under tools/scap_upconvert_v003/.
+For an external reviewer, the intended path is:
 
-It intentionally performs only:
+1. README.md
+2. design/conversion-contract.md
+3. design/native-source-layout.md
+4. design/applicability-registry.md
+5. source/split-policy-assessment/
+6. examples/
+7. results/
+8. evidence/
 
-- XCCDF semantic extraction into a compact versioned IR;
-- separate provenance/source accounting;
-- explicit diagnostics for constructs not yet represented.
+## Clean-source rule
 
-It does **not** yet emit native SCAP-NG YAML. That is deliberate: the IR must be
-reviewed before another renderer is permitted to shape the source model.
+Native SCAP-NG source SHALL NOT contain XCCDF, OVAL, OCIL, or CPE
+Applicability Language IDs, namespaces, hrefs, XML-shaped structures, or other
+legacy serialization residue.
 
-See conversion-contract.md, semantic-ir.md, and native-source-layout.md.
+Legacy lineage belongs only in evidence/provenance.
+
+If preserving such a reference appears necessary to retain semantics, the
+conversion path stops for design review rather than leaking the legacy
+construct into NG source.
