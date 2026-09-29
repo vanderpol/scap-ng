@@ -196,6 +196,29 @@ def emit_expression(parent, expr, ids):
     else:
         die(f"unsupported expression: {expr}")
 
+def emit_set(parent, spec, ids):
+    attrs={"set_operator": spec.get("operator","UNION")}
+    se=ET.SubElement(parent,q(OVAL_DEF,"set"),attrs)
+    nested=spec.get("sets")
+    collections=spec.get("collections")
+    if nested is not None:
+        if collections or spec.get("filters"):
+            die("nested set form cannot also contain collections/filters")
+        if not (1 <= len(nested) <= 2):
+            die("nested set form requires one or two child sets")
+        for child in nested:
+            emit_set(se,child,ids)
+    else:
+        if not collections or not (1 <= len(collections) <= 2):
+            die("leaf set form requires one or two collection references")
+        for ref in collections:
+            e=ET.SubElement(se,q(OVAL_DEF,"object_reference"))
+            e.text=ids.get("obj",ref)
+        for f in spec.get("filters",[]):
+            fe=ET.SubElement(se,q(OVAL_DEF,"filter"),{"action":f.get("action","exclude")})
+            fe.text=ids.get("ste",f["state"])
+    return se
+
 def build(data):
     sem = copy.deepcopy(data["ng_semantics"])
     raw_subs = data.get("fixture_substitutions", {})
@@ -286,14 +309,7 @@ def build(data):
                 "comment": col["id"],
             })
             if "set" in col:
-                s = col["set"]
-                se = ET.SubElement(o, q(OVAL_DEF, "set"), {"set_operator": s["operator"]})
-                for ref in s["collections"]:
-                    e = ET.SubElement(se, q(OVAL_DEF, "object_reference"))
-                    e.text = ids.get("obj", ref)
-                for f in s.get("filters", []):
-                    fe = ET.SubElement(se, q(OVAL_DEF, "filter"), {"action": f.get("action", "exclude")})
-                    fe.text = ids.get("ste", f["state"])
+                emit_set(o,col["set"],ids)
             else:
                 if "behaviors" in col:
                     ET.SubElement(o, q(ns, "behaviors"),
