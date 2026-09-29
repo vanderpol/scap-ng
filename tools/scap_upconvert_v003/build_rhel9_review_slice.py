@@ -789,22 +789,30 @@ def oval_semantic_inventory(oroot):
     }
 
 def unsupported_definition_features(oroot, definition_id):
-    """Return every currently unsupported construct reachable from a Definition.
+    """Return all structurally unsupported constructs reachable from a Definition.
 
-    This is diagnostic discovery, not lowering. It walks the full Definition
-    criteria closure first so one early failure cannot mask later unsupported
-    constructs such as filters behind sets or variable references.
+    Generic variables, sets, filters, and behaviors are native v003 constructs
+    and therefore are not errors here. This pass is intentionally independent of
+    lowering so diagnostics can enumerate multiple problems instead of masking
+    everything behind the first failure.
     """
     findings = []
-    seen_findings = set()
-    test_refs = set()
+    seen = set()
     visited_definitions = set()
+    visited_variables = set()
+
+    supported_components = {
+        "arithmetic", "begin", "concat", "end", "escape_regex",
+        "literal_component", "object_component", "regex_capture",
+        "split", "substring", "time_difference", "unique",
+        "variable_component",
+    }
 
     def add(feature, source_id=None, detail=None):
         key = (feature, source_id, detail)
-        if key in seen_findings:
+        if key in seen:
             return
-        seen_findings.add(key)
+        seen.add(key)
         item = {"feature": feature}
         if source_id is not None:
             item["source_id"] = source_id
@@ -812,17 +820,85 @@ def unsupported_definition_features(oroot, definition_id):
             item["detail"] = detail
         findings.append(item)
 
+    def inspect_variable(var_ref):
+        if not var_ref or var_ref in visited_variables:
+            return
+        visited_variables.add(var_ref)
+        variable = next(
+            (n for n in oroot.iter() if n.get("id") == var_ref and local(n.tag).endswith("_variable")),
+            None,
+        )
+        if variable is None:
+            add("variable_not_found", var_ref)
+            return
+        kind = local(variable.tag)
+        if kind not in ("constant_variable", "local_variable", "external_variable"):
+            add("variable_kind", var_ref, kind)
+            return
+        for descendant in variable.iter():
+            name = local(descendant.tag)
+            if descendant is variable or name == "value":
+                continue
+            if name.endswith("_variable"):
+                continue
+            if name not in supported_components:
+                add("variable_component", var_ref, name)
+            nested_ref = descendant.get("var_ref")
+            if nested_ref:
+                inspect_variable(nested_ref)
+
+    def inspect_object(obj_ref):
+        obj = find_by_id(oroot, obj_ref, "_object")
+        if obj is None:
+            add("object_not_found", obj_ref)
+            return
+        for descendant in obj.iter():
+            var_ref = descendant.get("var_ref")
+            if var_ref:
+                inspect_variable(var_ref)
+            if local(descendant.tag) == "var_ref" and text(descendant):
+                inspect_variable(text(descendant))
+            if local(descendant.tag) == "object_reference" and text(descendant):
+                inspect_object(text(descendant))
+            if local(descendant.tag) == "filter":
+                state_ref = descendant.get("state_ref") or text(descendant)
+                if not state_ref or find_by_id(oroot, state_ref, "_state") is None:
+                    add("filter_state_not_found", obj_ref, state_ref)
+
     def visit_criteria(node):
+        operator = (node.get("operator") or "AND").upper()
+        if operator not in ("AND", "OR"):
+            add("criteria_operator", detail=operator)
         for child in node:
             kind = local(child.tag)
             if kind == "criterion":
-                ref = child.get("test_ref")
-                if ref:
-                    test_refs.add(ref)
+                test_ref = child.get("test_ref")
+                test = next(
+                    (n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")),
+                    None,
+                )
+                if test is None:
+                    add("test_not_found", test_ref)
+                    continue
+                state_refs = []
+                for part in test:
+                    part_kind = local(part.tag)
+                    if part_kind == "object":
+                        inspect_object(part.get("object_ref"))
+                    elif part_kind == "state" and part.get("state_ref"):
+                        state_refs.append(part.get("state_ref"))
+                        state = find_by_id(oroot, part.get("state_ref"), "_state")
+                        if state is None:
+                            add("state_not_found", part.get("state_ref"))
+                        else:
+                            for descendant in state.iter():
+                                var_ref = descendant.get("var_ref")
+                                if var_ref:
+                                    inspect_variable(var_ref)
+                state_operator = (test.get("state_operator") or "AND").upper()
+                if len(state_refs) > 1 and state_operator not in ("AND", "OR"):
+                    add("state_operator", test_ref, state_operator)
             elif kind == "criteria":
-                operator = (child.get("operator") or "AND").upper()
-                if operator not in ("AND", "OR"):
-                    add("criteria_operator", detail=operator)
                 visit_criteria(child)
             elif kind == "extend_definition":
                 visit_definition(child.get("definition_ref"))
@@ -842,66 +918,13 @@ def unsupported_definition_features(oroot, definition_id):
         if criteria is None:
             add("missing_criteria", ref)
             return
-        operator = (criteria.get("operator") or "AND").upper()
-        if operator not in ("AND", "OR"):
-            add("criteria_operator", ref, operator)
         visit_criteria(criteria)
 
     visit_definition(definition_id)
-
-    for test_ref in sorted(test_refs):
-        test = next(
-            (n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")),
-            None,
-        )
-        if test is None:
-            add("test_not_found", test_ref)
-            continue
-
-        state_refs = [
-            child.get("state_ref")
-            for child in test
-            if local(child.tag) == "state" and child.get("state_ref")
-        ]
-        state_operator = (test.get("state_operator") or "AND").upper()
-        if len(state_refs) > 1 and state_operator not in ("AND", "OR"):
-            add("state_operator", test_ref, state_operator)
-
-        for child in test:
-            kind = local(child.tag)
-            if kind == "object":
-                obj_ref = child.get("object_ref")
-                obj = find_by_id(oroot, obj_ref, "_object")
-                if obj is None:
-                    add("object_not_found", obj_ref or test_ref)
-                    continue
-                for descendant in obj.iter():
-                    name = local(descendant.tag)
-                    if descendant is not obj and name in ("behaviors", "set", "filter"):
-                        add(f"object_{name}", obj_ref, descendant.get("action"))
-                    var_ref = descendant.get("var_ref")
-                    if var_ref:
-                        add("object_variable", obj_ref, var_ref)
-                    elif name == "var_ref" and text(descendant):
-                        add("object_variable", obj_ref, text(descendant))
-            elif kind == "state":
-                state_ref = child.get("state_ref")
-                state = find_by_id(oroot, state_ref, "_state")
-                if state is None:
-                    add("state_not_found", state_ref or test_ref)
-                    continue
-                for descendant in state.iter():
-                    name = local(descendant.tag)
-                    var_ref = descendant.get("var_ref")
-                    if var_ref:
-                        add("state_variable", state_ref, var_ref)
-                    elif name == "var_ref" and text(descendant):
-                        add("state_variable", state_ref, text(descendant))
-
     return findings
 
 def lower_definition(oroot, definition_id, assessment_id):
-    """Lower Boolean definition logic while requiring every leaf test to be exact."""
+    """Lower one OVAL Definition to native SCAP-NG assessment semantics."""
     definition = next(
         (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id),
         None,
@@ -912,8 +935,13 @@ def lower_definition(oroot, definition_id, assessment_id):
     assessment_title = oval_definition_title(definition)
     assessment_class = definition.get("class") or "miscellaneous"
     checks = {}
+    variables = {}
+    variable_names = {}
+    active_variables = set()
+    active_objects = set()
     test_to_check = {}
     used_check_ids = set()
+    used_variable_ids = set()
     active_definitions = set()
 
     def unique_check_id(title, capability):
@@ -925,6 +953,313 @@ def lower_definition(oroot, definition_id, assessment_id):
             suffix += 1
         used_check_ids.add(candidate)
         return candidate
+
+    def unique_variable_id(variable):
+        title = node_title(variable)
+        kind = local(variable.tag).replace("_variable", "")
+        base = semantic_id(title, f"{kind}-value")
+        candidate = base
+        suffix = 2
+        while candidate in used_variable_ids:
+            candidate = f"{base}-{suffix}"
+            suffix += 1
+        used_variable_ids.add(candidate)
+        return candidate
+
+    def capability_for_object(obj):
+        name = local(obj.tag)
+        ns_uri = obj.tag.split("}", 1)[0].strip("{") if "}" in obj.tag else ""
+        family = ns_uri.split("#")[-1].split("/")[-1] if ns_uri else "generic"
+        object_name = name[:-7] if name.endswith("_object") else name
+        return f"{family}.{object_name}"
+
+    def ensure_variable(var_ref):
+        if var_ref in variable_names:
+            return variable_names[var_ref], None
+        variable = next(
+            (n for n in oroot.iter() if n.get("id") == var_ref and local(n.tag).endswith("_variable")),
+            None,
+        )
+        if variable is None:
+            return None, f"variable_not_found:{var_ref}"
+        if var_ref in active_variables:
+            return None, f"variable_cycle:{var_ref}"
+
+        native_id = unique_variable_id(variable)
+        variable_names[var_ref] = native_id
+        active_variables.add(var_ref)
+        kind = local(variable.tag)
+        entry = {
+            "title": node_title(variable),
+            "datatype": variable.get("datatype") or "string",
+        }
+
+        if kind == "constant_variable":
+            values = [text(child) for child in variable if local(child.tag) == "value" and text(child) is not None]
+            entry["expression"] = {"literal": values[0] if len(values) == 1 else values}
+        elif kind == "external_variable":
+            entry["input"] = {
+                "required": True,
+                "cardinality": variable.get("version") and "one_or_more" or "one_or_more",
+            }
+        elif kind == "local_variable":
+            components = [child for child in variable if local(child.tag) not in ("notes",)]
+            if len(components) != 1:
+                active_variables.remove(var_ref)
+                return None, f"local_variable_component_count:{len(components)}"
+            expr, error = lower_component(components[0])
+            if error:
+                active_variables.remove(var_ref)
+                return None, error
+            entry["expression"] = expr
+        else:
+            active_variables.remove(var_ref)
+            return None, f"unsupported_variable_kind:{kind}"
+
+        variables[native_id] = entry
+        active_variables.remove(var_ref)
+        return native_id, None
+
+    def lower_component(node):
+        name = local(node.tag)
+
+        if name == "literal_component":
+            return {"literal": text(node)}, None
+
+        if name == "variable_component":
+            var_ref = node.get("var_ref")
+            native_id, error = ensure_variable(var_ref)
+            if error:
+                return None, error
+            return {"variable": native_id}, None
+
+        if name == "object_component":
+            obj_ref = node.get("object_ref")
+            field = node.get("item_field")
+            collection, error = lower_object(obj_ref)
+            if error:
+                return None, error
+            return {
+                "object_values": {
+                    "collect": collection,
+                    "field": field,
+                }
+            }, None
+
+        children = [child for child in node if local(child.tag) not in ("notes",)]
+        lowered = []
+        for child in children:
+            item, error = lower_component(child)
+            if error:
+                return None, error
+            lowered.append(item)
+
+        if name == "concat":
+            return {"concat": lowered}, None
+        if name == "unique":
+            return {"unique": lowered[0] if len(lowered) == 1 else lowered}, None
+        if name == "split":
+            return {
+                "split": {
+                    "value": lowered[0] if len(lowered) == 1 else lowered,
+                    "delimiter": node.get("delimiter"),
+                }
+            }, None
+        if name == "substring":
+            return {
+                "substring": {
+                    "value": lowered[0] if len(lowered) == 1 else lowered,
+                    "start": node.get("start"),
+                    "length": node.get("length"),
+                }
+            }, None
+        if name == "regex_capture":
+            return {
+                "regex_capture": {
+                    "value": lowered[0] if len(lowered) == 1 else lowered,
+                    "pattern": node.get("pattern"),
+                }
+            }, None
+        if name == "escape_regex":
+            return {"escape_regex": lowered[0] if len(lowered) == 1 else lowered}, None
+        if name == "arithmetic":
+            return {
+                "arithmetic": {
+                    "operation": (node.get("arithmetic_operation") or node.get("operation") or "").lower(),
+                    "operands": lowered,
+                }
+            }, None
+        if name in ("begin", "end"):
+            return {name: lowered[0] if len(lowered) == 1 else lowered}, None
+        if name == "time_difference":
+            return {
+                "time_difference": {
+                    "format_1": node.get("format_1"),
+                    "format_2": node.get("format_2"),
+                    "values": lowered,
+                }
+            }, None
+        return None, f"unsupported_variable_component:{name}"
+
+    def lower_entity_value(node):
+        var_ref = node.get("var_ref")
+        if var_ref:
+            native_id, error = ensure_variable(var_ref)
+            if error:
+                return None, error
+            return {"variable": native_id}, None
+        return text(node), None
+
+    def lower_state(state_ref):
+        state = find_by_id(oroot, state_ref, "_state")
+        if state is None:
+            return None, None, f"state_not_found:{state_ref}"
+        conditions = []
+        for child in state:
+            if local(child.tag) in ("notes",):
+                continue
+            value, error = lower_entity_value(child)
+            if error:
+                return None, None, error
+            item = {
+                "field": local(child.tag),
+                "operation": child.get("operation") or "equals",
+                "value": value,
+            }
+            if child.get("entity_check"):
+                item["entity_check"] = child.get("entity_check")
+            if child.get("var_check"):
+                item["variable_check"] = child.get("var_check")
+            if child.get("datatype"):
+                item["datatype"] = child.get("datatype")
+            if child.get("mask"):
+                item["mask"] = child.get("mask").lower() == "true"
+            conditions.append(item)
+        if not conditions:
+            condition = None
+        elif len(conditions) == 1:
+            condition = conditions[0]
+        else:
+            condition = {"all": conditions}
+        return condition, node_title(state), None
+
+    def lower_filter(filter_node):
+        state_ref = filter_node.get("state_ref") or text(filter_node)
+        if not state_ref:
+            return None, "filter_missing_state"
+        condition, state_title, error = lower_state(state_ref)
+        if error:
+            return None, error
+        item = {
+            "action": (filter_node.get("action") or "exclude").lower(),
+            "match": condition,
+        }
+        if state_title:
+            item["state_title"] = state_title
+        return item, None
+
+    def lower_set(set_node):
+        operator = (set_node.get("set_operator") or "UNION").lower()
+        members = []
+        filters = []
+        for child in set_node:
+            name = local(child.tag)
+            if name == "object_reference":
+                collection, error = lower_object(text(child))
+                if error:
+                    return None, error
+                members.append({"collect": collection})
+            elif name == "set":
+                nested, error = lower_set(child)
+                if error:
+                    return None, error
+                members.append({"set": nested})
+            elif name == "filter":
+                item, error = lower_filter(child)
+                if error:
+                    return None, error
+                filters.append(item)
+            else:
+                return None, f"unsupported_set_member:{name}"
+        result = {"operator": operator, "members": members}
+        if filters:
+            result["filters"] = filters
+        return result, None
+
+    def lower_object(obj_ref):
+        if not obj_ref:
+            return None, "object_ref_missing"
+        if obj_ref in active_objects:
+            return None, f"object_cycle:{obj_ref}"
+        obj = find_by_id(oroot, obj_ref, "_object")
+        if obj is None:
+            return None, f"object_not_found:{obj_ref}"
+
+        active_objects.add(obj_ref)
+        result = {
+            "object_title": node_title(obj),
+            "capability": capability_for_object(obj),
+        }
+        query = {}
+        filters = []
+        behaviors = {}
+        set_expr = None
+
+        for child in obj:
+            name = local(child.tag)
+            if name in ("notes",):
+                continue
+            if name == "behaviors":
+                behaviors.update(dict(child.attrib))
+                continue
+            if name == "filter":
+                item, error = lower_filter(child)
+                if error:
+                    active_objects.remove(obj_ref)
+                    return None, error
+                filters.append(item)
+                continue
+            if name == "set":
+                if set_expr is not None:
+                    active_objects.remove(obj_ref)
+                    return None, "multiple_object_sets"
+                set_expr, error = lower_set(child)
+                if error:
+                    active_objects.remove(obj_ref)
+                    return None, error
+                continue
+
+            value, error = lower_entity_value(child)
+            if error:
+                active_objects.remove(obj_ref)
+                return None, error
+            if value is None:
+                continue
+            item = value
+            attrs = {}
+            if child.get("operation"):
+                attrs["operation"] = child.get("operation")
+            if child.get("var_check"):
+                attrs["variable_check"] = child.get("var_check")
+            if child.get("entity_check"):
+                attrs["entity_check"] = child.get("entity_check")
+            if child.get("datatype"):
+                attrs["datatype"] = child.get("datatype")
+            if attrs:
+                attrs["value"] = value
+                item = attrs
+            query[name] = item
+
+        if query:
+            result["select"] = query
+        if set_expr is not None:
+            result["set"] = set_expr
+        if filters:
+            result["filters"] = filters
+        if behaviors:
+            result["behaviors"] = behaviors
+        active_objects.remove(obj_ref)
+        return result, None
 
     def lower_test(test_ref):
         if test_ref in test_to_check:
@@ -951,48 +1286,23 @@ def lower_definition(oroot, definition_id, assessment_id):
             elif local(child.tag) == "state" and child.get("state_ref"):
                 state_refs.append(child.get("state_ref"))
 
-        obj = find_by_id(oroot, obj_ref, "_object")
-        if obj is None:
-            return None, "object_not_found"
-
-        query = {}
-        for child in obj:
-            name = local(child.tag)
-            if name in ("behaviors", "set", "filter"):
-                return None, f"object_{name}_not_yet_lowered"
-            if name == "var_ref" or child.get("var_ref"):
-                return None, "object_variable_not_yet_lowered"
-            value = text(child)
-            if value is not None:
-                query[name] = (
-                    {"operation": child.get("operation"), "value": value}
-                    if child.get("operation") else value
-                )
+        collection, error = lower_object(obj_ref)
+        if error:
+            return None, error
+        # The Test identifies the collector family authoritatively. Preserve the
+        # object's recursive structure but normalize the top-level capability to it.
+        collection["capability"] = capability
 
         states = []
         state_titles = []
         for ref in state_refs:
-            state = find_by_id(oroot, ref, "_state")
-            if state is None:
-                return None, "state_not_found"
-            if node_title(state):
-                state_titles.append(node_title(state))
-            conditions = []
-            for child in state:
-                if local(child.tag) == "var_ref" or child.get("var_ref"):
-                    return None, "state_variable_not_yet_lowered"
-                item = {
-                    "field": local(child.tag),
-                    "operation": child.get("operation") or "equals",
-                    "value": text(child),
-                }
-                if child.get("entity_check"):
-                    item["entity_check"] = child.get("entity_check")
-                if child.get("datatype"):
-                    item["datatype"] = child.get("datatype")
-                conditions.append(item)
-            if conditions:
-                states.append(conditions[0] if len(conditions) == 1 else {"all": conditions})
+            condition, title, error = lower_state(ref)
+            if error:
+                return None, error
+            if title:
+                state_titles.append(title)
+            if condition is not None:
+                states.append(condition)
 
         check_id = unique_check_id(test_title, capability)
         test_to_check[test_ref] = check_id
@@ -1016,11 +1326,7 @@ def lower_definition(oroot, definition_id, assessment_id):
 
         checks[check_id] = {
             "test_title": test_title,
-            "collect": {
-                "object_title": node_title(obj),
-                "capability": capability,
-                "select": query,
-            },
+            "collect": collection,
             "assert": assertion,
         }
         return {"check": check_id}, None
@@ -1083,7 +1389,7 @@ def lower_definition(oroot, definition_id, assessment_id):
     if error:
         return None, error
 
-    return {"assessment": {
+    assessment = {
         "id": assessment_id,
         "version": int(definition.get("version")) if (definition.get("version") or "").isdigit() else definition.get("version"),
         "assessment_title": assessment_title,
@@ -1092,7 +1398,10 @@ def lower_definition(oroot, definition_id, assessment_id):
         "purpose": "assessment",
         "checks": checks,
         "evaluate": expression,
-    }}, None
+    }
+    if variables:
+        assessment["variables"] = variables
+    return {"assessment": assessment}, None
 
 def automated_refs(rec):
     refs = []
