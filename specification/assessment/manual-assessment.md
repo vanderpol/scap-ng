@@ -162,3 +162,11 @@ model.
 SCAP-NG therefore defines useful interoperable scanner behavior for that
 minimal input instead of requiring publishers to adopt a more complex
 interaction language before their existing manual content can be used.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Assessment Method](assessment-method.md) · [Contents](../README.md) · [Next: Source, Compilation, Packaging, and Integrity →](../package/package-and-integrity.md)
+
+<!-- spec-nav:end -->
