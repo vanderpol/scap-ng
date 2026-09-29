@@ -20,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "research/iterations/003/source/split-rule-assessment/rhel9-review-slice"
 LEGACY_OUT = ROOT / "research/iterations/003/source/split-policy-assessment/rhel9-review-slice"
 EVIDENCE = ROOT / "research/iterations/003/evidence/rhel9-review-slice"
+PACKAGE_OUT = ROOT / "research/iterations/003/packages"
+PACKAGE_NAME = "rhel9-review-slice.scap-ng.zip"
 XCCDF = "http://checklists.nist.gov/xccdf/1.2"
 NS = {"x": XCCDF}
 
@@ -167,6 +169,151 @@ def oval_descriptive_metadata_diagnostics(oroot, definition_id, rule_id, assessm
                     None,
                 )
                 warn_missing("Variable", variable, "variable_title", "OVAL_VARIABLE_COMMENT_MISSING")
+
+def canonical_json_bytes(obj):
+    return (json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n").encode("utf-8")
+
+def load_yaml(path):
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+def build_experimental_package(source_root, package_path):
+    """Build an iteration-003 package demonstrating logical-ID resolution.
+
+    This is intentionally an experimental package shape. It compiles YAML
+    authoring files to canonical JSON-like members and replaces source-path
+    applicability bindings with logical Assessment IDs.
+    """
+    benchmark_source = load_yaml(source_root / "benchmark.yaml")
+    applicability_source = load_yaml(source_root / "applicability.yaml")
+
+    benchmark = deepcopy(benchmark_source)
+    benchmark_id = benchmark["benchmark"]["id"]
+    applicability_catalog_id = f"{benchmark_id}.applicability"
+
+    # Scanner-facing Benchmark references the logical catalog identity, not a path.
+    benchmark["benchmark"]["applicability_catalog"] = applicability_catalog_id
+
+    applicability = {
+        "applicability_catalog": {
+            "id": applicability_catalog_id,
+            "conditions": [],
+        }
+    }
+
+    members = {}
+    objects = {}
+
+    def add_object(object_id, object_type, package_member, obj):
+        if object_id in objects:
+            raise RuntimeError(f"duplicate package object id: {object_id}")
+        data = canonical_json_bytes(obj)
+        members[package_member] = data
+        objects[object_id] = {
+            "type": object_type,
+            "path": package_member,
+            "sha256": sha256(data),
+        }
+
+    add_object(
+        benchmark_id,
+        "benchmark",
+        "benchmark.json",
+        benchmark,
+    )
+
+    # Resolve authoring applicability paths to logical Assessment IDs.
+    for entry in applicability_source.get("applicability", []):
+        source_path = source_root / entry["assessment"]
+        assessment_doc = load_yaml(source_path)
+        assessment_id = assessment_doc["assessment"]["id"]
+        applicability["applicability_catalog"]["conditions"].append({
+            "id": entry["id"],
+            "assessment": assessment_id,
+        })
+
+    add_object(
+        applicability_catalog_id,
+        "applicability_catalog",
+        "applicability.json",
+        applicability,
+    )
+
+    for rule_path in sorted((source_root / "rules").glob("*.yaml")):
+        rule_doc = load_yaml(rule_path)
+        rule_id = rule_doc["rule"]["id"]
+        add_object(rule_id, "rule", f"rules/{rule_id}.json", rule_doc)
+
+    assessment_paths = sorted((source_root / "assessments").rglob("*.yaml"))
+    for assessment_path in assessment_paths:
+        assessment_doc = load_yaml(assessment_path)
+        assessment_id = assessment_doc["assessment"]["id"]
+        rel_group = assessment_path.parent.name
+        add_object(
+            assessment_id,
+            "assessment",
+            f"assessments/{rel_group}/{assessment_id}.json",
+            assessment_doc,
+        )
+
+    # Validate that every Benchmark Rule ID resolves exactly once in the index.
+    benchmark_rules = benchmark["benchmark"].get("rules", [])
+    missing_rules = [
+        rid for rid in benchmark_rules
+        if rid not in objects or objects[rid]["type"] != "rule"
+    ]
+    if missing_rules:
+        raise RuntimeError(f"package index cannot resolve Benchmark Rules: {missing_rules}")
+
+    index = {
+        "format": "scap-ng-object-index",
+        "format_version": "0.0.3-experimental",
+        "benchmark": benchmark_id,
+        "objects": objects,
+    }
+    index_bytes = canonical_json_bytes(index)
+    members["index.json"] = index_bytes
+
+    manifest_members = {
+        name: {
+            "sha256": sha256(data),
+            "size": len(data),
+        }
+        for name, data in sorted(members.items())
+    }
+    manifest = {
+        "format": "scap-ng-package-manifest",
+        "format_version": "0.0.3-experimental",
+        "benchmark": benchmark_id,
+        "index": "index.json",
+        "members": manifest_members,
+    }
+    manifest_bytes = canonical_json_bytes(manifest)
+    members["manifest.json"] = manifest_bytes
+
+    package_path.parent.mkdir(parents=True, exist_ok=True)
+    if package_path.exists():
+        package_path.unlink()
+    with zipfile.ZipFile(package_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for name, data in sorted(members.items()):
+            info = zipfile.ZipInfo(name)
+            # Fixed timestamp makes the package reproducible for identical content.
+            info.date_time = (1980, 1, 1, 0, 0, 0)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            zf.writestr(info, data)
+
+    # Write review copies beside the package so index/manifest diffs are visible.
+    write_json(package_path.parent / "rhel9-review-slice.index.json", index)
+    write_json(package_path.parent / "rhel9-review-slice.manifest.json", manifest)
+
+    return {
+        "package": str(package_path.relative_to(ROOT)),
+        "sha256": sha256(package_path.read_bytes()),
+        "member_count": len(members),
+        "object_count": len(objects),
+        "rule_count": sum(1 for x in objects.values() if x["type"] == "rule"),
+        "assessment_count": sum(1 for x in objects.values() if x["type"] == "assessment"),
+    }
 
 def evidence_tree(node):
     return {
@@ -1428,7 +1575,18 @@ def main():
             "summary": summary,
             "diagnostics": diagnostics,
         })
+        package_summary = build_experimental_package(
+            OUT,
+            PACKAGE_OUT / PACKAGE_NAME,
+        )
+        write_json(EVIDENCE / "package-summary.json", package_summary)
         print("accepted native rules:", ", ".join(selected_ids))
+        print(
+            "package:",
+            package_summary["package"],
+            "objects=" + str(package_summary["object_count"]),
+            "sha256=" + package_summary["sha256"],
+        )
         print(
             "diagnostics:",
             " ".join(f"{level.upper()}={summary['counts'][level]}" for level in DIAGNOSTIC_LEVELS),
