@@ -2,8 +2,12 @@
 """Extract the authoritative embedded XCCDF Benchmark from a SCAP 1.4 source ZIP."""
 from __future__ import annotations
 import argparse
+import sys
 from pathlib import Path
 from lxml import etree
+
+TOOLS_DIR=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(TOOLS_DIR))
 import scap14_rule_splitter as split
 
 def main():
