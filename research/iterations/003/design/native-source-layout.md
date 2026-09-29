@@ -338,3 +338,50 @@ Iteration 003 uses:
 These labels MAY be populated from useful human-readable source comments during
 conversion. Legacy source identifiers and namespaces SHALL NOT be carried into
 native labels.
+
+
+## Candidate publisher metadata versus core Policy semantics
+
+Iteration 003 SHALL distinguish between:
+
+1. semantics explicitly defined by XCCDF and intentionally carried forward into
+   SCAP-NG; and
+2. publisher-specific metadata discovered inside source content but not defined
+   as first-class XCCDF semantics.
+
+Publisher-specific metadata SHALL NOT become normative SCAP-NG Policy fields
+merely because it is present in DISA STIG content.
+
+Examples currently observed in DISA STIG Rule description payloads include:
+
+- documentable;
+- false positives;
+- false negatives;
+- mitigations;
+- potential impacts;
+- responsibility.
+
+These fields are useful enough to preserve during conversion, but their
+inclusion in the eventual SCAP-NG core model is an open governance question.
+
+For iteration 003:
+
+- their original values SHALL remain preserved in conversion evidence;
+- they MAY be emitted in an explicitly marked experimental/publisher metadata
+  section for review;
+- they SHALL NOT be treated as settled core Policy properties;
+- promotion into the core Policy vocabulary requires an affirmative design
+  decision, ideally with OVAL Board / standards-community review.
+
+The review question for each such field is:
+
+- Is this broadly useful policy metadata beyond DISA STIGs?
+- Does it affect assessment, tailoring, remediation, reporting, or
+  interoperability?
+- Is there demonstrated producer/consumer use?
+- Would preserving it impose meaningful implementation burden?
+- Is it better represented as general extensible publisher metadata instead of
+  a standardized first-class field?
+
+This prevents SCAP-NG from standardizing accidental publisher conventions while
+still preserving information losslessly during migration.
