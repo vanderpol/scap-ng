@@ -50,12 +50,28 @@ can diverge from the policy package after compilation.
 Reusable Assessments MAY be embedded once and referenced by stable identity
 within the package.
 
-## 5. Package manifest
+## 5. Package manifest and object resolution
 
-A compiled package SHOULD contain a manifest that identifies every package
-member and its digest.
+A compiled package SHOULD contain one manifest that provides both package
+integrity metadata and deterministic logical-object resolution.
 
-Package integrity SHOULD be computable from a canonical manifest.
+The manifest SHOULD map each stable logical object identity to:
+
+- object type;
+- package path;
+- content digest;
+- content size.
+
+This mapping is distinct from Benchmark membership. For example, a Benchmark
+Rule list identifies which Rule IDs belong to the Benchmark, while the package
+manifest identifies where those Rule objects are located in the immutable
+package.
+
+A processor SHOULD be able to resolve packaged objects without relying on
+filename conventions or directory scanning.
+
+Package integrity SHOULD be computable from the canonical manifest and the
+digests it contains.
 
 The package identity SHOULD be immutable and content-derived, for example from
 the canonical manifest digest.
@@ -63,24 +79,11 @@ the canonical manifest digest.
 Results SHOULD reference the immutable package identity rather than duplicate
 the complete source package.
 
-## 5.1 Package object index
-
-A package manifest or associated package index MAY provide a package-wide
-mapping from stable logical object identity to the packaged representation of
-that object.
-
-This mapping is distinct from Benchmark membership. For example, a Benchmark
-Rule list identifies which Rule IDs belong to the Benchmark, while the package
-object index identifies where those Rule objects are located in the immutable
-package.
-
-A package object index SHOULD permit deterministic resolution without relying
-on filename conventions or directory scanning.
-
-An iteration-003 experimental package uses an `index.json` mapping containing
-logical object ID, object type, package path, and SHA-256 digest. This
-experimental shape is evidence for package design and is not yet the final
-normative serialization.
+Iteration 003 previously experimented with separate `index.json` and
+`manifest.json` files. Because both repeated package path and digest
+information, that design was consolidated into one `manifest.json`.
+This experimental manifest shape is evidence for package design and is not yet
+the final normative serialization.
 
 ## 6. Signing
 
