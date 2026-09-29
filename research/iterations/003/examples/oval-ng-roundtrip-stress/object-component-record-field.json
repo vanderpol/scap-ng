@@ -1,0 +1,43 @@
+{
+  "fixture_version": 1,
+  "id": "object-component-record-field",
+  "source": {
+    "note": "Schema-derived non-deprecated sql512 Object used to prove object_component record_field preservation.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/object-component-record-field.xml"
+  },
+  "ng_semantics": {
+    "collections": [
+      {
+        "id": "sql-settings-collection",
+        "type": "independent.sql512",
+        "selectors": {
+          "engine": "mysql",
+          "version": {
+            "operation": "pattern match",
+            "value": "^8\\..*$"
+          },
+          "instance": {
+            "operation": "pattern match",
+            "value": "^.*$"
+          },
+          "database": "security",
+          "sql": "SELECT name, value FROM settings"
+        }
+      }
+    ],
+    "variables": [
+      {
+        "id": "setting-names-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "object_component": {
+            "collection": "sql-settings-collection",
+            "item_field": "result",
+            "record_field": "name"
+          }
+        }
+      }
+    ]
+  }
+}
