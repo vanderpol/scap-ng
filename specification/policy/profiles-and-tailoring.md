@@ -393,3 +393,36 @@ SHOULD add worked source examples covering at least:
 
 These examples SHOULD use the same `research/iterations/002/examples/source/` organization as the
 current RHEL 9 and Windows 11 Benchmark examples.
+
+
+## 23. Check selection
+
+A policy MAY expose multiple named check alternatives for a Rule. A Tailoring
+artifact MAY select among those published alternatives by **check selector**.
+
+Illustrative source:
+
+    tailoring:
+      benchmark:
+        id: disa.example.stig
+        version: V1R1
+
+      check_selectors:
+        EXAMPLE-01-000001: manual
+
+The selector identifies a choice already exposed by the Rule's governing
+policy. Tailoring SHALL NOT use check selection to introduce, replace, or
+modify an Assessment implementation.
+
+Selector names are extensible and SHALL NOT be restricted to `automated` and
+`manual`.
+
+An explicitly selected check selector that cannot be resolved SHALL make policy
+resolution fail. A processor SHALL NOT silently fall back to a default check.
+
+This capability is the native SCAP-NG successor to XCCDF check-selection
+semantics, including tailoring that deliberately selects a manual alternative
+instead of an automated check.
+
+The effective policy recorded for a run SHALL include any non-default check
+selection needed to reconstruct which Assessment Method was executed.
