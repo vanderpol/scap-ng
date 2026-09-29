@@ -63,6 +63,25 @@ the canonical manifest digest.
 Results SHOULD reference the immutable package identity rather than duplicate
 the complete source package.
 
+## 5.1 Package object index
+
+A package manifest or associated package index MAY provide a package-wide
+mapping from stable logical object identity to the packaged representation of
+that object.
+
+This mapping is distinct from Benchmark membership. For example, a Benchmark
+Rule list identifies which Rule IDs belong to the Benchmark, while the package
+object index identifies where those Rule objects are located in the immutable
+package.
+
+A package object index SHOULD permit deterministic resolution without relying
+on filename conventions or directory scanning.
+
+An iteration-003 experimental package uses an `index.json` mapping containing
+logical object ID, object type, package path, and SHA-256 digest. This
+experimental shape is evidence for package design and is not yet the final
+normative serialization.
+
 ## 6. Signing
 
 SCAP-NG packages SHOULD support digital signatures over the canonical package
