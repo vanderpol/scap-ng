@@ -200,3 +200,42 @@ NOT map it to native `rule.version`.
 
 The generic SCAP 1.4 conversion profile SHALL NOT apply this publisher-specific
 interpretation.
+
+
+## Structural fidelity for OVAL-to-NG conversion
+
+For lossless SCAP 1.4 / OVAL conversion, the converter SHOULD preserve the
+author's existing semantic decomposition as closely as practical.
+
+This includes, when present and behaviorally meaningful:
+
+- OVAL Object boundaries -> SCAP-NG Collection boundaries;
+- OVAL Variable boundaries -> SCAP-NG Variable boundaries;
+- Variable-to-variable dependency chains;
+- Object-component dependencies;
+- State/filter boundaries;
+- Set composition; and
+- Explicit intermediate variables used for readability, reuse, or debugging.
+
+The converter SHALL NOT collapse a chain of OVAL Variables into one nested NG
+expression merely because the resulting expression is semantically equivalent.
+
+Likewise, it SHALL NOT duplicate a referenced OVAL Object/Collection inline at
+each use when the source represented one shared Object.
+
+Normalization SHOULD focus on serialization artifacts rather than authored
+semantic structure. Examples of appropriate normalization include:
+
+- replacing OVAL IDs with human-readable native NG IDs while preserving source
+  IDs in provenance;
+- replacing XML element/attribute syntax with native NG syntax;
+- removing namespace and href plumbing;
+- applying schema-defined defaults explicitly where useful; and
+- mapping OVAL Object to the working NG term Collection.
+
+A converted Assessment SHOULD therefore remain recognizable to an experienced
+OVAL author when comparing dependency structure, even though its serialization
+is native SCAP-NG.
+
+Native-authored SCAP-NG content MAY use a cleaner decomposition than converted
+content, provided both forms have the same defined semantics.
