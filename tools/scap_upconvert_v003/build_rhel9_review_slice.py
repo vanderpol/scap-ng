@@ -420,6 +420,7 @@ def lower_definition(oroot, definition_id, assessment_id):
         return None, "definition_not_found"
 
     assessment_title = node_title(definition)
+    assessment_class = definition.get("class") or "miscellaneous"
     checks = {}
     test_to_check = {}
     used_check_ids = set()
@@ -596,6 +597,8 @@ def lower_definition(oroot, definition_id, assessment_id):
         "id": assessment_id,
         "assessment_title": assessment_title,
         "mode": "automated",
+        "class": assessment_class,
+        "purpose": "assessment",
         "checks": checks,
         "evaluate": expression,
     }}, None
@@ -744,6 +747,7 @@ def benchmark_platform_assessment(platform_id, title, distro_ids):
             "id": platform_id + ".assessment",
             "assessment_title": title,
             "mode": "automated",
+            "class": "inventory",
             "purpose": "applicability",
             "checks": {
                 "operating-system-identity": {
@@ -1089,6 +1093,8 @@ def main():
                                    "id": aid,
                                    "assessment_title": f"Manual assessment for {rid}",
                                    "mode": "manual",
+                                   "class": "compliance",
+                                   "purpose": "assessment",
                                    "procedure": procedure,
                                    "inputs": [],
                                    "evidence": [],
