@@ -430,3 +430,24 @@ For the iteration-003 split-rule-assessment layout:
 This field is a source reference, not a naming convention. A processor SHALL
 NOT infer the applicability catalog from the presence, filename, or directory
 location of `applicability.yaml`.
+
+
+## Object filename conventions
+
+Human-readable filenames SHOULD identify the native object type even when the
+containing directory also conveys that information.
+
+For iteration 003, Rule files use:
+
+    <rule-id>.rule.yaml
+
+and compiled/package Rule objects use:
+
+    <rule-id>.rule.json
+
+Assessment filenames continue to identify their Assessment role/type using
+their established suffixes.
+
+Filename conventions aid authors and reviewers but SHALL NOT establish semantic
+identity or Benchmark membership. Stable logical IDs remain authoritative, and
+the package manifest resolves those IDs to packaged paths.
