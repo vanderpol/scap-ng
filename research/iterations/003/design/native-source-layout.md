@@ -300,3 +300,41 @@ The lossless-conversion target is sufficient native information to regenerate
 the same meaningful Benchmark publication data and policy semantics.
 
 It is not byte-for-byte reproduction of the original XML serialization.
+
+
+## First-class manual assessment
+
+SCAP-NG treats manual assessment as a native Assessment Method, not as a
+secondary legacy questionnaire mechanism.
+
+A publisher MAY provide automated and manual Assessment Methods for the same
+Rule and expose them through normal check selection.
+
+When a publisher supplies a manual Assessment Method directly, downstream
+content processors SHOULD NOT need to construct an additional questionnaire
+artifact merely to make that Rule manually assessable.
+
+This design can eliminate historical enrichment workflows in which a downstream
+organization had to add manual-question content to an otherwise complete
+Benchmark solely because the publication format separated automated and manual
+assessment mechanisms.
+
+Migration evidence describing such historical enrichment SHALL remain in the
+conversion evidence, while the native NG source SHOULD represent the resulting
+manual Assessment directly.
+
+## Assessment human-readable labels
+
+Assessment source SHALL use labels that identify the semantic object being
+described rather than overloading a generic `title` property at every level.
+
+Iteration 003 uses:
+
+- `assessment_title` for the Assessment Method;
+- `test_title` for an executable test/check node;
+- `object_title` for collected target/object meaning;
+- `state_title` for expected-state meaning.
+
+These labels MAY be populated from useful human-readable source comments during
+conversion. Legacy source identifiers and namespaces SHALL NOT be carried into
+native labels.
