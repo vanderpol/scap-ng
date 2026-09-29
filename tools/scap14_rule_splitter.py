@@ -551,6 +551,10 @@ def main() -> int:
         "applicability_unique_oval_definitions": 0,
         "applicability_unresolved_references": 0,
         "applicability_schema_invalid": 0,
+        "cpe_inventory_refs": 0,
+        "cpe_inventory_split_valid": 0,
+        "cpe_inventory_unresolved": 0,
+        "cpe_inventory_schema_invalid": 0,
     }
 
     # CPE applicability uses the same OVAL language as Rule checks, but those
@@ -564,7 +568,6 @@ def main() -> int:
                 "source_kind":"cpe_platform_expression",
                 "xccdf_component":benchmark_component_id,
             })
-    applicability_refs.extend(cpe_dictionary_oval_refs(components))
     stats["applicability_check_fact_refs"]=len(applicability_refs)
     oval_app_refs=[
         ref for ref in applicability_refs
@@ -702,6 +705,105 @@ def main() -> int:
                 "dependency_edge_count":len(dependency_edges),
                 "schema_errors":schema_errors,
             }
+
+    # CPE dictionary inventory checks are deliberately split per product.
+    # They are descriptive platform/product inventory Assessments, not part of
+    # the CPE/XCCDF applicability Assessment. Keeping them separate avoids
+    # cross-component OVAL ID collisions and guarantees inventory reporting
+    # cannot alter applicability truth.
+    cpe_inventory=[]
+    cpe_refs=cpe_dictionary_oval_refs(components)
+    stats["cpe_inventory_refs"]=len(cpe_refs)
+    for ordinal,ref in enumerate(cpe_refs,1):
+        entry={**ref}
+        definition_id=ref.get("definition_id")
+        if (
+            ref.get("system")!=OVAL_DEF_NS
+            or not definition_id
+            or not OVAL_ID_RE.match(definition_id)
+        ):
+            entry["status"]="unsupported_reference"
+            stats["cpe_inventory_unresolved"]+=1
+            cpe_inventory.append(entry)
+            continue
+
+        matches=[comp for comp in oval_components if comp.has_definition(definition_id)]
+        if len(matches)!=1:
+            entry["status"]="unresolved" if not matches else "ambiguous"
+            entry["match_count"]=len(matches)
+            stats["cpe_inventory_unresolved"]+=1
+            cpe_inventory.append(entry)
+            continue
+
+        component=matches[0]
+        closure,unresolved,edges=component.closure([definition_id])
+        if unresolved:
+            entry["status"]="resolution_error"
+            entry["unresolved"]=sorted(unresolved)
+            stats["cpe_inventory_unresolved"]+=1
+            cpe_inventory.append(entry)
+            continue
+
+        inventory_tree,counts=merge_rule_closures([(component,closure)])
+        xml_bytes=etree.tostring(
+            inventory_tree,
+            encoding="UTF-8",
+            xml_declaration=True,
+            pretty_print=True,
+        )
+        exact_tree=etree.ElementTree(etree.fromstring(xml_bytes))
+        schema_errors=validate_schema(exact_tree,schema)
+        inv_id=f"{ordinal:04d}-{safe_name(ref.get('cpe_name') or definition_id)}"
+        inv_dir=out/"platform-inventory"/inv_id
+        inv_dir.mkdir(parents=True,exist_ok=True)
+        oval_path=inv_dir/"oval.xml"
+        oval_path.write_bytes(xml_bytes)
+
+        provenance={
+            "generated_artifact":True,
+            "authoritative_source":"published_signed_niwc_scap14_zip",
+            "kind":"cpe_product_inventory",
+            "source":manifest["source"],
+            "cpe_name":ref.get("cpe_name"),
+            "cpe_component":ref.get("cpe_component"),
+            "definition_id":definition_id,
+            "oval_component":component.component_id,
+            "closure":{
+                "counts":counts,
+                "ids":sorted(closure),
+                "unresolved":[],
+                "dependency_edges":edges,
+                "fixed_point_complete":True,
+            },
+            "split_oval":{
+                "path":oval_path.relative_to(out).as_posix(),
+                "sha256":sha256(xml_bytes),
+                "bytes":len(xml_bytes),
+                "omni_schema_valid":not schema_errors,
+                "schema_errors":schema_errors,
+            },
+        }
+        (inv_dir/"provenance.json").write_text(
+            json.dumps(provenance,indent=2,sort_keys=True)+"\n",
+            encoding="utf-8",
+        )
+        entry.update({
+            "status":"schema_invalid" if schema_errors else "split_valid",
+            "match_count":1,
+            "oval_component":component.component_id,
+            "path":oval_path.relative_to(out).as_posix(),
+            "sha256":sha256(xml_bytes),
+            "closure_counts":counts,
+            "dependency_edge_count":len(edges),
+            "schema_errors":schema_errors,
+        })
+        if schema_errors:
+            stats["cpe_inventory_schema_invalid"]+=1
+        else:
+            stats["cpe_inventory_split_valid"]+=1
+        cpe_inventory.append(entry)
+
+    manifest["cpe_inventory"]=cpe_inventory
 
     for benchmark_component_id, benchmark in benchmarks:
         for row in rule_oval_refs(benchmark):
