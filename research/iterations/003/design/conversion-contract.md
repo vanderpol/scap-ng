@@ -81,3 +81,52 @@ SHOULD remain benchmark/vendor neutral.
 
 NIWC/DISA-specific corpus orchestration belongs in research/evidence tooling,
 not reusable converter logic.
+
+
+## Publisher conversion profiles
+
+The SCAP 1.4 converter SHALL implement standards-defined SCAP/XCCDF/OVAL
+semantics independently from publisher-specific conventions.
+
+Publisher-specific interpretation SHALL be isolated behind an explicit
+conversion profile. The initial profile is:
+
+- `disa-stig`
+
+The default/generic conversion path SHALL NOT assume DISA STIG conventions.
+
+A publisher profile MAY:
+
+- interpret documented publisher-specific identifier conventions;
+- normalize publisher-specific metadata;
+- recover semantics encoded by that publisher in a non-standard or overloaded
+  standard field;
+- map publisher extensions into explicit SCAP-NG publisher-extension fields.
+
+A publisher profile SHALL NOT:
+
+- silently change standards-defined semantics for content outside that profile;
+- discard the original source value used to derive a normalized value;
+- infer undocumented publisher behavior without evidence;
+- cause publisher-specific vocabulary to become normative SCAP-NG vocabulary.
+
+### DISA STIG Rule version handling
+
+DISA STIG content is known to overload the XCCDF Rule `version` element for
+publisher-specific Rule identification rather than using it solely as the
+generic XCCDF Item version.
+
+For `disa-stig` conversion:
+
+1. the converter SHALL preserve the original XCCDF Rule `version` value in
+   publisher-specific conversion metadata/provenance;
+2. the converter SHALL derive the native Rule revision/version from the
+   authoritative DISA Rule identifier convention when that convention can be
+   validated;
+3. the derivation rule SHALL be documented and regression-tested against real
+   DISA content;
+4. conversion SHALL stop for review if the identifier does not match a known,
+   validated DISA convention.
+
+The generic SCAP 1.4 conversion profile SHALL map XCCDF Rule version according
+to the XCCDF specification and SHALL NOT apply the DISA interpretation.
