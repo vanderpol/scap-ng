@@ -18,7 +18,7 @@ concepts and records deliberate divergences.
 | Manual Assessment | XCCDF Check Text / OCIL manual interaction | Check Text alone is sufficient; default result contract replaces need for questionnaire scaffolding |
 | Automated Assessment | XCCDF check + OVAL Definition/Test/Object/State/Variable graph | cleaner native Assessment language; Stage-1 migration remains lossless |
 | Capability | OVAL test/object family | portable collector/evaluation interface rather than XML Test element |
-| Platform | XCCDF platform + CPE applicability + OVAL inventory logic | explicit named Platform bound to ordinary Assessment logic; no scanner magic |
+| Platform | XCCDF platform + CPE applicability + OVAL inventory logic | explicit named Platform bound to ordinary Assessment logic; Platform/Inventory Assessment MAY also emit standardized product identifiers such as CPE into target inventory |
 | Rule applicability | XCCDF platform/refine applicability combinations | explicit reusable applicability conditions composed with Benchmark Platform |
 | Applicability catalog | CPE dictionary / XCCDF platform references | explicit Benchmark-scoped ID-to-Assessment mapping |
 | Assessment Request | no single direct analog | new run orchestration object |
@@ -30,6 +30,20 @@ concepts and records deliberate divergences.
 | Publisher extension | XCCDF metadata / foreign namespaces | formal constrained extension surface |
 | Historical provenance comments/report | source IDs embedded through component structure | preserved outside scanner semantics where possible |
 | SIEM projection | custom post-processing of ARF/XCCDF results | explicit projection from canonical results; denormalization is consumer-specific |
+
+## CPE inventory compatibility note
+
+SCAP 1.4 uses OVAL inventory definitions to determine whether a product is
+present and associates those inventory checks with CPE names. SP 800-126r4
+further uses the resulting target CPE set as input to CPE/XCCDF applicability.
+
+SCAP-NG preserves the product-inventory half of that behavior:
+
+    Platform/Inventory Assessment -> observed product -> target inventory CPE
+
+SCAP-NG intentionally does not make the emitted CPE an implicit input to Rule
+selection or applicability. CPE-based applicability, if standardized later,
+would be an explicit separate capability/profile.
 
 ## Important intentional departures
 
