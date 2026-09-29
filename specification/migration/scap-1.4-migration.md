@@ -124,3 +124,27 @@ testing.
 The scanner implementation SHALL NOT be allowed to define or constrain
 language semantics merely because it was implemented before the source and
 semantic model stabilized.
+
+
+## 11. XCCDF check selectors and conversion failure
+
+Stage-1 migration SHALL preserve XCCDF check-selection semantics. When a legacy
+Rule exposes alternative checks selectable by selector, the converted SCAP-NG
+policy SHALL expose semantically corresponding named check selectors and
+Tailoring/Profile selection SHALL resolve to the corresponding alternative.
+
+A converter SHALL NOT flatten multiple selectable legacy checks into a single
+Assessment when doing so would change selectable behavior.
+
+A converter SHALL NOT silently replace an unsupported automated check with a
+Manual Assessment, silently choose another selector, or silently fall back to a
+default check.
+
+More generally, a conforming Stage-1 converter SHALL either produce
+semantically equivalent SCAP-NG content or report a conversion error. It SHALL
+NOT knowingly emit content that is weaker, stronger, or otherwise
+non-equivalent to the supported source semantics.
+
+Every newly encountered source construct that requires a new semantic mapping
+SHOULD be added to the migration/conformance regression corpus after support is
+implemented.
