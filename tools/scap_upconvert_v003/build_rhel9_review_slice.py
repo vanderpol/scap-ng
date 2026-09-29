@@ -35,11 +35,51 @@ def write_yaml(path,obj):
 def write_json(path,obj):
     path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(obj,indent=2,sort_keys=True)+"\n",encoding="utf-8")
-def find_component(files, needle):
-    ms=[p for p in files if needle in p.name.lower() and p.suffix.lower()==".xml"]
-    if not ms: raise RuntimeError(f"No {needle} XML component found")
-    ms.sort(key=lambda p:(len(p.name),p.name))
-    return ms[0]
+def load_source_components(files):
+    """Return embedded Benchmark and OVAL definition roots from the source package."""
+    benchmark = None
+    oval = None
+    benchmark_source = None
+    oval_source = None
+
+    # Prefer explicit component files when a package provides them.
+    for p in files:
+        if p.suffix.lower() != ".xml":
+            continue
+        try:
+            root = ET.parse(p).getroot()
+        except ET.ParseError:
+            continue
+        if local(root.tag) == "Benchmark" and benchmark is None:
+            benchmark, benchmark_source = root, p.name
+        if local(root.tag) == "oval_definitions" and oval is None:
+            oval, oval_source = root, p.name
+
+    # Signed SCAP packages commonly carry the components inside one datastream.
+    if benchmark is None or oval is None:
+        for p in files:
+            if p.suffix.lower() != ".xml":
+                continue
+            try:
+                root = ET.parse(p).getroot()
+            except ET.ParseError:
+                continue
+            for node in root.iter():
+                lname = local(node.tag)
+                if benchmark is None and lname == "Benchmark":
+                    benchmark, benchmark_source = node, f"{p.name}#Benchmark"
+                elif oval is None and lname == "oval_definitions":
+                    oval, oval_source = node, f"{p.name}#oval_definitions"
+                if benchmark is not None and oval is not None:
+                    break
+            if benchmark is not None and oval is not None:
+                break
+
+    if benchmark is None:
+        raise RuntimeError("No XCCDF Benchmark component found in source package")
+    if oval is None:
+        raise RuntimeError("No OVAL definitions component found in source package")
+    return benchmark, oval, benchmark_source, oval_source
 def native_rule_id(rule):
     version=text(rule.find("x:version",NS))
     if version: return safe_id(version)
@@ -140,8 +180,7 @@ def main():
         td=Path(t); zp=td/"source.zip"; urllib.request.urlretrieve(SOURCE_URL,zp); data=zp.read_bytes()
         with zipfile.ZipFile(zp) as zf: zf.extractall(td/"pkg")
         files=[p for p in (td/"pkg").rglob("*") if p.is_file()]
-        xp=find_component(files,"xccdf"); op=find_component(files,"oval")
-        xr=ET.parse(xp).getroot(); oroot=ET.parse(op).getroot()
+        xr,oroot,xp_name,op_name=load_source_components(files)
         rs=records(xr); selected=choose(rs)
         source_to_native={r["source_rule_id"]:r["id"] for r in rs}
         profiles=[]
@@ -207,7 +246,7 @@ def main():
         if apps: write_yaml(OUT/"applicability.yaml",{"applicability":apps})
         write_json(EVIDENCE/"source-package.json",{"source_url":SOURCE_URL,"zip_sha256":sha256(data),
             "archive_files":sorted(str(p.relative_to(td/"pkg")) for p in files),
-            "selected_xccdf_component":xp.name,"selected_oval_component":op.name})
+            "selected_xccdf_component":xp_name,"selected_oval_component":op_name})
         write_json(EVIDENCE/"rule-mapping.json",{"rules":ev})
         write_json(EVIDENCE/"diagnostics.json",{"diagnostics":diags})
         print(f"emitted {len(selected)} representative policies; diagnostics: {len(diags)}")
