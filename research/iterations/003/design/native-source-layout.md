@@ -29,7 +29,7 @@ Iteration 003 SHALL NOT generate standalone:
 
 ## Applicability registry
 
-A small applicability.yaml remains in the split-policy-assessment design as an
+A small applicability.yaml remains in the split-rule-assessment design as an
 indirection layer:
 
     applicability ID -> Assessment Method
@@ -42,11 +42,11 @@ SHALL NOT contain migrated XCCDF/OVAL/CPE structures.
 ## Source organization
 
     source/
-      split-policy-assessment/
+      split-rule-assessment/
         <benchmark>/
           benchmark.yaml
           applicability.yaml
-          policy/
+          rules/
           assessments/
             automated/
             manual/
@@ -75,10 +75,10 @@ Use:
 A field SHALL be omitted only when it is not part of that native object model
 or when omission has a deliberately defined semantic meaning.
 
-This rule applies especially to Rule Policy source. The supported Rule Policy
+This rule applies especially to Rule source. The supported Rule
 surface for iteration 003 is:
 
-    policy:
+    rule:
       id:
       title:
       severity:
@@ -99,7 +99,7 @@ surface for iteration 003 is:
       default_check:
 
 The exact vocabulary may evolve during iteration 003, but once a field is part
-of the supported Policy model it SHALL remain visible in generated review
+of the supported Rule model it SHALL remain visible in generated review
 source even when unset.
 
 This is intentionally different from opaque legacy content models where authors
@@ -204,7 +204,7 @@ and cross-language stovepipes remain out of native NG source.
 
 ## Explicit Benchmark surface
 
-The same explicit-field rule used for Rule Policy applies to `benchmark.yaml`.
+The same explicit-field rule used for Rule applies to `benchmark.yaml`.
 
 The Benchmark is the complete native policy-publication record. A reader SHALL
 NOT need knowledge of the historical source schema to discover which
@@ -340,7 +340,7 @@ conversion. Legacy source identifiers and namespaces SHALL NOT be carried into
 native labels.
 
 
-## Candidate publisher metadata versus core Policy semantics
+## Candidate publisher metadata versus core Rule semantics
 
 Iteration 003 SHALL distinguish between:
 
@@ -349,7 +349,7 @@ Iteration 003 SHALL distinguish between:
 2. publisher-specific metadata discovered inside source content but not defined
    as first-class XCCDF semantics.
 
-Publisher-specific metadata SHALL NOT become normative SCAP-NG Policy fields
+Publisher-specific metadata SHALL NOT become normative SCAP-NG Rule fields
 merely because it is present in DISA STIG content.
 
 Examples currently observed in DISA STIG Rule description payloads include:
@@ -369,8 +369,8 @@ For iteration 003:
 - their original values SHALL remain preserved in conversion evidence;
 - they MAY be emitted in an explicitly marked experimental/publisher metadata
   section for review;
-- they SHALL NOT be treated as settled core Policy properties;
-- promotion into the core Policy vocabulary requires an affirmative design
+- they SHALL NOT be treated as settled core Rule properties;
+- promotion into the core Rule vocabulary requires an affirmative design
   decision, ideally with OVAL Board / standards-community review.
 
 The review question for each such field is:
