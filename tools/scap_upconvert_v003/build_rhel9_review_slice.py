@@ -968,6 +968,7 @@ def main():
         benchmark_doc = {
             "benchmark": {
                 "id": "rhel9-stig-review-slice",
+                "use_case": "compliance",
                 "title": localized_texts(xr, "title"),
                 "description": localized_texts(xr, "description"),
                 "language": xr.get("{http://www.w3.org/XML/1998/namespace}lang"),
