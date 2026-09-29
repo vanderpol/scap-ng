@@ -91,6 +91,40 @@ def records(root):
             })
     return out
 
+def normalized_fixes(rule):
+    system_map = {
+        "urn:xccdf:fix:script:sh": "shell",
+        "urn:xccdf:fix:script:ansible": "ansible",
+        "urn:xccdf:fix:script:powershell": "powershell",
+        "urn:xccdf:fix:script:batch": "batch",
+    }
+    fixes = []
+    for fix in rule.findall("x:fix", NS):
+        if list(fix):
+            return None, "remediation_substitution_not_yet_lowered"
+        source_system = fix.get("system")
+        kind = system_map.get(source_system)
+        if not kind:
+            return None, "remediation_system_not_yet_lowered"
+        script = text(fix)
+        if not script:
+            continue
+        item = {"type": kind, "content": script}
+        for source_name, native_name in (
+            ("reboot", "reboot"),
+            ("disruption", "disruption"),
+            ("complexity", "complexity"),
+            ("strategy", "strategy"),
+        ):
+            value = fix.get(source_name)
+            if value is not None:
+                if source_name == "reboot":
+                    item[native_name] = value.lower() == "true"
+                else:
+                    item[native_name] = value
+        fixes.append(item)
+    return fixes, None
+
 def policy_content(rule):
     out = {}
     raw = rule.find("x:description", NS)
@@ -139,8 +173,21 @@ def policy_content(rule):
         if item: references.append(item)
     if references: out["references"] = references
 
-    fixtext = text(rule.find("x:fixtext", NS))
-    if fixtext: out["remediation"] = fixtext
+    fixtext_node = rule.find("x:fixtext", NS)
+    fixtext = text(fixtext_node)
+    fixes, fix_error = normalized_fixes(rule)
+    if fix_error:
+        raise ValueError(fix_error)
+    if fixtext or fixes:
+        remediation = {}
+        if fixtext: remediation["guidance"] = fixtext
+        if fixtext_node is not None:
+            for source_name in ("reboot", "disruption", "complexity", "strategy"):
+                value = fixtext_node.get(source_name)
+                if value is not None:
+                    remediation[source_name] = (value.lower() == "true" if source_name == "reboot" else value)
+        if fixes: remediation["implementations"] = fixes
+        out["remediation"] = remediation
     return out
 
 def find_by_id(root, item_id, suffix):
@@ -287,7 +334,8 @@ def automated_refs(rec):
 def fully_lowerable(rec, oroot):
     rule = rec["element"]
     if rec["platforms"] or rec["requires"] or rec["conflicts"]: return False
-    if rule.findall("x:fix", NS): return False
+    _, fix_error = normalized_fixes(rule)
+    if fix_error: return False
     refs = automated_refs(rec)
     if not refs: return False
     for _, definition_id in {x for x in refs}:
