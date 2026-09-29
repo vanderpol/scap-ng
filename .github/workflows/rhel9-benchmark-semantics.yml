@@ -134,6 +134,19 @@ jobs:
             work/rhel9-regenerated-xccdf.xml \
             --output work/rhel9-xccdf-roundtrip.json
 
+      - name: Extract authoritative source XCCDF for structural diff
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/extract_xccdf_from_scap14.py \
+            niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip \
+            -o work/rhel9-source-xccdf.xml
+
+      - name: Generate benchmark XCCDF structural diffs
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/diff_xccdf_roundtrip.py \
+            work/rhel9-source-xccdf.xml \
+            work/rhel9-regenerated-xccdf.xml \
+            --out-dir work/rhel9-xccdf-diff
+
       - name: Upload benchmark semantic IR
         uses: actions/upload-artifact@v4
         with:
@@ -143,3 +156,5 @@ jobs:
             work/rhel9-ng-fidelity.json
             work/rhel9-regenerated-xccdf.xml
             work/rhel9-xccdf-roundtrip.json
+            work/rhel9-source-xccdf.xml
+            work/rhel9-xccdf-diff/**
