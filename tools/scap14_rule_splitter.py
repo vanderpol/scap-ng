@@ -359,6 +359,9 @@ def rule_oval_refs(benchmark):
                 href = ref.get("href") or ref.get(f"{{{XLINK_NS}}}href")
                 checks.append({
                     "system": system,
+                    "selector": check.get("selector"),
+                    "negate": check.get("negate"),
+                    "multi_check": check.get("multi-check"),
                     "name": name,
                     "href": href,
                     "exports": exports,
