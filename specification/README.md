@@ -15,6 +15,33 @@ directory remains subject to revision.
 Normative terms **SHALL**, **SHALL NOT**, **SHOULD**, **SHOULD NOT**, and
 **MAY** are used in their conventional standards sense.
 
+<!-- reading-order:start -->
+## Read the specification in order
+
+The specification is organized as a continuous document even though its
+sections are stored in subdirectories. Start here and follow the ordered links
+below; every page also contains **Previous · Contents · Next** navigation.
+
+1. [SCAP-NG Terminology](terminology.md)
+2. [SCAP-NG Requirements Index](requirements-index.md)
+3. [Conformance and Validation](core/conformance.md)
+4. [Benchmark, Rule, and Group Model](policy/benchmark.md)
+5. [Platform Specification and Applicability](policy/platform-and-applicability.md)
+6. [Profiles and Tailoring](policy/profiles-and-tailoring.md)
+7. [Policy Resolution and Evaluation Order](policy/policy-resolution.md)
+8. [Parameters, Tailoring Values, and Organizational Input](policy/parameters-and-organizational-input.md)
+9. [Assessment Method](assessment/assessment-method.md)
+10. [Manual Assessment](assessment/manual-assessment.md)
+11. [Source, Compilation, Packaging, and Integrity](package/package-and-integrity.md)
+12. [Results and Evidence](results/results.md)
+13. [SCAP 1.4 to SCAP-NG Migration](migration/scap-1.4-migration.md)
+14. [OVAL 5.12.3 to SCAP-NG Migration Mapping](migration/oval-5.12.3-to-ng.md)
+15. [OVAL 5.12.3 Test-Type to SCAP-NG Capability Crosswalk](migration/oval-5.12.3-capability-crosswalk.md)
+16. [Security Considerations](security/security-considerations.md)
+17. [SCAP 1.4 to SCAP-NG Concept Crosswalk](crosswalk/scap-1.4-concept-crosswalk.md)
+18. [SP 800-126r4 Concept Review for SCAP-NG](crosswalk/sp800-126r4-concept-review.md)
+<!-- reading-order:end -->
+
 ## Start here
 
 - `requirements-index.md` — current normative-area inventory and open issues.
