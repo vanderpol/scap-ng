@@ -256,6 +256,68 @@ def manual_assessment(rule: dict) -> tuple[dict, dict]:
     return assessment, assessment["migration"]
 
 
+def normalized_check_selector(value) -> str:
+    """Return the SCAP-NG selector name used for an XCCDF check candidate."""
+    return value if value not in (None, "") else "default"
+
+
+def check_selection_plan(rule: dict, assessment: dict | None) -> tuple[dict | None, dict | None]:
+    """Lower XCCDF check-selector candidates without silently collapsing alternatives.
+
+    The current generic converter can bind one effective assessment implementation
+    for a Rule. Multiple distinct XCCDF selector alternatives require separate
+    assessment lowering and are therefore a hard migration blocker until that
+    mapping exists.
+    """
+    checks = copy.deepcopy(rule.get("checks", []))
+    if not checks:
+        return None, None
+
+    selector_rows = []
+    seen = set()
+    for check in checks:
+        source_selector = check.get("selector")
+        selector = normalized_check_selector(source_selector)
+        if selector in seen:
+            continue
+        seen.add(selector)
+        selector_rows.append({
+            "selector": selector,
+            "source_selector": source_selector,
+        })
+
+    if len(selector_rows) > 1:
+        return None, {
+            "status": "unsupported",
+            "reason": "selectable_check_alternatives_not_lowered",
+            "selectors": selector_rows,
+            "message": (
+                "The source Rule exposes multiple XCCDF check selectors. "
+                "The converter SHALL lower each selector to a distinct SCAP-NG "
+                "check alternative before conversion may succeed."
+            ),
+        }
+
+    if assessment is None:
+        return None, {
+            "status": "unsupported",
+            "reason": "check_selector_without_assessment",
+            "selectors": selector_rows,
+            "message": "The source check selector cannot be bound to an Assessment.",
+        }
+
+    row = selector_rows[0]
+    return {
+        "checks": [{
+            "selector": row["selector"],
+            "source_selector": row["source_selector"],
+            "assessment": assessment.get("id"),
+            "assessment_version": assessment.get("version", 1),
+        }],
+        "default_check": row["selector"],
+    }, None
+
+
 def policy_rule(rule: dict) -> dict:
     fixes = [x for x in rule.get("fixes", []) if x.get("text")]
     return {
@@ -455,6 +517,17 @@ def main() -> int:
         else:
             assessment, migration = manual_assessment(rule)
 
+        selection, selection_error = check_selection_plan(rule, assessment)
+        if selection_error is not None and migration.get("status") != "unsupported":
+            migration = {
+                **selection_error,
+                "source": "SCAP 1.4 XCCDF check selection",
+                "source_rule": rule.get("id"),
+            }
+            assessment = None
+        elif selection is not None:
+            policy = {**policy, **selection}
+
         canonical = {
             "policy": policy,
             "assessment": assessment,
@@ -529,12 +602,15 @@ def main() -> int:
                 "assessment": assessment,
             },
         )
-        bindings.append({
+        binding = {
             "rule": rule["id"],
             "assessment": aid,
             "assessment_version": assessment.get("version", 1),
             "migration_status": migration.get("status"),
-        })
+        }
+        if policy.get("default_check") is not None:
+            binding["check_selector"] = policy["default_check"]
+        bindings.append(binding)
 
     dump_yaml(
         split_root / "automation" / "bindings.yaml",
