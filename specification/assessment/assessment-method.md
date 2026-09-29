@@ -35,7 +35,60 @@ authoritative metadata.
 
 Manual and automated methods MAY be peer methods for the same Rule.
 
-## 4. Automated semantics
+## 4. Assessment class and invocation purpose
+
+An Assessment Method SHALL declare an assessment `class` describing the
+semantic intent of a true result.
+
+The initial inherited class vocabulary is:
+
+- `compliance`;
+- `vulnerability`;
+- `patch`;
+- `inventory`;
+- `miscellaneous`.
+
+These values preserve the corresponding OVAL definition-class concepts.
+
+Assessment `class` SHALL remain distinct from invocation `purpose`.
+
+The initial purpose vocabulary is:
+
+- `assessment`: normal evaluation of the Assessment's declared class;
+- `applicability`: evaluation used to determine whether other content applies.
+
+A conforming implementation SHALL NOT infer class from purpose. For example,
+an inventory-class Assessment MAY be invoked for applicability, while another
+applicability Assessment may have a different class.
+
+The Boolean truth of an Assessment SHALL be interpreted according to its
+declared class and invocation context. In particular:
+
+- `compliance: true` means the evaluated condition complies;
+- `vulnerability: true` means the vulnerability condition is present;
+- `patch: true` means the patch/remediation condition represented by the
+  Assessment is present as defined by that Assessment;
+- `inventory: true` means the represented product/item condition is present;
+- `miscellaneous` SHALL define its interpretation explicitly.
+
+### Candidate NG class: information
+
+`information` is reserved as a candidate SCAP-NG Assessment class for
+non-compliance, non-vulnerability observations whose primary purpose is to
+report useful information.
+
+`information` is NOT an inherited OVAL class and is NOT currently normative
+SCAP-NG vocabulary.
+
+Adding `information` to the normative class enumeration requires an
+affirmative OVAL Board / SCAP-NG governance decision. Until such approval,
+conforming implementations SHALL NOT emit or require `class: information` as
+a standardized class.
+
+Research implementations MAY experiment with the concept only when clearly
+marked as non-conformant/experimental.
+
+## 5. Automated semantics
 
 Automated Assessments SHALL make behavior-affecting cardinality, existence, and
 quantifier semantics explicit.
@@ -47,7 +100,7 @@ Collection semantics and assertion semantics SHALL remain distinguishable.
 
 Assessment result/evidence limits SHALL NOT redefine compliance truth.
 
-## 5. Expected state and existence
+## 6. Expected state and existence
 
 Automated Assessments SHALL be able to express expected state independently
 from collection.
@@ -93,7 +146,7 @@ message and a structured failure reason. Examples include
 SCAP 1.4 migration SHALL preserve source existence/cardinality semantics,
 including OVAL `check_existence`, or SHALL fail explicitly.
 
-## 6. Capabilities
+## 7. Capabilities
 
 Assessment collection SHALL be expressed using defined capabilities.
 
@@ -105,7 +158,7 @@ Assessment explicitly supplies the shell/interpreter it intends to use; use of
 Bash makes that Assessment operationally Unix/Linux-oriented without changing
 the capability family.
 
-## 7. Inventory facts from Platform Assessments
+## 8. Inventory facts from Platform Assessments
 
 A Platform Assessment MAY emit descriptive target-inventory facts in addition
 to its Boolean Platform result.
@@ -137,14 +190,14 @@ A processor MAY deduplicate equivalent inventory facts emitted by multiple
 Platform Assessments, provided provenance sufficient to explain the reported
 inventory is retained.
 
-## 8. Descriptive titles
+## 9. Descriptive titles
 
 Automated Assessment nodes MAY carry concise human-readable descriptive titles
 that explain what is being collected or evaluated.
 
 When present, the preferred native field names are:
 
-- `definition_title` for a named Assessment/definition-level description;
+- `assessment_title` for the Assessment Method description;
 - `test_title` for a test/evaluation description;
 - `object_title` for a collection/object description;
 - `state_title` for an expected-state/predicate description;
@@ -160,7 +213,7 @@ OVAL `criteria` and `criterion` comments SHALL NOT be promoted into native
 SCAP-NG Boolean-expression titles merely because they exist in legacy content.
 They MAY be retained in migration provenance for source traceability.
 
-## 9. Reuse
+## 10. Reuse
 
 Reusable Assessments SHOULD use semantic identities describing the fact they
 establish rather than the first Rule or Benchmark that used them.
@@ -170,7 +223,7 @@ demonstrated.
 
 Reuse SHALL be promoted only when semantic equivalence has been established.
 
-## 10. Source references and compiled identity
+## 11. Source references and compiled identity
 
 Authoring paths MAY be used to reference Assessment source files.
 
@@ -181,7 +234,7 @@ Assessment identities.
 
 Moving or renaming a source file SHALL NOT change Assessment identity.
 
-## 11. Historical provenance
+## 12. Historical provenance
 
 Legacy XCCDF/OVAL/OCIL lineage SHOULD be retained as authoring comments or in
 separate conversion reports when useful for migration and review.
