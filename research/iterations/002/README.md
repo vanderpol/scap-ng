@@ -122,3 +122,15 @@ Current source-layout review examples:
 These trees are intended to show how the current split policy/assessment model
 looks as a coherent authoring source layout. They are design-review examples,
 not frozen schema.
+
+
+## Current implementation checkpoint
+
+The 2026-09-28 reconciliation of current design decisions against reused
+migration tooling is recorded in
+[`2026-09-28-design-reconciliation.md`](2026-09-28-design-reconciliation.md).
+
+That checkpoint is the guard against treating iteration-001 or earlier
+iteration-002 generated behavior as authoritative when it conflicts with the
+current split policy/assessment architecture, lossless-conversion requirement,
+check-selector semantics, result/evidence model, or authoring decisions.
