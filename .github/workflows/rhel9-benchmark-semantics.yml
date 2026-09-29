@@ -1,0 +1,78 @@
+name: RHEL 9 benchmark semantic inventory
+
+on:
+  pull_request:
+    paths:
+      - 'tools/scap14_benchmark_ir.py'
+      - 'tools/scap14_rule_splitter.py'
+      - 'tools/scap_ng_roundtrip_v003/**'
+      - '.github/workflows/rhel9-benchmark-semantics.yml'
+  workflow_dispatch:
+
+jobs:
+  benchmark-semantics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC RHEL 9 corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check lxml pyyaml
+
+      - name: Split the complete RHEL 9 benchmark
+        run: |
+          mkdir -p work
+          python scap-ng/tools/scap14_rule_splitter.py             niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --output-dir work/rhel9-split             --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd             --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5             --source-repository-path Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --benchmark-key rhel9             --fail-on-unresolved
+
+      - name: Build complete benchmark semantic IR
+        run: |
+          python scap-ng/tools/scap14_benchmark_ir.py             niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --split-root work/rhel9-split             --output work/rhel9-benchmark-ir.json
+
+      - name: Summarize benchmark semantics
+        run: |
+          python - <<'PY'
+          import json,collections
+          d=json.load(open('work/rhel9-benchmark-ir.json'))
+          print(json.dumps(d['summary'],indent=2,sort_keys=True))
+          print('\nProfile IDs:')
+          for p in d['profiles']:
+              print(' ',p['id'],'extends=',p.get('extends'),'actions=',len(p.get('actions',[])))
+          print('\nCheck-model kinds:')
+          c=collections.Counter(r.get('check_model',{}).get('kind') for r in d['rules'])
+          print(dict(c))
+          print('\nCheck systems:')
+          systems=collections.Counter()
+          selectors=collections.Counter()
+          for r in d['rules']:
+              for chk in r.get('checks',[]):
+                  systems[chk.get('system')]+=1
+                  selectors[chk.get('selector') or '<default>']+=1
+          print('systems',dict(systems))
+          print('selectors',dict(selectors))
+          print('\nRule policy features:')
+          for key in ('requires','conflicts','extends','platforms'):
+              print(key,sum(1 for r in d['rules'] if r.get(key)))
+          print('complex_check',sum(1 for r in d['rules'] if r.get('check_model',{}).get('kind')=='complex_check'))
+          print('\nValues:',len(d['values']))
+          for v in d['values'][:20]:
+              print(' ',v.get('id'),v.get('type'),v.get('interactive'),len(v.get('values',[])),len(v.get('choices',[])))
+          PY
+
+      - name: Upload benchmark semantic IR
+        uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-benchmark-semantic-ir
+          path: work/rhel9-benchmark-ir.json
