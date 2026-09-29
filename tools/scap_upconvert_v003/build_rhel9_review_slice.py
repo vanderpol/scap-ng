@@ -610,6 +610,7 @@ def functional_group(rec):
         ("logging", "Logging", (r"journald", r"rsyslog", r"syslog", r"log file")),
         ("graphical-environment", "Graphical Environment", (r"graphical", r"gnome", r"display manager", r"gdm")),
         ("system-lifecycle", "System Lifecycle and Support", (r"vendor-supported", r"supported release", r"end of life")),
+        ("login-notices", "Login Notices and Banners", (r"notice and consent banner", r"logon banner", r"login banner")),
         ("account-management", "Account Management", (r"user account", r"account management", r"inactive account", r"root account")),
         ("services", "Services", (r"\bservice\b", r"\bdaemon\b", r"systemd")),
         ("filesystem", "Filesystem and Permissions", (r"file permission", r"directory permission", r"file owner", r"mount point")),
@@ -757,6 +758,10 @@ def main():
             }
             for r in rs if r["platforms"]
         ]
+        benchmark_platform_refs = [
+            p.get("idref") for p in xr.findall("x:platform", NS) if p.get("idref")
+        ]
+
         manual_default_candidates = [
             {
                 "rule": r["id"],
@@ -774,17 +779,35 @@ def main():
         # - one Rule with real source Rule-level applicability;
         # - one manual/default Rule.
         baseline = [r for r in rs if fully_lowerable(r, oval_bundle)][:3]
-        applicability_rule = next(
-            (
-                r for r in rs
-                if r["platforms"]
-                and not r["requires"]
-                and not r["conflicts"]
-                and compliance_lowerable(r, oval_bundle)
-                and applicability_lowerable(r, platform_nodes, oval_bundle)
-            ),
-            None,
-        )
+        preferred_applicability = ["RHEL-09-211035", "RHEL-09-271010", "RHEL-09-231065"]
+        applicability_rules = []
+        for wanted in preferred_applicability:
+            candidate = next((r for r in rs if r["id"] == wanted), None)
+            if (
+                candidate
+                and candidate["platforms"]
+                and not candidate["requires"]
+                and not candidate["conflicts"]
+                and compliance_lowerable(candidate, oval_bundle)
+                and applicability_lowerable(candidate, platform_nodes, oval_bundle)
+            ):
+                applicability_rules.append(candidate)
+            if len(applicability_rules) == 2:
+                break
+        if len(applicability_rules) < 2:
+            for candidate in rs:
+                if candidate in applicability_rules:
+                    continue
+                if (
+                    candidate["platforms"]
+                    and not candidate["requires"]
+                    and not candidate["conflicts"]
+                    and compliance_lowerable(candidate, oval_bundle)
+                    and applicability_lowerable(candidate, platform_nodes, oval_bundle)
+                ):
+                    applicability_rules.append(candidate)
+                if len(applicability_rules) == 2:
+                    break
         preferred_manual = ["RHEL-09-251035", "RHEL-09-411095", "RHEL-09-211015"]
         manual_rule = next(
             (r for wanted in preferred_manual for r in rs if r["id"] == wanted and manual_only_lowerable(r)),
@@ -794,14 +817,14 @@ def main():
             manual_rule = next((r for r in rs if manual_only_lowerable(r)), None)
 
         selected = []
-        for candidate in baseline + [applicability_rule, manual_rule]:
+        for candidate in baseline + applicability_rules + [manual_rule]:
             if candidate and candidate["id"] not in {r["id"] for r in selected}:
                 selected.append(candidate)
 
-        if len(selected) < 5 or applicability_rule is None or manual_rule is None:
+        if len(selected) < 6 or len(applicability_rules) < 2 or manual_rule is None:
             raise RuntimeError(
                 "Golden slice requirements not satisfied: "
-                f"selected={len(selected)}, applicability={bool(applicability_rule)}, manual={bool(manual_rule)}"
+                f"selected={len(selected)}, applicability={len(applicability_rules)}, manual={bool(manual_rule)}"
             )
 
         selected_ids = [r["id"] for r in selected]
@@ -1007,6 +1030,7 @@ def main():
         write_json(EVIDENCE / "grouping.json", {"groups": grouping_evidence})
         write_json(EVIDENCE / "applicability-candidates.json", {"rules": applicability_candidates})
         write_json(EVIDENCE / "source-platform-inventory.json", {"platforms": source_platform_inventory})
+        write_json(EVIDENCE / "benchmark-platform-source.json", {"platform_refs": benchmark_platform_refs})
         write_json(EVIDENCE / "manual-default-candidates.json", {"rules": manual_default_candidates})
         write_json(EVIDENCE / "diagnostics.json", {"diagnostics": diagnostics})
         print("accepted native rules:", ", ".join(selected_ids))
