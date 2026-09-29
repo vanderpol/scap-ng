@@ -50,3 +50,19 @@ objects simply because content was converted from SCAP 1.4.
 
 SCAP-NG does preserve the ability to migrate supported SCAP 1.4 behavior
 losslessly before optional native refactoring.
+
+
+## Check-selection compatibility note
+
+SCAP-NG **check selector** is the semantic successor to XCCDF selectable
+`check` alternatives and their selector-driven refinement/tailoring behavior.
+The governing policy exposes named alternatives; effective policy selects one;
+the selected alternative resolves to an Assessment Method.
+
+This preserves the ability for legacy content or tailoring to select, for
+example, a manual alternative in place of an automated check without requiring
+the Benchmark Rule to reference an implementation directly.
+
+Missing requested selectors are resolution errors, not requests for default
+fallback. Stage-1 migration preserves this behavior losslessly or reports a
+conversion blocker.
