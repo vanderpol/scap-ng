@@ -144,3 +144,45 @@ For `disa-stig` conversion:
 
 The generic SCAP 1.4 conversion profile SHALL map XCCDF Rule version according
 to the XCCDF specification and SHALL NOT apply the DISA interpretation.
+
+
+### DISA STIG identifier mapping
+
+Publisher-side STIG Viewer data confirms that DISA distinguishes the following
+identities for a requirement:
+
+    Group ID: V-280940
+    Rule ID:  SV-280940r1184730
+    STIG ID:  RHEL-10-000560
+    SRG ID:   SRG-OS-000420-GPOS-00186
+
+For the `disa-stig` conversion profile, these SHALL remain distinct.
+
+The native Rule identity/revision SHALL be derived from the DISA Rule ID:
+
+    rule.id: SV-280940
+    rule.version: r1184730
+
+The DISA STIG ID SHALL be preserved as a typed external identifier and SHALL
+NOT be used as the native Rule version:
+
+    identifiers:
+      - scheme: disa-stig-id
+        value: RHEL-10-000560
+
+The DISA Group/Vulnerability ID and SRG ID SHALL likewise be preserved as typed
+identifiers when present:
+
+    identifiers:
+      - scheme: disa-vulnerability-id
+        value: V-280940
+      - scheme: disa-srg-id
+        value: SRG-OS-000420-GPOS-00186
+
+When DISA XCCDF content stores the STIG ID in the inherited XCCDF Rule
+`version` element, the `disa-stig` profile SHALL interpret that value as the
+publisher STIG ID, preserve the original source value in provenance, and SHALL
+NOT map it to native `rule.version`.
+
+The generic SCAP 1.4 conversion profile SHALL NOT apply this publisher-specific
+interpretation.
