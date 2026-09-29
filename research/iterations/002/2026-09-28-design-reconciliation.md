@@ -193,6 +193,36 @@ Changes include:
   conformance cases, stable existence failure reasons, effective selector
   identity, and deterministic-message requirements into the normative draft.
 
+## CPE product inventory
+
+CPE product identity is retained primarily as descriptive target inventory.
+
+The intended execution/result flow is:
+
+    source CPE dictionary / inventory definition
+        -> Platform Assessment
+        -> Platform truth
+        -> non-decisional product inventory output
+        -> target.inventory
+
+A CPE inventory output SHALL NOT change Benchmark Platform truth, Rule
+selection, Rule applicability, or compliance truth.
+
+The Stage-1 converter now resolves embedded CPE dictionary checks, binds CPE
+names to their source OVAL inventory definitions, and carries the exact source
+CPE as an inventory-output contract when that platform test succeeds.
+
+This preserves the useful SCAP 1.4 / SP 800-126r4 inventory-to-CPE relationship
+without making CPE an implicit NG applicability mechanism.
+
+See:
+
+- `decisions/cpe-platform-applicability-integration.md`
+- `../../../specification/policy/platform-and-applicability.md`
+- `../../../specification/assessment/assessment-method.md`
+- `../../../specification/results/results.md`
+- `../../../specification/migration/scap-1.4-migration.md`
+
 ## Completion rule
 
 This reconciliation is not complete merely because the focused tests pass.
