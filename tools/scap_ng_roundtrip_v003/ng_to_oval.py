@@ -183,6 +183,8 @@ def build(data):
             attrs={"operator": node.get("operator","AND")}
             if node.get("negate") is not None:
                 attrs["negate"]=str(bool(node["negate"])).lower()
+            if node.get("applicability_check") is not None:
+                attrs["applicability_check"]=str(bool(node["applicability_check"])).lower()
             ce=ET.SubElement(parent, q(OVAL_DEF, "criteria"), attrs)
             children=node.get("children")
             if children is None:
@@ -193,6 +195,8 @@ def build(data):
                     ca={"test_ref":ids.get("tst",cid),"comment":cid}
                     if child.get("negate") is not None:
                         ca["negate"]=str(bool(child["negate"])).lower()
+                    if child.get("applicability_check") is not None:
+                        ca["applicability_check"]=str(bool(child["applicability_check"])).lower()
                     ET.SubElement(ce,q(OVAL_DEF,"criterion"),ca)
                 elif "operator" in child or "children" in child or "checks" in child:
                     emit_criteria(ce,child)
@@ -213,6 +217,8 @@ def build(data):
                 "check": chk["check"],
                 "comment": chk["id"],
             }
+            if chk.get("state_operator") is not None:
+                attrs["state_operator"] = chk["state_operator"]
             t = ET.SubElement(tests, q(ns, name + "_test"), attrs)
             ET.SubElement(t, q(ns, "object"), {
                 "object_ref": ids.get("obj", chk["collection"])
