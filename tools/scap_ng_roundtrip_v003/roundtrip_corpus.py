@@ -48,7 +48,10 @@ def main():
             rows.append(row); print(f"REVERSE_ERROR {rel}: {exc}"); continue
 
         try:
-            result=compare(source,regen,data["source"]["root_definition"],None)
+            source_roots=data["source"].get("root_definition")
+            if source_roots is None:
+                source_roots=data["source"].get("root_definitions")
+            result=compare(source,regen,source_roots,None)
             if result["equal"]:
                 row["status"]="pass"
                 print(f"PASS {rel}")
