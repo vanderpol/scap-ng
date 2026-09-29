@@ -164,14 +164,31 @@ class Model:
     def test_multiset(self):
         return collections.Counter(repr(self.test(t)) for t in self.tests)
 
+    def object_multiset(self):
+        return collections.Counter(repr(self.obj(o)) for o in self.objects)
+
+    def state_multiset(self):
+        return collections.Counter(repr(self.state(s)) for s in self.states)
+
+    def variable_multiset(self):
+        return collections.Counter(repr(self.variable(v)) for v in self.vars)
+
 def compare(a,b,source_root=None,regenerated_root=None):
     am=Model(a); bm=Model(b)
-    A=am.test_multiset(); B=bm.test_multiset()
-    only_a=list((A-B).elements()); only_b=list((B-A).elements())
-    result={"equal":not only_a and not only_b,
-            "only_source":only_a,"only_regenerated":only_b,
-            "source_test_count":sum(A.values()),
-            "regenerated_test_count":sum(B.values())}
+    result={"equal":True}
+    for label, A, B in [
+        ("test", am.test_multiset(), bm.test_multiset()),
+        ("object", am.object_multiset(), bm.object_multiset()),
+        ("state", am.state_multiset(), bm.state_multiset()),
+        ("variable", am.variable_multiset(), bm.variable_multiset()),
+    ]:
+        only_a=list((A-B).elements()); only_b=list((B-A).elements())
+        result[label+"_equal"]=not only_a and not only_b
+        result["only_source_"+label]=only_a
+        result["only_regenerated_"+label]=only_b
+        result["source_"+label+"_count"]=sum(A.values())
+        result["regenerated_"+label+"_count"]=sum(B.values())
+        result["equal"]=result["equal"] and result[label+"_equal"]
     if source_root:
         if not regenerated_root:
             if len(bm.definitions)!=1:
