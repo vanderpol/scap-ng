@@ -23,6 +23,13 @@ jobs:
           ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
           path: niwc
 
+      - name: Check out pinned OVAL Self-Assertion corpus
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: self-assertion
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -63,6 +70,7 @@ jobs:
             --schema-dir scap-ng/third_party/scap-1.4-schemas/oval_5.12.3 \
             --corpus-inventory work/rhel9-oval-surface.json \
             --focused-source-dir scap-ng/research/iterations/003/evidence/roundtrip-source-oval \
+            --self-assertion-root self-assertion/SCAP_1.4/OVAL_Test_Content \
             --output work/oval-language-surface-coverage.json
 
       - name: Run corpus-wide semantic round trip
