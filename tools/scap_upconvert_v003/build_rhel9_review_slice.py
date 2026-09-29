@@ -166,7 +166,7 @@ def lower_source_platform(platform_node, oval_bundle):
 
 def parse_disa_rule_identity(rule):
     source_id = rule.get("id") or ""
-    m = re.search(r"_rule_(SV-\\d+)(r\\d+)_rule$", source_id)
+    m = re.search(r"_rule_(SV-\d+)(r\d+)_rule$", source_id)
     if not m:
         return None
     return {
@@ -201,7 +201,7 @@ def records(root):
             checks = rule.findall("x:check", NS)
             identity = native_rule_identity(rule)
             group_source_id = group.get("id") or ""
-            group_match = re.search(r"_group_(V-\\d+)$", group_source_id)
+            group_match = re.search(r"_group_(V-\d+)$", group_source_id)
             out.append({
                 "element": rule,
                 "source_rule_id": rule.get("id"),
