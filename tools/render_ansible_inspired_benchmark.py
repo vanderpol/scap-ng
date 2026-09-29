@@ -88,6 +88,8 @@ def transform_assessment(source: dict) -> dict:
         "method",
         "source_checks",
         "procedure",
+        "purpose",
+        "inventory_output",
     ):
         if key in source:
             out[key] = copy.deepcopy(source[key])
