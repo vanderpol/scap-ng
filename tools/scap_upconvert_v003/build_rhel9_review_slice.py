@@ -102,6 +102,31 @@ def collect_oval_bundle(files):
                 seen.add(digest)
     return bundle
 
+def oval_generator_metadata(oroot):
+    generators = []
+    for root in list(oroot):
+        if local(root.tag) != "oval_definitions":
+            continue
+        generator = next((n for n in root if local(n.tag) == "generator"), None)
+        if generator is None:
+            continue
+        item = {}
+        schema_versions = []
+        for child in generator:
+            name = local(child.tag)
+            value = text(child)
+            if name == "schema_version":
+                schema_versions.append({
+                    "value": value,
+                    "namespace": child.get("xmlns") or child.get("{http://www.w3.org/2000/xmlns/}xmlns"),
+                })
+            elif value is not None:
+                item[name] = value
+        if schema_versions:
+            item["schema_versions"] = schema_versions
+        generators.append(item)
+    return generators
+
 def source_platform_nodes(files):
     nodes = {}
     for p in files:
@@ -644,6 +669,7 @@ def lower_definition(oroot, definition_id, assessment_id):
 
     return {"assessment": {
         "id": assessment_id,
+        "version": int(definition.get("version")) if (definition.get("version") or "").isdigit() else definition.get("version"),
         "assessment_title": assessment_title,
         "mode": "automated",
         "class": assessment_class,
@@ -1154,6 +1180,7 @@ def main():
                     write_yaml(OUT / "assessments/manual" / f"{rid}.manual.assessment.yaml",
                                {"assessment": {
                                    "id": aid,
+                                   "version": 1,
                                    "assessment_title": f"Manual assessment for {rid}",
                                    "mode": "manual",
                                    "class": "compliance",
@@ -1227,6 +1254,9 @@ def main():
             "source_url": SOURCE_URL, "zip_sha256": sha256(package_bytes),
             "archive_files": sorted(str(p.relative_to(td / "pkg")) for p in files),
             "benchmark_component": xsrc, "assessment_component": osrc,
+        })
+        write_json(EVIDENCE / "oval-generator-metadata.json", {
+            "generators": oval_generator_metadata(oval_bundle),
         })
         write_json(EVIDENCE / "rule-mapping.json", {"rules": evidence})
         write_json(EVIDENCE / "grouping.json", {"groups": grouping_evidence})
