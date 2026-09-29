@@ -462,8 +462,10 @@ def main():
         if norm_text(np.get("title"))!=norm_text(source_profile.get("title")):
             issue("profile_title_mismatch",profile=pid,source=source_profile.get("title"),ng=np.get("title"))
         profile_desc=norm_text(source_profile.get("description"))
-        if profile_desc not in (None,"<ProfileDescription></ProfileDescription>"):
-            issue("profile_description_not_preserved",profile=pid,source=profile_desc)
+        expected_desc=None if profile_desc in (None,"<ProfileDescription></ProfileDescription>") else profile_desc
+        actual_desc=norm_text(np.get("description"))
+        if expected_desc!=actual_desc:
+            issue("profile_description_mismatch",profile=pid,source=expected_desc,ng=actual_desc)
         expected_disabled=expected_profile_disabled(src,sp)
         actual_disabled=sorted(np.get("disabled_rules") or [])
         if expected_disabled!=actual_disabled:
