@@ -23,7 +23,8 @@ def inventory_file(path):
         "test_types","object_types","state_types","variable_types","functions",
         "operations","check","check_existence","state_operator","criteria_operator",
         "set_operator","filter_action","var_check","entity_check","datatypes",
-        "behaviors","criteria_nodes","attribute_values",
+        "behaviors","criteria_nodes","component_types","entity_features",
+        "criteria_features","set_forms","attribute_values",
     ]}
     for el in root.iter():
         if not isinstance(el.tag,str):
@@ -43,6 +44,20 @@ def inventory_file(path):
             vals["functions"][local]+=1
         elif local in {"criteria","criterion","extend_definition"} and ns==OD:
             vals["criteria_nodes"][local]+=1
+            for feature in ("negate","applicability_check"):
+                if feature in el.attrib:
+                    vals["criteria_features"][f"{local}@{feature}={el.attrib[feature]}"]+=1
+        elif local in {"literal_component","object_component","variable_component"} and ns==OD:
+            vals["component_types"][local]+=1
+        elif local=="field" and ns==OD:
+            vals["entity_features"]["record_field"]+=1
+
+        xsi_nil="{http://www.w3.org/2001/XMLSchema-instance}nil"
+        if el.attrib.get(xsi_nil)=="true":
+            vals["entity_features"]["xsi:nil=true"]+=1
+        if local=="set" and ns==OD:
+            child_names=[E.QName(x).localname for x in el if isinstance(x.tag,str)]
+            vals["set_forms"]["nested" if "set" in child_names else "leaf"]+=1
 
         for a,bucket in [
             ("operation","operations"),("check","check"),("check_existence","check_existence"),
@@ -77,7 +92,8 @@ def main():
         "test_types","object_types","state_types","variable_types","functions",
         "operations","check","check_existence","state_operator","criteria_operator",
         "set_operator","filter_action","var_check","entity_check","datatypes",
-        "behaviors","criteria_nodes","attribute_values",
+        "behaviors","criteria_nodes","component_types","entity_features",
+        "criteria_features","set_forms","attribute_values",
     ]}
     per_file=[]
     for p in files:
