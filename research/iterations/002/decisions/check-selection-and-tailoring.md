@@ -35,6 +35,30 @@ A split model in which Benchmark only knows policy and policy resolves directly
 to one Assessment would lose this behavior. The named-check layer preserves the
 behavior without coupling Benchmark Rules directly to executable files.
 
+## Selector identity versus Assessment identity
+
+Different selector names MAY resolve to the same Assessment Method when the
+source semantics intentionally expose multiple names for equivalent technical
+behavior. Implementations SHALL preserve the selector identities even when the
+Assessment implementation is shared.
+
+A common enhanced STIG pattern is:
+
+    selector: <empty/default> -> OVAL definition X
+    selector: automated       -> OVAL definition X
+    selector: manual          -> Check Text / OCIL manual procedure
+
+A lossless NG conversion may therefore expose `default` and `automated` as
+distinct selectors that both resolve to one automated Assessment, while
+`manual` resolves to a Manual Assessment.
+
+This is implementation reuse, not selector collapse.
+
+Conversely, multiple non-equivalent source check candidates under one selector
+represent checking-system/fallback semantics. A converter SHALL preserve that
+behavior explicitly or SHALL fail conversion for the affected Rule; it SHALL
+NOT arbitrarily choose one candidate.
+
 ## Migration requirement
 
 Stage-1 SCAP 1.4 conversion SHALL preserve check-selection semantics.
