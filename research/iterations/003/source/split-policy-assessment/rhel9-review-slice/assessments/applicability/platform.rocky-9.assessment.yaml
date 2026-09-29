@@ -1,0 +1,27 @@
+assessment:
+  id: platform.rocky-9.assessment
+  title: Rocky Linux 9
+  mode: automated
+  purpose: applicability
+  checks:
+    operating-system-identity:
+      title: Rocky Linux 9
+      collect:
+        title: Operating system identity
+        capability: linux.os-release
+        select: {}
+      assert:
+        title: Rocky Linux 9
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - any:
+            - field: id
+              operation: equals
+              value: rocky
+          - field: version_id
+            operation: pattern match
+            value: ^9(?:\.|$)
+  evaluate:
+    check: operating-system-identity
