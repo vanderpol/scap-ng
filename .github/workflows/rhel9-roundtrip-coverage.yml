@@ -54,8 +54,29 @@ jobs:
                   print(f"  {count:5}  {name}")
           PY
 
-      - name: Upload full benchmark surface inventory
+      - name: Run corpus-wide semantic round trip
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus.py             work/rhel9-split             --out work/rhel9-roundtrip
+
+      - name: Summarize corpus-wide round trip
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('work/rhel9-roundtrip/summary.json'))
+          print(json.dumps({
+              'source_file_count':d['source_file_count'],
+              'counts':d['counts'],
+              'all_pass':d['all_pass'],
+          },indent=2))
+          for row in d['rows']:
+              if row['status']!='pass':
+                  print(row['status'],row['source'],row.get('error',''))
+          PY
+
+      - name: Upload full benchmark round-trip evidence
         uses: actions/upload-artifact@v4
         with:
-          name: rhel9-oval-roundtrip-surface
-          path: work/rhel9-oval-surface.json
+          name: rhel9-oval-roundtrip-evidence
+          path: |
+            work/rhel9-oval-surface.json
+            work/rhel9-roundtrip/summary.json
