@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <generator>
+    <oval:product_name>RHEL 10 STIG SCAP content assembly</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-09-23T15:13:16Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <!--
+OVAL provenance
+Origin: Derived from RHEL 9 benchmark
+Source benchmark: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+Source IDs: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257918
+Basis: Adaptation is documented in OVAL Content\RHEL10_Oracle_Repairs_2026-09-22\lineage.json.
+Last reviewed: 2026-09-24
+Assessment SHA-256: 0bd2480ed921ba1fac949f78a68d71f34243bae7601d6bf1049fc1eaf00ccaab
+Change summary: Adapted the source native file collection to the target path and recursion scope. Separate tests exclude entries passing each ownership or permission condition and require that no violating entries remain.
+Summary evidence: documented
+-->
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:28103700001" version="1" class="compliance">
+      <metadata>
+        <title>RHEL 10 must be configured so that system commands are owned by "root".</title>
+        <affected family="unix">
+          <platform>Red Hat Enterprise Linux 10</platform>
+        </affected>
+        <reference source="DISA STIG" ref_id="SV-281037"/>
+        <description>RHEL 10 check-text evaluation. Production comparison: RHEL-09-232190. Production file objects collect filenames, unlike the broken nil-filename RHEL 10 objects. The command source excludes links/directories; the library-owner source limits filenames to .so variants. Target find -L and non-directory scope are broader.</description>
+      </metadata>
+      <criteria operator="AND" comment="All listed conditions must be satisfied">
+        <criteria operator="OR" comment="Either no links exist or every link target is resolved successfully">
+          <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28103700002" comment="The selected population contains no file symlinks"/>
+          <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28103700003" comment="Resolve selected symlinks"/>
+        </criteria>
+        <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28103700004" comment="No selected entry violates user_id"/>
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <unix:file_test xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:tst:28103700002" version="1" comment="The selected population contains no file symlinks" check_existence="none_exist" check="all">
+      <unix:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28103700006"/>
+    </unix:file_test>
+    <unix:symlink_test xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:tst:28103700003" version="1" comment="Resolve selected symlinks" check_existence="all_exist" check="all">
+      <unix:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28103700007"/>
+      <unix:state state_ref="oval:navy.navwar.niwcatlantic.scc:ste:28103700014"/>
+    </unix:symlink_test>
+    <unix:file_test xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:tst:28103700004" version="1" comment="No selected entry violates user_id" check_existence="none_exist" check="all">
+      <unix:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28103700011"/>
+    </unix:file_test>
+  </tests>
+  <objects>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28103700005" version="1" comment="Collect the STIG-selected filesystem entries before independent violation filters">
+      <unix:behaviors recurse_direction="down" max_depth="-1" recurse="symlinks and directories" recurse_file_system="all"/>
+      <unix:path var_ref="oval:navy.navwar.niwcatlantic.scc:var:28103700016" var_check="at least one"/>
+      <unix:filename operation="pattern match">^.*$</unix:filename>
+      <filter action="exclude">oval:navy.navwar.niwcatlantic.scc:ste:28103700012</filter>
+    </unix:file_object>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28103700006" version="1" comment="Select symlinks for canonical-path resolution">
+      <set>
+        <object_reference>oval:navy.navwar.niwcatlantic.scc:obj:28103700005</object_reference>
+        <filter action="include">oval:navy.navwar.niwcatlantic.scc:ste:28103700013</filter>
+      </set>
+    </unix:file_object>
+    <unix:symlink_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28103700007" version="1" comment="Resolve selected symlinks">
+      <unix:filepath var_ref="oval:navy.navwar.niwcatlantic.scc:var:28103700017" var_check="at least one"/>
+    </unix:symlink_object>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28103700008" version="1" comment="Collect the actual file attributes of symlink targets">
+      <unix:filepath var_ref="oval:navy.navwar.niwcatlantic.scc:var:28103700018" var_check="at least one"/>
+      <filter action="exclude">oval:navy.navwar.niwcatlantic.scc:ste:28103700012</filter>
+    </unix:file_object>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28103700009" version="1" comment="Select entries that are not symbolic links">
+      <set>
+        <object_reference>oval:navy.navwar.niwcatlantic.scc:obj:28103700005</object_reference>
+        <filter action="exclude">oval:navy.navwar.niwcatlantic.scc:ste:28103700013</filter>
+      </set>
+    </unix:file_object>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28103700010" version="1" comment="Union direct entries and resolved link targets for find -L semantics">
+      <set set_operator="UNION">
+        <object_reference>oval:navy.navwar.niwcatlantic.scc:obj:28103700009</object_reference>
+        <object_reference>oval:navy.navwar.niwcatlantic.scc:obj:28103700008</object_reference>
+      </set>
+    </unix:file_object>
+    <unix:file_object xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:obj:28103700011" version="1" comment="Collect only violations of user_id; separate from every other permission bit">
+      <set>
+        <object_reference>oval:navy.navwar.niwcatlantic.scc:obj:28103700010</object_reference>
+        <filter action="exclude">oval:navy.navwar.niwcatlantic.scc:ste:28103700015</filter>
+      </set>
+    </unix:file_object>
+  </objects>
+  <states>
+    <unix:file_state xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:ste:28103700012" version="1" comment="Exclude directories from the non-directory file population">
+      <unix:type>directory</unix:type>
+    </unix:file_state>
+    <unix:file_state xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:ste:28103700013" version="1" comment="Identify file symlinks whose target attributes are required by find -L">
+      <unix:type>symbolic link</unix:type>
+    </unix:file_state>
+    <unix:symlink_state xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:ste:28103700014" version="1" comment="Every selected symlink must resolve to an absolute target">
+      <unix:canonical_path operation="pattern match">^/</unix:canonical_path>
+    </unix:symlink_state>
+    <unix:file_state xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" id="oval:navy.navwar.niwcatlantic.scc:ste:28103700015" version="1" comment="Owner UID has the required value">
+      <unix:user_id datatype="int">0</unix:user_id>
+    </unix:file_state>
+  </states>
+  <variables>
+    <constant_variable id="oval:navy.navwar.niwcatlantic.scc:var:28103700016" version="1" comment="Filesystem roots explicitly named by the RHEL 10 check" datatype="string">
+      <value>/bin</value>
+      <value>/sbin</value>
+      <value>/usr/bin</value>
+      <value>/usr/sbin</value>
+      <value>/usr/libexec</value>
+      <value>/usr/local/bin</value>
+      <value>/usr/local/sbin</value>
+    </constant_variable>
+    <local_variable id="oval:navy.navwar.niwcatlantic.scc:var:28103700017" version="1" comment="Paths of the selected file symlinks" datatype="string">
+      <object_component object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28103700006" item_field="filepath"/>
+    </local_variable>
+    <local_variable id="oval:navy.navwar.niwcatlantic.scc:var:28103700018" version="1" comment="Canonical target paths to assess instead of symlink mode bits" datatype="string">
+      <object_component object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28103700007" item_field="canonical_path"/>
+    </local_variable>
+  </variables>
+</oval_definitions>
