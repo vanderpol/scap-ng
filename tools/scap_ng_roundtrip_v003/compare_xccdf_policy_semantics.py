@@ -89,7 +89,21 @@ def main():
         issues.append({"kind":"profile_set_mismatch",
                        "missing":sorted(set(src_profiles)-set(gen_profiles)),
                        "extra":sorted(set(gen_profiles)-set(src_profiles))})
+    source_profile_meta={profile_name(p["id"]):p for p in src.get("profiles",[])}
+    generated_profile_meta={profile_name(p.get("id")):p for p in root.findall("x:Profile",NS)}
     for pid in set(src_profiles)&set(gen_profiles):
+        sp=source_profile_meta.get(pid,{})
+        gp=generated_profile_meta.get(pid)
+        if gp is not None:
+            st=sp.get("title")
+            gt=gp.findtext("x:title",namespaces=NS)
+            if gt!=st:
+                issues.append({"kind":"profile_title_mismatch","profile":pid,"source":st,"generated":gt})
+            sd=sp.get("description")
+            if sd=="<ProfileDescription></ProfileDescription>": sd=None
+            gd=gp.findtext("x:description",namespaces=NS)
+            if gd!=sd:
+                issues.append({"kind":"profile_description_mismatch","profile":pid,"source":sd,"generated":gd})
         if src_profiles[pid]!=gen_profiles[pid]:
             issues.append({"kind":"profile_selection_mismatch","profile":pid,
                            "source_disabled":sorted(src_profiles[pid]),
