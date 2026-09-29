@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
+  xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent">
+  <generator>
+    <oval:product_name>SCAP-NG round-trip schema-derived source</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-09-29T00:00:00Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <definition id="oval:scap-ng.roundtrip.source:def:1" version="1" class="compliance">
+      <metadata>
+        <title>Exercise entity_check and var_check together</title>
+        <description>Schema-derived round-trip stress case.</description>
+      </metadata>
+      <criteria>
+        <criterion test_ref="oval:scap-ng.roundtrip.source:tst:1" comment="many-to-many state comparison"/>
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <ind:textfilecontent54_test id="oval:scap-ng.roundtrip.source:tst:1" version="1"
+      check_existence="at_least_one_exists" check="all" comment="many-to-many state comparison">
+      <ind:object object_ref="oval:scap-ng.roundtrip.source:obj:1"/>
+      <ind:state state_ref="oval:scap-ng.roundtrip.source:ste:1"/>
+    </ind:textfilecontent54_test>
+  </tests>
+  <objects>
+    <ind:textfilecontent54_object id="oval:scap-ng.roundtrip.source:obj:1" version="1" comment="collect two regex subexpressions">
+      <ind:filepath>/tmp/scap-ng-many-to-many.conf</ind:filepath>
+      <ind:pattern operation="pattern match">^(foo)=(bar)$</ind:pattern>
+      <ind:instance datatype="int">1</ind:instance>
+    </ind:textfilecontent54_object>
+  </objects>
+  <states>
+    <ind:textfilecontent54_state id="oval:scap-ng.roundtrip.source:ste:1" version="1" comment="compare multiple item subexpressions to multiple variable values">
+      <ind:subexpression datatype="string" operation="equals"
+        var_ref="oval:scap-ng.roundtrip.source:var:1"
+        var_check="at least one"
+        entity_check="at least one"/>
+    </ind:textfilecontent54_state>
+  </states>
+  <variables>
+    <constant_variable id="oval:scap-ng.roundtrip.source:var:1" version="1" datatype="string" comment="accepted subexpression values">
+      <value>foo</value>
+      <value>bar</value>
+    </constant_variable>
+  </variables>
+</oval_definitions>
