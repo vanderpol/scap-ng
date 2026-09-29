@@ -48,3 +48,5 @@ visible through the GitHub integration.
 The branch workflow is not a semantic requirement of SCAP-NG; it is only a
 development/testing mechanism. The authoritative test requirements remain the
 XSD/Schematron validation and semantic round-trip comparisons described above.
+
+<!-- validation-trigger: typed-literal-full-batch -->
