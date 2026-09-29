@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse, json, sys, traceback
 from pathlib import Path
+from lxml import etree as E
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
@@ -65,11 +66,11 @@ def main():
                 diff_dir/"normalized-structural.diff"
             )
             (diff_dir/"source-normalized.xml").write_text(
-                __import__("lxml").etree.tostring(source_norm,pretty_print=True,encoding="unicode"),
+                E.tostring(source_norm,pretty_print=True,encoding="unicode"),
                 encoding="utf-8"
             )
             (diff_dir/"regenerated-normalized.xml").write_text(
-                __import__("lxml").etree.tostring(regen_norm,pretty_print=True,encoding="unicode"),
+                E.tostring(regen_norm,pretty_print=True,encoding="unicode"),
                 encoding="utf-8"
             )
             row["raw_diff_lines"]=len(raw.splitlines())
