@@ -950,7 +950,7 @@ def main():
                     "identifiers": [
                         {
                             "scheme": "cpe",
-                            "version": "2.3",
+                            "binding": "uri",
                             "value": value,
                         }
                         for value in benchmark_platform_refs
