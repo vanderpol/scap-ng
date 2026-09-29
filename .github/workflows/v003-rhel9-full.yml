@@ -1,0 +1,128 @@
+name: Build SCAP-NG 003 full RHEL9 benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/v003-rhel9-full.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v003-rhel9-full-main
+  cancel-in-progress: true
+
+jobs:
+  build-full-rhel9:
+    runs-on: ubuntu-latest
+    env:
+      SCAP_NG_V003_MODE: full
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pyyaml
+
+      - name: Generate full RHEL9 native source and package
+        run: python tools/scap_upconvert_v003/build_rhel9_review_slice.py
+
+      - name: Reject legacy residue in native source
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          import yaml
+          sys.path.insert(0, "tools")
+          from scap_upconvert_v003.cleanliness import assert_native_clean
+          root = Path("research/iterations/003/source/split-rule-assessment/rhel9-full")
+          files = sorted(root.rglob("*.yaml"))
+          if not files:
+              raise SystemExit("no full RHEL9 native source generated")
+          for path in files:
+              doc = yaml.safe_load(path.read_text())
+              assert_native_clean(doc)
+          print("clean native files:", len(files))
+          PY
+
+      - name: Validate package manifest resolution and integrity
+        run: |
+          python - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+
+          package = Path("research/iterations/003/packages/rhel9-full.scap-ng.zip")
+          with zipfile.ZipFile(package) as zf:
+              names = set(zf.namelist())
+              manifest = json.loads(zf.read("manifest.json"))
+              benchmark = json.loads(zf.read("benchmark.json"))["benchmark"]
+
+              objects = manifest["objects"]
+              for object_id, item in objects.items():
+                  path = item["path"]
+                  if path not in names:
+                      raise SystemExit(f"manifest path missing: {object_id} -> {path}")
+                  data = zf.read(path)
+                  if hashlib.sha256(data).hexdigest() != item["sha256"]:
+                      raise SystemExit(f"digest mismatch: {object_id}")
+                  if len(data) != item["size"]:
+                      raise SystemExit(f"size mismatch: {object_id}")
+
+              for rule_id in benchmark["rules"]:
+                  item = objects.get(rule_id)
+                  if not item or item["type"] != "rule":
+                      raise SystemExit(f"Benchmark Rule unresolved: {rule_id}")
+
+              catalog_id = benchmark["applicability_catalog"]
+              catalog = objects.get(catalog_id)
+              if not catalog or catalog["type"] != "applicability_catalog":
+                  raise SystemExit(f"applicability catalog unresolved: {catalog_id}")
+
+              app = json.loads(zf.read(catalog["path"]))["applicability_catalog"]
+              for condition in app["conditions"]:
+                  aid = condition["assessment"]
+                  item = objects.get(aid)
+                  if not item or item["type"] != "assessment":
+                      raise SystemExit(f"applicability Assessment unresolved: {aid}")
+
+              print("package members:", len(names))
+              print("logical objects:", len(objects))
+              print("benchmark rules:", len(benchmark["rules"]))
+          PY
+
+      - name: Commit full conversion evidence
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/iterations/003/source/split-rule-assessment/rhel9-full
+          git add -A research/iterations/003/evidence/rhel9-full
+          git add -A research/iterations/003/packages/rhel9-full.scap-ng.zip
+          git add -A research/iterations/003/packages/rhel9-full.manifest.json
+          if git diff --cached --quiet; then
+            echo "Full RHEL9 output already matches."
+          else
+            git commit -m "Generate full RHEL9 SCAP-NG 003 benchmark"
+            git fetch origin main
+            git rebase origin/main
+            git push
+          fi
+
+      - name: Enforce conversion diagnostics gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("research/iterations/003/evidence/rhel9-full/diagnostics.json")
+          doc = json.loads(p.read_text())
+          counts = doc["summary"]["counts"]
+          print("diagnostics:", counts)
+          if counts["fatal"]:
+              raise SystemExit("FATAL diagnostics present")
+          if counts["error"]:
+              raise SystemExit("ERROR diagnostics present; full conversion evidence was committed for review")
+          PY
