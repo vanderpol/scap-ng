@@ -120,10 +120,7 @@ identity metadata. For example:
 normalizes to:
 
     rule.id: SV-280940
-    rule.version: r118473
-
-The trailing `0` immediately before `_rule` is part of the DISA XCCDF
-identifier encoding and SHALL NOT be included in the effective Rule version.
+    rule.version: r1184730
 
 The `disa-stig` parser SHALL validate this convention before deriving either
 field. It SHALL NOT apply this transformation to generic SCAP/XCCDF content.
