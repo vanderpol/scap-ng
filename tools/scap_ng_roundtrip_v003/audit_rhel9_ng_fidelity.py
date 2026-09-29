@@ -449,6 +449,7 @@ def main():
     # Profiles: compare final selection outcome, independent of source's verbose
     # explicit select list representation.
     ng_profiles={p["id"]:p for p in bench.get("profiles",[])}
+    source_profiles={profile_id(p["id"]):p for p in src["profiles"]}
     resolved={profile_id(p["id"]):p for p in src["resolved_profiles"]}
     if set(resolved)!=set(ng_profiles):
         issue("profile_set_mismatch",
@@ -457,9 +458,10 @@ def main():
     for pid,sp in resolved.items():
         np=ng_profiles.get(pid)
         if not np: continue
-        if norm_text(np.get("title"))!=norm_text(sp.get("title")):
-            issue("profile_title_mismatch",profile=pid,source=sp.get("title"),ng=np.get("title"))
-        profile_desc=norm_text(sp.get("description"))
+        source_profile=source_profiles.get(pid) or {}
+        if norm_text(np.get("title"))!=norm_text(source_profile.get("title")):
+            issue("profile_title_mismatch",profile=pid,source=source_profile.get("title"),ng=np.get("title"))
+        profile_desc=norm_text(source_profile.get("description"))
         if profile_desc not in (None,"<ProfileDescription></ProfileDescription>"):
             issue("profile_description_not_preserved",profile=pid,source=profile_desc)
         expected_disabled=expected_profile_disabled(src,sp)
