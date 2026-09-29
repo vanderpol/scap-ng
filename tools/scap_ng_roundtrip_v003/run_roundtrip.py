@@ -22,8 +22,10 @@ def main():
         subprocess.run([sys.executable,str(root/"ng_to_oval.py"),str(fixture),"-o",str(out)],check=True)
         source=args.scap_content/src["path"]
         print(f"COMPARE {fixture.name}")
-        p=subprocess.run([sys.executable,str(root/"compare_oval_semantics.py"),str(source),str(out),"--json"],
-                         text=True,capture_output=True)
+        cmd=[sys.executable,str(root/"compare_oval_semantics.py"),str(source),str(out),"--json"]
+        if src.get("root_definition"):
+            cmd.extend(["--source-root",src["root_definition"]])
+        p=subprocess.run(cmd,text=True,capture_output=True)
         print(p.stdout)
         if p.returncode:
             failures.append(fixture.name)
