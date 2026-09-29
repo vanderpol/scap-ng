@@ -19,7 +19,7 @@ single_default = {
     "id": "rule-default",
     "checks": [{"selector": None, "system": "oval"}],
 }
-plan, error = mod.check_selection_plan(single_default, assessment())
+plan, error = mod.check_selection_plan(single_default, {"automated": assessment(), "manual": None})
 assert error is None, error
 assert plan == {
     "checks": [{
@@ -35,7 +35,7 @@ single_named = {
     "id": "rule-automated",
     "checks": [{"selector": "automated", "system": "oval"}],
 }
-plan, error = mod.check_selection_plan(single_named, assessment("assessment.auto"))
+plan, error = mod.check_selection_plan(single_named, {"automated": assessment("assessment.auto"), "manual": None})
 assert error is None, error
 assert plan["default_check"] == "automated", plan
 assert plan["checks"][0]["source_selector"] == "automated", plan
@@ -44,15 +44,38 @@ assert plan["checks"][0]["assessment"] == "assessment.auto", plan
 multiple = {
     "id": "rule-alternatives",
     "checks": [
+        {"selector": "", "system": "oval"},
         {"selector": "automated", "system": "oval"},
-        {"selector": "manual", "system": "ocil"},
+        {"selector": "manual", "system": "ocil", "inline_content": "Review manually."},
     ],
 }
-plan, error = mod.check_selection_plan(multiple, assessment())
+plan, error = mod.check_selection_plan(
+    multiple,
+    {
+        "automated": assessment("assessment.auto"),
+        "manual": assessment("assessment.manual"),
+    },
+)
+assert error is None, error
+assert plan["default_check"] == "default", plan
+assert {x["selector"] for x in plan["checks"]} == {"default", "automated", "manual"}, plan
+by_selector = {x["selector"]: x["assessment"] for x in plan["checks"]}
+assert by_selector["default"] == "assessment.auto", by_selector
+assert by_selector["automated"] == "assessment.auto", by_selector
+assert by_selector["manual"] == "assessment.manual", by_selector
+
+
+unsupported = {
+    "id": "rule-external",
+    "checks": [{"selector": "vendor", "system": "urn:example:unsupported"}],
+}
+plan, error = mod.check_selection_plan(
+    unsupported,
+    {"automated": assessment(), "manual": assessment("manual")},
+)
 assert plan is None, plan
 assert error["status"] == "unsupported", error
-assert error["reason"] == "selectable_check_alternatives_not_lowered", error
-assert {x["selector"] for x in error["selectors"]} == {"automated", "manual"}, error
+assert error["reason"] == "check_selector_without_assessment", error
 
 # Multiple checking-system candidates under the same selector remain one
 # selector alternative; the source check logic retains system ordering.
@@ -63,7 +86,7 @@ same_selector = {
         {"selector": "automated", "system": "system-b"},
     ],
 }
-plan, error = mod.check_selection_plan(same_selector, assessment())
+plan, error = mod.check_selection_plan(same_selector, {"automated": assessment(), "manual": None})
 assert error is None, error
 assert plan["default_check"] == "automated", plan
 
