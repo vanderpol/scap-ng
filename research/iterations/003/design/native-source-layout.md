@@ -162,3 +162,41 @@ Parameter binding, or result semantics.
 When the converter cannot infer a useful functional subgroup with sufficient
 confidence, it SHOULD place the Rule under a `needs-grouping` child of the
 appropriate assessment-mode parent rather than fabricate a topic.
+
+
+## Relationship to XCCDF design
+
+SCAP-NG is replacing the XCCDF serialization and legacy SCAP coupling model,
+not discarding useful policy-language design merely because it originated in
+XCCDF.
+
+Iteration 003 SHOULD retain or adapt XCCDF concepts when they remain useful,
+clear, and interoperable in a native NG model.
+
+Examples include:
+
+- Benchmark as the authoritative policy container;
+- hierarchical Groups;
+- Profiles as publisher-defined Benchmark variations;
+- Rule-level policy metadata such as severity, role, weight, rationale,
+  warnings, identifiers, references, dependencies, and remediation;
+- explicit check selection;
+- typed policy Parameters;
+- platform and Rule applicability composition.
+
+These concepts SHOULD be simplified where historical XCCDF behavior was
+needlessly complex, but their useful semantics SHOULD NOT be removed simply to
+make NG look different.
+
+The design test is:
+
+1. Does the concept have demonstrated authoring, interoperability, or execution
+   value?
+2. Can it be represented more clearly without legacy XML/SCAP coupling?
+3. Can it remain self-describing without hidden defaults or schema tribal
+   knowledge?
+
+If yes, SCAP-NG SHOULD preserve the concept in native form.
+
+Legacy XML namespaces, opaque identifiers, component hrefs, wrapper structures,
+and cross-language stovepipes remain out of native NG source.
