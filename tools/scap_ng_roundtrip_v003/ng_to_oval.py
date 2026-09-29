@@ -126,7 +126,10 @@ def add_entity(parent, ns, name, spec, ids):
 
 def emit_component(parent, comp, ids):
     if "literal" in comp:
-        el = ET.SubElement(parent, q(OVAL_DEF, "literal_component"))
+        attrs={}
+        if comp.get("datatype") is not None:
+            attrs["datatype"]=str(comp["datatype"])
+        el = ET.SubElement(parent, q(OVAL_DEF, "literal_component"), attrs)
         el.text = str(comp["literal"])
     elif "variable" in comp:
         ET.SubElement(parent, q(OVAL_DEF, "variable_component"),
