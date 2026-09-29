@@ -14,7 +14,8 @@ under design.
 | Benchmark / Rule / Group structure | `policy/benchmark.md` | draft |
 | Platform specification and applicability | `policy/platform-and-applicability.md` | draft |
 | Profiles and Tailoring | `policy/profiles-and-tailoring.md` | draft |
-| Policy resolution/evaluation order | `policy/policy-resolution.md` | draft |\n| Parameters and Organizational Input | `policy/parameters-and-organizational-input.md` | draft |
+| Policy resolution/evaluation order | `policy/policy-resolution.md` | draft |
+| Parameters and Organizational Input | `policy/parameters-and-organizational-input.md` | draft |
 | Assessment Methods | `assessment/assessment-method.md` | draft |
 | Manual Assessment defaults | `assessment/manual-assessment.md` | draft |
 | Results and evidence | `results/results.md` | draft |
@@ -36,6 +37,14 @@ inference.
 
 SCAP-NG SHALL support lossless migration of supported SCAP 1.4 semantics before
 optional native refactoring.
+
+SCAP-NG policy SHALL preserve selectable-check semantics. An explicitly
+requested check selector that does not resolve SHALL fail rather than silently
+falling back to another or default check.
+
+SCAP-NG automated assessment semantics SHALL represent existence and
+cardinality explicitly. Expected absence and expected presence SHALL have
+portable truth semantics independent of scanner implementation.
 
 SCAP-NG source organization and filenames MAY aid authors, but semantic
 identity and object type SHALL come from object content rather than path or
