@@ -107,19 +107,30 @@ def split_members(root: Path, package_type: str):
     referenced=set()
     for binding in bindings.get("bindings",[]):
         rid=binding.get("rule")
-        aid=binding.get("assessment")
         if rid not in rule_ids:
             raise ValueError(f"binding references unknown rule: {rid}")
         if rid in seen_rules:
             raise ValueError(f"duplicate binding for rule: {rid}")
         seen_rules.add(rid)
-        safe_aid="".join(
-            c if c.isalnum() or c in "._-" else "_" for c in aid
-        ).strip("_")
-        if safe_aid not in assessment_files:
-            raise ValueError(f"binding references missing assessment: {aid}")
-        seen_rules.add(rid)
-        referenced.add(safe_aid)
+
+        assessment_ids=[]
+        if binding.get("assessment"):
+            assessment_ids.append(binding["assessment"])
+        for check in binding.get("checks",[]) or []:
+            aid=check.get("assessment")
+            if aid and aid not in assessment_ids:
+                assessment_ids.append(aid)
+
+        if not assessment_ids:
+            raise ValueError(f"binding has no assessment references: {rid}")
+
+        for aid in assessment_ids:
+            safe_aid="".join(
+                c if c.isalnum() or c in "._-" else "_" for c in aid
+            ).strip("_")
+            if safe_aid not in assessment_files:
+                raise ValueError(f"binding references missing assessment: {aid}")
+            referenced.add(safe_aid)
 
     members["bindings.json"]=bindings
     for safe_aid in sorted(referenced):
