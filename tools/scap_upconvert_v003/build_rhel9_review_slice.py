@@ -700,6 +700,71 @@ def manual_only_lowerable(rec):
     )
     return check_kind(default) == "manual" and all(check_kind(c) == "manual" for c in rec["checks"])
 
+def benchmark_platform_assessment(platform_id, title, distro_ids):
+    conditions = []
+    for distro_id in distro_ids:
+        conditions.append({
+            "field": "id",
+            "operation": "equals",
+            "value": distro_id,
+        })
+    return {
+        "assessment": {
+            "id": platform_id + ".assessment",
+            "title": title,
+            "mode": "automated",
+            "purpose": "applicability",
+            "checks": {
+                "operating-system-identity": {
+                    "title": title,
+                    "collect": {
+                        "title": "Operating system identity",
+                        "capability": "linux.os-release",
+                        "select": {},
+                    },
+                    "assert": {
+                        "title": title,
+                        "existence": "at_least_one_exists",
+                        "check": "all",
+                        "state": {
+                            "all": [
+                                {"any": conditions},
+                                {
+                                    "field": "version_id",
+                                    "operation": "pattern match",
+                                    "value": r"^9(?:\.|$)",
+                                },
+                            ]
+                        },
+                    },
+                }
+            },
+            "evaluate": {"check": "operating-system-identity"},
+        }
+    }
+
+def benchmark_platform_conditions():
+    return [
+        (
+            "platform.rhel-9",
+            "Red Hat Enterprise Linux 9",
+            ["rhel"],
+            "cpe:/o:redhat:enterprise_linux:9.0",
+        ),
+        (
+            "platform.rocky-9",
+            "Rocky Linux 9",
+            ["rocky"],
+            "cpe:/o:rocky:rocky:9",
+        ),
+        (
+            "platform.almalinux-9",
+            "AlmaLinux 9",
+            ["almalinux"],
+            "cpe:/o:almalinux:almalinux:9",
+        ),
+    ]
+
 def main():
     shutil.rmtree(OUT, ignore_errors=True)
     shutil.rmtree(EVIDENCE, ignore_errors=True)
@@ -891,10 +956,13 @@ def main():
                         for value in benchmark_platform_refs
                     ],
                     "applicability": {
-                        "mechanism": "cpe-name-match",
                         "operator": "any",
+                        "conditions": [
+                            "platform.rhel-9",
+                            "platform.rocky-9",
+                            "platform.almalinux-9",
+                        ],
                     },
-                    "assessment": None,
                 },
                 "scoring": benchmark_scoring(xr),
                 "parameters": [],
@@ -907,6 +975,16 @@ def main():
 
         applicability_registry = {}
         applicability_assessments_written = set()
+
+        for app_id, app_title, distro_ids, cpe_value in benchmark_platform_conditions():
+            assessment = benchmark_platform_assessment(app_id, app_title, distro_ids)
+            applicability_registry[app_id] = assessment["assessment"]["id"]
+            write_yaml(
+                OUT / "assessments/applicability" / f"{assessment['assessment']['id']}.yaml",
+                assessment,
+            )
+            applicability_assessments_written.add(assessment["assessment"]["id"])
+
         evidence = []
         diagnostics = [
             {
@@ -1033,6 +1111,20 @@ def main():
         })
         write_json(EVIDENCE / "rule-mapping.json", {"rules": evidence})
         write_json(EVIDENCE / "grouping.json", {"groups": grouping_evidence})
+        write_json(
+            EVIDENCE / "benchmark-platform-mapping.json",
+            {
+                "conditions": [
+                    {
+                        "id": app_id,
+                        "title": app_title,
+                        "cpe": cpe_value,
+                        "assessment": app_id + ".assessment",
+                    }
+                    for app_id, app_title, distro_ids, cpe_value in benchmark_platform_conditions()
+                ]
+            },
+        )
         write_json(EVIDENCE / "applicability-candidates.json", {"rules": applicability_candidates})
         write_json(EVIDENCE / "source-platform-inventory.json", {"platforms": source_platform_inventory})
         write_json(EVIDENCE / "benchmark-platform-source.json", {"platform_refs": benchmark_platform_refs})
