@@ -70,6 +70,44 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.unix:ste:23036703
   derive:
+    oval:mil.disa.stig.defs:var:23036701:
+      source_variable_id: oval:mil.disa.stig.defs:var:23036701
+      source_type: constant_variable
+      datatype: int
+      comment: anonymous UIDs
+      semantic_ast:
+        datatype: int
+        id: oval:mil.disa.stig.defs:var:23036701
+        type: constant_variable
+        values:
+        - datatype: int
+          value: '65534'
+        - datatype: int
+          value: '65535'
+        - datatype: int
+          value: '4294967294'
+        - datatype: int
+          value: '4294967295'
+      resolution:
+        datatype: int
+        status: exact_static
+        values:
+        - '65534'
+        - '65535'
+        - '4294967294'
+        - '4294967295'
+        variable_type: constant_variable
+      evaluation_plan:
+        datatype: int
+        mode: static
+        resolution_status: exact_static
+        values:
+        - '65534'
+        - '65535'
+        - '4294967294'
+        - '4294967295'
+        variable_id: oval:mil.disa.stig.defs:var:23036701
+        variable_type: constant_variable
     oval:mil.disa.stig.defs:var:23036700:
       source_variable_id: oval:mil.disa.stig.defs:var:23036700
       source_type: local_variable
@@ -142,45 +180,35 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:mil.disa.stig.defs:var:23036700
         variable_type: local_variable
-    oval:mil.disa.stig.defs:var:23036701:
-      source_variable_id: oval:mil.disa.stig.defs:var:23036701
-      source_type: constant_variable
-      datatype: int
-      comment: anonymous UIDs
-      semantic_ast:
-        datatype: int
-        id: oval:mil.disa.stig.defs:var:23036701
-        type: constant_variable
-        values:
-        - datatype: int
-          value: '65534'
-        - datatype: int
-          value: '65535'
-        - datatype: int
-          value: '4294967294'
-        - datatype: int
-          value: '4294967295'
-      resolution:
-        datatype: int
-        status: exact_static
-        values:
-        - '65534'
-        - '65535'
-        - '4294967294'
-        - '4294967295'
-        variable_type: constant_variable
-      evaluation_plan:
-        datatype: int
-        mode: static
-        resolution_status: exact_static
-        values:
-        - '65534'
-        - '65535'
-        - '4294967294'
-        - '4294967295'
-        variable_id: oval:mil.disa.stig.defs:var:23036701
-        variable_type: constant_variable
   predicates:
+    oval:mil.disa.stig.unix:ste:23036701:
+      source_state_id: oval:mil.disa.stig.unix:ste:23036701
+      source_type: shadow_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: less than or equal
+        kind: element
+        name: chg_req
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '60'
+      comment: less than or equal to sixty
+    oval:mil.disa.stig.unix:ste:23036700:
+      source_state_id: oval:mil.disa.stig.unix:ste:23036700
+      source_type: shadow_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than
+        kind: element
+        name: chg_req
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '0'
+      comment: greater than zero
     oval:mil.disa.stig.unix:ste:23036702:
       source_state_id: oval:mil.disa.stig.unix:ste:23036702
       source_type: shadow_state
@@ -196,34 +224,6 @@ assessment:
         name: username
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       comment: Lines starting with usernames of system users
-    oval:mil.disa.stig.unix:ste:23036700:
-      source_state_id: oval:mil.disa.stig.unix:ste:23036700
-      source_type: shadow_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: greater than
-        kind: element
-        name: chg_req
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '0'
-      comment: greater than zero
-    oval:mil.disa.stig.unix:ste:23036701:
-      source_state_id: oval:mil.disa.stig.unix:ste:23036701
-      source_type: shadow_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: less than or equal
-        kind: element
-        name: chg_req
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '60'
-      comment: less than or equal to sixty
     oval:mil.disa.stig.unix:ste:23036703:
       source_state_id: oval:mil.disa.stig.unix:ste:23036703
       source_type: password_state
@@ -284,6 +284,34 @@ assessment:
         - oval:mil.disa.stig.unix:ste:23036701
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230367:
+        source_definition_id: oval:mil.disa.stig.defs:def:230367
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: No password in /etc/shadow has a maximum password age of 0 or greater than 60
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23036700
+          - comment: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23036701
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system user account passwords must be configured so that existing passwords are restricted
+              to a 60-day maximum lifetime.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258042:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258042
         class: compliance
@@ -318,34 +346,6 @@ assessment:
               there is the risk that RHEL 9 passwords could be compromised.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230367:
-        source_definition_id: oval:mil.disa.stig.defs:def:230367
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: No password in /etc/shadow has a maximum password age of 0 or greater than 60
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23036700
-          - comment: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23036701
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system user account passwords must be configured so that existing passwords are restricted
-              to a 60-day maximum lifetime.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:258042
@@ -357,16 +357,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258042
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258042
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258042
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -465,6 +471,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258042r1045133_rule
-    semantic_ir_sha256: 1ff1909d704d086df745f4ebb19c68bd9a1512ad4a32b7ac5656000dbbeb3be3
+    semantic_ir_sha256: b04ae89f6d5a9c2b0798549d84b489341314fa1ab45e68a562a0cb277fa7cd7f
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ebde87104c0fadfe9a530085c01e7227b7ad0831f5eef14f84b583158fe4049b

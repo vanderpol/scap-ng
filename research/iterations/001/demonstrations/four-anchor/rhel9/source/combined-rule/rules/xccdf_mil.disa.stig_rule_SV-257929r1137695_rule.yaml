@@ -337,7 +337,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
     version: 1
     description: A sticky bit must be set on all RHEL 9 public directories.
@@ -455,16 +469,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -563,11 +583,153 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
-      semantic_ir_sha256: a8c51bf614a59138430f5f51de5c5da63d36e381c9b1b82b3000d4a38e3805f9
+      semantic_ir_sha256: 860f3990a97c63745af6c5c7927e4c52ad156f3ae4ce36b3b87625a6e031c3d0
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c56b6d5519a83022b4e67b45d3bb99b9f1dd3b010dea4ee71725c0b5b876728f
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+    version: 1
+    description: A sticky bit must be set on all RHEL 9 public directories.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:30101
+      exports: []
+      inline_content: 'Verify that all world-writable directories have the sticky bit set. Determine if all world-writable
+        directories have the sticky bit set by running the following command: $ sudo find / -type d \( -perm -0002 -a ! -perm
+        -1000 \) -print 2>/dev/null drwxrwxrwt 7 root root 4096 Jul 26 11:19 /tmp If any of the returned directories are world-writable
+        and do not have the sticky bit set, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:30101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that all world-writable directories have the sticky bit set.
+
+
+            Determine if all world-writable directories have the sticky bit set by running the following command:
+
+
+            $ sudo find / -type d \( -perm -0002 -a ! -perm -1000 \) -print 2>/dev/null
+
+
+            drwxrwxrwt 7 root root 4096 Jul 26 11:19 /tmp
+
+
+            If any of the returned directories are world-writable and do not have the sticky bit set, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.linux:def:257929
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:30101
+        exports: []
+        inline_content: 'Verify that all world-writable directories have the sticky bit set. Determine if all world-writable
+          directories have the sticky bit set by running the following command: $ sudo find / -type d \( -perm -0002 -a !
+          -perm -1000 \) -print 2>/dev/null drwxrwxrwt 7 root root 4096 Jul 26 11:19 /tmp If any of the returned directories
+          are world-writable and do not have the sticky bit set, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:30101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that all world-writable directories have the sticky bit set.
+
+
+              Determine if all world-writable directories have the sticky bit set by running the following command:
+
+
+              $ sudo find / -type d \( -perm -0002 -a ! -perm -1000 \) -print 2>/dev/null
+
+
+              drwxrwxrwt 7 root root 4096 Jul 26 11:19 /tmp
+
+
+              If any of the returned directories are world-writable and do not have the sticky bit set, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that all world-writable directories have the sticky bit set. Determine if all world-writable directories
+      have the sticky bit set by running the following command: $ sudo find / -type d \( -perm -0002 -a ! -perm -1000 \) -print
+      2>/dev/null drwxrwxrwt 7 root root 4096 Jul 26 11:19 /tmp If any of the returned directories are world-writable and
+      do not have the sticky bit set, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 5cd35bfc46d466cb95e6d458912a422cafc616cf1703a7c701182d6ea0da0614
+  migration: *id002

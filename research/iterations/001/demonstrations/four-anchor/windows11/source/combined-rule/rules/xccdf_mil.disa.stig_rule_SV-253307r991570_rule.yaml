@@ -323,7 +323,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253307r991570_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253307r991570_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253307r991570_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253307r991570_rule
     version: 1
     description: The system must be configured to audit Account Logon - Credential Validation successes.
@@ -367,19 +381,6 @@ rule:
         comment: '''Credential Validation'' is set to ''Success'''
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25330700:
-          source_test_id: oval:mil.disa.stig.win:tst:25330700
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Audit Credential Validation'' is set to ''Success'''
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:25330700
-          source_other: []
         oval:mil.disa.stig.win:tst:25330701:
           source_test_id: oval:mil.disa.stig.win:tst:25330701
           source_type: auditeventpolicysubcategories_test
@@ -392,6 +393,19 @@ rule:
           - oval:mil.disa.stig.win:obj:20000000
           predicates:
           - oval:mil.disa.stig.win:ste:25330701
+          source_other: []
+        oval:mil.disa.stig.win:tst:25330700:
+          source_test_id: oval:mil.disa.stig.win:tst:25330700
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: '''Audit Credential Validation'' is set to ''Success'''
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:25330700
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:253307:
@@ -471,16 +485,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253307
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253307
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253307
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -582,11 +602,160 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253307r991570_rule
-      semantic_ir_sha256: 89d8fd5dcb6b6ba768bf396b3a19f28a7f8b9df990486a2867d30c94e0885263
+      semantic_ir_sha256: 48fd96504ea35db368ed523e0becaa7ef8e69a7674221f7888c0ac209cda6fff
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: d355705af5b9c5bbed54a7c69fde8fa8843a8013789c62a1b88589969222a3ce
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253307r991570_rule
+    version: 1
+    description: The system must be configured to audit Account Logon - Credential Validation successes.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:9901
+      exports: []
+      inline_content: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+        must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective. Use the AuditPol
+        tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges ("Run as Administrator").
+        Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following. If the system does not audit
+        the following, this is a finding: Account Logon >> Credential Validation - Success'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:9901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+            must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective.
+
+
+            Use the AuditPol tool to review the current Audit Policy configuration:
+
+            Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+            Enter "AuditPol /get /category:*".
+
+
+            Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+            Account Logon >> Credential Validation - Success'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253307
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253307
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253307
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253307
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:9901
+        exports: []
+        inline_content: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category
+          settings" must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective. Use
+          the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges
+          ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following. If
+          the system does not audit the following, this is a finding: Account Logon >> Credential Validation - Success'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:9901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+              must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective.
+
+
+              Use the AuditPol tool to review the current Audit Policy configuration:
+
+              Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+              Enter "AuditPol /get /category:*".
+
+
+              Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+              Account Logon >> Credential Validation - Success'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+      must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective. Use the AuditPol
+      tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges ("Run as Administrator").
+      Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following. If the system does not audit the
+      following, this is a finding: Account Logon >> Credential Validation - Success'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253307r991570_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 58b8a94889e175b9f5e19ef4a74d7af71c415f85f9195b667deb30d3f3bef2fc
+  migration: *id002

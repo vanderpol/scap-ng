@@ -371,7 +371,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278014r1182263_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278014r1182263_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-278014r1182263_rule
     version: 1
     description: Windows Server 2025 must automatically remove or disable emergency accounts after the crisis is resolved
@@ -567,10 +577,13 @@ rule:
       is a finding. Member servers and stand-alone or nondomain-joined systems: Open command prompt. Run "Net user [username]",
       where [username] is the name of the emergency account. If "Account expires" has been defined and is not within 72 hours
       for an emergency administrator account, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-278014r1182263_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: bd9ac83e9a0f57e70188346e4eb9b757813a4ed95cafb139b43820e07795ca2f
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

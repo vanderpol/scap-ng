@@ -224,7 +224,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-277983r1180655_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-277983r1180655_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-277983r1180655_rule
     version: 1
     description: Windows Server 2025 must prohibit the use or connection of unauthorized hardware components.
@@ -334,10 +344,13 @@ rule:
     source_result_algebra: xccdf-1.2-complex-check-eight-state
     procedure: Verify the operating system is configured to prohibit the use or connection of unauthorized hardware components.
       If the operating system is using undocumented or unapproved hardware, this is a finding.
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-277983r1180655_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 722d3a59f7a2e223b3a75b95a824bc967bc1cd0ace3e2ea6290135e34c7e60ea
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

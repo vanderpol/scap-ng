@@ -340,7 +340,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-278050r1180856_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-278050r1180856_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278050r1180856_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278050r1180856_rule
     version: 1
     description: Windows Server 2025 must be configured to audit Account Management - Security Group Management successes.
@@ -356,17 +370,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25330801:
-        source_state_id: oval:mil.disa.stig.win:ste:25330801
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: security_group_management
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS_FAILURE
-        comment: null
       oval:mil.disa.stig.win:ste:25330800:
         source_state_id: oval:mil.disa.stig.win:ste:25330800
         source_type: auditeventpolicysubcategories_state
@@ -377,6 +380,17 @@ rule:
           name: security_group_management
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS
+        comment: null
+      oval:mil.disa.stig.win:ste:25330801:
+        source_state_id: oval:mil.disa.stig.win:ste:25330801
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: security_group_management
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS_FAILURE
         comment: null
     evaluate:
       tests:
@@ -468,16 +482,22 @@ rule:
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows2025:def:278050
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows2025:def:278050
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows2025:def:278050
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
@@ -571,11 +591,144 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278050r1180856_rule
-      semantic_ir_sha256: e5fc5bf486eef2b697e051e350d603d91c6702d9ded580aff4476f6440abb1a4
+      semantic_ir_sha256: b9dd8a2ef834e64ca0d6792422f828924ac392942944b2930b5f7cc62d5fd1ea
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 7b79942b8cfc573a2bced1189e84466b9f715d1416cf28dcc4fc0d77c47ebac0
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278050r1180856_rule
+    version: 1
+    description: Windows Server 2025 must be configured to audit Account Management - Security Group Management successes.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:13301
+      exports: []
+      inline_content: 'Security Option "Audit: Force audit policy subcategory settings (Windows 7 or later) to override audit
+        policy category settings" must be set to "Enabled" (WN25-SO-000050) for the detailed auditing subcategories to be
+        effective. Use the "AuditPol" tool to review the current Audit Policy configuration. Open PowerShell or a command
+        prompt with elevated privileges ("Run as administrator"). Enter "AuditPol /get /category:*" Compare the "AuditPol"
+        settings with the following. If the system does not audit the following, this is a finding: Account Management >>
+        Security Group Management - Success'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:13301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Security Option \"Audit: Force audit policy subcategory settings (Windows 7 or later) to override audit policy\
+            \ category settings\" must be set to \"Enabled\" (WN25-SO-000050) for the detailed auditing subcategories to be\
+            \ effective. \n\nUse the \"AuditPol\" tool to review the current Audit Policy configuration.\n\nOpen PowerShell\
+            \ or a command prompt with elevated privileges (\"Run as administrator\").\n\nEnter \"AuditPol /get /category:*\"\
+            \n\nCompare the \"AuditPol\" settings with the following.\n\nIf the system does not audit the following, this\
+            \ is a finding:\n\nAccount Management >> Security Group Management - Success"
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278050
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278050
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278050
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278050
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:13301
+        exports: []
+        inline_content: 'Security Option "Audit: Force audit policy subcategory settings (Windows 7 or later) to override
+          audit policy category settings" must be set to "Enabled" (WN25-SO-000050) for the detailed auditing subcategories
+          to be effective. Use the "AuditPol" tool to review the current Audit Policy configuration. Open PowerShell or a
+          command prompt with elevated privileges ("Run as administrator"). Enter "AuditPol /get /category:*" Compare the
+          "AuditPol" settings with the following. If the system does not audit the following, this is a finding: Account Management
+          >> Security Group Management - Success'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:13301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Security Option \"Audit: Force audit policy subcategory settings (Windows 7 or later) to override audit\
+              \ policy category settings\" must be set to \"Enabled\" (WN25-SO-000050) for the detailed auditing subcategories\
+              \ to be effective. \n\nUse the \"AuditPol\" tool to review the current Audit Policy configuration.\n\nOpen PowerShell\
+              \ or a command prompt with elevated privileges (\"Run as administrator\").\n\nEnter \"AuditPol /get /category:*\"\
+              \n\nCompare the \"AuditPol\" settings with the following.\n\nIf the system does not audit the following, this\
+              \ is a finding:\n\nAccount Management >> Security Group Management - Success"
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Security Option "Audit: Force audit policy subcategory settings (Windows 7 or later) to override audit policy
+      category settings" must be set to "Enabled" (WN25-SO-000050) for the detailed auditing subcategories to be effective.
+      Use the "AuditPol" tool to review the current Audit Policy configuration. Open PowerShell or a command prompt with elevated
+      privileges ("Run as administrator"). Enter "AuditPol /get /category:*" Compare the "AuditPol" settings with the following.
+      If the system does not audit the following, this is a finding: Account Management >> Security Group Management - Success'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-278050r1180856_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: efd0842ebc38eb17c3ff8afb1fcda42196d0f03b135b1b01d6938efa2ff6a259
+  migration: *id002

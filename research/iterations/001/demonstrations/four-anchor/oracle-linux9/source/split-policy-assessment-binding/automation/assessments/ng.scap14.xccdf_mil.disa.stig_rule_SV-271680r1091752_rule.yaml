@@ -7,6 +7,31 @@ assessment:
   description: OL 9 must prevent a user from overriding the banner-message-enable setting for the graphical user interface.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25802600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25802600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: dconf user databases
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/profile/user
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^system-db:(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:25801300:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25801300
@@ -33,31 +58,6 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^/org/gnome/login-screen/banner-message-enable$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:25802600:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25802600
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: dconf user databases
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/dconf/profile/user
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^system-db:(\S+)\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -242,16 +242,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271680
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271680
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271680
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -355,6 +361,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271680r1091752_rule
-    semantic_ir_sha256: ddc3525fdfd6cc13a4788df65a5976e1b870854baf10896ce58ccc54d534592a
+    semantic_ir_sha256: 0dbf2943cf00f5f0ce049af7b4700853529ee7a61c55014f3e8bf71071056cf8
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: af6c9cbf9cc0f2a368178fc925c480b886b8c15a4f10907c3910ee1c3a60d22c

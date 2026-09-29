@@ -321,44 +321,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258006r1045071_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258006r1045071_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258006r1045071_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258006r1045071_rule
     version: 1
     description: RHEL 9 SSH daemon must not allow known hosts authentication.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25800601:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25800601
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config.d
-        - attributes:
-            datatype: string
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^.+\.conf$
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)IgnoreUserKnownHosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:25800600:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25800600
@@ -416,22 +398,40 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-    derive: {}
-    predicates:
-      oval:mil.disa.stig.ind:ste:25798801:
-        source_state_id: oval:mil.disa.stig.ind:ste:25798801
-        source_type: textfilecontent54_state
+      oval:mil.disa.stig.ind:obj:25800601:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25800601
+        source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config.d
         - attributes:
             datatype: string
-            operation: equals
+            operation: pattern match
           kind: element
-          name: subexpression
+          name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config.d/*.conf
-        comment: null
+          value: ^.+\.conf$
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)IgnoreUserKnownHosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+    derive: {}
+    predicates:
       oval:mil.disa.stig.ind:ste:20000016:
         source_state_id: oval:mil.disa.stig.ind:ste:20000016
         source_type: textfilecontent54_state
@@ -445,6 +445,20 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^(yes|"yes")$
+        comment: null
+      oval:mil.disa.stig.ind:ste:25798801:
+        source_state_id: oval:mil.disa.stig.ind:ste:25798801
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config.d/*.conf
         comment: null
     evaluate:
       tests:
@@ -461,19 +475,6 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:20000016
           source_other: []
-        oval:mil.disa.stig.ind:tst:25800601:
-          source_test_id: oval:mil.disa.stig.ind:tst:25800601
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/ssh/sshd_config.d:IgnoreUserKnownHosts == yes
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25800601
-          predicates:
-          - oval:mil.disa.stig.ind:ste:20000016
-          source_other: []
         oval:mil.disa.stig.ind:tst:25798801:
           source_test_id: oval:mil.disa.stig.ind:tst:25798801
           source_type: textfilecontent54_test
@@ -486,6 +487,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:25798800
           predicates:
           - oval:mil.disa.stig.ind:ste:25798801
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25800601:
+          source_test_id: oval:mil.disa.stig.ind:tst:25800601
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: /etc/ssh/sshd_config.d:IgnoreUserKnownHosts == yes
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25800601
+          predicates:
+          - oval:mil.disa.stig.ind:ste:20000016
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:258006:
@@ -568,16 +582,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258006
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258006
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258006
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -674,11 +694,149 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258006r1045071_rule
-      semantic_ir_sha256: 9ac75f0f1731ad4496bb179690a93ce377da742b0ef12ce3b4e843687866f598
+      semantic_ir_sha256: 934468b1cd61057ec7c14f7a3faffa6adb0ff08cb3ed586aca78a4ad4a456c1f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 650f98b8b692587d438d6eeba4ab90add968245c3587bcee548d6493f4457bac
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258006r1045071_rule
+    version: 1
+    description: RHEL 9 SSH daemon must not allow known hosts authentication.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:44101
+      exports: []
+      inline_content: 'Verify the SSH daemon does not allow known hosts authentication with the following command: $ sudo
+        /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*ignoreuserknownhosts''
+        IgnoreUserKnownHosts yes If the value is returned as "no", the returned line is commented out, or no output is returned,
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:44101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the SSH daemon does not allow known hosts authentication with the following command:
+
+
+            $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep
+            -iH ''^\s*ignoreuserknownhosts''
+
+
+            IgnoreUserKnownHosts yes
+
+
+            If the value is returned as "no", the returned line is commented out, or no output is returned, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258006
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258006
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258006
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258006
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:44101
+        exports: []
+        inline_content: 'Verify the SSH daemon does not allow known hosts authentication with the following command: $ sudo
+          /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*ignoreuserknownhosts''
+          IgnoreUserKnownHosts yes If the value is returned as "no", the returned line is commented out, or no output is returned,
+          this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:44101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the SSH daemon does not allow known hosts authentication with the following command:
+
+
+              $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+              grep -iH ''^\s*ignoreuserknownhosts''
+
+
+              IgnoreUserKnownHosts yes
+
+
+              If the value is returned as "no", the returned line is commented out, or no output is returned, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the SSH daemon does not allow known hosts authentication with the following command: $ sudo /usr/sbin/sshd
+      -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*ignoreuserknownhosts''
+      IgnoreUserKnownHosts yes If the value is returned as "no", the returned line is commented out, or no output is returned,
+      this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258006r1045071_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: ef95ecaa0dd7b6a33c3dec3660b45773ea959f9c02f588005fc9ed487904a167
+  migration: *id002

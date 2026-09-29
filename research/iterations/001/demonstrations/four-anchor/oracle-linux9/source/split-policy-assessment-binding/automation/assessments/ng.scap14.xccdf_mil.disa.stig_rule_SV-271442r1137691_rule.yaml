@@ -7,42 +7,6 @@ assessment:
   description: OL 9 must require authentication to access single-user mode.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25812900:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25812900
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /usr/lib/systemd/system
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: rescue.service
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*ExecStart=-\/usr\/lib\/systemd\/systemd-sulogin-shell\srescue$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25812901:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25812901
@@ -79,22 +43,46 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:25812900:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25812900
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /usr/lib/systemd/system
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: rescue.service
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*ExecStart=-\/usr\/lib\/systemd\/systemd-sulogin-shell\srescue$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25812900:
-        source_test_id: oval:mil.disa.stig.ind:tst:25812900
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25812900
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:25812901:
         source_test_id: oval:mil.disa.stig.ind:tst:25812901
         source_type: textfilecontent54_test
@@ -107,7 +95,47 @@ assessment:
         - oval:mil.disa.stig.ind:obj:25812901
         predicates: []
         source_other: []
+      oval:mil.disa.stig.ind:tst:25812900:
+        source_test_id: oval:mil.disa.stig.ind:tst:25812900
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25812900
+        predicates: []
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:258129:
+        source_definition_id: oval:mil.disa.stig.defs:def:258129
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25812900
+          - comment: /etc/systemd/system/rescue.service.d/*.conf:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell
+              rescue
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25812901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system operating systems must require authentication upon booting into rescue mode.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271442:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271442
         class: compliance
@@ -149,34 +177,6 @@ assessment:
               \ password."
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:258129:
-        source_definition_id: oval:mil.disa.stig.defs:def:258129
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /usr/lib/systemd/system/rescue.service:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell rescue
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25812900
-          - comment: /etc/systemd/system/rescue.service.d/*.conf:ExecStart is set to -/usr/lib/systemd/systemd-sulogin-shell
-              rescue
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25812901
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system operating systems must require authentication upon booting into rescue mode.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.ol9os:def:271442
@@ -188,16 +188,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271442
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271442
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271442
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -289,6 +295,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271442r1137691_rule
-    semantic_ir_sha256: c7ac9bc8d72c0c8e837ae2cf0328b891cfd3a82fcc7e88a0a8e4a0b3a74178a1
+    semantic_ir_sha256: 06b3672c8ba3f402dde677a64dcbdade7bc46cf7df2422f9789167a65a82ab33
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 923c0aeb3726b9da0454768c232301b0ee0b7540c4b60718cae32c66cec8da7f

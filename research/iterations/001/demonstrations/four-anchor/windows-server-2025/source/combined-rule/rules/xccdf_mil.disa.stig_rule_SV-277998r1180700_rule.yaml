@@ -562,7 +562,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-277998r1180700_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-277998r1180700_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-277998r1180700_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-277998r1180700_rule
     version: 1
     description: Windows Server 2025 permissions for the system drive root directory (usually C:\) must conform to minimum
@@ -661,6 +675,20 @@ rule:
           variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27799801
           variable_type: constant_variable
     predicates:
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: equals
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '0'
+        comment: Value must be equal to 0
       oval:navy.navwar.niwcatlantic.scc.windows:ste:27799802:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27799802
         source_type: shellcommand_state
@@ -686,20 +714,6 @@ rule:
           name: stderr_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         comment: Permissions must equal expected output
-      oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: equals
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '0'
-        comment: Value must be equal to 0
     evaluate:
       tests:
         oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802:
@@ -769,16 +783,22 @@ rule:
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:277998
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:277998
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:277998
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
@@ -950,11 +970,309 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-277998r1180700_rule
-      semantic_ir_sha256: e9438b549e3134304fbdc590e16ed67f98d3b716210137f90f9ea9017df56e3d
+      semantic_ir_sha256: ea1f98ddf913e4343fe6e5bc2d623a1d426c9b8a002e8c6693d0d689dbaddf52
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c7b164584f70f2ca62748decda3d5984d2ef94baf976258923c5cd5bdf713665
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-277998r1180700_rule
+    version: 1
+    description: Windows Server 2025 permissions for the system drive root directory (usually C:\) must conform to minimum
+      requirements.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:2901
+      exports: []
+      inline_content: 'The default permissions are adequate when the Security Option "Network access: Let Everyone permissions
+        apply to anonymous users" is set to "Disabled" (WN25-SO-000240). Review the permissions for the system drive''s root
+        directory (usually C:\). Nonprivileged groups such as Users or Authenticated Users must not have greater than "Read
+        & execute" permissions except where noted as defaults. Individual accounts must not be used to assign permissions.
+        If permissions are not as restrictive as the default permissions listed below, this is a finding. Viewing in File
+        Explorer: View the Properties of the system drive''s root directory. Select the "Security" tab, and then click "Advanced".
+        Default permissions: C:\ Type - "Allow" for all Inherited from - "None" for all Principal - Access - Applies to SYSTEM
+        - Full control - This folder, subfolders, and files Administrators - Full control - This folder, subfolders, and files
+        Users - Read & execute - This folder, subfolders, and files Users - Create folders/append data - This folder and subfolders
+        Users - Create files/write data - Subfolders only CREATOR OWNER - Full Control - Subfolders and files only Alternately,
+        use icacls: Open "command prompt (Admin)". Enter "icacls" followed by the directory: "icacls c:\" The following results
+        must be displayed: c:\ NT AUTHORITY\SYSTEM:(OI)(CI)(F) BUILTIN\Administrators:(OI)(CI)(F) BUILTIN\Users:(OI)(CI)(RX)
+        BUILTIN\Users:(CI)(AD) BUILTIN\Users:(CI)(IO)(WD) CREATOR OWNER:(OI)(CI)(IO)(F) Successfully processed 1 files; Failed
+        processing 0 files'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:2901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'The default permissions are adequate when the Security Option "Network access: Let Everyone permissions apply
+            to anonymous users" is set to "Disabled" (WN25-SO-000240).
+
+
+            Review the permissions for the system drive''s root directory (usually C:\). Nonprivileged groups such as Users
+            or Authenticated Users must not have greater than "Read & execute" permissions except where noted as defaults.
+            Individual accounts must not be used to assign permissions.
+
+
+            If permissions are not as restrictive as the default permissions listed below, this is a finding.
+
+
+            Viewing in File Explorer:
+
+
+            View the Properties of the system drive''s root directory.
+
+
+            Select the "Security" tab, and then click "Advanced".
+
+
+            Default permissions:
+
+            C:\
+
+            Type - "Allow" for all
+
+            Inherited from - "None" for all
+
+
+            Principal - Access - Applies to
+
+
+            SYSTEM - Full control - This folder, subfolders, and files
+
+            Administrators - Full control - This folder, subfolders, and files
+
+            Users - Read & execute - This folder, subfolders, and files
+
+            Users - Create folders/append data - This folder and subfolders
+
+            Users - Create files/write data - Subfolders only
+
+            CREATOR OWNER - Full Control - Subfolders and files only
+
+
+            Alternately, use icacls:
+
+
+            Open "command prompt (Admin)".
+
+
+            Enter "icacls" followed by the directory:
+
+
+            "icacls c:\"
+
+
+            The following results must be displayed:
+
+
+            c:\
+
+            NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+
+            BUILTIN\Administrators:(OI)(CI)(F)
+
+            BUILTIN\Users:(OI)(CI)(RX)
+
+            BUILTIN\Users:(CI)(AD)
+
+            BUILTIN\Users:(CI)(IO)(WD)
+
+            CREATOR OWNER:(OI)(CI)(IO)(F)
+
+            Successfully processed 1 files; Failed processing 0 files'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:277998
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:277998
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:277998
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:277998
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:2901
+        exports: []
+        inline_content: 'The default permissions are adequate when the Security Option "Network access: Let Everyone permissions
+          apply to anonymous users" is set to "Disabled" (WN25-SO-000240). Review the permissions for the system drive''s
+          root directory (usually C:\). Nonprivileged groups such as Users or Authenticated Users must not have greater than
+          "Read & execute" permissions except where noted as defaults. Individual accounts must not be used to assign permissions.
+          If permissions are not as restrictive as the default permissions listed below, this is a finding. Viewing in File
+          Explorer: View the Properties of the system drive''s root directory. Select the "Security" tab, and then click "Advanced".
+          Default permissions: C:\ Type - "Allow" for all Inherited from - "None" for all Principal - Access - Applies to
+          SYSTEM - Full control - This folder, subfolders, and files Administrators - Full control - This folder, subfolders,
+          and files Users - Read & execute - This folder, subfolders, and files Users - Create folders/append data - This
+          folder and subfolders Users - Create files/write data - Subfolders only CREATOR OWNER - Full Control - Subfolders
+          and files only Alternately, use icacls: Open "command prompt (Admin)". Enter "icacls" followed by the directory:
+          "icacls c:\" The following results must be displayed: c:\ NT AUTHORITY\SYSTEM:(OI)(CI)(F) BUILTIN\Administrators:(OI)(CI)(F)
+          BUILTIN\Users:(OI)(CI)(RX) BUILTIN\Users:(CI)(AD) BUILTIN\Users:(CI)(IO)(WD) CREATOR OWNER:(OI)(CI)(IO)(F) Successfully
+          processed 1 files; Failed processing 0 files'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:2901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'The default permissions are adequate when the Security Option "Network access: Let Everyone permissions
+              apply to anonymous users" is set to "Disabled" (WN25-SO-000240).
+
+
+              Review the permissions for the system drive''s root directory (usually C:\). Nonprivileged groups such as Users
+              or Authenticated Users must not have greater than "Read & execute" permissions except where noted as defaults.
+              Individual accounts must not be used to assign permissions.
+
+
+              If permissions are not as restrictive as the default permissions listed below, this is a finding.
+
+
+              Viewing in File Explorer:
+
+
+              View the Properties of the system drive''s root directory.
+
+
+              Select the "Security" tab, and then click "Advanced".
+
+
+              Default permissions:
+
+              C:\
+
+              Type - "Allow" for all
+
+              Inherited from - "None" for all
+
+
+              Principal - Access - Applies to
+
+
+              SYSTEM - Full control - This folder, subfolders, and files
+
+              Administrators - Full control - This folder, subfolders, and files
+
+              Users - Read & execute - This folder, subfolders, and files
+
+              Users - Create folders/append data - This folder and subfolders
+
+              Users - Create files/write data - Subfolders only
+
+              CREATOR OWNER - Full Control - Subfolders and files only
+
+
+              Alternately, use icacls:
+
+
+              Open "command prompt (Admin)".
+
+
+              Enter "icacls" followed by the directory:
+
+
+              "icacls c:\"
+
+
+              The following results must be displayed:
+
+
+              c:\
+
+              NT AUTHORITY\SYSTEM:(OI)(CI)(F)
+
+              BUILTIN\Administrators:(OI)(CI)(F)
+
+              BUILTIN\Users:(OI)(CI)(RX)
+
+              BUILTIN\Users:(CI)(AD)
+
+              BUILTIN\Users:(CI)(IO)(WD)
+
+              CREATOR OWNER:(OI)(CI)(IO)(F)
+
+              Successfully processed 1 files; Failed processing 0 files'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'The default permissions are adequate when the Security Option "Network access: Let Everyone permissions apply
+      to anonymous users" is set to "Disabled" (WN25-SO-000240). Review the permissions for the system drive''s root directory
+      (usually C:\). Nonprivileged groups such as Users or Authenticated Users must not have greater than "Read & execute"
+      permissions except where noted as defaults. Individual accounts must not be used to assign permissions. If permissions
+      are not as restrictive as the default permissions listed below, this is a finding. Viewing in File Explorer: View the
+      Properties of the system drive''s root directory. Select the "Security" tab, and then click "Advanced". Default permissions:
+      C:\ Type - "Allow" for all Inherited from - "None" for all Principal - Access - Applies to SYSTEM - Full control - This
+      folder, subfolders, and files Administrators - Full control - This folder, subfolders, and files Users - Read & execute
+      - This folder, subfolders, and files Users - Create folders/append data - This folder and subfolders Users - Create
+      files/write data - Subfolders only CREATOR OWNER - Full Control - Subfolders and files only Alternately, use icacls:
+      Open "command prompt (Admin)". Enter "icacls" followed by the directory: "icacls c:\" The following results must be
+      displayed: c:\ NT AUTHORITY\SYSTEM:(OI)(CI)(F) BUILTIN\Administrators:(OI)(CI)(F) BUILTIN\Users:(OI)(CI)(RX) BUILTIN\Users:(CI)(AD)
+      BUILTIN\Users:(CI)(IO)(WD) CREATOR OWNER:(OI)(CI)(IO)(F) Successfully processed 1 files; Failed processing 0 files'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-277998r1180700_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 16476f63fcd33e4b979df61e4763fb60202ebc4e5783a47e836dbe0a828268b6
+  migration: *id002

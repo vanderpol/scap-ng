@@ -276,7 +276,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257898r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257898r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257898r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257898r991589_rule
     version: 1
     description: RHEL 9 /etc/group file must be owned by root.
@@ -325,6 +339,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000005
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:257898:
+          source_definition_id: oval:mil.disa.stig.defs:def:257898
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /etc/group file is owned by root
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:25789800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system /etc/group file must be owned by root.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257898:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257898
           class: compliance
@@ -358,29 +395,6 @@ rule:
                 of this file is important for system security.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:257898:
-          source_definition_id: oval:mil.disa.stig.defs:def:257898
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /etc/group file is owned by root
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:25789800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system /etc/group file must be owned by root.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257898
@@ -392,16 +406,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257898
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257898
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257898
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -487,11 +507,125 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257898r991589_rule
-      semantic_ir_sha256: 8227d6abb99d55f45ec8da8915c52d8199982053108536289053390c0f010c18
+      semantic_ir_sha256: 580616daa27d473d3f714d3c75c5ce5748552e18972ab4f671d964175d1bdfe1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 0e1535b10a9d1fb6e654456733c888d42cd7eccb4c2786db607a44a1abf0151f
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257898r991589_rule
+    version: 1
+    description: RHEL 9 /etc/group file must be owned by root.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:23901
+      exports: []
+      inline_content: 'Verify the ownership of the "/etc/group" file with the following command: $ sudo stat -c "%U %n" /etc/group
+        root /etc/group If "/etc/group" file does not have an owner of "root", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:23901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify the ownership of the \"/etc/group\" file with the following command:\n\n$ sudo stat -c \"%U %n\" /etc/group\
+            \ \n\nroot /etc/group \n\nIf \"/etc/group\" file does not have an owner of \"root\", this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257898
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257898
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257898
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257898
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:23901
+        exports: []
+        inline_content: 'Verify the ownership of the "/etc/group" file with the following command: $ sudo stat -c "%U %n"
+          /etc/group root /etc/group If "/etc/group" file does not have an owner of "root", this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:23901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify the ownership of the \"/etc/group\" file with the following command:\n\n$ sudo stat -c \"%U %n\"\
+              \ /etc/group \n\nroot /etc/group \n\nIf \"/etc/group\" file does not have an owner of \"root\", this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the ownership of the "/etc/group" file with the following command: $ sudo stat -c "%U %n" /etc/group
+      root /etc/group If "/etc/group" file does not have an owner of "root", this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257898r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 02711805ec2d2f50d41ca3080fe89022bf54be0c0ee716d4b56a68c923441e61
+  migration: *id002

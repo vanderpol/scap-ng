@@ -236,7 +236,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278002r1181785_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278002r1181785_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-278002r1181785_rule
     version: 1
     description: Windows Server 2025 nonadministrative accounts or groups must only have print permissions on printer shares.
@@ -363,10 +373,13 @@ rule:
       the "Security" tab. If any standard user accounts or groups have permissions other than "Print", this is a finding.
       The default is for the "Everyone" group to be given Print permission. "All APPLICATION PACKAGES" and "CREATOR OWNER"
       are not standard user accounts.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-278002r1181785_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: d3116f0396855419a6589ae06598fa4d815c9124544b500f510f63d59513172d
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

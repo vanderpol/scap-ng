@@ -357,7 +357,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
     version: 1
     description: RHEL 9 must prevent a user from overriding the banner-message-enable setting for the graphical user interface.
@@ -497,18 +511,6 @@ rule:
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:25801300:
-          source_test_id: oval:mil.disa.stig.ind:tst:25801300
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25801300
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:25802600:
           source_test_id: oval:mil.disa.stig.ind:tst:25802600
           source_type: textfilecontent54_test
@@ -519,6 +521,18 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:25802600
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25801300:
+          source_test_id: oval:mil.disa.stig.ind:tst:25801300
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25801300
           predicates: []
           source_other: []
       definitions:
@@ -603,16 +617,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258013
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258013
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258013
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -705,11 +725,142 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
-      semantic_ir_sha256: 3824e6ee49b8a9c794ab90c25187fe0e8a7959c714a88d36731a8caeb6594494
+      semantic_ir_sha256: d5423d2645a1e94b2c9d26d7984ecc47f76a05af573dfa2f2c5dc6c37deae7e1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 014ee81b0748856594cdebe2f80042c8c5e1f6e0685548f7fb874bd9814355e9
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
+    version: 1
+    description: RHEL 9 must prevent a user from overriding the banner-message-enable setting for the graphical user interface.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:45301
+      exports: []
+      inline_content: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop
+        environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+        Verify RHEL 9 prevents a user from overriding settings for graphical user interfaces. Determine if the org.gnome.login-screen
+        banner-message-enable key is writable with the following command: $ gsettings writable org.gnome.login-screen banner-message-enable
+        false If "banner-message-enable" is writable or the result is "true", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:45301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop\
+            \ environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\
+            \nVerify RHEL 9 prevents a user from overriding settings for graphical user interfaces. \n\nDetermine if the org.gnome.login-screen\
+            \ banner-message-enable key is writable with the following command:\n\t\n$ gsettings writable org.gnome.login-screen\
+            \ banner-message-enable\n\t \nfalse\n\t \nIf \"banner-message-enable\" is writable or the result is \"true\",\
+            \ this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258013
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258013
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258013
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258013
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:45301
+        exports: []
+        inline_content: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME
+          desktop environment. If the system does not have any graphical user interface installed, this requirement is Not
+          Applicable. Verify RHEL 9 prevents a user from overriding settings for graphical user interfaces. Determine if the
+          org.gnome.login-screen banner-message-enable key is writable with the following command: $ gsettings writable org.gnome.login-screen
+          banner-message-enable false If "banner-message-enable" is writable or the result is "true", this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:45301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop\
+              \ environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\
+              \nVerify RHEL 9 prevents a user from overriding settings for graphical user interfaces. \n\nDetermine if the\
+              \ org.gnome.login-screen banner-message-enable key is writable with the following command:\n\t\n$ gsettings\
+              \ writable org.gnome.login-screen banner-message-enable\n\t \nfalse\n\t \nIf \"banner-message-enable\" is writable\
+              \ or the result is \"true\", this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop environment.
+      If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify RHEL
+      9 prevents a user from overriding settings for graphical user interfaces. Determine if the org.gnome.login-screen banner-message-enable
+      key is writable with the following command: $ gsettings writable org.gnome.login-screen banner-message-enable false
+      If "banner-message-enable" is writable or the result is "true", this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: eba1119571310e4dc7fb4747a55ac8a6b190c73f9992a1c0b3a27fb4ecbef8a4
+  migration: *id002

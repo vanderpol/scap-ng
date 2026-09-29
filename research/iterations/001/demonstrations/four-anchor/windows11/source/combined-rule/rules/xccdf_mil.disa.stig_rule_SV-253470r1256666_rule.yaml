@@ -323,36 +323,27 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253470r1256666_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253470r1256666_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253470r1256666_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253470r1256666_rule
     version: 1
     description: Windows 11 must use multifactor authentication for local and network access to privileged and nonprivileged
       accounts.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:25347000:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25347000
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '5'
-        comment: null
-        query:
-        - kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\\Microsoft\\Cryptography\\Calais\\Readers\\\S+
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       oval:mil.disa.stig.win:obj:25347001:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25347001
@@ -376,22 +367,33 @@ rule:
           kind: element
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      oval:mil.disa.stig.win:obj:25347000:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25347000
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '5'
+        comment: null
+        query:
+        - kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\\Microsoft\\Cryptography\\Calais\\Readers\\\S+
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
     derive: {}
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25347001:
-          source_test_id: oval:mil.disa.stig.win:tst:25347001
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: HKLM\SOFTWARE\Microsoft\Cryptography\Calais\SmartCards exists and contains at least one key.
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25347001
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.win:tst:25347000:
           source_test_id: oval:mil.disa.stig.win:tst:25347000
           source_type: registry_test
@@ -404,7 +406,47 @@ rule:
           - oval:mil.disa.stig.win:obj:25347000
           predicates: []
           source_other: []
+        oval:mil.disa.stig.win:tst:25347001:
+          source_test_id: oval:mil.disa.stig.win:tst:25347001
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: HKLM\SOFTWARE\Microsoft\Cryptography\Calais\SmartCards exists and contains at least one key.
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25347001
+          predicates: []
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253470:
+          source_definition_id: oval:mil.disa.stig.defs:def:253470
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25347000
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25347001
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows must use multifactor authentication for local and network access to privileged and non-privileged
+                accounts.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253470:
           source_definition_id: oval:mil.disa.stig.windows11:def:253470
           class: compliance
@@ -449,34 +491,6 @@ rule:
                 \ SRG-OS-000107-GPOS-00054, SRG-OS-000108-GPOS-00055"
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253470:
-          source_definition_id: oval:mil.disa.stig.defs:def:253470
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25347000
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25347001
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows must use multifactor authentication for local and network access to privileged and non-privileged
-                accounts.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253470
@@ -488,16 +502,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253470
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253470
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253470
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -590,11 +610,140 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253470r1256666_rule
-      semantic_ir_sha256: ffefa99a64c323d8344ca0e614fbd102cbd998ca486d273048008de16345218b
+      semantic_ir_sha256: 303976de9db88a99f4b6a1b2022b03c3d31c9a6ab4776436e01386bc1e775e80
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 9ec3580fca12686f60cc56b27dea77e6bcc2fadb778118af232ba3cbbf5d9630
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253470r1256666_rule
+    version: 1
+    description: Windows 11 must use multifactor authentication for local and network access to privileged and nonprivileged
+      accounts.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:41701
+      exports: []
+      inline_content: If the system is not a member of a domain, this is Not Applicable. If all of the following settings
+        exist and are populated, this is not a finding. \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\Readers \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\SmartCards
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:41701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'If the system is not a member of a domain, this is Not Applicable.
+
+
+            If all of the following settings exist and are populated, this is not a finding.
+
+
+            \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\Readers
+
+            \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\SmartCards'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253470
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253470
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253470
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253470
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:41701
+        exports: []
+        inline_content: If the system is not a member of a domain, this is Not Applicable. If all of the following settings
+          exist and are populated, this is not a finding. \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\Readers \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\SmartCards
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:41701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'If the system is not a member of a domain, this is Not Applicable.
+
+
+              If all of the following settings exist and are populated, this is not a finding.
+
+
+              \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\Readers
+
+              \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\SmartCards'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: If the system is not a member of a domain, this is Not Applicable. If all of the following settings exist and
+      are populated, this is not a finding. \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\Readers \HKLM\SOFTWARE\Microsoft\Cryptography\Calais\SmartCards
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253470r1256666_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 0f08a6cad95100257c510441d09ae75e4e82c81a517822f1b352ce297ecdf3ef
+  migration: *id002

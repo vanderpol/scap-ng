@@ -385,12 +385,51 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271556r1092532_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271556r1092532_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271556r1092532_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271556r1092532_rule
     version: 1
     description: OL 9 must audit all uses of the chown, fchown, fchownat, and lchown system calls.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23045507:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23045507
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 64-bit fchown syscall
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fchown\s+|(\s+|,)fchown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:23045504:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23045504
@@ -409,56 +448,6 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fchownat\s+|(\s+|,)fchownat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:23045502:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045502
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 32-bit lchown syscall
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+lchown\s+|(\s+|,)lchown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:23045505:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045505
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 64-bit fchownat syscall
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fchownat\s+|(\s+|,)fchownat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -491,13 +480,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23045506:
+      oval:mil.disa.stig.ind:obj:23045501:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045506
+        source_object_id: oval:mil.disa.stig.ind:obj:23045501
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: 32-bit fchown syscall
+        comment: 64-bit chown syscall
         query:
         - kind: element
           name: filepath
@@ -508,7 +497,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fchown\s+|(\s+|,)fchown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+chown\s+|(\s+|,)chown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -516,13 +505,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23045507:
+      oval:mil.disa.stig.ind:obj:23045502:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045507
+        source_object_id: oval:mil.disa.stig.ind:obj:23045502
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: 64-bit fchown syscall
+        comment: 32-bit lchown syscall
         query:
         - kind: element
           name: filepath
@@ -533,7 +522,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fchown\s+|(\s+|,)fchown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+lchown\s+|(\s+|,)lchown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -566,13 +555,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23045501:
+      oval:mil.disa.stig.ind:obj:23045505:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045501
+        source_object_id: oval:mil.disa.stig.ind:obj:23045505
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: 64-bit chown syscall
+        comment: 64-bit fchownat syscall
         query:
         - kind: element
           name: filepath
@@ -583,7 +572,32 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+chown\s+|(\s+|,)chown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fchownat\s+|(\s+|,)fchownat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23045506:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23045506
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 32-bit fchown syscall
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fchown\s+|(\s+|,)fchown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -595,18 +609,6 @@ rule:
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23045506:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045506
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 32-bit invocations of fchown syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045506
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:23045502:
           source_test_id: oval:mil.disa.stig.ind:tst:23045502
           source_type: textfilecontent54_test
@@ -619,16 +621,28 @@ rule:
           - oval:mil.disa.stig.ind:obj:23045502
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:23045503:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045503
+        oval:mil.disa.stig.ind:tst:23045506:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045506
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 64-bit invocations of lchown syscall
+          comment: Audit 32-bit invocations of fchown syscall
           check: all
           check_existence: all_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:23045503
+          - oval:mil.disa.stig.ind:obj:23045506
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23045507:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045507
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 64-bit invocations of fchown syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045507
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:23045505:
@@ -641,18 +655,6 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:23045505
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23045504:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045504
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 32-bit invocations of fchownat syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045504
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:23045500:
@@ -679,63 +681,31 @@ rule:
           - oval:mil.disa.stig.ind:obj:23045501
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:23045507:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045507
+        oval:mil.disa.stig.ind:tst:23045504:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045504
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 64-bit invocations of fchown syscall
+          comment: Audit 32-bit invocations of fchownat syscall
           check: all
           check_existence: all_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:23045507
+          - oval:mil.disa.stig.ind:obj:23045504
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23045503:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045503
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 64-bit invocations of lchown syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045503
           predicates: []
           source_other: []
       definitions:
-        oval:mil.disa.stig.ol9os:def:271556:
-          source_definition_id: oval:mil.disa.stig.ol9os:def:271556
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:230455
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: OL09-00-000645 - OL 9 must audit all uses of the chown, fchown, fchownat, and lchown system calls.
-            - attributes:
-                family: unix
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Oracle Linux 9
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: "Without generating audit records that are specific to the security and mission needs of the organization,\
-                \ it would be difficult to establish, correlate, and investigate the events relating to an incident or identify\
-                \ those responsible for one.\n\n\tAudit records can be generated from various components within the information\
-                \ system (e.g., module or policy filter).\n\n\tWhen a user logs on, the auid is set to the uid of the account\
-                \ being authenticated. Daemons are not user sessions and have the loginuid set to -1. The auid representation\
-                \ is an unsigned 32-bit integer, which equals 4294967295. The audit system interprets -1, 4294967295, and\
-                \ \"unset\" in the same way.\n\n\tThe system call rules are loaded into a matching engine that intercepts\
-                \ each system call made by all programs on the system. Therefore, it is very important to use system call\
-                \ rules only when absolutely necessary since these affect performance. The more rules, the bigger the performance\
-                \ hit. The performance can be helped, however, by combining system calls into one rule whenever possible.\n\
-                \n\tSatisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172,\
-                \ SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000064-GPOS-00033, SRG-OS-000466-GPOS-00210,\
-                \ SRG-OS-000458-GPOS-00203, SRG-OS-000474-GPOS-00219"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:230455:
           source_definition_id: oval:mil.disa.stig.defs:def:230455
           class: compliance
@@ -788,6 +758,50 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.ol9os:def:271556:
+          source_definition_id: oval:mil.disa.stig.ol9os:def:271556
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:230455
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: OL09-00-000645 - OL 9 must audit all uses of the chown, fchown, fchownat, and lchown system calls.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Oracle Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: "Without generating audit records that are specific to the security and mission needs of the organization,\
+                \ it would be difficult to establish, correlate, and investigate the events relating to an incident or identify\
+                \ those responsible for one.\n\n\tAudit records can be generated from various components within the information\
+                \ system (e.g., module or policy filter).\n\n\tWhen a user logs on, the auid is set to the uid of the account\
+                \ being authenticated. Daemons are not user sessions and have the loginuid set to -1. The auid representation\
+                \ is an unsigned 32-bit integer, which equals 4294967295. The audit system interprets -1, 4294967295, and\
+                \ \"unset\" in the same way.\n\n\tThe system call rules are loaded into a matching engine that intercepts\
+                \ each system call made by all programs on the system. Therefore, it is very important to use system call\
+                \ rules only when absolutely necessary since these affect performance. The more rules, the bigger the performance\
+                \ hit. The performance can be helped, however, by combining system calls into one rule whenever possible.\n\
+                \n\tSatisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172,\
+                \ SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000064-GPOS-00033, SRG-OS-000466-GPOS-00210,\
+                \ SRG-OS-000458-GPOS-00203, SRG-OS-000474-GPOS-00219"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271556
@@ -799,16 +813,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271556
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271556
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271556
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -908,11 +928,156 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271556r1092532_rule
-      semantic_ir_sha256: 8fe2737fa7946a326caea22d98ff4482ea8a5185cdaf04e4098768c8e7a172c8
+      semantic_ir_sha256: 49ab7f617930761433c22d268c9bd99fe3100f57095e389dce16479178412b43
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 7140a76bbb7c4c87f5d17c8a1cc859fe27247b928a6d5ef2792750a13149c4f8
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271556r1092532_rule
+    version: 1
+    description: OL 9 must audit all uses of the chown, fchown, fchownat, and lchown system calls.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:24101
+      exports: []
+      inline_content: 'Verify that OL 9 is configured to audit the execution of the chown, fchown, fchownat, and lchown system
+        calls with the following command: $ sudo auditctl -l | grep chown -a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown
+        -F auid>=1000 -F auid!=unset -k perm_mod -a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>=1000
+        -F auid!=unset -k perm_mod If both the "b32" and "b64" audit rules are not defined for the chown, fchown, fchownat,
+        and lchown system calls, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:24101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 is configured to audit the execution of the chown, fchown, fchownat, and lchown system calls
+            with the following command:
+
+
+            $ sudo auditctl -l | grep chown
+
+            -a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod
+
+            -a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod
+
+
+            If both the "b32" and "b64" audit rules are not defined for the chown, fchown, fchownat, and lchown system calls,
+            this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271556
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271556
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271556
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271556
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:24101
+        exports: []
+        inline_content: 'Verify that OL 9 is configured to audit the execution of the chown, fchown, fchownat, and lchown
+          system calls with the following command: $ sudo auditctl -l | grep chown -a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown
+          -F auid>=1000 -F auid!=unset -k perm_mod -a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>=1000
+          -F auid!=unset -k perm_mod If both the "b32" and "b64" audit rules are not defined for the chown, fchown, fchownat,
+          and lchown system calls, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:24101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 is configured to audit the execution of the chown, fchown, fchownat, and lchown system
+              calls with the following command:
+
+
+              $ sudo auditctl -l | grep chown
+
+              -a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod
+
+              -a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>=1000 -F auid!=unset -k perm_mod
+
+
+              If both the "b32" and "b64" audit rules are not defined for the chown, fchown, fchownat, and lchown system calls,
+              this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 is configured to audit the execution of the chown, fchown, fchownat, and lchown system calls
+      with the following command: $ sudo auditctl -l | grep chown -a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown
+      -F auid>=1000 -F auid!=unset -k perm_mod -a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>=1000 -F
+      auid!=unset -k perm_mod If both the "b32" and "b64" audit rules are not defined for the chown, fchown, fchownat, and
+      lchown system calls, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271556r1092532_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 25d103b18b48c8f502834e28c5d6cb60988380dc30a85e8972c7a4f7762503ca
+  migration: *id002

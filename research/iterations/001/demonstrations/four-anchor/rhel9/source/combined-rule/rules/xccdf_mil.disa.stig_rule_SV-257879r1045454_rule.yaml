@@ -362,7 +362,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257879r1045454_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257879r1045454_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-257879r1045454_rule
     version: 1
     description: RHEL 9 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or
@@ -554,10 +564,13 @@ rule:
       (other than /boot or /boot/efi) whose block device trees do not have a crypt block device of type LUKS, ask the administrator
       to indicate how persistent filesystems are encrypted. If there is no evidence that persistent filesystems are encrypted,
       this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-257879r1045454_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 68ace6f15766c5941b73a8289de428ebe98f80b681bb04e0d4750f001caa2842
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

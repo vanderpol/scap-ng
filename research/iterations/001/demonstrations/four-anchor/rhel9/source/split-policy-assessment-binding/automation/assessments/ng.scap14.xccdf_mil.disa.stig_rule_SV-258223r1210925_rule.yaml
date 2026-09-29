@@ -8,31 +8,6 @@ assessment:
     that affect /etc/shadow.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:28116000:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:28116000
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/audit/audit.rules
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32?\s+-F\s+path=/etc/shadow\s+-F\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:28116001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:28116001
@@ -51,6 +26,31 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64?\s+-F\s+path=/etc/shadow\s+-F\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:28116000:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:28116000
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/audit.rules
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32?\s+-F\s+path=/etc/shadow\s+-F\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -87,34 +87,6 @@ assessment:
         predicates: []
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:281160:
-        source_definition_id: oval:mil.disa.stig.defs:def:281160
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit 32-bit invocations of /etc/shadow
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:28116000
-          - comment: Audit 64-bit invocations of /etc/shadow
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:28116001
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must generate audit records for all account creations, modifications, disabling, and
-              termination events that affect /etc/shadow.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258223:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258223
         class: compliance
@@ -155,6 +127,34 @@ assessment:
               SRG-OS-000476-GPOS-00221'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:281160:
+        source_definition_id: oval:mil.disa.stig.defs:def:281160
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit 32-bit invocations of /etc/shadow
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:28116000
+          - comment: Audit 64-bit invocations of /etc/shadow
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:28116001
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must generate audit records for all account creations, modifications, disabling, and
+              termination events that affect /etc/shadow.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:258223
@@ -166,16 +166,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258223
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258223
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258223
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -270,6 +276,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258223r1210925_rule
-    semantic_ir_sha256: 0c7c39c319d8fb6b5df82c2a68a3a07f0bc734523dd38b63b5a3d3e773f68873
+    semantic_ir_sha256: 16e46cb6f9b70273d53442a351eecf27a7a6dfbacbc7ee776f0946c0c2848f43
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 53f8dc70ca103248a179b302f1787ea7cbbdb74af75daf1f123c55483c35d343

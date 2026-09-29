@@ -318,7 +318,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257852r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257852r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257852r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257852r991589_rule
     version: 1
     description: RHEL 9 must prevent code from being executed on file systems that contain user home directories.
@@ -369,29 +383,6 @@ rule:
           - oval:mil.disa.stig.linux:ste:20000000
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:257852:
-          source_definition_id: oval:mil.disa.stig.defs:def:257852
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /home has noexec option
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:25785200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent code from being executed on file systems that contain user home directories.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257852:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257852
           class: compliance
@@ -427,6 +418,29 @@ rule:
                 access.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:257852:
+          source_definition_id: oval:mil.disa.stig.defs:def:257852
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /home has noexec option
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:25785200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent code from being executed on file systems that contain user home directories.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257852
@@ -438,16 +452,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257852
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257852
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257852
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -548,11 +568,157 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257852r991589_rule
-      semantic_ir_sha256: 25a77a492d82e97d2e5ba20cd34bd574e828ca1adf1998eaf2edcd0105c25024
+      semantic_ir_sha256: 9a6fbf8c3f9e7d39731103db1bfef1a2fbbc180159ba1aee627f488aee363ebd
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: f6e423c751d5a93f98466a5fdc6925db0c2b1d86a08d26baa7e5b9b3fbfd2812
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257852r991589_rule
+    version: 1
+    description: RHEL 9 must prevent code from being executed on file systems that contain user home directories.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:14901
+      exports: []
+      inline_content: 'Verify "/home" is mounted with the "noexec" option with the following command: Note: If a separate
+        file system has not been created for the user home directories (user home directories are mounted under "/"), this
+        is automatically a finding, as the "noexec" option cannot be used on the "/" system. $ mount | grep /home tmpfs on
+        /home type xfs (rw,nodev,nosuid,noexec,seclabel) If the "/home" file system is mounted without the "noexec" option,
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:14901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify "/home" is mounted with the "noexec" option with the following command:
+
+
+            Note: If a separate file system has not been created for the user home directories (user home directories are
+            mounted under "/"), this is automatically a finding, as the "noexec" option cannot be used on the "/" system.
+
+
+            $ mount | grep /home
+
+
+            tmpfs on /home type xfs (rw,nodev,nosuid,noexec,seclabel)
+
+
+            If the "/home" file system is mounted without the "noexec" option, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257852
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257852
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257852
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257852
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:14901
+        exports: []
+        inline_content: 'Verify "/home" is mounted with the "noexec" option with the following command: Note: If a separate
+          file system has not been created for the user home directories (user home directories are mounted under "/"), this
+          is automatically a finding, as the "noexec" option cannot be used on the "/" system. $ mount | grep /home tmpfs
+          on /home type xfs (rw,nodev,nosuid,noexec,seclabel) If the "/home" file system is mounted without the "noexec" option,
+          this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:14901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify "/home" is mounted with the "noexec" option with the following command:
+
+
+              Note: If a separate file system has not been created for the user home directories (user home directories are
+              mounted under "/"), this is automatically a finding, as the "noexec" option cannot be used on the "/" system.
+
+
+              $ mount | grep /home
+
+
+              tmpfs on /home type xfs (rw,nodev,nosuid,noexec,seclabel)
+
+
+              If the "/home" file system is mounted without the "noexec" option, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify "/home" is mounted with the "noexec" option with the following command: Note: If a separate file system
+      has not been created for the user home directories (user home directories are mounted under "/"), this is automatically
+      a finding, as the "noexec" option cannot be used on the "/" system. $ mount | grep /home tmpfs on /home type xfs (rw,nodev,nosuid,noexec,seclabel)
+      If the "/home" file system is mounted without the "noexec" option, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257852r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: e4c6b94042a725ad6876c1bfeb013570fdde51b68808f1c0ef6d1c998a8aad65
+  migration: *id002

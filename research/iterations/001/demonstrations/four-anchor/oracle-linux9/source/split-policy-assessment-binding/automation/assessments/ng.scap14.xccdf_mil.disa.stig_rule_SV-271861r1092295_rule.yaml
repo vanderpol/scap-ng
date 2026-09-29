@@ -7,18 +7,6 @@ assessment:
   description: OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23031601:
-      capability: scapng.collect.independent.variable
-      source_object_id: oval:mil.disa.stig.ind:obj:23031601
-      source_type: variable_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: count of unique name servers
-      query:
-      - kind: element
-        name: var_ref
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: oval:mil.disa.stig.ind:var:23031600
     oval:mil.disa.stig.ind:obj:23031602:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23031602
@@ -44,6 +32,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23031601:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:23031601
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: count of unique name servers
+      query:
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.ind:var:23031600
     oval:mil.disa.stig.ind:obj:23031600:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23031600
@@ -145,19 +145,6 @@ assessment:
         variable_id: oval:mil.disa.stig.ind:var:23031600
         variable_type: local_variable
   predicates:
-    oval:mil.disa.stig.ind:ste:23031600:
-      source_state_id: oval:mil.disa.stig.ind:ste:23031600
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: (^|\s)dns(\s|$)
-      comment: hosts entry contains dns
     oval:mil.disa.stig.ind:ste:23031601:
       source_state_id: oval:mil.disa.stig.ind:ste:23031601
       source_type: variable_state
@@ -172,21 +159,21 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '2'
       comment: /etc/resolv.conf is configured with at least two name servers
+    oval:mil.disa.stig.ind:ste:23031600:
+      source_state_id: oval:mil.disa.stig.ind:ste:23031600
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (^|\s)dns(\s|$)
+      comment: hosts entry contains dns
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23031600:
-        source_test_id: oval:mil.disa.stig.ind:tst:23031600
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: The system is using DNS
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23031600
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23031600
-        source_other: []
       oval:mil.disa.stig.ind:tst:23031601:
         source_test_id: oval:mil.disa.stig.ind:tst:23031601
         source_type: variable_test
@@ -199,6 +186,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23031601
         predicates:
         - oval:mil.disa.stig.ind:ste:23031601
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23031600:
+        source_test_id: oval:mil.disa.stig.ind:tst:23031600
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: The system is using DNS
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23031600
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23031600
         source_other: []
       oval:mil.disa.stig.ind:tst:23031602:
         source_test_id: oval:mil.disa.stig.ind:tst:23031602
@@ -299,16 +299,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271861
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271861
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271861
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -408,6 +414,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271861r1092295_rule
-    semantic_ir_sha256: 1013007a4a6f94bd3d274f0f314b2720db2b4f101d60a03e683e5740e967e92a
+    semantic_ir_sha256: 1512236ae49b6b998bbf76f8d67e9ed5cfe710a24a77d61c534e1c5947ef0cdf
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 37dcfb903735c52afdf95a3434f50d1fcf0f7e6caadeda8e36c0316ea5b75de2

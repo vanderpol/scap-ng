@@ -8,28 +8,6 @@ assessment:
     includes status information) to an accepted trust anchor.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:navy.navwar.niwcatlantic.scc.linux:obj:25813102:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:25813102
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '13'
-      comment: Check that the root certicate is date/time valid
-      query:
-      - kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: bash
-      - kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: openssl x509 -in /etc/sssd/pki/sssd_auth_ca_db.pem -checkend 0
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: expire
     oval:navy.navwar.niwcatlantic.scc.linux:obj:25813101:
       capability: scapng.collect.independent.shellcommand
       source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:25813101
@@ -52,28 +30,30 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: 'Issuer:'
-  derive: {}
-  predicates:
-    oval:navy.navwar.niwcatlantic.scc.linux:ste:25813101:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25813101
-      source_type: shellcommand_state
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:25813102:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:25813102
+      source_type: shellcommand_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-        kind: element
-        name: exit_status
+      version: '13'
+      comment: Check that the root certicate is date/time valid
+      query:
+      - kind: element
+        name: shell
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '0'
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: openssl x509 -in /etc/sssd/pki/sssd_auth_ca_db.pem -checkend 0
       - attributes:
-          check_existence: at_least_one_exists
           operation: pattern match
         kind: element
-        name: stdout_line
+        name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: CN\s*=\s*DoD\s+Root\s+CA
-      comment: Verify that the Issuer is a DOD Root CA
+        value: expire
+  derive: {}
+  predicates:
     oval:navy.navwar.niwcatlantic.scc.linux:ste:25813102:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25813102
       source_type: shellcommand_state
@@ -94,6 +74,26 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: Certificate will not expire
       comment: Verify that the root cert is date/time valid
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:25813101:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25813101
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          check_existence: at_least_one_exists
+          operation: pattern match
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: CN\s*=\s*DoD\s+Root\s+CA
+      comment: Verify that the Issuer is a DOD Root CA
   evaluate:
     tests:
       oval:navy.navwar.niwcatlantic.scc.linux:tst:25813101:
@@ -164,16 +164,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.linux:def:258131
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:258131
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.linux:def:258131
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -280,6 +286,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258131r1134927_rule
-    semantic_ir_sha256: d706e11a0f1fe81b4eddc3cb1fc89272ff1f8f2beb5877d7399b520406b6bd9e
+    semantic_ir_sha256: 43de2a1b2a223abc14e55f467e191c744155e0c7e1ece46d270c6e8806852910
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: c51bf196f73130c9b26e34bc1ad3a1fc5d7911c9eeb27308ae74621807eb95e0

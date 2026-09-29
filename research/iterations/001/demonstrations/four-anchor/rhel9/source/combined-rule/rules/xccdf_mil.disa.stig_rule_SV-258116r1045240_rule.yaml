@@ -308,7 +308,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258116r1045240_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258116r1045240_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258116r1045240_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258116r1045240_rule
     version: 1
     description: RHEL 9 must be configured so that user and group account administration utilities are configured to store
@@ -367,19 +381,6 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:20441701:
-        source_state_id: oval:mil.disa.stig.ind:ste:20441701
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: sha512
-        comment: sha512
       oval:mil.disa.stig.ind:ste:20441700:
         source_state_id: oval:mil.disa.stig.ind:ste:20441700
         source_type: textfilecontent54_state
@@ -394,21 +395,21 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
         comment: defaults/crypt_style
+      oval:mil.disa.stig.ind:ste:20441701:
+        source_state_id: oval:mil.disa.stig.ind:ste:20441701
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: sha512
+        comment: sha512
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:20441701:
-          source_test_id: oval:mil.disa.stig.ind:tst:20441701
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: libuser.conf, crypt_style = sha512
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:20441701
-          predicates:
-          - oval:mil.disa.stig.ind:ste:20441701
-          source_other: []
         oval:mil.disa.stig.ind:tst:20441700:
           source_test_id: oval:mil.disa.stig.ind:tst:20441700
           source_type: textfilecontent54_test
@@ -422,7 +423,48 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:20441700
           source_other: []
+        oval:mil.disa.stig.ind:tst:20441701:
+          source_test_id: oval:mil.disa.stig.ind:tst:20441701
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: libuser.conf, crypt_style = sha512
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:20441701
+          predicates:
+          - oval:mil.disa.stig.ind:ste:20441701
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:204417:
+          source_definition_id: oval:mil.disa.stig.defs:def:204417
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: libuser.conf, defaults/crypt_style exists
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:20441700
+            - comment: libuser.conf, crypt_style = sha512
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:20441701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must be configured so that user and group account administration utilities are configured
+                to store only encrypted representations of passwords.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258116:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258116
           class: compliance
@@ -463,34 +505,6 @@ rule:
                 hashing algorithm that makes password cracking attacks more difficult.'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:204417:
-          source_definition_id: oval:mil.disa.stig.defs:def:204417
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: libuser.conf, defaults/crypt_style exists
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:20441700
-            - comment: libuser.conf, crypt_style = sha512
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:20441701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must be configured so that user and group account administration utilities are configured
-                to store only encrypted representations of passwords.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258116
@@ -502,16 +516,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258116
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258116
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258116
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -602,11 +622,134 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258116r1045240_rule
-      semantic_ir_sha256: 7cad4eabb6c4e1c5c9b035fc41ff9a6d296076af8fce478952bb81afba24c37f
+      semantic_ir_sha256: f086b4c93eed5edadd87075a3025ee8a69a1439c800a0ccc687975b7e68c8a3f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 34ea5627d740245b959a61536311547bcc63a5442280f1d40c5476af7562d81a
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258116r1045240_rule
+    version: 1
+    description: RHEL 9 must be configured so that user and group account administration utilities are configured to store
+      only encrypted representations of passwords.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:63901
+      exports: []
+      inline_content: 'Verify the user and group account administration utilities are configured to store only encrypted representations
+        of passwords with the following command: $ grep crypt_style /etc/libuser.conf crypt_style = sha512 If the "crypt_style"
+        variable is not set to "sha512", is not in the defaults section, is commented out, or does not exist, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:63901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify the user and group account administration utilities are configured to store only encrypted representations\
+            \ of passwords with the following command:\n\n$ grep crypt_style /etc/libuser.conf \n\ncrypt_style = sha512\n\n\
+            If the \"crypt_style\" variable is not set to \"sha512\", is not in the defaults section, is commented out, or\
+            \ does not exist, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258116
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258116
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258116
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258116
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:63901
+        exports: []
+        inline_content: 'Verify the user and group account administration utilities are configured to store only encrypted
+          representations of passwords with the following command: $ grep crypt_style /etc/libuser.conf crypt_style = sha512
+          If the "crypt_style" variable is not set to "sha512", is not in the defaults section, is commented out, or does
+          not exist, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:63901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify the user and group account administration utilities are configured to store only encrypted representations\
+              \ of passwords with the following command:\n\n$ grep crypt_style /etc/libuser.conf \n\ncrypt_style = sha512\n\
+              \nIf the \"crypt_style\" variable is not set to \"sha512\", is not in the defaults section, is commented out,\
+              \ or does not exist, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the user and group account administration utilities are configured to store only encrypted representations
+      of passwords with the following command: $ grep crypt_style /etc/libuser.conf crypt_style = sha512 If the "crypt_style"
+      variable is not set to "sha512", is not in the defaults section, is commented out, or does not exist, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258116r1045240_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 59bbe00a0e97a00ab2cf6774e52d273c78600f8685de205b8cbc2a2f8abf551b
+  migration: *id002

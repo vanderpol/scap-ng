@@ -319,7 +319,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253478r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253478r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253478r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253478r991589_rule
     version: 1
     description: Zone information must be preserved when saving attachments.
@@ -371,6 +385,36 @@ rule:
           value: SaveZoneInformation
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000026:
+        source_state_id: oval:mil.disa.stig.win:ste:20000026
+        source_type: ntuser_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: boolean
+          kind: element
+          name: enabled
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: 'false'
+        comment: null
+      oval:mil.disa.stig.win:ste:20000002:
+        source_state_id: oval:mil.disa.stig.win:ste:20000002
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_dword
+        - attributes:
+            datatype: int
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '2'
+        comment: null
       oval:mil.disa.stig.win:ste:20000027:
         source_state_id: oval:mil.disa.stig.win:ste:20000027
         source_type: ntuser_state
@@ -402,36 +446,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '2'
         comment: null
-      oval:mil.disa.stig.win:ste:20000002:
-        source_state_id: oval:mil.disa.stig.win:ste:20000002
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_dword
-        - attributes:
-            datatype: int
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '2'
-        comment: null
-      oval:mil.disa.stig.win:ste:20000026:
-        source_state_id: oval:mil.disa.stig.win:ste:20000026
-        source_type: ntuser_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: boolean
-          kind: element
-          name: enabled
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: 'false'
-        comment: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25347800:
@@ -462,34 +476,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000002
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253478:
-          source_definition_id: oval:mil.disa.stig.defs:def:253478
-          class: compliance
-          version: '3'
-          criteria:
-            children:
-            - comment: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25347800
-            - comment: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured'
-                or 'Disabled'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25347801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Zone information must be preserved when saving attachments.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253478:
           source_definition_id: oval:mil.disa.stig.windows11:def:253478
           class: compliance
@@ -523,6 +509,34 @@ rule:
                 Windows to determine risk.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253478:
+          source_definition_id: oval:mil.disa.stig.defs:def:253478
+          class: compliance
+          version: '3'
+          criteria:
+            children:
+            - comment: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25347800
+            - comment: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured'
+                or 'Disabled'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25347801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Zone information must be preserved when saving attachments.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253478
@@ -534,16 +548,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253478
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253478
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253478
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -645,11 +665,158 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253478r991589_rule
-      semantic_ir_sha256: 95edf5ad63c92fa69a803e85d246c679bbd261aae66f4ab11723e95ff2fb60ec
+      semantic_ir_sha256: 015ca372449b3c8c5ba6b260a878e740f72106082c8e8e8d99e0bc5c76c866cc
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: b1279f65c10a5a7cfe109449c2579da141909bd54be076e3840015223c530367
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253478r991589_rule
+    version: 1
+    description: Zone information must be preserved when saving attachments.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:43301
+      exports: []
+      inline_content: 'The default behavior is for Windows to mark file attachments with their zone information. If it exists
+        and is configured with a value of "1", this is a finding. Registry Hive: HKEY_CURRENT_USER Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments\
+        Value Name: SaveZoneInformation Value Type: REG_DWORD Value: 0x00000002 (2) (or if the Value Name does not exist)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:43301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'The default behavior is for Windows to mark file attachments with their zone information.
+
+
+            If it exists and is configured with a value of "1", this is a finding.
+
+
+            Registry Hive: HKEY_CURRENT_USER
+
+            Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments\
+
+
+            Value Name: SaveZoneInformation
+
+
+            Value Type: REG_DWORD
+
+            Value: 0x00000002 (2) (or if the Value Name does not exist)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253478
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253478
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253478
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253478
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:43301
+        exports: []
+        inline_content: 'The default behavior is for Windows to mark file attachments with their zone information. If it exists
+          and is configured with a value of "1", this is a finding. Registry Hive: HKEY_CURRENT_USER Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments\
+          Value Name: SaveZoneInformation Value Type: REG_DWORD Value: 0x00000002 (2) (or if the Value Name does not exist)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:43301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'The default behavior is for Windows to mark file attachments with their zone information.
+
+
+              If it exists and is configured with a value of "1", this is a finding.
+
+
+              Registry Hive: HKEY_CURRENT_USER
+
+              Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments\
+
+
+              Value Name: SaveZoneInformation
+
+
+              Value Type: REG_DWORD
+
+              Value: 0x00000002 (2) (or if the Value Name does not exist)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'The default behavior is for Windows to mark file attachments with their zone information. If it exists and
+      is configured with a value of "1", this is a finding. Registry Hive: HKEY_CURRENT_USER Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments\
+      Value Name: SaveZoneInformation Value Type: REG_DWORD Value: 0x00000002 (2) (or if the Value Name does not exist)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253478r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: f8acab6be4e9c3d658e03fc322daca65bd73644072c066bf7f10508a3352c670
+  migration: *id002

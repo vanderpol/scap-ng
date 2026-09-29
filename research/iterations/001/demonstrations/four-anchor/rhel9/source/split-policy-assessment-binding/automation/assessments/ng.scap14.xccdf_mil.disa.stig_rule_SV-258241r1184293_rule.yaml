@@ -7,6 +7,47 @@ assessment:
   description: RHEL 9 must implement a FIPS 140-3-compliant systemwide cryptographic policy.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '13'
+      comment: Retrieve system wide crypto policy(ies).
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: update-crypto-policies --show
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '13'
+      comment: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/crypto-policies/state/CURRENT.pol
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^hash\s*=\s*([^#\n]+)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102
@@ -57,47 +98,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '13'
-      comment: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/crypto-policies/state/CURRENT.pol
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^hash\s*=\s*([^#\n]+)$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '13'
-      comment: Retrieve system wide crypto policy(ies).
-      query:
-      - kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: bash
-      - kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: update-crypto-policies --show
   derive:
     oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101:
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101
@@ -158,33 +158,6 @@ assessment:
         variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101
         variable_type: constant_variable
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-          var_check: all
-          var_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      comment: Confirm correct algorithms.
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: SHA1-\d
-      comment: Check for existence of SHA1 algorithms (negated at criterion level).
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824101:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824101
       source_type: shellcommand_state
@@ -204,19 +177,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^FIPS:*
       comment: Confirm system wide crypto policy(ies) are correct.
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \b[A-Z]+\d*-((\d{1,2}\b)|(1\d\d\b)|(21\d\b)|(22[1-3]\b))
-      comment: Confirm minimum hash values of 224.
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105
       source_type: textfilecontent54_state
@@ -231,20 +191,73 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '2048'
       comment: Confirm minimum rsa size of 2048.
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+          var_check: all
+          var_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      comment: Confirm correct algorithms.
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \b[A-Z]+\d*-((\d{1,2}\b)|(1\d\d\b)|(21\d\b)|(22[1-3]\b))
+      comment: Confirm minimum hash values of 224.
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: SHA1-\d
+      comment: Check for existence of SHA1 algorithms (negated at criterion level).
   evaluate:
     tests:
-      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824104:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824104
-        source_type: textfilecontent54_test
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824101:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824101
+        source_type: shellcommand_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Verify minimum hash values of 224.
+        comment: Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy.
         check: all
-        check_existence: any_exist
+        check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101
         predicates:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824101
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Verify minimum rsa size of 2048.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105
         source_other: []
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824102:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824102
@@ -259,18 +272,18 @@ assessment:
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102
         source_other: []
-      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824101:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824101
-        source_type: shellcommand_test
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824104:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824104
+        source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy.
+        comment: Verify minimum hash values of 224.
         check: all
-        check_existence: at_least_one_exists
+        check_existence: any_exist
         state_operator: AND
         collections:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103
         predicates:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824101
+        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104
         source_other: []
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824103:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824103
@@ -284,19 +297,6 @@ assessment:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103
-        source_other: []
-      oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Verify minimum rsa size of 2048.
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105
         source_other: []
     definitions:
       oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241:
@@ -353,16 +353,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -501,6 +507,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258241r1184293_rule
-    semantic_ir_sha256: 94be9db02f78dff58adedf378f6299091abcc67daa3db5c07b53e2b31d80bd2a
+    semantic_ir_sha256: de50d26764af192c60982f29a4c979513c8dbe09cde33c13ce3d8755fb5f7753
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: acef3d36508e6faa1fb51e03cb05af04b7ac5c22ca119bbaaa060ed3675984ce

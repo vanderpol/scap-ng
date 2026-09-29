@@ -7,6 +7,54 @@ assessment:
   description: RHEL 9 must implement certificate status checking for multifactor authentication.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25812302:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25812302
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: 'sssd config: certificate_verification'
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25812300
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25812301
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+    oval:mil.disa.stig.ind:obj:25812300:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25812300
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: 'sssd.conf: certificate_verification'
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/sssd.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*certificate_verification\s*=\s*(.*)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:25812301:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25812301
@@ -41,54 +89,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25812300:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25812300
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: 'sssd.conf: certificate_verification'
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sssd/sssd.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*certificate_verification\s*=\s*(.*)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:25812302:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25812302
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: 'sssd config: certificate_verification'
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25812300
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25812301
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:25812300:
@@ -202,16 +202,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258123
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258123
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258123
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -312,6 +318,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258123r1134923_rule
-    semantic_ir_sha256: 9e00f2dccfac7a0d7d605206362f2c9b06ca91e7a9d38abf8d9a9b3ac68268ef
+    semantic_ir_sha256: b73b517c7c4064837f61954c8ea447a3750788459a6e467bbc6dc4b911a4f0ac
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: d555c32a4f3eed552fd3e8346a75c5529d23e230b5eadfbf98d23b5b6b8bb12d

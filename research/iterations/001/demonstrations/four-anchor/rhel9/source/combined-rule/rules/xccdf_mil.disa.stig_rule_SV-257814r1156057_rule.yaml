@@ -366,12 +366,51 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257814r1156057_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257814r1156057_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257814r1156057_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257814r1156057_rule
     version: 1
     description: RHEL 9 must disable core dumps for all users.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23031302:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23031302
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/security/limits.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:23031305:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23031305
@@ -434,9 +473,9 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23031300:
+      oval:mil.disa.stig.ind:obj:23031301:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23031300
+        source_object_id: oval:mil.disa.stig.ind:obj:23031301
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
@@ -444,9 +483,9 @@ rule:
         query:
         - children:
           - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23031302
+            object_ref: oval:mil.disa.stig.ind:obj:23031304
           - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23031303
+            object_ref: oval:mil.disa.stig.ind:obj:23031305
           evaluation_semantics:
             complement_is_relative: true
             filter_default_action: exclude
@@ -480,34 +519,9 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23031302:
+      oval:mil.disa.stig.ind:obj:23031300:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23031302
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/security/limits.conf
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:23031301:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23031301
+        source_object_id: oval:mil.disa.stig.ind:obj:23031300
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
@@ -515,9 +529,9 @@ rule:
         query:
         - children:
           - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23031304
+            object_ref: oval:mil.disa.stig.ind:obj:23031302
           - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23031305
+            object_ref: oval:mil.disa.stig.ind:obj:23031303
           evaluation_semantics:
             complement_is_relative: true
             filter_default_action: exclude
@@ -642,16 +656,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257814
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257814
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257814
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -761,11 +781,178 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257814r1156057_rule
-      semantic_ir_sha256: f20217f920c62933330b9355dd102d0734e1bc2aa518a795ff310cc29fec400c
+      semantic_ir_sha256: 055eda3a60ccf3d7afbe1db09dd8fdbf897bd4b517bbc730abd54e81e426d46a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 5f74886e7d62e404a5e2309c7efa7a2fe2bd805d6546eabbdfcf3bf6e427fd61
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257814r1156057_rule
+    version: 1
+    description: RHEL 9 must disable core dumps for all users.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7301
+      exports: []
+      inline_content: 'Note: If kernel dumps are disabled in accordance with RHEL-09-213040, this requirement is not applicable.
+        Verify RHEL 9 disables core dumps for all users by issuing the following command: $ grep -rs core /etc/security/limits.conf
+        /etc/security/limits.d/*.conf /etc/security/limits.conf:* hard core 0 This can be set as a global domain (with the
+        * wildcard) but may be set differently for multiple domains. If the "core" item is missing or commented out, or the
+        value is anything other than "0", and the need for core dumps is not documented with the information system security
+        officer (ISSO) as an operational requirement for all domains that have the "core" item assigned, this is a finding.
+        If entries exist for users or groups with a value set to anything other than "0", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Note: If kernel dumps are disabled in accordance with RHEL-09-213040, this requirement is not applicable.
+
+
+            Verify RHEL 9 disables core dumps for all users by issuing the following command:
+
+
+            $ grep -rs core /etc/security/limits.conf /etc/security/limits.d/*.conf
+
+
+            /etc/security/limits.conf:* hard core 0
+
+
+            This can be set as a global domain (with the * wildcard) but may be set differently for multiple domains.
+
+
+            If the "core" item is missing or commented out, or the value is anything other than "0", and the need for core
+            dumps is not documented with the information system security officer (ISSO) as an operational requirement for
+            all domains that have the "core" item assigned, this is a finding.
+
+
+            If entries exist for users or groups with a value set to anything other than "0", this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257814
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257814
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257814
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257814
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7301
+        exports: []
+        inline_content: 'Note: If kernel dumps are disabled in accordance with RHEL-09-213040, this requirement is not applicable.
+          Verify RHEL 9 disables core dumps for all users by issuing the following command: $ grep -rs core /etc/security/limits.conf
+          /etc/security/limits.d/*.conf /etc/security/limits.conf:* hard core 0 This can be set as a global domain (with the
+          * wildcard) but may be set differently for multiple domains. If the "core" item is missing or commented out, or
+          the value is anything other than "0", and the need for core dumps is not documented with the information system
+          security officer (ISSO) as an operational requirement for all domains that have the "core" item assigned, this is
+          a finding. If entries exist for users or groups with a value set to anything other than "0", this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Note: If kernel dumps are disabled in accordance with RHEL-09-213040, this requirement is not applicable.
+
+
+              Verify RHEL 9 disables core dumps for all users by issuing the following command:
+
+
+              $ grep -rs core /etc/security/limits.conf /etc/security/limits.d/*.conf
+
+
+              /etc/security/limits.conf:* hard core 0
+
+
+              This can be set as a global domain (with the * wildcard) but may be set differently for multiple domains.
+
+
+              If the "core" item is missing or commented out, or the value is anything other than "0", and the need for core
+              dumps is not documented with the information system security officer (ISSO) as an operational requirement for
+              all domains that have the "core" item assigned, this is a finding.
+
+
+              If entries exist for users or groups with a value set to anything other than "0", this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Note: If kernel dumps are disabled in accordance with RHEL-09-213040, this requirement is not applicable.
+      Verify RHEL 9 disables core dumps for all users by issuing the following command: $ grep -rs core /etc/security/limits.conf
+      /etc/security/limits.d/*.conf /etc/security/limits.conf:* hard core 0 This can be set as a global domain (with the *
+      wildcard) but may be set differently for multiple domains. If the "core" item is missing or commented out, or the value
+      is anything other than "0", and the need for core dumps is not documented with the information system security officer
+      (ISSO) as an operational requirement for all domains that have the "core" item assigned, this is a finding. If entries
+      exist for users or groups with a value set to anything other than "0", this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257814r1156057_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 6560e73fcbda26119e75ec7ec1680ea8a922eb2cb3e6de8c6cf18a90a196df99
+  migration: *id002

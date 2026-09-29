@@ -295,32 +295,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257881r1184299_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257881r1184299_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257881r1184299_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257881r1184299_rule
     version: 1
     description: RHEL 9 must prevent special devices on non-root local partitions.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:23030100:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23030100
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '3'
-        comment: null
-        query:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: ^/\S+$
-        - attributes:
-            action: include
-          kind: element
-          name: filter
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: oval:mil.disa.stig.linux:ste:23030102
       oval:mil.disa.stig.ind:obj:23030101:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23030101
@@ -346,8 +340,41 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.linux:obj:23030100:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23030100
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '3'
+        comment: null
+        query:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: ^/\S+$
+        - attributes:
+            action: include
+          kind: element
+          name: filter
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: oval:mil.disa.stig.linux:ste:23030102
     derive: {}
     predicates:
+      oval:mil.disa.stig.linux:ste:23030102:
+        source_state_id: oval:mil.disa.stig.linux:ste:23030102
+        source_type: partition_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: device
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: ^/dev\S*$
+        comment: null
       oval:mil.disa.stig.linux:ste:20000001:
         source_state_id: oval:mil.disa.stig.linux:ste:20000001
         source_type: partition_state
@@ -374,34 +401,8 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
         comment: null
-      oval:mil.disa.stig.linux:ste:23030102:
-        source_state_id: oval:mil.disa.stig.linux:ste:23030102
-        source_type: partition_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: device
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: ^/dev\S*$
-        comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23030101:
-          source_test_id: oval:mil.disa.stig.ind:tst:23030101
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are ignored.
-          check: all
-          check_existence: any_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23030101
-          predicates:
-          - oval:mil.disa.stig.ind:ste:23030100
-          source_other: []
         oval:mil.disa.stig.linux:tst:23030100:
           source_test_id: oval:mil.disa.stig.linux:tst:23030100
           source_type: partition_test
@@ -415,7 +416,47 @@ rule:
           predicates:
           - oval:mil.disa.stig.linux:ste:20000001
           source_other: []
+        oval:mil.disa.stig.ind:tst:23030101:
+          source_test_id: oval:mil.disa.stig.ind:tst:23030101
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are ignored.
+          check: all
+          check_existence: any_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23030101
+          predicates:
+          - oval:mil.disa.stig.ind:ste:23030100
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230301:
+          source_definition_id: oval:mil.disa.stig.defs:def:230301
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23030100
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23030101
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent special devices on non-root local partitions.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257881:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257881
           class: compliance
@@ -454,33 +495,6 @@ rule:
                 the exception of chroot jails if implemented.'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230301:
-          source_definition_id: oval:mil.disa.stig.defs:def:230301
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23030100
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23030101
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent special devices on non-root local partitions.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257881
@@ -492,16 +506,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257881
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257881
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257881
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -592,11 +612,135 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257881r1184299_rule
-      semantic_ir_sha256: 3eeffe62cf52c8f95434b3cfd76eec3b4868c3648ec15d7201eaa358a91307a4
+      semantic_ir_sha256: 59fc4d4ae5b504737ee3e839d04a1e27211e3634519f13abcacd22d3b434f9a6
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 6cab63e9cb6931c1ec1f0085eee28d3774319536f2855757268a57a3045baeff
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257881r1184299_rule
+    version: 1
+    description: RHEL 9 must prevent special devices on non-root local partitions.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:20501
+      exports: []
+      inline_content: 'Verify all nonroot local partitions are mounted with the "nodev" option with the following command:
+        $ sudo mount | grep ''^/dev\S* on /\S'' | grep --invert-match ''nodev'' If any output is produced, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:20501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify all nonroot local partitions are mounted with the "nodev" option with the following command:
+
+
+            $ sudo mount | grep ''^/dev\S* on /\S'' | grep --invert-match ''nodev''
+
+
+            If any output is produced, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257881
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257881
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257881
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257881
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:20501
+        exports: []
+        inline_content: 'Verify all nonroot local partitions are mounted with the "nodev" option with the following command:
+          $ sudo mount | grep ''^/dev\S* on /\S'' | grep --invert-match ''nodev'' If any output is produced, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:20501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify all nonroot local partitions are mounted with the "nodev" option with the following command:
+
+
+              $ sudo mount | grep ''^/dev\S* on /\S'' | grep --invert-match ''nodev''
+
+
+              If any output is produced, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify all nonroot local partitions are mounted with the "nodev" option with the following command: $ sudo
+      mount | grep ''^/dev\S* on /\S'' | grep --invert-match ''nodev'' If any output is produced, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257881r1184299_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 7e64a4906a4c585101bf6783f9554bd03aba9e27b5c3a984dbb5aa0139b2a574
+  migration: *id002

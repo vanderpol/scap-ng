@@ -7,8 +7,22 @@ rule:
     $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH
     ''^\s*x11uselocalhost'' X11UseLocalhost yes If the "X11UseLocalhost" keyword is set to "no", is missing, or is commented
     out, this is a finding.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271716r1091860_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271716r1091860_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271716r1091860_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
   cluster_id: null
   conflicts: []
+  default_check: default
   description: <VulnDiscussion>When X11 forwarding is enabled, there may be additional exposure to the server and client displays
     if the SSHD proxy display is configured to listen on the wildcard address. By default, SSHD binds the forwarding server
     to the loopback address and sets the hostname part of the "DISPLAY" environment variable to localhost. This prevents remote
@@ -317,7 +331,7 @@ rule:
   weight: '10.0'
 migration:
   note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_ir_sha256: 87131bc99f6dfbd17ca08b2c7164a23285cdaf958af304170da3fc5f73d4d465
+  semantic_ir_sha256: 3d64686a146b40983d6f5536a277553aa006074810454029071b57fa42e89ca7
   source: SCAP 1.4 / OVAL 5.12.3
   source_rule: xccdf_mil.disa.stig_rule_SV-271716r1091860_rule
   status: legacy_compatible

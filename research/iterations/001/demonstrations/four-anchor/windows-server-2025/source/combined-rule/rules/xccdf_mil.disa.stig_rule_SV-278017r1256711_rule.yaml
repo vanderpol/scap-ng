@@ -238,7 +238,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278017r1256711_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278017r1256711_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-278017r1256711_rule
     version: 1
     description: Windows Server 2025 must not have Wi-Fi enabled unless required by the organization.
@@ -360,10 +370,13 @@ rule:
       Where-Object PhysicalMediaType -eq "Native 802.11" Note: This command isolates the search to physical Wi-Fi adapters
       using the standard 802.11 wireless specification and does not rely on the adapter still having its default system name.
       If there is a Wi-Fi or Wireless LAN connection listed, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-278017r1256711_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 76d75c1688b803f4499662cdef2e13d93a113e273d0cd1d5f25694a301acf696
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

@@ -7,27 +7,56 @@ assessment:
   description: OL 9 must limit the number of concurrent sessions to ten for all accounts and/or account types.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23034600:
+    oval:mil.disa.stig.ind:obj:23034604:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23034600
+      source_object_id: oval:mil.disa.stig.ind:obj:23034604
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: all default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf
+      comment: non-default maxlogins in /etc/security/limits.conf
       query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23034601
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23034602
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/security/limits.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23034601:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23034601
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: default maxlogins in /etc/security/limits.conf
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/security/limits.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:23034603:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23034603
@@ -41,6 +70,27 @@ assessment:
           object_ref: oval:mil.disa.stig.ind:obj:23034604
         - kind: object_ref
           object_ref: oval:mil.disa.stig.ind:obj:23034605
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+    oval:mil.disa.stig.ind:obj:23034600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23034600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: all default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23034601
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23034602
         evaluation_semantics:
           complement_is_relative: true
           filter_default_action: exclude
@@ -80,31 +130,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23034601:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23034601
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: default maxlogins in /etc/security/limits.conf
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/security/limits.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23034605:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23034605
@@ -123,31 +148,6 @@ assessment:
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: .*\.conf$
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23034604:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23034604
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: non-default maxlogins in /etc/security/limits.conf
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/security/limits.conf
       - attributes:
           operation: pattern match
         kind: element
@@ -283,16 +283,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271753
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271753
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271753
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -399,6 +405,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271753r1091971_rule
-    semantic_ir_sha256: 8f4e58ea580d21f32d30900cb58b6dba019870eb5302518d37866eed643a84a8
+    semantic_ir_sha256: 0200027c6a3f6cddd6e6df968667cf5b8fda7835ab34d751d9cb6e263cadeabb
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 94baa705653de0850bcebe383802f376d07ad0bf051f9d876792a275424526dc

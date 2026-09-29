@@ -313,7 +313,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-277995r1180691_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-277995r1180691_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-277995r1180691_rule
     version: 1
     description: Windows Server 2025 must use an antivirus program.
@@ -479,10 +489,13 @@ rule:
       "*Defender*"} | Select Status,DisplayName" Verify if third-party antivirus is in use or enabled: Open PowerShell. Enter
       "get-service | where {$_.DisplayName -Like "*mcafee*"} | Select Status,DisplayName Enter "get-service | where {$_.DisplayName
       -Like "*symantec*"} | Select Status,DisplayName'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-277995r1180691_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: eacb369c9654b54aa921c5d053b00077e4b45e3e8f4ef6493bf17d44ed63c1f5
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

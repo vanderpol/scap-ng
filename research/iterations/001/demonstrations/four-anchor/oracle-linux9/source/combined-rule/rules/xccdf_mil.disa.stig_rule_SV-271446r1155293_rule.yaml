@@ -323,12 +323,50 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
     version: 1
     description: OL 9 must disable the Stream Control Transmission Protocol (SCTP) kernel module.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25780701:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25780701
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/modprobe.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^[ \t]*blacklist[ \t]+sctp[ \t]*$
+        - attributes:
+            datatype: int
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:23049600:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23049600
@@ -356,30 +394,6 @@ rule:
         - attributes:
             datatype: int
             operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:25780700:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25780700
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/modprobe.conf
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$
-        - attributes:
-            datatype: int
           kind: element
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -415,9 +429,9 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25780701:
+      oval:mil.disa.stig.ind:obj:25780700:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25780701
+        source_object_id: oval:mil.disa.stig.ind:obj:25780700
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
@@ -432,7 +446,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^[ \t]*blacklist[ \t]+sctp[ \t]*$
+          value: ^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$
         - attributes:
             datatype: int
           kind: element
@@ -443,16 +457,16 @@ rule:
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:25780701:
-          source_test_id: oval:mil.disa.stig.ind:tst:25780701
+        oval:mil.disa.stig.ind:tst:25780700:
+          source_test_id: oval:mil.disa.stig.ind:tst:25780700
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/modprobe.conf contains 'blacklist sctp'
+          comment: /etc/modprobe.conf contains 'install sctp /bin/false'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:25780701
+          - oval:mil.disa.stig.ind:obj:25780700
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:23049600:
@@ -467,16 +481,16 @@ rule:
           - oval:mil.disa.stig.ind:obj:23049600
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:25780700:
-          source_test_id: oval:mil.disa.stig.ind:tst:25780700
+        oval:mil.disa.stig.ind:tst:25780701:
+          source_test_id: oval:mil.disa.stig.ind:tst:25780701
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/modprobe.conf contains 'install sctp /bin/false'
+          comment: /etc/modprobe.conf contains 'blacklist sctp'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:25780700
+          - oval:mil.disa.stig.ind:obj:25780701
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:23049601:
@@ -585,16 +599,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271446
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271446
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271446
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -692,11 +712,151 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
-      semantic_ir_sha256: 062e44480a1418bfb54cfb91714495fd77b17a586d3a85893ca525f15f62cde7
+      semantic_ir_sha256: df1f3476a37778ec6a13c1856707544c9c2d2a5134b2f4fbf7dff868ca31be54
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 00d8bb29395d483ccf01b0332914ee1e1c29edf882a15d18f7ab794169e4fa8c
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
+    version: 1
+    description: OL 9 must disable the Stream Control Transmission Protocol (SCTP) kernel module.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:3101
+      exports: []
+      inline_content: 'Verify OL 9 disables the ability to load the sctp kernel module with the following command: $ grep
+        -irs sctp /etc/modprobe.conf /etc/modprobe.d/* /etc/modprobe.d/sctp.conf:install sctp /bin/false /etc/modprobe.d/sctp.conf:blacklist
+        sctp If the command does not return any output, or the line is commented out, and use of sctp is not documented with
+        the information system security officer (ISSO) as an operational requirement, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:3101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify OL 9 disables the ability to load the sctp kernel module with the following command:
+
+
+            $ grep -irs sctp /etc/modprobe.conf /etc/modprobe.d/*
+
+            /etc/modprobe.d/sctp.conf:install sctp /bin/false
+
+            /etc/modprobe.d/sctp.conf:blacklist sctp
+
+
+            If the command does not return any output, or the line is commented out, and use of sctp is not documented with
+            the information system security officer (ISSO) as an operational requirement, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271446
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271446
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271446
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271446
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:3101
+        exports: []
+        inline_content: 'Verify OL 9 disables the ability to load the sctp kernel module with the following command: $ grep
+          -irs sctp /etc/modprobe.conf /etc/modprobe.d/* /etc/modprobe.d/sctp.conf:install sctp /bin/false /etc/modprobe.d/sctp.conf:blacklist
+          sctp If the command does not return any output, or the line is commented out, and use of sctp is not documented
+          with the information system security officer (ISSO) as an operational requirement, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:3101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify OL 9 disables the ability to load the sctp kernel module with the following command:
+
+
+              $ grep -irs sctp /etc/modprobe.conf /etc/modprobe.d/*
+
+              /etc/modprobe.d/sctp.conf:install sctp /bin/false
+
+              /etc/modprobe.d/sctp.conf:blacklist sctp
+
+
+              If the command does not return any output, or the line is commented out, and use of sctp is not documented with
+              the information system security officer (ISSO) as an operational requirement, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify OL 9 disables the ability to load the sctp kernel module with the following command: $ grep -irs sctp
+      /etc/modprobe.conf /etc/modprobe.d/* /etc/modprobe.d/sctp.conf:install sctp /bin/false /etc/modprobe.d/sctp.conf:blacklist
+      sctp If the command does not return any output, or the line is commented out, and use of sctp is not documented with
+      the information system security officer (ISSO) as an operational requirement, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: d9c34dc93bb883823ad3bbd718afa5d0d9d7e7578f7bb9b485555bbdaf6138b8
+  migration: *id002

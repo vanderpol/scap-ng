@@ -334,7 +334,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258074r991590_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258074r991590_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258074r991590_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258074r991590_rule
     version: 1
     description: RHEL 9 must define default permissions for all authenticated users in such a way that the user can only read
@@ -467,16 +481,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258074
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258074
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258074
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -580,11 +600,162 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258074r991590_rule
-      semantic_ir_sha256: bf90ec668d07bdd3860ee77420d9ffb91832ec038b2c9c12ee42d07c0efa2bfc
+      semantic_ir_sha256: 38629235dfb572a86e192a786eb0434270a6088b1d4ab00ae75eaf04967d0287
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c68b3471931c9e7665103715723cdcd75fb1580f4e42fc2d560f8a4f52fd9edf
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258074r991590_rule
+    version: 1
+    description: RHEL 9 must define default permissions for all authenticated users in such a way that the user can only read
+      and modify their own files.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:56301
+      exports: []
+      inline_content: 'Verify RHEL 9 defines default permissions for all authenticated users in such a way that the user can
+        only read and modify their own files with the following command: Note: If the value of the "UMASK" parameter is set
+        to "000" in "/etc/login.defs" file, the Severity is raised to a CAT I. # grep -i umask /etc/login.defs UMASK 077 If
+        the value for the "UMASK" parameter is not "077", or the "UMASK" parameter is missing or is commented out, this is
+        a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:56301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify RHEL 9 defines default permissions for all authenticated users in such a way that the user can only
+            read and modify their own files with the following command:
+
+
+            Note: If the value of the "UMASK" parameter is set to "000" in "/etc/login.defs" file, the Severity is raised
+            to a CAT I.
+
+
+            # grep -i umask /etc/login.defs
+
+
+            UMASK 077
+
+
+            If the value for the "UMASK" parameter is not "077", or the "UMASK" parameter is missing or is commented out,
+            this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258074
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258074
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258074
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258074
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:56301
+        exports: []
+        inline_content: 'Verify RHEL 9 defines default permissions for all authenticated users in such a way that the user
+          can only read and modify their own files with the following command: Note: If the value of the "UMASK" parameter
+          is set to "000" in "/etc/login.defs" file, the Severity is raised to a CAT I. # grep -i umask /etc/login.defs UMASK
+          077 If the value for the "UMASK" parameter is not "077", or the "UMASK" parameter is missing or is commented out,
+          this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:56301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify RHEL 9 defines default permissions for all authenticated users in such a way that the user can only
+              read and modify their own files with the following command:
+
+
+              Note: If the value of the "UMASK" parameter is set to "000" in "/etc/login.defs" file, the Severity is raised
+              to a CAT I.
+
+
+              # grep -i umask /etc/login.defs
+
+
+              UMASK 077
+
+
+              If the value for the "UMASK" parameter is not "077", or the "UMASK" parameter is missing or is commented out,
+              this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 defines default permissions for all authenticated users in such a way that the user can only
+      read and modify their own files with the following command: Note: If the value of the "UMASK" parameter is set to "000"
+      in "/etc/login.defs" file, the Severity is raised to a CAT I. # grep -i umask /etc/login.defs UMASK 077 If the value
+      for the "UMASK" parameter is not "077", or the "UMASK" parameter is missing or is commented out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258074r991590_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: ab729cc832946aa6e1487564e753041de7b90b8e3094bd59a22aaf347301bd29
+  migration: *id002

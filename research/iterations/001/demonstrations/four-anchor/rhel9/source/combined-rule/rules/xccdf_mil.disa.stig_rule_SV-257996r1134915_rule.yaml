@@ -410,7 +410,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257996r1134915_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257996r1134915_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257996r1134915_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257996r1134915_rule
     version: 1
     description: RHEL 9 must be configured so that all network connections associated with SSH traffic are terminated after
@@ -630,16 +644,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257996
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257996
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257996
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -750,11 +770,178 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257996r1134915_rule
-      semantic_ir_sha256: b2c4255c134fd41aed4995166e798431549b7ace3500b279c22ff0fa405e7104
+      semantic_ir_sha256: b2b86f514df4718f3c0bdf872adb8491b1daab2f599efb72566fbcce6451eb2f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 8ebc51d4804f4e8aa3e1a9f4d8d4adbd9bf5bf2020fc98cbffd42b01af0f1182
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257996r1134915_rule
+    version: 1
+    description: RHEL 9 must be configured so that all network connections associated with SSH traffic are terminated after
+      10 minutes of becoming unresponsive.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:42301
+      exports: []
+      inline_content: 'Verify the "ClientAliveInterval" variable is set to a value of "600" or less by performing the following
+        command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+        grep -iH ''^\s*clientaliveinterval'' /etc/ssh/sshd_config.d/ClientAliveInterval.conf:ClientAliveInterval 600 Verify
+        the runtime value of "ClientAliveInterval" with the following command: $ sudo sshd -T | grep -i clientaliveinterval
+        clientaliveinterval 600 If "ClientAliveInterval" does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config",
+        or is commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:42301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the "ClientAliveInterval" variable is set to a value of "600" or less by performing the following
+            command:
+
+
+            $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep
+            -iH ''^\s*clientaliveinterval''
+
+
+            /etc/ssh/sshd_config.d/ClientAliveInterval.conf:ClientAliveInterval 600
+
+
+            Verify the runtime value of "ClientAliveInterval" with the following command:
+
+
+            $ sudo sshd -T | grep -i clientaliveinterval
+
+
+            clientaliveinterval 600
+
+
+            If "ClientAliveInterval" does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or
+            is commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257996
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257996
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257996
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257996
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:42301
+        exports: []
+        inline_content: 'Verify the "ClientAliveInterval" variable is set to a value of "600" or less by performing the following
+          command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs
+          sudo grep -iH ''^\s*clientaliveinterval'' /etc/ssh/sshd_config.d/ClientAliveInterval.conf:ClientAliveInterval 600
+          Verify the runtime value of "ClientAliveInterval" with the following command: $ sudo sshd -T | grep -i clientaliveinterval
+          clientaliveinterval 600 If "ClientAliveInterval" does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config",
+          or is commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:42301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the "ClientAliveInterval" variable is set to a value of "600" or less by performing the following
+              command:
+
+
+              $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+              grep -iH ''^\s*clientaliveinterval''
+
+
+              /etc/ssh/sshd_config.d/ClientAliveInterval.conf:ClientAliveInterval 600
+
+
+              Verify the runtime value of "ClientAliveInterval" with the following command:
+
+
+              $ sudo sshd -T | grep -i clientaliveinterval
+
+
+              clientaliveinterval 600
+
+
+              If "ClientAliveInterval" does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or
+              is commented out, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the "ClientAliveInterval" variable is set to a value of "600" or less by performing the following command:
+      $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH
+      ''^\s*clientaliveinterval'' /etc/ssh/sshd_config.d/ClientAliveInterval.conf:ClientAliveInterval 600 Verify the runtime
+      value of "ClientAliveInterval" with the following command: $ sudo sshd -T | grep -i clientaliveinterval clientaliveinterval
+      600 If "ClientAliveInterval" does not exist, does not have a value of "600" or less in "/etc/ssh/sshd_config", or is
+      commented out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257996r1134915_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: caa47aef93b2ab8f39a82477bf5e3f9e01fef0a91dd1925a025b094e5c8ad432
+  migration: *id002

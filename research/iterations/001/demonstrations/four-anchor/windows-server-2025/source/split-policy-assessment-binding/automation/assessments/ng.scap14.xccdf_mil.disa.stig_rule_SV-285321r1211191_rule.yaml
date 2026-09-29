@@ -7,9 +7,9 @@ assessment:
   description: Windows Server 2025 OpenSSH private host key files must conform to minimum requirements.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:28532101:
+    oval:mil.disa.stig.win:obj:28532100:
       capability: scapng.collect.windows.fileeffectiverights53
-      source_object_id: oval:mil.disa.stig.win:obj:28532101
+      source_object_id: oval:mil.disa.stig.win:obj:28532100
       source_type: fileeffectiverights53_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '2'
@@ -34,7 +34,7 @@ assessment:
         kind: element
         name: trustee_sid
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-32-544
+        value: S-1-5-18
     oval:mil.disa.stig.win:obj:28532102:
       capability: scapng.collect.windows.fileeffectiverights53
       source_object_id: oval:mil.disa.stig.win:obj:28532102
@@ -72,9 +72,9 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.win:ste:20000013
-    oval:mil.disa.stig.win:obj:28532100:
+    oval:mil.disa.stig.win:obj:28532101:
       capability: scapng.collect.windows.fileeffectiverights53
-      source_object_id: oval:mil.disa.stig.win:obj:28532100
+      source_object_id: oval:mil.disa.stig.win:obj:28532101
       source_type: fileeffectiverights53_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '2'
@@ -99,9 +99,22 @@ assessment:
         kind: element
         name: trustee_sid
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-18
+        value: S-1-5-32-544
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000013:
+      source_state_id: oval:mil.disa.stig.win:ste:20000013
+      source_type: fileeffectiverights53_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-32-544
+      comment: Administrators account.
     oval:mil.disa.stig.win:ste:20000012:
       source_state_id: oval:mil.disa.stig.win:ste:20000012
       source_type: fileeffectiverights53_state
@@ -224,33 +237,8 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: 'true'
       comment: Full Rights
-    oval:mil.disa.stig.win:ste:20000013:
-      source_state_id: oval:mil.disa.stig.win:ste:20000013
-      source_type: fileeffectiverights53_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-32-544
-      comment: Administrators account.
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:28532102:
-        source_test_id: oval:mil.disa.stig.win:tst:28532102
-        source_type: fileeffectiverights53_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'C:\ProgramData\ssh\*_key: Other accounts'
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:28532102
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.win:tst:28532100:
         source_test_id: oval:mil.disa.stig.win:tst:28532100
         source_type: fileeffectiverights53_test
@@ -263,6 +251,18 @@ assessment:
         - oval:mil.disa.stig.win:obj:28532100
         predicates:
         - oval:mil.disa.stig.win:ste:20000049
+        source_other: []
+      oval:mil.disa.stig.win:tst:28532102:
+        source_test_id: oval:mil.disa.stig.win:tst:28532102
+        source_type: fileeffectiverights53_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: 'C:\ProgramData\ssh\*_key: Other accounts'
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:28532102
+        predicates: []
         source_other: []
       oval:mil.disa.stig.win:tst:28532101:
         source_test_id: oval:mil.disa.stig.win:tst:28532101
@@ -352,16 +352,22 @@ assessment:
       exports: []
       href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows2025:def:285321
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.windows2025:def:285321
       exports: []
       href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows2025:def:285321
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
@@ -463,6 +469,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-285321r1211191_rule
-    semantic_ir_sha256: 3408967b1620b47914b610d6f9be967648e91a3e1ec7ad31beaf6ec8e3991c1b
+    semantic_ir_sha256: 8f19cd0656f768a756a756fee1a5653103548263bccc60889ac78cbf22f7f3ca
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 64362c658ea4ee44f5ce1187f861b431bda66b65f94ebce9cf39ec4bd747565a

@@ -285,37 +285,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271634r1091614_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271634r1091614_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271634r1091614_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271634r1091614_rule
     version: 1
     description: OL 9 must not allow blank or null passwords.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:24454000:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:24454000
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/pam.d/system-auth
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: \bnullok\b
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:24454100:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:24454100
@@ -341,22 +330,35 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:24454000:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:24454000
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/pam.d/system-auth
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: \bnullok\b
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:24454000:
-          source_test_id: oval:mil.disa.stig.ind:tst:24454000
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: There are no instances of nullok in /etc/pam.d/system-auth.
-          check: all
-          check_existence: none_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:24454000
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:24454100:
           source_test_id: oval:mil.disa.stig.ind:tst:24454100
           source_type: textfilecontent54_test
@@ -369,44 +371,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:24454100
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:24454000:
+          source_test_id: oval:mil.disa.stig.ind:tst:24454000
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: There are no instances of nullok in /etc/pam.d/system-auth.
+          check: all
+          check_existence: none_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:24454000
+          predicates: []
+          source_other: []
       definitions:
-        oval:mil.disa.stig.ol9os:def:271634:
-          source_definition_id: oval:mil.disa.stig.ol9os:def:271634
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:244540
-              kind: definition_ref
-              negate: false
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:244541
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: OL09-00-001110 - OL 9 must not allow blank or null passwords.
-            - attributes:
-                family: unix
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Oracle Linux 9
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: If an account has an empty password, anyone could log in and run commands with the privileges of that
-                account. Accounts with empty passwords should never be used in operational environments.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:244540:
           source_definition_id: oval:mil.disa.stig.defs:def:244540
           class: compliance
@@ -453,6 +430,43 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.ol9os:def:271634:
+          source_definition_id: oval:mil.disa.stig.ol9os:def:271634
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:244540
+              kind: definition_ref
+              negate: false
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:244541
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: OL09-00-001110 - OL 9 must not allow blank or null passwords.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Oracle Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: If an account has an empty password, anyone could log in and run commands with the privileges of that
+                account. Accounts with empty passwords should never be used in operational environments.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271634
@@ -464,16 +478,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271634
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271634
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271634
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -564,11 +584,135 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271634r1091614_rule
-      semantic_ir_sha256: 578148e9b4511c23e72a4964681f8fb943cd121f994ad86a940b22c60d9d20af
+      semantic_ir_sha256: 147caffe8133ac17818bba4cf2e2f6fde0cb9534b200563b430fc1a69cc141e6
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 1574a1827a0e45aecaf4c2e436882648dafa8b4ae991b30ca338c02ec068dbba
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271634r1091614_rule
+    version: 1
+    description: OL 9 must not allow blank or null passwords.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:39701
+      exports: []
+      inline_content: 'Verify that OL 9 does not allow null passwords with the following command: $ grep -i nullok /etc/pam.d/system-auth
+        /etc/pam.d/password-auth If output is produced, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:39701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 does not allow null passwords with the following command:
+
+
+            $ grep -i nullok /etc/pam.d/system-auth /etc/pam.d/password-auth
+
+
+            If output is produced, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271634
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271634
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271634
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271634
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:39701
+        exports: []
+        inline_content: 'Verify that OL 9 does not allow null passwords with the following command: $ grep -i nullok /etc/pam.d/system-auth
+          /etc/pam.d/password-auth If output is produced, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:39701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 does not allow null passwords with the following command:
+
+
+              $ grep -i nullok /etc/pam.d/system-auth /etc/pam.d/password-auth
+
+
+              If output is produced, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 does not allow null passwords with the following command: $ grep -i nullok /etc/pam.d/system-auth
+      /etc/pam.d/password-auth If output is produced, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271634r1091614_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: ea9a60416182759329b5b1e67d19d5ebe4eab529bee449bda2dd0a2e4e9b1927
+  migration: *id002

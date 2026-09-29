@@ -7,26 +7,33 @@ assessment:
   description: OL 9 must disable mounting of cramfs.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23049803:
+    oval:mil.disa.stig.ind:obj:23049800:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23049803
+      source_object_id: oval:mil.disa.stig.ind:obj:23049800
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
+      version: '2'
       comment: null
       query:
       - kind: element
-        name: filepath
+        name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.conf
+        value: /etc/modprobe.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
       - attributes:
           operation: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*blacklist[ \t]+cramfs[ \t]*$
+        value: ^[ \t]*install[ \t]+cramfs[ \t]+/bin/false[ \t]*$
       - attributes:
           datatype: int
+          operation: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -86,33 +93,26 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23049800:
+    oval:mil.disa.stig.ind:obj:23049803:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23049800
+      source_object_id: oval:mil.disa.stig.ind:obj:23049803
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
+      version: '1'
       comment: null
       query:
       - kind: element
-        name: path
+        name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: .*
+        value: /etc/modprobe.conf
       - attributes:
           operation: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*install[ \t]+cramfs[ \t]+/bin/false[ \t]*$
+        value: ^[ \t]*blacklist[ \t]+cramfs[ \t]*$
       - attributes:
           datatype: int
-          operation: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -133,16 +133,16 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23049801
         predicates: []
         source_other: []
-      oval:mil.disa.stig.ind:tst:23049802:
-        source_test_id: oval:mil.disa.stig.ind:tst:23049802
+      oval:mil.disa.stig.ind:tst:23049800:
+        source_test_id: oval:mil.disa.stig.ind:tst:23049800
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.conf contains 'install cramfs /bin/false'
+        comment: /etc/modprobe.d contains a file that contains 'install cramfs /bin/false'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.ind:obj:23049802
+        - oval:mil.disa.stig.ind:obj:23049800
         predicates: []
         source_other: []
       oval:mil.disa.stig.ind:tst:23049803:
@@ -157,56 +157,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23049803
         predicates: []
         source_other: []
-      oval:mil.disa.stig.ind:tst:23049800:
-        source_test_id: oval:mil.disa.stig.ind:tst:23049800
+      oval:mil.disa.stig.ind:tst:23049802:
+        source_test_id: oval:mil.disa.stig.ind:tst:23049802
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.d contains a file that contains 'install cramfs /bin/false'
+        comment: /etc/modprobe.conf contains 'install cramfs /bin/false'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.ind:obj:23049800
+        - oval:mil.disa.stig.ind:obj:23049802
         predicates: []
         source_other: []
     definitions:
-      oval:mil.disa.stig.ol9os:def:271448:
-        source_definition_id: oval:mil.disa.stig.ol9os:def:271448
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:230498
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: OL09-00-000045 - OL 9 must disable mounting of cramfs.
-          - attributes:
-              family: unix
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Oracle Linux 9
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: "It is detrimental for operating systems to provide, or install by default, functionality exceeding requirements\
-              \ or mission objectives. These unnecessary capabilities or services are often overlooked and therefore may remain\
-              \ unsecured. They increase the risk to the platform by providing additional attack vectors.\n\n\tRemoving support\
-              \ for unneeded filesystem types reduces the local attack surface of the server.\n\n\tCompressed ROM/RAM file\
-              \ system (or cramfs) is a read-only file system designed for simplicity and space-efficiency. It is mainly used\
-              \ in embedded and small-footprint systems."
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:230498:
         source_definition_id: oval:mil.disa.stig.defs:def:230498
         class: compliance
@@ -252,6 +215,43 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.ol9os:def:271448:
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271448
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230498
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000045 - OL 9 must disable mounting of cramfs.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "It is detrimental for operating systems to provide, or install by default, functionality exceeding requirements\
+              \ or mission objectives. These unnecessary capabilities or services are often overlooked and therefore may remain\
+              \ unsecured. They increase the risk to the platform by providing additional attack vectors.\n\n\tRemoving support\
+              \ for unneeded filesystem types reduces the local attack surface of the server.\n\n\tCompressed ROM/RAM file\
+              \ system (or cramfs) is a read-only file system designed for simplicity and space-efficiency. It is mainly used\
+              \ in embedded and small-footprint systems."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.ol9os:def:271448
@@ -263,16 +263,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271448
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271448
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271448
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -374,6 +380,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271448r1155297_rule
-    semantic_ir_sha256: 514cc35aed59d73f3b82c65a0a2274071537bfaffe7ecc241d1bfaac1176c2ce
+    semantic_ir_sha256: b09510045c534c8e4f54e646a374a4b9354a0a3eb590a851e7e06881fab82f11
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 00360315a5e156575d074ab5db597459165006096a3debca9de6a7d648bc6d1d

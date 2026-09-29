@@ -353,12 +353,51 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-284946r1208737_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-284946r1208737_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-284946r1208737_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-284946r1208737_rule
     version: 1
     description: OL 9 must elevate the SELinux context when an administrator calls the sudo command.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:27249600:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27249600
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/sudoers
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^(.*\bsysadm_r\b.*)$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:27249601:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:27249601
@@ -384,31 +423,6 @@ rule:
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: .*
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^(.*\bsysadm_r\b.*)$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:27249600:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27249600
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/sudoers
         - attributes:
             operation: pattern match
           kind: element
@@ -474,6 +488,29 @@ rule:
           - oval:mil.disa.stig.ind:ste:27249600
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:272496:
+          source_definition_id: oval:mil.disa.stig.defs:def:272496
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: elevate the SELinux context when an administrator calls the sudo command
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:27249600
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must elevate the SELinux context when an administrator calls the sudo command.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:284946:
           source_definition_id: oval:mil.disa.stig.ol9os:def:284946
           class: compliance
@@ -521,29 +558,6 @@ rule:
                 \ override options from earlier matching rules."
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:272496:
-          source_definition_id: oval:mil.disa.stig.defs:def:272496
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: elevate the SELinux context when an administrator calls the sudo command
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:27249600
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must elevate the SELinux context when an administrator calls the sudo command.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:284946
@@ -555,16 +569,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:284946
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:284946
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:284946
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -665,11 +685,157 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-284946r1208737_rule
-      semantic_ir_sha256: 95bb9b5433be9d3ef41575f55fac09634adabbeb692fb8c0c43721d281b894fd
+      semantic_ir_sha256: d106afea7aeb05c37da42ff811958c5148edb226d79530165459ba45b486fdcf
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 38ec970b6584d3807416b07b015165da456393e015911d8ca9831a30dd2f383d
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-284946r1208737_rule
+    version: 1
+    description: OL 9 must elevate the SELinux context when an administrator calls the sudo command.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:89501
+      exports: []
+      inline_content: 'Verify OL 9 elevates the SELinux context when an administrator calls the sudo command with the following
+        command: This command must be run as root: # sudo grep -r sysadm_r /etc/sudoers /etc/sudoers.d {%designated_group}
+        or {user_name} ALL=(ALL) TYPE=sysadm_t ROLE=sysadm_r {commands} If a designated sudoers administrator group or account(s)
+        is not configured to elevate the SELinux type and role to "sysadm_t" and "sysadm_r" with the use of the sudo command,
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:89501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify OL 9 elevates the SELinux context when an administrator calls the sudo command with the following
+            command:
+
+
+            This command must be run as root:
+
+
+            # sudo grep -r sysadm_r /etc/sudoers /etc/sudoers.d
+
+            {%designated_group} or {user_name} ALL=(ALL) TYPE=sysadm_t ROLE=sysadm_r {commands}
+
+
+            If a designated sudoers administrator group or account(s) is not configured to elevate the SELinux type and role
+            to "sysadm_t" and "sysadm_r" with the use of the sudo command, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:284946
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:284946
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:284946
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:284946
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:89501
+        exports: []
+        inline_content: 'Verify OL 9 elevates the SELinux context when an administrator calls the sudo command with the following
+          command: This command must be run as root: # sudo grep -r sysadm_r /etc/sudoers /etc/sudoers.d {%designated_group}
+          or {user_name} ALL=(ALL) TYPE=sysadm_t ROLE=sysadm_r {commands} If a designated sudoers administrator group or account(s)
+          is not configured to elevate the SELinux type and role to "sysadm_t" and "sysadm_r" with the use of the sudo command,
+          this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:89501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify OL 9 elevates the SELinux context when an administrator calls the sudo command with the following
+              command:
+
+
+              This command must be run as root:
+
+
+              # sudo grep -r sysadm_r /etc/sudoers /etc/sudoers.d
+
+              {%designated_group} or {user_name} ALL=(ALL) TYPE=sysadm_t ROLE=sysadm_r {commands}
+
+
+              If a designated sudoers administrator group or account(s) is not configured to elevate the SELinux type and
+              role to "sysadm_t" and "sysadm_r" with the use of the sudo command, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify OL 9 elevates the SELinux context when an administrator calls the sudo command with the following command:
+      This command must be run as root: # sudo grep -r sysadm_r /etc/sudoers /etc/sudoers.d {%designated_group} or {user_name}
+      ALL=(ALL) TYPE=sysadm_t ROLE=sysadm_r {commands} If a designated sudoers administrator group or account(s) is not configured
+      to elevate the SELinux type and role to "sysadm_t" and "sysadm_r" with the use of the sudo command, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-284946r1208737_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 083c53620efba17f4760ed867e209986da93c2ab35c064464d6b8856d001c9d7
+  migration: *id002

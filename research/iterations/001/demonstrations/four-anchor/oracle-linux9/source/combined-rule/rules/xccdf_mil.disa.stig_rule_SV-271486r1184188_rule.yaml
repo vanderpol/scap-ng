@@ -353,7 +353,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271486r1184188_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271486r1184188_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271486r1184188_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271486r1184188_rule
     version: 1
     description: OL 9 SSH server must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-3 validated
@@ -387,17 +401,6 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:25799101:
-        source_state_id: oval:mil.disa.stig.ind:ste:25799101
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
-        comment: null
       oval:mil.disa.stig.ind:ste:25799100:
         source_state_id: oval:mil.disa.stig.ind:ste:25799100
         source_type: textfilecontent54_state
@@ -408,6 +411,17 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+        comment: null
+      oval:mil.disa.stig.ind:ste:25799101:
+        source_state_id: oval:mil.disa.stig.ind:ste:25799101
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
         comment: null
     evaluate:
       tests:
@@ -426,6 +440,30 @@ rule:
           - oval:mil.disa.stig.ind:ste:25799101
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:257991:
+          source_definition_id: oval:mil.disa.stig.defs:def:257991
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25799100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system SSH server must be configured to use only Message Authentication Codes (MACs) employing
+                FIPS 140-3 validated cryptographic hash algorithms.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271486:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271486
           class: compliance
@@ -468,30 +506,6 @@ rule:
                 \ file."
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:257991:
-          source_definition_id: oval:mil.disa.stig.defs:def:257991
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25799100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system SSH server must be configured to use only Message Authentication Codes (MACs) employing
-                FIPS 140-3 validated cryptographic hash algorithms.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271486
@@ -503,16 +517,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271486
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271486
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271486
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -613,11 +633,157 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271486r1184188_rule
-      semantic_ir_sha256: 31415cce18da44a0d4bcace9c8f05ff92d9e5fbc05eb6d23e6198b416e5986d0
+      semantic_ir_sha256: e36e930d6e5256a5402008c763dc3acdb772434bbb97a1db275d9bb84942746d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 967e9a09712be17c4881f268f43a3f5070dc51404c13173692ea9d05dbdb1bb8
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271486r1184188_rule
+    version: 1
+    description: OL 9 SSH server must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-3 validated
+      cryptographic hash algorithms to protect the confidentiality of SSH server connections.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:10501
+      exports: []
+      inline_content: 'Verify OL 9 SSH server is configured to use only MACs employing FIPS 140-3 approved algorithms. To
+        verify the MACs in the systemwide SSH configuration file, use the following command: $ sudo grep -i MACs /etc/crypto-policies/back-ends/opensshserver.config
+        MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512 If the MACs entries in
+        the "opensshserver.config" file have any hashes other than "hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512",
+        or they are missing or commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:10501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify OL 9 SSH server is configured to use only MACs employing FIPS 140-3 approved algorithms.
+
+
+            To verify the MACs in the systemwide SSH configuration file, use the following command:
+
+
+            $ sudo grep -i MACs /etc/crypto-policies/back-ends/opensshserver.config
+
+            MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+
+
+            If the MACs entries in the "opensshserver.config" file have any hashes other than "hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512",
+            or they are missing or commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271486
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271486
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271486
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271486
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:10501
+        exports: []
+        inline_content: 'Verify OL 9 SSH server is configured to use only MACs employing FIPS 140-3 approved algorithms. To
+          verify the MACs in the systemwide SSH configuration file, use the following command: $ sudo grep -i MACs /etc/crypto-policies/back-ends/opensshserver.config
+          MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512 If the MACs entries
+          in the "opensshserver.config" file have any hashes other than "hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512",
+          or they are missing or commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:10501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify OL 9 SSH server is configured to use only MACs employing FIPS 140-3 approved algorithms.
+
+
+              To verify the MACs in the systemwide SSH configuration file, use the following command:
+
+
+              $ sudo grep -i MACs /etc/crypto-policies/back-ends/opensshserver.config
+
+              MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+
+
+              If the MACs entries in the "opensshserver.config" file have any hashes other than "hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512",
+              or they are missing or commented out, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify OL 9 SSH server is configured to use only MACs employing FIPS 140-3 approved algorithms. To verify
+      the MACs in the systemwide SSH configuration file, use the following command: $ sudo grep -i MACs /etc/crypto-policies/back-ends/opensshserver.config
+      MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512 If the MACs entries in
+      the "opensshserver.config" file have any hashes other than "hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512",
+      or they are missing or commented out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271486r1184188_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 79bf3c647df4a2e094dfdda3d20cd73738e01ddc4ff7bce6ae9b791c4265484a
+  migration: *id002

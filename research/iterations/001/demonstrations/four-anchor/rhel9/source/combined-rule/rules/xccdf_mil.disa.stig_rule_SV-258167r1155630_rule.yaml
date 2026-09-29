@@ -358,13 +358,40 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
     version: 1
     description: RHEL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit
       log.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.unix:obj:20000011:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:20000011
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '1'
+        comment: Audit log file location
+        query:
+        - attributes:
+            var_ref: oval:mil.disa.stig.defs:var:20000004
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       oval:mil.disa.stig.ind:obj:20000001:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:20000001
@@ -390,19 +417,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.unix:obj:20000011:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:20000011
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '1'
-        comment: Audit log file location
-        query:
-        - attributes:
-            var_ref: oval:mil.disa.stig.defs:var:20000004
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     derive:
       oval:mil.disa.stig.defs:var:20000004:
         source_variable_id: oval:mil.disa.stig.defs:var:20000004
@@ -529,6 +543,30 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000004
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230396:
+          source_definition_id: oval:mil.disa.stig.defs:def:230396
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit log is mode 0600 or less permissive
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23039600
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system audit logs must have a mode of 0600 or less permissive to prevent unauthorized read
+                access.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258167:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258167
           class: compliance
@@ -573,30 +611,6 @@ rule:
                 Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029, SRG-OS-000206-GPOS-00084'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230396:
-          source_definition_id: oval:mil.disa.stig.defs:def:230396
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit log is mode 0600 or less permissive
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23039600
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system audit logs must have a mode of 0600 or less permissive to prevent unauthorized read
-                access.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258167
@@ -608,16 +622,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258167
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258167
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258167
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -709,11 +729,141 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
-      semantic_ir_sha256: 410ae1d8effff7fa3f508212a32aa9fca287680f3b2667cbeec9cc5025473baa
+      semantic_ir_sha256: f8dafb2a5ebc4c775cadb4de64b1515f9b2eedfa1761316d045e859e921fe4b8
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: a872e4de11d3cdd3655eb99499f83cd6df3d8c357f30cb7be714d56041b8e4bd
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
+    version: 1
+    description: RHEL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit
+      log.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:73501
+      exports: []
+      inline_content: 'Verify the audit logs have a mode of "0600". Determine where the audit logs are stored with the following
+        command: $ sudo grep "^log_file" /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Using the location of
+        the audit log file, determine the mode of each audit log with the following command: $ sudo find /var/log/audit/ -type
+        f -exec stat -c ''%a %n'' {} \; 600 /var/log/audit/audit.log If the audit logs have a mode more permissive than "0600",
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:73501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify the audit logs have a mode of \"0600\". \n\nDetermine where the audit logs are stored with the following\
+            \ command:\n\n$ sudo grep \"^log_file\" /etc/audit/auditd.conf\n\nlog_file = /var/log/audit/audit.log\n\nUsing\
+            \ the location of the audit log file, determine the mode of each audit log with the following command:\n\n$ sudo\
+            \ find /var/log/audit/ -type f -exec stat -c '%a %n' {} \\;\n\n600 /var/log/audit/audit.log\n\nIf the audit logs\
+            \ have a mode more permissive than \"0600\", this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258167
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258167
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258167
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258167
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:73501
+        exports: []
+        inline_content: 'Verify the audit logs have a mode of "0600". Determine where the audit logs are stored with the following
+          command: $ sudo grep "^log_file" /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Using the location of
+          the audit log file, determine the mode of each audit log with the following command: $ sudo find /var/log/audit/
+          -type f -exec stat -c ''%a %n'' {} \; 600 /var/log/audit/audit.log If the audit logs have a mode more permissive
+          than "0600", this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:73501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify the audit logs have a mode of \"0600\". \n\nDetermine where the audit logs are stored with the following\
+              \ command:\n\n$ sudo grep \"^log_file\" /etc/audit/auditd.conf\n\nlog_file = /var/log/audit/audit.log\n\nUsing\
+              \ the location of the audit log file, determine the mode of each audit log with the following command:\n\n$\
+              \ sudo find /var/log/audit/ -type f -exec stat -c '%a %n' {} \\;\n\n600 /var/log/audit/audit.log\n\nIf the audit\
+              \ logs have a mode more permissive than \"0600\", this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the audit logs have a mode of "0600". Determine where the audit logs are stored with the following
+      command: $ sudo grep "^log_file" /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Using the location of the
+      audit log file, determine the mode of each audit log with the following command: $ sudo find /var/log/audit/ -type f
+      -exec stat -c ''%a %n'' {} \; 600 /var/log/audit/audit.log If the audit logs have a mode more permissive than "0600",
+      this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: d76ccf40162c4e1f552e669ca85d65d39db931f318f707fa927ed7a881ea0665
+  migration: *id002

@@ -309,7 +309,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253349r958412_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253349r958412_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253349r958412_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253349r958412_rule
     version: 1
     description: Windows 11 must be configured to audit MPSSVC Rule-Level Policy Change Failures.
@@ -442,16 +456,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253349
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253349
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253349
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -548,11 +568,148 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253349r958412_rule
-      semantic_ir_sha256: b77620fa38448141d0f0b36f40f1d0718b9fd55aeb96e4b02285a97fc34408a6
+      semantic_ir_sha256: b0985cc84548e5a8cbd0c7c54bc4720e18604de79cb6a34a47e8b4024b099027
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: ec570cc678ad5336dee6766731fd4275d3703fd9e1692e42717943c0d2fd9a1f
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253349r958412_rule
+    version: 1
+    description: Windows 11 must be configured to audit MPSSVC Rule-Level Policy Change Failures.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:18101
+      exports: []
+      inline_content: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with
+        elevated privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with
+        the following. If the system does not audit the following, this is a finding: Policy Change >> MPSSVC Rule-Level Policy
+        Change - Failure'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:18101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Use the AuditPol tool to review the current Audit Policy configuration:
+
+            Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+            Enter "AuditPol /get /category:*".
+
+
+            Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+            Policy Change >> MPSSVC Rule-Level Policy Change - Failure'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253349
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253349
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253349
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253349
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:18101
+        exports: []
+        inline_content: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with
+          elevated privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with
+          the following. If the system does not audit the following, this is a finding: Policy Change >> MPSSVC Rule-Level
+          Policy Change - Failure'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:18101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Use the AuditPol tool to review the current Audit Policy configuration:
+
+              Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+              Enter "AuditPol /get /category:*".
+
+
+              Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+              Policy Change >> MPSSVC Rule-Level Policy Change - Failure'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with elevated
+      privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following.
+      If the system does not audit the following, this is a finding: Policy Change >> MPSSVC Rule-Level Policy Change - Failure'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253349r958412_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: a7c430da1f5168ab794df6d7c045dec357ee03fc2a98bc446e6fa5af81ccffb8
+  migration: *id002

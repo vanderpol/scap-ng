@@ -372,7 +372,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257816r1155715_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257816r1155715_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257816r1155715_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257816r1155715_rule
     version: 1
     description: RHEL 9 must disable the use of user namespaces.
@@ -422,6 +436,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000009
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:271727:
+          source_definition_id: oval:mil.disa.stig.defs:def:271727
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: user.max_user_namespaces is set to 0
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23054800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must disable the use of user namespaces.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257816:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257816
           class: compliance
@@ -454,29 +491,6 @@ rule:
               text: User namespaces are used primarily for Linux containers. The value "0" disallows the use of user namespaces.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:271727:
-          source_definition_id: oval:mil.disa.stig.defs:def:271727
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: user.max_user_namespaces is set to 0
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23054800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must disable the use of user namespaces.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257816
@@ -488,16 +502,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257816
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257816
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257816
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -600,11 +620,161 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257816r1155715_rule
-      semantic_ir_sha256: 11c7ee4748ba5d5d0f4c1a7c651f58951a145f6a7e16c7e7e6ebf7245b924ab3
+      semantic_ir_sha256: a04089fe314022f1c30d7a2a744642607cc23fe9731c862090249a97db96880b
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 11ccbe03a622127195ac7f2e1702e52369392231005e3eaeba98b855dc0762dc
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257816r1155715_rule
+    version: 1
+    description: RHEL 9 must disable the use of user namespaces.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7701
+      exports: []
+      inline_content: 'Verify RHEL 9 disables the use of user namespaces. Check the status of the "user.max_user_namespaces"
+        parameter with the following command: $ sudo sysctl user.max_user_namespaces user.max_user_namespaces = 0 If "user.max_user_namespaces"
+        is not set to "0" or is missing, this is a finding. If the use of namespaces is operationally required and documented
+        with the information system security manager (ISSM), it is not a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify RHEL 9 disables the use of user namespaces.
+
+
+            Check the status of the "user.max_user_namespaces" parameter with the following command:
+
+
+            $ sudo sysctl user.max_user_namespaces
+
+
+            user.max_user_namespaces = 0
+
+
+            If "user.max_user_namespaces" is not set to "0" or is missing, this is a finding.
+
+
+            If the use of namespaces is operationally required and documented with the information system security manager
+            (ISSM), it is not a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257816
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257816
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257816
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257816
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7701
+        exports: []
+        inline_content: 'Verify RHEL 9 disables the use of user namespaces. Check the status of the "user.max_user_namespaces"
+          parameter with the following command: $ sudo sysctl user.max_user_namespaces user.max_user_namespaces = 0 If "user.max_user_namespaces"
+          is not set to "0" or is missing, this is a finding. If the use of namespaces is operationally required and documented
+          with the information system security manager (ISSM), it is not a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify RHEL 9 disables the use of user namespaces.
+
+
+              Check the status of the "user.max_user_namespaces" parameter with the following command:
+
+
+              $ sudo sysctl user.max_user_namespaces
+
+
+              user.max_user_namespaces = 0
+
+
+              If "user.max_user_namespaces" is not set to "0" or is missing, this is a finding.
+
+
+              If the use of namespaces is operationally required and documented with the information system security manager
+              (ISSM), it is not a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 disables the use of user namespaces. Check the status of the "user.max_user_namespaces" parameter
+      with the following command: $ sudo sysctl user.max_user_namespaces user.max_user_namespaces = 0 If "user.max_user_namespaces"
+      is not set to "0" or is missing, this is a finding. If the use of namespaces is operationally required and documented
+      with the information system security manager (ISSM), it is not a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257816r1155715_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: bdf719e20996bae444e3148c32c4ca271416edf3481e8de9740732aa01fe4bd7
+  migration: *id002

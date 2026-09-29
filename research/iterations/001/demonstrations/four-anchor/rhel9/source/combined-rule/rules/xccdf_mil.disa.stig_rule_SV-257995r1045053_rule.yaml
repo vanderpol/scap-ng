@@ -367,34 +367,27 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257995r1045053_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257995r1045053_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257995r1045053_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257995r1045053_rule
     version: 1
     description: RHEL 9 must be configured so that all network connections associated with SSH traffic terminate after becoming
       unresponsive.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:27170902:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27170902
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        comment: all sshd_config and sshd_config.d/* files
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:27170900
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:27170901
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
       oval:mil.disa.stig.ind:obj:27170901:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:27170901
@@ -426,6 +419,27 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:27170902:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27170902
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        comment: all sshd_config and sshd_config.d/* files
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:27170900
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:27170901
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
       oval:mil.disa.stig.ind:obj:27170900:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:27170900
@@ -483,31 +497,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000003
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:271709:
-          source_definition_id: oval:mil.disa.stig.defs:def:271709
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /etc/ssh/sshd_config:ClientAliveCountMax = 1
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:27170900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must be configured so that all network connections associated with SSH traffic are
-                terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated
-                mission requirements.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257995:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257995
           class: compliance
@@ -563,6 +552,31 @@ rule:
                 Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000279-GPOS-00109'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:271709:
+          source_definition_id: oval:mil.disa.stig.defs:def:271709
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /etc/ssh/sshd_config:ClientAliveCountMax = 1
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:27170900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must be configured so that all network connections associated with SSH traffic are
+                terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated
+                mission requirements.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257995
@@ -574,16 +588,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257995
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257995
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257995
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -682,11 +702,152 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257995r1045053_rule
-      semantic_ir_sha256: f35623214dbea1487d199920cb1854e019e7ca0c4475411f89e7502e576ba593
+      semantic_ir_sha256: 1498864fe87e1cc3276976939a34d128013443fff8034bc12c47615d62026c03
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: f4d35438e9480787339a04fbc323b65b262cb6428a27aa73a08099856b75c681
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257995r1045053_rule
+    version: 1
+    description: RHEL 9 must be configured so that all network connections associated with SSH traffic terminate after becoming
+      unresponsive.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:42101
+      exports: []
+      inline_content: 'Verify the "ClientAliveCountMax" is set to "1" by performing the following command: $ sudo /usr/sbin/sshd
+        -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*clientalivecountmax''
+        ClientAliveCountMax 1 If "ClientAliveCountMax" does not exist, is not set to a value of "1" in "/etc/ssh/sshd_config",
+        or is commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:42101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the "ClientAliveCountMax" is set to "1" by performing the following command:
+
+
+            $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep
+            -iH ''^\s*clientalivecountmax''
+
+
+            ClientAliveCountMax 1
+
+
+            If "ClientAliveCountMax" does not exist, is not set to a value of "1" in "/etc/ssh/sshd_config", or is commented
+            out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257995
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257995
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257995
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257995
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:42101
+        exports: []
+        inline_content: 'Verify the "ClientAliveCountMax" is set to "1" by performing the following command: $ sudo /usr/sbin/sshd
+          -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*clientalivecountmax''
+          ClientAliveCountMax 1 If "ClientAliveCountMax" does not exist, is not set to a value of "1" in "/etc/ssh/sshd_config",
+          or is commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:42101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the "ClientAliveCountMax" is set to "1" by performing the following command:
+
+
+              $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+              grep -iH ''^\s*clientalivecountmax''
+
+
+              ClientAliveCountMax 1
+
+
+              If "ClientAliveCountMax" does not exist, is not set to a value of "1" in "/etc/ssh/sshd_config", or is commented
+              out, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the "ClientAliveCountMax" is set to "1" by performing the following command: $ sudo /usr/sbin/sshd
+      -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*clientalivecountmax''
+      ClientAliveCountMax 1 If "ClientAliveCountMax" does not exist, is not set to a value of "1" in "/etc/ssh/sshd_config",
+      or is commented out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257995r1045053_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 827e4150ff94cf47d1aa71c9b09981b906de8ca22f155c0bc56d07e91d570ba0
+  migration: *id002

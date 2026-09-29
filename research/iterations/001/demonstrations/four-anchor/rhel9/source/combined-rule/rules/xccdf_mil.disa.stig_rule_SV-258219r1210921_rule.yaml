@@ -391,7 +391,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258219r1210921_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258219r1210921_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258219r1210921_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258219r1210921_rule
     version: 1
     description: RHEL 9 must generate audit records for all account creations, modifications, disabling, and termination events
@@ -556,16 +570,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258219
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258219
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258219
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -656,11 +676,136 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258219r1210921_rule
-      semantic_ir_sha256: 683ed4d74140f861fe4271383d06256270a8754214ed955f599560e92e467310
+      semantic_ir_sha256: 4238922f86bd466f045281be67a0af3ca61e6fd416f5b9a727bcf838ec3abca3
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: e0a8aa95048d26778c95a1d0bb54389a86ebf04dfdf4bb8a242d6b0535624a2a
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258219r1210921_rule
+    version: 1
+    description: RHEL 9 must generate audit records for all account creations, modifications, disabling, and termination events
+      that affect /etc/group.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:83701
+      exports: []
+      inline_content: 'Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination
+        events that affect "/etc/group" with the following command: $ sudo auditctl -l | egrep ''(/etc/group)'' -a always,exit
+        -F arch=b32 -F path=/etc/group -F perm=wa -k identity -a always,exit -F arch=b64 -F path=/etc/group -F perm=wa -k
+        identity If the command does not return a line, or the line is commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:83701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination\
+            \ events that affect \"/etc/group\" with the following command:\n\n$ sudo auditctl -l | egrep '(/etc/group)' \
+            \ \n-a always,exit -F arch=b32 -F path=/etc/group -F perm=wa -k identity\n-a always,exit -F arch=b64 -F path=/etc/group\
+            \ -F perm=wa -k identity\n\nIf the command does not return a line, or the line is commented out, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258219
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258219
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258219
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258219
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:83701
+        exports: []
+        inline_content: 'Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination
+          events that affect "/etc/group" with the following command: $ sudo auditctl -l | egrep ''(/etc/group)'' -a always,exit
+          -F arch=b32 -F path=/etc/group -F perm=wa -k identity -a always,exit -F arch=b64 -F path=/etc/group -F perm=wa -k
+          identity If the command does not return a line, or the line is commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:83701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination\
+              \ events that affect \"/etc/group\" with the following command:\n\n$ sudo auditctl -l | egrep '(/etc/group)'\
+              \  \n-a always,exit -F arch=b32 -F path=/etc/group -F perm=wa -k identity\n-a always,exit -F arch=b64 -F path=/etc/group\
+              \ -F perm=wa -k identity\n\nIf the command does not return a line, or the line is commented out, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination
+      events that affect "/etc/group" with the following command: $ sudo auditctl -l | egrep ''(/etc/group)'' -a always,exit
+      -F arch=b32 -F path=/etc/group -F perm=wa -k identity -a always,exit -F arch=b64 -F path=/etc/group -F perm=wa -k identity
+      If the command does not return a line, or the line is commented out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258219r1210921_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 56a759762b91e05ab35d568413494332450f424255ee7bf5981f38a8cae884d4
+  migration: *id002

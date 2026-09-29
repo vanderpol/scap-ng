@@ -268,7 +268,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271847r1092253_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271847r1092253_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271847r1092253_rule
     version: 1
     description: OL 9 must be configured so that executable search paths within the initialization files of all local interactive
@@ -403,10 +413,13 @@ rule:
       grep -i path= /home/*/.* /home/[localinteractiveuser]/.bash_profile:PATH=$PATH:$HOME/.local/bin:$HOME/bin If any local
       interactive user initialization files have executable search path statements that include directories outside of their
       home directory and is not documented with the ISSO as an operational requirement, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271847r1092253_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 131be9b17f4ce6073486fc032953a9a05797bd87d0da0bbcf3dde5c7b848416f
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

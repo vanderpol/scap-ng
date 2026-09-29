@@ -6,22 +6,6 @@ assessment:
   description: SCAP 1.4 CPE applicability checks
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:10000100:
-      capability: scapng.collect.windows.wmi57
-      source_object_id: oval:mil.disa.stig.win:obj:10000100
-      source_type: wmi57_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: namespace
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: root\cimv2
-      - kind: element
-        name: wql
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SELECT DomainRole FROM win32_computersystem
     oval:mil.disa.stig.win:obj:10002500:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:10002500
@@ -49,6 +33,22 @@ assessment:
         kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+    oval:mil.disa.stig.win:obj:10000100:
+      capability: scapng.collect.windows.wmi57
+      source_object_id: oval:mil.disa.stig.win:obj:10000100
+      source_type: wmi57_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: namespace
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: root\cimv2
+      - kind: element
+        name: wql
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SELECT DomainRole FROM win32_computersystem
     oval:mil.disa.stig.win:obj:10000600:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:10000600
@@ -164,26 +164,6 @@ assessment:
         value: SELECT DomainRole FROM win32_computersystem
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:10000300:
-      source_state_id: oval:mil.disa.stig.win:ste:10000300
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '2'
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Standalone Server
     oval:mil.disa.stig.win:ste:10000400:
       source_state_id: oval:mil.disa.stig.win:ste:10000400
       source_type: wmi57_state
@@ -204,44 +184,6 @@ assessment:
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       comment: Domain Member Server
-    oval:mil.disa.stig.win:ste:10000600:
-      source_state_id: oval:mil.disa.stig.win:ste:10000600
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_sz
-      - attributes:
-          datatype: string
-          operation: case insensitive not equal
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Server Core
-      comment: Server Core
-    oval:mil.disa.stig.win:ste:10000500:
-      source_state_id: oval:mil.disa.stig.win:ste:10000500
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '4'
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Backup Domain Controller
     oval:mil.disa.stig.win:ste:10000501:
       source_state_id: oval:mil.disa.stig.win:ste:10000501
       source_type: wmi57_state
@@ -262,8 +204,8 @@ assessment:
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       comment: Primary Domain Controller
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:301:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:301
+    oval:mil.disa.stig.win:ste:10000500:
+      source_state_id: oval:mil.disa.stig.win:ste:10000500
       source_type: wmi57_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
@@ -277,11 +219,49 @@ assessment:
           kind: element
           name: field
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '3'
+          value: '4'
         kind: element
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Domain Member Server
+      comment: Backup Domain Controller
+    oval:mil.disa.stig.win:ste:10000600:
+      source_state_id: oval:mil.disa.stig.win:ste:10000600
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_sz
+      - attributes:
+          datatype: string
+          operation: case insensitive not equal
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Server Core
+      comment: Server Core
+    oval:mil.disa.stig.win:ste:10000300:
+      source_state_id: oval:mil.disa.stig.win:ste:10000300
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '2'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      comment: Standalone Server
     oval:navy.navwar.niwcatlantic.scc.windows:ste:302:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:302
       source_type: wmi57_state
@@ -302,6 +282,86 @@ assessment:
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       comment: Backup Domain Controller
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:301:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:301
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '3'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      comment: Domain Member Server
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:102:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:102
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '3'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      comment: Domain Member Server
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:303:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:303
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '5'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      comment: Primary Domain Controller
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:101:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:101
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '2'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      comment: Standalone Server
     oval:navy.navwar.niwcatlantic.scc.windows:ste:201:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:201
       source_type: cmdlet_state
@@ -323,93 +383,20 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       comment: Is install state not equal to installed
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:102:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:102
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '3'
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Domain Member Server
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:101:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:101
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '2'
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Standalone Server
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:303:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:303
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '5'
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Primary Domain Controller
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:10000500:
-        source_test_id: oval:mil.disa.stig.win:tst:10000500
+      oval:mil.disa.stig.win:tst:10000400:
+        source_test_id: oval:mil.disa.stig.win:tst:10000400
         source_type: wmi57_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: The system is a Windows Domain Controller
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: OR
-        collections:
-        - oval:mil.disa.stig.win:obj:10000100
-        predicates:
-        - oval:mil.disa.stig.win:ste:10000500
-        - oval:mil.disa.stig.win:ste:10000501
-        source_other: []
-      oval:mil.disa.stig.win:tst:10002500:
-        source_test_id: oval:mil.disa.stig.win:tst:10002500
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: OpenSSH Server is installed
+        comment: The system is a Windows Domain Member Server
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.win:obj:10002500
-        predicates: []
+        - oval:mil.disa.stig.win:obj:10000100
+        predicates:
+        - oval:mil.disa.stig.win:ste:10000400
         source_other: []
       oval:mil.disa.stig.win:tst:10000600:
         source_test_id: oval:mil.disa.stig.win:tst:10000600
@@ -424,6 +411,32 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:10000600
         source_other: []
+      oval:mil.disa.stig.win:tst:10002500:
+        source_test_id: oval:mil.disa.stig.win:tst:10002500
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: OpenSSH Server is installed
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:10002500
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.win:tst:10000500:
+        source_test_id: oval:mil.disa.stig.win:tst:10000500
+        source_type: wmi57_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: The system is a Windows Domain Controller
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: OR
+        collections:
+        - oval:mil.disa.stig.win:obj:10000100
+        predicates:
+        - oval:mil.disa.stig.win:ste:10000500
+        - oval:mil.disa.stig.win:ste:10000501
+        source_other: []
       oval:mil.disa.stig.win:tst:10000300:
         source_test_id: oval:mil.disa.stig.win:tst:10000300
         source_type: wmi57_test
@@ -437,32 +450,6 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:10000300
         source_other: []
-      oval:mil.disa.stig.win:tst:10000400:
-        source_test_id: oval:mil.disa.stig.win:tst:10000400
-        source_type: wmi57_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: The system is a Windows Domain Member Server
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:10000100
-        predicates:
-        - oval:mil.disa.stig.win:ste:10000400
-        source_other: []
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:101:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:101
-        source_type: wmi57_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: The system is a Windows Standalone Server
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:101
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:101
-        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:201:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:201
         source_type: cmdlet_test
@@ -475,19 +462,6 @@ assessment:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:201
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:201
-        source_other: []
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:301:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:301
-        source_type: wmi57_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: The system is a Windows Domain Member Server
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:301
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:301
         source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:102:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:102
@@ -516,7 +490,64 @@ assessment:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:302
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:303
         source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:301:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:301
+        source_type: wmi57_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: The system is a Windows Domain Member Server
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:301
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:301
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:101:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:101
+        source_type: wmi57_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: The system is a Windows Standalone Server
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:101
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:101
+        source_other: []
     definitions:
+      oval:mil.disa.stig.win:def:100006:
+        source_definition_id: oval:mil.disa.stig.win:def:100006
+        class: inventory
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:10000600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system is a Windows Server Core Installation
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.win:def:100004:
         source_definition_id: oval:mil.disa.stig.win:def:100004
         class: inventory
@@ -536,6 +567,37 @@ assessment:
           - name: title
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: The system is a Windows Domain Member Server
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.win:def:100005:
+        source_definition_id: oval:mil.disa.stig.win:def:100005
+        class: inventory
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:10000500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system is a Windows Domain Controller
           - attributes:
               family: windows
             children:
@@ -579,37 +641,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.win:def:100005:
-        source_definition_id: oval:mil.disa.stig.win:def:100005
-        class: inventory
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:10000500
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system is a Windows Domain Controller
-          - attributes:
-              family: windows
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Microsoft Windows Server
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.win:def:100003:
         source_definition_id: oval:mil.disa.stig.win:def:100003
         class: inventory
@@ -639,65 +670,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.win:def:100006:
-        source_definition_id: oval:mil.disa.stig.win:def:100006
-        class: inventory
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:10000600
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system is a Windows Server Core Installation
-          - attributes:
-              family: windows
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Microsoft Windows Server
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:navy.navwar.niwcatlantic.scc.windows:def:201:
-        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:201
-        class: inventory
-        version: '1'
-        criteria:
-          children:
-          - comment: Rule is applicable if FTP is installed. Otherwise, N/A.
-            kind: test_ref
-            negate: false
-            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:201
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: SRG-OS-000480-GPOS-00227, SV-205853r991589
-          - attributes:
-              family: windows
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Used in platform specification to check if FTP is installed
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:navy.navwar.niwcatlantic.scc.windows:def:301:
@@ -730,6 +702,34 @@ assessment:
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: The system is a Windows Member Server or Domain Controller
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:navy.navwar.niwcatlantic.scc.windows:def:201:
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:201
+        class: inventory
+        version: '1'
+        criteria:
+          children:
+          - comment: Rule is applicable if FTP is installed. Otherwise, N/A.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:201
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: SRG-OS-000480-GPOS-00227, SV-205853r991589
+          - attributes:
+              family: windows
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Used in platform specification to check if FTP is installed
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:navy.navwar.niwcatlantic.scc.windows:def:102:
@@ -860,7 +860,7 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: applicability
-    semantic_ir_sha256: 8df8f5ee3ba160f19cdf97a55b4d6db5e8eba2f41fe8ff41cbff3df36794591b
+    semantic_ir_sha256: 270fd3cb2f61346e1586d65cc846231987298e4f8151de60edb70a32d4eb143d
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 8161a5a1be631cccf95edbcd00674ad4a488dcc51e57fe56d815e7404bbdf862
 migration: *id001
@@ -948,5 +948,5 @@ source_diagnostic:
     system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     xccdf_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
   schema_errors: []
-  sha256: 29e738c10ac0acf8bb0f33d2ca96f78ab867116d105e728b97b13bddd2d3e615
+  sha256: 131b50f72c3cc928bfdc58a1262d76fd89187a52b0d3de858f924228cd744945
   status: split_valid

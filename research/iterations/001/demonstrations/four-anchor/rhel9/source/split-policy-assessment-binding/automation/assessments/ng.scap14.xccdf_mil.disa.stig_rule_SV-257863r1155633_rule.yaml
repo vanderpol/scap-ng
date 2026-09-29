@@ -7,18 +7,6 @@ assessment:
   description: RHEL 9 must mount /dev/shm with the nodev option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:23050900:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23050900
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /dev/shm
     oval:mil.disa.stig.ind:obj:23050900:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23050900
@@ -43,6 +31,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.linux:obj:23050900:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23050900
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /dev/shm
   derive: {}
   predicates:
     oval:mil.disa.stig.linux:ste:20000001:
@@ -73,19 +73,6 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23050800:
-        source_test_id: oval:mil.disa.stig.ind:tst:23050800
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: If /dev/shm is configured in /etc/fstab, it is configured with the nodev option.
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23050900
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23030100
-        source_other: []
       oval:mil.disa.stig.linux:tst:23050800:
         source_test_id: oval:mil.disa.stig.linux:tst:23050800
         source_type: partition_test
@@ -99,34 +86,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.linux:ste:20000001
         source_other: []
+      oval:mil.disa.stig.ind:tst:23050800:
+        source_test_id: oval:mil.disa.stig.ind:tst:23050800
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: If /dev/shm is configured in /etc/fstab, it is configured with the nodev option.
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23050900
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23030100
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230508:
-        source_definition_id: oval:mil.disa.stig.defs:def:230508
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23050800
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23050800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must mount /dev/shm with the nodev option.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257863:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257863
         class: compliance
@@ -165,6 +138,33 @@ assessment:
               exception of chroot jails if implemented.'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230508:
+        source_definition_id: oval:mil.disa.stig.defs:def:230508
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23050800
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23050800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /dev/shm with the nodev option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:257863
@@ -176,16 +176,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257863
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257863
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257863
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -286,6 +292,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257863r1155633_rule
-    semantic_ir_sha256: 809cd6056bca74268083d2b9210be049daddd055b94e6de4a03c578903c31222
+    semantic_ir_sha256: 730a16397efd963add20f65f5bc459ca1ef72bf9483fd74c136eca413066df95
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 40a3bc1c86d7f9dc919d3376dd3289758ca19b861264cd14a9ff0265bf70bdb4

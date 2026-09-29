@@ -323,7 +323,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253335r991573_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253335r991573_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253335r991573_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253335r991573_rule
     version: 1
     description: The system must be configured to audit System - System Integrity failures.
@@ -339,20 +353,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25333500:
-        source_state_id: oval:mil.disa.stig.win:ste:25333500
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-            operation: equals
-          kind: element
-          name: system_integrity
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_FAILURE
-        comment: Audit - System Integrity - Failure only
       oval:mil.disa.stig.win:ste:25333501:
         source_state_id: oval:mil.disa.stig.win:ste:25333501
         source_type: auditeventpolicysubcategories_state
@@ -367,6 +367,20 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
         comment: Audit - System Integrity - Success and Failure
+      oval:mil.disa.stig.win:ste:25333500:
+        source_state_id: oval:mil.disa.stig.win:ste:25333500
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: system_integrity
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_FAILURE
+        comment: Audit - System Integrity - Failure only
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25333501:
@@ -396,6 +410,33 @@ rule:
           - oval:mil.disa.stig.win:ste:25333500
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253335:
+          source_definition_id: oval:mil.disa.stig.defs:def:253335
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - System Integrity - Failure only
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25333500
+            - comment: Audit - System Integrity - Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25333501
+            comment: Audit - System Integrity - Failure
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system must be configured to audit System - System Integrity failures.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253335:
           source_definition_id: oval:mil.disa.stig.windows11:def:253335
           class: compliance
@@ -435,33 +476,6 @@ rule:
                 System Integrity records events related to violations of integrity to the security subsystem.'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253335:
-          source_definition_id: oval:mil.disa.stig.defs:def:253335
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - System Integrity - Failure only
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25333500
-            - comment: Audit - System Integrity - Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25333501
-            comment: Audit - System Integrity - Failure
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system must be configured to audit System - System Integrity failures.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253335
@@ -473,16 +487,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253335
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253335
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253335
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -584,11 +604,160 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253335r991573_rule
-      semantic_ir_sha256: 5c6b5143f1e00dfa12f6e5f27871d919c32b65a8f312ddc9acc57d5a494104fa
+      semantic_ir_sha256: ddc21c6a99691bc67384124d9a904df97b14b92437daa09fd4c6d3283bd054f8
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: ec309a05e88fddd21ce0cc1ac6766bf3ce3f7b8216423b5da7fbb1e2c5af4de3
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253335r991573_rule
+    version: 1
+    description: The system must be configured to audit System - System Integrity failures.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:15501
+      exports: []
+      inline_content: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+        must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective. Use the AuditPol
+        tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges ("Run as Administrator").
+        Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following. If the system does not audit
+        the following, this is a finding: System >> System Integrity - Failure'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:15501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+            must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective.
+
+
+            Use the AuditPol tool to review the current Audit Policy configuration:
+
+            Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+            Enter "AuditPol /get /category:*".
+
+
+            Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+            System >> System Integrity - Failure'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253335
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253335
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253335
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253335
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:15501
+        exports: []
+        inline_content: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category
+          settings" must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective. Use
+          the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges
+          ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following. If
+          the system does not audit the following, this is a finding: System >> System Integrity - Failure'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:15501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+              must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective.
+
+
+              Use the AuditPol tool to review the current Audit Policy configuration:
+
+              Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+              Enter "AuditPol /get /category:*".
+
+
+              Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+              System >> System Integrity - Failure'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+      must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective. Use the AuditPol
+      tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges ("Run as Administrator").
+      Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following. If the system does not audit the
+      following, this is a finding: System >> System Integrity - Failure'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253335r991573_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 48b6221016e3c2c8377a751652a85eab66bd0328b8b6816c7942008a422d91ab
+  migration: *id002

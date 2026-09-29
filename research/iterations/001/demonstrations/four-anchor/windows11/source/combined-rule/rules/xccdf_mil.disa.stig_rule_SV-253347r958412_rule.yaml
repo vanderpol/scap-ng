@@ -313,7 +313,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253347r958412_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253347r958412_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253347r958412_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253347r958412_rule
     version: 1
     description: Windows 11 must be configured to audit Detailed File Share Failures.
@@ -329,17 +343,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25334700:
-        source_state_id: oval:mil.disa.stig.win:ste:25334700
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: detailed_file_share
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_FAILURE
-        comment: null
       oval:mil.disa.stig.win:ste:25334701:
         source_state_id: oval:mil.disa.stig.win:ste:25334701
         source_type: auditeventpolicysubcategories_state
@@ -350,6 +353,17 @@ rule:
           name: detailed_file_share
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
+        comment: null
+      oval:mil.disa.stig.win:ste:25334700:
+        source_state_id: oval:mil.disa.stig.win:ste:25334700
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: detailed_file_share
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_FAILURE
         comment: null
     evaluate:
       tests:
@@ -446,16 +460,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253347
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253347
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253347
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -552,11 +572,148 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253347r958412_rule
-      semantic_ir_sha256: 4eca0d6e37c284ed523a76bd090795a34654593732cce6c0c1ed5c0a6bbfae14
+      semantic_ir_sha256: 62f6a6d81938414b6b01d25b152a3c1ca7e7a0463928c79f5a42502c4cba7684
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: a3450f96b12c9cf1f5be4eb09b53afc12a1014bf378df38464be309f3792e51d
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253347r958412_rule
+    version: 1
+    description: Windows 11 must be configured to audit Detailed File Share Failures.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:17701
+      exports: []
+      inline_content: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with
+        elevated privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with
+        the following. If the system does not audit the following, this is a finding: Object Access >> Detailed File Share
+        - Failure'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:17701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Use the AuditPol tool to review the current Audit Policy configuration:
+
+            Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+            Enter "AuditPol /get /category:*".
+
+
+            Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+            Object Access >> Detailed File Share - Failure'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253347
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253347
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253347
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253347
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:17701
+        exports: []
+        inline_content: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with
+          elevated privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with
+          the following. If the system does not audit the following, this is a finding: Object Access >> Detailed File Share
+          - Failure'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:17701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Use the AuditPol tool to review the current Audit Policy configuration:
+
+              Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+              Enter "AuditPol /get /category:*".
+
+
+              Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+              Object Access >> Detailed File Share - Failure'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with elevated
+      privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following.
+      If the system does not audit the following, this is a finding: Object Access >> Detailed File Share - Failure'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253347r958412_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 4f7a83e84f72e3a9ca8fd61ca041526e65c1ec4d8034eec0af852b14fd44d0fd
+  migration: *id002

@@ -317,7 +317,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271601r1091515_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271601r1091515_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271601r1091515_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271601r1091515_rule
     version: 1
     description: OL 9 must take action when allocated audit record storage volume reaches 95 percent of the audit record storage
@@ -380,6 +394,30 @@ rule:
           - oval:mil.disa.stig.ind:ste:25815800
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:258158:
+          source_definition_id: oval:mil.disa.stig.defs:def:258158
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: '/etc/audit/auditd.conf: admin_space_left = 5%'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25815800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must take action when allocated audit record storage volume reaches 95 percent of
+                the audit record storage capacity.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271601:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271601
           class: compliance
@@ -414,30 +452,6 @@ rule:
                 when the storage volume reaches capacity.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:258158:
-          source_definition_id: oval:mil.disa.stig.defs:def:258158
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: '/etc/audit/auditd.conf: admin_space_left = 5%'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25815800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must take action when allocated audit record storage volume reaches 95 percent of
-                the audit record storage capacity.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271601
@@ -449,16 +463,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271601
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271601
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271601
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -560,11 +580,160 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271601r1091515_rule
-      semantic_ir_sha256: 81002324dd5602c1c9b5aa9b9057a814b29edfdd73c50fe7ab6d57b0fae5e1d6
+      semantic_ir_sha256: 2e2b4c81705169eccf0884b26aae43189309bdfb2ac1b2d74a35d1fbaa3cdd08
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 6740088d81b9f1f08a3686845825ce8f85bc434db6280d21882ca0ab8ef70578
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271601r1091515_rule
+    version: 1
+    description: OL 9 must take action when allocated audit record storage volume reaches 95 percent of the audit record storage
+      capacity.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:33101
+      exports: []
+      inline_content: 'Verify that OL 9 takes action when allocated audit record storage volume reaches 95 percent of the
+        repository maximum audit record storage capacity with the following command: $ sudo grep -w admin_space_left /etc/audit/auditd.conf
+        admin_space_left = 5% If the value of the "admin_space_left" keyword is not set to 5 percent of the storage volume
+        allocated to audit logs, or if the line is commented out, ask the system administrator (SA) to indicate how the system
+        is taking action if the allocated storage is about to reach capacity. If the "space_left" value is not configured
+        to the correct value, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:33101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 takes action when allocated audit record storage volume reaches 95 percent of the repository
+            maximum audit record storage capacity with the following command:
+
+
+            $ sudo grep -w admin_space_left /etc/audit/auditd.conf
+
+            admin_space_left = 5%
+
+
+            If the value of the "admin_space_left" keyword is not set to 5 percent of the storage volume allocated to audit
+            logs, or if the line is commented out, ask the system administrator (SA) to indicate how the system is taking
+            action if the allocated storage is about to reach capacity. If the "space_left" value is not configured to the
+            correct value, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271601
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271601
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271601
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271601
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:33101
+        exports: []
+        inline_content: 'Verify that OL 9 takes action when allocated audit record storage volume reaches 95 percent of the
+          repository maximum audit record storage capacity with the following command: $ sudo grep -w admin_space_left /etc/audit/auditd.conf
+          admin_space_left = 5% If the value of the "admin_space_left" keyword is not set to 5 percent of the storage volume
+          allocated to audit logs, or if the line is commented out, ask the system administrator (SA) to indicate how the
+          system is taking action if the allocated storage is about to reach capacity. If the "space_left" value is not configured
+          to the correct value, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:33101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 takes action when allocated audit record storage volume reaches 95 percent of the repository
+              maximum audit record storage capacity with the following command:
+
+
+              $ sudo grep -w admin_space_left /etc/audit/auditd.conf
+
+              admin_space_left = 5%
+
+
+              If the value of the "admin_space_left" keyword is not set to 5 percent of the storage volume allocated to audit
+              logs, or if the line is commented out, ask the system administrator (SA) to indicate how the system is taking
+              action if the allocated storage is about to reach capacity. If the "space_left" value is not configured to the
+              correct value, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 takes action when allocated audit record storage volume reaches 95 percent of the repository
+      maximum audit record storage capacity with the following command: $ sudo grep -w admin_space_left /etc/audit/auditd.conf
+      admin_space_left = 5% If the value of the "admin_space_left" keyword is not set to 5 percent of the storage volume allocated
+      to audit logs, or if the line is commented out, ask the system administrator (SA) to indicate how the system is taking
+      action if the allocated storage is about to reach capacity. If the "space_left" value is not configured to the correct
+      value, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271601r1091515_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 43ff0e10e133420c65fbcafe66d91444601a81daae6405868ee7daf73340a560
+  migration: *id002

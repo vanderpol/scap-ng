@@ -315,7 +315,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271625r1091587_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271625r1091587_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271625r1091587_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271625r1091587_rule
     version: 1
     description: OL 9 password-auth must be configured to use a sufficient number of hashing rounds.
@@ -378,29 +392,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:25810000
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:258099:
-          source_definition_id: oval:mil.disa.stig.defs:def:258099
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: The pam_unix module is included in password-auth and configured for 100000 or more rounds.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25809900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system password-auth must be configured to use a sufficient number of hashing rounds.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271625:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271625
           class: compliance
@@ -437,6 +428,29 @@ rule:
                 \ SRG-OS-000120-GPOS-00061"
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258099:
+          source_definition_id: oval:mil.disa.stig.defs:def:258099
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: The pam_unix module is included in password-auth and configured for 100000 or more rounds.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25809900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system password-auth must be configured to use a sufficient number of hashing rounds.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271625
@@ -448,16 +462,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271625
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271625
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271625
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -552,11 +572,144 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271625r1091587_rule
-      semantic_ir_sha256: b80b309e848999d964af2718e1da946a5982b590ede0cdaf1f00dd5ec62f3452
+      semantic_ir_sha256: 670c11d8cb26482bc3e4bbdd73793c20a0d82111f0ab5ce9982aa2b722fbd832
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 61c8dc1721bc2ab34e98dc13bd29bdef10305a6b26846499b3d9da73067e7382
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271625r1091587_rule
+    version: 1
+    description: OL 9 password-auth must be configured to use a sufficient number of hashing rounds.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:37901
+      exports: []
+      inline_content: 'Verify that OL 9 password-auth is configured to use a sufficient number of hashing rounds with the
+        following command: $ sudo grep rounds /etc/pam.d/password-auth password sufficient pam_unix.so sha512 rounds=100000
+        If a matching line is not returned or "rounds" is less than "100000", this a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:37901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 password-auth is configured to use a sufficient number of hashing rounds with the following
+            command:
+
+
+            $ sudo grep rounds /etc/pam.d/password-auth
+
+            password sufficient pam_unix.so sha512 rounds=100000
+
+
+            If a matching line is not returned or "rounds" is less than "100000", this a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271625
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271625
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271625
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271625
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:37901
+        exports: []
+        inline_content: 'Verify that OL 9 password-auth is configured to use a sufficient number of hashing rounds with the
+          following command: $ sudo grep rounds /etc/pam.d/password-auth password sufficient pam_unix.so sha512 rounds=100000
+          If a matching line is not returned or "rounds" is less than "100000", this a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:37901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 password-auth is configured to use a sufficient number of hashing rounds with the following
+              command:
+
+
+              $ sudo grep rounds /etc/pam.d/password-auth
+
+              password sufficient pam_unix.so sha512 rounds=100000
+
+
+              If a matching line is not returned or "rounds" is less than "100000", this a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 password-auth is configured to use a sufficient number of hashing rounds with the following
+      command: $ sudo grep rounds /etc/pam.d/password-auth password sufficient pam_unix.so sha512 rounds=100000 If a matching
+      line is not returned or "rounds" is less than "100000", this a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271625r1091587_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: bd3d8d90cb8b4591e677ee989541044ca4df0a4dccdb9b222680bf81c23850c9
+  migration: *id002

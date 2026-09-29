@@ -7,6 +7,18 @@ assessment:
   description: OL 9 must mount /dev/shm with the noexec option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.linux:obj:23051000:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23051000
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /dev/shm
     oval:mil.disa.stig.ind:obj:23051001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23051001
@@ -31,33 +43,8 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.linux:obj:23051000:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23051000
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /dev/shm
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23051001:
-      source_state_id: oval:mil.disa.stig.ind:ste:23051001
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: (?:^noexec$|^noexec,|,noexec$|,noexec,)
-      comment: null
     oval:mil.disa.stig.linux:ste:20000000:
       source_state_id: oval:mil.disa.stig.linux:ste:20000000
       source_type: partition_state
@@ -71,21 +58,21 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: noexec
       comment: null
+    oval:mil.disa.stig.ind:ste:23051001:
+      source_state_id: oval:mil.disa.stig.ind:ste:23051001
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?:^noexec$|^noexec,|,noexec$|,noexec,)
+      comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23051001:
-        source_test_id: oval:mil.disa.stig.ind:tst:23051001
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: If /dev/shm is configured in /etc/fstab, it is configured with the noexec option
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23051001
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23051001
-        source_other: []
       oval:mil.disa.stig.linux:tst:23051000:
         source_test_id: oval:mil.disa.stig.linux:tst:23051000
         source_type: partition_test
@@ -98,6 +85,19 @@ assessment:
         - oval:mil.disa.stig.linux:obj:23051000
         predicates:
         - oval:mil.disa.stig.linux:ste:20000000
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23051001:
+        source_test_id: oval:mil.disa.stig.ind:tst:23051001
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: If /dev/shm is configured in /etc/fstab, it is configured with the noexec option
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23051001
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23051001
         source_other: []
     definitions:
       oval:mil.disa.stig.ol9os:def:271651:
@@ -172,16 +172,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271651
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271651
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271651
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -282,6 +288,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271651r1091665_rule
-    semantic_ir_sha256: da7afad12d054056eebf1a29aba5223fc7dd27f8c7d14f652f64e8d4703f6b0c
+    semantic_ir_sha256: 81480f7f4811011a3202b8c38cd57fa5424b3bf950f38adfddefff07b83444f5
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 48e42da4c1f563b425e572b8aa8accfbf5f3dc99d7295765b9959d510c5f619a

@@ -267,7 +267,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257928r1155576_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257928r1155576_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-257928r1155576_rule
     version: 1
     description: All RHEL 9 world-writable directories must be owned by root, sys, bin, or an application user.
@@ -393,10 +403,13 @@ rule:
       the following command: $ sudo find / -xdev -type d -perm -0002 -uid +999 -exec stat -c "%U, %u, %A, %n" {} \; 2>/dev/null
       If there is output that indicates world-writable directories are owned by any account other than root or an approved
       system account, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-257928r1155576_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 1e0f904a3943519e23f2c109917b18c1f6b9cf575c474e77e03f5ca98dc98423
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

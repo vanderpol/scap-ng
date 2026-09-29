@@ -304,12 +304,38 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257878r958804_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257878r958804_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257878r958804_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257878r958804_rule
     version: 1
     description: RHEL 9 must mount /var/tmp with the nosuid option.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.linux:obj:23052100:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23052100
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /var/tmp
       oval:mil.disa.stig.ind:obj:23052101:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23052101
@@ -334,33 +360,8 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.linux:obj:23052100:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23052100
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /var/tmp
     derive: {}
     predicates:
-      oval:mil.disa.stig.linux:ste:20000002:
-        source_state_id: oval:mil.disa.stig.linux:ste:20000002
-        source_type: partition_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          kind: element
-          name: mount_options
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: nosuid
-        comment: null
       oval:mil.disa.stig.ind:ste:23052101:
         source_state_id: oval:mil.disa.stig.ind:ste:23052101
         source_type: textfilecontent54_state
@@ -373,6 +374,19 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+        comment: null
+      oval:mil.disa.stig.linux:ste:20000002:
+        source_state_id: oval:mil.disa.stig.linux:ste:20000002
+        source_type: partition_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          kind: element
+          name: mount_options
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: nosuid
         comment: null
     evaluate:
       tests:
@@ -403,33 +417,6 @@ rule:
           - oval:mil.disa.stig.linux:ste:20000002
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230521:
-          source_definition_id: oval:mil.disa.stig.defs:def:230521
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23052100
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23052101
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must mount /var/tmp with the nosuid option.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257878:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257878
           class: compliance
@@ -465,6 +452,33 @@ rule:
                 administrative access.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230521:
+          source_definition_id: oval:mil.disa.stig.defs:def:230521
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23052100
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23052101
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must mount /var/tmp with the nosuid option.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257878
@@ -476,16 +490,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257878
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257878
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257878
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -580,11 +600,144 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257878r958804_rule
-      semantic_ir_sha256: 96ab63669216fd00995d4ccb3ab0a1a7303d83389b27f49112b439cd152fe61c
+      semantic_ir_sha256: 6ba6574022f4ebd534b64f6bc6389cf4155fcada0c04d1c0d32dbe7f286488ed
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: d9a8c90d6814d2f8e03d9b180985502f124eb2c6aadae240474732bece63d0b9
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257878r958804_rule
+    version: 1
+    description: RHEL 9 must mount /var/tmp with the nosuid option.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:19901
+      exports: []
+      inline_content: 'Verify "/var/tmp" is mounted with the "nosuid" option: $ mount | grep /var/tmp /dev/mapper/rhel-var-tmp
+        on /var/tmp type xfs (rw,nodev,nosuid,noexec,seclabel) If the "/var/tmp" file system is mounted without the "nosuid"
+        option, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:19901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify "/var/tmp" is mounted with the "nosuid" option:
+
+
+            $ mount | grep /var/tmp
+
+
+            /dev/mapper/rhel-var-tmp on /var/tmp type xfs (rw,nodev,nosuid,noexec,seclabel)
+
+
+            If the "/var/tmp" file system is mounted without the "nosuid" option, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257878
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257878
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257878
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257878
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:19901
+        exports: []
+        inline_content: 'Verify "/var/tmp" is mounted with the "nosuid" option: $ mount | grep /var/tmp /dev/mapper/rhel-var-tmp
+          on /var/tmp type xfs (rw,nodev,nosuid,noexec,seclabel) If the "/var/tmp" file system is mounted without the "nosuid"
+          option, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:19901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify "/var/tmp" is mounted with the "nosuid" option:
+
+
+              $ mount | grep /var/tmp
+
+
+              /dev/mapper/rhel-var-tmp on /var/tmp type xfs (rw,nodev,nosuid,noexec,seclabel)
+
+
+              If the "/var/tmp" file system is mounted without the "nosuid" option, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify "/var/tmp" is mounted with the "nosuid" option: $ mount | grep /var/tmp /dev/mapper/rhel-var-tmp on
+      /var/tmp type xfs (rw,nodev,nosuid,noexec,seclabel) If the "/var/tmp" file system is mounted without the "nosuid" option,
+      this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257878r958804_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 7d82f9a9633a56131824201ac6e740ce07c92b4d688bcf9dea26e7530e02081e
+  migration: *id002

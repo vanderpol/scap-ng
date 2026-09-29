@@ -254,7 +254,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253272r1210286_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253272r1210286_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-253272r1210286_rule
     version: 1
     description: Standard local user accounts must not exist on a system in a domain.
@@ -394,10 +404,13 @@ rule:
       (Disabled, *SID unique per workstation) Built-in WDAGUtilityAccount (Disabled, SID ending in 504) Local administrator
       account(s) * Note that the SID for defaultuser0 is machine-specific and immutable (cannot be changed). It will differ
       per Windows installation. All of the built-in accounts may not exist on a system, depending on the Windows 11 version.
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-253272r1210286_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 7f6790f4e2118067fdc3a70b77213ea43d95b6f1c55d6c4061e20d6d337ec749
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

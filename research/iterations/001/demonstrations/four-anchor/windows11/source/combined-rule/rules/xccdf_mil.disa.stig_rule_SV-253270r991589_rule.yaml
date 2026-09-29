@@ -258,7 +258,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253270r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253270r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-253270r991589_rule
     version: 1
     description: Only accounts responsible for the backup operations must be members of the Backup Operators group.
@@ -394,10 +404,13 @@ rule:
       of the Backup Operators group. If the group contains no accounts, this is not a finding. If the group contains any accounts,
       the accounts must be specifically for backup functions. If the group contains any standard user accounts used for performing
       normal user tasks, this is a finding.
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-253270r991589_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 857ef06bf832cfba5142109a00e72fff8265c1382d5ad1e3f36def8fe03bf1e8
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

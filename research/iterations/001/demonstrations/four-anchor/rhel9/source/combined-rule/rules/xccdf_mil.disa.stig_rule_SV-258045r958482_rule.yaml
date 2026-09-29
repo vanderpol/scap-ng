@@ -297,7 +297,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258045r958482_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258045r958482_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258045r958482_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258045r958482_rule
     version: 1
     description: RHEL 9 duplicate User IDs (UIDs) must not exist for interactive users.
@@ -470,19 +484,6 @@ rule:
           variable_id: oval:mil.disa.stig.defs:var:25804500
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.ind:ste:25804500:
-        source_state_id: oval:mil.disa.stig.ind:ste:25804500
-        source_type: variable_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            var_ref: oval:mil.disa.stig.defs:var:25804501
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: count of passwd UIDs
       oval:mil.disa.stig.unix:ste:25804500:
         source_state_id: oval:mil.disa.stig.unix:ste:25804500
         source_type: password_state
@@ -497,6 +498,19 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '1000'
         comment: Interactive Users
+      oval:mil.disa.stig.ind:ste:25804500:
+        source_state_id: oval:mil.disa.stig.ind:ste:25804500
+        source_type: variable_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            var_ref: oval:mil.disa.stig.defs:var:25804501
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: count of passwd UIDs
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:25804500:
@@ -583,16 +597,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258045
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258045
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258045
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -680,11 +700,130 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258045r958482_rule
-      semantic_ir_sha256: 2f03a799470a5797f37ec3263e7a0b318a1abb1ee4385aecf07429fff53825de
+      semantic_ir_sha256: 250161c4d8b2de606c019a79c2142b4e4da41aa967155a4c32f19e7bc5818d34
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: ab81708ab2fd5094cd406063d6afe858d27e8bccf44147df2bd9979256f61187
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258045r958482_rule
+    version: 1
+    description: RHEL 9 duplicate User IDs (UIDs) must not exist for interactive users.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:51701
+      exports: []
+      inline_content: 'Verify that RHEL 9 contains no duplicate UIDs for interactive users with the following command: $ sudo
+        awk -F ":" ''list[$3]++{print $1, $3}'' /etc/passwd If output is produced and the accounts listed are interactive
+        user accounts, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:51701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that RHEL 9 contains no duplicate UIDs for interactive users with the following command:\n\n$ sudo\
+            \ awk -F \":\" 'list[$3]++{print $1, $3}' /etc/passwd \n\nIf output is produced and the accounts listed are interactive\
+            \ user accounts, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258045
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258045
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258045
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258045
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:51701
+        exports: []
+        inline_content: 'Verify that RHEL 9 contains no duplicate UIDs for interactive users with the following command: $
+          sudo awk -F ":" ''list[$3]++{print $1, $3}'' /etc/passwd If output is produced and the accounts listed are interactive
+          user accounts, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:51701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify that RHEL 9 contains no duplicate UIDs for interactive users with the following command:\n\n$ sudo\
+              \ awk -F \":\" 'list[$3]++{print $1, $3}' /etc/passwd \n\nIf output is produced and the accounts listed are\
+              \ interactive user accounts, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that RHEL 9 contains no duplicate UIDs for interactive users with the following command: $ sudo awk
+      -F ":" ''list[$3]++{print $1, $3}'' /etc/passwd If output is produced and the accounts listed are interactive user accounts,
+      this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258045r958482_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 7d837b78f5dd701929bbaac9b20beea1ac73f967ce245178d0d58f1bc7a7ac2e
+  migration: *id002

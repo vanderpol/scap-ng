@@ -316,7 +316,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253499r958726_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253499r958726_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253499r958726_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253499r958726_rule
     version: 1
     description: The "Load and unload device drivers" user right must only be assigned to the Administrators group.
@@ -336,16 +350,6 @@ rule:
           value: SE_LOAD_DRIVER_NAME
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:20000029:
-        source_state_id: oval:mil.disa.stig.win:ste:20000029
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -358,6 +362,16 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
+        comment: null
+      oval:mil.disa.stig.win:ste:20000029:
+        source_state_id: oval:mil.disa.stig.win:ste:20000029
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         comment: null
     evaluate:
       tests:
@@ -447,16 +461,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253499
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253499
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253499
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -556,11 +576,155 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253499r958726_rule
-      semantic_ir_sha256: 690751b3e88e22c6e8dc62239ab21d0276e8107628977f9453c211544efbd716
+      semantic_ir_sha256: 912ae8f644249f54505ac282d1a15b900056f6ed0e40a21b80886dda16217791
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: b4a2865a27b7e2c26e777590371f1c62aeaa4f876b0845f5cc8582794f9f9491
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253499r958726_rule
+    version: 1
+    description: The "Load and unload device drivers" user right must only be assigned to the Administrators group.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:47501
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+        If any groups or accounts other than the following are granted the "Load and unload device drivers" user right, this
+        is a finding: Administrators'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:47501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+            Run "gpedit.msc".
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If any groups or accounts other than the following are granted the "Load and unload device drivers" user right,
+            this is a finding:
+
+
+            Administrators'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253499
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253499
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253499
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253499
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:47501
+        exports: []
+        inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+          Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+          If any groups or accounts other than the following are granted the "Load and unload device drivers" user right,
+          this is a finding: Administrators'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:47501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the effective setting in Local Group Policy Editor.
+
+              Run "gpedit.msc".
+
+
+              Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+              Policies >> User Rights Assignment.
+
+
+              If any groups or accounts other than the following are granted the "Load and unload device drivers" user right,
+              this is a finding:
+
+
+              Administrators'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer Policy
+      >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment. If any
+      groups or accounts other than the following are granted the "Load and unload device drivers" user right, this is a finding:
+      Administrators'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253499r958726_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 5d84ea27413d8307b4f9bcff48f64b00a5bbd6f322b28b37912eeae1ae4848f4
+  migration: *id002

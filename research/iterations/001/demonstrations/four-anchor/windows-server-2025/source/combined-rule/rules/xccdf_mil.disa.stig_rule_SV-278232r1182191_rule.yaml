@@ -305,7 +305,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-278232r1182191_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-278232r1182191_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278232r1182191_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278232r1182191_rule
     version: 1
     description: Windows Server 2025 User Account Control (UAC) approval mode for the built-in Administrator must be enabled.
@@ -373,30 +387,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253468:
-          source_definition_id: oval:mil.disa.stig.defs:def:253468
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''User Account Control: Admin Approval Mode for the Built-in Administrator account'' is set
-                to ''Enabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25346800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: User Account Control approval mode for the built-in Administrator must be enabled.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278232:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278232
           class: compliance
@@ -432,6 +422,30 @@ rule:
                 \ Mode.\n\n  Satisfies: SRG-OS-000373-GPOS-00156, SRG-OS-000373-GPOS-00157"
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253468:
+          source_definition_id: oval:mil.disa.stig.defs:def:253468
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''User Account Control: Admin Approval Mode for the Built-in Administrator account'' is set
+                to ''Enabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25346800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: User Account Control approval mode for the built-in Administrator must be enabled.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows2025:def:278232
@@ -443,16 +457,22 @@ rule:
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows2025:def:278232
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows2025:def:278232
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows2025:def:278232
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
@@ -543,11 +563,137 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278232r1182191_rule
-      semantic_ir_sha256: ec667fc7d673d6c5e3ceb39724011daadc61af89c5898d4663206af85c1d0b34
+      semantic_ir_sha256: e08a19045dedc495f06b7b1904ad3ed5dee529aa07ab23f4c56e8d4cfbd1eba5
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: b63c060f52b1f74b2388eaa902eacf6a277aadb1fc7d303da49ae6ad04a179c1
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278232r1182191_rule
+    version: 1
+    description: Windows Server 2025 User Account Control (UAC) approval mode for the built-in Administrator must be enabled.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:48901
+      exports: []
+      inline_content: 'UAC requirements are not applicable for Server Core installations (this is the default installation
+        option for Windows Server 2025 versus Server with Desktop Experience). If the following registry value does not exist
+        or is not configured as specified, this is a finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\
+        Value Name: FilterAdministratorToken Value Type: REG_DWORD Value: 0x00000001 (1)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:48901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "UAC requirements are not applicable for Server Core installations (this is the default installation option\
+            \ for Windows Server 2025 versus Server with Desktop Experience).\n\nIf the following registry value does not\
+            \ exist or is not configured as specified, this is a finding:\n\nRegistry Hive: HKEY_LOCAL_MACHINE \nRegistry\
+            \ Path: \\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\\n\nValue Name: FilterAdministratorToken\n\
+            \nValue Type: REG_DWORD\nValue: 0x00000001 (1)"
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278232
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278232
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278232
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278232
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:48901
+        exports: []
+        inline_content: 'UAC requirements are not applicable for Server Core installations (this is the default installation
+          option for Windows Server 2025 versus Server with Desktop Experience). If the following registry value does not
+          exist or is not configured as specified, this is a finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\
+          Value Name: FilterAdministratorToken Value Type: REG_DWORD Value: 0x00000001 (1)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:48901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "UAC requirements are not applicable for Server Core installations (this is the default installation option\
+              \ for Windows Server 2025 versus Server with Desktop Experience).\n\nIf the following registry value does not\
+              \ exist or is not configured as specified, this is a finding:\n\nRegistry Hive: HKEY_LOCAL_MACHINE \nRegistry\
+              \ Path: \\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\\n\nValue Name: FilterAdministratorToken\n\
+              \nValue Type: REG_DWORD\nValue: 0x00000001 (1)"
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'UAC requirements are not applicable for Server Core installations (this is the default installation option
+      for Windows Server 2025 versus Server with Desktop Experience). If the following registry value does not exist or is
+      not configured as specified, this is a finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\
+      Value Name: FilterAdministratorToken Value Type: REG_DWORD Value: 0x00000001 (1)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-278232r1182191_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 7a9f68af4fc98cb97c52c28b6a5beb4622242c0abad527fba03619583dd32104
+  migration: *id002

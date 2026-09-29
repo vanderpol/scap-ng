@@ -347,37 +347,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258176r1155595_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258176r1155595_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258176r1155595_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258176r1155595_rule
     version: 1
     description: RHEL 9 must audit uses of the "execve" system call.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23038602:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23038602
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 32-bit execve syscall gid comparison
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:23038601:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23038601
@@ -396,31 +385,6 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+uid!=euid\s+-F\s+euid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:23038603:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23038603
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 64-bit execve syscall gid comparison
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -453,6 +417,56 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:23038603:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23038603
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 64-bit execve syscall gid comparison
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23038602:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23038602
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 32-bit execve syscall gid comparison
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates: {}
     evaluate:
@@ -467,18 +481,6 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:23038601
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23038603:
-          source_test_id: oval:mil.disa.stig.ind:tst:23038603
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 64-bit invocations of execve syscall comparing gids
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23038603
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:23038600:
@@ -505,43 +507,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:23038602
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:23038603:
+          source_test_id: oval:mil.disa.stig.ind:tst:23038603
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 64-bit invocations of execve syscall comparing gids
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23038603
+          predicates: []
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230386:
-          source_definition_id: oval:mil.disa.stig.defs:def:230386
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit 32-bit invocations of execve syscall comparing uids
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23038600
-            - comment: Audit 64-bit invocations of execve syscall comparing uids
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23038601
-            - comment: Audit 32-bit invocations of execve syscall comparing gids
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23038602
-            - comment: Audit 64-bit invocations of execve syscall comparing gids
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23038603
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system audit system must be configured to audit the execution of privileged functions and
-                prevent all software from executing at higher privilege levels than users executing the software.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258176:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258176
           class: compliance
@@ -580,6 +558,42 @@ rule:
                 Satisfies: SRG-OS-000326-GPOS-00126, SRG-OS-000327-GPOS-00127'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230386:
+          source_definition_id: oval:mil.disa.stig.defs:def:230386
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit 32-bit invocations of execve syscall comparing uids
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23038600
+            - comment: Audit 64-bit invocations of execve syscall comparing uids
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23038601
+            - comment: Audit 32-bit invocations of execve syscall comparing gids
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23038602
+            - comment: Audit 64-bit invocations of execve syscall comparing gids
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23038603
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system audit system must be configured to audit the execution of privileged functions and
+                prevent all software from executing at higher privilege levels than users executing the software.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258176
@@ -591,16 +605,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258176
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258176
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258176
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -703,11 +723,162 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258176r1155595_rule
-      semantic_ir_sha256: 3db2a54e4ba7afc5b4d641a42128a2b39172463468368294bb918e0b3c00ac95
+      semantic_ir_sha256: 28a30827a635f6617199704bc1ff2a60dd559d9f9fdf868f9fe3c18fd51139cc
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 46173f32920576429fa984583c8ab4cd35485c05eb5801261c1a4f7e1deb2427
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258176r1155595_rule
+    version: 1
+    description: RHEL 9 must audit uses of the "execve" system call.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:75101
+      exports: []
+      inline_content: 'Verify RHEL 9 is configured to audit the execution of the "execve" system call with the following command:
+        $ sudo auditctl -l | grep execve -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv -a always,exit
+        -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0
+        -k execpriv -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv If the command does not return
+        all lines, or the lines are commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:75101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify RHEL 9 is configured to audit the execution of the "execve" system call with the following command:
+
+
+            $ sudo auditctl -l | grep execve
+
+
+            -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv
+
+            -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv
+
+            -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv
+
+            -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv
+
+
+            If the command does not return all lines, or the lines are commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258176
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258176
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258176
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258176
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:75101
+        exports: []
+        inline_content: 'Verify RHEL 9 is configured to audit the execution of the "execve" system call with the following
+          command: $ sudo auditctl -l | grep execve -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv
+          -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv -a always,exit -F arch=b32 -S execve -C
+          gid!=egid -F egid=0 -k execpriv -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv If the command
+          does not return all lines, or the lines are commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:75101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify RHEL 9 is configured to audit the execution of the "execve" system call with the following command:
+
+
+              $ sudo auditctl -l | grep execve
+
+
+              -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv
+
+              -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv
+
+              -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv
+
+              -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv
+
+
+              If the command does not return all lines, or the lines are commented out, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 is configured to audit the execution of the "execve" system call with the following command:
+      $ sudo auditctl -l | grep execve -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv -a always,exit
+      -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0
+      -k execpriv -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv If the command does not return all
+      lines, or the lines are commented out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258176r1155595_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 38f2ba7d5e2a6f8e18e394edf40348a3a9ab710ab1d394a64cd58e24970e82a7
+  migration: *id002

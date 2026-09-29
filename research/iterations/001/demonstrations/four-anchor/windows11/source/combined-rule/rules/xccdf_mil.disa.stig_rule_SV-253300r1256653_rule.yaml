@@ -350,12 +350,34 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
     version: 1
     description: The password history must be configured to 24 passwords remembered.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:20000002:
+        capability: scapng.collect.windows.passwordpolicy
+        source_object_id: oval:mil.disa.stig.win:obj:20000002
+        source_type: passwordpolicy_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query: []
       oval:mil.disa.stig.win:obj:25330000:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25330000
@@ -385,16 +407,22 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: DevicePasswordHistory
-      oval:mil.disa.stig.win:obj:20000002:
-        capability: scapng.collect.windows.passwordpolicy
-        source_object_id: oval:mil.disa.stig.win:obj:20000002
-        source_type: passwordpolicy_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query: []
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:25330000:
+        source_state_id: oval:mil.disa.stig.win:ste:25330000
+        source_type: passwordpolicy_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: password_hist_len
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '24'
+        comment: Password History Length is greater than or equal to variable
       oval:mil.disa.stig.win:ste:25330001:
         source_state_id: oval:mil.disa.stig.win:ste:25330001
         source_type: registry_state
@@ -413,20 +441,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '24'
         comment: null
-      oval:mil.disa.stig.win:ste:25330000:
-        source_state_id: oval:mil.disa.stig.win:ste:25330000
-        source_type: passwordpolicy_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: password_hist_len
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '24'
-        comment: Password History Length is greater than or equal to variable
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25330001:
@@ -456,33 +470,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25330000
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:25330000:
-          source_definition_id: oval:mil.disa.stig.defs:def:25330000
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Verifies 'Enforce password history' is set to '24' passwords or more by GPO
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25330000
-            - comment: Verifies 'Enforce password history' is set to '24' passwords or more by Intune
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25330001
-            comment: null
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The password history must be configured to 24 passwords remembered.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253300:
           source_definition_id: oval:mil.disa.stig.windows11:def:253300
           class: compliance
@@ -518,6 +505,33 @@ rule:
                 is 24 for Windows domain systems. DoW has decided this is the appropriate value for all Windows systems.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:25330000:
+          source_definition_id: oval:mil.disa.stig.defs:def:25330000
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Verifies 'Enforce password history' is set to '24' passwords or more by GPO
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25330000
+            - comment: Verifies 'Enforce password history' is set to '24' passwords or more by Intune
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25330001
+            comment: null
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The password history must be configured to 24 passwords remembered.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253300
@@ -529,16 +543,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253300
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253300
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253300
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -647,11 +667,173 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
-      semantic_ir_sha256: 869ddb9a6eb4cdba445838956139bea39d1c50dd6645ed9766ad7b2f727966b3
+      semantic_ir_sha256: f626d4c3f66a395fc4ae1d15e8619a4abebb284cb05cc7333cd78ab3d8526ba4
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: d5fc6253cf8bad14fc5e55c7e30c18a4e6765e2a56fffdc90d39d9051b86a87a
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
+    version: 1
+    description: The password history must be configured to 24 passwords remembered.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:8501
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". For GPO-managed systems,
+        navigate to: Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies
+        >> Password Policy. Or For Intune-managed systems, navigate to: HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\DeviceLock!DevicePasswordHistory
+        If the value for "Enforce password history" is less than "24" passwords remembered, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:8501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+            Run "gpedit.msc".
+
+
+            For GPO-managed systems, navigate to:
+
+
+            Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies >>
+            Password Policy.
+
+
+            Or
+
+
+            For Intune-managed systems, navigate to:
+
+
+            HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\DeviceLock!DevicePasswordHistory
+
+
+            If the value for "Enforce password history" is less than "24" passwords remembered, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253300
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253300
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253300
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253300
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:8501
+        exports: []
+        inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". For GPO-managed systems,
+          navigate to: Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account
+          Policies >> Password Policy. Or For Intune-managed systems, navigate to: HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\DeviceLock!DevicePasswordHistory
+          If the value for "Enforce password history" is less than "24" passwords remembered, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:8501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+              Run "gpedit.msc".
+
+
+              For GPO-managed systems, navigate to:
+
+
+              Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies
+              >> Password Policy.
+
+
+              Or
+
+
+              For Intune-managed systems, navigate to:
+
+
+              HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\DeviceLock!DevicePasswordHistory
+
+
+              If the value for "Enforce password history" is less than "24" passwords remembered, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". For GPO-managed systems, navigate
+      to: Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies >>
+      Password Policy. Or For Intune-managed systems, navigate to: HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\DeviceLock!DevicePasswordHistory
+      If the value for "Enforce password history" is less than "24" passwords remembered, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: c41f4df1f59cf3596fa7c04d5d658b0349eff3aa6039e56041a865867278b03b
+  migration: *id002

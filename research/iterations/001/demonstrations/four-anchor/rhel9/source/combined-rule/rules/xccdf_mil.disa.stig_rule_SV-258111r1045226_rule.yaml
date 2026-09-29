@@ -304,12 +304,47 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258111r1045226_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258111r1045226_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258111r1045226_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258111r1045226_rule
     version: 1
     description: RHEL 9 must enforce password complexity by requiring that at least one uppercase character be used.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23035700:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23035700
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        comment: null
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23035701
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23035702
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
       oval:mil.disa.stig.ind:obj:23035702:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23035702
@@ -346,27 +381,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23035700:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23035700
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        comment: null
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23035701
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23035702
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
       oval:mil.disa.stig.ind:obj:23035701:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23035701
@@ -424,30 +438,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000020
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230357:
-          source_definition_id: oval:mil.disa.stig.defs:def:230357
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: at least one uppercase character is required
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23035700
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must enforce password complexity by requiring that at least one uppercase character
-                be used.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258111:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258111
           class: compliance
@@ -486,6 +476,30 @@ rule:
                 makes password guessing attacks more difficult by ensuring a larger search space.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230357:
+          source_definition_id: oval:mil.disa.stig.defs:def:230357
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: at least one uppercase character is required
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23035700
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must enforce password complexity by requiring that at least one uppercase character
+                be used.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258111
@@ -497,16 +511,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258111
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258111
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258111
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -595,11 +615,131 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258111r1045226_rule
-      semantic_ir_sha256: f9d99e55f598398384cd31a9f65d2f94757cc1184e00fba1ba54185fbc5dad95
+      semantic_ir_sha256: 2a6a1c67ec0bf783ad33d8066409838e906db56e3373dc5119cf9bdcabe92388
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 177d0d85eb5132ea462b3aa30fb5bb86bbe82ea45f3389e26e4b65f41245a506
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258111r1045226_rule
+    version: 1
+    description: RHEL 9 must enforce password complexity by requiring that at least one uppercase character be used.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:62901
+      exports: []
+      inline_content: 'Verify that RHEL 9 enforces password complexity by requiring that at least one uppercase character
+        be used. Check the value for "ucredit" with the following command: $ grep ucredit /etc/security/pwquality.conf /etc/security/pwquality.conf.d/*.conf
+        ucredit = -1 If the value of "ucredit" is a positive number or is commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:62901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that RHEL 9 enforces password complexity by requiring that at least one uppercase character be used.\n\
+            \nCheck the value for \"ucredit\" with the following command:\n\n$ grep ucredit /etc/security/pwquality.conf /etc/security/pwquality.conf.d/*.conf\
+            \  \n\nucredit = -1 \n\nIf the value of \"ucredit\" is a positive number or is commented out, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258111
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258111
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258111
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258111
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:62901
+        exports: []
+        inline_content: 'Verify that RHEL 9 enforces password complexity by requiring that at least one uppercase character
+          be used. Check the value for "ucredit" with the following command: $ grep ucredit /etc/security/pwquality.conf /etc/security/pwquality.conf.d/*.conf
+          ucredit = -1 If the value of "ucredit" is a positive number or is commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:62901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify that RHEL 9 enforces password complexity by requiring that at least one uppercase character be used.\n\
+              \nCheck the value for \"ucredit\" with the following command:\n\n$ grep ucredit /etc/security/pwquality.conf\
+              \ /etc/security/pwquality.conf.d/*.conf  \n\nucredit = -1 \n\nIf the value of \"ucredit\" is a positive number\
+              \ or is commented out, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that RHEL 9 enforces password complexity by requiring that at least one uppercase character be used.
+      Check the value for "ucredit" with the following command: $ grep ucredit /etc/security/pwquality.conf /etc/security/pwquality.conf.d/*.conf
+      ucredit = -1 If the value of "ucredit" is a positive number or is commented out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258111r1045226_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 30f72ed616b7d826d07cb7291a00dd72363b0a3e4683d065ab7bafd3156e5500
+  migration: *id002

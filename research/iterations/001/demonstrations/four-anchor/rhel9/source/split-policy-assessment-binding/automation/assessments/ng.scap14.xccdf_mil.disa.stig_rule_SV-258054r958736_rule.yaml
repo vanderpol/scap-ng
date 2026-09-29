@@ -37,20 +37,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:20000015:
-      source_state_id: oval:mil.disa.stig.ind:ste:20000015
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: greater than
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '0'
-      comment: null
     oval:mil.disa.stig.ind:ste:23033300:
       source_state_id: oval:mil.disa.stig.ind:ste:23033300
       source_type: textfilecontent54_state
@@ -64,6 +50,20 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '3'
+      comment: null
+    oval:mil.disa.stig.ind:ste:20000015:
+      source_state_id: oval:mil.disa.stig.ind:ste:20000015
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
       comment: null
   evaluate:
     tests:
@@ -82,6 +82,29 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000015
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230333:
+        source_definition_id: oval:mil.disa.stig.defs:def:230333
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: deny is set to 3 or less but not 0 in /etc/security/faillock.conf
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23033300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must automatically lock an account when three unsuccessful logon attempts occur.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258054:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258054
         class: compliance
@@ -118,29 +141,6 @@ assessment:
               Satisfies: SRG-OS-000329-GPOS-00128, SRG-OS-000021-GPOS-00005'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230333:
-        source_definition_id: oval:mil.disa.stig.defs:def:230333
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: deny is set to 3 or less but not 0 in /etc/security/faillock.conf
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23033300
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must automatically lock an account when three unsuccessful logon attempts occur.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:258054
@@ -152,16 +152,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258054
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258054
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258054
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -260,6 +266,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258054r958736_rule
-    semantic_ir_sha256: 375da1d09095a5ef694fad341d333a44a62ed7f1db17c9539a19071226710846
+    semantic_ir_sha256: 012ebf3e2870f9aabe4c54ccfac1e6f3f9fece8a9ffd168ddf970fe296e744ac
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 888df84f6f86dcc246b0fc6fd1e4e0a6c44f07dc5d09dd83354ba6ff4322f0e4

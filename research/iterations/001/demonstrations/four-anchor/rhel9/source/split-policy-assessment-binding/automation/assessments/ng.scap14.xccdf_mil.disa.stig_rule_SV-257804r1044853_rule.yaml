@@ -7,30 +7,6 @@ assessment:
   description: RHEL 9 must be configured to disable the Asynchronous Transfer Mode kernel module.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25780400:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25780400
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*install[ \t]+atm[ \t]+/bin/false[ \t]*$
-      - attributes:
-          datatype: int
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23049400:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23049400
@@ -58,6 +34,54 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25780400:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25780400
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*install[ \t]+atm[ \t]+/bin/false[ \t]*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25780401:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25780401
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*blacklist[ \t]+atm[ \t]*$
+      - attributes:
+          datatype: int
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -93,34 +117,34 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25780401:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25780401
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*blacklist[ \t]+atm[ \t]*$
-      - attributes:
-          datatype: int
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
   derive: {}
   predicates: {}
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:25780401:
+        source_test_id: oval:mil.disa.stig.ind:tst:25780401
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /etc/modprobe.conf contains a file that contains 'blacklist atm'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25780401
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23049401:
+        source_test_id: oval:mil.disa.stig.ind:tst:23049401
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /etc/modprobe.d contains a file that contains 'blacklist atm'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23049401
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.ind:tst:23049400:
         source_test_id: oval:mil.disa.stig.ind:tst:23049400
         source_type: textfilecontent54_test
@@ -143,30 +167,6 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:25780400
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23049401:
-        source_test_id: oval:mil.disa.stig.ind:tst:23049401
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.d contains a file that contains 'blacklist atm'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23049401
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:25780401:
-        source_test_id: oval:mil.disa.stig.ind:tst:25780401
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.conf contains a file that contains 'blacklist atm'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25780401
         predicates: []
         source_other: []
     definitions:
@@ -259,16 +259,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257804
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257804
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257804
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -362,6 +368,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257804r1044853_rule
-    semantic_ir_sha256: c283eaecba244f2de251e86042ef23bbf6ddff43ac2817d286caa4ebcd3d3ce9
+    semantic_ir_sha256: be2ec677e1863cdd853dc3e695b670693e6dac758adf9603f827fa4d40fa2e28
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 297da850144b68876104832faf0aeddf347a7098ed4aaaaa2a8c656d9aa67124

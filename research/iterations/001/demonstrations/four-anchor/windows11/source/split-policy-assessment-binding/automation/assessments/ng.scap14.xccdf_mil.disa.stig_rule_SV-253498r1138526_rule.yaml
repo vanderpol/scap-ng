@@ -22,6 +22,19 @@ assessment:
         value: SE_IMPERSONATE_NAME
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000036:
+      source_state_id: oval:mil.disa.stig.win:ste:20000036
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          operation: case insensitive equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: LOCAL SERVICE
+      comment: null
     oval:mil.disa.stig.win:ste:20000030:
       source_state_id: oval:mil.disa.stig.win:ste:20000030
       source_type: userright_state
@@ -34,6 +47,19 @@ assessment:
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: Administrators
+      comment: null
+    oval:mil.disa.stig.win:ste:20000038:
+      source_state_id: oval:mil.disa.stig.win:ste:20000038
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          operation: case insensitive equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SERVICE
       comment: null
     oval:mil.disa.stig.win:ste:20000037:
       source_state_id: oval:mil.disa.stig.win:ste:20000037
@@ -71,32 +97,6 @@ assessment:
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       comment: null
-    oval:mil.disa.stig.win:ste:20000038:
-      source_state_id: oval:mil.disa.stig.win:ste:20000038
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          operation: case insensitive equals
-        kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SERVICE
-      comment: null
-    oval:mil.disa.stig.win:ste:20000036:
-      source_state_id: oval:mil.disa.stig.win:ste:20000036
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          operation: case insensitive equals
-        kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: LOCAL SERVICE
-      comment: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25349801:
@@ -119,6 +119,31 @@ assessment:
         - oval:mil.disa.stig.win:ste:25349802
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253498:
+        source_definition_id: oval:mil.disa.stig.defs:def:253498
+        class: compliance
+        version: '6'
+        criteria:
+          children:
+          - comment: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE,
+              RESTRICTED SERVICES\PrintSpoolerService
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25349801
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service,
+              Local Service, and Network Service.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253498:
         source_definition_id: oval:mil.disa.stig.windows11:def:253498
         class: compliance
@@ -156,31 +181,6 @@ assessment:
               to run on their behalf. An attacker could potentially use this to elevate privileges.'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253498:
-        source_definition_id: oval:mil.disa.stig.defs:def:253498
-        class: compliance
-        version: '6'
-        criteria:
-          children:
-          - comment: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE,
-              RESTRICTED SERVICES\PrintSpoolerService
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25349801
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service,
-              Local Service, and Network Service.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.windows11:def:253498
@@ -192,16 +192,22 @@ assessment:
       exports: []
       href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows11:def:253498
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.windows11:def:253498
       exports: []
       href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows11:def:253498
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -315,6 +321,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
-    semantic_ir_sha256: 8f9cf4d159e15e4c9e2fa6d7cb96c60cdaabfa4eba3d42e82326b9a80303139c
+    semantic_ir_sha256: edcbd790c747c6e115bf842daac441878ff97263e8a536ff1bc892d65e2969b8
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 5b4b159114ad506d376f979f4642a98c83b4b7f7ce6e09c17c4b78235f8d88bf

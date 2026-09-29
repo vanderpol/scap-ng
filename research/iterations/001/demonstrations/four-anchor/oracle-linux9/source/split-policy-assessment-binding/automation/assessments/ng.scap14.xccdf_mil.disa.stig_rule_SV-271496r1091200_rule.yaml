@@ -7,18 +7,6 @@ assessment:
   description: OL 9 must have the Advanced Intrusion Detection Environment (AIDE) package installed.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:28513400:
-      capability: scapng.collect.linux.rpminfo
-      source_object_id: oval:mil.disa.stig.linux:obj:28513400
-      source_type: rpminfo_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: aide
     oval:mil.disa.stig.unix:obj:28513401:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:28513401
@@ -31,6 +19,18 @@ assessment:
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: /var/lib/aide/aide.db.gz
+    oval:mil.disa.stig.linux:obj:28513400:
+      capability: scapng.collect.linux.rpminfo
+      source_object_id: oval:mil.disa.stig.linux:obj:28513400
+      source_type: rpminfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: aide
   derive: {}
   predicates:
     oval:mil.disa.stig.unix:ste:28513400:
@@ -49,6 +49,18 @@ assessment:
       comment: not empty
   evaluate:
     tests:
+      oval:mil.disa.stig.linux:tst:28513400:
+        source_test_id: oval:mil.disa.stig.linux:tst:28513400
+        source_type: rpminfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: aide package is installed
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:28513400
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.unix:tst:28513401:
         source_test_id: oval:mil.disa.stig.unix:tst:28513401
         source_type: file_test
@@ -62,19 +74,35 @@ assessment:
         predicates:
         - oval:mil.disa.stig.unix:ste:28513400
         source_other: []
-      oval:mil.disa.stig.linux:tst:28513400:
-        source_test_id: oval:mil.disa.stig.linux:tst:28513400
-        source_type: rpminfo_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: aide package is installed
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:28513400
-        predicates: []
-        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:258134:
+        source_definition_id: oval:mil.disa.stig.defs:def:258134
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: aide package is installed
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:28513400
+          - comment: /var/lib/aide/aide.db.gz exists and is not empty
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:28513401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system operating system must use a file integrity tool to verify correct operation of all
+              security functions.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271496:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271496
         class: compliance
@@ -112,34 +140,6 @@ assessment:
               \ and setting intrusion detection parameters.\n\n\tSatisfies: SRG-OS-000363-GPOS-00150, SRG-OS-000445-GPOS-00199"
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:258134:
-        source_definition_id: oval:mil.disa.stig.defs:def:258134
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: aide package is installed
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:28513400
-          - comment: /var/lib/aide/aide.db.gz exists and is not empty
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:28513401
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system operating system must use a file integrity tool to verify correct operation of all
-              security functions.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.ol9os:def:271496
@@ -151,16 +151,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271496
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271496
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271496
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -257,6 +263,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271496r1091200_rule
-    semantic_ir_sha256: 765db84344d5a711dee08dec1940eed82868b97a6f541c9229f8859b123160f6
+    semantic_ir_sha256: 519003a7651d9926e1a5e14b9cf73850a0a526cc71f58b92f2ef1158ae603d79
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: a02a73755fe7c5c15f8a25499a13190cd1f1fa6fd690a07a86636ef6e524a158

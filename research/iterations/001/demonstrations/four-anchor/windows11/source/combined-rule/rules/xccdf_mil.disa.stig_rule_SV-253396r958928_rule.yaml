@@ -321,7 +321,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253396r958928_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253396r958928_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253396r958928_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253396r958928_rule
     version: 1
     description: Explorer Data Execution Prevention must be enabled.
@@ -388,29 +402,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253396:
-          source_definition_id: oval:mil.disa.stig.defs:def:253396
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Verifies 'Turn off Data Execution Prevention for Explorer' is set to 'Disabled' or 'Not Configured'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25339600
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Explorer Data Execution Prevention must be enabled.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253396:
           source_definition_id: oval:mil.disa.stig.windows11:def:253396
           class: compliance
@@ -445,6 +436,29 @@ rule:
                 off for File Explorer.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253396:
+          source_definition_id: oval:mil.disa.stig.defs:def:253396
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Verifies 'Turn off Data Execution Prevention for Explorer' is set to 'Disabled' or 'Not Configured'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25339600
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Explorer Data Execution Prevention must be enabled.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253396
@@ -456,16 +470,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253396
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253396
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253396
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -567,11 +587,158 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253396r958928_rule
-      semantic_ir_sha256: 390b627c2f44e09bb1c0f37e23bcc24c4f3476e756a49502c36b02fc509af983
+      semantic_ir_sha256: 3fd8ec951204b1887078e76136c1c84081fee5b51b76d1f756fc7a0576493879
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c1353eae3cfb8deba4baec88490e3cfb0973704c28be249cff43eedd29d5880c
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253396r958928_rule
+    version: 1
+    description: Explorer Data Execution Prevention must be enabled.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:27101
+      exports: []
+      inline_content: 'The default behavior is for data execution prevention to be turned on for file explorer. If it exists
+        and is configured with a value of "1", this is a finding. Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\Explorer\
+        Value Name: NoDataExecutionPrevention Value Type: REG_DWORD Value: 0 (or if the Value Name does not exist)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:27101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'The default behavior is for data execution prevention to be turned on for file explorer.
+
+
+            If it exists and is configured with a value of "1", this is a finding.
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Policies\Microsoft\Windows\Explorer\
+
+
+            Value Name: NoDataExecutionPrevention
+
+
+            Value Type: REG_DWORD
+
+            Value: 0 (or if the Value Name does not exist)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253396
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253396
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253396
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253396
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:27101
+        exports: []
+        inline_content: 'The default behavior is for data execution prevention to be turned on for file explorer. If it exists
+          and is configured with a value of "1", this is a finding. Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\Explorer\
+          Value Name: NoDataExecutionPrevention Value Type: REG_DWORD Value: 0 (or if the Value Name does not exist)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:27101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'The default behavior is for data execution prevention to be turned on for file explorer.
+
+
+              If it exists and is configured with a value of "1", this is a finding.
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SOFTWARE\Policies\Microsoft\Windows\Explorer\
+
+
+              Value Name: NoDataExecutionPrevention
+
+
+              Value Type: REG_DWORD
+
+              Value: 0 (or if the Value Name does not exist)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'The default behavior is for data execution prevention to be turned on for file explorer. If it exists and
+      is configured with a value of "1", this is a finding. Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\Explorer\
+      Value Name: NoDataExecutionPrevention Value Type: REG_DWORD Value: 0 (or if the Value Name does not exist)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253396r958928_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 18989f87a9dd1df8e8aa71bd9d3beddeb61a1d92d0332ee0c4860a342b214b79
+  migration: *id002

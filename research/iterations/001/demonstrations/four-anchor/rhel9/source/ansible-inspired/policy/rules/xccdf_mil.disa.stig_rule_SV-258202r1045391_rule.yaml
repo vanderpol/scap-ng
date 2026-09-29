@@ -6,8 +6,22 @@ rule:
   check: 'Verify that RHEL 9 is configured to audit the execution of the "ssh-keysign" command with the following command:
     $ sudo auditctl -l | grep ssh-keysign -a always,exit -S all -F path=/usr/libexec/openssh/ssh-keysign -F perm=x -F auid>=1000
     -F auid!=-1 -F key=privileged-ssh If the command does not return a line, or the line is commented out, this is a finding.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258202r1045391_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258202r1045391_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258202r1045391_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
   cluster_id: null
   conflicts: []
+  default_check: default
   description: '<VulnDiscussion>Without generating audit record specific to the security and mission needs of the organization,
     it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible
     for one. Audit records can be generated from various components within the information system (e.g., module or policy
@@ -372,7 +386,7 @@ rule:
   weight: '10.0'
 migration:
   note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_ir_sha256: 8fa29274f122e74dc836340d1edcb2e97c16e4944377cf9eb5ca50e1d9ed9479
+  semantic_ir_sha256: 4aacff514b66b9a56099b56232da69e62d33988467a834e889c492f310657aa5
   source: SCAP 1.4 / OVAL 5.12.3
   source_rule: xccdf_mil.disa.stig_rule_SV-258202r1045391_rule
   status: legacy_compatible

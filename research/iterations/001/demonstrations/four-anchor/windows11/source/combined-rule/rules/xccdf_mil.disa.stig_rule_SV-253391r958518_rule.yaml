@@ -308,7 +308,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253391r958518_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253391r958518_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253391r958518_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253391r958518_rule
     version: 1
     description: Administrator accounts must not be enumerated during elevation.
@@ -375,6 +389,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253391:
+          source_definition_id: oval:mil.disa.stig.defs:def:253391
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Verifies 'Enumerate administrator accounts on elevation' is set to 'Disabled'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25339100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Administrator accounts must not be enumerated during elevation.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253391:
           source_definition_id: oval:mil.disa.stig.windows11:def:253391
           class: compliance
@@ -409,29 +446,6 @@ rule:
                 a running application.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253391:
-          source_definition_id: oval:mil.disa.stig.defs:def:253391
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Verifies 'Enumerate administrator accounts on elevation' is set to 'Disabled'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25339100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Administrator accounts must not be enumerated during elevation.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253391
@@ -443,16 +457,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253391
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253391
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253391
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -551,11 +571,152 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253391r958518_rule
-      semantic_ir_sha256: 61dfd6eb625f5b0bad62920913f921dd6432b2fa9f9d3b223205e1e8cce6ae1b
+      semantic_ir_sha256: 838dcb74c28c5e44e1b2d6a4ff5e6f4dd604907ae7c8042170868af9dc4e1869
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: b4aa450c772d6a2b18c14635295e2952da0e8c493657ca9cc2bb466c9f57dd99
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253391r958518_rule
+    version: 1
+    description: Administrator accounts must not be enumerated during elevation.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26101
+      exports: []
+      inline_content: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+        Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI\ Value
+        Name: EnumerateAdministrators Value Type: REG_DWORD Value: 0'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI\
+
+
+            Value Name: EnumerateAdministrators
+
+
+            Value Type: REG_DWORD
+
+            Value: 0'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253391
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253391
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253391
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253391
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26101
+        exports: []
+        inline_content: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+          Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI\ Value
+          Name: EnumerateAdministrators Value Type: REG_DWORD Value: 0'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI\
+
+
+              Value Name: EnumerateAdministrators
+
+
+              Value Type: REG_DWORD
+
+              Value: 0'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'If the following registry value does not exist or is not configured as specified, this is a finding: Registry
+      Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI\ Value Name: EnumerateAdministrators
+      Value Type: REG_DWORD Value: 0'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253391r958518_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: b39f70c71d2744c9187fbb22789ca15cffec36f8cc4207da71a32f20dc3cde22
+  migration: *id002

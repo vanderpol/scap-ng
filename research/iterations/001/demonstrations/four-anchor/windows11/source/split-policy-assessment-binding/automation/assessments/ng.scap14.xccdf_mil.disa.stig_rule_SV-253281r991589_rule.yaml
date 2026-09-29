@@ -7,6 +7,63 @@ assessment:
   description: A host-based firewall must be installed and enabled on the system.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102:
+      capability: scapng.collect.windows.cmdlet
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
+      source_type: cmdlet_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '18'
+      comment: Gather FirewallProduct from NetSecurity
+      query:
+      - attributes:
+          operation: equals
+        kind: element
+        name: module_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: NetSecurity
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: module_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: version
+          nil: 'true'
+        kind: element
+        name: module_version
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - kind: element
+        name: verb
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Get
+      - kind: element
+        name: noun
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: NetFirewallProfile
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: policystore
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: ActiveStore
+        kind: element
+        name: parameters
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: property
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: name,enabled,defaultinboundaction,defaultoutboundaction,logfilename
+        kind: element
+        name: select
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
     oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101:
       capability: scapng.collect.windows.cmdlet
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101
@@ -70,63 +127,6 @@ assessment:
         kind: element
         name: select
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102:
-      capability: scapng.collect.windows.cmdlet
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
-      source_type: cmdlet_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '18'
-      comment: Gather FirewallProduct from NetSecurity
-      query:
-      - attributes:
-          operation: equals
-        kind: element
-        name: module_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: NetSecurity
-      - attributes:
-          nil: 'true'
-        kind: element
-        name: module_id
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - attributes:
-          datatype: version
-          nil: 'true'
-        kind: element
-        name: module_version
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - kind: element
-        name: verb
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Get
-      - kind: element
-        name: noun
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: NetFirewallProfile
-      - attributes:
-          datatype: record
-        children:
-        - attributes:
-            name: policystore
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: ActiveStore
-        kind: element
-        name: parameters
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - attributes:
-          datatype: record
-        children:
-        - attributes:
-            name: property
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: name,enabled,defaultinboundaction,defaultoutboundaction,logfilename
-        kind: element
-        name: select
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
   derive: {}
   predicates:
     oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102:
@@ -169,19 +169,6 @@ assessment:
       comment: Product State must be 397568 (enabled)
   evaluate:
     tests:
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102
-        source_type: cmdlet_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Verify Windows defender firewall is enabled.
-        check: at least one
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102
-        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:25328101:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328101
         source_type: cmdlet_test
@@ -194,6 +181,19 @@ assessment:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328101
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102
+        source_type: cmdlet_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: Verify Windows defender firewall is enabled.
+        check: at least one
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102
         source_other: []
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:253281:
@@ -236,16 +236,22 @@ assessment:
       exports: []
       href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
       exports: []
       href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -339,6 +345,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253281r991589_rule
-    semantic_ir_sha256: d0b784e2a7541060f14f7e9463f0a2aeecb219186d1d24ad760876f32ebc13d2
+    semantic_ir_sha256: f42c4191420217dd65cc61a8f419b77851a7c5d77427e6f7d0086140e89ccef3
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 0ea6f539701bea9a2ea17433f90b4ba0cb62bcf0395c34b27925f3880ad4fb44

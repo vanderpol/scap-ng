@@ -318,7 +318,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258039r1045131_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258039r1045131_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258039r1045131_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258039r1045131_rule
     version: 1
     description: RHEL 9 Bluetooth must be disabled.
@@ -390,18 +404,6 @@ rule:
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23050700:
-          source_test_id: oval:mil.disa.stig.ind:tst:23050700
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23050700
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:23050701:
           source_test_id: oval:mil.disa.stig.ind:tst:23050701
           source_type: textfilecontent54_test
@@ -414,34 +416,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:23050701
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:23050700:
+          source_test_id: oval:mil.disa.stig.ind:tst:23050700
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: /etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23050700
+          predicates: []
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230507:
-          source_definition_id: oval:mil.disa.stig.defs:def:230507
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23050700
-            - comment: /etc/modprobe.d contains a file that contains 'blacklist bluetooth'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23050701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system Bluetooth must be disabled.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258039:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258039
           class: compliance
@@ -483,6 +470,33 @@ rule:
                 Satisfies: SRG-OS-000095-GPOS-00049, SRG-OS-000300-GPOS-00118'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230507:
+          source_definition_id: oval:mil.disa.stig.defs:def:230507
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23050700
+            - comment: /etc/modprobe.d contains a file that contains 'blacklist bluetooth'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23050701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system Bluetooth must be disabled.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258039
@@ -494,16 +508,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258039
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258039
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258039
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -594,11 +614,136 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258039r1045131_rule
-      semantic_ir_sha256: 5e2b201e8a8f1b2fc09dd3871c77a218e47de935435108b2142f002adf913044
+      semantic_ir_sha256: a27402b18b87c104560830ae3877ed17a8af4dd9bb789fd8bb358cdf9ecbe2dc
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: da836027e296ab3d0e3d2e79b5c087c43f97109a5865c767873e3c8ef9ea8f05
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258039r1045131_rule
+    version: 1
+    description: RHEL 9 Bluetooth must be disabled.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:50501
+      exports: []
+      inline_content: 'Verify that RHEL 9 disables the ability to load the Bluetooth kernel module with the following command:
+        $ sudo grep -r bluetooth /etc/modprobe.conf /etc/modprobe.d/* install bluetooth /bin/false blacklist bluetooth If
+        the command does not return any output, or the lines are commented out, and use of Bluetooth is not documented with
+        the information system security officer (ISSO) as an operational requirement, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:50501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that RHEL 9 disables the ability to load the Bluetooth kernel module with the following command:\n\
+            \n$ sudo grep -r bluetooth /etc/modprobe.conf /etc/modprobe.d/* \n\ninstall bluetooth /bin/false\nblacklist bluetooth\n\
+            \t\nIf the command does not return any output, or the lines are commented out, and use of Bluetooth is not documented\
+            \ with the information system security officer (ISSO) as an operational requirement, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258039
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258039
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258039
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258039
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:50501
+        exports: []
+        inline_content: 'Verify that RHEL 9 disables the ability to load the Bluetooth kernel module with the following command:
+          $ sudo grep -r bluetooth /etc/modprobe.conf /etc/modprobe.d/* install bluetooth /bin/false blacklist bluetooth If
+          the command does not return any output, or the lines are commented out, and use of Bluetooth is not documented with
+          the information system security officer (ISSO) as an operational requirement, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:50501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify that RHEL 9 disables the ability to load the Bluetooth kernel module with the following command:\n\
+              \n$ sudo grep -r bluetooth /etc/modprobe.conf /etc/modprobe.d/* \n\ninstall bluetooth /bin/false\nblacklist\
+              \ bluetooth\n\t\nIf the command does not return any output, or the lines are commented out, and use of Bluetooth\
+              \ is not documented with the information system security officer (ISSO) as an operational requirement, this\
+              \ is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that RHEL 9 disables the ability to load the Bluetooth kernel module with the following command: $
+      sudo grep -r bluetooth /etc/modprobe.conf /etc/modprobe.d/* install bluetooth /bin/false blacklist bluetooth If the
+      command does not return any output, or the lines are commented out, and use of Bluetooth is not documented with the
+      information system security officer (ISSO) as an operational requirement, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258039r1045131_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 6704fbb821c34a117210227aa8899ea7d535cc4bc0c9ee3c70e86d05aa4690ef
+  migration: *id002

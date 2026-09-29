@@ -233,7 +233,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278012r1181951_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278012r1181951_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-278012r1181951_rule
     version: 1
     description: Windows Server 2025 must have a host-based firewall installed and enabled.
@@ -352,10 +362,13 @@ rule:
     procedure: Determine if a host-based firewall is installed and enabled on the system. If a host-based firewall is not
       installed and enabled on the system, this is a finding. The configuration requirements will be determined by the applicable
       firewall STIG.
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-278012r1181951_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: c19bf546e359aab4636dd9248aeb315d8e21723dd0824db58b68831ca8d27d9a
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

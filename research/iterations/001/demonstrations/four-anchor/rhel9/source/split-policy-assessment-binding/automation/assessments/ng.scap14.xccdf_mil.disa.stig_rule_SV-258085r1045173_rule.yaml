@@ -7,6 +7,60 @@ assessment:
   description: RHEL 9 must use the invoking user's password for privilege escalation when using "sudo".
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:23764205:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23764205
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /etc/sudoers Defaults !runaspw
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sudoers
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*Defaults\s+!runaspw\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23764201:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23764201
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: /etc/sudoers includedir
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sudoers
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*[#@]includedir\s+(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:23764203:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23764203
@@ -21,6 +75,51 @@ assessment:
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/sudoers
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*Defaults\s+!rootpw\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.unix:obj:23764200:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:23764200
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: /etc/sudoers.d config files, excluding files ending with ~ or containing .
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/sudoers.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: ^[^.]*[^.~]$
+    oval:mil.disa.stig.ind:obj:23764204:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23764204
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /etc/sudoers.d Defaults !rootpw
+      query:
+      - attributes:
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23764200
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       - attributes:
           operation: pattern match
         kind: element
@@ -61,13 +160,13 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23764201:
+    oval:mil.disa.stig.ind:obj:23764200:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23764201
+      source_object_id: oval:mil.disa.stig.ind:obj:23764200
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: /etc/sudoers includedir
+      version: '1'
+      comment: /etc/sudoers Defaults !targetpw
       query:
       - attributes:
           datatype: string
@@ -80,7 +179,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*[#@]includedir\s+(\S+)\s*$
+        value: ^\s*Defaults\s+!targetpw\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -115,105 +214,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23764200:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23764200
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: /etc/sudoers Defaults !targetpw
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sudoers
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*Defaults\s+!targetpw\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23764204:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23764204
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: /etc/sudoers.d Defaults !rootpw
-      query:
-      - attributes:
-          var_check: at least one
-          var_ref: oval:mil.disa.stig.defs:var:23764200
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*Defaults\s+!rootpw\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23764205:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23764205
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: /etc/sudoers Defaults !runaspw
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sudoers
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*Defaults\s+!runaspw\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.unix:obj:23764200:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:23764200
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: /etc/sudoers.d config files, excluding files ending with ~ or containing .
-      query:
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /etc/sudoers.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: ^[^.]*[^.~]$
   derive:
     oval:mil.disa.stig.defs:var:23764200:
       source_variable_id: oval:mil.disa.stig.defs:var:23764200
@@ -273,17 +273,30 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23764204:
-        source_test_id: oval:mil.disa.stig.ind:tst:23764204
+      oval:mil.disa.stig.ind:tst:23764200:
+        source_test_id: oval:mil.disa.stig.ind:tst:23764200
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Defaults !rootpw in /etc/sudoers.d
+        comment: Defaults !targetpw in /etc/sudoers
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.ind:obj:23764204
+        - oval:mil.disa.stig.ind:obj:23764200
         predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23764201:
+        source_test_id: oval:mil.disa.stig.ind:tst:23764201
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /etc/sudoers.d included in /etc/sudoers
+        check: at least one
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23764201
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23764200
         source_other: []
       oval:mil.disa.stig.ind:tst:23764203:
         source_test_id: oval:mil.disa.stig.ind:tst:23764203
@@ -295,6 +308,30 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:23764203
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23764205:
+        source_test_id: oval:mil.disa.stig.ind:tst:23764205
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Defaults !runaspw in /etc/sudoers
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23764205
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23764204:
+        source_test_id: oval:mil.disa.stig.ind:tst:23764204
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Defaults !rootpw in /etc/sudoers.d
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23764204
         predicates: []
         source_other: []
       oval:mil.disa.stig.ind:tst:23764202:
@@ -319,43 +356,6 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:23764206
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23764201:
-        source_test_id: oval:mil.disa.stig.ind:tst:23764201
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/sudoers.d included in /etc/sudoers
-        check: at least one
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23764201
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23764200
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23764205:
-        source_test_id: oval:mil.disa.stig.ind:tst:23764205
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Defaults !runaspw in /etc/sudoers
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23764205
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23764200:
-        source_test_id: oval:mil.disa.stig.ind:tst:23764200
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Defaults !targetpw in /etc/sudoers
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23764200
         predicates: []
         source_other: []
     definitions:
@@ -460,16 +460,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258085
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258085
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258085
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -588,6 +594,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258085r1045173_rule
-    semantic_ir_sha256: 47ff5c73eadbd7d609107f7e2a2e52b35925b2d429ce0c032391d08da936d698
+    semantic_ir_sha256: 1f4c9d6256724c968400de064db363921ac01a265311c3c4a58cb0d359596218
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: cecc7fbbfa4dbb15077a3da154318febbf158847ea026dc8ff59a2005f5d76b6

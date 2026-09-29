@@ -259,7 +259,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258138r1045274_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258138r1045274_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-258138r1045274_rule
     version: 1
     description: RHEL 9 must be configured so that the file integrity tool verifies Access Control Lists (ACLs).
@@ -386,10 +396,13 @@ rule:
     procedure: 'Verify that AIDE is verifying ACLs with the following command: $ sudo grep acl /etc/aide.conf All= p+i+n+u+g+s+m+S+sha512+acl+xattrs+selinux
       If the "acl" rule is not being used on all uncommented selection lines in the "/etc/aide.conf" file, or ACLs are not
       being checked by another file integrity tool, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-258138r1045274_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 2f50f5c1a2187a3603712a7a0be0e570bb5d341e4ea3c3cc3b81f7375a925701
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

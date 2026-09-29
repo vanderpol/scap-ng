@@ -298,7 +298,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271789r1134863_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271789r1134863_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271789r1134863_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271789r1134863_rule
     version: 1
     description: OL 9 library files must be group owned by root or a system account.
@@ -379,6 +393,17 @@ rule:
           variable_id: oval:mil.disa.stig.defs:var:20000018
           variable_type: constant_variable
     predicates:
+      oval:mil.disa.stig.unix:ste:20000015:
+        source_state_id: oval:mil.disa.stig.unix:ste:20000015
+        source_type: file_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: regular
+        comment: null
       oval:mil.disa.stig.unix:ste:20000006:
         source_state_id: oval:mil.disa.stig.unix:ste:20000006
         source_type: file_state
@@ -392,17 +417,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '0'
         comment: group-owned by root
-      oval:mil.disa.stig.unix:ste:20000015:
-        source_state_id: oval:mil.disa.stig.unix:ste:20000015
-        source_type: file_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: regular
-        comment: null
     evaluate:
       tests:
         oval:mil.disa.stig.unix:tst:23026200:
@@ -418,29 +432,6 @@ rule:
           predicates: []
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230262:
-          source_definition_id: oval:mil.disa.stig.defs:def:230262
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: All system-wide library files must be group-owned by root
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23026200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system library files must be group-owned by root or a system account.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271789:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271789
           class: compliance
@@ -477,6 +468,29 @@ rule:
                 \ privileges."
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230262:
+          source_definition_id: oval:mil.disa.stig.defs:def:230262
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: All system-wide library files must be group-owned by root
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23026200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system library files must be group-owned by root or a system account.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271789
@@ -488,16 +502,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271789
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271789
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271789
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -590,11 +610,140 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271789r1134863_rule
-      semantic_ir_sha256: 2d3fe40a4b0a2186a5a4a89eb8a883edee5b384b13cfb7e55886026375870a64
+      semantic_ir_sha256: 4616623b3cc569c1a0dffe8baf2aace1745cfc364e0c4fa8cccaceec1115611d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 2003d040f7f6cf92952a62f52e9f67f0d014f93d75958c8eb90e2a8b2a310f44
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271789r1134863_rule
+    version: 1
+    description: OL 9 library files must be group owned by root or a system account.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:69301
+      exports: []
+      inline_content: 'Verify that OL 9 systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib",
+        and "/usr/lib64" are group owned by root with the following command: $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type
+        f -name ''*.so*'' ! -group root -exec stat -c "%n %G" {} + If any output is returned, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:69301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib",
+            and "/usr/lib64" are group owned by root with the following command:
+
+
+            $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type f -name ''*.so*'' ! -group root -exec stat -c "%n %G" {} +
+
+
+            If any output is returned, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271789
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271789
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271789
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271789
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:69301
+        exports: []
+        inline_content: 'Verify that OL 9 systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib",
+          and "/usr/lib64" are group owned by root with the following command: $ sudo find /lib /lib64 /usr/lib /usr/lib64
+          -type f -name ''*.so*'' ! -group root -exec stat -c "%n %G" {} + If any output is returned, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:69301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib",
+              and "/usr/lib64" are group owned by root with the following command:
+
+
+              $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type f -name ''*.so*'' ! -group root -exec stat -c "%n %G" {} +
+
+
+              If any output is returned, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib",
+      and "/usr/lib64" are group owned by root with the following command: $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type
+      f -name ''*.so*'' ! -group root -exec stat -c "%n %G" {} + If any output is returned, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271789r1134863_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 79fc2a2020f395c1a605ee618dd763d553b56d092d2c3b93521934b0d5aad0e5
+  migration: *id002

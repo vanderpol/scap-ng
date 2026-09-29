@@ -319,7 +319,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253304r1051045_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253304r1051045_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253304r1051045_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253304r1051045_rule
     version: 1
     description: The built-in Microsoft password complexity filter must be enabled.
@@ -431,16 +445,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253304
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253304
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253304
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -541,11 +561,158 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253304r1051045_rule
-      semantic_ir_sha256: 8163a95118c7412ad8fc3eaff4d8170206ce12990a040423cb94c098a2c113bb
+      semantic_ir_sha256: 4b2ea64b67dd0b8a26aeebcbe2d01030045614c10d38a0e4fb763b5f2b448fc2
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: b37e7193fb4e7b6e42df23a824055d69424babc3bc465b9fc237a2761c4b7379
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253304r1051045_rule
+    version: 1
+    description: The built-in Microsoft password complexity filter must be enabled.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:9301
+      exports: []
+      inline_content: Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies >> Password Policy.
+        If the value for "Password must meet complexity requirements" is not set to "Enabled", this is a finding. If the site
+        is using a password filter that requires this setting be set to "Disabled" for the filter to be used, this would not
+        be considered a finding.
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:9301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+            Run "gpedit.msc".
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account
+            Policies >> Password Policy.
+
+
+            If the value for "Password must meet complexity requirements" is not set to "Enabled", this is a finding.
+
+
+            If the site is using a password filter that requires this setting be set to "Disabled" for the filter to be used,
+            this would not be considered a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253304
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253304
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253304
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253304
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:9301
+        exports: []
+        inline_content: Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+          Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies >> Password Policy.
+          If the value for "Password must meet complexity requirements" is not set to "Enabled", this is a finding. If the
+          site is using a password filter that requires this setting be set to "Disabled" for the filter to be used, this
+          would not be considered a finding.
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:9301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the effective setting in Local Group Policy Editor.
+
+              Run "gpedit.msc".
+
+
+              Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Account
+              Policies >> Password Policy.
+
+
+              If the value for "Password must meet complexity requirements" is not set to "Enabled", this is a finding.
+
+
+              If the site is using a password filter that requires this setting be set to "Disabled" for the filter to be
+              used, this would not be considered a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer Policy
+      >> Computer Configuration >> Windows Settings >> Security Settings >> Account Policies >> Password Policy. If the value
+      for "Password must meet complexity requirements" is not set to "Enabled", this is a finding. If the site is using a
+      password filter that requires this setting be set to "Disabled" for the filter to be used, this would not be considered
+      a finding.
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253304r1051045_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: eadc51256a97119a7f7adbe84f44d6db83f7157670057bab00d2ca58bcb6afbf
+  migration: *id002

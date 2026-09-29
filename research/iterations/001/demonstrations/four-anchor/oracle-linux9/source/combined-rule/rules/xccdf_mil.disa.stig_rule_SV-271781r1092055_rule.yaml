@@ -239,7 +239,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271781r1092055_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271781r1092055_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271781r1092055_rule
     version: 1
     description: OL 9 local files and directories must have a valid owner.
@@ -358,10 +368,13 @@ rule:
     procedure: 'Verify that OL 9 local files and directories on OL 9 have a valid owner with the following command: $ df --local
       -P | awk {''if (NR!=1) print $6''} | sudo xargs -I ''{}'' find ''{}'' -xdev -nouser If any files on the system do not
       have an assigned owner, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271781r1092055_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 470c71de206b07e7c6f8e61c2d2a43a468521d2af27781f3f656c8379a1491a1
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

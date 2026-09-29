@@ -316,7 +316,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271715r1091857_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271715r1091857_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271715r1091857_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271715r1091857_rule
     version: 1
     description: OL 9 SSH daemon must display the date and time of the last successful account logon upon an SSH logon.
@@ -347,6 +361,31 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*include\s+(.*)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23038200:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23038200
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)PrintLastLog(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -390,47 +429,8 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23038200:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23038200
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)PrintLastLog(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:20000016:
-        source_state_id: oval:mil.disa.stig.ind:ste:20000016
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-            operation: pattern match
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^(yes|"yes")$
-        comment: null
       oval:mil.disa.stig.ind:ste:25798801:
         source_state_id: oval:mil.disa.stig.ind:ste:25798801
         source_type: textfilecontent54_state
@@ -445,8 +445,35 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/ssh/sshd_config.d/*.conf
         comment: null
+      oval:mil.disa.stig.ind:ste:20000016:
+        source_state_id: oval:mil.disa.stig.ind:ste:20000016
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^(yes|"yes")$
+        comment: null
     evaluate:
       tests:
+        oval:mil.disa.stig.ind:tst:25798801:
+          source_test_id: oval:mil.disa.stig.ind:tst:25798801
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: sshd_config includes sshd_config.d
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25798800
+          predicates:
+          - oval:mil.disa.stig.ind:ste:25798801
+          source_other: []
         oval:mil.disa.stig.ind:tst:23038200:
           source_test_id: oval:mil.disa.stig.ind:tst:23038200
           source_type: textfilecontent54_test
@@ -472,19 +499,6 @@ rule:
           - oval:mil.disa.stig.ind:obj:25800900
           predicates:
           - oval:mil.disa.stig.ind:ste:20000016
-          source_other: []
-        oval:mil.disa.stig.ind:tst:25798801:
-          source_test_id: oval:mil.disa.stig.ind:tst:25798801
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: sshd_config includes sshd_config.d
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25798800
-          predicates:
-          - oval:mil.disa.stig.ind:ste:25798801
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:258009:
@@ -568,16 +582,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271715
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271715
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271715
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -675,11 +695,151 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271715r1091857_rule
-      semantic_ir_sha256: 24f094fb5d175c6811b73fa25f31f43de401d286cb68016e95cce34c55973ce2
+      semantic_ir_sha256: 3eb683dc84ebb7677930b61ec95fb03dd8da8c25123a70357b287d87cee21f0e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 644e739fba50af9b3d77703628ab951cc487014bcc5ab8865243422bf626240e
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271715r1091857_rule
+    version: 1
+    description: OL 9 SSH daemon must display the date and time of the last successful account logon upon an SSH logon.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:55301
+      exports: []
+      inline_content: 'Verify that OL 9 SSH daemon provides users with feedback on when account accesses last occurred with
+        the following command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' ''
+        '' | xargs sudo grep -iH ''^\s*printlastlog'' PrintLastLog yes If the "PrintLastLog" keyword is set to "no", the returned
+        line is commented out, or no output is returned, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:55301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 SSH daemon provides users with feedback on when account accesses last occurred with the
+            following command:
+
+
+            $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep
+            -iH ''^\s*printlastlog''
+
+            PrintLastLog yes
+
+
+            If the "PrintLastLog" keyword is set to "no", the returned line is commented out, or no output is returned, this
+            is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271715
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271715
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271715
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271715
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:55301
+        exports: []
+        inline_content: 'Verify that OL 9 SSH daemon provides users with feedback on when account accesses last occurred with
+          the following command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n''
+          '' '' | xargs sudo grep -iH ''^\s*printlastlog'' PrintLastLog yes If the "PrintLastLog" keyword is set to "no",
+          the returned line is commented out, or no output is returned, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:55301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 SSH daemon provides users with feedback on when account accesses last occurred with the
+              following command:
+
+
+              $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+              grep -iH ''^\s*printlastlog''
+
+              PrintLastLog yes
+
+
+              If the "PrintLastLog" keyword is set to "no", the returned line is commented out, or no output is returned,
+              this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 SSH daemon provides users with feedback on when account accesses last occurred with the following
+      command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+      grep -iH ''^\s*printlastlog'' PrintLastLog yes If the "PrintLastLog" keyword is set to "no", the returned line is commented
+      out, or no output is returned, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271715r1091857_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: dc165db2282679dd507a11e01e23c6f59e87364f6f781c31ec11d6f7ffbc3034
+  migration: *id002

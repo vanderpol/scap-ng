@@ -7,13 +7,13 @@ assessment:
   description: OL 9 must audit uses of the execve system call.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23038602:
+    oval:mil.disa.stig.ind:obj:23038603:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23038602
+      source_object_id: oval:mil.disa.stig.ind:obj:23038603
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: 32-bit execve syscall gid comparison
+      comment: 64-bit execve syscall gid comparison
       query:
       - kind: element
         name: filepath
@@ -24,7 +24,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -57,31 +57,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23038603:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23038603
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: 64-bit execve syscall gid comparison
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/audit/audit.rules
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23038601:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23038601
@@ -107,34 +82,35 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23038602:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23038602
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: 32-bit execve syscall gid comparison
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/audit.rules
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23038603:
-        source_test_id: oval:mil.disa.stig.ind:tst:23038603
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Audit 64-bit invocations of execve syscall comparing gids
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23038603
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23038601:
-        source_test_id: oval:mil.disa.stig.ind:tst:23038601
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Audit 64-bit invocations of execve syscall comparing uids
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23038601
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:23038602:
         source_test_id: oval:mil.disa.stig.ind:tst:23038602
         source_type: textfilecontent54_test
@@ -159,43 +135,31 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23038600
         predicates: []
         source_other: []
+      oval:mil.disa.stig.ind:tst:23038603:
+        source_test_id: oval:mil.disa.stig.ind:tst:23038603
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Audit 64-bit invocations of execve syscall comparing gids
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23038603
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23038601:
+        source_test_id: oval:mil.disa.stig.ind:tst:23038601
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Audit 64-bit invocations of execve syscall comparing uids
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23038601
+        predicates: []
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230386:
-        source_definition_id: oval:mil.disa.stig.defs:def:230386
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit 32-bit invocations of execve syscall comparing uids
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23038600
-          - comment: Audit 64-bit invocations of execve syscall comparing uids
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23038601
-          - comment: Audit 32-bit invocations of execve syscall comparing gids
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23038602
-          - comment: Audit 64-bit invocations of execve syscall comparing gids
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23038603
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system audit system must be configured to audit the execution of privileged functions and
-              prevent all software from executing at higher privilege levels than users executing the software.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271570:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271570
         class: compliance
@@ -232,6 +196,42 @@ assessment:
               Satisfies: SRG-OS-000326-GPOS-00126, SRG-OS-000327-GPOS-00127, SRG-OS-000755-GPOS-00220"
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230386:
+        source_definition_id: oval:mil.disa.stig.defs:def:230386
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit 32-bit invocations of execve syscall comparing uids
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23038600
+          - comment: Audit 64-bit invocations of execve syscall comparing uids
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23038601
+          - comment: Audit 32-bit invocations of execve syscall comparing gids
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23038602
+          - comment: Audit 64-bit invocations of execve syscall comparing gids
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23038603
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system audit system must be configured to audit the execution of privileged functions and
+              prevent all software from executing at higher privilege levels than users executing the software.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.ol9os:def:271570
@@ -243,16 +243,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271570
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271570
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271570
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -348,6 +354,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271570r1092558_rule
-    semantic_ir_sha256: f5a79655a0dc69ffca7c724a777addedecce52d22ae4ac72b595784900b3a91b
+    semantic_ir_sha256: f0d5eecd45bbb13153b7199027a01df8a79547f5c4feeaccf6697d899253d500
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 14b040f6588969445f44dff20db2e687f90d69d0e8ad1772f765845cc51b5816

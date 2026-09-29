@@ -8,31 +8,56 @@ assessment:
     media from the system being audited via rsyslog.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25814801:
+    oval:mil.disa.stig.ind:obj:20000005:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25814801
+      source_object_id: oval:mil.disa.stig.ind:obj:20000005
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: 'rsyslog.conf: DefaultNetstreamDriver'
+      comment: 'rsyslog: module blocks'
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:20000006
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:20000007
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+    oval:mil.disa.stig.ind:obj:20000007:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:20000007
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: 'rsyslog.d/*.conf: module blocks'
       query:
       - attributes:
           ignore_case: 'true'
         kind: element
         name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
+      - kind: element
+        name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/rsyslog.conf
+        value: /etc/rsyslog.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.*\.conf$
       - attributes:
           operation: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\$DefaultNetstreamDriver\s+(\S+)\s*$
+        value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -76,74 +101,27 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:20000007:
+    oval:mil.disa.stig.ind:obj:25814800:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:20000007
+      source_object_id: oval:mil.disa.stig.ind:obj:25814800
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: 'rsyslog.d/*.conf: module blocks'
+      comment: DefaultNetstreamDriver
       query:
-      - attributes:
-          ignore_case: 'true'
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/rsyslog.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^.*\.conf$
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:20000006:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:20000006
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: 'rsyslog.conf: module blocks'
-      query:
-      - attributes:
-          ignore_case: 'true'
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/rsyslog.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25814801
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25814802
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:20000003:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:20000003
@@ -176,27 +154,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25814800:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25814800
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: DefaultNetstreamDriver
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25814801
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25814802
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
     oval:mil.disa.stig.ind:obj:20000002:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:20000002
@@ -210,27 +167,6 @@ assessment:
           object_ref: oval:mil.disa.stig.ind:obj:20000003
         - kind: object_ref
           object_ref: oval:mil.disa.stig.ind:obj:20000004
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
-    oval:mil.disa.stig.ind:obj:20000005:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:20000005
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: 'rsyslog: module blocks'
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:20000006
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:20000007
         evaluation_semantics:
           complement_is_relative: true
           filter_default_action: exclude
@@ -275,10 +211,74 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:20000006:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:20000006
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: 'rsyslog.conf: module blocks'
+      query:
+      - attributes:
+          ignore_case: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/rsyslog.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25814801:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25814801
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: 'rsyslog.conf: DefaultNetstreamDriver'
+      query:
+      - attributes:
+          ignore_case: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/rsyslog.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\$DefaultNetstreamDriver\s+(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:20000027:
-      source_state_id: oval:mil.disa.stig.ind:ste:20000027
+    oval:mil.disa.stig.ind:ste:25814802:
+      source_state_id: oval:mil.disa.stig.ind:ste:25814802
       source_type: textfilecontent54_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       operator: AND
@@ -289,7 +289,7 @@ assessment:
         kind: element
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+        value: (?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\b
       comment: null
     oval:mil.disa.stig.ind:ste:25814800:
       source_state_id: oval:mil.disa.stig.ind:ste:25814800
@@ -305,20 +305,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: gtls
       comment: null
-    oval:mil.disa.stig.ind:ste:25814802:
-      source_state_id: oval:mil.disa.stig.ind:ste:25814802
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: (?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\b
-      comment: null
     oval:mil.disa.stig.ind:ste:25814801:
       source_state_id: oval:mil.disa.stig.ind:ste:25814801
       source_type: textfilecontent54_state
@@ -333,8 +319,35 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: (?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\s*=\s*"gtls"
       comment: null
+    oval:mil.disa.stig.ind:ste:20000027:
+      source_state_id: oval:mil.disa.stig.ind:ste:20000027
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+      comment: null
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:25814800:
+        source_test_id: oval:mil.disa.stig.ind:tst:25814800
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: DefaultNetstreamDriver == gtls
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25814800
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25814800
+        source_other: []
       oval:mil.disa.stig.ind:tst:25814801:
         source_test_id: oval:mil.disa.stig.ind:tst:25814801
         source_type: textfilecontent54_test
@@ -348,19 +361,6 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:20000027
         - oval:mil.disa.stig.ind:ste:25814801
-        source_other: []
-      oval:mil.disa.stig.ind:tst:25814800:
-        source_test_id: oval:mil.disa.stig.ind:tst:25814800
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: DefaultNetstreamDriver == gtls
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25814800
-        predicates:
-        - oval:mil.disa.stig.ind:ste:25814800
         source_other: []
       oval:mil.disa.stig.ind:tst:25814802:
         source_test_id: oval:mil.disa.stig.ind:tst:25814802
@@ -469,16 +469,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258148
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258148
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258148
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -587,6 +593,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258148r1045292_rule
-    semantic_ir_sha256: 9901e30f4c87084ff5bd14a90b8a7600b000025fd4fc0f9338781f518a621a01
+    semantic_ir_sha256: 7a2866373b5838bd944d9110a945f2595431d4a0afd291af3a4b4e093bbea309
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 5f48e3946974e0c1b7a04a8abf42a053fede8ae7bf2450e165634616616bca06

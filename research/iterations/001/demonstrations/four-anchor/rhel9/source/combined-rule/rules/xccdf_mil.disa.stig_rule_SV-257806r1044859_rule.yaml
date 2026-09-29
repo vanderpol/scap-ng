@@ -292,43 +292,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257806r1044859_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257806r1044859_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257806r1044859_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257806r1044859_rule
     version: 1
     description: RHEL 9 must be configured to disable the FireWire kernel module.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23049900:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23049900
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        comment: null
-        query:
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/modprobe.d
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: .*
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^[ \t]*install[ \t]+firewire-core[ \t]+/bin/false[ \t]*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:23049901:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23049901
@@ -384,6 +367,37 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:23049900:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23049900
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        comment: null
+        query:
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/modprobe.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: .*
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^[ \t]*install[ \t]+firewire-core[ \t]+/bin/false[ \t]*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25780601:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25780601
@@ -412,6 +426,18 @@ rule:
     predicates: {}
     evaluate:
       tests:
+        oval:mil.disa.stig.ind:tst:23049900:
+          source_test_id: oval:mil.disa.stig.ind:tst:23049900
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: /etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23049900
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.ind:tst:23049901:
           source_test_id: oval:mil.disa.stig.ind:tst:23049901
           source_type: textfilecontent54_test
@@ -448,51 +474,7 @@ rule:
           - oval:mil.disa.stig.ind:obj:25780601
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:23049900:
-          source_test_id: oval:mil.disa.stig.ind:tst:23049900
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23049900
-          predicates: []
-          source_other: []
       definitions:
-        oval:mil.disa.stig.rhel9os:def:257806:
-          source_definition_id: oval:mil.disa.stig.rhel9os:def:257806
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:257806
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: RHEL-09-213055 - RHEL 9 must be configured to disable the FireWire kernel module.
-            - attributes:
-                family: unix
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Red Hat Enterprise Linux 9
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Disabling firewire protects the system against exploitation of any flaws in its implementation.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:257806:
           source_definition_id: oval:mil.disa.stig.defs:def:257806
           class: compliance
@@ -538,6 +520,38 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.rhel9os:def:257806:
+          source_definition_id: oval:mil.disa.stig.rhel9os:def:257806
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:257806
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: RHEL-09-213055 - RHEL 9 must be configured to disable the FireWire kernel module.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Red Hat Enterprise Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Disabling firewire protects the system against exploitation of any flaws in its implementation.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257806
@@ -549,16 +563,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257806
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257806
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257806
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -649,11 +669,137 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257806r1044859_rule
-      semantic_ir_sha256: ab793245b35f28f6db5ee281f2be5959c866e63fb88ee35fe41f2fc2e95d8e62
+      semantic_ir_sha256: cbe46fd596b1809025e4d5443e0dbffc5f48c2ced3b958ee8de46a93d1b36f8a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 812a90f299102e5c1c2db555716e3ccb0b0a3c906a8a68bb6d87ac0909f23881
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257806r1044859_rule
+    version: 1
+    description: RHEL 9 must be configured to disable the FireWire kernel module.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:5701
+      exports: []
+      inline_content: 'Verify that RHEL 9 disables the ability to load the firewire-core kernel module with the following
+        command: $ grep -r firewire-core /etc/modprobe.conf /etc/modprobe.d/* install firewire-core /bin/false blacklist firewire-core
+        If the command does not return any output, or the lines are commented out, and use of firewire-core is not documented
+        with the information system security officer (ISSO) as an operational requirement, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:5701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that RHEL 9 disables the ability to load the firewire-core kernel module with the following command:\n\
+            \n$ grep -r firewire-core /etc/modprobe.conf /etc/modprobe.d/* \n\ninstall firewire-core /bin/false\nblacklist\
+            \ firewire-core\n\nIf the command does not return any output, or the lines are commented out, and use of firewire-core\
+            \ is not documented with the information system security officer (ISSO) as an operational requirement, this is\
+            \ a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257806
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257806
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257806
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257806
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:5701
+        exports: []
+        inline_content: 'Verify that RHEL 9 disables the ability to load the firewire-core kernel module with the following
+          command: $ grep -r firewire-core /etc/modprobe.conf /etc/modprobe.d/* install firewire-core /bin/false blacklist
+          firewire-core If the command does not return any output, or the lines are commented out, and use of firewire-core
+          is not documented with the information system security officer (ISSO) as an operational requirement, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:5701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify that RHEL 9 disables the ability to load the firewire-core kernel module with the following command:\n\
+              \n$ grep -r firewire-core /etc/modprobe.conf /etc/modprobe.d/* \n\ninstall firewire-core /bin/false\nblacklist\
+              \ firewire-core\n\nIf the command does not return any output, or the lines are commented out, and use of firewire-core\
+              \ is not documented with the information system security officer (ISSO) as an operational requirement, this\
+              \ is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that RHEL 9 disables the ability to load the firewire-core kernel module with the following command:
+      $ grep -r firewire-core /etc/modprobe.conf /etc/modprobe.d/* install firewire-core /bin/false blacklist firewire-core
+      If the command does not return any output, or the lines are commented out, and use of firewire-core is not documented
+      with the information system security officer (ISSO) as an operational requirement, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257806r1044859_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: b5855b47cb42c3e8b6a3cf32b0690c31e1c2f58d770bed4b2b18c9a0db90cbce
+  migration: *id002

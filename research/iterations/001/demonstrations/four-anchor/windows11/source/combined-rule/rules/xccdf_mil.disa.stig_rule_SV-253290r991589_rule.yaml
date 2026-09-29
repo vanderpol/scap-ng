@@ -316,7 +316,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253290r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253290r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253290r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253290r991589_rule
     version: 1
     description: Orphaned security identifiers (SIDs) must be removed from user rights on Windows 11.
@@ -620,16 +634,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:253290
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253290
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:253290
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -730,11 +750,158 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253290r991589_rule
-      semantic_ir_sha256: 8e1c6560acf2bd36a494b1f8a38a2f7121032d08cdd759d520ef8549fecb9910
+      semantic_ir_sha256: 711fd38bc178f14c10a40dded097963355b5fd8f1199c2bc81910e34faafffef
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: a741b07cdc3a3dd1a12ede364fa9b49e3025063d65b78c1043425d1b50499193
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253290r991589_rule
+    version: 1
+    description: Orphaned security identifiers (SIDs) must be removed from user rights on Windows 11.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:6901
+      exports: []
+      inline_content: Review the effective User Rights setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to
+        Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User
+        Rights Assignment. Review each User Right listed for any unresolved SIDs to determine whether they are valid, such
+        as due to being temporarily disconnected from the domain. (Unresolved SIDs have the format of "*S-1-..".) If any unresolved
+        SIDs exist and are not for currently valid accounts or groups, this is a finding.
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:6901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Review the effective User Rights setting in Local Group Policy Editor.
+
+            Run "gpedit.msc".
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            Review each User Right listed for any unresolved SIDs to determine whether they are valid, such as due to being
+            temporarily disconnected from the domain. (Unresolved SIDs have the format of "*S-1-..".)
+
+
+            If any unresolved SIDs exist and are not for currently valid accounts or groups, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253290
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253290
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253290
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253290
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:6901
+        exports: []
+        inline_content: Review the effective User Rights setting in Local Group Policy Editor. Run "gpedit.msc". Navigate
+          to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >>
+          User Rights Assignment. Review each User Right listed for any unresolved SIDs to determine whether they are valid,
+          such as due to being temporarily disconnected from the domain. (Unresolved SIDs have the format of "*S-1-..".) If
+          any unresolved SIDs exist and are not for currently valid accounts or groups, this is a finding.
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:6901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Review the effective User Rights setting in Local Group Policy Editor.
+
+              Run "gpedit.msc".
+
+
+              Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+              Policies >> User Rights Assignment.
+
+
+              Review each User Right listed for any unresolved SIDs to determine whether they are valid, such as due to being
+              temporarily disconnected from the domain. (Unresolved SIDs have the format of "*S-1-..".)
+
+
+              If any unresolved SIDs exist and are not for currently valid accounts or groups, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: Review the effective User Rights setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local
+      Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights
+      Assignment. Review each User Right listed for any unresolved SIDs to determine whether they are valid, such as due to
+      being temporarily disconnected from the domain. (Unresolved SIDs have the format of "*S-1-..".) If any unresolved SIDs
+      exist and are not for currently valid accounts or groups, this is a finding.
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253290r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 5c23c3cee527acc694c2d389e27b96e9a35f66b27dbef612cc4e73b88d9988f3
+  migration: *id002

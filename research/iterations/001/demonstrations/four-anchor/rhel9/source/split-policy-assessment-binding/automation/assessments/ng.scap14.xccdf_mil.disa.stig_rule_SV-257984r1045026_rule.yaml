@@ -7,6 +7,27 @@ assessment:
   description: RHEL 9 SSHD must not allow blank passwords.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25798400:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25798400
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: PermitEmptyPasswords in all sshd_config and sshd_config.d/* files
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25798401
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25798402
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:25798401:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25798401
@@ -32,27 +53,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25798400:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25798400
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: PermitEmptyPasswords in all sshd_config and sshd_config.d/* files
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25798401
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25798402
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
     oval:mil.disa.stig.ind:obj:25798402:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25798402
@@ -186,16 +186,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257984
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257984
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257984
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -296,6 +302,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257984r1045026_rule
-    semantic_ir_sha256: 4905d5e84f302bbf8bac6e85f00f572dc5a3be537b3e81cac9f66e9114419ce9
+    semantic_ir_sha256: 928b1ec8c410b4a6ab5cc422169f02ca391b82fdfefe1c91cd01318da393e0b1
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 499d8dcdca57a504533ebedda594324428e6f8529cc9eca91cf6ca86d7b0e7c3

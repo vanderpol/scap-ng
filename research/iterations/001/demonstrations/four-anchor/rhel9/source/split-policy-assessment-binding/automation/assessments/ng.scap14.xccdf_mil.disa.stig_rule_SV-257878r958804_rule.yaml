@@ -7,6 +7,18 @@ assessment:
   description: RHEL 9 must mount /var/tmp with the nosuid option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.linux:obj:23052100:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23052100
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /var/tmp
     oval:mil.disa.stig.ind:obj:23052101:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23052101
@@ -31,33 +43,8 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.linux:obj:23052100:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23052100
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /var/tmp
   derive: {}
   predicates:
-    oval:mil.disa.stig.linux:ste:20000002:
-      source_state_id: oval:mil.disa.stig.linux:ste:20000002
-      source_type: partition_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      operator: AND
-      entities:
-      - attributes:
-          entity_check: at least one
-        kind: element
-        name: mount_options
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: nosuid
-      comment: null
     oval:mil.disa.stig.ind:ste:23052101:
       source_state_id: oval:mil.disa.stig.ind:ste:23052101
       source_type: textfilecontent54_state
@@ -70,6 +57,19 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+      comment: null
+    oval:mil.disa.stig.linux:ste:20000002:
+      source_state_id: oval:mil.disa.stig.linux:ste:20000002
+      source_type: partition_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      operator: AND
+      entities:
+      - attributes:
+          entity_check: at least one
+        kind: element
+        name: mount_options
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: nosuid
       comment: null
   evaluate:
     tests:
@@ -100,33 +100,6 @@ assessment:
         - oval:mil.disa.stig.linux:ste:20000002
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230521:
-        source_definition_id: oval:mil.disa.stig.defs:def:230521
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23052100
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23052101
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must mount /var/tmp with the nosuid option.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257878:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257878
         class: compliance
@@ -162,6 +135,33 @@ assessment:
               administrative access.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230521:
+        source_definition_id: oval:mil.disa.stig.defs:def:230521
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23052100
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23052101
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /var/tmp with the nosuid option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:257878
@@ -173,16 +173,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257878
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257878
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257878
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -281,6 +287,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257878r958804_rule
-    semantic_ir_sha256: 96ab63669216fd00995d4ccb3ab0a1a7303d83389b27f49112b439cd152fe61c
+    semantic_ir_sha256: 6ba6574022f4ebd534b64f6bc6389cf4155fcada0c04d1c0d32dbe7f286488ed
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: d9a8c90d6814d2f8e03d9b180985502f124eb2c6aadae240474732bece63d0b9

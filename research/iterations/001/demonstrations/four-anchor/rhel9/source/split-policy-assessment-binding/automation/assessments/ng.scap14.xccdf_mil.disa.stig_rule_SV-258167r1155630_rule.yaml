@@ -7,6 +7,19 @@ assessment:
   description: RHEL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit log.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.unix:obj:20000011:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:20000011
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: Audit log file location
+      query:
+      - attributes:
+          var_ref: oval:mil.disa.stig.defs:var:20000004
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     oval:mil.disa.stig.ind:obj:20000001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:20000001
@@ -32,19 +45,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.unix:obj:20000011:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:20000011
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: Audit log file location
-      query:
-      - attributes:
-          var_ref: oval:mil.disa.stig.defs:var:20000004
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
   derive:
     oval:mil.disa.stig.defs:var:20000004:
       source_variable_id: oval:mil.disa.stig.defs:var:20000004
@@ -171,6 +171,30 @@ assessment:
         - oval:mil.disa.stig.unix:ste:20000004
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230396:
+        source_definition_id: oval:mil.disa.stig.defs:def:230396
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit log is mode 0600 or less permissive
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23039600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system audit logs must have a mode of 0600 or less permissive to prevent unauthorized read
+              access.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258167:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258167
         class: compliance
@@ -215,30 +239,6 @@ assessment:
               Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029, SRG-OS-000206-GPOS-00084'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230396:
-        source_definition_id: oval:mil.disa.stig.defs:def:230396
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit log is mode 0600 or less permissive
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23039600
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system audit logs must have a mode of 0600 or less permissive to prevent unauthorized read
-              access.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:258167
@@ -250,16 +250,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258167
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258167
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258167
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -355,6 +361,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
-    semantic_ir_sha256: 410ae1d8effff7fa3f508212a32aa9fca287680f3b2667cbeec9cc5025473baa
+    semantic_ir_sha256: f8dafb2a5ebc4c775cadb4de64b1515f9b2eedfa1761316d045e859e921fe4b8
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: a872e4de11d3cdd3655eb99499f83cd6df3d8c357f30cb7be714d56041b8e4bd

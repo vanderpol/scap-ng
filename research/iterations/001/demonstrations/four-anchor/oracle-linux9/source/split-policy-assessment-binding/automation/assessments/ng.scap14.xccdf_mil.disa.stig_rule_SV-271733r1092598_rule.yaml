@@ -7,22 +7,6 @@ assessment:
   description: OL 9 must be configured so that the kdump service is disabled.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:23031000:
-      capability: scapng.collect.linux.systemdunitproperty
-      source_object_id: oval:mil.disa.stig.linux:obj:23031000
-      source_type: systemdunitproperty_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: unit
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: kdump.service
-      - kind: element
-        name: property
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: LoadState
     oval:mil.disa.stig.linux:obj:23031001:
       capability: scapng.collect.linux.systemdunitproperty
       source_object_id: oval:mil.disa.stig.linux:obj:23031001
@@ -55,6 +39,22 @@ assessment:
         name: property
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: ActiveState
+    oval:mil.disa.stig.linux:obj:23031000:
+      capability: scapng.collect.linux.systemdunitproperty
+      source_object_id: oval:mil.disa.stig.linux:obj:23031000
+      source_type: systemdunitproperty_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: kdump.service
+      - kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: LoadState
   derive: {}
   predicates:
     oval:mil.disa.stig.linux:ste:20000007:
@@ -81,16 +81,16 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:23031000:
-        source_test_id: oval:mil.disa.stig.linux:tst:23031000
+      oval:mil.disa.stig.linux:tst:23031001:
+        source_test_id: oval:mil.disa.stig.linux:tst:23031001
         source_type: systemdunitproperty_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: kdump.service LoadState is masked if it exists.
+        comment: kdump.service UnitFileState is masked if it exists.
         check: all
         check_existence: any_exist
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.linux:obj:23031000
+        - oval:mil.disa.stig.linux:obj:23031001
         predicates:
         - oval:mil.disa.stig.linux:ste:20000005
         source_other: []
@@ -107,16 +107,16 @@ assessment:
         predicates:
         - oval:mil.disa.stig.linux:ste:20000007
         source_other: []
-      oval:mil.disa.stig.linux:tst:23031001:
-        source_test_id: oval:mil.disa.stig.linux:tst:23031001
+      oval:mil.disa.stig.linux:tst:23031000:
+        source_test_id: oval:mil.disa.stig.linux:tst:23031000
         source_type: systemdunitproperty_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: kdump.service UnitFileState is masked if it exists.
+        comment: kdump.service LoadState is masked if it exists.
         check: all
         check_existence: any_exist
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.linux:obj:23031001
+        - oval:mil.disa.stig.linux:obj:23031000
         predicates:
         - oval:mil.disa.stig.linux:ste:20000005
         source_other: []
@@ -198,16 +198,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271733
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271733
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271733
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -304,6 +310,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271733r1092598_rule
-    semantic_ir_sha256: a24696f288219b796668d47f02296a54deb86187bb24fc677bb7e60eb11ea3e6
+    semantic_ir_sha256: 0360a195076409caeea8d077feea49cfc71b3b35016e795db867e2a2b1a5ca70
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: cdfec2e5d74052ca0b78745783b934a52722055413ce6a380509967fd0c31de7

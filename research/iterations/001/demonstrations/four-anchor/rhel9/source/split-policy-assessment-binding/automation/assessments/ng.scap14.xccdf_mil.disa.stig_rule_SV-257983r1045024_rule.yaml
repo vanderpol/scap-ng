@@ -7,36 +7,6 @@ assessment:
   description: RHEL 9 SSHD must accept public key authentication.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25798301:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25798301
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - attributes:
-          ignore_case: 'true'
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*(?i)PubkeyAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25798300:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25798300
@@ -105,22 +75,38 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:25798301:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25798301
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - attributes:
+          ignore_case: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)PubkeyAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:25798801:
-      source_state_id: oval:mil.disa.stig.ind:ste:25798801
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config.d/*.conf
-      comment: null
     oval:mil.disa.stig.ind:ste:20000016:
       source_state_id: oval:mil.disa.stig.ind:ste:20000016
       source_type: textfilecontent54_state
@@ -135,21 +121,22 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^(yes|"yes")$
       comment: null
+    oval:mil.disa.stig.ind:ste:25798801:
+      source_state_id: oval:mil.disa.stig.ind:ste:25798801
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config.d/*.conf
+      comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25798300:
-        source_test_id: oval:mil.disa.stig.ind:tst:25798300
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: '/etc/ssh/sshd_config.d: PubkeyAuthentication is set to yes'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25798300
-        predicates:
-        - oval:mil.disa.stig.ind:ste:20000016
-        source_other: []
       oval:mil.disa.stig.ind:tst:25798801:
         source_test_id: oval:mil.disa.stig.ind:tst:25798801
         source_type: textfilecontent54_test
@@ -162,6 +149,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:25798800
         predicates:
         - oval:mil.disa.stig.ind:ste:25798801
+        source_other: []
+      oval:mil.disa.stig.ind:tst:25798300:
+        source_test_id: oval:mil.disa.stig.ind:tst:25798300
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: '/etc/ssh/sshd_config.d: PubkeyAuthentication is set to yes'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25798300
+        predicates:
+        - oval:mil.disa.stig.ind:ste:20000016
         source_other: []
       oval:mil.disa.stig.ind:tst:25798301:
         source_test_id: oval:mil.disa.stig.ind:tst:25798301
@@ -262,16 +262,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257983
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257983
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257983
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -367,6 +373,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257983r1045024_rule
-    semantic_ir_sha256: 098f4648895697d59837fa6789b2811da205b674368fd369afe6626b8c019e0a
+    semantic_ir_sha256: 8d35a77316d21252e1ebd30542ec776995cd838364103408a3fdd9347ca2187d
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 730cde8ac3ab96c9342f5b69d6e6f4dc7cb58042afc884f5fbfc5e2a98fcc2e9

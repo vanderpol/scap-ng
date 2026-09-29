@@ -7,18 +7,6 @@ assessment:
   description: OL 9 must allocate audit record storage capacity to store at least one week's worth of audit records.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25815500:
-      capability: scapng.collect.independent.variable
-      source_object_id: oval:mil.disa.stig.ind:obj:25815500
-      source_type: variable_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: var_ref
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: oval:mil.disa.stig.defs:var:25815500
     oval:mil.disa.stig.ind:obj:23029402:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23029402
@@ -65,6 +53,18 @@ assessment:
         kind: element
         name: mount_point
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+    oval:mil.disa.stig.ind:obj:25815500:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:25815500
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.defs:var:25815500
   derive:
     oval:mil.disa.stig.defs:var:23029400:
       source_variable_id: oval:mil.disa.stig.defs:var:23029400
@@ -193,18 +193,6 @@ assessment:
       comment: 10GiB
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:23029400:
-        source_test_id: oval:mil.disa.stig.linux:tst:23029400
-        source_type: partition_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: There is a separate file system for audit data directory.
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:23029400
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:25815500:
         source_test_id: oval:mil.disa.stig.ind:tst:25815500
         source_type: variable_test
@@ -218,7 +206,47 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:25815500
         source_other: []
+      oval:mil.disa.stig.linux:tst:23029400:
+        source_test_id: oval:mil.disa.stig.linux:tst:23029400
+        source_type: partition_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: There is a separate file system for audit data directory.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23029400
+        predicates: []
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:258155:
+        source_definition_id: oval:mil.disa.stig.defs:def:258155
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: Audit file system exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23029400
+          - comment: Audit file system total space >= 10GiB
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25815500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must allocate audit record storage capacity to store at least one week of audit records,
+              when audit records are not immediately sent to a central audit record storage facility.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271596:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271596
         class: compliance
@@ -254,34 +282,6 @@ assessment:
               \ is usually performed during initial installation of OL 9.\n\n\tSatisfies: SRG-OS-000341-GPOS-00132, SRG-OS-000342-GPOS-00133"
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:258155:
-        source_definition_id: oval:mil.disa.stig.defs:def:258155
-        class: compliance
-        version: '3'
-        criteria:
-          children:
-          - comment: Audit file system exists
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23029400
-          - comment: Audit file system total space >= 10GiB
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25815500
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must allocate audit record storage capacity to store at least one week of audit records,
-              when audit records are not immediately sent to a central audit record storage facility.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.ol9os:def:271596
@@ -293,16 +293,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271596
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271596
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271596
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -405,6 +411,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271596r1091500_rule
-    semantic_ir_sha256: 52d6dbeb2954bc985565f21c63cdab17d0996cabef7ec6ef66d5444fdbcdb722
+    semantic_ir_sha256: a1dbdbc2d71879bc96eb5d4eda08a07caba40f8f7d6f24d45685a1abf14aaaf2
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 6e536216ffac3919203db57cb5304ea11bf1133932ea9b3a24463bc1364e5cd1

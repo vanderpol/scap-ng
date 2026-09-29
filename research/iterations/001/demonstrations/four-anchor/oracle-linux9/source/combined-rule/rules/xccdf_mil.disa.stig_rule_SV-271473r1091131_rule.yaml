@@ -275,7 +275,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271473r1091131_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271473r1091131_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271473r1091131_rule
     version: 1
     description: OL 9 must be configured so that the firewall employs a deny-all, allow-by-exception policy for allowing connections
@@ -399,10 +409,13 @@ rule:
       public interfaces: ens33 $ sudo firewall-cmd --info-zone=public | grep target target: DROP $ sudo firewall-cmd --permanent
       --info-zone=public | grep target target: DROP If no zones are active on the OL 9 interfaces or if runtime and permanent
       targets are set to a different option other than "DROP", this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271473r1091131_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 78f127d98b06935c9768ae0c9e6b4a2f04c1c6f6d1e87b28c5e00b17196a5e8a
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

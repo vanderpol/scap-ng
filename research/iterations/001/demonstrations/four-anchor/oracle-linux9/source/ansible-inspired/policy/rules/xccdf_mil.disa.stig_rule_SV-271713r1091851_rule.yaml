@@ -7,8 +7,22 @@ rule:
     | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*x11forwarding'' X11forwarding
     no If the value is returned as "yes", the returned line is commented out, or no output is returned, and X11 forwarding
     is not documented with the information system security officer (ISSO) as an operational requirement, this is a finding.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271713r1091851_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271713r1091851_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271713r1091851_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
   cluster_id: null
   conflicts: []
+  default_check: default
   description: <VulnDiscussion>When X11 forwarding is enabled, there may be additional exposure to the server and client displays
     if the SSHD proxy display is configured to listen on the wildcard address. By default, SSHD binds the forwarding server
     to the loopback address and sets the hostname part of the DISPLAY environment variable to localhost. This prevents remote
@@ -322,7 +336,7 @@ rule:
   weight: '10.0'
 migration:
   note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_ir_sha256: 19a9712b0a82da09ec19ed0c9e29e1ac06201b6c0e5be37b5c20bd58a96eb58e
+  semantic_ir_sha256: 03475ea3de2aefb82fec72e6ee55b736b2beb66a82dbfa1671a5f40f5fd41699
   source: SCAP 1.4 / OVAL 5.12.3
   source_rule: xccdf_mil.disa.stig_rule_SV-271713r1091851_rule
   status: legacy_compatible

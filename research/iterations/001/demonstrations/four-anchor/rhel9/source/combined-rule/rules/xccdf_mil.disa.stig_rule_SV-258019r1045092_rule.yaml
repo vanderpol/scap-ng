@@ -361,42 +361,27 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
     version: 1
     description: RHEL 9 must be able to initiate directly a session lock for all connection types using smart card when the
       smart card is removed.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.unix:obj:23035100:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:23035100
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '2'
-        comment: dconf database directories
-        query:
-        - attributes:
-            max_depth: '1'
-            recurse_direction: down
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: /etc/dconf/db
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - attributes:
-            action: include
-          kind: element
-          name: filter
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: oval:mil.disa.stig.unix:ste:23035100
       oval:mil.disa.stig.ind:obj:23035100:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23035100
@@ -432,6 +417,35 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.unix:obj:23035100:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:23035100
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '2'
+        comment: dconf database directories
+        query:
+        - attributes:
+            max_depth: '1'
+            recurse_direction: down
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: /etc/dconf/db
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - attributes:
+            action: include
+          kind: element
+          name: filter
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: oval:mil.disa.stig.unix:ste:23035100
     derive:
       oval:mil.disa.stig.defs:var:23035100:
         source_variable_id: oval:mil.disa.stig.defs:var:23035100
@@ -596,16 +610,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258019
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258019
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258019
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -698,11 +718,141 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
-      semantic_ir_sha256: cea48e90376924a410365d18fffb94a92942cd389f2d6ca0e24ce2fada73df9e
+      semantic_ir_sha256: f7b63b0ddfaf889e399ef21ac1f381351f2d0eb212e024cddfc995aab730dad1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: d82d3d290789bc0017b6d40297f8075d187bc9a4f132676b1eccc2acf022fca3
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
+    version: 1
+    description: RHEL 9 must be able to initiate directly a session lock for all connection types using smart card when the
+      smart card is removed.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:46501
+      exports: []
+      inline_content: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop
+        environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+        Verify RHEL 9 enables a user''s session lock until that user reestablishes access using established identification
+        and authentication procedures with the following command: $ gsettings get org.gnome.settings-daemon.peripherals.smartcard
+        removal-action ''lock-screen'' If the result is not ''lock-screen'', this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:46501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop\
+            \ environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\
+            \nVerify RHEL 9 enables a user's session lock until that user reestablishes access using established identification\
+            \ and authentication procedures with the following command:\n\n$ gsettings get org.gnome.settings-daemon.peripherals.smartcard\
+            \ removal-action\n \n'lock-screen'\n \nIf the result is not 'lock-screen', this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258019
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258019
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258019
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258019
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:46501
+        exports: []
+        inline_content: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME
+          desktop environment. If the system does not have any graphical user interface installed, this requirement is Not
+          Applicable. Verify RHEL 9 enables a user''s session lock until that user reestablishes access using established
+          identification and authentication procedures with the following command: $ gsettings get org.gnome.settings-daemon.peripherals.smartcard
+          removal-action ''lock-screen'' If the result is not ''lock-screen'', this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:46501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop\
+              \ environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\
+              \nVerify RHEL 9 enables a user's session lock until that user reestablishes access using established identification\
+              \ and authentication procedures with the following command:\n\n$ gsettings get org.gnome.settings-daemon.peripherals.smartcard\
+              \ removal-action\n \n'lock-screen'\n \nIf the result is not 'lock-screen', this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop environment.
+      If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify RHEL
+      9 enables a user''s session lock until that user reestablishes access using established identification and authentication
+      procedures with the following command: $ gsettings get org.gnome.settings-daemon.peripherals.smartcard removal-action
+      ''lock-screen'' If the result is not ''lock-screen'', this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: ee03b519c0386319467c538c0fc154a7ce16499c0e997804db6253e3aca74776
+  migration: *id002

@@ -291,7 +291,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253359r958478_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253359r958478_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253359r958478_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253359r958478_rule
     version: 1
     description: Run as different user must be removed from context menus.
@@ -317,32 +331,6 @@ rule:
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SOFTWARE\Classes\batfile\shell\runasuser
-        - attributes:
-            datatype: string
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SuppressionPolicy
-      oval:mil.disa.stig.win:obj:25335903:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25335903
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            datatype: string
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Classes\mscfile\shell\runasuser
         - attributes:
             datatype: string
           kind: element
@@ -401,6 +389,32 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SuppressionPolicy
+      oval:mil.disa.stig.win:obj:25335903:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25335903
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Classes\mscfile\shell\runasuser
+        - attributes:
+            datatype: string
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SuppressionPolicy
     derive: {}
     predicates:
       oval:mil.disa.stig.win:ste:25335900:
@@ -436,16 +450,16 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25335900
           source_other: []
-        oval:mil.disa.stig.win:tst:25335902:
-          source_test_id: oval:mil.disa.stig.win:tst:25335902
+        oval:mil.disa.stig.win:tst:25335901:
+          source_test_id: oval:mil.disa.stig.win:tst:25335901
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (exefile)'
+          comment: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (cmdfile)'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.win:obj:25335902
+          - oval:mil.disa.stig.win:obj:25335901
           predicates:
           - oval:mil.disa.stig.win:ste:25335900
           source_other: []
@@ -462,16 +476,16 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25335900
           source_other: []
-        oval:mil.disa.stig.win:tst:25335901:
-          source_test_id: oval:mil.disa.stig.win:tst:25335901
+        oval:mil.disa.stig.win:tst:25335902:
+          source_test_id: oval:mil.disa.stig.win:tst:25335902
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (cmdfile)'
+          comment: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (exefile)'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.win:obj:25335901
+          - oval:mil.disa.stig.win:obj:25335902
           predicates:
           - oval:mil.disa.stig.win:ste:25335900
           source_other: []
@@ -556,16 +570,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253359
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253359
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253359
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -656,11 +676,137 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253359r958478_rule
-      semantic_ir_sha256: 1082f44a0c888609c31ecb8d4c4fb79d86d178838698ebdedcfaad619f04a05c
+      semantic_ir_sha256: fed1dbbb7e1b99c53f5c8720865cf1cb424404bbcd384438e0ab6273c05c3e19
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 52cbdc7a0e82140cc04b904371ce8ce2c4ce46fbf2b0659e14154ff880e17482
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253359r958478_rule
+    version: 1
+    description: Run as different user must be removed from context menus.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:20101
+      exports: []
+      inline_content: 'If the following registry values do not exist or are not configured as specified, this is a finding.
+        The policy configures the same Value Name, Type and Value under four different registry paths. Registry Hive: HKEY_LOCAL_MACHINE
+        Registry Paths: \SOFTWARE\Classes\batfile\shell\runasuser\ \SOFTWARE\Classes\cmdfile\shell\runasuser\ \SOFTWARE\Classes\exefile\shell\runasuser\
+        \SOFTWARE\Classes\mscfile\shell\runasuser\ Value Name: SuppressionPolicy Type: REG_DWORD Value: 0x00001000 (4096)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:20101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "If the following registry values do not exist or are not configured as specified, this is a finding.\nThe\
+            \ policy configures the same Value Name, Type and Value under four different registry paths.\n\nRegistry Hive:\
+            \ HKEY_LOCAL_MACHINE\nRegistry Paths: \n\\SOFTWARE\\Classes\\batfile\\shell\\runasuser\\\n\\SOFTWARE\\Classes\\\
+            cmdfile\\shell\\runasuser\\\n\\SOFTWARE\\Classes\\exefile\\shell\\runasuser\\\n\\SOFTWARE\\Classes\\mscfile\\\
+            shell\\runasuser\\\n\nValue Name: SuppressionPolicy\n\nType: REG_DWORD\nValue: 0x00001000 (4096)"
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253359
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253359
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253359
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253359
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:20101
+        exports: []
+        inline_content: 'If the following registry values do not exist or are not configured as specified, this is a finding.
+          The policy configures the same Value Name, Type and Value under four different registry paths. Registry Hive: HKEY_LOCAL_MACHINE
+          Registry Paths: \SOFTWARE\Classes\batfile\shell\runasuser\ \SOFTWARE\Classes\cmdfile\shell\runasuser\ \SOFTWARE\Classes\exefile\shell\runasuser\
+          \SOFTWARE\Classes\mscfile\shell\runasuser\ Value Name: SuppressionPolicy Type: REG_DWORD Value: 0x00001000 (4096)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:20101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "If the following registry values do not exist or are not configured as specified, this is a finding.\n\
+              The policy configures the same Value Name, Type and Value under four different registry paths.\n\nRegistry Hive:\
+              \ HKEY_LOCAL_MACHINE\nRegistry Paths: \n\\SOFTWARE\\Classes\\batfile\\shell\\runasuser\\\n\\SOFTWARE\\Classes\\\
+              cmdfile\\shell\\runasuser\\\n\\SOFTWARE\\Classes\\exefile\\shell\\runasuser\\\n\\SOFTWARE\\Classes\\mscfile\\\
+              shell\\runasuser\\\n\nValue Name: SuppressionPolicy\n\nType: REG_DWORD\nValue: 0x00001000 (4096)"
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'If the following registry values do not exist or are not configured as specified, this is a finding. The policy
+      configures the same Value Name, Type and Value under four different registry paths. Registry Hive: HKEY_LOCAL_MACHINE
+      Registry Paths: \SOFTWARE\Classes\batfile\shell\runasuser\ \SOFTWARE\Classes\cmdfile\shell\runasuser\ \SOFTWARE\Classes\exefile\shell\runasuser\
+      \SOFTWARE\Classes\mscfile\shell\runasuser\ Value Name: SuppressionPolicy Type: REG_DWORD Value: 0x00001000 (4096)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253359r958478_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: eb839bc73b9ce9e0669f3d0c47102157fc86d021dc28e6687f70624ea7509878
+  migration: *id002

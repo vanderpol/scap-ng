@@ -7,48 +7,6 @@ assessment:
   description: RHEL 9 library directories must have mode 755 or less permissive.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:navy.navwar.niwcatlantic.scc.linux:obj:25788310:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:25788310
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '13'
-      comment: All system-wide Library Directories have 755 or better (gwrite should be = false.)
-      query:
-      - attributes:
-          recurse_direction: down
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      - attributes:
-          var_check: only one
-          var_ref: oval:navy.navwar.niwcatlantic.scc.linux:var:25788302
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      - attributes:
-          nil: 'true'
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      - attributes:
-          action: exclude
-        kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788301
-      - attributes:
-          action: exclude
-        kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788306
-      - attributes:
-          action: exclude
-        kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788308
     oval:navy.navwar.niwcatlantic.scc.linux:obj:25788330:
       capability: scapng.collect.unix.file
       source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:25788330
@@ -79,6 +37,48 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788302
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788306
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788308
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:25788310:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:25788310
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '13'
+      comment: All system-wide Library Directories have 755 or better (gwrite should be = false.)
+      query:
+      - attributes:
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - attributes:
+          var_check: only one
+          var_ref: oval:navy.navwar.niwcatlantic.scc.linux:var:25788302
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788301
       - attributes:
           action: exclude
         kind: element
@@ -131,6 +131,19 @@ assessment:
         variable_id: oval:navy.navwar.niwcatlantic.scc.linux:var:25788302
         variable_type: constant_variable
   predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:25788302:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788302
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      comment: Mode 755 or less permissive (owrite should be = false.)
     oval:navy.navwar.niwcatlantic.scc.linux:ste:25788306:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788306
       source_type: file_state
@@ -153,19 +166,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: file
       comment: null
-    oval:navy.navwar.niwcatlantic.scc.linux:ste:25788302:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788302
-      source_type: file_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: boolean
-        kind: element
-        name: owrite
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: 'false'
-      comment: Mode 755 or less permissive (owrite should be = false.)
     oval:navy.navwar.niwcatlantic.scc.linux:ste:25788301:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788301
       source_type: file_state
@@ -253,16 +253,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.linux:def:257883
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257883
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.linux:def:257883
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -358,6 +364,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257883r991560_rule
-    semantic_ir_sha256: 511d1ebe74e35d7addf5eb453dcf8337a3897686b18452468ee0fe3e40001a0e
+    semantic_ir_sha256: d1b03ab690d9c0b20176d17a9f10fba9ecaf6c61e8749d9bd66f0556e137def4
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ed2725a01b11054ccd530b66db7578ae760f7d03c3332f59bed8569789bbfd67

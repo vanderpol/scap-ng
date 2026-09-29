@@ -7,18 +7,6 @@ assessment:
   description: RHEL 9 must mount /dev/shm with the nosuid option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:23050900:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23050900
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /dev/shm
     oval:mil.disa.stig.ind:obj:23050900:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23050900
@@ -43,6 +31,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.linux:obj:23050900:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23050900
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /dev/shm
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:23050900:
@@ -73,19 +73,6 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:23050900:
-        source_test_id: oval:mil.disa.stig.linux:tst:23050900
-        source_type: partition_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: If /dev/shm is mounted, it is mounted with the nosuid option
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:23050900
-        predicates:
-        - oval:mil.disa.stig.linux:ste:23050900
-        source_other: []
       oval:mil.disa.stig.ind:tst:23050900:
         source_test_id: oval:mil.disa.stig.ind:tst:23050900
         source_type: textfilecontent54_test
@@ -98,6 +85,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23050900
         predicates:
         - oval:mil.disa.stig.ind:ste:23050900
+        source_other: []
+      oval:mil.disa.stig.linux:tst:23050900:
+        source_test_id: oval:mil.disa.stig.linux:tst:23050900
+        source_type: partition_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: If /dev/shm is mounted, it is mounted with the nosuid option
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23050900
+        predicates:
+        - oval:mil.disa.stig.linux:ste:23050900
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:230509:
@@ -173,16 +173,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257865
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257865
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257865
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -280,6 +286,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257865r1184297_rule
-    semantic_ir_sha256: 44b8bc9430e2bd0b9e092f21e2db67362ef11d1111a8098aa5e88383ae54a532
+    semantic_ir_sha256: ce114b40587f67db2e7080dd8e0e018e1da87f8a067ae0a03bdf83ab31198bf1
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 6d7e378d90ae8a85afd4fce36c9d505f641304615cfcb7af4aae07425107a6fe

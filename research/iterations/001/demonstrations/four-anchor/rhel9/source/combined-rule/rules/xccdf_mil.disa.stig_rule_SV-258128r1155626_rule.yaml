@@ -323,7 +323,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
     version: 1
     description: RHEL 9 must require authentication to access emergency mode.
@@ -462,16 +476,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258128
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258128
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258128
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -565,11 +585,144 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
-      semantic_ir_sha256: 655902fd18641584fcb029e74314744677770e1ab637115192242e22e3caddba
+      semantic_ir_sha256: 13d84150f98391a4111edb2227f4384fb36e93ea0fb66292e533cf967ab6baad
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 2c529bf9af429f5b5819f2221191ea5b6205e3cd8ad60039f7ab67adfc2a0e21
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
+    version: 1
+    description: RHEL 9 must require authentication to access emergency mode.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:66101
+      exports: []
+      inline_content: 'Verify RHEL 9 requires authentication for emergency mode with the following command: $ grep sulogin
+        /usr/lib/systemd/system/emergency.service ExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency If the line
+        is not returned from the default systemd file, use the following command to look for modifications to the emergency.service:
+        $ grep sulogin /etc/systemd/system/emergency.service.d/*.conf If the line is not returned from either location this
+        is a finding. Note: The configuration setting can only be in either the default location, or in the drop in file,
+        not both locations.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:66101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify RHEL 9 requires authentication for emergency mode with the following command:\n\n$ grep sulogin /usr/lib/systemd/system/emergency.service\
+            \ \n\nExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency\n\nIf the line is not returned from the default\
+            \ systemd file, use the following command to look for modifications to the emergency.service:\n\n$ grep sulogin\
+            \ /etc/systemd/system/emergency.service.d/*.conf \n\nIf the line is not returned from either location this is\
+            \ a finding.\n\nNote: The configuration setting can only be in either the default location, or in the drop in\
+            \ file, not both locations."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258128
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258128
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258128
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258128
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:66101
+        exports: []
+        inline_content: 'Verify RHEL 9 requires authentication for emergency mode with the following command: $ grep sulogin
+          /usr/lib/systemd/system/emergency.service ExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency If the line
+          is not returned from the default systemd file, use the following command to look for modifications to the emergency.service:
+          $ grep sulogin /etc/systemd/system/emergency.service.d/*.conf If the line is not returned from either location this
+          is a finding. Note: The configuration setting can only be in either the default location, or in the drop in file,
+          not both locations.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:66101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify RHEL 9 requires authentication for emergency mode with the following command:\n\n$ grep sulogin\
+              \ /usr/lib/systemd/system/emergency.service \n\nExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency\n\
+              \nIf the line is not returned from the default systemd file, use the following command to look for modifications\
+              \ to the emergency.service:\n\n$ grep sulogin /etc/systemd/system/emergency.service.d/*.conf \n\nIf the line\
+              \ is not returned from either location this is a finding.\n\nNote: The configuration setting can only be in\
+              \ either the default location, or in the drop in file, not both locations."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 requires authentication for emergency mode with the following command: $ grep sulogin /usr/lib/systemd/system/emergency.service
+      ExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency If the line is not returned from the default systemd file,
+      use the following command to look for modifications to the emergency.service: $ grep sulogin /etc/systemd/system/emergency.service.d/*.conf
+      If the line is not returned from either location this is a finding. Note: The configuration setting can only be in either
+      the default location, or in the drop in file, not both locations.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 6c291bda42df8e9ae81b7b93384fe4746b9120cbf8d505e82b8957efb1352d3b
+  migration: *id002

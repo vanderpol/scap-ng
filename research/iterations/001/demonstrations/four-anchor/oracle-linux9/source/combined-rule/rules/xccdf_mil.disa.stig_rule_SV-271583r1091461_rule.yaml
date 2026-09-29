@@ -336,26 +336,27 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271583r1091461_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271583r1091461_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271583r1091461_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271583r1091461_rule
     version: 1
     description: OL 9 audit logs must be group-owned by root or by a restricted logging group to prevent unauthorized read
       access.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.unix:obj:23039700:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:23039700
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '2'
-        comment: Audit log file location
-        query:
-        - attributes:
-            var_ref: oval:mil.disa.stig.defs:var:23039700
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       oval:mil.disa.stig.ind:obj:23039701:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23039701
@@ -381,6 +382,19 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.unix:obj:23039700:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:23039700
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '2'
+        comment: Audit log file location
+        query:
+        - attributes:
+            var_ref: oval:mil.disa.stig.defs:var:23039700
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     derive:
       oval:mil.disa.stig.defs:var:23039700:
         source_variable_id: oval:mil.disa.stig.defs:var:23039700
@@ -522,16 +536,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271583
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271583
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271583
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -627,11 +647,151 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271583r1091461_rule
-      semantic_ir_sha256: 383d8e7bd8d0da759c0d76f83c6b5eab2f01ef2c5a00669816235a42567516a2
+      semantic_ir_sha256: 381b487cfaaf7ae63d70556cfe9c1f9c6b5c0262493ae4786640a295c0bef4d5
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 1326d52b55d8a74ba4ea59cea69430bb3bf23d7b3c2f96d862856294f14cb7bd
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271583r1091461_rule
+    version: 1
+    description: OL 9 audit logs must be group-owned by root or by a restricted logging group to prevent unauthorized read
+      access.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29501
+      exports: []
+      inline_content: 'Verify that OL 9 audit logs are group-owned by "root" or a restricted logging group. First determine
+        if a group other than "root" has been assigned to the audit logs with the following command: $ sudo grep log_group
+        /etc/audit/auditd.conf log_group = root Then determine where the audit logs are stored with the following command:
+        $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Then, using the location of the
+        audit log file, determine if the audit log is group-owned by "root" using the following command: $ sudo stat -c "%G
+        %n" /var/log/audit/audit.log root /var/log/audit/audit.log If the audit log is not group-owned by "root" or the configured
+        alternative logging group, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 audit logs are group-owned by \"root\" or a restricted logging group. \n\nFirst determine\
+            \ if a group other than \"root\" has been assigned to the audit logs with the following command:\n\n$ sudo grep\
+            \ log_group /etc/audit/auditd.conf\nlog_group = root\n\nThen determine where the audit logs are stored with the\
+            \ following command:\n\n$ sudo grep -iw log_file /etc/audit/auditd.conf\nlog_file = /var/log/audit/audit.log\n\
+            \nThen, using the location of the audit log file, determine if the audit log is group-owned by \"root\" using\
+            \ the following command:\n\n$ sudo stat -c \"%G %n\" /var/log/audit/audit.log\nroot /var/log/audit/audit.log\n\
+            \nIf the audit log is not group-owned by \"root\" or the configured alternative logging group, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271583
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271583
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271583
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271583
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29501
+        exports: []
+        inline_content: 'Verify that OL 9 audit logs are group-owned by "root" or a restricted logging group. First determine
+          if a group other than "root" has been assigned to the audit logs with the following command: $ sudo grep log_group
+          /etc/audit/auditd.conf log_group = root Then determine where the audit logs are stored with the following command:
+          $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Then, using the location of
+          the audit log file, determine if the audit log is group-owned by "root" using the following command: $ sudo stat
+          -c "%G %n" /var/log/audit/audit.log root /var/log/audit/audit.log If the audit log is not group-owned by "root"
+          or the configured alternative logging group, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify that OL 9 audit logs are group-owned by \"root\" or a restricted logging group. \n\nFirst determine\
+              \ if a group other than \"root\" has been assigned to the audit logs with the following command:\n\n$ sudo grep\
+              \ log_group /etc/audit/auditd.conf\nlog_group = root\n\nThen determine where the audit logs are stored with\
+              \ the following command:\n\n$ sudo grep -iw log_file /etc/audit/auditd.conf\nlog_file = /var/log/audit/audit.log\n\
+              \nThen, using the location of the audit log file, determine if the audit log is group-owned by \"root\" using\
+              \ the following command:\n\n$ sudo stat -c \"%G %n\" /var/log/audit/audit.log\nroot /var/log/audit/audit.log\n\
+              \nIf the audit log is not group-owned by \"root\" or the configured alternative logging group, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 audit logs are group-owned by "root" or a restricted logging group. First determine if a
+      group other than "root" has been assigned to the audit logs with the following command: $ sudo grep log_group /etc/audit/auditd.conf
+      log_group = root Then determine where the audit logs are stored with the following command: $ sudo grep -iw log_file
+      /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Then, using the location of the audit log file, determine
+      if the audit log is group-owned by "root" using the following command: $ sudo stat -c "%G %n" /var/log/audit/audit.log
+      root /var/log/audit/audit.log If the audit log is not group-owned by "root" or the configured alternative logging group,
+      this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271583r1091461_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: b032f03efff617182937c7a0f34b67e3c6b4e0d7216823618a3936f326c9489d
+  migration: *id002

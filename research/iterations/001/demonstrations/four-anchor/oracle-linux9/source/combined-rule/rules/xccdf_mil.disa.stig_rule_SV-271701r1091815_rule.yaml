@@ -278,7 +278,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271701r1091815_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271701r1091815_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271701r1091815_rule
     version: 1
     description: OL 9 must block unauthorized peripherals before establishing a connection.
@@ -414,10 +424,13 @@ rule:
       id 1d6b:0001 serial If the command does not return results or an error is returned, ask the SA to indicate how unauthorized
       peripherals are being blocked. If there is no evidence that unauthorized peripherals are being blocked before establishing
       a connection, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271701r1091815_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 2ae74f41724ab4b3246dc908c7eaedeeace928ff964637dae5422a89e5aa480a
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

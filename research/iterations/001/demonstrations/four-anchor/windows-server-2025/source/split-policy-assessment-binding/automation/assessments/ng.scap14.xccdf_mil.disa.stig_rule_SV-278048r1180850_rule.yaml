@@ -17,19 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25330600:
-      source_state_id: oval:mil.disa.stig.win:ste:25330600
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: credential_validation
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_FAILURE
-      comment: '''Credential Validation'' is set to ''Failure'''
     oval:mil.disa.stig.win:ste:25330701:
       source_state_id: oval:mil.disa.stig.win:ste:25330701
       source_type: auditeventpolicysubcategories_state
@@ -43,6 +30,19 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
       comment: '''Credential Validation'' is set to ''Success'' and ''Failure'''
+    oval:mil.disa.stig.win:ste:25330600:
+      source_state_id: oval:mil.disa.stig.win:ste:25330600
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: credential_validation
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_FAILURE
+      comment: '''Credential Validation'' is set to ''Failure'''
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25330701:
@@ -72,6 +72,33 @@ assessment:
         - oval:mil.disa.stig.win:ste:25330600
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253306:
+        source_definition_id: oval:mil.disa.stig.defs:def:253306
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Credential Validation - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330600
+          - comment: Audit - Credential Validation - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330701
+          comment: Audit - Credential Validation - Failure
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Account Logon - Credential Validation failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278048:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278048
         class: compliance
@@ -109,33 +136,6 @@ assessment:
               \ account logon."
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253306:
-        source_definition_id: oval:mil.disa.stig.defs:def:253306
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Credential Validation - Failure only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330600
-          - comment: Audit - Credential Validation - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330701
-          comment: Audit - Credential Validation - Failure
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Account Logon - Credential Validation failures.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.windows2025:def:278048
@@ -147,16 +147,22 @@ assessment:
       exports: []
       href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows2025:def:278048
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.windows2025:def:278048
       exports: []
       href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows2025:def:278048
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
@@ -254,6 +260,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278048r1180850_rule
-    semantic_ir_sha256: 422465139560ab1a215115fec1111c3f52e106c955e13a306e914d339377392f
+    semantic_ir_sha256: fffa5aa729a384139770861d9fe639d170b74f860c33699ad82972a727701662
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 0d9624be8f97a870df7dd271b5b2dd824c81654f854839c0c3f4111d8fc04383

@@ -350,7 +350,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278177r1182280_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278177r1182280_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-278177r1182280_rule
     version: 1
     description: Windows Server 2025 must only allow administrators responsible for the member server or stand-alone or nondomain-joined
@@ -528,10 +538,13 @@ rule:
       Standard user accounts must not be members of the local Administrator group. If accounts that do not have responsibility
       for administration of the system are members of the local Administrators group, this is a finding. If the built-in Administrator
       account or other required administrative accounts are found on the system, this is not a finding.
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-278177r1182280_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 450228db31a354222ad718b7d27b02cfc705e9bc333bbe4332b07a943de5f607
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

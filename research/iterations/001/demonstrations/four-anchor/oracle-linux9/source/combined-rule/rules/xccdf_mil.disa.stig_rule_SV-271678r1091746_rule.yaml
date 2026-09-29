@@ -348,37 +348,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271678r1091746_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271678r1091746_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271678r1091746_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271678r1091746_rule
     version: 1
     description: OL 9 must prevent a user from overriding the disabling of the graphical user interface automount function.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25801700:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25801700
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '3'
-        comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/dconf/profile/user
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*system-db\s*:\s*local\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:25801500:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25801500
@@ -403,6 +392,31 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^/org/gnome/desktop/media-handling/automount-open$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:25801700:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25801700
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/dconf/profile/user
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*system-db\s*:\s*local\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -512,16 +526,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271678
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271678
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271678
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -621,11 +641,159 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271678r1091746_rule
-      semantic_ir_sha256: dd5321891690cd90d83e066f1b67535d454c819a0453c908fdefb23d3ac7174c
+      semantic_ir_sha256: 3677e9c47bea0ee256996c23bb11cf8b4e273f4b94f8c2b53a1223979a7a63f7
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 811e69bf53728572f35a9c01468006ab711c01a784267ef759a9867d28e0efe9
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271678r1091746_rule
+    version: 1
+    description: OL 9 must prevent a user from overriding the disabling of the graphical user interface automount function.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:48101
+      exports: []
+      inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+        If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+        OL 9 disables ability of the user to override the graphical user interface automount setting. Determine which profile
+        the system database is using with the following command: $ grep system-db /etc/dconf/profile/user system-db:local
+        Check that the automount setting is locked from nonprivileged user modification with the following command: Note:
+        The example below is using the database "local" for the system, so the path is "/etc/dconf/db/local.d". This path
+        must be modified if a database other than "local" is being used. $ grep ''automount-open'' /etc/dconf/db/local.d/locks/*
+        /org/gnome/desktop/media-handling/automount-open If the command does not return at least the example result, this
+        is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:48101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.\
+            \ If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\n\
+            Verify that OL 9 disables ability of the user to override the graphical user interface automount setting.\n\n\
+            Determine which profile the system database is using with the following command:\n\n$ grep system-db /etc/dconf/profile/user\n\
+            system-db:local\n\nCheck that the automount setting is locked from nonprivileged user modification with the following\
+            \ command:\n\nNote: The example below is using the database \"local\" for the system, so the path is \"/etc/dconf/db/local.d\"\
+            . This path must be modified if a database other than \"local\" is being used.\n\n$ grep 'automount-open' /etc/dconf/db/local.d/locks/*\
+            \ \n/org/gnome/desktop/media-handling/automount-open\n\nIf the command does not return at least the example result,\
+            \ this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271678
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271678
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271678
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271678
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:48101
+        exports: []
+        inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+          If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+          OL 9 disables ability of the user to override the graphical user interface automount setting. Determine which profile
+          the system database is using with the following command: $ grep system-db /etc/dconf/profile/user system-db:local
+          Check that the automount setting is locked from nonprivileged user modification with the following command: Note:
+          The example below is using the database "local" for the system, so the path is "/etc/dconf/db/local.d". This path
+          must be modified if a database other than "local" is being used. $ grep ''automount-open'' /etc/dconf/db/local.d/locks/*
+          /org/gnome/desktop/media-handling/automount-open If the command does not return at least the example result, this
+          is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:48101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.\
+              \ If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\n\
+              Verify that OL 9 disables ability of the user to override the graphical user interface automount setting.\n\n\
+              Determine which profile the system database is using with the following command:\n\n$ grep system-db /etc/dconf/profile/user\n\
+              system-db:local\n\nCheck that the automount setting is locked from nonprivileged user modification with the\
+              \ following command:\n\nNote: The example below is using the database \"local\" for the system, so the path\
+              \ is \"/etc/dconf/db/local.d\". This path must be modified if a database other than \"local\" is being used.\n\
+              \n$ grep 'automount-open' /etc/dconf/db/local.d/locks/* \n/org/gnome/desktop/media-handling/automount-open\n\
+              \nIf the command does not return at least the example result, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+      If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+      OL 9 disables ability of the user to override the graphical user interface automount setting. Determine which profile
+      the system database is using with the following command: $ grep system-db /etc/dconf/profile/user system-db:local Check
+      that the automount setting is locked from nonprivileged user modification with the following command: Note: The example
+      below is using the database "local" for the system, so the path is "/etc/dconf/db/local.d". This path must be modified
+      if a database other than "local" is being used. $ grep ''automount-open'' /etc/dconf/db/local.d/locks/* /org/gnome/desktop/media-handling/automount-open
+      If the command does not return at least the example result, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271678r1091746_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 8b5a7f13f1c009d13bcd0ce33c97cf947e0fc34fddcf2dd6574ba002ee7521b0
+  migration: *id002

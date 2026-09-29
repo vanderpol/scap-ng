@@ -338,12 +338,38 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258155r1045300_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258155r1045300_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258155r1045300_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258155r1045300_rule
     version: 1
     description: RHEL 9 must allocate audit record storage capacity to store at least one week's worth of audit records.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25815500:
+        capability: scapng.collect.independent.variable
+        source_object_id: oval:mil.disa.stig.ind:obj:25815500
+        source_type: variable_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: var_ref
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: oval:mil.disa.stig.defs:var:25815500
       oval:mil.disa.stig.ind:obj:23029402:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23029402
@@ -390,18 +416,6 @@ rule:
           kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      oval:mil.disa.stig.ind:obj:25815500:
-        capability: scapng.collect.independent.variable
-        source_object_id: oval:mil.disa.stig.ind:obj:25815500
-        source_type: variable_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: var_ref
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: oval:mil.disa.stig.defs:var:25815500
     derive:
       oval:mil.disa.stig.defs:var:23029400:
         source_variable_id: oval:mil.disa.stig.defs:var:23029400
@@ -530,6 +544,18 @@ rule:
         comment: 10GiB
     evaluate:
       tests:
+        oval:mil.disa.stig.linux:tst:23029400:
+          source_test_id: oval:mil.disa.stig.linux:tst:23029400
+          source_type: partition_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          comment: There is a separate file system for audit data directory.
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23029400
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.ind:tst:25815500:
           source_test_id: oval:mil.disa.stig.ind:tst:25815500
           source_type: variable_test
@@ -543,47 +569,7 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:25815500
           source_other: []
-        oval:mil.disa.stig.linux:tst:23029400:
-          source_test_id: oval:mil.disa.stig.linux:tst:23029400
-          source_type: partition_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: There is a separate file system for audit data directory.
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23029400
-          predicates: []
-          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:258155:
-          source_definition_id: oval:mil.disa.stig.defs:def:258155
-          class: compliance
-          version: '3'
-          criteria:
-            children:
-            - comment: Audit file system exists
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23029400
-            - comment: Audit file system total space >= 10GiB
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25815500
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must allocate audit record storage capacity to store at least one week of audit records,
-                when audit records are not immediately sent to a central audit record storage facility.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258155:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258155
           class: compliance
@@ -625,6 +611,34 @@ rule:
                 Satisfies: SRG-OS-000341-GPOS-00132, SRG-OS-000342-GPOS-00133'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258155:
+          source_definition_id: oval:mil.disa.stig.defs:def:258155
+          class: compliance
+          version: '3'
+          criteria:
+            children:
+            - comment: Audit file system exists
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23029400
+            - comment: Audit file system total space >= 10GiB
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25815500
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must allocate audit record storage capacity to store at least one week of audit records,
+                when audit records are not immediately sent to a central audit record storage facility.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258155
@@ -636,16 +650,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258155
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258155
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258155
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -744,11 +764,157 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258155r1045300_rule
-      semantic_ir_sha256: 030b31eb3f54d3f23fd3b611e4e3cc4b48c4a3ff0ae264aeba0b88e6c02084b0
+      semantic_ir_sha256: 97a05b9199cc1871051643792f7f02cff189873c1c3cdd3edac2b3c2ecd23f14
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 1734603f4d1b68eb6b0d80019ef3ac6eb8e35b9fcc010618d17e054a09a3d3c2
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258155r1045300_rule
+    version: 1
+    description: RHEL 9 must allocate audit record storage capacity to store at least one week's worth of audit records.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:71101
+      exports: []
+      inline_content: 'Verify RHEL 9 allocates audit record storage capacity to store at least one week of audit records when
+        audit records are not immediately sent to a central audit record storage facility. Note: The partition size needed
+        to capture a week of audit records is based on the activity level of the system and the total storage capacity available.
+        Typically 10.0GB of storage space for audit records should be sufficient. Determine which partition the audit records
+        are being written to with the following command: $ sudo grep -w log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log
+        Check the size of the partition that audit records are written to with the following command and verify whether it
+        is sufficiently large: # df -h /var/log/audit/ /dev/sda2 24G 10.4G 13.6G 43% /var/log/audit If the audit record partition
+        is not allocated for sufficient storage capacity, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:71101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify RHEL 9 allocates audit record storage capacity to store at least one week of audit records when audit\
+            \ records are not immediately sent to a central audit record storage facility.\n\nNote: The partition size needed\
+            \ to capture a week of audit records is based on the activity level of the system and the total storage capacity\
+            \ available. Typically 10.0GB of storage space for audit records should be sufficient.\n\nDetermine which partition\
+            \ the audit records are being written to with the following command:\n\n$ sudo grep -w log_file /etc/audit/auditd.conf\n\
+            \nlog_file = /var/log/audit/audit.log \n\nCheck the size of the partition that audit records are written to with\
+            \ the following command and verify whether it is sufficiently large:\n\n # df -h /var/log/audit/\n\n/dev/sda2\
+            \ 24G 10.4G 13.6G 43% /var/log/audit \n\nIf the audit record partition is not allocated for sufficient storage\
+            \ capacity, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258155
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258155
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258155
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258155
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:71101
+        exports: []
+        inline_content: 'Verify RHEL 9 allocates audit record storage capacity to store at least one week of audit records
+          when audit records are not immediately sent to a central audit record storage facility. Note: The partition size
+          needed to capture a week of audit records is based on the activity level of the system and the total storage capacity
+          available. Typically 10.0GB of storage space for audit records should be sufficient. Determine which partition the
+          audit records are being written to with the following command: $ sudo grep -w log_file /etc/audit/auditd.conf log_file
+          = /var/log/audit/audit.log Check the size of the partition that audit records are written to with the following
+          command and verify whether it is sufficiently large: # df -h /var/log/audit/ /dev/sda2 24G 10.4G 13.6G 43% /var/log/audit
+          If the audit record partition is not allocated for sufficient storage capacity, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:71101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify RHEL 9 allocates audit record storage capacity to store at least one week of audit records when\
+              \ audit records are not immediately sent to a central audit record storage facility.\n\nNote: The partition\
+              \ size needed to capture a week of audit records is based on the activity level of the system and the total\
+              \ storage capacity available. Typically 10.0GB of storage space for audit records should be sufficient.\n\n\
+              Determine which partition the audit records are being written to with the following command:\n\n$ sudo grep\
+              \ -w log_file /etc/audit/auditd.conf\n\nlog_file = /var/log/audit/audit.log \n\nCheck the size of the partition\
+              \ that audit records are written to with the following command and verify whether it is sufficiently large:\n\
+              \n # df -h /var/log/audit/\n\n/dev/sda2 24G 10.4G 13.6G 43% /var/log/audit \n\nIf the audit record partition\
+              \ is not allocated for sufficient storage capacity, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 allocates audit record storage capacity to store at least one week of audit records when audit
+      records are not immediately sent to a central audit record storage facility. Note: The partition size needed to capture
+      a week of audit records is based on the activity level of the system and the total storage capacity available. Typically
+      10.0GB of storage space for audit records should be sufficient. Determine which partition the audit records are being
+      written to with the following command: $ sudo grep -w log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log
+      Check the size of the partition that audit records are written to with the following command and verify whether it is
+      sufficiently large: # df -h /var/log/audit/ /dev/sda2 24G 10.4G 13.6G 43% /var/log/audit If the audit record partition
+      is not allocated for sufficient storage capacity, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258155r1045300_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 154abf5c9fff214b1bba685fce6b97df9afcea5d7a6b097099d3ad24af2e7463
+  migration: *id002

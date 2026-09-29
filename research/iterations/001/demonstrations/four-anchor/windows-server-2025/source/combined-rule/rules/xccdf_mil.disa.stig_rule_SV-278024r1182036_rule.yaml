@@ -331,7 +331,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-278024r1182036_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-278024r1182036_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278024r1182036_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278024r1182036_rule
     version: 1
     description: Windows Server 2025 must have the Server Message Block (SMB) v1 protocol disabled on the SMB server.
@@ -427,19 +441,6 @@ rule:
         comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25328700:
-          source_test_id: oval:mil.disa.stig.win:tst:25328700
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Configure SMBv1 Server'' is set to ''Disabled'''
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25328700
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000000
-          source_other: []
         oval:mil.disa.stig.win:tst:25328600:
           source_test_id: oval:mil.disa.stig.win:tst:25328600
           source_type: wmi57_test
@@ -452,6 +453,19 @@ rule:
           - oval:mil.disa.stig.win:obj:25328600
           predicates:
           - oval:mil.disa.stig.win:ste:25328600
+          source_other: []
+        oval:mil.disa.stig.win:tst:25328700:
+          source_test_id: oval:mil.disa.stig.win:tst:25328700
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: '''Configure SMBv1 Server'' is set to ''Disabled'''
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25328700
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
         oval:mil.disa.stig.windows2025:def:278024:
@@ -526,16 +540,22 @@ rule:
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows2025:def:278024
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows2025:def:278024
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows2025:def:278024
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
@@ -639,11 +659,163 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278024r1182036_rule
-      semantic_ir_sha256: 58d6e33efbafbabfab5d351ab0a47a5b229b498bd445ee362b9a55d91d0bb844
+      semantic_ir_sha256: 5dec2c558749c094f554b1a5b0249e29a4a100cdbd5ef2b537f8885301c2a0f7
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: eec1eb5cf470c5e120264df04c150012e388000c2056b55f3e1bbc8a2adfda72
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278024r1182036_rule
+    version: 1
+    description: Windows Server 2025 must have the Server Message Block (SMB) v1 protocol disabled on the SMB server.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:8101
+      exports: []
+      inline_content: 'Different methods are available to disable SMBv1 on Windows Server 2025, if WN25-00-000380 is configured,
+        this is not applicable. If the following registry value does not exist or is not configured as specified, this is
+        a finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\
+        Value Name: SMB1 Type: REG_DWORD Value: 0x00000000 (0)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:8101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Different methods are available to disable SMBv1 on Windows Server 2025, if WN25-00-000380 is configured,
+            this is not applicable.
+
+
+            If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\
+
+
+            Value Name: SMB1
+
+
+            Type: REG_DWORD
+
+            Value: 0x00000000 (0)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278024
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278024
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278024
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278024
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:8101
+        exports: []
+        inline_content: 'Different methods are available to disable SMBv1 on Windows Server 2025, if WN25-00-000380 is configured,
+          this is not applicable. If the following registry value does not exist or is not configured as specified, this is
+          a finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\
+          Value Name: SMB1 Type: REG_DWORD Value: 0x00000000 (0)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:8101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Different methods are available to disable SMBv1 on Windows Server 2025, if WN25-00-000380 is configured,
+              this is not applicable.
+
+
+              If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\
+
+
+              Value Name: SMB1
+
+
+              Type: REG_DWORD
+
+              Value: 0x00000000 (0)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Different methods are available to disable SMBv1 on Windows Server 2025, if WN25-00-000380 is configured,
+      this is not applicable. If the following registry value does not exist or is not configured as specified, this is a
+      finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\
+      Value Name: SMB1 Type: REG_DWORD Value: 0x00000000 (0)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-278024r1182036_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 90c3ad0e93ae4ca56e02cb66ddde99d165f4fe4ea6cafe0ac31804ed7207b5fc
+  migration: *id002

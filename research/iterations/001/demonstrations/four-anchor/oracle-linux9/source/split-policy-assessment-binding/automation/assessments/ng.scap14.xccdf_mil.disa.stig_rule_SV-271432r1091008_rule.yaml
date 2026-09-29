@@ -197,18 +197,6 @@ assessment:
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:23029400:
-        source_test_id: oval:mil.disa.stig.linux:tst:23029400
-        source_type: partition_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: There is a separate file system for audit data directory.
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:23029400
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:23029401:
         source_test_id: oval:mil.disa.stig.ind:tst:23029401
         source_type: textfilecontent54_test
@@ -221,7 +209,46 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23029401
         predicates: []
         source_other: []
+      oval:mil.disa.stig.linux:tst:23029400:
+        source_test_id: oval:mil.disa.stig.linux:tst:23029400
+        source_type: partition_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: There is a separate file system for audit data directory.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23029400
+        predicates: []
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230294:
+        source_definition_id: oval:mil.disa.stig.defs:def:230294
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: There is a separate file system for audit data directory.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23029400
+          - comment: There is a separate file system configured for audit data directory.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23029401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must use a separate file system for the system audit data path.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271432:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271432
         class: compliance
@@ -255,33 +282,6 @@ assessment:
               files and helps ensure that auditing cannot be halted due to the partition running out of space.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230294:
-        source_definition_id: oval:mil.disa.stig.defs:def:230294
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: There is a separate file system for audit data directory.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23029400
-          - comment: There is a separate file system configured for audit data directory.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23029401
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must use a separate file system for the system audit data path.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.ol9os:def:271432
@@ -293,16 +293,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271432
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271432
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271432
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -395,6 +401,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271432r1091008_rule
-    semantic_ir_sha256: ba172d2dd0dd65a18f57d4df52f8273f1da9a2f8eef39ad4358d38ffab0cd7f4
+    semantic_ir_sha256: 54307e5241ad8d64b831c90df5d6b82a69e110e0c4fe488a0d2a840828237eed
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 4e4ec43bc9a6356e3e9949a60a77e75d730b1d95657eb9bdbfa2cb72e297f12a

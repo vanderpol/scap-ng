@@ -222,7 +222,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278041r1180829_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278041r1180829_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-278041r1180829_rule
     version: 1
     description: Windows Server 2025 audit records must be backed up to a different system or media than the system being
@@ -335,10 +345,13 @@ rule:
     source_result_algebra: xccdf-1.2-complex-check-eight-state
     procedure: Determine if a process to back up log data to a different system or media than the system being audited has
       been implemented. If it has not, this is a finding.
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-278041r1180829_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 34a1e15af136a2baf66805ac16b4ca5d1bb9a13686793c56d9a12846dae258fb
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

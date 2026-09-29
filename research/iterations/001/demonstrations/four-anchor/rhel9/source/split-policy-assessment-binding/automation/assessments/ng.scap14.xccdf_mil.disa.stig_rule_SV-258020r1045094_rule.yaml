@@ -7,31 +7,6 @@ assessment:
   description: RHEL 9 must prevent a user from overriding the disabling of the graphical user smart card removal action.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25802600:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25802600
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: dconf user databases
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/dconf/profile/user
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^system-db:(\S+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25802000:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25802000
@@ -58,6 +33,31 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^/org/gnome/settings-daemon/peripherals/smartcard/removal-action$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25802600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25802600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: dconf user databases
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/profile/user
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^system-db:(\S+)\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -141,6 +141,18 @@ assessment:
   predicates: {}
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:25802600:
+        source_test_id: oval:mil.disa.stig.ind:tst:25802600
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: dconf user database(s) exist
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25802600
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.ind:tst:25802000:
         source_test_id: oval:mil.disa.stig.ind:tst:25802000
         source_type: textfilecontent54_test
@@ -152,18 +164,6 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:25802000
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:25802600:
-        source_test_id: oval:mil.disa.stig.ind:tst:25802600
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: dconf user database(s) exist
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25802600
         predicates: []
         source_other: []
     definitions:
@@ -250,16 +250,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258020
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258020
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258020
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -355,6 +361,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258020r1045094_rule
-    semantic_ir_sha256: d0f2f5d31e52d68d94db71087e371615bdf7c02c26ba56952d84c1f2c644420d
+    semantic_ir_sha256: 025a4bd7848786d4d63df0c771658b887220096aa8542514172ae40ae4f82537
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: a475497682e47a7e5c07ed0a652408f0201d82574ecebeff2e0fca57dba3e087

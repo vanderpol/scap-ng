@@ -304,38 +304,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253280r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253280r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253280r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253280r991589_rule
     version: 1
     description: Software certificate installation files must be removed from Windows 11.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002:
-        capability: scapng.collect.windows.file
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '18'
-        comment: Search for .pfx files
-        query:
-        - attributes:
-            max_depth: '-1'
-            recurse_direction: down
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: .*
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: \.[Pp][Ff][Xx]$
       oval:navy.navwar.niwcatlantic.scc.windows:obj:25328001:
         capability: scapng.collect.windows.file
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328001
@@ -374,6 +362,32 @@ rule:
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:navy.navwar.niwcatlantic.scc.windows:ste:25328002
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002:
+        capability: scapng.collect.windows.file
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '18'
+        comment: Search for .pfx files
+        query:
+        - attributes:
+            max_depth: '-1'
+            recurse_direction: down
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: .*
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: \.[Pp][Ff][Xx]$
     derive: {}
     predicates:
       oval:navy.navwar.niwcatlantic.scc.windows:ste:25328001:
@@ -469,16 +483,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:253280
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253280
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:253280
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -575,11 +595,150 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253280r991589_rule
-      semantic_ir_sha256: 0e3e329eb665beaa8853c85ed8bc74136584c8b7210db9dfb3f52e0cb6c5db05
+      semantic_ir_sha256: 86330fa390801bb6e5f3c05fdc6a436dd5886866ca6b7fe9fade3447b7374582
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: e530ed277133e330749b6642401e1336158c8fce278aeb0910d6b9a078d78ea5
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253280r991589_rule
+    version: 1
+    description: Software certificate installation files must be removed from Windows 11.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5101
+      exports: []
+      inline_content: Search all drives for *.p12 and *.pfx files. If any files with these extensions exist, this is a finding.
+        This does not apply to server-based applications that have a requirement for .p12 certificate files (e.g., Oracle
+        Wallet Manager) or Adobe PreFlight certificate files. Some applications create files with extensions of .p12 that
+        are not certificate installation files. Removal of non-certificate installation files from systems is not required.
+        These must be documented with the ISSO.
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Search all drives for *.p12 and *.pfx files.
+
+
+            If any files with these extensions exist, this is a finding.
+
+
+            This does not apply to server-based applications that have a requirement for .p12 certificate files (e.g., Oracle
+            Wallet Manager) or Adobe PreFlight certificate files. Some applications create files with extensions of .p12 that
+            are not certificate installation files. Removal of non-certificate installation files from systems is not required.
+            These must be documented with the ISSO.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253280
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253280
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253280
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253280
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5101
+        exports: []
+        inline_content: Search all drives for *.p12 and *.pfx files. If any files with these extensions exist, this is a finding.
+          This does not apply to server-based applications that have a requirement for .p12 certificate files (e.g., Oracle
+          Wallet Manager) or Adobe PreFlight certificate files. Some applications create files with extensions of .p12 that
+          are not certificate installation files. Removal of non-certificate installation files from systems is not required.
+          These must be documented with the ISSO.
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Search all drives for *.p12 and *.pfx files.
+
+
+              If any files with these extensions exist, this is a finding.
+
+
+              This does not apply to server-based applications that have a requirement for .p12 certificate files (e.g., Oracle
+              Wallet Manager) or Adobe PreFlight certificate files. Some applications create files with extensions of .p12
+              that are not certificate installation files. Removal of non-certificate installation files from systems is not
+              required. These must be documented with the ISSO.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: Search all drives for *.p12 and *.pfx files. If any files with these extensions exist, this is a finding. This
+      does not apply to server-based applications that have a requirement for .p12 certificate files (e.g., Oracle Wallet
+      Manager) or Adobe PreFlight certificate files. Some applications create files with extensions of .p12 that are not certificate
+      installation files. Removal of non-certificate installation files from systems is not required. These must be documented
+      with the ISSO.
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253280r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: f3973dc95d5f9b4726b57d438270f0a26bccb41a12cfcef336841f564c4cd505
+  migration: *id002

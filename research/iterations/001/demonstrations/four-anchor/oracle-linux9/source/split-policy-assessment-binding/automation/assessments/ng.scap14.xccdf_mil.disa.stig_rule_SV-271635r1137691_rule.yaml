@@ -7,33 +7,6 @@ assessment:
   description: OL 9 must require a boot loader superuser password.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25778700:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25778700
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '3'
-      comment: /etc/grub2.cfg:superusers
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/grub2.cfg
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*set\s+superusers\s*=\s*"(\S+)"\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25778701:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25778701
@@ -61,22 +34,35 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-  derive: {}
-  predicates:
-    oval:mil.disa.stig.ind:ste:25778701:
-      source_state_id: oval:mil.disa.stig.ind:ste:25778701
-      source_type: textfilecontent54_state
+    oval:mil.disa.stig.ind:obj:25778700:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25778700
+      source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
+      version: '3'
+      comment: /etc/grub2.cfg:superusers
+      query:
       - attributes:
           datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/grub2.cfg
+      - attributes:
           operation: pattern match
         kind: element
-        name: subexpression
+        name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^grub\.pbkdf2\.sha512\.
-      comment: GRUB superuser password
+        value: ^\s*set\s+superusers\s*=\s*"(\S+)"\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive: {}
+  predicates:
     oval:mil.disa.stig.ind:ste:25778700:
       source_state_id: oval:mil.disa.stig.ind:ste:25778700
       source_type: textfilecontent54_state
@@ -91,21 +77,22 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^\S+$
       comment: GRUB superuser name
+    oval:mil.disa.stig.ind:ste:25778701:
+      source_state_id: oval:mil.disa.stig.ind:ste:25778701
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^grub\.pbkdf2\.sha512\.
+      comment: GRUB superuser password
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25778700:
-        source_test_id: oval:mil.disa.stig.ind:tst:25778700
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/grub2.cfg:superusers exists and has a name.
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25778700
-        predicates:
-        - oval:mil.disa.stig.ind:ste:25778700
-        source_other: []
       oval:mil.disa.stig.ind:tst:25778701:
         source_test_id: oval:mil.disa.stig.ind:tst:25778701
         source_type: textfilecontent54_test
@@ -119,34 +106,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:25778701
         source_other: []
+      oval:mil.disa.stig.ind:tst:25778700:
+        source_test_id: oval:mil.disa.stig.ind:tst:25778700
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /etc/grub2.cfg:superusers exists and has a name.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25778700
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25778700
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:257787:
-        source_definition_id: oval:mil.disa.stig.defs:def:257787
-        class: compliance
-        version: '3'
-        criteria:
-          children:
-          - comment: /etc/grub2.cfg:superusers exists and has a name.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25778700
-          - comment: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25778701
-          comment: Verify a BIOS GRUB superuser password is configured.
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must require a boot loader superuser password.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271635:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271635
         class: compliance
@@ -188,6 +161,33 @@ assessment:
               \ to enter single-user mode."
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:257787:
+        source_definition_id: oval:mil.disa.stig.defs:def:257787
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: /etc/grub2.cfg:superusers exists and has a name.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25778700
+          - comment: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25778701
+          comment: Verify a BIOS GRUB superuser password is configured.
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must require a boot loader superuser password.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.ol9os:def:271635
@@ -199,16 +199,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271635
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271635
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271635
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -307,6 +313,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271635r1137691_rule
-    semantic_ir_sha256: 6b97b4351d58d012a49bafe8a48c423409ed1fba26e4e57056c5ff28de45d6d0
+    semantic_ir_sha256: c2cf09c1922521aa38f6dff405f5e3293fed179777f18f04c0e2d21db6f3a91c
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: de33a99d96efed422101f47bc695a18d61f2c83e74727a128b2963fb00dcddd1

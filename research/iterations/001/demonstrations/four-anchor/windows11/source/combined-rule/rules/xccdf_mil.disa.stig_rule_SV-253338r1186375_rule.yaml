@@ -364,7 +364,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253338r1186375_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253338r1186375_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253338r1186375_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253338r1186375_rule
     version: 1
     description: The security event log size must be configured to a value that holds at least one week's worth of audit records.
@@ -435,30 +449,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25333800
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253338:
-          source_definition_id: oval:mil.disa.stig.defs:def:253338
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: The Security event log size is configured to 5120000 KB or greater
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25333800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The security event log size must be configured to a value that holds at least one week's worth of audit
-                records.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253338:
           source_definition_id: oval:mil.disa.stig.windows11:def:253338
           class: compliance
@@ -494,6 +484,30 @@ rule:
                 the volume of security event audit records and increase the registry value for the log size as needed.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253338:
+          source_definition_id: oval:mil.disa.stig.defs:def:253338
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: The Security event log size is configured to 5120000 KB or greater
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25333800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The security event log size must be configured to a value that holds at least one week's worth of audit
+                records.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253338
@@ -505,16 +519,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253338
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253338
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253338
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -630,11 +650,191 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253338r1186375_rule
-      semantic_ir_sha256: 8fd6b2cd4d659e6779aa4ab1f9b91dd6f49a9ea8007710ae89bf0f5f764dba8f
+      semantic_ir_sha256: f94d0ea9412b9c360d7f4240ecb11a33c7a58543d742e018161424470a062ed1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 3fc779c70212ffc4d48959e92159cebcf56a611ad0fc669d1b6140d3b7acdac0
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253338r1186375_rule
+    version: 1
+    description: The security event log size must be configured to a value that holds at least one week's worth of audit records.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:16101
+      exports: []
+      inline_content: 'If the system is configured to send audit records directly to an audit server, this requirement is
+        not applicable. This must be documented with the information system security officer (ISSO). The registry configuration
+        setting below must be set (at least) to a value equal to the size needed to contain one week''s worth of audit records
+        in the security event log. The value used below is an example that assumes a typical week’s log size of 5GB. If the
+        following registry value does not exist or is not configured as specified, this is a finding: NOTE: The following
+        registry entry is an example; the value must equal at least one week''s worth of records. Registry Hive: HKEY_LOCAL_MACHINE
+        Registry Path: \SOFTWARE\Policies\Microsoft\Windows\EventLog\Security\ Value Name: MaxSize Value Type: REG_DWORD Value:0x49960800
+        (5120000) (or greater)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:16101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'If the system is configured to send audit records directly to an audit server, this requirement is not applicable.
+            This must be documented with the information system security officer (ISSO).
+
+
+            The registry configuration setting below must be set (at least) to a value equal to the size needed to contain
+            one week''s worth of audit records in the security event log. The value used below is an example that assumes
+            a typical week’s log size of 5GB.
+
+
+            If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+            NOTE: The following registry entry is an example; the value must equal at least one week''s worth of records.
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Policies\Microsoft\Windows\EventLog\Security\
+
+
+            Value Name: MaxSize
+
+
+            Value Type: REG_DWORD
+
+            Value:0x49960800 (5120000) (or greater)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253338
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253338
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253338
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253338
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:16101
+        exports: []
+        inline_content: 'If the system is configured to send audit records directly to an audit server, this requirement is
+          not applicable. This must be documented with the information system security officer (ISSO). The registry configuration
+          setting below must be set (at least) to a value equal to the size needed to contain one week''s worth of audit records
+          in the security event log. The value used below is an example that assumes a typical week’s log size of 5GB. If
+          the following registry value does not exist or is not configured as specified, this is a finding: NOTE: The following
+          registry entry is an example; the value must equal at least one week''s worth of records. Registry Hive: HKEY_LOCAL_MACHINE
+          Registry Path: \SOFTWARE\Policies\Microsoft\Windows\EventLog\Security\ Value Name: MaxSize Value Type: REG_DWORD
+          Value:0x49960800 (5120000) (or greater)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:16101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'If the system is configured to send audit records directly to an audit server, this requirement is not
+              applicable. This must be documented with the information system security officer (ISSO).
+
+
+              The registry configuration setting below must be set (at least) to a value equal to the size needed to contain
+              one week''s worth of audit records in the security event log. The value used below is an example that assumes
+              a typical week’s log size of 5GB.
+
+
+              If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+              NOTE: The following registry entry is an example; the value must equal at least one week''s worth of records.
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SOFTWARE\Policies\Microsoft\Windows\EventLog\Security\
+
+
+              Value Name: MaxSize
+
+
+              Value Type: REG_DWORD
+
+              Value:0x49960800 (5120000) (or greater)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'If the system is configured to send audit records directly to an audit server, this requirement is not applicable.
+      This must be documented with the information system security officer (ISSO). The registry configuration setting below
+      must be set (at least) to a value equal to the size needed to contain one week''s worth of audit records in the security
+      event log. The value used below is an example that assumes a typical week’s log size of 5GB. If the following registry
+      value does not exist or is not configured as specified, this is a finding: NOTE: The following registry entry is an
+      example; the value must equal at least one week''s worth of records. Registry Hive: HKEY_LOCAL_MACHINE Registry Path:
+      \SOFTWARE\Policies\Microsoft\Windows\EventLog\Security\ Value Name: MaxSize Value Type: REG_DWORD Value:0x49960800 (5120000)
+      (or greater)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253338r1186375_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: a4468d2a2e99b254246d2d1d35fd226733d2f132fe10f3e4d189b73b20f4ffcc
+  migration: *id002

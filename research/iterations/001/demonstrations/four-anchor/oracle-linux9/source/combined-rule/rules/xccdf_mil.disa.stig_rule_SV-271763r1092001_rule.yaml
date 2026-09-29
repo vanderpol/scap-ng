@@ -306,7 +306,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271763r1092001_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271763r1092001_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271763r1092001_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271763r1092001_rule
     version: 1
     description: OL 9 must be configured to prevent unrestricted mail relaying.
@@ -421,16 +435,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271763
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271763
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271763
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -522,11 +542,140 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271763r1092001_rule
-      semantic_ir_sha256: 90b5f50b0e3c2f3041f2cd4443b32925b7aed289a929952e04b601c315c8a782
+      semantic_ir_sha256: 5df96d78d545e3519522a2a425a3006a120395a2156cd69903ff39517de87f4d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: bfbf0ff069cd96fd8cb711c9252fe274015910fd0cd64119c10f07f32138bef0
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271763r1092001_rule
+    version: 1
+    description: OL 9 must be configured to prevent unrestricted mail relaying.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:64501
+      exports: []
+      inline_content: 'Note: If postfix is not installed, this requirement is Not Applicable. Verify that OL 9 is configured
+        to prevent unrestricted mail relaying with the following command: $ postconf -n smtpd_client_restrictions smtpd_client_restrictions
+        = permit_mynetworks,reject If the "smtpd_client_restrictions" parameter contains any entries other than "permit_mynetworks"
+        and "reject", and the additional entries have not been documented with the information system security officer (ISSO),
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:64501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Note: If postfix is not installed, this requirement is Not Applicable.\n\nVerify that OL 9 is configured\
+            \ to prevent unrestricted mail relaying with the following command:\n\n$ postconf -n smtpd_client_restrictions\
+            \ \nsmtpd_client_restrictions = permit_mynetworks,reject \n\nIf the \"smtpd_client_restrictions\" parameter contains\
+            \ any entries other than \"permit_mynetworks\" and \"reject\", and the additional entries have not been documented\
+            \ with the information system security officer (ISSO), this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271763
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271763
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271763
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271763
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:64501
+        exports: []
+        inline_content: 'Note: If postfix is not installed, this requirement is Not Applicable. Verify that OL 9 is configured
+          to prevent unrestricted mail relaying with the following command: $ postconf -n smtpd_client_restrictions smtpd_client_restrictions
+          = permit_mynetworks,reject If the "smtpd_client_restrictions" parameter contains any entries other than "permit_mynetworks"
+          and "reject", and the additional entries have not been documented with the information system security officer (ISSO),
+          this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:64501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Note: If postfix is not installed, this requirement is Not Applicable.\n\nVerify that OL 9 is configured\
+              \ to prevent unrestricted mail relaying with the following command:\n\n$ postconf -n smtpd_client_restrictions\
+              \ \nsmtpd_client_restrictions = permit_mynetworks,reject \n\nIf the \"smtpd_client_restrictions\" parameter\
+              \ contains any entries other than \"permit_mynetworks\" and \"reject\", and the additional entries have not\
+              \ been documented with the information system security officer (ISSO), this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Note: If postfix is not installed, this requirement is Not Applicable. Verify that OL 9 is configured to prevent
+      unrestricted mail relaying with the following command: $ postconf -n smtpd_client_restrictions smtpd_client_restrictions
+      = permit_mynetworks,reject If the "smtpd_client_restrictions" parameter contains any entries other than "permit_mynetworks"
+      and "reject", and the additional entries have not been documented with the information system security officer (ISSO),
+      this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271763r1092001_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 3395d1b33bde8fb020978232927526bd5babdb44b025085f14874af4a9c42ef3
+  migration: *id002

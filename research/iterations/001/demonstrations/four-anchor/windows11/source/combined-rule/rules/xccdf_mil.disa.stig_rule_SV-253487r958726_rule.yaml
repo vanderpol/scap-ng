@@ -344,7 +344,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253487r958726_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253487r958726_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253487r958726_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253487r958726_rule
     version: 1
     description: The "Create global objects" user right must only be assigned to Administrators, Service, Local Service, and
@@ -365,6 +379,19 @@ rule:
           value: SE_CREATE_GLOBAL_NAME
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000036:
+        source_state_id: oval:mil.disa.stig.win:ste:20000036
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: LOCAL SERVICE
+        comment: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -377,6 +404,19 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
+        comment: null
+      oval:mil.disa.stig.win:ste:20000038:
+        source_state_id: oval:mil.disa.stig.win:ste:20000038
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SERVICE
         comment: null
       oval:mil.disa.stig.win:ste:20000037:
         source_state_id: oval:mil.disa.stig.win:ste:20000037
@@ -400,32 +440,6 @@ rule:
         - kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: null
-      oval:mil.disa.stig.win:ste:20000038:
-        source_state_id: oval:mil.disa.stig.win:ste:20000038
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SERVICE
-        comment: null
-      oval:mil.disa.stig.win:ste:20000036:
-        source_state_id: oval:mil.disa.stig.win:ste:20000036
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: LOCAL SERVICE
         comment: null
     evaluate:
       tests:
@@ -519,16 +533,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253487
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253487
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253487
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -635,11 +655,168 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253487r958726_rule
-      semantic_ir_sha256: 0ddad7476e80c1efd975981da9239abc72cc6dc43e70314b4e2fe2320b1a54fd
+      semantic_ir_sha256: b5d33f05af705148ce9244eca034e88f806df9dcac092412ebb7b021c7d69ee6
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 51c31401bffb021841125f4e9a0bace9d064521bff1c63480448c977795be60e
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253487r958726_rule
+    version: 1
+    description: The "Create global objects" user right must only be assigned to Administrators, Service, Local Service, and
+      Network Service.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:45101
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+        If any groups or accounts other than the following are granted the "Create global objects" user right, this is a finding:
+        Administrators LOCAL SERVICE NETWORK SERVICE SERVICE'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:45101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+            Run "gpedit.msc".
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If any groups or accounts other than the following are granted the "Create global objects" user right, this is
+            a finding:
+
+
+            Administrators
+
+            LOCAL SERVICE
+
+            NETWORK SERVICE
+
+            SERVICE'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253487
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253487
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253487
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253487
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:45101
+        exports: []
+        inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+          Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+          If any groups or accounts other than the following are granted the "Create global objects" user right, this is a
+          finding: Administrators LOCAL SERVICE NETWORK SERVICE SERVICE'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:45101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the effective setting in Local Group Policy Editor.
+
+              Run "gpedit.msc".
+
+
+              Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+              Policies >> User Rights Assignment.
+
+
+              If any groups or accounts other than the following are granted the "Create global objects" user right, this
+              is a finding:
+
+
+              Administrators
+
+              LOCAL SERVICE
+
+              NETWORK SERVICE
+
+              SERVICE'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer Policy
+      >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment. If any
+      groups or accounts other than the following are granted the "Create global objects" user right, this is a finding: Administrators
+      LOCAL SERVICE NETWORK SERVICE SERVICE'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253487r958726_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: bb18b9d2bda202f4d3e8f21a64f8cd883ae04bd38bff6bebe8ae4c981fd20d4f
+  migration: *id002

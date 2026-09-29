@@ -336,7 +336,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257800r1198253_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257800r1198253_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257800r1198253_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257800r1198253_rule
     version: 1
     description: RHEL 9 must restrict exposed kernel pointer addresses access.
@@ -386,6 +400,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000010
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:257800:
+          source_definition_id: oval:mil.disa.stig.defs:def:257800
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: kernel.kptr_restrict is set to 1
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:25780000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must restrict exposed kernel pointer addresses access.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257800:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257800
           class: compliance
@@ -424,29 +461,6 @@ rule:
                 Satisfies: SRG-OS-000132-GPOS-00067, SRG-OS-000433-GPOS-00192, SRG-OS-000480-GPOS-00227'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:257800:
-          source_definition_id: oval:mil.disa.stig.defs:def:257800
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: kernel.kptr_restrict is set to 1
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:25780000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must restrict exposed kernel pointer addresses access.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257800
@@ -458,16 +472,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257800
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257800
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257800
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -555,11 +575,130 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257800r1198253_rule
-      semantic_ir_sha256: 215c2247093a002bc4f1fbd821cbe3fa46d155b6dff7262ea7ed628df1fab0a3
+      semantic_ir_sha256: 196d0ac2f16632aa45f053669ed5883dc9c23be7373045a16aa8693c3f4c679c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: cf8e9fa5567e753316e678013b824dd970153a3dc5facca92a054db01afce827
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257800r1198253_rule
+    version: 1
+    description: RHEL 9 must restrict exposed kernel pointer addresses access.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4501
+      exports: []
+      inline_content: 'Verify RHEL 9 is configured to restrict exposed kernel pointer address access. Verify the runtime status
+        of the "kernel.kptr_restrict" kernel parameter with the following command: $ sudo sysctl kernel.kptr_restrict kernel.kptr_restrict
+        = 1 If "kernel.kptr_restrict" is not set to "1" or is missing, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify RHEL 9 is configured to restrict exposed kernel pointer address access.\n\nVerify the runtime status\
+            \ of the \"kernel.kptr_restrict\" kernel parameter with the following command:\n\n$ sudo sysctl kernel.kptr_restrict\
+            \ \nkernel.kptr_restrict = 1\n\nIf \"kernel.kptr_restrict\" is not set to \"1\" or is missing, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257800
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257800
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257800
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257800
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4501
+        exports: []
+        inline_content: 'Verify RHEL 9 is configured to restrict exposed kernel pointer address access. Verify the runtime
+          status of the "kernel.kptr_restrict" kernel parameter with the following command: $ sudo sysctl kernel.kptr_restrict
+          kernel.kptr_restrict = 1 If "kernel.kptr_restrict" is not set to "1" or is missing, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify RHEL 9 is configured to restrict exposed kernel pointer address access.\n\nVerify the runtime status\
+              \ of the \"kernel.kptr_restrict\" kernel parameter with the following command:\n\n$ sudo sysctl kernel.kptr_restrict\
+              \ \nkernel.kptr_restrict = 1\n\nIf \"kernel.kptr_restrict\" is not set to \"1\" or is missing, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 is configured to restrict exposed kernel pointer address access. Verify the runtime status of
+      the "kernel.kptr_restrict" kernel parameter with the following command: $ sudo sysctl kernel.kptr_restrict kernel.kptr_restrict
+      = 1 If "kernel.kptr_restrict" is not set to "1" or is missing, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257800r1198253_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: ca22d903d4744f71318f6f3ccc35985fb723c901dd9b278e0bde8f1abfaff2fa
+  migration: *id002

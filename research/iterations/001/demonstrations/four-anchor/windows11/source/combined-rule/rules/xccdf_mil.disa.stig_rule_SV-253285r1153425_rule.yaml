@@ -414,33 +414,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
     version: 1
     description: The Windows PowerShell 2.0 feature must be disabled on the system.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:25328500:
-        capability: scapng.collect.windows.wmi57
-        source_object_id: oval:mil.disa.stig.win:obj:25328500
-        source_type: wmi57_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: Windows PowerShell 2.0 Win32_OptionalFeature object
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: namespace
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: root\cimv2
-        - attributes:
-            datatype: string
-            operation: equals
-          kind: element
-          name: wql
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2Root'
       oval:mil.disa.stig.win:obj:25328501:
         capability: scapng.collect.windows.wmi57
         source_object_id: oval:mil.disa.stig.win:obj:25328501
@@ -462,6 +455,27 @@ rule:
           name: wql
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2'
+      oval:mil.disa.stig.win:obj:25328500:
+        capability: scapng.collect.windows.wmi57
+        source_object_id: oval:mil.disa.stig.win:obj:25328500
+        source_type: wmi57_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: Windows PowerShell 2.0 Win32_OptionalFeature object
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: namespace
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: root\cimv2
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: wql
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'MicrosoftWindowsPowerShellV2Root'
     derive: {}
     predicates:
       oval:mil.disa.stig.win:ste:25328500:
@@ -488,19 +502,6 @@ rule:
         comment: Check Windows PowerShell 2.0 Win32_OptionalFeature object InstallState is equal to 2
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25328500:
-          source_test_id: oval:mil.disa.stig.win:tst:25328500
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Windows PowerShell 2.0 optional feature is disabled
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25328500
-          predicates:
-          - oval:mil.disa.stig.win:ste:25328500
-          source_other: []
         oval:mil.disa.stig.win:tst:25328501:
           source_test_id: oval:mil.disa.stig.win:tst:25328501
           source_type: wmi57_test
@@ -514,7 +515,49 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25328500
           source_other: []
+        oval:mil.disa.stig.win:tst:25328500:
+          source_test_id: oval:mil.disa.stig.win:tst:25328500
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Windows PowerShell 2.0 optional feature is disabled
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25328500
+          predicates:
+          - oval:mil.disa.stig.win:ste:25328500
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253285:
+          source_definition_id: oval:mil.disa.stig.defs:def:253285
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_OptionalFeature is at InstallState
+                2
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25328500
+            - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Engine Win32_OptionalFeature is at InstallState
+                2
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25328501
+            comment: Determine if Windows PowerShell 2.0 feature is disabled
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The Windows PowerShell 2.0 feature must be disabled on the system.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253285:
           source_definition_id: oval:mil.disa.stig.windows11:def:253285
           class: compliance
@@ -549,35 +592,6 @@ rule:
                 the Windows PowerShell 5.0 script block logging feature.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253285:
-          source_definition_id: oval:mil.disa.stig.defs:def:253285
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Win32_OptionalFeature is at InstallState
-                2
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25328500
-            - comment: Check the WMI Objects to see if the Windows PowerShell 2.0 Engine Win32_OptionalFeature is at InstallState
-                2
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25328501
-            comment: Determine if Windows PowerShell 2.0 feature is disabled
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The Windows PowerShell 2.0 feature must be disabled on the system.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253285
@@ -589,16 +603,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253285
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253285
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253285
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -719,11 +739,199 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
-      semantic_ir_sha256: f490d24f8456a0a9d5a5e532969cd3a89071886eba4efe0c955961bc61867e86
+      semantic_ir_sha256: 35643880d9e8a4b99c8519a132c4832ff23969825fa8d9c7659987c24f757d1b
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: fc9c10ce04bcd09e3fd1460af4f9a722009f1aa4e260928f224ae2493128b311
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
+    version: 1
+    description: The Windows PowerShell 2.0 feature must be disabled on the system.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5901
+      exports: []
+      inline_content: 'For Windows 11 version 24H2 and newer, this requirement is Not Applicable. Run "Windows PowerShell"
+        with elevated privileges (run as administrator). Enter the following: Get-WindowsOptionalFeature -Online | Where FeatureName
+        -like *PowerShellv2* If either of the following have a "State" of "Enabled", this is a finding. FeatureName : MicrosoftWindowsPowerShellV2
+        State : Enabled FeatureName : MicrosoftWindowsPowerShellV2Root State : Enabled Alternately: Search for "Features".
+        Select "Turn Windows features on or off". If "Windows PowerShell 2.0" (whether the subcategory of "Windows PowerShell
+        2.0 Engine" is selected or not) is selected, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'For Windows 11 version 24H2 and newer, this requirement is Not Applicable.
+
+
+            Run "Windows PowerShell" with elevated privileges (run as administrator).
+
+
+            Enter the following:
+
+            Get-WindowsOptionalFeature -Online | Where FeatureName -like *PowerShellv2*
+
+
+            If either of the following have a "State" of "Enabled", this is a finding.
+
+
+            FeatureName : MicrosoftWindowsPowerShellV2
+
+            State : Enabled
+
+            FeatureName : MicrosoftWindowsPowerShellV2Root
+
+            State : Enabled
+
+
+            Alternately:
+
+            Search for "Features".
+
+
+            Select "Turn Windows features on or off".
+
+
+            If "Windows PowerShell 2.0" (whether the subcategory of "Windows PowerShell 2.0 Engine" is selected or not) is
+            selected, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253285
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253285
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253285
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253285
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5901
+        exports: []
+        inline_content: 'For Windows 11 version 24H2 and newer, this requirement is Not Applicable. Run "Windows PowerShell"
+          with elevated privileges (run as administrator). Enter the following: Get-WindowsOptionalFeature -Online | Where
+          FeatureName -like *PowerShellv2* If either of the following have a "State" of "Enabled", this is a finding. FeatureName
+          : MicrosoftWindowsPowerShellV2 State : Enabled FeatureName : MicrosoftWindowsPowerShellV2Root State : Enabled Alternately:
+          Search for "Features". Select "Turn Windows features on or off". If "Windows PowerShell 2.0" (whether the subcategory
+          of "Windows PowerShell 2.0 Engine" is selected or not) is selected, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'For Windows 11 version 24H2 and newer, this requirement is Not Applicable.
+
+
+              Run "Windows PowerShell" with elevated privileges (run as administrator).
+
+
+              Enter the following:
+
+              Get-WindowsOptionalFeature -Online | Where FeatureName -like *PowerShellv2*
+
+
+              If either of the following have a "State" of "Enabled", this is a finding.
+
+
+              FeatureName : MicrosoftWindowsPowerShellV2
+
+              State : Enabled
+
+              FeatureName : MicrosoftWindowsPowerShellV2Root
+
+              State : Enabled
+
+
+              Alternately:
+
+              Search for "Features".
+
+
+              Select "Turn Windows features on or off".
+
+
+              If "Windows PowerShell 2.0" (whether the subcategory of "Windows PowerShell 2.0 Engine" is selected or not)
+              is selected, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'For Windows 11 version 24H2 and newer, this requirement is Not Applicable. Run "Windows PowerShell" with elevated
+      privileges (run as administrator). Enter the following: Get-WindowsOptionalFeature -Online | Where FeatureName -like
+      *PowerShellv2* If either of the following have a "State" of "Enabled", this is a finding. FeatureName : MicrosoftWindowsPowerShellV2
+      State : Enabled FeatureName : MicrosoftWindowsPowerShellV2Root State : Enabled Alternately: Search for "Features". Select
+      "Turn Windows features on or off". If "Windows PowerShell 2.0" (whether the subcategory of "Windows PowerShell 2.0 Engine"
+      is selected or not) is selected, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253285r1153425_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 7d004d60215a190f8df1c684f0843b87e17fc411846022f65a933abf151a703d
+  migration: *id002

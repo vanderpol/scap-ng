@@ -309,7 +309,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253346r958412_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253346r958412_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253346r958412_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253346r958412_rule
     version: 1
     description: Windows 11 must be configured to audit other Logon/Logoff Events Failures.
@@ -325,19 +339,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25334601:
-        source_state_id: oval:mil.disa.stig.win:ste:25334601
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: other_logon_logoff_events
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS_FAILURE
-        comment: '''Log On'' is set to ''Success'' and ''Failure'''
       oval:mil.disa.stig.win:ste:25334600:
         source_state_id: oval:mil.disa.stig.win:ste:25334600
         source_type: auditeventpolicysubcategories_state
@@ -351,6 +352,19 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_FAILURE
         comment: '''Log On'' is set to ''Failure'''
+      oval:mil.disa.stig.win:ste:25334601:
+        source_state_id: oval:mil.disa.stig.win:ste:25334601
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          kind: element
+          name: other_logon_logoff_events
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS_FAILURE
+        comment: '''Log On'' is set to ''Success'' and ''Failure'''
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25334600:
@@ -368,29 +382,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25334601
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253346:
-          source_definition_id: oval:mil.disa.stig.defs:def:253346
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - Logon - Failure only and Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25334600
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows must be configured to audit other Logon/Logoff Events Failures.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253346:
           source_definition_id: oval:mil.disa.stig.windows11:def:253346
           class: compliance
@@ -431,6 +422,29 @@ rule:
                 events. Logon events are essential to understanding user activity and detecting potential attacks.'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253346:
+          source_definition_id: oval:mil.disa.stig.defs:def:253346
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - Logon - Failure only and Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25334600
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows must be configured to audit other Logon/Logoff Events Failures.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253346
@@ -442,16 +456,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253346
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253346
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253346
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -548,11 +568,148 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253346r958412_rule
-      semantic_ir_sha256: 16e00aa4da373f77722ce5212e2ae4bd753fb814db4edfd0ccaa46ca4e82bb40
+      semantic_ir_sha256: 761a2b7957f37a9daae6f7782362ee4561bc93c298ae9a3b4a698a8d464ca8b3
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 632078ba57c2910d1661fb1b5b29edccecc1c09af44256ee8a3b8b64aad3bf4d
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253346r958412_rule
+    version: 1
+    description: Windows 11 must be configured to audit other Logon/Logoff Events Failures.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:17501
+      exports: []
+      inline_content: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with
+        elevated privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with
+        the following. If the system does not audit the following, this is a finding: Logon/Logoff >> Other Logon/Logoff Events
+        - Failure'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:17501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Use the AuditPol tool to review the current Audit Policy configuration:
+
+            Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+            Enter "AuditPol /get /category:*".
+
+
+            Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+            Logon/Logoff >> Other Logon/Logoff Events - Failure'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253346
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253346
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253346
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253346
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:17501
+        exports: []
+        inline_content: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with
+          elevated privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with
+          the following. If the system does not audit the following, this is a finding: Logon/Logoff >> Other Logon/Logoff
+          Events - Failure'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:17501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Use the AuditPol tool to review the current Audit Policy configuration:
+
+              Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+              Enter "AuditPol /get /category:*".
+
+
+              Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+              Logon/Logoff >> Other Logon/Logoff Events - Failure'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with elevated
+      privileges ("Run as Administrator"). Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following.
+      If the system does not audit the following, this is a finding: Logon/Logoff >> Other Logon/Logoff Events - Failure'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253346r958412_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: fbe850137acc1c26f7c114b22bba5caa7b6ab390440e7a3dcf916ef95e02523b
+  migration: *id002

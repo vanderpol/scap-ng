@@ -7,22 +7,6 @@ assessment:
   description: OL 9 must use the SSSD package for multifactor authentication services.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:27149401:
-      capability: scapng.collect.linux.systemdunitproperty
-      source_object_id: oval:mil.disa.stig.linux:obj:27149401
-      source_type: systemdunitproperty_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: unit
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: sssd.service
-      - kind: element
-        name: property
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: UnitFileState
     oval:mil.disa.stig.linux:obj:27149400:
       capability: scapng.collect.linux.systemdunitproperty
       source_object_id: oval:mil.disa.stig.linux:obj:27149400
@@ -39,19 +23,24 @@ assessment:
         name: property
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: ActiveState
+    oval:mil.disa.stig.linux:obj:27149401:
+      capability: scapng.collect.linux.systemdunitproperty
+      source_object_id: oval:mil.disa.stig.linux:obj:27149401
+      source_type: systemdunitproperty_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: sssd.service
+      - kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: UnitFileState
   derive: {}
   predicates:
-    oval:mil.disa.stig.linux:ste:20000006:
-      source_state_id: oval:mil.disa.stig.linux:ste:20000006
-      source_type: systemdunitproperty_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      operator: AND
-      entities:
-      - kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: enabled
-      comment: null
     oval:mil.disa.stig.linux:ste:20000003:
       source_state_id: oval:mil.disa.stig.linux:ste:20000003
       source_type: systemdunitproperty_state
@@ -63,21 +52,19 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: active
       comment: null
+    oval:mil.disa.stig.linux:ste:20000006:
+      source_state_id: oval:mil.disa.stig.linux:ste:20000006
+      source_type: systemdunitproperty_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      operator: AND
+      entities:
+      - kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: enabled
+      comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:27149400:
-        source_test_id: oval:mil.disa.stig.linux:tst:27149400
-        source_type: systemdunitproperty_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: sssd.service is active
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:27149400
-        predicates:
-        - oval:mil.disa.stig.linux:ste:20000003
-        source_other: []
       oval:mil.disa.stig.linux:tst:27149401:
         source_test_id: oval:mil.disa.stig.linux:tst:27149401
         source_type: systemdunitproperty_test
@@ -90,6 +77,19 @@ assessment:
         - oval:mil.disa.stig.linux:obj:27149401
         predicates:
         - oval:mil.disa.stig.linux:ste:20000006
+        source_other: []
+      oval:mil.disa.stig.linux:tst:27149400:
+        source_test_id: oval:mil.disa.stig.linux:tst:27149400
+        source_type: systemdunitproperty_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: sssd.service is active
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:27149400
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000003
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:271494:
@@ -177,16 +177,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271494
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271494
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271494
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -278,6 +284,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271494r1091194_rule
-    semantic_ir_sha256: fc7267b9d4159dbea6cc7630ce024c2bda6904f4c7aa61f5797e8c0ef19a57c3
+    semantic_ir_sha256: 434d8b7b97a8806379243b421d10d9f5b095739217c31e5dc3cf6d9de8d65623
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: e782c315d5320c912e9064cbbbbce611154b02d2f87954063078a583af3599da

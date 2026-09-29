@@ -17,19 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25332100:
-      source_state_id: oval:mil.disa.stig.win:ste:25332100
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: other_object_access_events
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS
-      comment: '''Other Object Access Events'' is set to ''Success'''
     oval:mil.disa.stig.win:ste:25332101:
       source_state_id: oval:mil.disa.stig.win:ste:25332101
       source_type: auditeventpolicysubcategories_state
@@ -43,21 +30,21 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
       comment: '''Other Object Access Events'' is set to ''Success'' and ''Failure'''
+    oval:mil.disa.stig.win:ste:25332100:
+      source_state_id: oval:mil.disa.stig.win:ste:25332100
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: other_object_access_events
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS
+      comment: '''Other Object Access Events'' is set to ''Success'''
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25332100:
-        source_test_id: oval:mil.disa.stig.win:tst:25332100
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit Other Object Access Events'' is set to ''Success'''
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25332100
-        source_other: []
       oval:mil.disa.stig.win:tst:25332101:
         source_test_id: oval:mil.disa.stig.win:tst:25332101
         source_type: auditeventpolicysubcategories_test
@@ -71,34 +58,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25332101
         source_other: []
+      oval:mil.disa.stig.win:tst:25332100:
+        source_test_id: oval:mil.disa.stig.win:tst:25332100
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Audit Other Object Access Events'' is set to ''Success'''
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25332100
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253321:
-        source_definition_id: oval:mil.disa.stig.defs:def:253321
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Other Object Access Events - Success only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332100
-          - comment: Audit - Other Object Access Events - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332101
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Windows must be configured to audit Object Access - Other Object Access Events successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278062:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278062
         class: compliance
@@ -137,6 +110,33 @@ assessment:
               \ jobs and COM+ objects."
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253321:
+        source_definition_id: oval:mil.disa.stig.defs:def:253321
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Other Object Access Events - Success only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332100
+          - comment: Audit - Other Object Access Events - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332101
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows must be configured to audit Object Access - Other Object Access Events successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.windows2025:def:278062
@@ -148,16 +148,22 @@ assessment:
       exports: []
       href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows2025:def:278062
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.windows2025:def:278062
       exports: []
       href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows2025:def:278062
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
@@ -269,6 +275,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278062r1180892_rule
-    semantic_ir_sha256: e9b61354cff015f97b5005570d6ea6d061f645469bd7b77345fbb072fc3fc589
+    semantic_ir_sha256: 93d6e5d112bdbe49e659af352fb880b4826ea2f42e8b9d437c1fd49447cc8765
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: b97d0758368dab08a06cd82598bd3cdeded14eb57dc1811d8f38b736d4ac17d1

@@ -305,7 +305,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271783r1184216_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271783r1184216_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271783r1184216_rule
     version: 1
     description: OL 9 local interactive user home directories must be group-owned by the home directory owner's primary group.
@@ -471,10 +481,13 @@ rule:
       !~ /nologin/){print $6}'' /etc/passwd) drwxr-x--- 2 disauser admin 4096 Jun 5 12:41 disauser Check the user''s primary
       group with the following command: $ sudo grep $(grep disauser /etc/passwd | awk -F: ''{print $4}'') /etc/group admin:x:250:disauser,doduser,nsauser
       If the user home directory referenced in "/etc/passwd" is not group-owned by that user''s primary GID, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271783r1184216_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: cded0b20ac5076f8170ae5b97bcd5ce2dd89d3b69117677d6d56765a9b4b21d3
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

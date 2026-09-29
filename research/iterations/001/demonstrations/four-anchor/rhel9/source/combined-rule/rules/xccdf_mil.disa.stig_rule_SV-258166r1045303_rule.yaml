@@ -319,12 +319,44 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258166r1045303_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258166r1045303_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258166r1045303_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258166r1045303_rule
     version: 1
     description: RHEL 9 audit log directory must be owned by root to prevent unauthorized read access.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.unix:obj:23040100:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:23040100
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '1'
+        comment: Audit log directory
+        query:
+        - attributes:
+            var_ref: oval:mil.disa.stig.defs:var:23029400
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       oval:mil.disa.stig.ind:obj:23029402:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23029402
@@ -356,24 +388,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.unix:obj:23040100:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:23040100
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '1'
-        comment: Audit log directory
-        query:
-        - attributes:
-            var_ref: oval:mil.disa.stig.defs:var:23029400
-          kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     derive:
       oval:mil.disa.stig.defs:var:23029400:
         source_variable_id: oval:mil.disa.stig.defs:var:23029400
@@ -516,16 +530,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258166
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258166
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258166
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -617,11 +637,139 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258166r1045303_rule
-      semantic_ir_sha256: a99a7cb8a7862e25b2d030f89c5a6552f61effc7c4b6b1577f477cdf84028f35
+      semantic_ir_sha256: e41a46f1ffe1f1257dfac64d55ba1f6ca545c385b22428eef0859c264c7cb7d8
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 12c21820bec576a40c5a8fda9e34fddb4969308b08a34d54870f26441d33d2d6
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258166r1045303_rule
+    version: 1
+    description: RHEL 9 audit log directory must be owned by root to prevent unauthorized read access.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:73301
+      exports: []
+      inline_content: 'Verify the audit logs directory is owned by "root". Determine where the audit logs are stored with
+        the following command: $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Using the
+        location of the audit log file, determine if the audit log directory is owned by "root" using the following command:
+        $ sudo stat -c ''%U %n'' /var/log/audit root /var/log/audit If the audit log directory is not owned by "root", this
+        is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:73301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify the audit logs directory is owned by \"root\". \n\nDetermine where the audit logs are stored with\
+            \ the following command:\n\n$ sudo grep -iw log_file /etc/audit/auditd.conf\n\nlog_file = /var/log/audit/audit.log\n\
+            \nUsing the location of the audit log file, determine if the audit log directory is owned by \"root\" using the\
+            \ following command:\n\n$ sudo stat -c '%U %n' /var/log/audit\n\nroot /var/log/audit\n\nIf the audit log directory\
+            \ is not owned by \"root\", this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258166
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258166
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258166
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258166
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:73301
+        exports: []
+        inline_content: 'Verify the audit logs directory is owned by "root". Determine where the audit logs are stored with
+          the following command: $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Using
+          the location of the audit log file, determine if the audit log directory is owned by "root" using the following
+          command: $ sudo stat -c ''%U %n'' /var/log/audit root /var/log/audit If the audit log directory is not owned by
+          "root", this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:73301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify the audit logs directory is owned by \"root\". \n\nDetermine where the audit logs are stored with\
+              \ the following command:\n\n$ sudo grep -iw log_file /etc/audit/auditd.conf\n\nlog_file = /var/log/audit/audit.log\n\
+              \nUsing the location of the audit log file, determine if the audit log directory is owned by \"root\" using\
+              \ the following command:\n\n$ sudo stat -c '%U %n' /var/log/audit\n\nroot /var/log/audit\n\nIf the audit log\
+              \ directory is not owned by \"root\", this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the audit logs directory is owned by "root". Determine where the audit logs are stored with the following
+      command: $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Using the location of the
+      audit log file, determine if the audit log directory is owned by "root" using the following command: $ sudo stat -c
+      ''%U %n'' /var/log/audit root /var/log/audit If the audit log directory is not owned by "root", this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258166r1045303_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: fe704de61028e8f2969a29f74ceb8d29269ef448a102b05bfbc16e3bd7416eac
+  migration: *id002

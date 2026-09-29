@@ -277,12 +277,83 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253281r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253281r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253281r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253281r991589_rule
     version: 1
     description: A host-based firewall must be installed and enabled on the system.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102:
+        capability: scapng.collect.windows.cmdlet
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
+        source_type: cmdlet_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '18'
+        comment: Gather FirewallProduct from NetSecurity
+        query:
+        - attributes:
+            operation: equals
+          kind: element
+          name: module_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: NetSecurity
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: module_id
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: version
+            nil: 'true'
+          kind: element
+          name: module_version
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - kind: element
+          name: verb
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Get
+        - kind: element
+          name: noun
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: NetFirewallProfile
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: policystore
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: ActiveStore
+          kind: element
+          name: parameters
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: property
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: name,enabled,defaultinboundaction,defaultoutboundaction,logfilename
+          kind: element
+          name: select
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101:
         capability: scapng.collect.windows.cmdlet
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101
@@ -346,63 +417,6 @@ rule:
           kind: element
           name: select
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102:
-        capability: scapng.collect.windows.cmdlet
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
-        source_type: cmdlet_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '18'
-        comment: Gather FirewallProduct from NetSecurity
-        query:
-        - attributes:
-            operation: equals
-          kind: element
-          name: module_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: NetSecurity
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: module_id
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            datatype: version
-            nil: 'true'
-          kind: element
-          name: module_version
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - kind: element
-          name: verb
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Get
-        - kind: element
-          name: noun
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: NetFirewallProfile
-        - attributes:
-            datatype: record
-          children:
-          - attributes:
-              name: policystore
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: ActiveStore
-          kind: element
-          name: parameters
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            datatype: record
-          children:
-          - attributes:
-              name: property
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: name,enabled,defaultinboundaction,defaultoutboundaction,logfilename
-          kind: element
-          name: select
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
     derive: {}
     predicates:
       oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102:
@@ -445,19 +459,6 @@ rule:
         comment: Product State must be 397568 (enabled)
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102
-          source_type: cmdlet_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Verify Windows defender firewall is enabled.
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:25328101:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328101
           source_type: cmdlet_test
@@ -470,6 +471,19 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328101
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102
+          source_type: cmdlet_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Verify Windows defender firewall is enabled.
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:253281:
@@ -512,16 +526,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -611,11 +631,134 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253281r991589_rule
-      semantic_ir_sha256: d0b784e2a7541060f14f7e9463f0a2aeecb219186d1d24ad760876f32ebc13d2
+      semantic_ir_sha256: f42c4191420217dd65cc61a8f419b77851a7c5d77427e6f7d0086140e89ccef3
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 0ea6f539701bea9a2ea17433f90b4ba0cb62bcf0395c34b27925f3880ad4fb44
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253281r991589_rule
+    version: 1
+    description: A host-based firewall must be installed and enabled on the system.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5301
+      exports: []
+      inline_content: Determine if a host-based firewall is installed and enabled on the system. If a host-based firewall
+        is not installed and enabled on the system, this is a finding. The configuration requirements will be determined by
+        the applicable firewall STIG.
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Determine if a host-based firewall is installed and enabled on the system. If a host-based firewall is not
+            installed and enabled on the system, this is a finding.
+
+
+            The configuration requirements will be determined by the applicable firewall STIG.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253281
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5301
+        exports: []
+        inline_content: Determine if a host-based firewall is installed and enabled on the system. If a host-based firewall
+          is not installed and enabled on the system, this is a finding. The configuration requirements will be determined
+          by the applicable firewall STIG.
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:5301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Determine if a host-based firewall is installed and enabled on the system. If a host-based firewall is
+              not installed and enabled on the system, this is a finding.
+
+
+              The configuration requirements will be determined by the applicable firewall STIG.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: Determine if a host-based firewall is installed and enabled on the system. If a host-based firewall is not
+      installed and enabled on the system, this is a finding. The configuration requirements will be determined by the applicable
+      firewall STIG.
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253281r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 5dc331e9fc3190905e43cfd705ec4a8d1718ee759ff2359dab921c551c0bc73b
+  migration: *id002

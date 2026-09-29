@@ -355,7 +355,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
     version: 1
     description: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service,
@@ -376,6 +390,19 @@ rule:
           value: SE_IMPERSONATE_NAME
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000036:
+        source_state_id: oval:mil.disa.stig.win:ste:20000036
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: LOCAL SERVICE
+        comment: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -388,6 +415,19 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
+        comment: null
+      oval:mil.disa.stig.win:ste:20000038:
+        source_state_id: oval:mil.disa.stig.win:ste:20000038
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SERVICE
         comment: null
       oval:mil.disa.stig.win:ste:20000037:
         source_state_id: oval:mil.disa.stig.win:ste:20000037
@@ -425,32 +465,6 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         comment: null
-      oval:mil.disa.stig.win:ste:20000038:
-        source_state_id: oval:mil.disa.stig.win:ste:20000038
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SERVICE
-        comment: null
-      oval:mil.disa.stig.win:ste:20000036:
-        source_state_id: oval:mil.disa.stig.win:ste:20000036
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: LOCAL SERVICE
-        comment: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25349801:
@@ -473,6 +487,31 @@ rule:
           - oval:mil.disa.stig.win:ste:25349802
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253498:
+          source_definition_id: oval:mil.disa.stig.defs:def:253498
+          class: compliance
+          version: '6'
+          criteria:
+            children:
+            - comment: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE,
+                RESTRICTED SERVICES\PrintSpoolerService
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service,
+                Local Service, and Network Service.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253498:
           source_definition_id: oval:mil.disa.stig.windows11:def:253498
           class: compliance
@@ -510,31 +549,6 @@ rule:
                 account to run on their behalf. An attacker could potentially use this to elevate privileges.'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253498:
-          source_definition_id: oval:mil.disa.stig.defs:def:253498
-          class: compliance
-          version: '6'
-          criteria:
-            children:
-            - comment: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE,
-                RESTRICTED SERVICES\PrintSpoolerService
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25349801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service,
-                Local Service, and Network Service.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253498
@@ -546,16 +560,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253498
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253498
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253498
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -665,11 +685,174 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
-      semantic_ir_sha256: 8f9cf4d159e15e4c9e2fa6d7cb96c60cdaabfa4eba3d42e82326b9a80303139c
+      semantic_ir_sha256: edcbd790c747c6e115bf842daac441878ff97263e8a536ff1bc892d65e2969b8
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 5b4b159114ad506d376f979f4642a98c83b4b7f7ce6e09c17c4b78235f8d88bf
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
+    version: 1
+    description: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service,
+      Local Service, and Network Service.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:47301
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+        If any groups or accounts other than the following are granted the "Impersonate a client after authentication" user
+        right, this is a finding: Administrators LOCAL SERVICE NETWORK SERVICE RESTRICTED SERVICES\PrintSpoolerService SERVICE'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:47301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+            Run "gpedit.msc".
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If any groups or accounts other than the following are granted the "Impersonate a client after authentication"
+            user right, this is a finding:
+
+
+            Administrators
+
+            LOCAL SERVICE
+
+            NETWORK SERVICE
+
+            RESTRICTED SERVICES\PrintSpoolerService
+
+            SERVICE'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253498
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253498
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253498
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253498
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:47301
+        exports: []
+        inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+          Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+          If any groups or accounts other than the following are granted the "Impersonate a client after authentication" user
+          right, this is a finding: Administrators LOCAL SERVICE NETWORK SERVICE RESTRICTED SERVICES\PrintSpoolerService SERVICE'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:47301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+              Run "gpedit.msc".
+
+
+              Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+              Policies >> User Rights Assignment.
+
+
+              If any groups or accounts other than the following are granted the "Impersonate a client after authentication"
+              user right, this is a finding:
+
+
+              Administrators
+
+              LOCAL SERVICE
+
+              NETWORK SERVICE
+
+              RESTRICTED SERVICES\PrintSpoolerService
+
+              SERVICE'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer Policy
+      >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment. If any
+      groups or accounts other than the following are granted the "Impersonate a client after authentication" user right,
+      this is a finding: Administrators LOCAL SERVICE NETWORK SERVICE RESTRICTED SERVICES\PrintSpoolerService SERVICE'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 110509403a5f305a9e62b40141148dc9a74a419557e5564599bf8c5a18cdc3bb
+  migration: *id002

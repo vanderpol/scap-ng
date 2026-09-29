@@ -7,6 +7,30 @@ assessment:
   description: OL 9 must disable the Stream Control Transmission Protocol (SCTP) kernel module.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25780701:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25780701
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*blacklist[ \t]+sctp[ \t]*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:23049600:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23049600
@@ -34,30 +58,6 @@ assessment:
       - attributes:
           datatype: int
           operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:25780700:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25780700
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$
-      - attributes:
-          datatype: int
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -93,9 +93,9 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25780701:
+    oval:mil.disa.stig.ind:obj:25780700:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25780701
+      source_object_id: oval:mil.disa.stig.ind:obj:25780700
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
@@ -110,7 +110,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*blacklist[ \t]+sctp[ \t]*$
+        value: ^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$
       - attributes:
           datatype: int
         kind: element
@@ -121,16 +121,16 @@ assessment:
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25780701:
-        source_test_id: oval:mil.disa.stig.ind:tst:25780701
+      oval:mil.disa.stig.ind:tst:25780700:
+        source_test_id: oval:mil.disa.stig.ind:tst:25780700
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.conf contains 'blacklist sctp'
+        comment: /etc/modprobe.conf contains 'install sctp /bin/false'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.ind:obj:25780701
+        - oval:mil.disa.stig.ind:obj:25780700
         predicates: []
         source_other: []
       oval:mil.disa.stig.ind:tst:23049600:
@@ -145,16 +145,16 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23049600
         predicates: []
         source_other: []
-      oval:mil.disa.stig.ind:tst:25780700:
-        source_test_id: oval:mil.disa.stig.ind:tst:25780700
+      oval:mil.disa.stig.ind:tst:25780701:
+        source_test_id: oval:mil.disa.stig.ind:tst:25780701
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.conf contains 'install sctp /bin/false'
+        comment: /etc/modprobe.conf contains 'blacklist sctp'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.ind:obj:25780700
+        - oval:mil.disa.stig.ind:obj:25780701
         predicates: []
         source_other: []
       oval:mil.disa.stig.ind:tst:23049601:
@@ -263,16 +263,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271446
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271446
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271446
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -374,6 +380,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
-    semantic_ir_sha256: 062e44480a1418bfb54cfb91714495fd77b17a586d3a85893ca525f15f62cde7
+    semantic_ir_sha256: df1f3476a37778ec6a13c1856707544c9c2d2a5134b2f4fbf7dff868ca31be54
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 00d8bb29395d483ccf01b0332914ee1e1c29edf882a15d18f7ab794169e4fa8c

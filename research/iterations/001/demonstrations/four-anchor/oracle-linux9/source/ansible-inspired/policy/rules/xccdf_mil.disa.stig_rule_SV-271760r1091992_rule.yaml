@@ -6,8 +6,18 @@ rule:
   check: 'Verify that OL 9 ExecShield is enabled on 64-bit systems with the following command: $ sudo dmesg | grep ''[NX|DX]*protection''
     [ 0.000000] NX (Execute Disable) protection: active If "dmesg" does not show "NX (Execute Disable) protection" active,
     this is a finding.'
+  checks:
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271760r1091992_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271760r1091992_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
   cluster_id: null
   conflicts: []
+  default_check: default
   description: <VulnDiscussion>ExecShield uses the segmentation feature on all x86 systems to prevent execution in memory
     higher than a certain address. It writes an address as a limit in the code segment descriptor, to control where code can
     be executed, on a per-process basis. When the kernel places a process's memory regions such as the stack and heap higher
@@ -231,7 +241,8 @@ rule:
   title: OL 9 must implement nonexecutable data to protect its memory from unauthorized code execution.
   weight: '10.0'
 migration:
-  note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+  note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for manual
+    execution.
   source: SCAP 1.4 XCCDF manual/external check
   source_rule: xccdf_mil.disa.stig_rule_SV-271760r1091992_rule
   status: legacy_compatible

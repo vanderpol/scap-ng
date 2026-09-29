@@ -7,8 +7,22 @@ rule:
     $ sudo grep "^log_file" /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Using the location of the audit log
     file, determine the mode of each audit log with the following command: $ sudo find /var/log/audit/ -type f -exec stat
     -c ''%a %n'' {} \; 600 /var/log/audit/audit.log If the audit logs have a mode more permissive than "0600", this is a finding.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
   cluster_id: null
   conflicts: []
+  default_check: default
   description: '<VulnDiscussion>Only authorized personnel should be aware of errors and the details of the errors. Error messages
     are an indicator of an organization''s operational state or can identify the RHEL 9 system or platform. Additionally,
     Personally Identifiable Information (PII) and operational information must not be revealed through error messages to unauthorized
@@ -360,7 +374,7 @@ rule:
   weight: '10.0'
 migration:
   note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_ir_sha256: 410ae1d8effff7fa3f508212a32aa9fca287680f3b2667cbeec9cc5025473baa
+  semantic_ir_sha256: f8dafb2a5ebc4c775cadb4de64b1515f9b2eedfa1761316d045e859e921fe4b8
   source: SCAP 1.4 / OVAL 5.12.3
   source_rule: xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
   status: legacy_compatible

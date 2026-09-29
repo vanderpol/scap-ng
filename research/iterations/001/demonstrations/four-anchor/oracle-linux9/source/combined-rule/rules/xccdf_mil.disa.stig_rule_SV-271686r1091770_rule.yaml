@@ -333,12 +333,51 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271686r1091770_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271686r1091770_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271686r1091770_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271686r1091770_rule
     version: 1
     description: OL 9 must prevent a user from overriding the disable-restart-buttons setting for the graphical user interface.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25801700:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25801700
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/dconf/profile/user
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*system-db\s*:\s*local\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25803000:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25803000
@@ -364,31 +403,6 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*\/org\/gnome\/login-screen\/disable-restart-buttons$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:25801700:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25801700
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '3'
-        comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/dconf/profile/user
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*system-db\s*:\s*local\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -425,6 +439,34 @@ rule:
           predicates: []
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:258030:
+          source_definition_id: oval:mil.disa.stig.defs:def:258030
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25801700
+            - comment: Check that the disable-restart-button setting is locked from nonprivileged user modification
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25803000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent a user from overriding the disable-restart-buttons setting for the graphical
+                user interface.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271686:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271686
           class: compliance
@@ -460,34 +502,6 @@ rule:
                 to reboot.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:258030:
-          source_definition_id: oval:mil.disa.stig.defs:def:258030
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25801700
-            - comment: Check that the disable-restart-button setting is locked from nonprivileged user modification
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25803000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent a user from overriding the disable-restart-buttons setting for the graphical
-                user interface.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271686
@@ -499,16 +513,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271686
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271686
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271686
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -608,11 +628,160 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271686r1091770_rule
-      semantic_ir_sha256: e7a44195e839bfc90d57625180a7dea6e2f7b3649b47d5a740d0ea00b810681e
+      semantic_ir_sha256: dedb3307d0061e890130a3123fc72c1f88e98a9c6e94a2a1a399e8abd8c3ea0b
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 78ba35c23cb8039926d159c8977659304d62eea11efdba31fd8e26223cc777f3
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271686r1091770_rule
+    version: 1
+    description: OL 9 must prevent a user from overriding the disable-restart-buttons setting for the graphical user interface.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:49701
+      exports: []
+      inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+        If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+        OL 9 prevents a user from overriding the disable-restart-buttons setting for graphical user interfaces. Determine
+        which profile the system database is using with the following command: $ grep system-db /etc/dconf/profile/user system-db:local
+        Check that graphical settings are locked from nonprivileged user modification with the following command: Note: The
+        example below is using the database "local" for the system, so the path is "/etc/dconf/db/local.d". This path must
+        be modified if a database other than "local" is being used. $ grep disable-restart-buttons /etc/dconf/db/local.d/locks/*
+        /org/gnome/login-screen/disable-restart-buttons If the command does not return at least the example result, this is
+        a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:49701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.\
+            \ If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\n\
+            Verify that OL 9 prevents a user from overriding the disable-restart-buttons setting for graphical user interfaces.\
+            \ \n\nDetermine which profile the system database is using with the following command:\n\n$ grep system-db /etc/dconf/profile/user\n\
+            system-db:local\n\nCheck that graphical settings are locked from nonprivileged user modification with the following\
+            \ command:\n\nNote: The example below is using the database \"local\" for the system, so the path is \"/etc/dconf/db/local.d\"\
+            . This path must be modified if a database other than \"local\" is being used.\n\n$ grep disable-restart-buttons\
+            \ /etc/dconf/db/local.d/locks/* \n/org/gnome/login-screen/disable-restart-buttons\n\nIf the command does not return\
+            \ at least the example result, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271686
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271686
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271686
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271686
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:49701
+        exports: []
+        inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+          If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+          OL 9 prevents a user from overriding the disable-restart-buttons setting for graphical user interfaces. Determine
+          which profile the system database is using with the following command: $ grep system-db /etc/dconf/profile/user
+          system-db:local Check that graphical settings are locked from nonprivileged user modification with the following
+          command: Note: The example below is using the database "local" for the system, so the path is "/etc/dconf/db/local.d".
+          This path must be modified if a database other than "local" is being used. $ grep disable-restart-buttons /etc/dconf/db/local.d/locks/*
+          /org/gnome/login-screen/disable-restart-buttons If the command does not return at least the example result, this
+          is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:49701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.\
+              \ If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\n\
+              Verify that OL 9 prevents a user from overriding the disable-restart-buttons setting for graphical user interfaces.\
+              \ \n\nDetermine which profile the system database is using with the following command:\n\n$ grep system-db /etc/dconf/profile/user\n\
+              system-db:local\n\nCheck that graphical settings are locked from nonprivileged user modification with the following\
+              \ command:\n\nNote: The example below is using the database \"local\" for the system, so the path is \"/etc/dconf/db/local.d\"\
+              . This path must be modified if a database other than \"local\" is being used.\n\n$ grep disable-restart-buttons\
+              \ /etc/dconf/db/local.d/locks/* \n/org/gnome/login-screen/disable-restart-buttons\n\nIf the command does not\
+              \ return at least the example result, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+      If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+      OL 9 prevents a user from overriding the disable-restart-buttons setting for graphical user interfaces. Determine which
+      profile the system database is using with the following command: $ grep system-db /etc/dconf/profile/user system-db:local
+      Check that graphical settings are locked from nonprivileged user modification with the following command: Note: The
+      example below is using the database "local" for the system, so the path is "/etc/dconf/db/local.d". This path must be
+      modified if a database other than "local" is being used. $ grep disable-restart-buttons /etc/dconf/db/local.d/locks/*
+      /org/gnome/login-screen/disable-restart-buttons If the command does not return at least the example result, this is
+      a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271686r1091770_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 4adb448807ff73865fd53bc002c54d05d6617a37751661a904f65fe8ef7ccb9b
+  migration: *id002

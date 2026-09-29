@@ -11,8 +11,18 @@ rule:
     | sort -n | tail -1); if [ -n "$db_mtime" ] && [ -n "$keyfile_mtime" ] && [ "$db_mtime" -lt "$keyfile_mtime" ]; then echo
     "$db needs update"; return 1; fi; done; }; dconf_needs_update If the command has any output, then a dconf database needs
     to be updated, and this is a finding.'
+  checks:
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258028r991589_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258028r991589_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
   cluster_id: null
   conflicts: []
+  default_check: default
   description: <VulnDiscussion>Unlike text-based keyfiles, the binary database is impossible to check through most automated
     and all manual means; therefore, in order to evaluate dconf configuration, both have to be true at the same time - configuration
     files have to be compliant, and the database needs to be more recent than those keyfiles, which gives confidence that
@@ -285,7 +295,8 @@ rule:
   title: RHEL 9 effective dconf policy must match the policy keyfiles.
   weight: '10.0'
 migration:
-  note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+  note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for manual
+    execution.
   source: SCAP 1.4 XCCDF manual/external check
   source_rule: xccdf_mil.disa.stig_rule_SV-258028r991589_rule
   status: legacy_compatible

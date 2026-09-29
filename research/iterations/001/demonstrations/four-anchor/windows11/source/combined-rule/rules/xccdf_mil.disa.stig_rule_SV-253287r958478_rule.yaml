@@ -332,33 +332,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253287r958478_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253287r958478_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253287r958478_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253287r958478_rule
     version: 1
     description: The Server Message Block (SMB) v1 protocol must be disabled on the SMB server.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:25328600:
-        capability: scapng.collect.windows.wmi57
-        source_object_id: oval:mil.disa.stig.win:obj:25328600
-        source_type: wmi57_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: namespace
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: root\cimv2
-        - attributes:
-            datatype: string
-            operation: equals
-          kind: element
-          name: wql
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
       oval:mil.disa.stig.win:obj:25328700:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25328700
@@ -385,6 +378,27 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SMB1
+      oval:mil.disa.stig.win:obj:25328600:
+        capability: scapng.collect.windows.wmi57
+        source_object_id: oval:mil.disa.stig.win:obj:25328600
+        source_type: wmi57_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: namespace
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: root\cimv2
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: wql
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
     derive: {}
     predicates:
       oval:mil.disa.stig.win:ste:25328600:
@@ -428,19 +442,6 @@ rule:
         comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25328600:
-          source_test_id: oval:mil.disa.stig.win:tst:25328600
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25328600
-          predicates:
-          - oval:mil.disa.stig.win:ste:25328600
-          source_other: []
         oval:mil.disa.stig.win:tst:25328700:
           source_test_id: oval:mil.disa.stig.win:tst:25328700
           source_type: registry_test
@@ -453,6 +454,19 @@ rule:
           - oval:mil.disa.stig.win:obj:25328700
           predicates:
           - oval:mil.disa.stig.win:ste:20000000
+          source_other: []
+        oval:mil.disa.stig.win:tst:25328600:
+          source_test_id: oval:mil.disa.stig.win:tst:25328600
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25328600
+          predicates:
+          - oval:mil.disa.stig.win:ste:25328600
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:253287:
@@ -532,16 +546,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253287
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253287
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253287
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -645,11 +665,163 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253287r958478_rule
-      semantic_ir_sha256: 0c2f9df85abf3ae216f94e1c5763a1944ff1cc7646358d2fc6b9ccdfd619d0e7
+      semantic_ir_sha256: e6f6dcf7695e7472eeba8bb067ad8a51ddd1bcf2ee9026060796eb17e29d2fab
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: b3310a8e22a2c9b055c75b9973d2a6887f2336bba5c3e4f09f43088b3dd3d64d
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253287r958478_rule
+    version: 1
+    description: The Server Message Block (SMB) v1 protocol must be disabled on the SMB server.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:6301
+      exports: []
+      inline_content: 'Different methods are available to disable SMBv1 on Windows 11, if WN11-00-000160 is configured, this
+        is NA. If the following registry value does not exist or is not configured as specified, this is a finding: Registry
+        Hive: HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\ Value Name: SMB1
+        Type: REG_DWORD Value: 0x00000000 (0)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:6301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Different methods are available to disable SMBv1 on Windows 11, if WN11-00-000160 is configured, this is
+            NA.
+
+
+            If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\
+
+
+            Value Name: SMB1
+
+
+            Type: REG_DWORD
+
+            Value: 0x00000000 (0)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253287
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253287
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253287
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253287
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:6301
+        exports: []
+        inline_content: 'Different methods are available to disable SMBv1 on Windows 11, if WN11-00-000160 is configured,
+          this is NA. If the following registry value does not exist or is not configured as specified, this is a finding:
+          Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\ Value
+          Name: SMB1 Type: REG_DWORD Value: 0x00000000 (0)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:6301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Different methods are available to disable SMBv1 on Windows 11, if WN11-00-000160 is configured, this is
+              NA.
+
+
+              If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\
+
+
+              Value Name: SMB1
+
+
+              Type: REG_DWORD
+
+              Value: 0x00000000 (0)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Different methods are available to disable SMBv1 on Windows 11, if WN11-00-000160 is configured, this is NA.
+      If the following registry value does not exist or is not configured as specified, this is a finding: Registry Hive:
+      HKEY_LOCAL_MACHINE Registry Path: \SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\ Value Name: SMB1 Type:
+      REG_DWORD Value: 0x00000000 (0)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253287r958478_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 72af6656fd294627acf24085f77d5e6c1e89f886b1e303849893ed9500a8034b
+  migration: *id002

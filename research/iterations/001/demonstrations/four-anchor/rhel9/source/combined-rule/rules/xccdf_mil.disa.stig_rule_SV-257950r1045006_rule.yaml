@@ -237,7 +237,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257950r1045006_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257950r1045006_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-257950r1045006_rule
     version: 1
     description: RHEL 9 must not have unauthorized IP tunnels configured.
@@ -357,10 +367,13 @@ rule:
       with the following command: $ systemctl is-active ipsec Inactive If the "IPsec" service is active, check for configured
       IPsec connections ("conn"), with the following command: $ sudo grep -rni conn /etc/ipsec.conf /etc/ipsec.d/ Verify any
       returned results are documented with the ISSO. If the IPsec tunnels are active and not approved, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-257950r1045006_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: e537641076dde834c1fe0cd66237de627ca41611d1c8747bd2ed01380840d522
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

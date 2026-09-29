@@ -355,7 +355,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253324r991583_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253324r991583_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253324r991583_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253324r991583_rule
     version: 1
     description: The system must be configured to audit Object Access - Removable Storage successes.
@@ -500,16 +514,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253324
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253324
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253324
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -622,11 +642,185 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253324r991583_rule
-      semantic_ir_sha256: 99eb683e3bfea9cae5d9baaf983f7c9e990d73f42aeb8730aba6095c94856e0c
+      semantic_ir_sha256: 6323c0cd979208b75d09221a2b8e21974be0c00e89c7368ef82cc983176abdba
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: d589d687ec3619ecef99a2986d6359cc85ae02254a295c38b1f89147352117a2
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253324r991583_rule
+    version: 1
+    description: The system must be configured to audit Object Access - Removable Storage successes.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:13301
+      exports: []
+      inline_content: 'Security Option "Audit: Force audit policy subcategory settings (Windows Vista or later) to override
+        audit policy category settings" must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories
+        to be effective. Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with
+        elevated privileges ("Run as Administrator"). Enter "AuditPol /get /category:*" Compare the AuditPol settings with
+        the following. If the system does not audit the following, this is a finding: Object Access >> Removable Storage -
+        Success Some virtual machines may generate excessive audit events for access to the virtual hard disk itself when
+        this setting is enabled. This may be set to Not Configured in such cases and would not be a finding. This must be
+        documented with the ISSO to include mitigations such as monitoring or restricting any actual removable storage connected
+        to the VM.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:13301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Security Option "Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit
+            policy category settings" must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to
+            be effective.
+
+
+            Use the AuditPol tool to review the current Audit Policy configuration:
+
+            Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+            Enter "AuditPol /get /category:*"
+
+
+            Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+            Object Access >> Removable Storage - Success
+
+
+            Some virtual machines may generate excessive audit events for access to the virtual hard disk itself when this
+            setting is enabled. This may be set to Not Configured in such cases and would not be a finding. This must be documented
+            with the ISSO to include mitigations such as monitoring or restricting any actual removable storage connected
+            to the VM.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253324
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253324
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253324
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253324
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:13301
+        exports: []
+        inline_content: 'Security Option "Audit: Force audit policy subcategory settings (Windows Vista or later) to override
+          audit policy category settings" must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories
+          to be effective. Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with
+          elevated privileges ("Run as Administrator"). Enter "AuditPol /get /category:*" Compare the AuditPol settings with
+          the following. If the system does not audit the following, this is a finding: Object Access >> Removable Storage
+          - Success Some virtual machines may generate excessive audit events for access to the virtual hard disk itself when
+          this setting is enabled. This may be set to Not Configured in such cases and would not be a finding. This must be
+          documented with the ISSO to include mitigations such as monitoring or restricting any actual removable storage connected
+          to the VM.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:13301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Security Option "Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit
+              policy category settings" must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories
+              to be effective.
+
+
+              Use the AuditPol tool to review the current Audit Policy configuration:
+
+              Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+              Enter "AuditPol /get /category:*"
+
+
+              Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+              Object Access >> Removable Storage - Success
+
+
+              Some virtual machines may generate excessive audit events for access to the virtual hard disk itself when this
+              setting is enabled. This may be set to Not Configured in such cases and would not be a finding. This must be
+              documented with the ISSO to include mitigations such as monitoring or restricting any actual removable storage
+              connected to the VM.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Security Option "Audit: Force audit policy subcategory settings (Windows Vista or later) to override audit
+      policy category settings" must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective.
+      Use the AuditPol tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges
+      ("Run as Administrator"). Enter "AuditPol /get /category:*" Compare the AuditPol settings with the following. If the
+      system does not audit the following, this is a finding: Object Access >> Removable Storage - Success Some virtual machines
+      may generate excessive audit events for access to the virtual hard disk itself when this setting is enabled. This may
+      be set to Not Configured in such cases and would not be a finding. This must be documented with the ISSO to include
+      mitigations such as monitoring or restricting any actual removable storage connected to the VM.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253324r991583_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: c85aa4dee420b0104dbd076051109a233072509398064df29580bbe5256ec1e5
+  migration: *id002

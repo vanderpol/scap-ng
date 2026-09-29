@@ -276,7 +276,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271699r1091809_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271699r1091809_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271699r1091809_rule
     version: 1
     description: OL 9 must securely compare internal information system clocks at least every 24 hours.
@@ -402,10 +412,13 @@ rule:
       file is configured to an authoritative DOD time source by running the following command: $ grep -i server /etc/chrony.conf
       server 0.us.pool.ntp.mil If the parameter "server" is not set or is not set to an authoritative DOD time source, this
       is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271699r1091809_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 5dd7f030e646e28058c6425b7858e90e887d8c655e3f5fa6469bbb254c668db3
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

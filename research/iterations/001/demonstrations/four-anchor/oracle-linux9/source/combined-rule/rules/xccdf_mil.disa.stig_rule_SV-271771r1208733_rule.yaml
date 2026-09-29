@@ -315,7 +315,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271771r1208733_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271771r1208733_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271771r1208733_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271771r1208733_rule
     version: 1
     description: OL 9 SSH private host key files must have mode 0600 or less permissive.
@@ -424,6 +438,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000004
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230287:
+          source_definition_id: oval:mil.disa.stig.defs:def:230287
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: SSH private key files mode 600 or less permissive
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23028700
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system SSH private host key files must have mode 0600 or less permissive.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271771:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271771
           class: compliance
@@ -456,29 +493,6 @@ rule:
               text: If an unauthorized user obtains the private SSH host key file, the host could be impersonated.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230287:
-          source_definition_id: oval:mil.disa.stig.defs:def:230287
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: SSH private key files mode 600 or less permissive
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23028700
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system SSH private host key files must have mode 0600 or less permissive.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271771
@@ -490,16 +504,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271771
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271771
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271771
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -600,11 +620,155 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271771r1208733_rule
-      semantic_ir_sha256: 89ea1f6f61557d214f94fbdacba90a0ced523095d1a4e9913e6c5f96f1621639
+      semantic_ir_sha256: 2b0d88478e68accff5a60eca8df1b1a9ef3efa7cb281a125963018414cd76d4e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 737add404e8f9f89253032562b9c3de3b1855dc91afd8819eb83d65b0b3cf7e9
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271771r1208733_rule
+    version: 1
+    description: OL 9 SSH private host key files must have mode 0600 or less permissive.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:65701
+      exports: []
+      inline_content: 'Verify that OL 9 SSH private host key files have a mode of "0600" or less permissive with the following
+        command: $ ls -l /etc/ssh/*_key 600 /etc/ssh/ssh_host_dsa_key 600 /etc/ssh/ssh_host_ecdsa_key 600 /etc/ssh/ssh_host_ed25519_key
+        600 /etc/ssh/ssh_host_rsa_key If any private host key file has a mode more permissive than "0600", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:65701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 SSH private host key files have a mode of "0600" or less permissive with the following command:
+
+
+            $ ls -l /etc/ssh/*_key
+
+            600 /etc/ssh/ssh_host_dsa_key
+
+            600 /etc/ssh/ssh_host_ecdsa_key
+
+            600 /etc/ssh/ssh_host_ed25519_key
+
+            600 /etc/ssh/ssh_host_rsa_key
+
+
+            If any private host key file has a mode more permissive than "0600", this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271771
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271771
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271771
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271771
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:65701
+        exports: []
+        inline_content: 'Verify that OL 9 SSH private host key files have a mode of "0600" or less permissive with the following
+          command: $ ls -l /etc/ssh/*_key 600 /etc/ssh/ssh_host_dsa_key 600 /etc/ssh/ssh_host_ecdsa_key 600 /etc/ssh/ssh_host_ed25519_key
+          600 /etc/ssh/ssh_host_rsa_key If any private host key file has a mode more permissive than "0600", this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:65701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 SSH private host key files have a mode of "0600" or less permissive with the following
+              command:
+
+
+              $ ls -l /etc/ssh/*_key
+
+              600 /etc/ssh/ssh_host_dsa_key
+
+              600 /etc/ssh/ssh_host_ecdsa_key
+
+              600 /etc/ssh/ssh_host_ed25519_key
+
+              600 /etc/ssh/ssh_host_rsa_key
+
+
+              If any private host key file has a mode more permissive than "0600", this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 SSH private host key files have a mode of "0600" or less permissive with the following command:
+      $ ls -l /etc/ssh/*_key 600 /etc/ssh/ssh_host_dsa_key 600 /etc/ssh/ssh_host_ecdsa_key 600 /etc/ssh/ssh_host_ed25519_key
+      600 /etc/ssh/ssh_host_rsa_key If any private host key file has a mode more permissive than "0600", this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271771r1208733_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 1ce66b2ae04dd6229899c9d4ce96e216a99dd30783804139cfbcb5caa20eaef8
+  migration: *id002

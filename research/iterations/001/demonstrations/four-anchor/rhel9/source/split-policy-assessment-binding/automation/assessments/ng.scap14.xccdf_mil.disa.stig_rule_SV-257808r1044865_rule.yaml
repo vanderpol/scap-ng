@@ -7,37 +7,6 @@ assessment:
   description: RHEL 9 must disable the Transparent Inter Process Communication (TIPC) kernel module.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23049701:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23049701
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: .*
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*blacklist[ \t]+tipc[ \t]*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23049700:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23049700
@@ -62,6 +31,37 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^[ \t]*install[ \t]+tipc[ \t]+/bin/false[ \t]*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23049701:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23049701
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*blacklist[ \t]+tipc[ \t]*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -98,6 +98,33 @@ assessment:
         predicates: []
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230497:
+        source_definition_id: oval:mil.disa.stig.defs:def:230497
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: /etc/modprobe.d contains a file that contains 'install tipc /bin/false'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23049700
+          - comment: /etc/modprobe.d contains a file that contains 'blacklist tipc'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23049701
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable the transparent inter-process communication (TIPC) protocol.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257808:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257808
         class: compliance
@@ -141,33 +168,6 @@ assessment:
               of any flaws in its implementation.'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230497:
-        source_definition_id: oval:mil.disa.stig.defs:def:230497
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: /etc/modprobe.d contains a file that contains 'install tipc /bin/false'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23049700
-          - comment: /etc/modprobe.d contains a file that contains 'blacklist tipc'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23049701
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must disable the transparent inter-process communication (TIPC) protocol.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:257808
@@ -179,16 +179,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257808
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257808
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257808
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -282,6 +288,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257808r1044865_rule
-    semantic_ir_sha256: 90d993b6816e4f723e8fcea7d14517ef51d2197a89ae690c5187545cf0412a51
+    semantic_ir_sha256: 98143e08829dd4caa64d0d9497bff476916b9eabbe8d808b881a81738b624b42
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 4af703eec97cfed89152ea22440d3aa38657c019fb0fbc52ae23477196b23b6a

@@ -383,39 +383,27 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253362r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253362r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253362r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253362r991589_rule
     version: 1
     description: Hardened UNC Paths must be defined to require mutual authentication and integrity for at least the \\*\SYSVOL
       and \\*\NETLOGON shares.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:25336201:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25336201
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: Hardened Path Config for \\*\NETLOGON
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            datatype: string
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
-        - attributes:
-            datatype: string
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: \\*\NETLOGON
       oval:mil.disa.stig.win:obj:25336200:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25336200
@@ -442,8 +430,71 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: \\*\SYSVOL
+      oval:mil.disa.stig.win:obj:25336201:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25336201
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: Hardened Path Config for \\*\NETLOGON
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
+        - attributes:
+            datatype: string
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: \\*\NETLOGON
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:25336200:
+        source_state_id: oval:mil.disa.stig.win:ste:25336200
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_sz
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: (^| *, *)RequireMutualAuthentication=1( *, *|$)
+        comment: RequireMutualAuthentication=1
+      oval:mil.disa.stig.win:ste:25336201:
+        source_state_id: oval:mil.disa.stig.win:ste:25336201
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_sz
+        - attributes:
+            datatype: string
+            entity_check: none satisfy
+            operation: pattern match
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: (^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))
+        comment: No RequireMutualAuthentication!=1
       oval:mil.disa.stig.win:ste:25336202:
         source_state_id: oval:mil.disa.stig.win:ste:25336202
         source_type: registry_state
@@ -481,43 +532,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: (^| *, *)RequireIntegrity=(?!1( *, *|$))
         comment: No RequireIntegrity!=1
-      oval:mil.disa.stig.win:ste:25336201:
-        source_state_id: oval:mil.disa.stig.win:ste:25336201
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_sz
-        - attributes:
-            datatype: string
-            entity_check: none satisfy
-            operation: pattern match
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: (^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))
-        comment: No RequireMutualAuthentication!=1
-      oval:mil.disa.stig.win:ste:25336200:
-        source_state_id: oval:mil.disa.stig.win:ste:25336200
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_sz
-        - attributes:
-            datatype: string
-            operation: pattern match
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: (^| *, *)RequireMutualAuthentication=1( *, *|$)
-        comment: RequireMutualAuthentication=1
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25336201:
@@ -627,16 +641,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253362
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253362
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253362
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -750,11 +770,183 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253362r991589_rule
-      semantic_ir_sha256: d9ac36df9154c08ae912ef63b63231874aec31c4c0c0cbdbafe604c2b8dfdff6
+      semantic_ir_sha256: 966bf20949a5de8977646b04246bb49b7f8050c3e877e372b0b7426e2afd33d9
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: bccdda85d98657c30423dc0f45dfe1bcb2b44435168c4ad2ce47435c6f9a0984
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253362r991589_rule
+    version: 1
+    description: Hardened UNC Paths must be defined to require mutual authentication and integrity for at least the \\*\SYSVOL
+      and \\*\NETLOGON shares.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:20701
+      exports: []
+      inline_content: 'This requirement is applicable to domain-joined systems, for standalone systems this is NA. If the
+        following registry values do not exist or are not configured as specified, this is a finding. Registry Hive: HKEY_LOCAL_MACHINE
+        Registry Path: \SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths\ Value Name: \\*\NETLOGON Value
+        Type: REG_SZ Value: RequireMutualAuthentication=1, RequireIntegrity=1 Value Name: \\*\SYSVOL Value Type: REG_SZ Value:
+        RequireMutualAuthentication=1, RequireIntegrity=1 Additional entries would not be a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:20701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This requirement is applicable to domain-joined systems, for standalone systems this is NA.
+
+
+            If the following registry values do not exist or are not configured as specified, this is a finding.
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths\
+
+
+            Value Name: \\*\NETLOGON
+
+            Value Type: REG_SZ
+
+            Value: RequireMutualAuthentication=1, RequireIntegrity=1
+
+
+            Value Name: \\*\SYSVOL
+
+            Value Type: REG_SZ
+
+            Value: RequireMutualAuthentication=1, RequireIntegrity=1
+
+
+            Additional entries would not be a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253362
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253362
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253362
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253362
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:20701
+        exports: []
+        inline_content: 'This requirement is applicable to domain-joined systems, for standalone systems this is NA. If the
+          following registry values do not exist or are not configured as specified, this is a finding. Registry Hive: HKEY_LOCAL_MACHINE
+          Registry Path: \SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths\ Value Name: \\*\NETLOGON Value
+          Type: REG_SZ Value: RequireMutualAuthentication=1, RequireIntegrity=1 Value Name: \\*\SYSVOL Value Type: REG_SZ
+          Value: RequireMutualAuthentication=1, RequireIntegrity=1 Additional entries would not be a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:20701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'This requirement is applicable to domain-joined systems, for standalone systems this is NA.
+
+
+              If the following registry values do not exist or are not configured as specified, this is a finding.
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths\
+
+
+              Value Name: \\*\NETLOGON
+
+              Value Type: REG_SZ
+
+              Value: RequireMutualAuthentication=1, RequireIntegrity=1
+
+
+              Value Name: \\*\SYSVOL
+
+              Value Type: REG_SZ
+
+              Value: RequireMutualAuthentication=1, RequireIntegrity=1
+
+
+              Additional entries would not be a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'This requirement is applicable to domain-joined systems, for standalone systems this is NA. If the following
+      registry values do not exist or are not configured as specified, this is a finding. Registry Hive: HKEY_LOCAL_MACHINE
+      Registry Path: \SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths\ Value Name: \\*\NETLOGON Value Type:
+      REG_SZ Value: RequireMutualAuthentication=1, RequireIntegrity=1 Value Name: \\*\SYSVOL Value Type: REG_SZ Value: RequireMutualAuthentication=1,
+      RequireIntegrity=1 Additional entries would not be a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253362r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 524a6c0ba494bdc00cddf1b4c0d16f8688ba4199d9e5dea4680513d377b43725
+  migration: *id002

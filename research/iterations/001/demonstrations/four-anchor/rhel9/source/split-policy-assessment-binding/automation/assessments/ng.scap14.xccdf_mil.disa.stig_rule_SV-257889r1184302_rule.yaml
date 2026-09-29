@@ -7,33 +7,6 @@ assessment:
   description: All RHEL 9 local initialization files must have mode 0740 or less permissive.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.unix:obj:23032503:
-      capability: scapng.collect.unix.password
-      source_object_id: oval:mil.disa.stig.unix:obj:23032503
-      source_type: password_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: only root users (uid=0) home-dirs excluding root directory
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.unix:obj:20000016
-        - action: exclude
-          action_explicit: false
-          kind: filter
-          state_ref: oval:mil.disa.stig.unix:ste:20000018
-        - action: exclude
-          action_explicit: false
-          kind: filter
-          state_ref: oval:mil.disa.stig.unix:ste:23032500
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: COMPLEMENT
-        operator_explicit: true
     oval:mil.disa.stig.unix:obj:23032500:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:23032500
@@ -92,21 +65,6 @@ assessment:
         kind: set
         operator: COMPLEMENT
         operator_explicit: true
-    oval:mil.disa.stig.unix:obj:20000016:
-      capability: scapng.collect.unix.password
-      source_object_id: oval:mil.disa.stig.unix:obj:20000016
-      source_type: password_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: Users with an username
-      query:
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: username
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '[\w]+'
     oval:mil.disa.stig.unix:obj:23032501:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:23032501
@@ -138,48 +96,49 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.unix:ste:20000021
+    oval:mil.disa.stig.unix:obj:20000016:
+      capability: scapng.collect.unix.password
+      source_object_id: oval:mil.disa.stig.unix:obj:20000016
+      source_type: password_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: Users with an username
+      query:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: username
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '[\w]+'
+    oval:mil.disa.stig.unix:obj:23032503:
+      capability: scapng.collect.unix.password
+      source_object_id: oval:mil.disa.stig.unix:obj:23032503
+      source_type: password_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: only root users (uid=0) home-dirs excluding root directory
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.unix:obj:20000016
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.unix:ste:20000018
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.unix:ste:23032500
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: COMPLEMENT
+        operator_explicit: true
   derive:
-    oval:mil.disa.stig.defs:var:23032501:
-      source_variable_id: oval:mil.disa.stig.defs:var:23032501
-      source_type: local_variable
-      datatype: string
-      comment: The home directory of the root user.
-      semantic_ast:
-        datatype: string
-        expression:
-          item_field: home_dir
-          object_ref: oval:mil.disa.stig.unix:obj:23032503
-          op: object_component
-          record_field: null
-        id: oval:mil.disa.stig.defs:var:23032501
-        type: local_variable
-      resolution:
-        datatype: string
-        item_field: home_dir
-        object_ref: oval:mil.disa.stig.unix:obj:23032503
-        operation: object_component
-        reason: object_component_requires_collection:password_object
-        record_field: null
-        status: dynamic_object_dependency
-        variable_type: local_variable
-      evaluation_plan:
-        datatype: string
-        dependencies:
-          objects:
-          - oval:mil.disa.stig.unix:obj:23032503
-          operations:
-          - object_component
-          variables: []
-        expression:
-          item_field: home_dir
-          object_ref: oval:mil.disa.stig.unix:obj:23032503
-          op: object_component
-          record_field: null
-        mode: target_dependent
-        reason: object_component_requires_collection:password_object
-        resolution_status: dynamic_object_dependency
-        variable_id: oval:mil.disa.stig.defs:var:23032501
-        variable_type: local_variable
     oval:mil.disa.stig.defs:var:23032500:
       source_variable_id: oval:mil.disa.stig.defs:var:23032500
       source_type: local_variable
@@ -221,6 +180,47 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:mil.disa.stig.defs:var:23032500
         variable_type: local_variable
+    oval:mil.disa.stig.defs:var:23032501:
+      source_variable_id: oval:mil.disa.stig.defs:var:23032501
+      source_type: local_variable
+      datatype: string
+      comment: The home directory of the root user.
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: home_dir
+          object_ref: oval:mil.disa.stig.unix:obj:23032503
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:23032501
+        type: local_variable
+      resolution:
+        datatype: string
+        item_field: home_dir
+        object_ref: oval:mil.disa.stig.unix:obj:23032503
+        operation: object_component
+        reason: object_component_requires_collection:password_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.unix:obj:23032503
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: home_dir
+          object_ref: oval:mil.disa.stig.unix:obj:23032503
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:password_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23032501
+        variable_type: local_variable
   predicates:
     oval:mil.disa.stig.unix:ste:23032500:
       source_state_id: oval:mil.disa.stig.unix:ste:23032500
@@ -233,21 +233,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: /
       comment: root directory
-    oval:mil.disa.stig.unix:ste:20000017:
-      source_state_id: oval:mil.disa.stig.unix:ste:20000017
-      source_type: password_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          entity_check: all
-          operation: less than
-        kind: element
-        name: user_id
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '1000'
-      comment: only uids < 1000
     oval:mil.disa.stig.unix:ste:20000020:
       source_state_id: oval:mil.disa.stig.unix:ste:20000020
       source_type: file_state
@@ -303,6 +288,21 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: 'false'
       comment: mode 0740 or less permissive
+    oval:mil.disa.stig.unix:ste:20000017:
+      source_state_id: oval:mil.disa.stig.unix:ste:20000017
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          entity_check: all
+          operation: less than
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1000'
+      comment: only uids < 1000
     oval:mil.disa.stig.unix:ste:20000021:
       source_state_id: oval:mil.disa.stig.unix:ste:20000021
       source_type: file_state
@@ -331,19 +331,6 @@ assessment:
       comment: only uids > 0
   evaluate:
     tests:
-      oval:mil.disa.stig.unix:tst:23032500:
-        source_test_id: oval:mil.disa.stig.unix:tst:23032500
-        source_type: file_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: Local initialization files for non-system users have mode 0740 or less permissive.
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.unix:obj:23032500
-        predicates:
-        - oval:mil.disa.stig.unix:ste:20000020
-        source_other: []
       oval:mil.disa.stig.unix:tst:23032501:
         source_test_id: oval:mil.disa.stig.unix:tst:23032501
         source_type: file_test
@@ -354,6 +341,19 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.unix:obj:23032501
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000020
+        source_other: []
+      oval:mil.disa.stig.unix:tst:23032500:
+        source_test_id: oval:mil.disa.stig.unix:tst:23032500
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: Local initialization files for non-system users have mode 0740 or less permissive.
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:23032500
         predicates:
         - oval:mil.disa.stig.unix:ste:20000020
         source_other: []
@@ -429,16 +429,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257889
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257889
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257889
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -533,6 +539,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257889r1184302_rule
-    semantic_ir_sha256: 6c395c0c29d66ffd8a8f288d9cb96fc61a52ac4a2e665ef4be7a50f1ae8faf11
+    semantic_ir_sha256: 3fdbfdf848c575e5ab34940133728bf3c63c71aec69587deb2f54c5dcf8fe453
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 2ef1dce58d5104bbe42128301a676ea8c57c6e48643effd69c651d693db1ee7a

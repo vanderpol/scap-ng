@@ -366,7 +366,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257838r1044912_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257838r1044912_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257838r1044912_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257838r1044912_rule
     version: 1
     description: RHEL 9 must have the openssl-pkcs11 package installed.
@@ -473,16 +487,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257838
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257838
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257838
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -587,11 +607,165 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257838r1044912_rule
-      semantic_ir_sha256: e0cec859702c3aa4471c95be4b68b37066db91dd203dad2a3c28b2b63951d9dd
+      semantic_ir_sha256: f1b9a07c6fbe075a2cb21c6920df32491277a691f03113206a557d44cef22d6e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: aec1d290f0154acc774aabfe8554781466560121df8228df8a7545bf77bfdf47
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257838r1044912_rule
+    version: 1
+    description: RHEL 9 must have the openssl-pkcs11 package installed.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:12101
+      exports: []
+      inline_content: 'Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication
+        method, this requirement is Not Applicable. Verify that RHEL 9 has the openssl-pkcs11 package installed with the following
+        command: $ dnf list --installed openssl-pkcs11 Example output: openssl-pkcs.i686 0.4.11-7.el9 openssl-pkcs.x86_64
+        0.4.11-7.el9 If the "openssl-pkcs11" package is not installed, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:12101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication
+            method, this requirement is Not Applicable.
+
+
+            Verify that RHEL 9 has the openssl-pkcs11 package installed with the following command:
+
+
+            $ dnf list --installed openssl-pkcs11
+
+
+            Example output:
+
+
+            openssl-pkcs.i686          0.4.11-7.el9
+
+            openssl-pkcs.x86_64          0.4.11-7.el9
+
+
+            If the "openssl-pkcs11" package is not installed, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257838
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257838
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257838
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257838
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:12101
+        exports: []
+        inline_content: 'Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication
+          method, this requirement is Not Applicable. Verify that RHEL 9 has the openssl-pkcs11 package installed with the
+          following command: $ dnf list --installed openssl-pkcs11 Example output: openssl-pkcs.i686 0.4.11-7.el9 openssl-pkcs.x86_64
+          0.4.11-7.el9 If the "openssl-pkcs11" package is not installed, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:12101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication
+              method, this requirement is Not Applicable.
+
+
+              Verify that RHEL 9 has the openssl-pkcs11 package installed with the following command:
+
+
+              $ dnf list --installed openssl-pkcs11
+
+
+              Example output:
+
+
+              openssl-pkcs.i686          0.4.11-7.el9
+
+              openssl-pkcs.x86_64          0.4.11-7.el9
+
+
+              If the "openssl-pkcs11" package is not installed, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication
+      method, this requirement is Not Applicable. Verify that RHEL 9 has the openssl-pkcs11 package installed with the following
+      command: $ dnf list --installed openssl-pkcs11 Example output: openssl-pkcs.i686 0.4.11-7.el9 openssl-pkcs.x86_64 0.4.11-7.el9
+      If the "openssl-pkcs11" package is not installed, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257838r1044912_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: c9740977dcb1c8b73dda55a54cd288a2449aa434b32af800a82f790f464db3f1
+  migration: *id002

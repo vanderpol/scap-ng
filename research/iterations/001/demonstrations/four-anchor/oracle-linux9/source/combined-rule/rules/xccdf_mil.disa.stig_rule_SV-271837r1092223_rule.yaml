@@ -325,7 +325,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
     version: 1
     description: OL 9 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file.
@@ -365,19 +379,6 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: text
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
-        comment: Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
       oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701
         source_type: textfilecontent54_state
@@ -391,8 +392,8 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth\b
         comment: Check that auth required pam_faillock.so preath line exists.
-      oval:navy.navwar.niwcatlantic.scc.linux:ste:27183702:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183702
+      oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704
         source_type: textfilecontent54_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         operator: AND
@@ -402,8 +403,8 @@ rule:
           kind: element
           name: text
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: \n\s*auth\s+required\s+pam_faillock.so\s+authfail\b
-        comment: Check that auth required pam_faillock.so authfail line exists.
+          value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
+        comment: Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
       oval:navy.navwar.niwcatlantic.scc.linux:ste:27183703:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183703
         source_type: textfilecontent54_state
@@ -417,6 +418,19 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \n\s*account\s+required\s+pam_faillock.so\b
         comment: Check that account required pam_faillock.so line exists.
+      oval:navy.navwar.niwcatlantic.scc.linux:ste:27183702:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183702
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: text
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: \n\s*auth\s+required\s+pam_faillock.so\s+authfail\b
+        comment: Check that auth required pam_faillock.so authfail line exists.
     evaluate:
       tests:
         oval:navy.navwar.niwcatlantic.scc.linux:tst:27183701:
@@ -473,16 +487,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.linux:def:271837
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271837
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.linux:def:271837
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -583,11 +603,157 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
-      semantic_ir_sha256: b61171d452c66933b0165733a6bb5dfa9a97f058df29f9aa5f6b643b03c9cf1b
+      semantic_ir_sha256: 8720ab29a962efe8b076bfcb92d714d406932b5d7aac75f7776d303730c02d17
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 168b6a34eaf8aada12f11052b6f89e10b6a7315f572ea621ed3d6c0288c1d9eb
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
+    version: 1
+    description: OL 9 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:78901
+      exports: []
+      inline_content: 'Verify that OL 9 configures the pam_faillock.so module to exist in the "/etc/pam.d/system-auth" file
+        with the following command: $ grep pam_faillock.so /etc/pam.d/system-auth auth required pam_faillock.so preauth auth
+        required pam_faillock.so authfail account required pam_faillock.so If the pam_faillock.so module is not present in
+        the "/etc/pam.d/system-auth" file with the "preauth" line listed before pam_unix.so, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:78901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 configures the pam_faillock.so module to exist in the "/etc/pam.d/system-auth" file with
+            the following command:
+
+
+            $ grep pam_faillock.so /etc/pam.d/system-auth
+
+            auth required pam_faillock.so preauth
+
+            auth required pam_faillock.so authfail
+
+            account required pam_faillock.so
+
+
+            If the pam_faillock.so module is not present in the "/etc/pam.d/system-auth" file with the "preauth" line listed
+            before pam_unix.so, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:271837
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.linux:def:271837
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:271837
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.linux:def:271837
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:78901
+        exports: []
+        inline_content: 'Verify that OL 9 configures the pam_faillock.so module to exist in the "/etc/pam.d/system-auth" file
+          with the following command: $ grep pam_faillock.so /etc/pam.d/system-auth auth required pam_faillock.so preauth
+          auth required pam_faillock.so authfail account required pam_faillock.so If the pam_faillock.so module is not present
+          in the "/etc/pam.d/system-auth" file with the "preauth" line listed before pam_unix.so, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:78901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that OL 9 configures the pam_faillock.so module to exist in the "/etc/pam.d/system-auth" file with
+              the following command:
+
+
+              $ grep pam_faillock.so /etc/pam.d/system-auth
+
+              auth required pam_faillock.so preauth
+
+              auth required pam_faillock.so authfail
+
+              account required pam_faillock.so
+
+
+              If the pam_faillock.so module is not present in the "/etc/pam.d/system-auth" file with the "preauth" line listed
+              before pam_unix.so, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 configures the pam_faillock.so module to exist in the "/etc/pam.d/system-auth" file with
+      the following command: $ grep pam_faillock.so /etc/pam.d/system-auth auth required pam_faillock.so preauth auth required
+      pam_faillock.so authfail account required pam_faillock.so If the pam_faillock.so module is not present in the "/etc/pam.d/system-auth"
+      file with the "preauth" line listed before pam_unix.so, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 7a8241569a4aaaf38ba43809a023195910eb68169413dde941b6e460dfd7fcf5
+  migration: *id002

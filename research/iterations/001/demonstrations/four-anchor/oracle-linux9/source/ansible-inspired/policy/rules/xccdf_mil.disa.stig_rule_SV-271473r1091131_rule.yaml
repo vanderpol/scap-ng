@@ -8,8 +8,18 @@ rule:
     interfaces: ens33 $ sudo firewall-cmd --info-zone=public | grep target target: DROP $ sudo firewall-cmd --permanent --info-zone=public
     | grep target target: DROP If no zones are active on the OL 9 interfaces or if runtime and permanent targets are set to
     a different option other than "DROP", this is a finding.'
+  checks:
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271473r1091131_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271473r1091131_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
   cluster_id: null
   conflicts: []
+  default_check: default
   description: <VulnDiscussion>Failure to restrict network connectivity only to authorized systems permits inbound connections
     from malicious systems. It also permits outbound connections that may facilitate exfiltration of DOD data. OL 9 incorporates
     the "firewalld" daemon, which allows for many different configurations. One of these configurations is zones. Zones can
@@ -276,7 +286,8 @@ rule:
     to other systems.
   weight: '10.0'
 migration:
-  note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+  note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for manual
+    execution.
   source: SCAP 1.4 XCCDF manual/external check
   source_rule: xccdf_mil.disa.stig_rule_SV-271473r1091131_rule
   status: legacy_compatible

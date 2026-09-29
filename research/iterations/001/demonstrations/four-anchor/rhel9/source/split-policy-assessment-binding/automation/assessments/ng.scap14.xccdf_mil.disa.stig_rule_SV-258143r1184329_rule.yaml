@@ -8,27 +8,6 @@ assessment:
     the server is being used for log aggregation.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25814300:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25814300
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: remote log acceptance config
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25814301
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25814302
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
     oval:mil.disa.stig.ind:obj:25814301:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25814301
@@ -62,6 +41,27 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:25814300:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25814300
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: remote log acceptance config
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25814301
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25814302
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:25814302:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25814302
@@ -174,30 +174,6 @@ assessment:
         predicates: []
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:258143:
-        source_definition_id: oval:mil.disa.stig.defs:def:258143
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: no remote log acceptance
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25814300
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must be configured so that the rsyslog daemon does not accept log messages from other
-              servers unless the server is being used for log aggregation.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258143:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258143
         class: compliance
@@ -237,6 +213,30 @@ assessment:
               security officer (ISSO).'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:258143:
+        source_definition_id: oval:mil.disa.stig.defs:def:258143
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: no remote log acceptance
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25814300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must be configured so that the rsyslog daemon does not accept log messages from other
+              servers unless the server is being used for log aggregation.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:258143
@@ -248,16 +248,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258143
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258143
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258143
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -376,6 +382,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258143r1184329_rule
-    semantic_ir_sha256: d28986b66f8ae09284b261887deaf2b2f5f86dbcff8262bf7a7e60f0ba637cf4
+    semantic_ir_sha256: 8ae0c92749b8a812f90f3929a27e6db47f3fcf733e0fad817c73506723eb9bcf
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 17432ca0a131b748aca8d72fe62915ede10516b222e22109458b9d604ea436a9

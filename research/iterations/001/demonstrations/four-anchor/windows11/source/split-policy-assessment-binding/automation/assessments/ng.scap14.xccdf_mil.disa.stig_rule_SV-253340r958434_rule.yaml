@@ -33,29 +33,32 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: file
-    oval:mil.disa.stig.win:obj:25334004:
-      capability: scapng.collect.windows.fileeffectiverights53
-      source_object_id: oval:mil.disa.stig.win:obj:25334004
-      source_type: fileeffectiverights53_object
+    oval:mil.disa.stig.win:obj:20000015:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:20000015
+      source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: The Application event log. Strict filepath, as listed.
+      comment: System Root Directory
       query:
       - attributes:
           datatype: string
-          operation: case insensitive equals
-          var_check: at least one
-          var_ref: oval:mil.disa.stig.win:var:25334002
         kind: element
-        name: filepath
+        name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
       - attributes:
           datatype: string
-          operation: pattern match
         kind: element
-        name: trustee_sid
+        name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: .*
+        value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+      - attributes:
+          datatype: string
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SystemRoot
     oval:mil.disa.stig.win:obj:25334003:
       capability: scapng.collect.windows.fileeffectiverights53
       source_object_id: oval:mil.disa.stig.win:obj:25334003
@@ -134,32 +137,6 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: false
-    oval:mil.disa.stig.win:obj:20000015:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:20000015
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: System Root Directory
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - attributes:
-          datatype: string
-        kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
-      - attributes:
-          datatype: string
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SystemRoot
     oval:mil.disa.stig.win:obj:25334001:
       capability: scapng.collect.windows.fileeffectiverights53
       source_object_id: oval:mil.disa.stig.win:obj:25334001
@@ -173,6 +150,29 @@ assessment:
           operation: case insensitive equals
           var_check: at least one
           var_ref: oval:mil.disa.stig.win:var:25334001
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: .*
+    oval:mil.disa.stig.win:obj:25334004:
+      capability: scapng.collect.windows.fileeffectiverights53
+      source_object_id: oval:mil.disa.stig.win:obj:25334004
+      source_type: fileeffectiverights53_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: The Application event log. Strict filepath, as listed.
+      query:
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.win:var:25334002
         kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -323,6 +323,58 @@ assessment:
         variable_id: oval:mil.disa.stig.win:var:25334001
         variable_type: local_variable
   predicates:
+    oval:mil.disa.stig.win:ste:20000015:
+      source_state_id: oval:mil.disa.stig.win:ste:20000015
+      source_type: fileeffectiverights53_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-15-2-1
+      comment: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
+    oval:mil.disa.stig.win:ste:20000013:
+      source_state_id: oval:mil.disa.stig.win:ste:20000013
+      source_type: fileeffectiverights53_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-32-544
+      comment: Administrators account.
+    oval:mil.disa.stig.win:ste:20000014:
+      source_state_id: oval:mil.disa.stig.win:ste:20000014
+      source_type: fileeffectiverights53_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-19
+      comment: LOCAL SERVICE account, the owner.
+    oval:mil.disa.stig.win:ste:20000012:
+      source_state_id: oval:mil.disa.stig.win:ste:20000012
+      source_type: fileeffectiverights53_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-18
+      comment: SYSTEM account.
     oval:mil.disa.stig.win:ste:20000016:
       source_state_id: oval:mil.disa.stig.win:ste:20000016
       source_type: registry_state
@@ -350,58 +402,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122
       comment: Event Log process account. Deterministically built with respect to service name.
-    oval:mil.disa.stig.win:ste:20000014:
-      source_state_id: oval:mil.disa.stig.win:ste:20000014
-      source_type: fileeffectiverights53_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-19
-      comment: LOCAL SERVICE account, the owner.
-    oval:mil.disa.stig.win:ste:20000013:
-      source_state_id: oval:mil.disa.stig.win:ste:20000013
-      source_type: fileeffectiverights53_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-32-544
-      comment: Administrators account.
-    oval:mil.disa.stig.win:ste:20000012:
-      source_state_id: oval:mil.disa.stig.win:ste:20000012
-      source_type: fileeffectiverights53_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-18
-      comment: SYSTEM account.
-    oval:mil.disa.stig.win:ste:20000015:
-      source_state_id: oval:mil.disa.stig.win:ste:20000015
-      source_type: fileeffectiverights53_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-15-2-1
-      comment: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25334002:
@@ -442,42 +442,6 @@ assessment:
         predicates: []
         source_other: []
     definitions:
-      oval:mil.disa.stig.windows11:def:253340:
-        source_definition_id: oval:mil.disa.stig.windows11:def:253340
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:253340
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: WN11-AU-000515 - Windows 11 permissions for the Application event log must prevent access by non-privileged
-              accounts.
-          - attributes:
-              family: windows
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Microsoft Windows 11
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot
-              service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary
-              to provide a trail of evidence in case the system or network is compromised. The Application event log may be
-              susceptible to tampering if proper permissions are not applied.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:253340:
         source_definition_id: oval:mil.disa.stig.defs:def:253340
         class: compliance
@@ -523,6 +487,42 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.windows11:def:253340:
+        source_definition_id: oval:mil.disa.stig.windows11:def:253340
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253340
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-AU-000515 - Windows 11 permissions for the Application event log must prevent access by non-privileged
+              accounts.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot
+              service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary
+              to provide a trail of evidence in case the system or network is compromised. The Application event log may be
+              susceptible to tampering if proper permissions are not applied.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.windows11:def:253340
@@ -534,16 +534,22 @@ assessment:
       exports: []
       href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows11:def:253340
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.windows11:def:253340
       exports: []
       href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.windows11:def:253340
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -655,6 +661,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253340r958434_rule
-    semantic_ir_sha256: 765ad9109dc4c79a0988699289c5d3a195ae0de0d12ac4c9014cbc0974a44c6f
+    semantic_ir_sha256: 09ebbd84c37482f208f1a3c700ddac27629d20868598f08da3ee34b48cad4e89
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ec04332e97479434d8f57c0404da7a1968e2892055f2325595916f4a921421fd

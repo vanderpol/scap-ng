@@ -295,61 +295,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-256893r958552_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-256893r958552_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-256893r958552_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-256893r958552_rule
     version: 1
     description: Internet Explorer must be disabled for Windows 11.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:20000017:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:20000017
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: EditionID
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            datatype: string
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
-        - attributes:
-            datatype: string
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: EditionId
-      oval:mil.disa.stig.edge:obj:103:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.edge:obj:103
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: 32-bit DisplayName equals Microsoft Edge
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.edge:obj:101
-          - action: include
-            action_explicit: true
-            kind: filter
-            state_ref: oval:mil.disa.stig.edge:ste:100
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: false
       oval:mil.disa.stig.edge:obj:100:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.edge:obj:100
@@ -382,26 +347,6 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: DisplayName
-      oval:mil.disa.stig.win:obj:25689301:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25689301
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Policies\Microsoft\Internet Explorer\Main
-        - kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: NotifyDisableIEOptions
       oval:mil.disa.stig.win:obj:25689300:
         capability: scapng.collect.windows.wmi57
         source_object_id: oval:mil.disa.stig.win:obj:25689300
@@ -423,6 +368,29 @@ rule:
           name: wql
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'
+      oval:mil.disa.stig.edge:obj:103:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.edge:obj:103
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: 32-bit DisplayName equals Microsoft Edge
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.edge:obj:101
+          - action: include
+            action_explicit: true
+            kind: filter
+            state_ref: oval:mil.disa.stig.edge:ste:100
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: false
       oval:mil.disa.stig.edge:obj:102:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.edge:obj:102
@@ -478,8 +446,88 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: DisplayName
+      oval:mil.disa.stig.win:obj:25689301:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25689301
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Policies\Microsoft\Internet Explorer\Main
+        - kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: NotifyDisableIEOptions
+      oval:mil.disa.stig.win:obj:20000017:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:20000017
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: EditionID
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+        - attributes:
+            datatype: string
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: EditionId
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000018:
+        source_state_id: oval:mil.disa.stig.win:ste:20000018
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_sz
+        - attributes:
+            datatype: string
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: EnterpriseS
+        comment: EditionID = EnterpriseS (reg_sz)
+      oval:mil.disa.stig.win:ste:20000002:
+        source_state_id: oval:mil.disa.stig.win:ste:20000002
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_dword
+        - attributes:
+            datatype: int
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '2'
+        comment: null
       oval:mil.disa.stig.win:ste:20000000:
         source_state_id: oval:mil.disa.stig.win:ste:20000000
         source_type: registry_state
@@ -532,40 +580,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Microsoft Edge
         comment: registry value equals Microsoft Edge
-      oval:mil.disa.stig.win:ste:20000002:
-        source_state_id: oval:mil.disa.stig.win:ste:20000002
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_dword
-        - attributes:
-            datatype: int
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '2'
-        comment: null
-      oval:mil.disa.stig.win:ste:20000018:
-        source_state_id: oval:mil.disa.stig.win:ste:20000018
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_sz
-        - attributes:
-            datatype: string
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: EnterpriseS
-        comment: EditionID = EnterpriseS (reg_sz)
       oval:mil.disa.stig.win:ste:20000001:
         source_state_id: oval:mil.disa.stig.win:ste:20000001
         source_type: registry_state
@@ -597,6 +611,18 @@ rule:
           - oval:mil.disa.stig.edge:obj:102
           predicates: []
           source_other: []
+        oval:mil.disa.stig.edge:tst:101:
+          source_test_id: oval:mil.disa.stig.edge:tst:101
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: 32-bit Microsoft Edge is installed
+          check: all
+          check_existence: none_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.edge:obj:103
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.win:tst:22070601:
           source_test_id: oval:mil.disa.stig.win:tst:22070601
           source_type: registry_test
@@ -609,19 +635,6 @@ rule:
           - oval:mil.disa.stig.win:obj:20000017
           predicates:
           - oval:mil.disa.stig.win:ste:20000018
-          source_other: []
-        oval:mil.disa.stig.win:tst:25689300:
-          source_test_id: oval:mil.disa.stig.win:tst:25689300
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Internet Explorer 11 optional feature disabled or not installed
-          check: all
-          check_existence: any_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25689300
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000020
           source_other: []
         oval:mil.disa.stig.win:tst:25689301:
           source_test_id: oval:mil.disa.stig.win:tst:25689301
@@ -638,17 +651,18 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           - oval:mil.disa.stig.win:ste:20000002
           source_other: []
-        oval:mil.disa.stig.edge:tst:101:
-          source_test_id: oval:mil.disa.stig.edge:tst:101
-          source_type: registry_test
+        oval:mil.disa.stig.win:tst:25689300:
+          source_test_id: oval:mil.disa.stig.win:tst:25689300
+          source_type: wmi57_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: 32-bit Microsoft Edge is installed
+          comment: Internet Explorer 11 optional feature disabled or not installed
           check: all
-          check_existence: none_exist
+          check_existence: any_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.edge:obj:103
-          predicates: []
+          - oval:mil.disa.stig.win:obj:25689300
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000020
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:256893:
@@ -743,16 +757,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:256893
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:256893
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:256893
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -847,11 +867,144 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-256893r958552_rule
-      semantic_ir_sha256: 69a359cbab65aeca0cfa230f6da5db19a5d4031380cc6e9800fcda4a88b5a2b6
+      semantic_ir_sha256: 168451f05fd4d2237f42be0620bbf69c1476b59603d3f769e1badb0f31b92859
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 04de4bfa5878cf29dbc1f331a886443b96f2b19e65288a5d8dfc7df0dc8eea44
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-256893r958552_rule
+    version: 1
+    description: Internet Explorer must be disabled for Windows 11.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:49101
+      exports: []
+      inline_content: 'Determine if IE11 is installed or enabled on Windows 11 semi-annual channel. If IE11 is installed or
+        not disabled on Windows 11 semi-annual channel, this is a finding. If IE11 is installed on an unsupported operating
+        system and is enabled or installed, this is a finding. For more information, visit: https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge#what-is-the-lifecycle-policy-for-internet-explorer-'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:49101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Determine if IE11 is installed or enabled on Windows 11 semi-annual channel.
+
+
+            If IE11 is installed or not disabled on Windows 11 semi-annual channel, this is a finding.
+
+
+            If IE11 is installed on an unsupported operating system and is enabled or installed, this is a finding.
+
+
+            For more information, visit: https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge#what-is-the-lifecycle-policy-for-internet-explorer-'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:256893
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:256893
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:256893
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:256893
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:49101
+        exports: []
+        inline_content: 'Determine if IE11 is installed or enabled on Windows 11 semi-annual channel. If IE11 is installed
+          or not disabled on Windows 11 semi-annual channel, this is a finding. If IE11 is installed on an unsupported operating
+          system and is enabled or installed, this is a finding. For more information, visit: https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge#what-is-the-lifecycle-policy-for-internet-explorer-'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:49101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Determine if IE11 is installed or enabled on Windows 11 semi-annual channel.
+
+
+              If IE11 is installed or not disabled on Windows 11 semi-annual channel, this is a finding.
+
+
+              If IE11 is installed on an unsupported operating system and is enabled or installed, this is a finding.
+
+
+              For more information, visit: https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge#what-is-the-lifecycle-policy-for-internet-explorer-'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Determine if IE11 is installed or enabled on Windows 11 semi-annual channel. If IE11 is installed or not disabled
+      on Windows 11 semi-annual channel, this is a finding. If IE11 is installed on an unsupported operating system and is
+      enabled or installed, this is a finding. For more information, visit: https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge#what-is-the-lifecycle-policy-for-internet-explorer-'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-256893r958552_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 20e1b59e431956a6a390d5a80156912a0d658ceacf61a337c1bf0e15c2941d72
+  migration: *id002

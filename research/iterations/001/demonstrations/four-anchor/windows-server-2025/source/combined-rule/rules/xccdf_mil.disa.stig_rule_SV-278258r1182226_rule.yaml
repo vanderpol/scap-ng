@@ -368,7 +368,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-278258r1182226_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-278258r1182226_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278258r1182226_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278258r1182226_rule
     version: 1
     description: The Windows Server 2025 "Modify firmware environment values" user right must only be assigned to the Administrators
@@ -389,6 +403,16 @@ rule:
           value: SE_SYSTEM_ENVIRONMENT_NAME
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000029:
+        source_state_id: oval:mil.disa.stig.win:ste:20000029
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -401,16 +425,6 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
-        comment: null
-      oval:mil.disa.stig.win:ste:20000029:
-        source_state_id: oval:mil.disa.stig.win:ste:20000029
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         comment: null
     evaluate:
       tests:
@@ -429,29 +443,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000030
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253502:
-          source_definition_id: oval:mil.disa.stig.defs:def:253502
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Modify firmware environment values - Administrators
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25350201
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Modify firmware environment values" user right must only be assigned to the Administrators group.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278258:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278258
           class: compliance
@@ -487,6 +478,29 @@ rule:
                 \ environment variables. This could result in hardware failures or a denial of service."
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253502:
+          source_definition_id: oval:mil.disa.stig.defs:def:253502
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Modify firmware environment values - Administrators
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25350201
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Modify firmware environment values" user right must only be assigned to the Administrators group.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows2025:def:278258
@@ -498,16 +512,22 @@ rule:
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows2025:def:278258
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows2025:def:278258
         exports: []
         href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows2025:def:278258
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
@@ -625,11 +645,192 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278258r1182226_rule
-      semantic_ir_sha256: fe36df6b75c96fd4f342c36a43c25c584bc6a1e305c5e7d0f726d9acd59be31c
+      semantic_ir_sha256: 95158ab476f7031a24ef7816d8a497649e3b44ca52e14657852ff47ef83e3394
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: d9df56af9f9bafe465941650e9eda9e302c49ea64fae515aa98ad89ab05d4f75
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278258r1182226_rule
+    version: 1
+    description: The Windows Server 2025 "Modify firmware environment values" user right must only be assigned to the Administrators
+      group.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:54101
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+        If any accounts or groups other than the following are granted the "Modify firmware environment values" user right,
+        this is a finding: - Administrators. For server core installations, run the following command: Secedit /Export /Areas
+        User_Rights /cfg c:\path\filename.txt Review the text file. If any SIDs other than the following are granted the "SeSystemEnvironmentPrivilege"
+        user right, this is a finding: S-1-5-32-544 (Administrators)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:54101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+            Run gpedit.msc.
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If any accounts or groups other than the following are granted the "Modify firmware environment values" user right,
+            this is a finding:
+
+            - Administrators.
+
+
+            For server core installations, run the following command:
+
+
+            Secedit /Export /Areas User_Rights /cfg c:\path\filename.txt
+
+
+            Review the text file.
+
+
+            If any SIDs other than the following are granted the "SeSystemEnvironmentPrivilege" user right, this is a finding:
+
+
+            S-1-5-32-544 (Administrators)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278258
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278258
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+          name: oval:mil.disa.stig.windows2025:def:278258
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+              name: oval:mil.disa.stig.windows2025:def:278258
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:54101
+        exports: []
+        inline_content: 'Verify the effective setting in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer
+          Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+          If any accounts or groups other than the following are granted the "Modify firmware environment values" user right,
+          this is a finding: - Administrators. For server core installations, run the following command: Secedit /Export /Areas
+          User_Rights /cfg c:\path\filename.txt Review the text file. If any SIDs other than the following are granted the
+          "SeSystemEnvironmentPrivilege" user right, this is a finding: S-1-5-32-544 (Administrators)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:54101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+              Run gpedit.msc.
+
+
+              Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+              Policies >> User Rights Assignment.
+
+
+              If any accounts or groups other than the following are granted the "Modify firmware environment values" user
+              right, this is a finding:
+
+              - Administrators.
+
+
+              For server core installations, run the following command:
+
+
+              Secedit /Export /Areas User_Rights /cfg c:\path\filename.txt
+
+
+              Review the text file.
+
+
+              If any SIDs other than the following are granted the "SeSystemEnvironmentPrivilege" user right, this is a finding:
+
+
+              S-1-5-32-544 (Administrators)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the effective setting in Local Group Policy Editor. Run gpedit.msc. Navigate to Local Computer Policy
+      >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment. If any
+      accounts or groups other than the following are granted the "Modify firmware environment values" user right, this is
+      a finding: - Administrators. For server core installations, run the following command: Secedit /Export /Areas User_Rights
+      /cfg c:\path\filename.txt Review the text file. If any SIDs other than the following are granted the "SeSystemEnvironmentPrivilege"
+      user right, this is a finding: S-1-5-32-544 (Administrators)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-278258r1182226_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 6a1f55ebaf752c16af68a621704f14516e3b969172bac438409d388a74123017
+  migration: *id002

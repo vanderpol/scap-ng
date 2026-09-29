@@ -394,7 +394,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258221r1210923_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258221r1210923_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258221r1210923_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258221r1210923_rule
     version: 1
     description: RHEL 9 must generate audit records for all account creations, modifications, disabling, and termination events
@@ -480,6 +494,34 @@ rule:
           predicates: []
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:281158:
+          source_definition_id: oval:mil.disa.stig.defs:def:281158
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit 32-bit invocations of /etc/security/opasswd
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:28115800
+            - comment: Audit 64-bit invocations of /etc/security/opasswd
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:28115801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must generate audit records for all account creations, modifications, disabling,
+                and termination events that affect /etc/security/opasswd.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258221:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258221
           class: compliance
@@ -520,34 +562,6 @@ rule:
                 SRG-OS-000476-GPOS-00221'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:281158:
-          source_definition_id: oval:mil.disa.stig.defs:def:281158
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit 32-bit invocations of /etc/security/opasswd
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:28115800
-            - comment: Audit 64-bit invocations of /etc/security/opasswd
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:28115801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must generate audit records for all account creations, modifications, disabling,
-                and termination events that affect /etc/security/opasswd.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258221
@@ -559,16 +573,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258221
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258221
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258221
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -660,11 +680,138 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258221r1210923_rule
-      semantic_ir_sha256: f8f793d197e77755c40a331db744169af85d2f5f8eba7ebc077ea2cb21e02092
+      semantic_ir_sha256: e8cfc7f2706ba4fa72f9aa641dae134217a378572af1b60340c47d5b902362f3
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: aa7dc78ed104ce47a3f0746818e31ae3e789db30f6f35a44cd6c6aa782390ef4
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258221r1210923_rule
+    version: 1
+    description: RHEL 9 must generate audit records for all account creations, modifications, disabling, and termination events
+      that affect /etc/opasswd.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:84101
+      exports: []
+      inline_content: 'Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination
+        events that affect "/etc/security/opasswd" with the following command: $ sudo auditctl -l | egrep ''(/etc/security/opasswd)''
+        -a always,exit -F arch=b32 -F path=/etc/security/opasswd -F perm=wa -k identity -a always,exit -F arch=b64 -F path=/etc/security/opasswd
+        -F perm=wa -k identity If the command does not return a line, or the line is commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:84101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination\
+            \ events that affect \"/etc/security/opasswd\" with the following command:\n\n$ sudo auditctl -l | egrep '(/etc/security/opasswd)'\
+            \ \n-a always,exit -F arch=b32 -F path=/etc/security/opasswd -F perm=wa -k identity\n-a always,exit -F arch=b64\
+            \ -F path=/etc/security/opasswd -F perm=wa -k identity\n\nIf the command does not return a line, or the line is\
+            \ commented out, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258221
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258221
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258221
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258221
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:84101
+        exports: []
+        inline_content: 'Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination
+          events that affect "/etc/security/opasswd" with the following command: $ sudo auditctl -l | egrep ''(/etc/security/opasswd)''
+          -a always,exit -F arch=b32 -F path=/etc/security/opasswd -F perm=wa -k identity -a always,exit -F arch=b64 -F path=/etc/security/opasswd
+          -F perm=wa -k identity If the command does not return a line, or the line is commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:84101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination\
+              \ events that affect \"/etc/security/opasswd\" with the following command:\n\n$ sudo auditctl -l | egrep '(/etc/security/opasswd)'\
+              \ \n-a always,exit -F arch=b32 -F path=/etc/security/opasswd -F perm=wa -k identity\n-a always,exit -F arch=b64\
+              \ -F path=/etc/security/opasswd -F perm=wa -k identity\n\nIf the command does not return a line, or the line\
+              \ is commented out, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 generates audit records for all account creations, modifications, disabling, and termination
+      events that affect "/etc/security/opasswd" with the following command: $ sudo auditctl -l | egrep ''(/etc/security/opasswd)''
+      -a always,exit -F arch=b32 -F path=/etc/security/opasswd -F perm=wa -k identity -a always,exit -F arch=b64 -F path=/etc/security/opasswd
+      -F perm=wa -k identity If the command does not return a line, or the line is commented out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258221r1210923_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 9f5dc507767fbf8ade6fcc88733f197ffee70109cb5df417fa2216da38de1392
+  migration: *id002

@@ -298,7 +298,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258098r1045195_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258098r1045195_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258098r1045195_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258098r1045195_rule
     version: 1
     description: RHEL 9 must ensure the password complexity module is enabled in the system-auth file.
@@ -435,16 +449,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258098
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258098
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258098
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -536,11 +556,140 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258098r1045195_rule
-      semantic_ir_sha256: dfe1b48c300ff2126dab8ae727064121ecac606a71a4981aa721653122fe32a1
+      semantic_ir_sha256: 9977f2d8a331ef290656cf4d0a3c96772ff30fa79cf43c4f9cf946f4dd3dc44f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: cc6daa19d8cdeb151eaa96c8d0973382f3b6b2849f299fa7fe24ebfffcd2593a
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258098r1045195_rule
+    version: 1
+    description: RHEL 9 must ensure the password complexity module is enabled in the system-auth file.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:60501
+      exports: []
+      inline_content: 'Verify RHEL 9 uses "pwquality" to enforce the password complexity rules in the system-auth file with
+        the following command: $ grep pam_pwquality /etc/pam.d/system-auth password required pam_pwquality.so If the command
+        does not return a line containing the value "pam_pwquality.so", or the line is commented out, this is a finding. If
+        the system administrator (SA) can demonstrate that the required configuration is contained in a PAM configuration
+        file included or substacked from the system-auth file, this is not a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:60501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify RHEL 9 uses \"pwquality\" to enforce the password complexity rules in the system-auth file with the\
+            \ following command:\n\n$ grep pam_pwquality /etc/pam.d/system-auth\n\npassword required pam_pwquality.so \n\n\
+            If the command does not return a line containing the value \"pam_pwquality.so\", or the line is commented out,\
+            \ this is a finding.\n\nIf the system administrator (SA) can demonstrate that the required configuration is contained\
+            \ in a PAM configuration file included or substacked from the system-auth file, this is not a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258098
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258098
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258098
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258098
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:60501
+        exports: []
+        inline_content: 'Verify RHEL 9 uses "pwquality" to enforce the password complexity rules in the system-auth file with
+          the following command: $ grep pam_pwquality /etc/pam.d/system-auth password required pam_pwquality.so If the command
+          does not return a line containing the value "pam_pwquality.so", or the line is commented out, this is a finding.
+          If the system administrator (SA) can demonstrate that the required configuration is contained in a PAM configuration
+          file included or substacked from the system-auth file, this is not a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:60501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify RHEL 9 uses \"pwquality\" to enforce the password complexity rules in the system-auth file with\
+              \ the following command:\n\n$ grep pam_pwquality /etc/pam.d/system-auth\n\npassword required pam_pwquality.so\
+              \ \n\nIf the command does not return a line containing the value \"pam_pwquality.so\", or the line is commented\
+              \ out, this is a finding.\n\nIf the system administrator (SA) can demonstrate that the required configuration\
+              \ is contained in a PAM configuration file included or substacked from the system-auth file, this is not a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 uses "pwquality" to enforce the password complexity rules in the system-auth file with the following
+      command: $ grep pam_pwquality /etc/pam.d/system-auth password required pam_pwquality.so If the command does not return
+      a line containing the value "pam_pwquality.so", or the line is commented out, this is a finding. If the system administrator
+      (SA) can demonstrate that the required configuration is contained in a PAM configuration file included or substacked
+      from the system-auth file, this is not a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258098r1045195_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 3220bac49c89c7b157483c20dc8431d8d8f5ebc602c4d1347568297f27ad50a3
+  migration: *id002

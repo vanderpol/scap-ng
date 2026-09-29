@@ -332,7 +332,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253364r958358_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253364r958358_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253364r958358_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253364r958358_rule
     version: 1
     description: Simultaneous connections to the internet or a Windows domain must be limited.
@@ -393,6 +407,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000003
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253364:
+          source_definition_id: oval:mil.disa.stig.defs:def:253364
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: Simultaneous connections to the internet or a Windows domain are limited
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25336400
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Simultaneous connections to the internet or a Windows domain must be limited.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253364:
           source_definition_id: oval:mil.disa.stig.windows11:def:253364
           class: compliance
@@ -428,29 +465,6 @@ rule:
                 for example, the less preferred connection (typically wireless) will be disconnected.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253364:
-          source_definition_id: oval:mil.disa.stig.defs:def:253364
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: Simultaneous connections to the internet or a Windows domain are limited
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25336400
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Simultaneous connections to the internet or a Windows domain must be limited.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253364
@@ -462,16 +476,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253364
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253364
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253364
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -575,11 +595,163 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253364r958358_rule
-      semantic_ir_sha256: 211e15106ee29e717727f6d58c75edbe0c98cebf4debadb5fb2f9265c71fb77d
+      semantic_ir_sha256: 5cb3d0049b4c51ce6ff7071fa50e169f435161a12361d75ad7665b9b60d66001
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c57262d9471be5b9b5c0b442e6f69421488187b06e07860e6ee176618da3ca4d
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253364r958358_rule
+    version: 1
+    description: Simultaneous connections to the internet or a Windows domain must be limited.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:21101
+      exports: []
+      inline_content: 'The default behavior for "Minimize the number of simultaneous connections to the Internet or a Windows
+        Domain" is "Enabled". If it exists and is configured with a value of "0", this is a finding. Registry Hive: HKEY_LOCAL_MACHINE
+        Registry Path: \SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy\ Value Name: fMinimizeConnections Value Type:
+        REG_DWORD Value: 3 (or if the Value Name does not exist)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:21101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'The default behavior for "Minimize the number of simultaneous connections to the Internet or a Windows Domain"
+            is "Enabled".
+
+
+            If it exists and is configured with a value of "0", this is a finding.
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy\
+
+
+            Value Name: fMinimizeConnections
+
+
+            Value Type: REG_DWORD
+
+            Value: 3 (or if the Value Name does not exist)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253364
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253364
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253364
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253364
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:21101
+        exports: []
+        inline_content: 'The default behavior for "Minimize the number of simultaneous connections to the Internet or a Windows
+          Domain" is "Enabled". If it exists and is configured with a value of "0", this is a finding. Registry Hive: HKEY_LOCAL_MACHINE
+          Registry Path: \SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy\ Value Name: fMinimizeConnections Value Type:
+          REG_DWORD Value: 3 (or if the Value Name does not exist)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:21101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'The default behavior for "Minimize the number of simultaneous connections to the Internet or a Windows
+              Domain" is "Enabled".
+
+
+              If it exists and is configured with a value of "0", this is a finding.
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy\
+
+
+              Value Name: fMinimizeConnections
+
+
+              Value Type: REG_DWORD
+
+              Value: 3 (or if the Value Name does not exist)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'The default behavior for "Minimize the number of simultaneous connections to the Internet or a Windows Domain"
+      is "Enabled". If it exists and is configured with a value of "0", this is a finding. Registry Hive: HKEY_LOCAL_MACHINE
+      Registry Path: \SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy\ Value Name: fMinimizeConnections Value Type:
+      REG_DWORD Value: 3 (or if the Value Name does not exist)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253364r958358_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 80621da0da1aa5ba05db65f6d56ec2c3aec93c5aeb27d4616b64cb60c51b0484
+  migration: *id002

@@ -7,25 +7,6 @@ assessment:
   description: Default permissions for the HKEY_LOCAL_MACHINE registry hive must be maintained.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '18'
-      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
-      query:
-      - kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: powershell
-      - kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
-          | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
-          $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
-          PropagationFlags: $($_.PropagationFlags)" }'
     oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101:
       capability: scapng.collect.independent.shellcommand
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101
@@ -61,6 +42,25 @@ assessment:
         name: command
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Software", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
+          | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
+          $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
+          PropagationFlags: $($_.PropagationFlags)" }'
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '18'
+      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
           | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
           $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
           PropagationFlags: $($_.PropagationFlags)" }'
@@ -114,19 +114,6 @@ assessment:
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102
         source_other: []
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101
-        source_type: shellcommand_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained.
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101
-        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102
         source_type: shellcommand_test
@@ -139,6 +126,19 @@ assessment:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25343101
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101
         source_other: []
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:253431:
@@ -183,16 +183,22 @@ assessment:
       exports: []
       href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.windows:def:253431
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253431
       exports: []
       href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
       match_count: 1
+      multi_check: null
       name: oval:navy.navwar.niwcatlantic.scc.windows:def:253431
+      negate: null
       oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -370,6 +376,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253431r958726_rule
-    semantic_ir_sha256: d6dc7a595cd4e6d8038edba429136fc26a80ee0264a300b57109ba7dd82f7909
+    semantic_ir_sha256: 98093ec47694f5c25dfda51f88c18c630cbee9e743368cb1c84690a3dc83c4a9
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 0a805ff7bd92e904bfab8a5111ed20ee9ab445849b6b214986b8dfef3db6c9c9

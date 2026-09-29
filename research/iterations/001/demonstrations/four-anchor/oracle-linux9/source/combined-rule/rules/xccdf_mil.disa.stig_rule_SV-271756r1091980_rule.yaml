@@ -284,7 +284,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271756r1091980_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271756r1091980_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271756r1091980_rule
     version: 1
     description: OL 9 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or
@@ -420,10 +430,13 @@ rule:
       present must be of type "crypto_LUKS". If any partitions other than the boot partition or pseudo file systems (such
       as /proc or /sys) or temporary file systems (that are tmpfs) are not type "crypto_LUKS", ask the administrator to indicate
       how the partitions are encrypted. If there is no evidence that these partitions are encrypted, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271756r1091980_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 749faf29760071cf52861db8d3441ed8e923d917ceb4649c521cd94cd54f2a4d
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

@@ -298,7 +298,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257945r1038944_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257945r1038944_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-257945r1038944_rule
     version: 1
     description: RHEL 9 must securely compare internal information system clocks at least every 24 hours.
@@ -424,10 +434,13 @@ rule:
       "chrony.conf" file is configured to an authoritative DOD time source by running the following command: $ sudo grep -i
       server /etc/chrony.conf server 0.us.pool.ntp.mil If the parameter "server" is not set or is not set to an authoritative
       DOD time source, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-257945r1038944_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 26d795f54c39083db46bcaac11df1fd7adc2f714e00c8829b1ee1083d412982e
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

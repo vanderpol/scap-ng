@@ -306,7 +306,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271580r1091452_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271580r1091452_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271580r1091452_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271580r1091452_rule
     version: 1
     description: OL 9 audit system must take appropriate action when the audit storage volume is full.
@@ -339,8 +353,8 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:23039200:
-        source_state_id: oval:mil.disa.stig.ind:ste:23039200
+      oval:mil.disa.stig.ind:ste:23039202:
+        source_state_id: oval:mil.disa.stig.ind:ste:23039202
         source_type: textfilecontent54_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         operator: AND
@@ -350,7 +364,7 @@ rule:
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (?i)^syslog$
+          value: (?i)^halt$
         comment: null
       oval:mil.disa.stig.ind:ste:23039201:
         source_state_id: oval:mil.disa.stig.ind:ste:23039201
@@ -365,8 +379,8 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (?i)^single$
         comment: null
-      oval:mil.disa.stig.ind:ste:23039202:
-        source_state_id: oval:mil.disa.stig.ind:ste:23039202
+      oval:mil.disa.stig.ind:ste:23039200:
+        source_state_id: oval:mil.disa.stig.ind:ste:23039200
         source_type: textfilecontent54_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         operator: AND
@@ -376,7 +390,7 @@ rule:
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (?i)^halt$
+          value: (?i)^syslog$
         comment: null
     evaluate:
       tests:
@@ -396,29 +410,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:23039202
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230392:
-          source_definition_id: oval:mil.disa.stig.defs:def:230392
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23039200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system audit system must take appropriate action when the audit storage volume is full.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271580:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271580
           class: compliance
@@ -454,6 +445,29 @@ rule:
                 failure depend upon the nature of the failure mode.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230392:
+          source_definition_id: oval:mil.disa.stig.defs:def:230392
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23039200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system audit system must take appropriate action when the audit storage volume is full.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271580
@@ -465,16 +479,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271580
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271580
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271580
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -567,11 +587,142 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271580r1091452_rule
-      semantic_ir_sha256: 92459b1cc8030e60aadfbd90ed8f9bc4aa335df9f6ec5815c747e3dfc3d5fe76
+      semantic_ir_sha256: 2a6ee7a77f5a9df28f309b839ec7e393c415376cb4cc0a5831fea930c3bae8b0
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c32e38ee0e480891fc99785f7b504588b28fafb8f00bac32a768017ee6eef9dd
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271580r1091452_rule
+    version: 1
+    description: OL 9 audit system must take appropriate action when the audit storage volume is full.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:28901
+      exports: []
+      inline_content: 'Verify that OL 9 takes the appropriate action when the audit storage volume is full. Check that OL
+        9 takes the appropriate action when the audit storage volume is full with the following command: $ sudo grep disk_full_action
+        /etc/audit/auditd.conf disk_full_action = HALT If the value of the "disk_full_action" option is not "SYSLOG", "SINGLE",
+        or "HALT", or the line is commented out, ask the system administrator (SA) to indicate how the system takes appropriate
+        action when an audit storage volume is full. If there is no evidence of appropriate action, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:28901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 takes the appropriate action when the audit storage volume is full. \n\nCheck that OL 9\
+            \ takes the appropriate action when the audit storage volume is full with the following command:\n\n$ sudo grep\
+            \ disk_full_action /etc/audit/auditd.conf\ndisk_full_action = HALT\n\nIf the value of the \"disk_full_action\"\
+            \ option is not \"SYSLOG\", \"SINGLE\", or \"HALT\", or the line is commented out, ask the system administrator\
+            \ (SA) to indicate how the system takes appropriate action when an audit storage volume is full. If there is no\
+            \ evidence of appropriate action, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271580
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271580
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271580
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271580
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:28901
+        exports: []
+        inline_content: 'Verify that OL 9 takes the appropriate action when the audit storage volume is full. Check that OL
+          9 takes the appropriate action when the audit storage volume is full with the following command: $ sudo grep disk_full_action
+          /etc/audit/auditd.conf disk_full_action = HALT If the value of the "disk_full_action" option is not "SYSLOG", "SINGLE",
+          or "HALT", or the line is commented out, ask the system administrator (SA) to indicate how the system takes appropriate
+          action when an audit storage volume is full. If there is no evidence of appropriate action, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:28901
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify that OL 9 takes the appropriate action when the audit storage volume is full. \n\nCheck that OL\
+              \ 9 takes the appropriate action when the audit storage volume is full with the following command:\n\n$ sudo\
+              \ grep disk_full_action /etc/audit/auditd.conf\ndisk_full_action = HALT\n\nIf the value of the \"disk_full_action\"\
+              \ option is not \"SYSLOG\", \"SINGLE\", or \"HALT\", or the line is commented out, ask the system administrator\
+              \ (SA) to indicate how the system takes appropriate action when an audit storage volume is full. If there is\
+              \ no evidence of appropriate action, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 takes the appropriate action when the audit storage volume is full. Check that OL 9 takes
+      the appropriate action when the audit storage volume is full with the following command: $ sudo grep disk_full_action
+      /etc/audit/auditd.conf disk_full_action = HALT If the value of the "disk_full_action" option is not "SYSLOG", "SINGLE",
+      or "HALT", or the line is commented out, ask the system administrator (SA) to indicate how the system takes appropriate
+      action when an audit storage volume is full. If there is no evidence of appropriate action, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271580r1091452_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 7143d0b3bfa979acdfcefdbbacc743a7b4e4d10ff50383f588c9ce46193af865
+  migration: *id002

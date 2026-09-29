@@ -329,7 +329,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253392r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253392r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253392r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253392r991589_rule
     version: 1
     description: Enhanced diagnostic data must be limited to the minimum required to support Windows Analytics.
@@ -406,19 +420,6 @@ rule:
         comment: Value Equal To 1
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:25339202:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25339202
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Enhanced diagnostic data must be limited to the minimum required to support Windows Analytics.
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25339202
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25339202
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:25339201:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25339201
           source_type: registry_test
@@ -431,6 +432,19 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:25339201
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:25339201
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:25339202:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25339202
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Enhanced diagnostic data must be limited to the minimum required to support Windows Analytics.
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25339202
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25339202
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:253392:
@@ -476,16 +490,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:253392
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253392
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.windows:def:253392
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -589,11 +609,163 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253392r991589_rule
-      semantic_ir_sha256: 6e9616e7d28c666d2d95eaf9bd1f0e9fa891593fe3cf5153ff2565f5551911f6
+      semantic_ir_sha256: dd51b00085c9e9adcd20e5fb1306303aaf56b7196664e09998238d3c5be48634
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 7e2145c78df83067908ec1fbde642c7cccbd2080ed7b2a19f5538429d8e2dcaf
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253392r991589_rule
+    version: 1
+    description: Enhanced diagnostic data must be limited to the minimum required to support Windows Analytics.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26301
+      exports: []
+      inline_content: 'If "Enhanced" level is enabled for telemetry, this must be configured. If "Security" or "Basic" are
+        configured, this is NA. (See WN11-CC-000205). If the following registry value does not exist or is not configured
+        as specified, this is a finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DataCollection\
+        Value Name: LimitEnhancedDiagnosticDataWindowsAnalytics Type: REG_DWORD Value: 0x00000001 (1)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'If "Enhanced" level is enabled for telemetry, this must be configured. If "Security" or "Basic" are configured,
+            this is NA. (See WN11-CC-000205).
+
+
+            If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DataCollection\
+
+
+            Value Name: LimitEnhancedDiagnosticDataWindowsAnalytics
+
+
+            Type: REG_DWORD
+
+            Value: 0x00000001 (1)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253392
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253392
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253392
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253392
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26301
+        exports: []
+        inline_content: 'If "Enhanced" level is enabled for telemetry, this must be configured. If "Security" or "Basic" are
+          configured, this is NA. (See WN11-CC-000205). If the following registry value does not exist or is not configured
+          as specified, this is a finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DataCollection\
+          Value Name: LimitEnhancedDiagnosticDataWindowsAnalytics Type: REG_DWORD Value: 0x00000001 (1)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'If "Enhanced" level is enabled for telemetry, this must be configured. If "Security" or "Basic" are configured,
+              this is NA. (See WN11-CC-000205).
+
+
+              If the following registry value does not exist or is not configured as specified, this is a finding:
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DataCollection\
+
+
+              Value Name: LimitEnhancedDiagnosticDataWindowsAnalytics
+
+
+              Type: REG_DWORD
+
+              Value: 0x00000001 (1)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'If "Enhanced" level is enabled for telemetry, this must be configured. If "Security" or "Basic" are configured,
+      this is NA. (See WN11-CC-000205). If the following registry value does not exist or is not configured as specified,
+      this is a finding: Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DataCollection\
+      Value Name: LimitEnhancedDiagnosticDataWindowsAnalytics Type: REG_DWORD Value: 0x00000001 (1)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253392r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 80e38822b055b99f845f3821e7a22678cba75812ec98838066149cf449c35aa8
+  migration: *id002

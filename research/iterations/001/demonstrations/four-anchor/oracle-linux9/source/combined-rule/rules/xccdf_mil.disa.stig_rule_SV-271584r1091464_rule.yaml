@@ -313,12 +313,44 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271584r1091464_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271584r1091464_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271584r1091464_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271584r1091464_rule
     version: 1
     description: OL 9 audit log directory must be owned by root to prevent unauthorized read access.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.unix:obj:23040100:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:23040100
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '1'
+        comment: Audit log directory
+        query:
+        - attributes:
+            var_ref: oval:mil.disa.stig.defs:var:23029400
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       oval:mil.disa.stig.ind:obj:23029402:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23029402
@@ -350,24 +382,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.unix:obj:23040100:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:23040100
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '1'
-        comment: Audit log directory
-        query:
-        - attributes:
-            var_ref: oval:mil.disa.stig.defs:var:23029400
-          kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     derive:
       oval:mil.disa.stig.defs:var:23029400:
         source_variable_id: oval:mil.disa.stig.defs:var:23029400
@@ -440,6 +454,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000005
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230399:
+          source_definition_id: oval:mil.disa.stig.defs:def:230399
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: audit log directories are owned by root
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23039900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system audit log directory must be owned by root to prevent unauthorized read access.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271584:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271584
           class: compliance
@@ -474,29 +511,6 @@ rule:
                 \ SRG-OS-000206-GPOS-00084"
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230399:
-          source_definition_id: oval:mil.disa.stig.defs:def:230399
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: audit log directories are owned by root
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23039900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system audit log directory must be owned by root to prevent unauthorized read access.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271584
@@ -508,16 +522,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271584
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271584
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271584
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -609,11 +629,140 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271584r1091464_rule
-      semantic_ir_sha256: 998e10c4111c96503ccd20867e1881fca8c69eba04459edfcbec2add9f69ff4c
+      semantic_ir_sha256: 4a340f06861c009f416999edde9953e768339fac13df68d77c31a23590e61236
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: e8442a611e72980c4f24d08e3431e8a00605b78a5ae7231e6da178028e11b676
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271584r1091464_rule
+    version: 1
+    description: OL 9 audit log directory must be owned by root to prevent unauthorized read access.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29701
+      exports: []
+      inline_content: 'Verify that OL 9 audit logs directory is owned by "root". First determine where the audit logs are
+        stored with the following command: $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log
+        Then using the location of the audit log file, determine if the audit log directory is owned by "root" using the following
+        command: $ sudo ls -ld /var/log/audit drwx------ 2 root root 23 Jun 11 11:56 /var/log/audit If the audit log directory
+        is not owned by "root", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 audit logs directory is owned by \"root\". \n\nFirst determine where the audit logs are\
+            \ stored with the following command:\n\n$ sudo grep -iw log_file /etc/audit/auditd.conf\nlog_file = /var/log/audit/audit.log\n\
+            \nThen using the location of the audit log file, determine if the audit log directory is owned by \"root\" using\
+            \ the following command:\n\n$ sudo ls -ld /var/log/audit\ndrwx------ 2 root root 23 Jun 11 11:56 /var/log/audit\n\
+            \nIf the audit log directory is not owned by \"root\", this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271584
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271584
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271584
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271584
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29701
+        exports: []
+        inline_content: 'Verify that OL 9 audit logs directory is owned by "root". First determine where the audit logs are
+          stored with the following command: $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log
+          Then using the location of the audit log file, determine if the audit log directory is owned by "root" using the
+          following command: $ sudo ls -ld /var/log/audit drwx------ 2 root root 23 Jun 11 11:56 /var/log/audit If the audit
+          log directory is not owned by "root", this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify that OL 9 audit logs directory is owned by \"root\". \n\nFirst determine where the audit logs are\
+              \ stored with the following command:\n\n$ sudo grep -iw log_file /etc/audit/auditd.conf\nlog_file = /var/log/audit/audit.log\n\
+              \nThen using the location of the audit log file, determine if the audit log directory is owned by \"root\" using\
+              \ the following command:\n\n$ sudo ls -ld /var/log/audit\ndrwx------ 2 root root 23 Jun 11 11:56 /var/log/audit\n\
+              \nIf the audit log directory is not owned by \"root\", this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 audit logs directory is owned by "root". First determine where the audit logs are stored
+      with the following command: $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Then
+      using the location of the audit log file, determine if the audit log directory is owned by "root" using the following
+      command: $ sudo ls -ld /var/log/audit drwx------ 2 root root 23 Jun 11 11:56 /var/log/audit If the audit log directory
+      is not owned by "root", this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271584r1091464_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: fb4ba411f198133055c880683d2ca58f3e0f360cd3cd71d657226b3228b9b56f
+  migration: *id002

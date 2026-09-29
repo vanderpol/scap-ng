@@ -267,7 +267,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271676r1091740_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271676r1091740_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271676r1091740_rule
     version: 1
     description: OL 9 must conceal, via the session lock, information previously visible on the display with a publicly viewable
@@ -396,10 +406,13 @@ rule:
       picture-uri If properly configured, the output should be "''''". To ensure that users cannot set the screensaver background,
       run the following: $ grep picture-uri /etc/dconf/db/local.d/locks/* If properly configured, the output should be "/org/gnome/desktop/screensaver/picture-uri".
       If it is not set or configured properly, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271676r1091740_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: 04e0376c9435e1a55fe8d8bb223e5f0d239f8169b2c3ca5efe01795966f99f22
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

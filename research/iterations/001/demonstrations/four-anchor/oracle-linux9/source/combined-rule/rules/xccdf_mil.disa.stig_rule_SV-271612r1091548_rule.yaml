@@ -301,7 +301,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271612r1091548_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-271612r1091548_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271612r1091548_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271612r1091548_rule
     version: 1
     description: OL 9 must ensure the password complexity module in the system-auth file is configured for three retries or
@@ -365,30 +379,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000018
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:251714:
-          source_definition_id: oval:mil.disa.stig.defs:def:251714
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /etc/pam.d/system-auth:retry not greater than 3 and not 0
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25171400
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured
-                for three retries or less.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271612:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271612
           class: compliance
@@ -428,6 +418,30 @@ rule:
                 \ with an error, the system will audit abnormal attempts at password changes."
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:251714:
+          source_definition_id: oval:mil.disa.stig.defs:def:251714
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /etc/pam.d/system-auth:retry not greater than 3 and not 0
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25171400
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured
+                for three retries or less.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.ol9os:def:271612
@@ -439,16 +453,22 @@ rule:
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271612
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.ol9os:def:271612
         exports: []
         href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.ol9os:def:271612
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -538,11 +558,136 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271612r1091548_rule
-      semantic_ir_sha256: 5f4c810fd127016ad0a07a447c60ac6594090fa719e375a75af9fc3dce36039f
+      semantic_ir_sha256: 0a69be8f65eb9ef6fe830bc14e0e546e8cfef2fb49550592fd2f2a3d5d8588e7
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 962b51a2205f2d4e5f5cef540101ee7656724db433c85cf335e8bc1e6449925f
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271612r1091548_rule
+    version: 1
+    description: OL 9 must ensure the password complexity module in the system-auth file is configured for three retries or
+      less.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:35301
+      exports: []
+      inline_content: 'Verify that OL 9 is configured to limit the "pwquality" retry option to "3". Check for the use of the
+        "pwquality" retry option in the system-auth file with the following command: $ grep pam_pwquality /etc/pam.d/system-auth
+        password required pam_pwquality.so retry=3 If the value of "retry" is set to "0" or greater than "3", or is missing,
+        this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:35301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 is configured to limit the \"pwquality\" retry option to \"3\". \n\nCheck for the use of\
+            \ the \"pwquality\" retry option in the system-auth file with the following command:\n\n$ grep pam_pwquality /etc/pam.d/system-auth\
+            \ \npassword required pam_pwquality.so retry=3\n\nIf the value of \"retry\" is set to \"0\" or greater than \"\
+            3\", or is missing, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271612
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271612
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+          name: oval:mil.disa.stig.ol9os:def:271612
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+              name: oval:mil.disa.stig.ol9os:def:271612
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:35301
+        exports: []
+        inline_content: 'Verify that OL 9 is configured to limit the "pwquality" retry option to "3". Check for the use of
+          the "pwquality" retry option in the system-auth file with the following command: $ grep pam_pwquality /etc/pam.d/system-auth
+          password required pam_pwquality.so retry=3 If the value of "retry" is set to "0" or greater than "3", or is missing,
+          this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:35301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: "Verify that OL 9 is configured to limit the \"pwquality\" retry option to \"3\". \n\nCheck for the use\
+              \ of the \"pwquality\" retry option in the system-auth file with the following command:\n\n$ grep pam_pwquality\
+              \ /etc/pam.d/system-auth \npassword required pam_pwquality.so retry=3\n\nIf the value of \"retry\" is set to\
+              \ \"0\" or greater than \"3\", or is missing, this is a finding."
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that OL 9 is configured to limit the "pwquality" retry option to "3". Check for the use of the "pwquality"
+      retry option in the system-auth file with the following command: $ grep pam_pwquality /etc/pam.d/system-auth password
+      required pam_pwquality.so retry=3 If the value of "retry" is set to "0" or greater than "3", or is missing, this is
+      a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-271612r1091548_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 4a76b55ee8654aa99c976fbacbf9b854fb33b79c2deb90bd1d791ce790f226e1
+  migration: *id002

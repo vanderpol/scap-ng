@@ -230,7 +230,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-288475r1256669_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-288475r1256669_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-288475r1256669_rule
     version: 1
     description: All Wi-Fi Direct adapters must be disabled on the system.
@@ -346,10 +356,13 @@ rule:
       (run as administrator). Enter the following command: Get-NetAdapter -InterfaceDescription "Microsoft Wi-Fi Direct*"
       -IncludeHidden If there are no Wi-Fi Direct adapters configured on the system, no adapter information will display.
       If any Wi-Fi Direct adapters are listed, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-288475r1256669_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: a4bfefce8474ad52a9764459d585fd96e41979f36145625e32671da0c262bf3b
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

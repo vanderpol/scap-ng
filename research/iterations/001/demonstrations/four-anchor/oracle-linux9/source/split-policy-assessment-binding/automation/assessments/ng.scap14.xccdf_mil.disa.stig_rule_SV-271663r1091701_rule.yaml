@@ -7,6 +7,18 @@ assessment:
   description: OL 9 must mount /var/tmp with the nodev option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.linux:obj:23052000:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23052000
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /var/tmp
     oval:mil.disa.stig.ind:obj:23052001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23052001
@@ -31,33 +43,8 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.linux:obj:23052000:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23052000
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /var/tmp
   derive: {}
   predicates:
-    oval:mil.disa.stig.linux:ste:20000001:
-      source_state_id: oval:mil.disa.stig.linux:ste:20000001
-      source_type: partition_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      operator: AND
-      entities:
-      - attributes:
-          entity_check: at least one
-        kind: element
-        name: mount_options
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: nodev
-      comment: null
     oval:mil.disa.stig.ind:ste:23052000:
       source_state_id: oval:mil.disa.stig.ind:ste:23052000
       source_type: textfilecontent54_state
@@ -70,6 +57,19 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
+      comment: null
+    oval:mil.disa.stig.linux:ste:20000001:
+      source_state_id: oval:mil.disa.stig.linux:ste:20000001
+      source_type: partition_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      operator: AND
+      entities:
+      - attributes:
+          entity_check: at least one
+        kind: element
+        name: mount_options
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: nodev
       comment: null
   evaluate:
     tests:
@@ -173,16 +173,22 @@ assessment:
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271663
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.ol9os:def:271663
       exports: []
       href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.ol9os:def:271663
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
@@ -283,6 +289,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271663r1091701_rule
-    semantic_ir_sha256: 270a8e2ece1808276d4772d25e2fb0211f1bf3a7a7f1dabcecbf648395a9b2bb
+    semantic_ir_sha256: 55c2e0a22e7ff399106875e0c16393daacbfa95fc477cde7d396b4ec13282b4b
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 8ab29b83ed6648c8fa90cda72ced8cc3ac65f6ffe52b085c3ea57fee5a9f9983

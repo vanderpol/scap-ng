@@ -40,20 +40,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23026400:
-      source_state_id: oval:mil.disa.stig.ind:ste:23026400
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
-      comment: null
     oval:mil.disa.stig.ind:ste:23026401:
       source_state_id: oval:mil.disa.stig.ind:ste:23026401
       source_type: textfilecontent54_state
@@ -68,21 +54,22 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: \n\s*gpgcheck\s*=\s*(False|0|no)\s*(\n|$)
       comment: null
+    oval:mil.disa.stig.ind:ste:23026400:
+      source_state_id: oval:mil.disa.stig.ind:ste:23026400
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
+      comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23026401:
-        source_test_id: oval:mil.disa.stig.ind:tst:23026401
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 0.
-        check: none satisfy
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23026400
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23026401
-        source_other: []
       oval:mil.disa.stig.ind:tst:23026400:
         source_test_id: oval:mil.disa.stig.ind:tst:23026400
         source_type: textfilecontent54_test
@@ -95,6 +82,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23026400
         predicates:
         - oval:mil.disa.stig.ind:ste:23026400
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23026401:
+        source_test_id: oval:mil.disa.stig.ind:tst:23026401
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 0.
+        check: none satisfy
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23026400
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23026401
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:230264:
@@ -179,16 +179,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257822
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:257822
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:257822
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -293,6 +299,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257822r1155615_rule
-    semantic_ir_sha256: 265462ea2a7ed146b86c6461d2184586d985265bcd0f032ae3e327ef65ec6f3f
+    semantic_ir_sha256: ef7bf84792d4097d6d653e0c294a80549b7f9664ba758907e485d5387aac7574
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: b9fa269c55a6983ffbe22775829100f943480c74e036926b5455aed2613e7f32

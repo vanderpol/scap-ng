@@ -7,24 +7,30 @@ assessment:
   description: RHEL 9 must limit the number of concurrent sessions to ten for all accounts and/or account types.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23034604:
+    oval:mil.disa.stig.ind:obj:23034602:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23034604
+      source_object_id: oval:mil.disa.stig.ind:obj:23034602
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: non-default maxlogins in /etc/security/limits.conf
+      comment: default maxlogins in /etc/security/limits.d/*.conf
       query:
       - kind: element
-        name: filepath
+        name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/security/limits.conf
+        value: /etc/security/limits.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*\.conf$
       - attributes:
           operation: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+        value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -74,13 +80,13 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-    oval:mil.disa.stig.ind:obj:23034601:
+    oval:mil.disa.stig.ind:obj:23034604:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23034601
+      source_object_id: oval:mil.disa.stig.ind:obj:23034604
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: default maxlogins in /etc/security/limits.conf
+      comment: non-default maxlogins in /etc/security/limits.conf
       query:
       - kind: element
         name: filepath
@@ -91,38 +97,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23034602:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23034602
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: default maxlogins in /etc/security/limits.d/*.conf
-      query:
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/security/limits.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: .*\.conf$
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+        value: ^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -161,6 +136,31 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23034601:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23034601
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: default maxlogins in /etc/security/limits.conf
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/security/limits.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:23034600:
@@ -179,19 +179,6 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23034601:
-        source_test_id: oval:mil.disa.stig.ind:tst:23034601
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23034603
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23034600
-        source_other: []
       oval:mil.disa.stig.ind:tst:23034600:
         source_test_id: oval:mil.disa.stig.ind:tst:23034600
         source_type: textfilecontent54_test
@@ -205,7 +192,48 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:23034600
         source_other: []
+      oval:mil.disa.stig.ind:tst:23034601:
+        source_test_id: oval:mil.disa.stig.ind:tst:23034601
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23034603
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23034600
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230346:
+        source_definition_id: oval:mil.disa.stig.defs:def:230346
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23034600
+          - comment: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23034601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must limit the number of concurrent sessions to ten for all accounts and/or account
+              types.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258069:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258069
         class: compliance
@@ -246,34 +274,6 @@ assessment:
               based on mission needs and the operational environment for each system.'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230346:
-        source_definition_id: oval:mil.disa.stig.defs:def:230346
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23034600
-          - comment: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23034601
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must limit the number of concurrent sessions to ten for all accounts and/or account
-              types.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
     definition_results:
     - oval:mil.disa.stig.rhel9os:def:258069
@@ -285,16 +285,22 @@ assessment:
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258069
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     - definition_id: oval:mil.disa.stig.rhel9os:def:258069
       exports: []
       href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
       match_count: 1
+      multi_check: null
       name: oval:mil.disa.stig.rhel9os:def:258069
+      negate: null
       oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
       status: resolved
       system: http://oval.mitre.org/XMLSchema/oval-definitions-5
     component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -402,6 +408,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258069r958398_rule
-    semantic_ir_sha256: 18718b8c74cfb04d53777412d039ebdbe4824c4631fed6e6a3e4e65400563702
+    semantic_ir_sha256: ce4864fd9f794b08be5bd56f759294fd65550c8a4c66a9eae00c59096fbb4073
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 293671eed90b6b6ce5f620eddef7a51e9fdb21a2a509289344db9178704b8ee3

@@ -250,7 +250,17 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271606r1091530_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271606r1091530_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.manual.xccdf_mil.disa.stig_rule_SV-271606r1091530_rule
     version: 1
     description: OL 9 must map the authenticated identity to the user or group account for PKI-based authentication.
@@ -371,10 +381,13 @@ rule:
       matchrule =<SAN>.*EDIPI@mil maprule = (userCertificate;binary={cert!bin}) domains = testing.test If the certmap section
       does not exist, ask the system administrator (SA) to indicate how certificates are mapped to accounts. If there is no
       evidence of certificate mapping, this is a finding.'
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 XCCDF manual/external check
       source_rule: xccdf_mil.disa.stig_rule_SV-271606r1091530_rule
-      note: The source check reference is preserved. Dedicated OCIL questionnaire lowering is a separate conversion layer.
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
     semantic_fingerprint_sha256: f8a06e6267e6a171b8e4c34cfd451cd6bcdf2f340af90e83a0f0fb5ba679f0f8
-  migration: *id001
+  assessments:
+  - *id001
+  migration: *id002

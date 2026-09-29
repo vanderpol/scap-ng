@@ -6,8 +6,22 @@ rule:
   check: 'Verify that RHEL 9 is configured to audit the execution of the "unix_chkpwd" command with the following command:
     $ sudo auditctl -l | grep unix_chkpwd -a always,exit -S all -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>=1000 -F auid!=-1
     -F key=privileged-unix-update If the command does not return a line, or the line is commented out, this is a finding.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258206r1045403_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258206r1045403_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258206r1045403_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
   cluster_id: null
   conflicts: []
+  default_check: default
   description: '<VulnDiscussion>Without generating audit record specific to the security and mission needs of the organization,
     it would be difficult to establish, correlate, and investigate the events relating to an incident or identify those responsible
     for one. Audit records can be generated from various components within the information system (e.g., module or policy
@@ -372,7 +386,7 @@ rule:
   weight: '10.0'
 migration:
   note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_ir_sha256: 44b104eee81a7682536d3a145c2f5a0697c47551dc63307940a5f449fa2e6334
+  semantic_ir_sha256: 65b43a8ee35a51eee9ca1081674e12fb357eba3e8f8c3d782d7ce52f73efe314
   source: SCAP 1.4 / OVAL 5.12.3
   source_rule: xccdf_mil.disa.stig_rule_SV-258206r1045403_rule
   status: legacy_compatible

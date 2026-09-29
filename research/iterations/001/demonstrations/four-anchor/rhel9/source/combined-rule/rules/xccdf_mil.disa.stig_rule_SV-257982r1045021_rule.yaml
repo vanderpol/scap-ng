@@ -333,37 +333,47 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257982r1045021_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257982r1045021_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257982r1045021_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257982r1045021_rule
     version: 1
     description: RHEL 9 must log SSH connection attempts and failures to the server.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23481500:
+      oval:mil.disa.stig.ind:obj:23481502:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23481500
+        source_object_id: oval:mil.disa.stig.ind:obj:23481502
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Pull value of /etc/ssh/sshd_config:LogLevel
+        comment: all sshd_config and sshd_config.d/* files
         query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23481500
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23481501
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
       oval:mil.disa.stig.ind:obj:23481501:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23481501
@@ -395,27 +405,31 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23481502:
+      oval:mil.disa.stig.ind:obj:23481500:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23481502
+        source_object_id: oval:mil.disa.stig.ind:obj:23481500
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: all sshd_config and sshd_config.d/* files
+        comment: Pull value of /etc/ssh/sshd_config:LogLevel
         query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23481500
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23481501
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23481500:
@@ -519,16 +533,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257982
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257982
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257982
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -628,11 +648,155 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257982r1045021_rule
-      semantic_ir_sha256: e0bac87ea3fc5c61ace8363fd10d73bc555a2d0c3140bbca15b08c49ec096727
+      semantic_ir_sha256: e187d4b3edc9bb0475229794ff3d442ba97df7eb028d2f6cf37281e0774a9e98
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: ce557fb9637e0cc9a84b5be67065a41b202f0d14fa5d7f70cd091a592b4d6990
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257982r1045021_rule
+    version: 1
+    description: RHEL 9 must log SSH connection attempts and failures to the server.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40101
+      exports: []
+      inline_content: 'Verify that RHEL 9 logs SSH connection attempts and failures to the server. Check what the SSH daemon''s
+        "LogLevel" option is set to with the following command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}''
+        | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*loglevel'' LogLevel VERBOSE If a value of "VERBOSE" is
+        not returned or the line is commented out or missing, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that RHEL 9 logs SSH connection attempts and failures to the server.
+
+
+            Check what the SSH daemon''s "LogLevel" option is set to with the following command:
+
+
+            $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep
+            -iH ''^\s*loglevel''
+
+
+            LogLevel VERBOSE
+
+
+            If a value of "VERBOSE" is not returned or the line is commented out or missing, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257982
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257982
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257982
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257982
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40101
+        exports: []
+        inline_content: 'Verify that RHEL 9 logs SSH connection attempts and failures to the server. Check what the SSH daemon''s
+          "LogLevel" option is set to with the following command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print
+          $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*loglevel'' LogLevel VERBOSE If a value of "VERBOSE"
+          is not returned or the line is commented out or missing, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that RHEL 9 logs SSH connection attempts and failures to the server.
+
+
+              Check what the SSH daemon''s "LogLevel" option is set to with the following command:
+
+
+              $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+              grep -iH ''^\s*loglevel''
+
+
+              LogLevel VERBOSE
+
+
+              If a value of "VERBOSE" is not returned or the line is commented out or missing, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that RHEL 9 logs SSH connection attempts and failures to the server. Check what the SSH daemon''s "LogLevel"
+      option is set to with the following command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d
+      ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH ''^\s*loglevel'' LogLevel VERBOSE If a value of "VERBOSE" is not returned
+      or the line is commented out or missing, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257982r1045021_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 29e4ac0004040a7b133e92d9a233de53e248c819ba2c673d4ed7416fa1b12ea5
+  migration: *id002

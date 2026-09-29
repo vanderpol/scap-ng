@@ -307,24 +307,26 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257861r1044941_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257861r1044941_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257861r1044941_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257861r1044941_rule
     version: 1
     description: RHEL 9 must prevent files with the setuid and setgid bit set from being executed on the /boot directory.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:23030000:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23030000
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /boot
       oval:mil.disa.stig.ind:obj:23030001:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23030001
@@ -349,6 +351,18 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.linux:obj:23030000:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23030000
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /boot
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:2303001:
@@ -484,16 +498,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257861
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257861
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257861
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -588,11 +608,144 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257861r1044941_rule
-      semantic_ir_sha256: 466c0acd1657859f74935b0ac2047e85e6d8af669a767738d83c2be624952760
+      semantic_ir_sha256: c47066f641e9b308cc26de65d9acba1a7519f4ff9d3347d7d1a35608cef6119a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: ee4b16e1034d3290e7c39bd199c19878eab32afd214dbc2db0b90cd6ca9caf30
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257861r1044941_rule
+    version: 1
+    description: RHEL 9 must prevent files with the setuid and setgid bit set from being executed on the /boot directory.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:16501
+      exports: []
+      inline_content: 'Verify the /boot directory is mounted with the "nosuid" option with the following command: $ mount
+        | grep ''\s/boot\s'' /dev/sda1 on /boot type xfs (rw,nosuid,relatime,seclabe,attr2,inode64,noquota) If the /boot file
+        system does not have the "nosuid" option set, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:16501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the /boot directory is mounted with the "nosuid" option with the following command:
+
+
+            $ mount | grep ''\s/boot\s''
+
+
+            /dev/sda1 on /boot type xfs (rw,nosuid,relatime,seclabe,attr2,inode64,noquota)
+
+
+            If the /boot file system does not have the "nosuid" option set, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257861
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257861
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257861
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257861
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:16501
+        exports: []
+        inline_content: 'Verify the /boot directory is mounted with the "nosuid" option with the following command: $ mount
+          | grep ''\s/boot\s'' /dev/sda1 on /boot type xfs (rw,nosuid,relatime,seclabe,attr2,inode64,noquota) If the /boot
+          file system does not have the "nosuid" option set, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:16501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the /boot directory is mounted with the "nosuid" option with the following command:
+
+
+              $ mount | grep ''\s/boot\s''
+
+
+              /dev/sda1 on /boot type xfs (rw,nosuid,relatime,seclabe,attr2,inode64,noquota)
+
+
+              If the /boot file system does not have the "nosuid" option set, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the /boot directory is mounted with the "nosuid" option with the following command: $ mount | grep
+      ''\s/boot\s'' /dev/sda1 on /boot type xfs (rw,nosuid,relatime,seclabe,attr2,inode64,noquota) If the /boot file system
+      does not have the "nosuid" option set, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257861r1044941_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: bc81cdb3211d0a977436a93070ca34eb13f2ea774059d18af273d655611f81c4
+  migration: *id002

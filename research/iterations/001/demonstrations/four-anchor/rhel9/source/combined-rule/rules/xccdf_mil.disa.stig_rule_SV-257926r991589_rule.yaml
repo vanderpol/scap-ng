@@ -341,7 +341,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257926r991589_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257926r991589_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257926r991589_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257926r991589_rule
     version: 1
     description: RHEL 9 cron configuration files directory must be owned by root.
@@ -428,6 +442,33 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000005
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:257926:
+          source_definition_id: oval:mil.disa.stig.defs:def:257926
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /etc/cron* files owned by root
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:25792600
+            - comment: /etc/cron* directories owned by root
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:25792601
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system cron configuration files directory must be owned by root.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257926:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257926
           class: compliance
@@ -462,33 +503,6 @@ rule:
                 be owned by the correct group to prevent unauthorized changes.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:257926:
-          source_definition_id: oval:mil.disa.stig.defs:def:257926
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /etc/cron* files owned by root
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:25792600
-            - comment: /etc/cron* directories owned by root
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:25792601
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system cron configuration files directory must be owned by root.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:257926
@@ -500,16 +514,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257926
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:257926
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:257926
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -616,11 +636,168 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257926r991589_rule
-      semantic_ir_sha256: e1c7e9fd0aa3ec7699e29d8bdf8ab9a5fce193a2e8058a1e513118e6d41d0b22
+      semantic_ir_sha256: 4dabf7bf53d925a65729bd4dc1a08ae74febfa31b621ba6495d82a68aa77e213
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 764b84cbecd5c087f81044bbf3e1172ab6345fe9bd56709cf0cd9e472ea86e20
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257926r991589_rule
+    version: 1
+    description: RHEL 9 cron configuration files directory must be owned by root.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:29501
+      exports: []
+      inline_content: 'Verify the ownership of all cron configuration files with the command: $ stat -c "%U %n" /etc/cron*
+        root /etc/cron.d root /etc/cron.daily root /etc/cron.deny root /etc/cron.hourly root /etc/cron.monthly root /etc/crontab
+        root /etc/cron.weekly If any crontab is not owned by root, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:29501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the ownership of all cron configuration files with the command:
+
+
+            $ stat -c "%U %n" /etc/cron*
+
+
+            root /etc/cron.d
+
+            root /etc/cron.daily
+
+            root /etc/cron.deny
+
+            root /etc/cron.hourly
+
+            root /etc/cron.monthly
+
+            root /etc/crontab
+
+            root /etc/cron.weekly
+
+
+            If any crontab is not owned by root, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257926
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257926
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257926
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:257926
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:29501
+        exports: []
+        inline_content: 'Verify the ownership of all cron configuration files with the command: $ stat -c "%U %n" /etc/cron*
+          root /etc/cron.d root /etc/cron.daily root /etc/cron.deny root /etc/cron.hourly root /etc/cron.monthly root /etc/crontab
+          root /etc/cron.weekly If any crontab is not owned by root, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:29501
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the ownership of all cron configuration files with the command:
+
+
+              $ stat -c "%U %n" /etc/cron*
+
+
+              root /etc/cron.d
+
+              root /etc/cron.daily
+
+              root /etc/cron.deny
+
+              root /etc/cron.hourly
+
+              root /etc/cron.monthly
+
+              root /etc/crontab
+
+              root /etc/cron.weekly
+
+
+              If any crontab is not owned by root, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the ownership of all cron configuration files with the command: $ stat -c "%U %n" /etc/cron* root /etc/cron.d
+      root /etc/cron.daily root /etc/cron.deny root /etc/cron.hourly root /etc/cron.monthly root /etc/crontab root /etc/cron.weekly
+      If any crontab is not owned by root, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257926r991589_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 7c6ebdbdbc3d0a442a9caec2c7bd84c5890972b6aa549c38e5184649193dc2bc
+  migration: *id002

@@ -360,7 +360,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258163r958424_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258163r958424_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258163r958424_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258163r958424_rule
     version: 1
     description: RHEL 9 System Administrator (SA) and/or information system security officer (ISSO) (at a minimum) must be
@@ -423,6 +437,30 @@ rule:
           - oval:mil.disa.stig.ind:ste:23038800
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230388:
+          source_definition_id: oval:mil.disa.stig.defs:def:230388
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: '/etc/audit/auditd.conf: action_mail_acct = root'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23038800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum)
+                must be alerted of an audit processing failure event.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258163:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258163
           class: compliance
@@ -470,30 +508,6 @@ rule:
                 Satisfies: SRG-OS-000046-GPOS-00022, SRG-OS-000343-GPOS-00134'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230388:
-          source_definition_id: oval:mil.disa.stig.defs:def:230388
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: '/etc/audit/auditd.conf: action_mail_acct = root'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23038800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum)
-                must be alerted of an audit processing failure event.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258163
@@ -505,16 +519,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258163
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258163
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258163
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -617,11 +637,162 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258163r958424_rule
-      semantic_ir_sha256: 9404ddc7b5467d6e89b0e210581cb52c158d9ae7846b9094f9f328ab2cebf2d4
+      semantic_ir_sha256: 5f39ce2c75442958611c2f985d9bbb34394c5e4d53702fb3f0c7c3c63aa23f79
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 7e1bdaea1413d4267c2ad8993175c7319a92315dcfbd0fedd8fa514d9793097f
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258163r958424_rule
+    version: 1
+    description: RHEL 9 System Administrator (SA) and/or information system security officer (ISSO) (at a minimum) must be
+      alerted of an audit processing failure event.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:72701
+      exports: []
+      inline_content: 'Verify that RHEL 9 is configured to notify the SA and/or ISSO (at a minimum) in the event of an audit
+        processing failure with the following command: $ sudo grep action_mail_acct /etc/audit/auditd.conf action_mail_acct
+        = root If the value of the "action_mail_acct" keyword is not set to "root" and/or other accounts for security personnel,
+        the "action_mail_acct" keyword is missing, or the retuned line is commented out, ask the SA to indicate how they and
+        the ISSO are notified of an audit process failure. If there is no evidence of the proper personnel being notified
+        of an audit processing failure, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:72701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that RHEL 9 is configured to notify the SA and/or ISSO (at a minimum) in the event of an audit processing
+            failure with the following command:
+
+
+            $ sudo grep action_mail_acct /etc/audit/auditd.conf
+
+
+            action_mail_acct = root
+
+
+            If the value of the "action_mail_acct" keyword is not set to "root" and/or other accounts for security personnel,
+            the "action_mail_acct" keyword is missing, or the retuned line is commented out, ask the SA to indicate how they
+            and the ISSO are notified of an audit process failure. If there is no evidence of the proper personnel being notified
+            of an audit processing failure, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258163
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258163
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258163
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258163
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:72701
+        exports: []
+        inline_content: 'Verify that RHEL 9 is configured to notify the SA and/or ISSO (at a minimum) in the event of an audit
+          processing failure with the following command: $ sudo grep action_mail_acct /etc/audit/auditd.conf action_mail_acct
+          = root If the value of the "action_mail_acct" keyword is not set to "root" and/or other accounts for security personnel,
+          the "action_mail_acct" keyword is missing, or the retuned line is commented out, ask the SA to indicate how they
+          and the ISSO are notified of an audit process failure. If there is no evidence of the proper personnel being notified
+          of an audit processing failure, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:72701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that RHEL 9 is configured to notify the SA and/or ISSO (at a minimum) in the event of an audit processing
+              failure with the following command:
+
+
+              $ sudo grep action_mail_acct /etc/audit/auditd.conf
+
+
+              action_mail_acct = root
+
+
+              If the value of the "action_mail_acct" keyword is not set to "root" and/or other accounts for security personnel,
+              the "action_mail_acct" keyword is missing, or the retuned line is commented out, ask the SA to indicate how
+              they and the ISSO are notified of an audit process failure. If there is no evidence of the proper personnel
+              being notified of an audit processing failure, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that RHEL 9 is configured to notify the SA and/or ISSO (at a minimum) in the event of an audit processing
+      failure with the following command: $ sudo grep action_mail_acct /etc/audit/auditd.conf action_mail_acct = root If the
+      value of the "action_mail_acct" keyword is not set to "root" and/or other accounts for security personnel, the "action_mail_acct"
+      keyword is missing, or the retuned line is commented out, ask the SA to indicate how they and the ISSO are notified
+      of an audit process failure. If there is no evidence of the proper personnel being notified of an audit processing failure,
+      this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258163r958424_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: ef9b759619bd6fce26a70710a04c39b2a05f56c9ca7a83e2c76a7330c3d3fb3e
+  migration: *id002

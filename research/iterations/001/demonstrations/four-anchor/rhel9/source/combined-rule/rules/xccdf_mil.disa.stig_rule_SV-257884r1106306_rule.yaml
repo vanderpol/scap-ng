@@ -318,7 +318,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257884r1106306_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257884r1106306_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257884r1106306_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257884r1106306_rule
     version: 1
     description: RHEL 9 library files must have mode 755 or less permissive.
@@ -444,17 +458,6 @@ rule:
           variable_id: oval:navy.navwar.niwcatlantic.scc.linux:var:25788402
           variable_type: constant_variable
     predicates:
-      oval:navy.navwar.niwcatlantic.scc.linux:ste:25788407:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788407
-        source_type: file_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: directory
-        comment: null
       oval:navy.navwar.niwcatlantic.scc.linux:ste:25788406:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788406
         source_type: file_state
@@ -466,19 +469,17 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: symbolic link
         comment: symbolic links
-      oval:navy.navwar.niwcatlantic.scc.linux:ste:25788401:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788401
+      oval:navy.navwar.niwcatlantic.scc.linux:ste:25788407:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788407
         source_type: file_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         operator: AND
         entities:
-        - attributes:
-            datatype: boolean
-          kind: element
-          name: gwrite
+        - kind: element
+          name: type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: 'false'
-        comment: Mode 755 or less permissive (gwrite should be = false)
+          value: directory
+        comment: null
       oval:navy.navwar.niwcatlantic.scc.linux:ste:25788402:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788402
         source_type: file_state
@@ -492,20 +493,21 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: 'false'
         comment: Mode 755 or less permissive (owrite should be = false)
+      oval:navy.navwar.niwcatlantic.scc.linux:ste:25788401:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25788401
+        source_type: file_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        operator: AND
+        entities:
+        - attributes:
+            datatype: boolean
+          kind: element
+          name: gwrite
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: 'false'
+        comment: Mode 755 or less permissive (gwrite should be = false)
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.linux:tst:25788407:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:25788407
-          source_type: file_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          comment: System Library files have mode 755 or less permissive (gwrite should be = false)
-          check: all
-          check_existence: none_exist
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.linux:obj:25788407
-          predicates: []
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.linux:tst:25788427:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:25788427
           source_type: file_test
@@ -516,6 +518,18 @@ rule:
           state_operator: AND
           collections:
           - oval:navy.navwar.niwcatlantic.scc.linux:obj:25788427
+          predicates: []
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.linux:tst:25788407:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:25788407
+          source_type: file_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          comment: System Library files have mode 755 or less permissive (gwrite should be = false)
+          check: all
+          check_existence: none_exist
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.linux:obj:25788407
           predicates: []
           source_other: []
       definitions:
@@ -566,16 +580,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.linux:def:257884
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:257884
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
         match_count: 1
+        multi_check: null
         name: oval:navy.navwar.niwcatlantic.scc.linux:def:257884
+        negate: null
         oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -672,11 +692,149 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257884r1106306_rule
-      semantic_ir_sha256: 1f986f113816c9a897e6a088bbf210bf4de0fcb9f7e197390efe75e671731363
+      semantic_ir_sha256: f768f10f4dd80b5553862ec8b5f1ce43216b03b98a50ff8703bfcc6cf5b3c2ad
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 876ce490f2a80b6c182cb6e7146c31bad794f8d2fdb6c402fe54f2e46aa830c0
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257884r1106306_rule
+    version: 1
+    description: RHEL 9 library files must have mode 755 or less permissive.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:21101
+      exports: []
+      inline_content: 'Verify the systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib",
+        and "/usr/lib64" have mode 0755 or less permissive. Check that the systemwide shared library files have mode 0755
+        or less permissive with the following command: $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type f -name ''*.so*''
+        -perm /022 -exec stat -c "%n %a" {} + If any output is returned, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:21101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib", and
+            "/usr/lib64" have mode 0755 or less permissive.
+
+
+            Check that the systemwide shared library files have mode 0755 or less permissive with the following command:
+
+
+            $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type f -name ''*.so*'' -perm /022 -exec stat -c "%n %a" {} +
+
+
+            If any output is returned, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:257884
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.linux:def:257884
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.linux:def:257884
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.linux:def:257884
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:21101
+        exports: []
+        inline_content: 'Verify the systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib",
+          and "/usr/lib64" have mode 0755 or less permissive. Check that the systemwide shared library files have mode 0755
+          or less permissive with the following command: $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type f -name ''*.so*''
+          -perm /022 -exec stat -c "%n %a" {} + If any output is returned, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:21101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib", and
+              "/usr/lib64" have mode 0755 or less permissive.
+
+
+              Check that the systemwide shared library files have mode 0755 or less permissive with the following command:
+
+
+              $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type f -name ''*.so*'' -perm /022 -exec stat -c "%n %a" {} +
+
+
+              If any output is returned, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the systemwide shared library files contained in the directories "/lib", "/lib64", "/usr/lib", and
+      "/usr/lib64" have mode 0755 or less permissive. Check that the systemwide shared library files have mode 0755 or less
+      permissive with the following command: $ sudo find /lib /lib64 /usr/lib /usr/lib64 -type f -name ''*.so*'' -perm /022
+      -exec stat -c "%n %a" {} + If any output is returned, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-257884r1106306_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: c3170574867591f7e64cc7b6a1ce12be701e762380fd25024d1af57392482857
+  migration: *id002

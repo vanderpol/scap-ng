@@ -394,19 +394,33 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258187r1155603_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258187r1155603_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258187r1155603_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258187r1155603_rule
     version: 1
     description: RHEL 9 must audit all uses of the rename, unlink, rmdir, renameat, and unlinkat system calls.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25300001:
+      oval:mil.disa.stig.ind:obj:24877401:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25300001
+        source_object_id: oval:mil.disa.stig.ind:obj:24877401
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        comment: 64-bit unlink command
+        version: '1'
+        comment: Audit 64-bit invocations of rmdir
         query:
         - kind: element
           name: filepath
@@ -417,7 +431,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+unlink\s+|(\s+|,)unlink(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+rmdir\s+|(\s+|,)rmdir(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -425,13 +439,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25300101:
+      oval:mil.disa.stig.ind:obj:25299700:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25300101
+        source_object_id: oval:mil.disa.stig.ind:obj:25299700
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 64-bit unlinkat command
+        version: '2'
+        comment: 32-bit rename command
         query:
         - kind: element
           name: filepath
@@ -442,7 +456,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+unlinkat\s+|(\s+|,)unlinkat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+rename\s+|(\s+|,)rename(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -500,13 +514,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:24877401:
+      oval:mil.disa.stig.ind:obj:25300100:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:24877401
+        source_object_id: oval:mil.disa.stig.ind:obj:25300100
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Audit 64-bit invocations of rmdir
+        comment: 32-bit unlinkat command
         query:
         - kind: element
           name: filepath
@@ -517,7 +531,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+rmdir\s+|(\s+|,)rmdir(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+unlinkat\s+|(\s+|,)unlinkat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -575,13 +589,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25299700:
+      oval:mil.disa.stig.ind:obj:25300001:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25299700
+        source_object_id: oval:mil.disa.stig.ind:obj:25300001
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '2'
-        comment: 32-bit rename command
+        comment: 64-bit unlink command
         query:
         - kind: element
           name: filepath
@@ -592,32 +606,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+rename\s+|(\s+|,)rename(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:25300100:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25300100
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 32-bit unlinkat command
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+unlinkat\s+|(\s+|,)unlinkat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+unlink\s+|(\s+|,)unlink(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -650,6 +639,31 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:25300101:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25300101
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 64-bit unlinkat command
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+unlinkat\s+|(\s+|,)unlinkat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates: {}
     evaluate:
@@ -666,28 +680,16 @@ rule:
           - oval:mil.disa.stig.ind:obj:25299800
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:24877401:
-          source_test_id: oval:mil.disa.stig.ind:tst:24877401
+        oval:mil.disa.stig.ind:tst:25299700:
+          source_test_id: oval:mil.disa.stig.ind:tst:25299700
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 64-bit invocations of the rmdir
+          comment: Audit 32-bit invocations of rename
           check: all
           check_existence: all_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:24877401
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:25300100:
-          source_test_id: oval:mil.disa.stig.ind:tst:25300100
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 32-bit invocations of unlinkat
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25300100
+          - oval:mil.disa.stig.ind:obj:25299700
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:25300101:
@@ -702,42 +704,6 @@ rule:
           - oval:mil.disa.stig.ind:obj:25300101
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:25300001:
-          source_test_id: oval:mil.disa.stig.ind:tst:25300001
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 64-bit invocations of unlink
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25300001
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:25299700:
-          source_test_id: oval:mil.disa.stig.ind:tst:25299700
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 32-bit invocations of rename
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25299700
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:25300000:
-          source_test_id: oval:mil.disa.stig.ind:tst:25300000
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 32-bit invocations of unlink
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25300000
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:24877400:
           source_test_id: oval:mil.disa.stig.ind:tst:24877400
           source_type: textfilecontent54_test
@@ -748,6 +714,18 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:24877400
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25300001:
+          source_test_id: oval:mil.disa.stig.ind:tst:25300001
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 64-bit invocations of unlink
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25300001
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:25299801:
@@ -762,6 +740,18 @@ rule:
           - oval:mil.disa.stig.ind:obj:25299801
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:25300100:
+          source_test_id: oval:mil.disa.stig.ind:tst:25300100
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 32-bit invocations of unlinkat
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25300100
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.ind:tst:25299701:
           source_test_id: oval:mil.disa.stig.ind:tst:25299701
           source_type: textfilecontent54_test
@@ -774,117 +764,31 @@ rule:
           - oval:mil.disa.stig.ind:obj:25299701
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:24877401:
+          source_test_id: oval:mil.disa.stig.ind:tst:24877401
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 64-bit invocations of the rmdir
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:24877401
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25300000:
+          source_test_id: oval:mil.disa.stig.ind:tst:25300000
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 32-bit invocations of unlink
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25300000
+          predicates: []
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:252998:
-          source_definition_id: oval:mil.disa.stig.defs:def:252998
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit 32-bit invocations of renameat
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25299800
-            - comment: Audit 64-bit invocations of renameat
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25299801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Successful/unsuccessful uses of the "renameat" command in the operating system must generate an audit
-                record.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:252997:
-          source_definition_id: oval:mil.disa.stig.defs:def:252997
-          class: compliance
-          version: '5'
-          criteria:
-            children:
-            - comment: Audit 32-bit invocations of rename
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25299700
-            - comment: Audit 64-bit invocations of rename
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25299701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Successful/unsuccessful uses of the "rename" command in the operating system must generate an audit record.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253000:
-          source_definition_id: oval:mil.disa.stig.defs:def:253000
-          class: compliance
-          version: '5'
-          criteria:
-            children:
-            - comment: Audit 32-bit invocations of unlink
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25300000
-            - comment: Audit 64-bit invocations of unlink
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25300001
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Successful/unsuccessful uses of the "unlink" command in the operating system must generate an audit record
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253001:
-          source_definition_id: oval:mil.disa.stig.defs:def:253001
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: Audit 32-bit invocations of unlinkat
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25300100
-            - comment: Audit 64-bit invocations of unlinkat
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25300101
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Successful/unsuccessful uses of the "unlinkat" command in the operating system must generate an audit
-                record.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258187:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258187
           class: compliance
@@ -937,6 +841,34 @@ rule:
 
                 Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172,
                 SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000466-GPOS-00210, SRG-OS-000467-GPOS-00211, SRG-OS-000468-GPOS-00212'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:252998:
+          source_definition_id: oval:mil.disa.stig.defs:def:252998
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit 32-bit invocations of renameat
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25299800
+            - comment: Audit 64-bit invocations of renameat
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25299801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of the "renameat" command in the operating system must generate an audit
+                record.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:230439:
@@ -1006,6 +938,88 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:252997:
+          source_definition_id: oval:mil.disa.stig.defs:def:252997
+          class: compliance
+          version: '5'
+          criteria:
+            children:
+            - comment: Audit 32-bit invocations of rename
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25299700
+            - comment: Audit 64-bit invocations of rename
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25299701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of the "rename" command in the operating system must generate an audit record.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253001:
+          source_definition_id: oval:mil.disa.stig.defs:def:253001
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: Audit 32-bit invocations of unlinkat
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25300100
+            - comment: Audit 64-bit invocations of unlinkat
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25300101
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of the "unlinkat" command in the operating system must generate an audit
+                record.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253000:
+          source_definition_id: oval:mil.disa.stig.defs:def:253000
+          class: compliance
+          version: '5'
+          criteria:
+            children:
+            - comment: Audit 32-bit invocations of unlink
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25300000
+            - comment: Audit 64-bit invocations of unlink
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25300001
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Successful/unsuccessful uses of the "unlink" command in the operating system must generate an audit record
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.rhel9os:def:258187
@@ -1017,16 +1031,22 @@ rule:
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258187
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.rhel9os:def:258187
         exports: []
         href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.rhel9os:def:258187
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
@@ -1128,11 +1148,161 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258187r1155603_rule
-      semantic_ir_sha256: fdf76933cff2fa5478aa05f38b45a9a68d5ec075dafd7090dc117ec470faa648
+      semantic_ir_sha256: 4a2a0968d08ac70de149e1ed12f35cb6764dba9a6fa617336c9b541ac250bcdd
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 5c6a79e077b6667d05d79173d5f5c49c6a233cf9505d59ab84c031261114e62b
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258187r1155603_rule
+    version: 1
+    description: RHEL 9 must audit all uses of the rename, unlink, rmdir, renameat, and unlinkat system calls.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:77301
+      exports: []
+      inline_content: 'Verify RHEL 9 is configured to audit successful/unsuccessful attempts to use the "rename", "unlink",
+        "rmdir", "renameat", and "unlinkat" system calls with the following command: $ sudo auditctl -l | grep ''rename\|unlink\|rmdir''
+        -a always,exit -F arch=b32 -S unlink,rename,rmdir,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete -a always,exit
+        -F arch=b64 -S rename,rmdir,unlink,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete If the command does not
+        return an audit rule for "rename", "unlink", "rmdir", "renameat", and "unlinkat" or any of the lines returned are
+        commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:77301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify RHEL 9 is configured to audit successful/unsuccessful attempts to use the "rename", "unlink", "rmdir",
+            "renameat", and "unlinkat" system calls with the following command:
+
+
+            $ sudo auditctl -l | grep ''rename\|unlink\|rmdir''
+
+
+            -a always,exit -F arch=b32 -S unlink,rename,rmdir,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete
+
+            -a always,exit -F arch=b64 -S rename,rmdir,unlink,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete
+
+
+            If the command does not return an audit rule for "rename", "unlink", "rmdir", "renameat", and "unlinkat" or any
+            of the lines returned are commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258187
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258187
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:258187
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+              name: oval:mil.disa.stig.rhel9os:def:258187
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:77301
+        exports: []
+        inline_content: 'Verify RHEL 9 is configured to audit successful/unsuccessful attempts to use the "rename", "unlink",
+          "rmdir", "renameat", and "unlinkat" system calls with the following command: $ sudo auditctl -l | grep ''rename\|unlink\|rmdir''
+          -a always,exit -F arch=b32 -S unlink,rename,rmdir,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete -a always,exit
+          -F arch=b64 -S rename,rmdir,unlink,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete If the command does
+          not return an audit rule for "rename", "unlink", "rmdir", "renameat", and "unlinkat" or any of the lines returned
+          are commented out, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:77301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify RHEL 9 is configured to audit successful/unsuccessful attempts to use the "rename", "unlink", "rmdir",
+              "renameat", and "unlinkat" system calls with the following command:
+
+
+              $ sudo auditctl -l | grep ''rename\|unlink\|rmdir''
+
+
+              -a always,exit -F arch=b32 -S unlink,rename,rmdir,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete
+
+              -a always,exit -F arch=b64 -S rename,rmdir,unlink,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete
+
+
+              If the command does not return an audit rule for "rename", "unlink", "rmdir", "renameat", and "unlinkat" or
+              any of the lines returned are commented out, this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify RHEL 9 is configured to audit successful/unsuccessful attempts to use the "rename", "unlink", "rmdir",
+      "renameat", and "unlinkat" system calls with the following command: $ sudo auditctl -l | grep ''rename\|unlink\|rmdir''
+      -a always,exit -F arch=b32 -S unlink,rename,rmdir,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete -a always,exit
+      -F arch=b64 -S rename,rmdir,unlink,unlinkat,renameat -F auid>=1000 -F auid!=-1 -F key=delete If the command does not
+      return an audit rule for "rename", "unlink", "rmdir", "renameat", and "unlinkat" or any of the lines returned are commented
+      out, this is a finding.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258187r1155603_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: e33d2562c71dd736d075a4c8bbbaceb1e17cd0791fb14d349a84f4038d0ebe80
+  migration: *id002
