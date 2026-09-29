@@ -70,7 +70,7 @@ A Rule object SHALL own Rule-specific semantics, including as
 applicable:
 
 - stable Rule identity;
-- Rule revision;
+- Rule version/revision;
 - title;
 - severity;
 - discussion/rationale;
@@ -451,3 +451,37 @@ is one executable Benchmark per SCAP-NG Benchmark publication.
 **Specification navigation:** [← Previous: Conformance](../core/conformance.md) · [Contents](../README.md) · [Next: Platform and Applicability →](platform-and-applicability.md)
 
 <!-- spec-nav:end -->
+
+
+## 24. Rule version and revision
+
+A Rule SHALL expose a version/revision field when the publisher supplies a
+meaningful Rule revision.
+
+Rule identity and Rule version SHALL be distinct concepts. A revision of the
+same logical Rule SHOULD retain the same Rule identity and change its
+version/revision value.
+
+Migration tooling SHALL preserve the source semantics of the version field.
+Publisher-specific profiles MAY derive the native Rule version from a
+publisher-specific identifier convention when the publisher is known to
+overload the generic XCCDF Item `version` field. Such derivation SHALL be
+explicit, documented, and provenance-preserving.
+
+For DISA STIG conversion, the native Rule ID and Rule version are derived from
+the DISA Rule ID convention (for example, `SV-280940r1184730` becomes Rule
+ID `SV-280940` and version `r1184730`). A DISA STIG ID such as
+`RHEL-10-000560` remains a separate typed identifier.
+
+## 25. Structured Rule references
+
+Rule references SHOULD preserve meaningful source relationships rather than
+collapsing structured citation metadata into one display string.
+
+When present, reference properties such as title, creator, publisher, subject,
+date, type, source, identifier, relation, and URI SHOULD remain separately
+addressable in native source.
+
+A human-readable synthesized citation MAY be generated for display, but it
+SHALL NOT replace structured reference data when that structure was present in
+the source.
