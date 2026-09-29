@@ -56,6 +56,45 @@ def main():
             issues.append({"kind":"weight_mismatch","rule":rid})
         gt=g.findtext("x:title",namespaces=NS)
         if gt!=sr.get("title"): issues.append({"kind":"title_mismatch","rule":rid})
+
+        # Descriptive/remediation/reference content is part of policy fidelity,
+        # even when it does not affect pass/fail truth semantics.
+        gdesc=g.findtext("x:description",namespaces=NS)
+        if gdesc!=sr.get("description"):
+            issues.append({"kind":"description_mismatch","rule":rid})
+        grat=g.findtext("x:rationale",namespaces=NS)
+        if grat!=sr.get("rationale"):
+            issues.append({"kind":"rationale_mismatch","rule":rid})
+
+        source_fixtexts=[x.get("text") for x in sr.get("fixes",[]) if x.get("kind")=="fixtext"]
+        generated_fixtexts=[(" ".join("".join(x.itertext()).split()) or None) for x in g.findall("x:fixtext",NS)]
+        if source_fixtexts!=generated_fixtexts:
+            issues.append({"kind":"fixtext_mismatch","rule":rid,
+                           "source":source_fixtexts,"generated":generated_fixtexts})
+        for ft in g.findall("x:fixtext",NS):
+            ref=ft.get("fixref")
+            if ref and g.find(f"x:fix[@id='{ref}']",NS) is None:
+                issues.append({"kind":"dangling_generated_fixref","rule":rid,"fixref":ref})
+
+        source_refs=sorted((x.get("text") or "") for x in sr.get("references",[]))
+        generated_refs=sorted((" ".join("".join(x.itertext()).split()) or "") for x in g.findall("x:reference",NS))
+        if source_refs!=generated_refs:
+            issues.append({"kind":"reference_mismatch","rule":rid,
+                           "source":source_refs,"generated":generated_refs})
+
+        source_manual={
+            (x.get("selector") or "default"):x.get("inline_content")
+            for x in sr.get("checks",[]) if x.get("inline_content") is not None
+        }
+        generated_manual={}
+        for chk in g.findall("x:check",NS):
+            cc=chk.find("x:check-content",NS)
+            if cc is not None:
+                generated_manual[chk.get("selector") or "default"]=" ".join("".join(cc.itertext()).split()) or None
+        if source_manual!=generated_manual:
+            issues.append({"kind":"inline_check_content_mismatch","rule":rid,
+                           "source":source_manual,"generated":generated_manual})
+
         expected={c.get("selector") or "default" for c in sr.get("checks",[])}
         actual={c.get("selector") or "default" for c in g.findall("x:check",NS)}
         if expected!=actual:
