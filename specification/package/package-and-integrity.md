@@ -79,3 +79,11 @@ The compiler SHOULD omit authoring comments from canonical scanner packages.
 
 A separate conversion report MAY preserve complete machine-readable legacy
 lineage.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Manual Assessment](../assessment/manual-assessment.md) · [Contents](../README.md) · [Next: Results and Evidence →](../results/results.md)
+
+<!-- spec-nav:end -->
