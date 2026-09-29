@@ -241,7 +241,7 @@ def build_experimental_package(source_root, package_path):
     for rule_path in sorted((source_root / "rules").glob("*.yaml")):
         rule_doc = load_yaml(rule_path)
         rule_id = rule_doc["rule"]["id"]
-        add_object(rule_id, "rule", f"rules/{rule_id}.json", rule_doc)
+        add_object(rule_id, "rule", f"rules/{rule_id}.rule.json", rule_doc)
 
     assessment_paths = sorted((source_root / "assessments").rglob("*.yaml"))
     for assessment_path in assessment_paths:
