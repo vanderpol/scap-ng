@@ -57,6 +57,14 @@ jobs:
                   print(f"  {count:5}  {name}")
           PY
 
+      - name: Audit tracked OVAL language surface coverage
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/audit_oval_language_surface.py \
+            --schema-dir scap-ng/third_party/scap-1.4-schemas/oval_5.12.3 \
+            --corpus-inventory work/rhel9-oval-surface.json \
+            --focused-source-dir scap-ng/research/iterations/003/evidence/roundtrip-source-oval \
+            --output work/oval-language-surface-coverage.json
+
       - name: Run corpus-wide semantic round trip
         run: |
           python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus.py             work/rhel9-split             --out work/rhel9-roundtrip             --strict
@@ -83,6 +91,7 @@ jobs:
           name: rhel9-oval-roundtrip-evidence
           path: |
             work/rhel9-oval-surface.json
+            work/oval-language-surface-coverage.json
             work/rhel9-roundtrip/summary.json
             work/rhel9-roundtrip/diffs/
 
