@@ -34,14 +34,16 @@ class Model:
         self.vars={e.attrib["id"]:e for sec in self.root.findall(f"{{{OD}}}variables") for e in sec}
         self.memo={}
 
-    def entity(self,e):
+    def entity(self,e,state_context=False):
         _,local=split(e.tag)
+        vr=e.attrib.get("var_ref")
         base=("entity",local,
               e.attrib.get("datatype","string"),
               e.attrib.get("operation","equals"),
-              e.attrib.get("var_check","all"),
-              e.attrib.get("entity_check","all"))
-        vr=e.attrib.get("var_ref")
+              e.attrib.get("mask","false"),
+              (e.attrib.get("var_check","all") if vr else None),
+              (e.attrib.get("entity_check","all") if state_context else e.attrib.get("entity_check")),
+              (e.attrib.get("check_existence","at_least_one_exists") if state_context else e.attrib.get("check_existence")))
         if vr: return base+("var",self.variable(vr))
         return base+("value",sval(e.text))
 
@@ -128,7 +130,7 @@ class Model:
         e=self.states[sid]
         self.memo[key]=("recursion-state",sid)
         out=("state",typed(e,"_state"),e.attrib.get("operator","AND"),
-             tuple(self.entity(c) for c in e))
+             tuple(self.entity(c,True) for c in e))
         self.memo[key]=out; return out
 
     def setexpr(self,e):
