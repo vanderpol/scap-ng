@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 import yaml
 
 SOURCE_URL = (
-    "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/"
+    "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/8c8e5dff860af6b1290ee9273a282db24278f8d5/Current/"
     "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip"
 )
 ROOT = Path(__file__).resolve().parents[2]
