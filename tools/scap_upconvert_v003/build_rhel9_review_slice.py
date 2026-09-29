@@ -1210,6 +1210,7 @@ def main():
                     },
                 },
                 "scoring": benchmark_scoring(xr),
+                "applicability_catalog": "applicability.yaml",
                 "parameters": [],
                 "groups": groups,
                 "profiles": profiles,
