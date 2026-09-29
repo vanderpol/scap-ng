@@ -58,11 +58,12 @@ The executable implementation of a reusable applicability condition SHOULD be
 an ordinary Assessment Method.
 
 Iteration 003 SHALL NOT generate a monolithic `applicability.yaml` containing
-legacy OVAL/CPE IR.
+legacy source IR.
 
-A separate applicability catalog MAY be reconsidered only if it provides useful
-independent authoring/governance beyond what normal named Assessment objects and
-Benchmark/Rule references provide.
+A small applicability registry is retained to provide stable semantic
+applicability identifiers and bind those identifiers to Assessment Methods.
+Rules and Benchmarks reference applicability IDs rather than assessment paths.
+See `applicability-registry.md`.
 
 ## Parameters
 
@@ -101,10 +102,13 @@ A benchmark-specific source tree should therefore begin approximately as:
       benchmark.yaml
       policy/
         RHEL-09-....policy.yaml
+      applicability.yaml
       assessments/
         automated/
           ...
         manual/
+          ...
+        applicability/
           ...
 
 Reusable platform/applicability/compliance Assessments may live in shared
