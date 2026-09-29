@@ -17,7 +17,10 @@ def parse(path:Path):
 
 def canonical_lines(tree):
     data=E.tostring(tree,method="c14n",with_comments=True)
-    return data.decode("utf-8").splitlines()
+    # C14N is usually one physical line; reparse and pretty-print it so the
+    # unified diff is reviewable without losing canonicalized attribute/ns form.
+    canon=E.fromstring(data)
+    return E.tostring(canon,pretty_print=True,encoding="unicode").splitlines()
 
 def strip_noise(tree):
     root=tree.getroot()
