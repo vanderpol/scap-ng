@@ -45,7 +45,7 @@ Current gates:
 - NG benchmark fidelity audit against source XCCDF: **0 issues**
 - Regenerated XCCDF 1.2: schema valid
 - XCCDF policy semantic comparison: **0 issues across 445 Rules / 11 Profiles**
-- deterministic RHEL 9 NG regeneration: PASS
+- deterministic RHEL 9 NG regeneration: expected diff pending refresh after SRG identifier preservation
 
 ## OVAL / assessment layer
 
@@ -108,7 +108,7 @@ Current gates:
 | notice/front-matter/rear-matter/plain-text | Benchmark publication metadata | Preserved, represented differently | RHEL 9 fidelity audit | No |
 | Benchmark references | Benchmark references | Preserved exactly semantically | RHEL 9 fidelity audit | No |
 | Rule title/severity/weight/role | Rule fields | Preserved exactly | RHEL 9 fidelity audit | `role` result-semantics question deferred |
-| STIG identifiers / CCI | Rule identifiers | Preserved exactly | RHEL 9 fidelity audit | No |
+| STIG / vulnerability / SRG identifiers / CCI | Rule identifiers | Preserved exactly after Group-title promotion | RHEL 9 fidelity audit; SRG identity was discovered by raw XML structural audit | No |
 | Rule discussion | Rule discussion | Preserved, represented differently | Parsed from DISA description wrapper | No |
 | DISA description extension fields | Rule `extensions.disa_stig` | Preserved, represented differently | Includes documentable and related fields | No |
 | Rule reference metadata | Rule references | Preserved exactly semantically | 445 DPMS refs verified | No |
@@ -117,7 +117,7 @@ Current gates:
 | XCCDF inline manual `check-content` | Manual Assessment `procedure` | Preserved, represented differently | 445 manual procedures verified | No |
 | XCCDF check selector | Rule named check selector | Preserved exactly | default / automated / manual | No |
 | Default check | `default_check` / default selector | Preserved exactly | Fidelity audit | No |
-| XCCDF Group used as one-Rule wrapper | Native semantic grouping may replace it | Intentional NG normalization | All 445 RHEL 9 source Groups verified semantically inert | **Yes / document** |
+| XCCDF Group used as one-Rule wrapper | Native semantic grouping may replace it after source metadata promotion | Intentional NG normalization | Wrapper behavior is inert, but Group title carries the DISA SRG identifier and SHALL be promoted to the Rule before wrapper removal | **Yes / document** |
 | Non-inert Group semantics | Must be preserved | Preserved requirement; not exercised by RHEL 9 | Audit fails if source group has semantic attributes | **Yes: native placement** |
 | Profile effective selection | NG Profile disabled/enabled rule result | Preserved exactly | 11 profiles verified | No |
 | Verbose explicit `select selected=true` list | Effective profile delta | Intentional NG normalization | Thousands of source entries collapse to effective selection | No |
@@ -159,6 +159,13 @@ pass. Known causes include:
 These differences are diagnostics and SHALL NOT be used to waive semantic loss.
 Each source semantic field is audited independently against NG.
 
+A fail-closed raw XML surface gate now inventories every observed XCCDF element
+path and attribute path. Any source path that is not explicitly classified as
+native semantics, approved normalization, or provenance causes the audit to
+fail. The gate also verifies exact source check-reference tuples against
+conversion provenance and validates the corpus-specific assumptions used to
+normalize empty Group/Profile wrappers and empty fix anchors.
+
 ## Exit criteria for iteration-003 lossless conversion model
 
 Before declaring the split Rule/Assessment conversion model mature:
@@ -168,8 +175,7 @@ Before declaring the split Rule/Assessment conversion model mature:
 3. Every source-side XCCDF/OVAL construct in supported corpora SHALL appear in
    this audit as preserved, intentionally changed, rejected/deprecated, or
    explicitly deferred.
-4. Additional corpora SHALL be run to cover constructs absent from RHEL 9,
-   beginning with Oracle Linux 9 and then Windows 11 / Windows Server 2025.
+4. Additional corpora SHALL be run to cover constructs absent from RHEL 9. Oracle Linux 9 currently passes 410/410 OVAL round trips with no new construct types; Windows 11 / Windows Server 2025 remain the next materially different corpora.
 5. XSD/Schematron surface not exercised by those corpora SHALL receive targeted
    stress fixtures.
 6. Production converter refactoring SHALL follow this validated semantic model,
