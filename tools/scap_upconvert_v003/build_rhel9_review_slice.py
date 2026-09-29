@@ -164,9 +164,28 @@ def lower_source_platform(platform_node, oval_bundle):
     assessment["assessment"]["purpose"] = "applicability"
     return app_id, assessment, None
 
-def native_rule_id(rule):
-    version = text(rule.find("x:version", NS))
-    return safe_id(version) if version else safe_id(text(rule.find("x:title", NS)) or "rule")
+def parse_disa_rule_identity(rule):
+    source_id = rule.get("id") or ""
+    m = re.search(r"_rule_(SV-\\d+)(r\\d+)_rule$", source_id)
+    if not m:
+        return None
+    return {
+        "rule_id": m.group(1),
+        "rule_version": m.group(2),
+        "stig_id": text(rule.find("x:version", NS)),
+    }
+
+def native_rule_identity(rule):
+    disa = parse_disa_rule_identity(rule)
+    if disa:
+        return disa
+    source_id = rule.get("id")
+    source_version = text(rule.find("x:version", NS))
+    return {
+        "rule_id": safe_id(source_id) if source_id else safe_id(text(rule.find("x:title", NS)) or "rule"),
+        "rule_version": source_version,
+        "stig_id": None,
+    }
 
 def check_kind(check):
     selector = (check.get("selector") or "").strip().lower()
@@ -180,8 +199,17 @@ def records(root):
     for group in root.findall(".//x:Group", NS):
         for rule in group.findall("x:Rule", NS):
             checks = rule.findall("x:check", NS)
+            identity = native_rule_identity(rule)
+            group_source_id = group.get("id") or ""
+            group_match = re.search(r"_group_(V-\\d+)$", group_source_id)
             out.append({
-                "element": rule, "source_rule_id": rule.get("id"), "id": native_rule_id(rule),
+                "element": rule,
+                "source_rule_id": rule.get("id"),
+                "source_group_id": group.get("id"),
+                "id": identity["rule_id"],
+                "version": identity["rule_version"],
+                "stig_id": identity["stig_id"],
+                "vulnerability_id": group_match.group(1) if group_match else None,
                 "title": text(rule.find("x:title", NS)), "severity": rule.get("severity"),
                 "role": rule.get("role"), "weight": rule.get("weight"), "checks": checks,
                 "platforms": [p.get("idref") for p in rule.findall("x:platform", NS) if p.get("idref")],
@@ -383,11 +411,31 @@ def rule_content(rule):
     for ref in rule.findall("x:reference", NS):
         item = {}
         href = ref.get("href")
-        value = text(ref)
         if href and not any(term in href.lower() for term in ("xccdf", "oval", "ocil", "cpe.mitre.org/language")):
             item["url"] = href
-        if value: item["text"] = value
-        if item: references.append(item)
+
+        children = list(ref)
+        if children:
+            structured = {}
+            for child in children:
+                name = local(child.tag)
+                value = text(child)
+                if not value:
+                    continue
+                if name in structured:
+                    if not isinstance(structured[name], list):
+                        structured[name] = [structured[name]]
+                    structured[name].append(value)
+                else:
+                    structured[name] = value
+            item.update(structured)
+        else:
+            value = text(ref)
+            if value:
+                item["text"] = value
+
+        if item:
+            references.append(item)
     if references: out["references"] = references
 
     fixtext_node = rule.find("x:fixtext", NS)
@@ -1046,8 +1094,15 @@ def main():
                 "potential_impacts": content_fields.get("potential_impacts"),
                 "responsibility": content_fields.get("responsibility"),
             }
+            rule_identifiers = list(content_fields.get("identifiers", []))
+            if rec.get("stig_id"):
+                rule_identifiers.append({"scheme": "disa-stig-id", "value": rec["stig_id"]})
+            if rec.get("vulnerability_id"):
+                rule_identifiers.append({"scheme": "disa-vulnerability-id", "value": rec["vulnerability_id"]})
+
             rule_doc = {"rule": {
                 "id": rid,
+                "version": rec.get("version"),
                 "title": rec["title"],
                 "severity": rec["severity"],
                 "role": rec["role"],
@@ -1058,7 +1113,7 @@ def main():
                     "disa_stig": publisher_extension,
                 },
                 "warnings": content_fields.get("warnings", []),
-                "identifiers": content_fields.get("identifiers", []),
+                "identifiers": rule_identifiers,
                 "references": content_fields.get("references", []),
                 "requires": [],
                 "conflicts": [],
@@ -1133,7 +1188,10 @@ def main():
                     "disa_stig": publisher_extension,
                 },
                 "native_rule_id": rid,
+                "native_rule_version": rec.get("version"),
                 "source_rule_id": rec["source_rule_id"],
+                "source_group_id": rec.get("source_group_id"),
+                "source_xccdf_version": text(rec["element"].find("x:version", NS)),
                 "source_checks": [{
                     "selector": c.get("selector"),
                     "system": c.get("system"),
