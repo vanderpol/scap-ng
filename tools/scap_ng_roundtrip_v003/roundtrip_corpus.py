@@ -63,11 +63,23 @@ def main():
         rows.append(row)
 
     counts={}
-    for row in rows: counts[row["status"]]=counts.get(row["status"],0)+1
+    error_signatures={}
+    for row in rows:
+        counts[row["status"]]=counts.get(row["status"],0)+1
+        if row["status"]!="pass":
+            sig=row.get("error") or row["status"]
+            # Normalize volatile IDs and numeric suffixes so repeated semantic
+            # blockers group together across rule-specific OVAL closures.
+            import re
+            sig=re.sub(r"oval:[A-Za-z0-9_.-]+:(?:def|tst|obj|ste|var):[A-Za-z0-9_.-]+","<oval-id>",sig)
+            sig=re.sub(r"\b\d{4,}\b","<n>",sig)
+            key=f"{row['status']}: {sig}"
+            error_signatures[key]=error_signatures.get(key,0)+1
     summary={
         "format":"oval-ng-roundtrip-corpus-summary-0.1",
         "source_file_count":len(files),
         "counts":dict(sorted(counts.items())),
+        "error_signatures":dict(sorted(error_signatures.items(), key=lambda kv:(-kv[1],kv[0]))),
         "all_pass":counts.get("pass",0)==len(files),
         "rows":rows,
     }
