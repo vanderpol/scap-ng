@@ -10,6 +10,7 @@ sys.path.insert(0,str(HERE))
 from oval_to_fixture import Converter
 from ng_to_oval import build as build_oval
 from compare_oval_semantics import compare
+from diff_oval_roundtrip import parse as diff_parse, canonical_lines, strip_noise, pretty_lines, write_diff
 
 def main():
     ap=argparse.ArgumentParser()
@@ -48,6 +49,33 @@ def main():
             rows.append(row); print(f"REVERSE_ERROR {rel}: {exc}"); continue
 
         try:
+            diff_dir=a.out/"diffs"/stem
+            diff_dir.mkdir(parents=True,exist_ok=True)
+            source_tree=diff_parse(source)
+            regen_tree=diff_parse(regen)
+            raw=write_diff(
+                canonical_lines(source_tree),canonical_lines(regen_tree),
+                rel,row["regenerated"],diff_dir/"raw-c14n.diff"
+            )
+            source_norm=strip_noise(diff_parse(source))
+            regen_norm=strip_noise(diff_parse(regen))
+            normalized=write_diff(
+                pretty_lines(source_norm),pretty_lines(regen_norm),
+                "source-normalized.xml","regenerated-normalized.xml",
+                diff_dir/"normalized-structural.diff"
+            )
+            (diff_dir/"source-normalized.xml").write_text(
+                __import__("lxml").etree.tostring(source_norm,pretty_print=True,encoding="unicode"),
+                encoding="utf-8"
+            )
+            (diff_dir/"regenerated-normalized.xml").write_text(
+                __import__("lxml").etree.tostring(regen_norm,pretty_print=True,encoding="unicode"),
+                encoding="utf-8"
+            )
+            row["raw_diff_lines"]=len(raw.splitlines())
+            row["normalized_diff_lines"]=len(normalized.splitlines())
+            row["diff_dir"]=diff_dir.relative_to(a.out).as_posix()
+
             source_roots=data["source"].get("root_definition")
             if source_roots is None:
                 source_roots=data["source"].get("root_definitions")
@@ -83,6 +111,12 @@ def main():
         "counts":dict(sorted(counts.items())),
         "error_signatures":dict(sorted(error_signatures.items(), key=lambda kv:(-kv[1],kv[0]))),
         "all_pass":counts.get("pass",0)==len(files),
+        "xml_diff_summary":{
+            "raw_diff_files":sum(1 for x in rows if x.get("raw_diff_lines",0)>0),
+            "normalized_diff_files":sum(1 for x in rows if x.get("normalized_diff_lines",0)>0),
+            "raw_diff_lines":sum(x.get("raw_diff_lines",0) for x in rows),
+            "normalized_diff_lines":sum(x.get("normalized_diff_lines",0) for x in rows),
+        },
         "rows":rows,
     }
     (a.out/"summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+chr(10),encoding="utf-8")
