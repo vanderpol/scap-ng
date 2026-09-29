@@ -132,7 +132,18 @@ def emit_expression(parent, expr, ids):
             emit_component(el, comp, ids)
     elif "count" in expr:
         el = ET.SubElement(parent, q(OVAL_DEF, "count"))
-        emit_component(el, expr["count"], ids)
+        value=expr["count"]
+        for comp in (value if isinstance(value,list) else [value]):
+            emit_component(el, comp, ids)
+    elif "unique" in expr:
+        el = ET.SubElement(parent, q(OVAL_DEF, "unique"))
+        value=expr["unique"]
+        for comp in (value if isinstance(value,list) else [value]):
+            emit_component(el, comp, ids)
+    elif "split" in expr:
+        value=expr["split"]
+        el = ET.SubElement(parent, q(OVAL_DEF, "split"), {"delimiter": value["delimiter"]})
+        emit_component(el, value["component"], ids)
     else:
         die(f"unsupported expression: {expr}")
 
