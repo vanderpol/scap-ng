@@ -118,4 +118,4 @@ It intentionally performs only:
 It does **not** yet emit native SCAP-NG YAML. That is deliberate: the IR must be
 reviewed before another renderer is permitted to shape the source model.
 
-See conversion-contract.md and semantic-ir.md.
+See conversion-contract.md, semantic-ir.md, and native-source-layout.md.
