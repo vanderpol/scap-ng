@@ -7,6 +7,20 @@ up-converter must satisfy before generated SCAP-NG source is accepted.
 
 ## Source authority
 
+For SCAP 1.4 and OVAL compatibility, the authoritative language definition SHALL
+be the applicable XSD plus its Schematron constraints.
+
+The converter SHALL use:
+
+1. XSD for valid structure, types, substitution groups, defaults, cardinality,
+   allowed attributes/elements, and extension points; and
+2. Schematron for cross-element, reference, datatype, and semantic constraints
+   that cannot be expressed completely by XSD.
+
+Specification prose, examples, existing scanner behavior, and production content
+MAY be used to explain intent, discover real-world combinations, and construct
+regression tests, but SHALL NOT override the XSD/Schematron language definition.
+
 The converter SHALL consume pinned original SCAP 1.4 artifacts/components.
 Generated iteration-001 and iteration-002 YAML SHALL NOT be authoritative input.
 
