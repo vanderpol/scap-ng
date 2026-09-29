@@ -112,6 +112,23 @@ A publisher profile SHALL NOT:
 
 ### DISA STIG Rule version handling
 
+The DISA XCCDF Rule identifier convention SHALL be parsed as publisher-specific
+identity metadata. For example:
+
+    xccdf_mil.disa.stig_rule_SV-280940r1184730_rule
+
+normalizes to:
+
+    rule.id: SV-280940
+    rule.version: r118473
+
+The trailing `0` immediately before `_rule` is part of the DISA XCCDF
+identifier encoding and SHALL NOT be included in the effective Rule version.
+
+The `disa-stig` parser SHALL validate this convention before deriving either
+field. It SHALL NOT apply this transformation to generic SCAP/XCCDF content.
+
+
 DISA STIG content is known to overload the XCCDF Rule `version` element for
 publisher-specific Rule identification rather than using it solely as the
 generic XCCDF Item version.
