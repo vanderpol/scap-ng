@@ -1,0 +1,18 @@
+assessment:
+  id: RHEL-09-211030.automated
+  mode: automated
+  checks:
+    check-1:
+      collect:
+        capability: unix.symlink
+        select:
+          filepath: /etc/systemd/system/default.target
+      assert:
+        existence: all_exist
+        check: all
+        state:
+        - field: canonical_path
+          operation: pattern match
+          value: '[\S]*\/multi\-user\.target$'
+  evaluate:
+    check: check-1

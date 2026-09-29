@@ -1,0 +1,19 @@
+assessment:
+  id: RHEL-09-211040.automated
+  mode: automated
+  checks:
+    check-1:
+      collect:
+        capability: linux.systemdunitproperty
+        select:
+          unit: systemd-journald.service
+          property: ActiveState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+        - field: value
+          operation: equals
+          value: active
+  evaluate:
+    check: check-1

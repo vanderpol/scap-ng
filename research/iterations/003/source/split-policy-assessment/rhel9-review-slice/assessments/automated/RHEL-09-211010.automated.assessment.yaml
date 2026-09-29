@@ -1,0 +1,38 @@
+assessment:
+  id: RHEL-09-211010.automated
+  mode: automated
+  checks:
+    check-1:
+      collect:
+        capability: independent.textfilecontent54
+        select:
+          path: /etc
+          filename: redhat-release
+          pattern:
+            operation: pattern match
+            value: ^\s*Red Hat Enterprise Linux release 9\.(\d+)
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+        - field: subexpression
+          operation: equals
+          value: '7'
+          datatype: int
+        - field: subexpression
+          operation: equals
+          value: '8'
+          datatype: int
+        - field: subexpression
+          operation: equals
+          value: '9'
+          datatype: int
+        - field: subexpression
+          operation: equals
+          value: '10'
+          datatype: int
+  evaluate:
+    check: check-1
