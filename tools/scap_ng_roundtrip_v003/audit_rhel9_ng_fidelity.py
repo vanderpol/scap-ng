@@ -51,6 +51,18 @@ def rule_identity(source_id: str):
 def profile_id(source_id: str):
     return source_id[len(PROFILE_PREFIX):] if source_id.startswith(PROFILE_PREFIX) else source_id
 
+def norm_text(value):
+    if value is None:
+        return None
+    value=" ".join(str(value).split())
+    return value or None
+
+def disa_tag(description, tag):
+    if not description:
+        return None
+    m=re.search(rf"<{re.escape(tag)}>(.*?)</{re.escape(tag)}>",description,re.S|re.I)
+    return norm_text(m.group(1)) if m else None
+
 def native_rules(root: Path):
     out={}
     for p in sorted((root/"rules").glob("*.yaml")):
@@ -126,6 +138,52 @@ def main():
         nw=ng.get("weight")
         if sw is not None and nw is not None and float(sw)!=float(nw):
             issue("rule_field_mismatch",rule=rid,field="weight",source=sw,ng=nw)
+
+        # Descriptive/publisher metadata used by reports and authoring tools.
+        expected_discussion=disa_tag(sr.get("description"),"VulnDiscussion")
+        if norm_text(ng.get("discussion"))!=expected_discussion:
+            issue("rule_discussion_mismatch",rule=rid,
+                  source=expected_discussion,ng=norm_text(ng.get("discussion")))
+
+        source_doc=disa_tag(sr.get("description"),"Documentable")
+        expected_doc=None if source_doc is None else source_doc.lower() in {"1","true","yes"}
+        actual_doc=((ng.get("extensions") or {}).get("disa_stig") or {}).get("documentable")
+        if actual_doc!=expected_doc:
+            issue("rule_documentable_mismatch",rule=rid,source=expected_doc,ng=actual_doc)
+
+        source_ccis=sorted(i.get("value") for i in sr.get("idents",[])
+                           if i.get("system")=="http://cyber.mil/cci")
+        ng_ccis=sorted(i.get("value") for i in ng.get("identifiers",[])
+                       if i.get("scheme")=="cci")
+        if source_ccis!=ng_ccis:
+            issue("rule_cci_mismatch",rule=rid,source=source_ccis,ng=ng_ccis)
+
+        group_path=sr.get("group_path") or []
+        source_vuln=None
+        if group_path:
+            m=re.search(r"_group_(V-\\d+)$",group_path[-1])
+            source_vuln=m.group(1) if m else None
+        ng_vulns=[i.get("value") for i in ng.get("identifiers",[])
+                  if i.get("scheme")=="disa-vulnerability-id"]
+        if source_vuln is not None and ng_vulns!=[source_vuln]:
+            issue("rule_vulnerability_id_mismatch",rule=rid,source=source_vuln,ng=ng_vulns)
+
+        fixtexts=[x.get("text") for x in sr.get("fixes",[]) if x.get("kind")=="fixtext"]
+        expected_guidance=norm_text(fixtexts[0]) if fixtexts else None
+        actual_guidance=norm_text((ng.get("remediation") or {}).get("guidance"))
+        if expected_guidance!=actual_guidance:
+            issue("rule_remediation_mismatch",rule=rid,
+                  source=expected_guidance,ng=actual_guidance)
+
+        # RHEL9 has one normalized DPMS reference per Rule. Compare its semantic
+        # text content rather than the legacy XML wrapper.
+        src_refs=sorted(norm_text(x.get("text")) for x in sr.get("references",[]))
+        ng_refs=[]
+        for ref in ng.get("references",[]):
+            ng_refs.append(norm_text(" ".join(str(ref.get(k) or "") for k in
+                ("title","publisher","type","subject","identifier"))))
+        if src_refs!=sorted(ng_refs):
+            issue("rule_reference_mismatch",rule=rid,source=src_refs,ng=sorted(ng_refs))
 
         # This source has no requires/conflicts, but compare generically.
         if sr.get("requires") != ng.get("requires",[]):
