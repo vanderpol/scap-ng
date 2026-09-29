@@ -128,3 +128,11 @@ SCAP 1.4 migration conformance SHALL verify preservation of source OVAL
 
 A converter that cannot preserve a source existence/cardinality construct SHALL
 report an explicit conversion blocker rather than substitute another condition.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: SCAP-NG Requirements Index](../requirements-index.md) · [Contents](../README.md) · [Next: Benchmark, Rule, and Group Model →](../policy/benchmark.md)
+
+<!-- spec-nav:end -->
