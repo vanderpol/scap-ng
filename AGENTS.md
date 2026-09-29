@@ -154,3 +154,17 @@ Use evidence according to the question being answered:
 - "Can SCAP-NG migrate real published STIG content?" -> NIWC published STIG corpus.
 - "Does SCAP-NG correctly model this OVAL language feature?" -> OVAL Self-Assertion corpus plus OVAL 5.12.3 schema/documentation.
 - "Can a native SCAP-NG representation replace the source behavior exactly?" -> require faithful IR plus differential/conformance testing; do not infer equivalence from syntax alone.
+
+
+## Iteration 003 native-output cleanliness
+
+Iteration 003 restarts SCAP 1.4 up-conversion from the accepted native design.
+
+- Native SCAP-NG output SHALL NOT contain XCCDF, OVAL, OCIL, or CPE Applicability Language namespaces, IDs, hrefs, XML-shaped structures, or other legacy serialization residue.
+- Legacy source identifiers and component linkage belong only in conversion provenance/evidence.
+- If preserving a legacy reference appears necessary for semantics, stop that conversion path and raise a design-review blocker; do not emit it into native NG without explicit project-owner approval.
+- `benchmark.yaml` owns Benchmark policy structure, including Profiles, meaningful Groups, and Parameters.
+- Iteration 003 does not generate standalone `profiles.yaml`, `groups.yaml`, `values.yaml`, `platforms.yaml`, or `processing.yaml`.
+- A small `applicability.yaml` registry is retained only as semantic applicability-ID -> Assessment binding indirection; it SHALL NOT contain migrated OVAL/CPE/XCCDF structures.
+- Rules reference applicability IDs, not Assessment file paths.
+- The clean-room converter lives under `tools/scap_upconvert_v003/` and SHALL NOT import the iteration-001/002 whole-benchmark conversion pipeline.
