@@ -47,7 +47,53 @@ Collection semantics and assertion semantics SHALL remain distinguishable.
 
 Assessment result/evidence limits SHALL NOT redefine compliance truth.
 
-## 5. Capabilities
+## 5. Expected state and existence
+
+Automated Assessments SHALL be able to express expected state independently
+from collection.
+
+An expected state MAY constrain value, existence, or cardinality. Existence is
+a first-class state condition and SHALL NOT be represented only by incidental
+string comparison or scanner-specific control flow.
+
+At minimum, the following semantics SHALL be representable:
+
+- expected `none`: zero matching observations are required;
+- expected `one_or_more`: at least one matching observation is required;
+- explicit cardinality constraints where an exact or bounded count is part of
+  the policy.
+
+For an expected state of `none`:
+
+- zero matching observations SHALL evaluate true;
+- one or more matching observations SHALL evaluate false.
+
+For an expected state of `one_or_more`:
+
+- zero matching observations SHALL evaluate false;
+- one or more matching observations SHALL evaluate true.
+
+These semantics apply uniformly to capability result entities such as files,
+packages, processes, accounts, configuration entries, Registry values, command
+output entities, and other collected facts.
+
+Illustrative authoring syntax:
+
+    state:
+      stdout:
+        existence: none
+
+The exact final serialization remains subject to schema design, but a conforming
+implementation SHALL preserve the above truth semantics.
+
+A failed existence assertion SHOULD produce both a deterministic human-readable
+message and a structured failure reason. Examples include
+`unexpected_existence` and `required_item_missing`.
+
+SCAP 1.4 migration SHALL preserve source existence/cardinality semantics,
+including OVAL `check_existence`, or SHALL fail explicitly.
+
+## 6. Capabilities
 
 Assessment collection SHALL be expressed using defined capabilities.
 
@@ -59,7 +105,7 @@ Assessment explicitly supplies the shell/interpreter it intends to use; use of
 Bash makes that Assessment operationally Unix/Linux-oriented without changing
 the capability family.
 
-## 6. Reuse
+## 7. Reuse
 
 Reusable Assessments SHOULD use semantic identities describing the fact they
 establish rather than the first Rule or Benchmark that used them.
@@ -69,7 +115,7 @@ demonstrated.
 
 Reuse SHALL be promoted only when semantic equivalence has been established.
 
-## 7. Source references and compiled identity
+## 8. Source references and compiled identity
 
 Authoring paths MAY be used to reference Assessment source files.
 
@@ -80,7 +126,7 @@ Assessment identities.
 
 Moving or renaming a source file SHALL NOT change Assessment identity.
 
-## 8. Historical provenance
+## 9. Historical provenance
 
 Legacy XCCDF/OVAL/OCIL lineage SHOULD be retained as authoring comments or in
 separate conversion reports when useful for migration and review.
