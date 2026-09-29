@@ -457,7 +457,21 @@ rule:
       namespace: http://checklists.nist.gov/xccdf/1.2
     name: Rule
     namespace: http://checklists.nist.gov/xccdf/1.2
-  assessment:
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
     id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
     version: 1
     description: The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations must be configured
@@ -495,6 +509,19 @@ rule:
           value: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000034:
+        source_state_id: oval:mil.disa.stig.win:ste:20000034
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(NT Authority\\)?Local account$
+        comment: null
       oval:mil.disa.stig.win:ste:20000032:
         source_state_id: oval:mil.disa.stig.win:ste:20000032
         source_type: userright_state
@@ -507,6 +534,19 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Everyone
+        comment: null
+      oval:mil.disa.stig.win:ste:20000041:
+        source_state_id: oval:mil.disa.stig.win:ste:20000041
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(.+\\)?Enterprise Admins$
         comment: null
       oval:mil.disa.stig.win:ste:10000100:
         source_state_id: oval:mil.disa.stig.win:ste:10000100
@@ -528,26 +568,19 @@ rule:
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         comment: Standalone Workstation
-      oval:mil.disa.stig.win:ste:10000200:
-        source_state_id: oval:mil.disa.stig.win:ste:10000200
-        source_type: wmi57_state
+      oval:mil.disa.stig.win:ste:20000033:
+        source_state_id: oval:mil.disa.stig.win:ste:20000033
+        source_type: userright_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
         - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: domainrole
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '1'
+            operation: case insensitive equals
           kind: element
-          name: result
+          name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Domain Member Workstation
+          value: Guests
+        comment: null
       oval:mil.disa.stig.win:ste:10000400:
         source_state_id: oval:mil.disa.stig.win:ste:10000400
         source_type: wmi57_state
@@ -568,18 +601,38 @@ rule:
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         comment: Domain Member Server
-      oval:mil.disa.stig.win:ste:20000033:
-        source_state_id: oval:mil.disa.stig.win:ste:20000033
+      oval:mil.disa.stig.win:ste:10000200:
+        source_state_id: oval:mil.disa.stig.win:ste:10000200
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: domainrole
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '1'
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: Domain Member Workstation
+      oval:mil.disa.stig.win:ste:20000040:
+        source_state_id: oval:mil.disa.stig.win:ste:20000040
         source_type: userright_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
         - attributes:
-            operation: case insensitive equals
+            operation: pattern match
           kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Guests
+          value: ^(?i)(.+\\)?Domain Admins$
         comment: null
       oval:mil.disa.stig.win:ste:10000300:
         source_state_id: oval:mil.disa.stig.win:ste:10000300
@@ -601,60 +654,8 @@ rule:
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         comment: Standalone Server
-      oval:mil.disa.stig.win:ste:20000040:
-        source_state_id: oval:mil.disa.stig.win:ste:20000040
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(.+\\)?Domain Admins$
-        comment: null
-      oval:mil.disa.stig.win:ste:20000034:
-        source_state_id: oval:mil.disa.stig.win:ste:20000034
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(NT Authority\\)?Local account$
-        comment: null
-      oval:mil.disa.stig.win:ste:20000041:
-        source_state_id: oval:mil.disa.stig.win:ste:20000041
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(.+\\)?Enterprise Admins$
-        comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25349510:
-          source_test_id: oval:mil.disa.stig.win:tst:25349510
-          source_type: userright_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Deny log on through Remote Desktop Services - Enterprise Admins
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25349500
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000041
-          source_other: []
         oval:mil.disa.stig.win:tst:25349508:
           source_test_id: oval:mil.disa.stig.win:tst:25349508
           source_type: userright_test
@@ -667,46 +668,6 @@ rule:
           - oval:mil.disa.stig.win:obj:25349500
           predicates:
           - oval:mil.disa.stig.win:ste:20000032
-          source_other: []
-        oval:mil.disa.stig.win:tst:25349509:
-          source_test_id: oval:mil.disa.stig.win:tst:25349509
-          source_type: userright_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Deny log on through Remote Desktop Services - Domain Admins
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25349500
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000040
-          source_other: []
-        oval:mil.disa.stig.win:tst:25349507:
-          source_test_id: oval:mil.disa.stig.win:tst:25349507
-          source_type: userright_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Deny log on through Remote Desktop Services - Guests
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25349500
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000033
-          source_other: []
-        oval:mil.disa.stig.win:tst:10002300:
-          source_test_id: oval:mil.disa.stig.win:tst:10002300
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: The system is a non-DC domain-joined Windows server or workstation
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: OR
-          collections:
-          - oval:mil.disa.stig.win:obj:10000100
-          predicates:
-          - oval:mil.disa.stig.win:ste:10000200
-          - oval:mil.disa.stig.win:ste:10000400
           source_other: []
         oval:mil.disa.stig.win:tst:10002200:
           source_test_id: oval:mil.disa.stig.win:tst:10002200
@@ -722,6 +683,33 @@ rule:
           - oval:mil.disa.stig.win:ste:10000100
           - oval:mil.disa.stig.win:ste:10000300
           source_other: []
+        oval:mil.disa.stig.win:tst:10002300:
+          source_test_id: oval:mil.disa.stig.win:tst:10002300
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: The system is a non-DC domain-joined Windows server or workstation
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: OR
+          collections:
+          - oval:mil.disa.stig.win:obj:10000100
+          predicates:
+          - oval:mil.disa.stig.win:ste:10000200
+          - oval:mil.disa.stig.win:ste:10000400
+          source_other: []
+        oval:mil.disa.stig.win:tst:25349507:
+          source_test_id: oval:mil.disa.stig.win:tst:25349507
+          source_type: userright_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Deny log on through Remote Desktop Services - Guests
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25349500
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000033
+          source_other: []
         oval:mil.disa.stig.win:tst:25349506:
           source_test_id: oval:mil.disa.stig.win:tst:25349506
           source_type: userright_test
@@ -735,61 +723,33 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000034
           source_other: []
+        oval:mil.disa.stig.win:tst:25349509:
+          source_test_id: oval:mil.disa.stig.win:tst:25349509
+          source_type: userright_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Deny log on through Remote Desktop Services - Domain Admins
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25349500
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000040
+          source_other: []
+        oval:mil.disa.stig.win:tst:25349510:
+          source_test_id: oval:mil.disa.stig.win:tst:25349510
+          source_type: userright_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Deny log on through Remote Desktop Services - Enterprise Admins
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25349500
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000041
+          source_other: []
       definitions:
-        oval:mil.disa.stig.windows11:def:253495:
-          source_definition_id: oval:mil.disa.stig.windows11:def:253495
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:253495
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: WN11-UR-000090 - The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations
-                must be configured to prevent access from highly privileged domain accounts and local accounts on domain systems
-                and unauthenticated access on all systems.
-            - attributes:
-                family: windows
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Microsoft Windows 11
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: 'Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
-
-
-                The "Deny log on through Remote Desktop Services" right defines the accounts that are prevented from logging
-                on using Remote Desktop Services.
-
-
-                If Remote Desktop Services is not used by the organization, the Everyone group must be assigned this right
-                to prevent all access.
-
-
-                In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust
-                systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to
-                the compromise of an entire domain.
-
-
-                Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement
-                resulting from credential theft attacks.
-
-
-                The Guests group must be assigned this right to prevent unauthenticated access.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:253495:
           source_definition_id: oval:mil.disa.stig.defs:def:253495
           class: compliance
@@ -853,6 +813,60 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.windows11:def:253495:
+          source_definition_id: oval:mil.disa.stig.windows11:def:253495
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:253495
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: WN11-UR-000090 - The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations
+                must be configured to prevent access from highly privileged domain accounts and local accounts on domain systems
+                and unauthenticated access on all systems.
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows 11
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: 'Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
+
+
+                The "Deny log on through Remote Desktop Services" right defines the accounts that are prevented from logging
+                on using Remote Desktop Services.
+
+
+                If Remote Desktop Services is not used by the organization, the Everyone group must be assigned this right
+                to prevent all access.
+
+
+                In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust
+                systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to
+                the compromise of an entire domain.
+
+
+                Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement
+                resulting from credential theft attacks.
+
+
+                The Guests group must be assigned this right to prevent unauthenticated access.'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
       definition_results:
       - oval:mil.disa.stig.windows11:def:253495
@@ -864,16 +878,22 @@ rule:
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253495
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: ''
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       - definition_id: oval:mil.disa.stig.windows11:def:253495
         exports: []
         href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
         match_count: 1
+        multi_check: null
         name: oval:mil.disa.stig.windows11:def:253495
+        negate: null
         oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        selector: automated
         status: resolved
         system: http://oval.mitre.org/XMLSchema/oval-definitions-5
       component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
@@ -1004,11 +1024,218 @@ rule:
         system: http://scap.nist.gov/schema/ocil/2
       kind: check_candidates
     source_result_algebra: xccdf-1.2-complex-check-eight-state
-    migration: &id001
+    migration: &id002
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
-      semantic_ir_sha256: 60b940ec89c1f045b3b9d6a6aefb10b1224a3eb5aa0f9ba678995e48319f6f39
+      semantic_ir_sha256: 0c2833df154576aad2680d33afe8836c52107c903f3332673307dec517b82e01
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 99c6e09a7d7ce194a1612b928dbfdb17de476df06640adc289dbaa0ced17b1bb
-  migration: *id001
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+    version: 1
+    description: The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations must be configured
+      to prevent access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access
+      on all systems.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+        If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right, this
+        is a finding: If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of
+        the groups listed below. Domain Systems Only: Enterprise Admins group Domain Admins group Local account (see Note
+        below) All Systems: Guests group Privileged Access Workstations (PAWs) dedicated to the management of Active Directory
+        are exempt from denying the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation
+        STIG for PAW requirements.) Note: "Local account" is a built-in security group used to assign user rights and permissions
+        to all local accounts.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+            Run "gpedit.msc".
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right,
+            this is a finding:
+
+
+            If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of the groups
+            listed below.
+
+
+            Domain Systems Only:
+
+            Enterprise Admins group
+
+            Domain Admins group
+
+            Local account (see Note below)
+
+
+            All Systems:
+
+            Guests group
+
+
+            Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying
+            the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.)
+
+
+            Note: "Local account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253495
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253495
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253495
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+              name: oval:mil.disa.stig.windows11:def:253495
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+        exports: []
+        inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+          Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+          If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right,
+          this is a finding: If Remote Desktop Services is not used by the organization, the "Everyone" group can replace
+          all of the groups listed below. Domain Systems Only: Enterprise Admins group Domain Admins group Local account (see
+          Note below) All Systems: Guests group Privileged Access Workstations (PAWs) dedicated to the management of Active
+          Directory are exempt from denying the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access
+          Workstation STIG for PAW requirements.) Note: "Local account" is a built-in security group used to assign user rights
+          and permissions to all local accounts.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+              Run "gpedit.msc".
+
+
+              Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+              Policies >> User Rights Assignment.
+
+
+              If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right,
+              this is a finding:
+
+
+              If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of the groups
+              listed below.
+
+
+              Domain Systems Only:
+
+              Enterprise Admins group
+
+              Domain Admins group
+
+              Local account (see Note below)
+
+
+              All Systems:
+
+              Guests group
+
+
+              Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying
+              the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW
+              requirements.)
+
+
+              Note: "Local account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer Policy
+      >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment. If the
+      following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right, this is a
+      finding: If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of the groups
+      listed below. Domain Systems Only: Enterprise Admins group Domain Admins group Local account (see Note below) All Systems:
+      Guests group Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying
+      the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.)
+      Note: "Local account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: dcae6340ad71e16f77c3036f6bfab39c248e87b099e20e24fc51ea89e6c88d7c
+  migration: *id002
