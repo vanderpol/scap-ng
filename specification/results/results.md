@@ -79,6 +79,13 @@ multiple CPE generations or other identifier systems can coexist.
 Whether a reported CPE is later used for content applicability is a separate
 policy/evaluation concern.
 
+When product inventory is emitted by a Platform Assessment, the result SHOULD
+retain enough provenance to identify the producing Platform Assessment and the
+supporting observed evidence.
+
+Product inventory is descriptive target data. It SHALL NOT be interpreted as a
+Rule result, compliance finding, or implicit applicability decision.
+
 ## 5. Rule result self-description
 
 A Rule result SHOULD contain enough Rule context for common downstream use
