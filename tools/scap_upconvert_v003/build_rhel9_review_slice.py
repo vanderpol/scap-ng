@@ -331,17 +331,22 @@ def automated_refs(rec):
         refs.append(((c.get("selector") or "").strip() or "default", ref.get("name")))
     return refs
 
-def fully_lowerable(rec, oroot):
+def lowerability_reason(rec, oroot):
     rule = rec["element"]
-    if rec["platforms"] or rec["requires"] or rec["conflicts"]: return False
+    if rec["platforms"]: return "rule_applicability_not_yet_lowered"
+    if rec["requires"]: return "requires_not_yet_lowered"
+    if rec["conflicts"]: return "conflicts_not_yet_lowered"
     _, fix_error = normalized_fixes(rule)
-    if fix_error: return False
+    if fix_error: return fix_error
     refs = automated_refs(rec)
-    if not refs: return False
+    if not refs: return "no_automated_check"
     for _, definition_id in {x for x in refs}:
-        assessment, _ = lower_definition(oroot, definition_id, "probe")
-        if assessment is None: return False
-    return True
+        assessment, error = lower_definition(oroot, definition_id, "probe")
+        if assessment is None: return error
+    return None
+
+def fully_lowerable(rec, oroot):
+    return lowerability_reason(rec, oroot) is None
 
 def main():
     shutil.rmtree(OUT, ignore_errors=True)
@@ -360,7 +365,13 @@ def main():
         # preserve every check-selection and automated-assessment semantic it emits.
         selected = [r for r in rs if fully_lowerable(r, oroot)][:3]
         if len(selected) < 3:
-            raise RuntimeError(f"Only {len(selected)} fully lowerable Rules found; refusing partial review slice")
+            from collections import Counter
+            reasons = Counter(lowerability_reason(r, oroot) for r in rs)
+            summary = ", ".join(f"{k}={v}" for k, v in reasons.most_common(12))
+            raise RuntimeError(
+                f"Only {len(selected)} fully lowerable Rules found; refusing partial review slice. "
+                f"Top rejection reasons: {summary}"
+            )
 
         selected_ids = [r["id"] for r in selected]
         source_to_native = {r["source_rule_id"]: r["id"] for r in rs}
