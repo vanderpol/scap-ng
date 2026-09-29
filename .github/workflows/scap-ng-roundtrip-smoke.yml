@@ -63,12 +63,14 @@ jobs:
             out/*.xml
 
       - name: Upload regenerated OVAL
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: regenerated-oval
           path: out/*.xml
 
       - name: Compare original and regenerated OVAL semantics
+        if: always()
         run: |
           set -euo pipefail
           python scap-ng/tools/scap_ng_roundtrip_v003/run_roundtrip.py \
