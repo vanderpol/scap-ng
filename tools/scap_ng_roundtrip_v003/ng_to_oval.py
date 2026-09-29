@@ -277,7 +277,7 @@ def build(data):
         d = ET.SubElement(defs, q(OVAL_DEF, "definition"), {
             "id": ids.get("def", data["id"]),
             "version": "1",
-            "class": "compliance",
+            "class": sem.get("definition_class","compliance"),
         })
         md = ET.SubElement(d, q(OVAL_DEF, "metadata"))
         ET.SubElement(md, q(OVAL_DEF, "title")).text = f"Round-trip fixture {data['id']}"
