@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 
 OVAL_DEF = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 OVAL_COMMON = "http://oval.mitre.org/XMLSchema/oval-common-5"
+XSI = "http://www.w3.org/2001/XMLSchema-instance"
 NS = {
     "independent": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
     "linux": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
@@ -21,6 +22,7 @@ NS = {
 }
 ET.register_namespace("", OVAL_DEF)
 ET.register_namespace("oval", OVAL_COMMON)
+ET.register_namespace("xsi", XSI)
 ET.register_namespace("ind", NS["independent"])
 ET.register_namespace("linux", NS["linux"])
 ET.register_namespace("unix", NS["unix"])
@@ -90,8 +92,14 @@ def attrs_for_entity(spec, ids):
 
 def add_entity(parent, ns, name, spec, ids):
     if isinstance(spec, dict):
-        el = ET.SubElement(parent, q(ns, name), attrs_for_entity(spec, ids))
-        if "fields" in spec:
+        eattrs=attrs_for_entity(spec, ids)
+        if spec.get("nil") is True:
+            eattrs[q(XSI,"nil")]="true"
+        el = ET.SubElement(parent, q(ns, name), eattrs)
+        if spec.get("nil") is True:
+            if "fields" in spec or "variable" in spec or "value" in spec:
+                die(f"{name}: nil entity cannot also contain fields/variable/value")
+        elif "fields" in spec:
             if "variable" in spec or "value" in spec:
                 die(f"{name}: record fields cannot be combined with variable/value")
             for field in spec["fields"]:
