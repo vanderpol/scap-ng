@@ -585,6 +585,45 @@ def main():
         xr, oroot, xsrc, osrc = load_source_components(files)
         rs = records(xr)
 
+        all_xml_roots = []
+        for source_file in files:
+            if source_file.suffix.lower() != ".xml":
+                continue
+            try:
+                all_xml_roots.append((source_file.name, ET.parse(source_file).getroot()))
+            except ET.ParseError:
+                pass
+
+        source_platform_refs = sorted({
+            ref.lstrip("#")
+            for r in rs
+            for ref in r["platforms"]
+        })
+        source_platform_inventory = []
+        for platform_ref in source_platform_refs:
+            matches = []
+            for source_name, source_root in all_xml_roots:
+                for node in source_root.iter():
+                    if node.get("id") == platform_ref:
+                        matches.append({
+                            "source_file": source_name,
+                            "element": local(node.tag),
+                            "attributes": dict(node.attrib),
+                            "text": text(node),
+                            "children": [
+                                {
+                                    "element": local(child.tag),
+                                    "attributes": dict(child.attrib),
+                                    "text": text(child),
+                                }
+                                for child in list(node)
+                            ],
+                        })
+            source_platform_inventory.append({
+                "source_id": platform_ref,
+                "matches": matches,
+            })
+
         applicability_candidates = [
             {
                 "rule": r["id"],
@@ -800,6 +839,7 @@ def main():
         write_json(EVIDENCE / "rule-mapping.json", {"rules": evidence})
         write_json(EVIDENCE / "grouping.json", {"groups": grouping_evidence})
         write_json(EVIDENCE / "applicability-candidates.json", {"rules": applicability_candidates})
+        write_json(EVIDENCE / "source-platform-inventory.json", {"platforms": source_platform_inventory})
         write_json(EVIDENCE / "manual-default-candidates.json", {"rules": manual_default_candidates})
         write_json(EVIDENCE / "diagnostics.json", {"diagnostics": diagnostics})
         print("accepted native rules:", ", ".join(selected_ids))
