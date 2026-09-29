@@ -109,3 +109,36 @@ Results SHALL identify enough resolved policy state to answer:
 Results MAY use compact references when the immutable package and Tailoring
 artifacts are available, but historical interpretation SHALL NOT depend on
 mutable current source.
+
+
+## 9. Check selection
+
+A Rule's policy binding MAY expose one or more named **check selectors**. Each
+selector SHALL resolve to an Assessment Method or other assessment
+implementation permitted by this specification.
+
+The Benchmark Rule SHALL remain bound to policy rather than directly to a
+particular executable Assessment implementation.
+
+When more than one check is exposed, the policy MAY identify a default check.
+Selector names are extensible identifiers; implementations SHALL NOT assume
+that only `automated` and `manual` are valid names.
+
+A Profile or Tailoring layer MAY select an exposed check selector when the
+governing policy permits check selection. Check selection changes which
+published assessment alternative evaluates the Rule; it SHALL NOT rewrite the
+selected Assessment implementation.
+
+Effective resolution is therefore:
+
+    Benchmark Rule -> Policy -> selected check -> Assessment
+
+Check selection SHALL be resolved and frozen with the effective policy before
+applicability and compliance execution.
+
+If an explicitly requested selector does not exist for the Rule's applicable
+policy, resolution SHALL fail. A processor SHALL NOT silently substitute the
+default check or another available check.
+
+Results SHALL identify the effective check selector and Assessment Method used
+when check alternatives exist.
