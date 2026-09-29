@@ -1000,7 +1000,7 @@ def lower_definition(oroot, definition_id, assessment_id):
         elif kind == "external_variable":
             entry["input"] = {
                 "required": True,
-                "cardinality": variable.get("version") and "one_or_more" or "one_or_more",
+                "cardinality": "one_or_more",
             }
         elif kind == "local_variable":
             components = [child for child in variable if local(child.tag) not in ("notes",)]
