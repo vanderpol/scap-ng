@@ -148,3 +148,38 @@ non-equivalent to the supported source semantics.
 Every newly encountered source construct that requires a new semantic mapping
 SHOULD be added to the migration/conformance regression corpus after support is
 implemented.
+
+
+## 12. CPE inventory migration
+
+SCAP 1.4 OVAL inventory definitions that map to CPE identifiers SHALL preserve
+the product-identity relationship during Stage-1 migration.
+
+When a legacy inventory definition is used to establish the presence of an
+operating system or application and a corresponding CPE identifier is known,
+the converted Platform/Inventory Assessment SHOULD retain that identifier as a
+descriptive inventory output.
+
+A successful converted Platform/Inventory Assessment MAY therefore contribute
+an observed product record to the result package, including the corresponding
+CPE identifier.
+
+This inventory side output SHALL NOT change:
+
+- Benchmark Platform truth;
+- Rule selection;
+- Rule applicability;
+- compliance Assessment truth.
+
+The migration converter SHALL distinguish:
+
+1. CPE as product inventory identity; and
+2. legacy CPE/XCCDF applicability processing.
+
+Preserving the former SHALL NOT silently introduce the latter into native
+SCAP-NG semantics.
+
+If the source CPE identifier cannot be mapped unambiguously to the migrated
+inventory Assessment, the converter SHOULD preserve the original relationship
+as migration provenance and report it for review rather than invent a product
+identifier.
