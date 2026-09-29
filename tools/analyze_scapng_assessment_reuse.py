@@ -24,6 +24,10 @@ from typing import Any
 DROP_KEYS = {
     "id",
     "comment",
+    "test_title",
+    "object_title",
+    "state_title",
+    "variable_title",
     "metadata",
     "version",
     "source_object_id",
