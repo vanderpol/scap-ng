@@ -30,6 +30,7 @@ def main():
         if p.returncode:
             failures.append(fixture.name)
             if p.stderr: print(p.stderr,file=sys.stderr)
+    # Fail closed: any semantic mismatch makes the harness nonzero.
     if failures:
         print("Semantic mismatches: "+", ".join(failures),file=sys.stderr)
         return 1
