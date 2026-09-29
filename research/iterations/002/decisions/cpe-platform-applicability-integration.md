@@ -17,8 +17,12 @@ standardized external platform/product identifiers such as CPE when those
 identifiers are useful to publishers, tools, asset inventories, vulnerability
 management systems, or future OVAL/CPE standards work.
 
-CPE is treated as an **identity and matching facet of Platform**, not as a
-replacement for the Platform Assessment that establishes truth on a target.
+For the primary SCAP-NG use case, CPE is treated first as **reported product
+identity in target inventory**. A scan may report the operating-system CPE and
+application CPEs observed on the target.
+
+CPE matching for content applicability is a secondary/optional use case. CPE
+does not replace the Platform Assessment that establishes truth on a target.
 
 The intended layering is:
 
@@ -33,6 +37,40 @@ The intended layering is:
 
 Rule applicability remains a separate layer for target conditions beyond basic
 product/platform identity.
+
+## Primary SCAP-NG use case: target inventory reporting
+
+The primary SCAP-NG use of CPE is inventory reporting, not policy selection.
+
+A scan result SHOULD be able to report standardized product identifiers for
+the target operating system and detected applications, for example:
+
+    target:
+      inventory:
+        operating_system:
+          identifiers:
+            - scheme: cpe
+              version: "2.3"
+              value: "cpe:2.3:o:microsoft:windows_11:*:*:*:*:*:*:*:*"
+
+        applications:
+          - name: example
+            identifiers:
+              - scheme: cpe
+                version: "2.3"
+                value: "cpe:2.3:a:vendor:product:version:*:*:*:*:*:*:*"
+
+This inventory is descriptive output about the target.
+
+A reported CPE SHALL NOT by itself be treated as unique asset identity. Multiple
+assets may report the same product CPE.
+
+A scanner MAY report more than one applicable CPE identifier for a product when
+required by the governing CPE naming/version rules, but duplicate or
+contradictory identifiers SHOULD be normalized or explained.
+
+The result model SHOULD preserve the CPE scheme/version so future CPE revisions
+can coexist with legacy identifiers.
 
 ## Why preserve a CPE integration point
 
