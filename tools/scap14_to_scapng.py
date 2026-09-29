@@ -318,6 +318,28 @@ def check_selection_plan(rule: dict, assessment: dict | None) -> tuple[dict | No
     }, None
 
 
+def native_profile_check_selectors(source: dict) -> list[dict]:
+    """Project resolved XCCDF refine-rule selectors into native tailoring data."""
+    out = []
+    for profile in source.get("resolved_profiles", []):
+        selections = {}
+        for action in profile.get("effective_actions", []):
+            if action.get("kind") != "refine-rule":
+                continue
+            selector = action.get("attributes", {}).get("selector")
+            if selector in (None, ""):
+                continue
+            for target in action.get("targets", []):
+                if target.get("kind") == "rule" and target.get("id"):
+                    # XCCDF profile actions are ordered; later actions override.
+                    selections[target["id"]] = selector
+        out.append({
+            "profile": profile.get("id"),
+            "check_selectors": selections,
+        })
+    return out
+
+
 def policy_rule(rule: dict) -> dict:
     fixes = [x for x in rule.get("fixes", []) if x.get("text")]
     return {
@@ -470,6 +492,7 @@ def main() -> int:
         "prototype": True,
         "profiles": source.get("profiles", []),
         "resolved_profiles": source.get("resolved_profiles", []),
+        "check_selectors": native_profile_check_selectors(source),
     })
     dump_yaml(combined_root / "groups.yaml", {
         "scap_ng": SPEC, "prototype": True, "groups": source.get("groups", [])
@@ -496,6 +519,7 @@ def main() -> int:
         "prototype": True,
         "profiles": source.get("profiles", []),
         "resolved_profiles": source.get("resolved_profiles", []),
+        "check_selectors": native_profile_check_selectors(source),
     })
     dump_yaml(split_root / "groups.yaml", {
         "scap_ng": SPEC, "prototype": True, "groups": source.get("groups", [])
@@ -635,6 +659,7 @@ def main() -> int:
         "platform_definitions": source.get("platform_definitions", []),
         "profiles": source.get("profiles", []),
         "resolved_profiles": source.get("resolved_profiles", []),
+        "profile_check_selectors": native_profile_check_selectors(source),
         "groups": source.get("groups", []),
         "values": source.get("values", []),
         "rules": canonical_rules,
