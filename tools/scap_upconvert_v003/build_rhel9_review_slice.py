@@ -28,6 +28,13 @@ def text(node):
     s = " ".join("".join(node.itertext()).split())
     return s or None
 def safe_id(s): return re.sub(r"[^A-Za-z0-9_.-]+", "-", s.strip()).strip("-")
+def semantic_id(value, fallback):
+    slug = re.sub(r"[^a-z0-9]+", "-", (value or "").lower()).strip("-")
+    stop = {"the","a","an","is","are","must","be","of","to","for","with","and"}
+    words = [w for w in slug.split("-") if w and w not in stop]
+    return "-".join(words[:10]) or fallback
+def node_title(node):
+    return ((node.get("comment") or "").strip() or None) if node is not None else None
 def sha256(data): return hashlib.sha256(data).hexdigest()
 def write_yaml(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -200,62 +207,105 @@ def find_by_id(root, item_id, suffix):
 
 def lower_definition(oroot, definition_id, assessment_id):
     """Lower Boolean definition logic while requiring every leaf test to be exact."""
-    definition = next((n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id), None)
-    if definition is None: return None, "definition_not_found"
+    definition = next(
+        (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id),
+        None,
+    )
+    if definition is None:
+        return None, "definition_not_found"
 
+    assessment_title = node_title(definition)
     checks = {}
     test_to_check = {}
-    counter = [0]
+    used_check_ids = set()
     active_definitions = set()
+
+    def unique_check_id(title, capability):
+        base = semantic_id(title, semantic_id(capability, "check"))
+        candidate = base
+        suffix = 2
+        while candidate in used_check_ids:
+            candidate = f"{base}-{suffix}"
+            suffix += 1
+        used_check_ids.add(candidate)
+        return candidate
 
     def lower_test(test_ref):
         if test_ref in test_to_check:
             return {"check": test_to_check[test_ref]}, None
-        test = next((n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")), None)
-        if test is None: return None, "test_not_found"
+
+        test = next(
+            (n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")),
+            None,
+        )
+        if test is None:
+            return None, "test_not_found"
 
         test_name = local(test.tag)
         ns_uri = test.tag.split("}", 1)[0].strip("{")
         family = ns_uri.split("#")[-1].split("/")[-1]
         capability = f"{family}.{test_name[:-5] if test_name.endswith('_test') else test_name}"
+        test_title = node_title(test)
 
-        obj_ref = None; state_refs = []
+        obj_ref = None
+        state_refs = []
         for child in test:
-            if local(child.tag) == "object": obj_ref = child.get("object_ref")
-            elif local(child.tag) == "state" and child.get("state_ref"): state_refs.append(child.get("state_ref"))
+            if local(child.tag) == "object":
+                obj_ref = child.get("object_ref")
+            elif local(child.tag) == "state" and child.get("state_ref"):
+                state_refs.append(child.get("state_ref"))
+
         obj = find_by_id(oroot, obj_ref, "_object")
-        if obj is None: return None, "object_not_found"
+        if obj is None:
+            return None, "object_not_found"
 
         query = {}
         for child in obj:
             name = local(child.tag)
-            if name in ("behaviors", "set", "filter"): return None, f"object_{name}_not_yet_lowered"
-            if child.get("var_ref"): return None, "object_variable_not_yet_lowered"
+            if name in ("behaviors", "set", "filter"):
+                return None, f"object_{name}_not_yet_lowered"
+            if child.get("var_ref"):
+                return None, "object_variable_not_yet_lowered"
             value = text(child)
             if value is not None:
-                query[name] = ({"operation": child.get("operation"), "value": value}
-                               if child.get("operation") else value)
+                query[name] = (
+                    {"operation": child.get("operation"), "value": value}
+                    if child.get("operation") else value
+                )
 
-            states = []
+        states = []
+        state_titles = []
         for ref in state_refs:
             state = find_by_id(oroot, ref, "_state")
-            if state is None: return None, "state_not_found"
+            if state is None:
+                return None, "state_not_found"
+            if node_title(state):
+                state_titles.append(node_title(state))
             conditions = []
             for child in state:
-                if child.get("var_ref"): return None, "state_variable_not_yet_lowered"
-                item = {"field": local(child.tag), "operation": child.get("operation") or "equals", "value": text(child)}
-                if child.get("entity_check"): item["entity_check"] = child.get("entity_check")
-                if child.get("datatype"): item["datatype"] = child.get("datatype")
+                if child.get("var_ref"):
+                    return None, "state_variable_not_yet_lowered"
+                item = {
+                    "field": local(child.tag),
+                    "operation": child.get("operation") or "equals",
+                    "value": text(child),
+                }
+                if child.get("entity_check"):
+                    item["entity_check"] = child.get("entity_check")
+                if child.get("datatype"):
+                    item["datatype"] = child.get("datatype")
                 conditions.append(item)
             if conditions:
                 states.append(conditions[0] if len(conditions) == 1 else {"all": conditions})
 
-        counter[0] += 1
-        check_id = f"check-{counter[0]}"
+        check_id = unique_check_id(test_title, capability)
         test_to_check[test_ref] = check_id
+
         assertion = {
+            "title": " / ".join(state_titles) if state_titles else None,
             "existence": test.get("check_existence") or "at_least_one_exists",
             "check": test.get("check") or "all",
+            "state": None,
         }
         if states:
             state_operator = (test.get("state_operator") or "AND").upper()
@@ -269,7 +319,12 @@ def lower_definition(oroot, definition_id, assessment_id):
                 return None, f"unsupported_state_operator:{state_operator}"
 
         checks[check_id] = {
-            "collect": {"capability": capability, "select": query},
+            "title": test_title,
+            "collect": {
+                "title": node_title(obj),
+                "capability": capability,
+                "select": query,
+            },
             "assert": assertion,
         }
         return {"check": check_id}, None
@@ -285,21 +340,30 @@ def lower_definition(oroot, definition_id, assessment_id):
                 term, error = lower_criteria(child)
             elif kind == "extend_definition":
                 ref = child.get("definition_ref")
-                if ref in active_definitions: return None, "definition_cycle"
-                target = next((n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == ref), None)
-                if target is None: return None, "extended_definition_not_found"
+                if ref in active_definitions:
+                    return None, "definition_cycle"
+                target = next(
+                    (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == ref),
+                    None,
+                )
+                if target is None:
+                    return None, "extended_definition_not_found"
                 nested = next((n for n in target if local(n.tag) == "criteria"), None)
-                if nested is None: return None, "extended_definition_missing_criteria"
+                if nested is None:
+                    return None, "extended_definition_missing_criteria"
                 active_definitions.add(ref)
                 term, error = lower_criteria(nested)
                 active_definitions.remove(ref)
             else:
                 continue
-            if error: return None, error
+            if error:
+                return None, error
             if (child.get("negate") or "false").lower() == "true":
                 term = {"not": term}
             terms.append(term)
-        if not terms: return None, "empty_criteria"
+
+        if not terms:
+            return None, "empty_criteria"
         if len(terms) == 1:
             expr = terms[0]
         elif operator == "AND":
@@ -308,19 +372,24 @@ def lower_definition(oroot, definition_id, assessment_id):
             expr = {"any": terms}
         else:
             return None, f"unsupported_criteria_operator:{operator}"
+
         if (node.get("negate") or "false").lower() == "true":
             expr = {"not": expr}
         return expr, None
 
-    root_criteria = next((c for c in definition if local(c.tag) == "criteria"), None)
-    if root_criteria is None: return None, "missing_criteria"
+    root_criteria = next((n for n in definition if local(n.tag) == "criteria"), None)
+    if root_criteria is None:
+        return None, "missing_criteria"
+
     active_definitions.add(definition_id)
     expression, error = lower_criteria(root_criteria)
     active_definitions.remove(definition_id)
-    if error: return None, error
+    if error:
+        return None, error
 
     return {"assessment": {
         "id": assessment_id,
+        "title": assessment_title,
         "mode": "automated",
         "checks": checks,
         "evaluate": expression,
@@ -351,6 +420,69 @@ def lowerability_reason(rec, oroot):
 
 def fully_lowerable(rec, oroot):
     return lowerability_reason(rec, oroot) is None
+
+def functional_group(rec):
+    haystack = " ".join(filter(None, [
+        rec.get("title"),
+        text(rec["element"].find("x:description", NS)),
+        text(rec["element"].find("x:fixtext", NS)),
+    ])).lower()
+    topics = [
+        ("ssh", "SSH", ("ssh", "sshd", "secure shell")),
+        ("password-policy", "Password Policy", ("password", "pam", "pwquality", "login.defs")),
+        ("auditing", "Auditing", ("audit", "audisp", "journald", "log")),
+        ("account-management", "Account Management", ("account", "user", "group", "uid", "gid")),
+        ("services", "Services", ("service", "systemd", "daemon", "target")),
+        ("filesystem", "Filesystem and Permissions", ("file", "directory", "permission", "owner", "mount")),
+        ("networking", "Networking", ("network", "firewall", "ipv4", "ipv6", "tcp", "udp")),
+        ("cryptography", "Cryptography", ("crypto", "fips", "cipher", "certificate", "key")),
+    ]
+    for gid, title, needles in topics:
+        if any(n in haystack for n in needles):
+            return gid, title
+    return "needs-grouping", "Needs Grouping"
+
+def build_groups(selected):
+    parents = {
+        "automated": {"id": "automated", "title": "Automated", "groups": {}},
+        "manual-or-managerial": {
+            "id": "manual-or-managerial",
+            "title": "Manual or Managerial",
+            "groups": {},
+        },
+    }
+    evidence = []
+    for rec in selected:
+        default = next(
+            (c for c in rec["checks"] if not (c.get("selector") or "").strip()),
+            rec["checks"][0] if rec["checks"] else None,
+        )
+        parent_id = "manual-or-managerial" if default is None or check_kind(default) == "manual" else "automated"
+        topic_id, topic_title = functional_group(rec)
+        subgroup_id = f"{parent_id}.{topic_id}"
+        subgroup = parents[parent_id]["groups"].setdefault(
+            subgroup_id,
+            {"id": subgroup_id, "title": topic_title, "rules": []},
+        )
+        subgroup["rules"].append(rec["id"])
+        evidence.append({
+            "rule": rec["id"],
+            "assessment_group": parent_id,
+            "functional_group": subgroup_id,
+            "method": "heuristic",
+        })
+
+    output = []
+    for parent in parents.values():
+        children = list(parent["groups"].values())
+        if not children:
+            continue
+        output.append({
+            "id": parent["id"],
+            "title": parent["title"],
+            "groups": children,
+        })
+    return output, evidence
 
 def main():
     shutil.rmtree(OUT, ignore_errors=True)
@@ -414,11 +546,25 @@ def main():
                 profile["extends"] = safe_id(p.get("extends").split("_profile_")[-1])
             profiles.append(profile)
 
+        groups, grouping_evidence = build_groups(selected)
         write_yaml(OUT / "benchmark.yaml", {"benchmark": {
             "id": "rhel9-stig-review-slice",
             "title": "Red Hat Enterprise Linux 9 STIG — SCAP-NG 003 review slice",
             "version": text(xr.find("x:version", NS)),
-            "platform": "rhel.9",
+            "platform": {
+                "id": "rhel.9",
+                "title": "Red Hat Enterprise Linux 9",
+                "identifiers": [
+                    {
+                        "scheme": "cpe",
+                        "version": "2.3",
+                        "value": "cpe:2.3:o:redhat:enterprise_linux:9:*:*:*:*:*:*:*",
+                    }
+                ],
+                "assessment": None,
+            },
+            "parameters": [],
+            "groups": groups,
             "profiles": profiles,
             "rules": deepcopy(selected_ids),
         }})
@@ -426,10 +572,32 @@ def main():
         evidence = []; diagnostics = []
         for rec in selected:
             rid = rec["id"]; rule = rec["element"]
-            policy = {"policy": {"id": rid, "title": rec["title"], "severity": rec["severity"]}}
-            if rec["role"]: policy["policy"]["role"] = rec["role"]
-            if rec["weight"]: policy["policy"]["weight"] = float(rec["weight"])
-            policy["policy"].update(policy_content(rule))
+            content_fields = policy_content(rule)
+            policy = {"policy": {
+                "id": rid,
+                "title": rec["title"],
+                "severity": rec["severity"],
+                "role": rec["role"],
+                "weight": float(rec["weight"]) if rec["weight"] is not None else None,
+                "discussion": content_fields.get("discussion"),
+                "rationale": content_fields.get("rationale"),
+                "documentable": content_fields.get("documentable"),
+                "false_positives": content_fields.get("false_positives"),
+                "false_negatives": content_fields.get("false_negatives"),
+                "mitigations": content_fields.get("mitigations"),
+                "potential_impacts": content_fields.get("potential_impacts"),
+                "responsibility": content_fields.get("responsibility"),
+                "warnings": content_fields.get("warnings", []),
+                "identifiers": content_fields.get("identifiers", []),
+                "references": content_fields.get("references", []),
+                "requires": [],
+                "conflicts": [],
+                "applicability": [],
+                "parameters": {},
+                "remediation": content_fields.get("remediation"),
+                "checks": {},
+                "default_check": None,
+            }}
 
             checks = {}
             definition_to_assessment = {}
@@ -439,7 +607,14 @@ def main():
                     aid = f"{rid}.manual"
                     procedure = text(c.find("x:check-content", NS))
                     write_yaml(OUT / "assessments/manual" / f"{rid}.manual.assessment.yaml",
-                               {"assessment": {"id": aid, "mode": "manual", "procedure": procedure}})
+                               {"assessment": {
+                                   "id": aid,
+                                   "title": f"Manual assessment for {rid}",
+                                   "mode": "manual",
+                                   "procedure": procedure,
+                                   "inputs": [],
+                                   "evidence": [],
+                               }})
                     checks[selector] = aid
                     continue
 
@@ -480,6 +655,7 @@ def main():
             "benchmark_component": xsrc, "assessment_component": osrc,
         })
         write_json(EVIDENCE / "rule-mapping.json", {"rules": evidence})
+        write_json(EVIDENCE / "grouping.json", {"groups": grouping_evidence})
         write_json(EVIDENCE / "diagnostics.json", {"diagnostics": diagnostics})
         print("accepted native rules:", ", ".join(selected_ids))
 
