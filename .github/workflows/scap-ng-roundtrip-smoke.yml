@@ -51,3 +51,11 @@ jobs:
         with:
           name: regenerated-oval
           path: out/*.xml
+
+      - name: Compare original and regenerated OVAL semantics
+        run: |
+          set -euo pipefail
+          python scap-ng/tools/scap_ng_roundtrip_v003/run_roundtrip.py \
+            --fixtures scap-ng/research/iterations/003/examples/oval-ng-roundtrip-stress \
+            --scap-content scap-content \
+            --out semantic-out
