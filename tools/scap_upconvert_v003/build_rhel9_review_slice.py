@@ -762,6 +762,144 @@ def find_by_id(root, item_id, suffix):
     if not item_id: return None
     return next((n for n in root.iter() if n.get("id") == item_id and local(n.tag).endswith(suffix)), None)
 
+def oval_semantic_inventory(oroot):
+    """Inventory source constructs independently of conversion success.
+
+    This prevents fail-fast lowering from making unsupported source semantics
+    appear rarer than they really are.
+    """
+    counts = {}
+    variable_kinds = {}
+    for node in oroot.iter():
+        name = local(node.tag)
+        if name in ("filter", "set", "behaviors"):
+            counts[name] = counts.get(name, 0) + 1
+        if name.endswith("_variable"):
+            variable_kinds[name] = variable_kinds.get(name, 0) + 1
+        if name in (
+            "arithmetic", "begin", "concat", "end", "escape_regex",
+            "literal_component", "object_component", "regex_capture",
+            "split", "substring", "time_difference", "unique",
+            "variable_component",
+        ):
+            counts[name] = counts.get(name, 0) + 1
+    return {
+        "construct_counts": dict(sorted(counts.items())),
+        "variable_kinds": dict(sorted(variable_kinds.items())),
+    }
+
+def unsupported_definition_features(oroot, definition_id):
+    """Return every currently unsupported construct reachable from a Definition.
+
+    This is diagnostic discovery, not lowering. It walks the full Definition
+    criteria closure first so one early failure cannot mask later unsupported
+    constructs such as filters behind sets or variable references.
+    """
+    findings = []
+    seen_findings = set()
+    test_refs = set()
+    visited_definitions = set()
+
+    def add(feature, source_id=None, detail=None):
+        key = (feature, source_id, detail)
+        if key in seen_findings:
+            return
+        seen_findings.add(key)
+        item = {"feature": feature}
+        if source_id is not None:
+            item["source_id"] = source_id
+        if detail is not None:
+            item["detail"] = detail
+        findings.append(item)
+
+    def visit_criteria(node):
+        for child in node:
+            kind = local(child.tag)
+            if kind == "criterion":
+                ref = child.get("test_ref")
+                if ref:
+                    test_refs.add(ref)
+            elif kind == "criteria":
+                operator = (child.get("operator") or "AND").upper()
+                if operator not in ("AND", "OR"):
+                    add("criteria_operator", detail=operator)
+                visit_criteria(child)
+            elif kind == "extend_definition":
+                visit_definition(child.get("definition_ref"))
+
+    def visit_definition(ref):
+        if not ref or ref in visited_definitions:
+            return
+        visited_definitions.add(ref)
+        definition = next(
+            (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == ref),
+            None,
+        )
+        if definition is None:
+            add("definition_not_found", ref)
+            return
+        criteria = next((n for n in definition if local(n.tag) == "criteria"), None)
+        if criteria is None:
+            add("missing_criteria", ref)
+            return
+        operator = (criteria.get("operator") or "AND").upper()
+        if operator not in ("AND", "OR"):
+            add("criteria_operator", ref, operator)
+        visit_criteria(criteria)
+
+    visit_definition(definition_id)
+
+    for test_ref in sorted(test_refs):
+        test = next(
+            (n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")),
+            None,
+        )
+        if test is None:
+            add("test_not_found", test_ref)
+            continue
+
+        state_refs = [
+            child.get("state_ref")
+            for child in test
+            if local(child.tag) == "state" and child.get("state_ref")
+        ]
+        state_operator = (test.get("state_operator") or "AND").upper()
+        if len(state_refs) > 1 and state_operator not in ("AND", "OR"):
+            add("state_operator", test_ref, state_operator)
+
+        for child in test:
+            kind = local(child.tag)
+            if kind == "object":
+                obj_ref = child.get("object_ref")
+                obj = find_by_id(oroot, obj_ref, "_object")
+                if obj is None:
+                    add("object_not_found", obj_ref or test_ref)
+                    continue
+                for descendant in obj.iter():
+                    name = local(descendant.tag)
+                    if descendant is not obj and name in ("behaviors", "set", "filter"):
+                        add(f"object_{name}", obj_ref, descendant.get("action"))
+                    var_ref = descendant.get("var_ref")
+                    if var_ref:
+                        add("object_variable", obj_ref, var_ref)
+                    elif name == "var_ref" and text(descendant):
+                        add("object_variable", obj_ref, text(descendant))
+            elif kind == "state":
+                state_ref = child.get("state_ref")
+                state = find_by_id(oroot, state_ref, "_state")
+                if state is None:
+                    add("state_not_found", state_ref or test_ref)
+                    continue
+                for descendant in state.iter():
+                    name = local(descendant.tag)
+                    var_ref = descendant.get("var_ref")
+                    if var_ref:
+                        add("state_variable", state_ref, var_ref)
+                    elif name == "var_ref" and text(descendant):
+                        add("state_variable", state_ref, text(descendant))
+
+    return findings
+
 def lower_definition(oroot, definition_id, assessment_id):
     """Lower Boolean definition logic while requiring every leaf test to be exact."""
     definition = next(
@@ -1539,6 +1677,7 @@ def main():
 
             checks = {}
             definition_to_assessment = {}
+            definition_failures = {}
             for c in rec["checks"]:
                 selector = (c.get("selector") or "").strip() or "default"
                 if check_kind(c) == "manual":
@@ -1562,25 +1701,46 @@ def main():
                 ref = c.find("x:check-content-ref", NS)
                 definition_id = ref.get("name")
                 aid = definition_to_assessment.get(definition_id)
-                if aid is None:
+                if definition_id in definition_failures:
+                    aid = None
+                elif aid is None:
                     aid = f"{rid}.automated"
-                    assessment, error = lower_definition(oval_bundle, definition_id, aid)
-                    if assessment is None:
+                    unsupported = unsupported_definition_features(oval_bundle, definition_id)
+                    if unsupported:
+                        definition_failures[definition_id] = unsupported
                         if FULL_MODE:
                             add_diagnostic(
-                                diagnostics, "error", "AUTOMATED_ASSESSMENT_NOT_LOWERABLE",
-                                "Automated source Assessment was not emitted because it cannot be represented faithfully.",
-                                rule_id=rid, assessment_id=aid, source_id=definition_id, detail=error,
+                                diagnostics, "error", "AUTOMATED_ASSESSMENT_UNSUPPORTED_FEATURES",
+                                "Automated source Assessment was not emitted because the source uses one or more constructs not yet supported by the current v003 lowerer.",
+                                rule_id=rid,
+                                assessment_id=aid,
+                                source_id=definition_id,
+                                unsupported_features=unsupported,
                             )
                             aid = None
                         else:
-                            raise RuntimeError(f"{rid}: automated lowering regressed: {error}")
+                            raise RuntimeError(
+                                f"{rid}: automated lowering requires unsupported features: {unsupported}"
+                            )
                     else:
-                        oval_descriptive_metadata_diagnostics(
-                            oval_bundle, definition_id, rid, aid, diagnostics
-                        )
-                        write_yaml(OUT / "assessments/automated" / f"{rid}.automated.assessment.yaml", assessment)
-                        definition_to_assessment[definition_id] = aid
+                        assessment, error = lower_definition(oval_bundle, definition_id, aid)
+                        if assessment is None:
+                            definition_failures[definition_id] = [{"feature": "lowering_error", "detail": error}]
+                            if FULL_MODE:
+                                add_diagnostic(
+                                    diagnostics, "error", "AUTOMATED_ASSESSMENT_NOT_LOWERABLE",
+                                    "Automated source Assessment was not emitted because it cannot be represented faithfully.",
+                                    rule_id=rid, assessment_id=aid, source_id=definition_id, detail=error,
+                                )
+                                aid = None
+                            else:
+                                raise RuntimeError(f"{rid}: automated lowering regressed: {error}")
+                        else:
+                            oval_descriptive_metadata_diagnostics(
+                                oval_bundle, definition_id, rid, aid, diagnostics
+                            )
+                            write_yaml(OUT / "assessments/automated" / f"{rid}.automated.assessment.yaml", assessment)
+                            definition_to_assessment[definition_id] = aid
                 if aid is not None:
                     checks[selector] = aid
 
@@ -1675,9 +1835,12 @@ def main():
         write_json(EVIDENCE / "source-platform-inventory.json", {"platforms": source_platform_inventory})
         write_json(EVIDENCE / "benchmark-platform-source.json", {"platform_refs": benchmark_platform_refs})
         write_json(EVIDENCE / "manual-default-candidates.json", {"rules": manual_default_candidates})
+        source_semantic_inventory = oval_semantic_inventory(oval_bundle)
+        write_json(EVIDENCE / "source-semantic-inventory.json", source_semantic_inventory)
         summary = diagnostic_summary(diagnostics)
         write_json(EVIDENCE / "diagnostics.json", {
             "summary": summary,
+            "source_semantic_inventory": source_semantic_inventory,
             "diagnostics": diagnostics,
         })
         package_summary = build_experimental_package(
