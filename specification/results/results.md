@@ -55,6 +55,7 @@ This SHOULD include, as applicable:
 - structured failure reason;
 - bounded evidence;
 - Assessment mode;
+- effective check selector and Assessment Method identity;
 - Tailoring and Organizational Input provenance where relevant.
 
 The full Rule discussion, remediation, Manual Assessment procedure, and
@@ -69,6 +70,11 @@ message suitable for logs, APIs, Splunk, Elastic, dashboards, and review tools.
 The message SHALL be derived from the same authoritative result data as the
 machine-readable outcome/failure reason.
 
+For standard existence/cardinality patterns, conforming implementations SHOULD
+generate semantically equivalent deterministic messages from the observed count
+and expected state rather than requiring content authors to hand-author
+scanner-specific prose.
+
 Heuristic or AI-generated analysis SHALL NOT replace the authoritative
 message.
 
@@ -76,13 +82,21 @@ message.
 
 Failed results SHOULD provide a machine-readable reason.
 
-Core reason categories SHOULD include at least concepts equivalent to:
+Core reason categories SHOULD include stable machine-readable identities for
+at least:
 
-- unexpected existence;
-- required item missing;
-- required match missing;
-- value mismatch;
-- cardinality mismatch.
+- `unexpected_existence`;
+- `required_item_missing`;
+- `required_match_missing`;
+- `value_mismatch`;
+- `cardinality_mismatch`.
+
+For an expected-absence condition, observing one or more prohibited matching
+items SHOULD produce `unexpected_existence`.
+
+For an expected-presence condition, observing zero required matching items
+SHOULD produce `required_item_missing` unless the more specific
+`required_match_missing` accurately describes the case.
 
 ## 7. Concrete evidence
 
