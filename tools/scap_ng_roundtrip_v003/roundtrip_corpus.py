@@ -32,8 +32,7 @@ def main():
         try:
             data=Converter(source).convert()
             fixture=fixtures_dir/(stem+".json")
-            fixture.write_text(json.dumps(data,indent=2)+"
-",encoding="utf-8")
+            fixture.write_text(json.dumps(data,indent=2)+"\\n",encoding="utf-8")
             row["fixture"]=fixture.relative_to(a.out).as_posix()
         except Exception as exc:
             row.update(status="forward_error",error=f"{type(exc).__name__}: {exc}")
@@ -83,8 +82,7 @@ def main():
         "all_pass":counts.get("pass",0)==len(files),
         "rows":rows,
     }
-    (a.out/"summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"
-",encoding="utf-8")
+    (a.out/"summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\\n",encoding="utf-8")
     print(json.dumps({"source_file_count":len(files),"counts":summary["counts"],"all_pass":summary["all_pass"]},indent=2))
     if a.strict and not summary["all_pass"]:
         raise SystemExit(1)
