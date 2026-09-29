@@ -91,7 +91,21 @@ def attrs_for_entity(spec, ids):
 def add_entity(parent, ns, name, spec, ids):
     if isinstance(spec, dict):
         el = ET.SubElement(parent, q(ns, name), attrs_for_entity(spec, ids))
-        if "variable" in spec:
+        if "fields" in spec:
+            if "variable" in spec or "value" in spec:
+                die(f"{name}: record fields cannot be combined with variable/value")
+            for field in spec["fields"]:
+                fattrs=attrs_for_entity(field,ids)
+                fattrs["name"]=field["name"]
+                fe=ET.SubElement(el,q(OVAL_DEF,"field"),fattrs)
+                if "variable" in field:
+                    if "value" in field:
+                        die(f"{name}.{field['name']}: variable and value both supplied")
+                elif "value" in field:
+                    fe.text=str(field["value"])
+                else:
+                    die(f"{name}.{field['name']}: field missing value or variable")
+        elif "variable" in spec:
             if "value" in spec:
                 die(f"{name}: variable and value both supplied")
         elif "value" in spec:
