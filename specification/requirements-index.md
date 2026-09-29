@@ -87,3 +87,11 @@ this index:
 - final schema for richer manual observations/questions;
 - final extension and digital-signature wire formats;
 - final privacy/redaction requirements for sensitive results and inputs.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: SCAP-NG Terminology](terminology.md) · [Contents](README.md) · [Next: Conformance →](core/conformance.md)
+
+<!-- spec-nav:end -->
