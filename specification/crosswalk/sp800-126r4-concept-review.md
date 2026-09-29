@@ -147,3 +147,11 @@ checklist.
 SCAP-NG should retain those concerns and additionally treat active Assessment
 capabilities and policy-data injection boundaries as first-class security
 topics.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: SCAP 1.4 to SCAP-NG Concept Crosswalk](scap-1.4-concept-crosswalk.md) · [Contents](../README.md)
+
+<!-- spec-nav:end -->
