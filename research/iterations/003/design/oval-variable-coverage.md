@@ -24,8 +24,8 @@ Status values:
 | external_variable | externally supplied typed value set plus optional allowed values/restrictions | prototype | round-trip case covers possible_value and possible_restriction; execution binding still needed |
 | local_variable | one ComponentGroup member producing zero/one/many values | prototype | full recursive component coverage |
 | variable_component | variable -> variable dependency | prototype | deep chains, shared dependencies, cycle rejection |
-| object_component | object -> item field -> variable values, optional record_field | prototype | 0/1/many items and repeated item entities; record_field |
-| literal_component | typed literal expression input | prototype | datatype/cast rules |
+| object_component | object -> item field -> variable values, optional record_field | prototype | record_field round-trip covered; 0/1/many runtime item behavior remains |
+| literal_component | typed literal expression input | prototype | typed-literal round-trip covered; datatype/cast runtime rules remain |
 | arithmetic | 2+ operands; int/float; Cartesian product for collections | prototype | product cardinality, casts, error propagation |
 | begin | one string component plus required character/string | prototype | collection-valued input and datatype constraints |
 | concat | 2+ components; Cartesian product; DNE/error flag propagation | prototype | exact flag/result semantics |
@@ -42,6 +42,11 @@ Status values:
 | var_ref in object entities | variable supplies selector values | prototype | all operations, multi-valued var_check |
 | var_ref in state entities | variable supplies expected values | prototype | round-trip many-to-many var_check + entity_check covered; truth-table execution still needed |
 | var_ref datatype matching | referenced variable datatype must match consuming entity rules | design | validator generated from schema constraints |
+| entity mask | mask suppresses corresponding collected value in OVAL Results while retaining definition semantics | prototype | round-trip covered; NG result redaction semantics still to define |
+| nillable entities | xsi:nil remains distinct from empty string where component schemas permit nil | prototype | round-trip covered; native syntax uses explicit nil state |
+| record-valued entities | record parent plus named fields, per-field operation/entity_check/mask/var_ref semantics | prototype | non-deprecated sql512 State round-trip covered; broader runtime evaluation remains |
+| State operator | combines State entity predicates; default AND | prototype | non-default OR round-trip covered |
+| criteria applicability_check | marks criteria/criterion/extended definition as applicability evaluation | prototype | criterion applicability round-trip covered; NG applicability lowering remains architectural |
 | var_ref on record entity | prohibited | design | static rejection |
 | empty variable consumed by Object | Object considered not to exist | design | execution/result conformance |
 | empty variable consumed by State | State evaluation error | design | execution/result conformance |
@@ -51,7 +56,7 @@ Status values:
 | entity_check + var_check | two-level many-to-many state evaluation | prototype | structural/semantic round-trip covered; exhaustive execution truth-table tests remain |
 | nested functions | arbitrary recursive FunctionGroup composition | prototype | broad FunctionGroup round-trip coverage exists; deeper mixed nesting and runtime flag semantics remain |
 | dependency graph | reference-driven variable/object/state dependencies | design | planner/order proof; indirect-cycle rejection is pending OVAL Board review |
-| object set recursion | nested sets with schema-constrained arity | prototype | recursive set evaluation |
+| object set recursion | nested sets with schema-constrained arity | prototype | direct recursive Set round-trip covered; runtime set evaluation remains |
 | set object references | 1..2 refs; referenced objects same type as parent | design | Schematron compatibility validation |
 | set filters | zero..many state references applied before set operator | prototype | ordering/composition tests |
 | filter action | include/exclude; default exclude | prototype | multiple/conflicting filters |
@@ -59,7 +64,7 @@ Status values:
 | variables inside objects used by sets | variable-dependent collection feeding set | prototype | chained dependency test |
 | status/flag propagation | complete/incomplete/error/DNE/not-collected/not-applicable as defined per function | design | schema evaluation-chart tests |
 | operation/datatype compatibility | operation set constrained by datatype | design | generated/static validation |
-| implicit defaults | schema defaults must be normalized without semantic loss | design | default-value inventory |
+| implicit defaults | schema defaults must be normalized without semantic loss | design | comparator normalizes major exercised defaults; full schema-wide default inventory remains |
 | deprecated constructs | deprecated source semantics SHALL trigger migration/update policy | design | deprecated inventory and diagnostics |
 
 ## Important structural conclusion
