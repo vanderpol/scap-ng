@@ -103,13 +103,17 @@ def normalized_fixes(rule):
         if list(fix):
             return None, "remediation_substitution_not_yet_lowered"
         source_system = fix.get("system")
-        kind = system_map.get(source_system)
-        if not kind:
+        if fix.get("platform"):
+            return None, "remediation_platform_not_yet_lowered"
+        kind = system_map.get(source_system) if source_system else None
+        if source_system and not kind:
             return None, "remediation_system_not_yet_lowered"
         script = text(fix)
         if not script:
             continue
-        item = {"type": kind, "content": script}
+        item = {"content": script}
+        if kind:
+            item["type"] = kind
         for source_name, native_name in (
             ("reboot", "reboot"),
             ("disruption", "disruption"),
