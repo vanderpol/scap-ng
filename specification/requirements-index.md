@@ -38,6 +38,13 @@ inference.
 SCAP-NG SHALL support lossless migration of supported SCAP 1.4 semantics before
 optional native refactoring.
 
+SCAP-NG SHOULD reuse established NIST/SCAP/XCCDF/OVAL terminology when the
+existing term remains semantically correct. New normative terminology SHOULD
+be introduced only when no existing standards term accurately represents the
+NG concept or when retaining the legacy term would preserve obsolete
+architecture or ambiguity. Intentional terminology changes SHOULD be recorded
+in the SCAP 1.4 compatibility crosswalk.
+
 SCAP-NG policy SHALL preserve selectable-check semantics. An explicitly
 requested check selector that does not resolve SHALL fail rather than silently
 falling back to another or default check.
