@@ -368,9 +368,15 @@ def main():
             from collections import Counter
             reasons = Counter(lowerability_reason(r, oroot) for r in rs)
             summary = ", ".join(f"{k}={v}" for k, v in reasons.most_common(12))
+            fix_systems = Counter(
+                (fix.get("system") or "<none>")
+                for r in rs
+                for fix in r["element"].findall("x:fix", NS)
+            )
+            fix_summary = ", ".join(f"{k}={v}" for k, v in fix_systems.most_common(8))
             raise RuntimeError(
                 f"Only {len(selected)} fully lowerable Rules found; refusing partial review slice. "
-                f"Top rejection reasons: {summary}"
+                f"Top rejection reasons: {summary}. Source remediation systems: {fix_summary}"
             )
 
         selected_ids = [r["id"] for r in selected]
