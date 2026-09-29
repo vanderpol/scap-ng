@@ -39,7 +39,47 @@ Results SHOULD support one or more typed target identifiers, such as:
 Hostname and relevant addresses SHOULD remain available as descriptive
 correlation data.
 
-## 4. Rule result self-description
+## 4. Target product inventory
+
+A complete scan result SHOULD support target product inventory independently
+from per-Rule compliance results.
+
+At minimum, when available, target inventory SHOULD be able to identify:
+
+- the operating system;
+- detected applications relevant to the scan;
+- standardized external product identifiers associated with those products.
+
+CPE MAY be used as one such standardized product identifier.
+
+Illustrative result structure:
+
+    target:
+      inventory:
+        operating_system:
+          name: Microsoft Windows 11
+          identifiers:
+            - scheme: cpe
+              version: "2.3"
+              value: "cpe:2.3:o:microsoft:windows_11:*:*:*:*:*:*:*:*"
+
+        applications:
+          - name: PostgreSQL
+            version: "16"
+            identifiers:
+              - scheme: cpe
+                version: "2.3"
+                value: "cpe:2.3:a:postgresql:postgresql:16:*:*:*:*:*:*:*"
+
+Product identifiers SHALL NOT be treated as unique asset identifiers.
+
+The inventory representation SHOULD preserve identifier scheme and version so
+multiple CPE generations or other identifier systems can coexist.
+
+Whether a reported CPE is later used for content applicability is a separate
+policy/evaluation concern.
+
+## 5. Rule result self-description
 
 A Rule result SHOULD contain enough Rule context for common downstream use
 without requiring the consumer to possess the original Benchmark.
@@ -62,7 +102,7 @@ The full Rule discussion, remediation, Manual Assessment procedure, and
 Assessment implementation SHOULD NOT automatically be copied into every Rule
 result.
 
-## 5. Deterministic message
+## 6. Deterministic message
 
 Every Rule result SHOULD contain a concise deterministic human-readable
 message suitable for logs, APIs, Splunk, Elastic, dashboards, and review tools.
@@ -78,7 +118,7 @@ scanner-specific prose.
 Heuristic or AI-generated analysis SHALL NOT replace the authoritative
 message.
 
-## 6. Failure reason
+## 7. Failure reason
 
 Failed results SHOULD provide a machine-readable reason.
 
@@ -98,7 +138,7 @@ For an expected-presence condition, observing zero required matching items
 SHOULD produce `required_item_missing` unless the more specific
 `required_match_missing` accurately describes the case.
 
-## 7. Concrete evidence
+## 8. Concrete evidence
 
 When failure is established by a concrete violating item, at least one concrete
 failing example SHALL be retained unless collection/evaluation failed before
@@ -109,7 +149,7 @@ Evidence SHOULD identify what failed and why.
 A missing required item or condition SHALL be represented as a missing
 requirement, not as a fabricated collected object.
 
-## 8. Evidence limits and short circuiting
+## 9. Evidence limits and short circuiting
 
 Evidence-retention limits SHALL NOT be compliance thresholds.
 
@@ -126,7 +166,7 @@ Results SHOULD distinguish:
 If the full population was not evaluated, a total population failure count
 SHALL be reported as unknown rather than inferred from observed failures.
 
-## 9. Summary
+## 10. Summary
 
 A result package SHOULD provide precomputed aggregate counters so common
 consumers are not required to scan every Rule result merely to construct a
@@ -142,7 +182,7 @@ Useful aggregates include:
 Publisher-specific projections MAY add aliases such as DISA CAT I/II/III
 counts, but core SCAP-NG SHALL NOT require publisher-specific severity labels.
 
-## 10. SIEM projection
+## 11. SIEM projection
 
 A result exporter MAY project the normalized package into denormalized event
 formats such as JSONL.
@@ -152,7 +192,7 @@ event per Rule result.
 
 Consumer-specific denormalization SHALL NOT dictate the canonical result model.
 
-## 11. Manual results
+## 12. Manual results
 
 Manual Assessment default behavior and completed outcome semantics are defined
 in `../assessment/manual-assessment.md`.
@@ -160,7 +200,7 @@ in `../assessment/manual-assessment.md`.
 Manual results SHOULD distinguish factual finding/evidence details from general
 reviewer comments.
 
-## 12. Decisive outcome explanation
+## 13. Decisive outcome explanation
 
 For nontrivial automated results, the result model SHOULD support a structured
 decisive outcome explanation: the smallest evaluated expression subtree, or set
