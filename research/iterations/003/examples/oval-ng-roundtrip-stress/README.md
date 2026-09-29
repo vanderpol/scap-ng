@@ -45,6 +45,13 @@ testing.
   - multiple Object -> Variable -> Object chains;
   - concat over independently collected object components.
 
+- `rhel-command-ownership-set-filter-variable.json`
+  - real RHEL-family OVAL graph;
+  - Variables + var_check + recursive file collection;
+  - filtered Sets and direct Collection filters;
+  - symlink resolution;
+  - nested AND/OR criteria.
+
 - `cartesian-variable-chain.json`
   - synthetic schema-derived language stress case;
   - variable -> variable chain;
