@@ -85,15 +85,46 @@ to an alternative exposed by the governing Rule policy.
 Processors SHALL NOT silently substitute a default or different selector for an
 unresolved explicit selection.
 
-Conformance tests SHOULD include at least:
+Conformance tests SHALL include at least:
 
 - default check resolution when no explicit selector is supplied;
 - explicit selection of an automated alternative;
 - explicit selection of a manual alternative;
+- distinct selector identities that intentionally share one Assessment Method;
 - extensible selector names other than `automated` and `manual`;
 - failure for an unknown selector;
-- preservation of effective selector identity in results; and
+- preservation of effective selector identity in results;
+- explicit failure for non-equivalent same-selector checking-system alternatives
+  when the implementation cannot preserve their fallback semantics; and
 - Stage-1 migration of representative XCCDF selectable-check content.
 
 Unsupported or non-equivalent legacy check-selection semantics SHALL cause an
 explicit conversion failure rather than semantic approximation.
+
+
+## 7. Existence and cardinality conformance
+
+Conformance tests SHALL exercise first-class expected-state existence semantics
+independently of any one collection capability.
+
+At minimum, the base test set SHALL establish:
+
+| Expected state | Observed matches | Required outcome |
+| --- | ---: | --- |
+| `none` | 0 | pass |
+| `none` | 1 | fail |
+| `none` | more than 1 | fail |
+| `one_or_more` | 0 | fail |
+| `one_or_more` | 1 | pass |
+| `one_or_more` | more than 1 | pass |
+
+A failing expected-absence case SHOULD identify
+`unexpected_existence`. A failing expected-presence case SHOULD identify
+`required_item_missing` or a more specific standardized missing-match reason.
+
+SCAP 1.4 migration conformance SHALL verify preservation of source OVAL
+`check_existence` semantics, including at least `none_exist` and
+`at_least_one_exists`.
+
+A converter that cannot preserve a source existence/cardinality construct SHALL
+report an explicit conversion blocker rather than substitute another condition.
