@@ -99,3 +99,11 @@ SCAP-NG preserves the OVAL definition-class distinction as Assessment
 SCAP-NG adds a separate Assessment `purpose` concept so that the same
 Assessment semantics may be invoked for ordinary evaluation or applicability
 without changing the Assessment's class.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Security Considerations](../security/security-considerations.md) · [Contents](../README.md) · [Next: SP 800-126r4 Concept Review for SCAP-NG →](sp800-126r4-concept-review.md)
+
+<!-- spec-nav:end -->
