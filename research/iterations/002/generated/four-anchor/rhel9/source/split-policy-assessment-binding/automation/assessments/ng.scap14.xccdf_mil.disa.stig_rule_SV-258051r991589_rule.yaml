@@ -1,0 +1,332 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258051r991589_rule
+  version: 1
+  description: All RHEL 9 local interactive users must have a home directory assigned in the /etc/passwd file.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.unix:obj:20000016:
+      capability: scapng.collect.unix.password
+      source_object_id: oval:mil.disa.stig.unix:obj:20000016
+      source_type: password_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: Users with an username
+      query:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: username
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '[\w]+'
+    oval:mil.disa.stig.unix:obj:20000017:
+      capability: scapng.collect.unix.password
+      source_object_id: oval:mil.disa.stig.unix:obj:20000017
+      source_type: password_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: only non-system users (uid>999) home-dirs
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.unix:obj:20000016
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.unix:ste:20000017
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: COMPLEMENT
+        operator_explicit: true
+    oval:mil.disa.stig.unix:obj:20000018:
+      capability: scapng.collect.unix.password
+      source_object_id: oval:mil.disa.stig.unix:obj:20000018
+      source_type: password_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: only root users (uid=0) home-dirs
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.unix:obj:20000016
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.unix:ste:20000018
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: COMPLEMENT
+        operator_explicit: true
+  derive: {}
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000018:
+      source_state_id: oval:mil.disa.stig.unix:ste:20000018
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          entity_check: all
+          operation: greater than
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '0'
+      comment: only uids > 0
+    oval:mil.disa.stig.unix:ste:20000017:
+      source_state_id: oval:mil.disa.stig.unix:ste:20000017
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          entity_check: all
+          operation: less than
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1000'
+      comment: only uids < 1000
+    oval:mil.disa.stig.unix:ste:20000016:
+      source_state_id: oval:mil.disa.stig.unix:ste:20000016
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: home_dir
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: .+
+      comment: only users with the home directory defined
+  evaluate:
+    tests:
+      oval:mil.disa.stig.unix:tst:25805101:
+        source_test_id: oval:mil.disa.stig.unix:tst:25805101
+        source_type: password_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: check if root's home directory is not defined
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:20000018
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000016
+        source_other: []
+      oval:mil.disa.stig.unix:tst:25805100:
+        source_test_id: oval:mil.disa.stig.unix:tst:25805100
+        source_type: password_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: check for users without a home directory not defined
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:20000017
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000016
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.defs:def:258051:
+        source_definition_id: oval:mil.disa.stig.defs:def:258051
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Check for local non-system users in /etc/passwd without a home directory defined
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:25805100
+          - comment: Check /etc/passwd if root has a home directory defined
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:25805101
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: All the operating system local interactive users must have a home directory assigned in the /etc/passwd
+              file.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.rhel9os:def:258051:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:258051
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258051
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-411060 - All RHEL 9 local interactive users must have a home directory assigned in the /etc/passwd
+              file.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: If local interactive users are not assigned a valid home directory, there is no place for the storage and
+              control of files they should own.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.rhel9os:def:258051
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:258051
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:258051
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:258051
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:258051
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-258051r991589_rule
+    title: All RHEL 9 local interactive users must have a home directory assigned in the /etc/passwd file.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258051
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258051
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258051
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258051
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:52901
+      exports: []
+      inline_content: 'Verify that interactive users on the system have a home directory assigned with the following command:
+        $ sudo awk -F: ''($3>=1000)&&($7 !~ /nologin/){print $1, $3, $6}'' /etc/passwd smithk:x:1000:1000:smithk:/home/smithk:/bin/bash
+        scsaustin:x:1001:1001:scsaustin:/home/scsaustin:/bin/bash djohnson:x:1002:1002:djohnson:/home/djohnson:/bin/bash Inspect
+        the output and verify that all interactive users (normally users with a user identifier (UID) greater that 1000) have
+        a home directory defined. If users home directory is not defined, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:52901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that interactive users on the system have a home directory assigned with the following command:\n\
+            \ \n$ sudo awk -F: '($3>=1000)&&($7 !~ /nologin/){print $1, $3, $6}' /etc/passwd\n\nsmithk:x:1000:1000:smithk:/home/smithk:/bin/bash\n\
+            scsaustin:x:1001:1001:scsaustin:/home/scsaustin:/bin/bash\ndjohnson:x:1002:1002:djohnson:/home/djohnson:/bin/bash\n\
+            \nInspect the output and verify that all interactive users (normally users with a user identifier (UID) greater\
+            \ that 1000) have a home directory defined.\n\nIf users home directory is not defined, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-258051r991589_rule
+    semantic_ir_sha256: 17c585da031575d2983a15a0e18d29cbc761e988d17752134e7b7d434d47769a
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: b6129d19adddd05b4876ef78f5a39d93723f756f1482f5237bfb52abca8e2130

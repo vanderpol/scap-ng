@@ -1,0 +1,494 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer Policy >>
+    Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment. If the following
+    groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right, this is a finding: If
+    Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of the groups listed below.
+    Domain Systems Only: Enterprise Admins group Domain Admins group Local account (see Note below) All Systems: Guests group
+    Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying the Enterprise
+    Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.) Note: "Local
+    account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
+  cluster_id: null
+  conflicts: []
+  default_check: default
+  description: <VulnDiscussion>Inappropriate granting of user rights can provide system, administrative, and other high-level
+    capabilities. The "Deny log on through Remote Desktop Services" right defines the accounts that are prevented from logging
+    on using Remote Desktop Services. If Remote Desktop Services is not used by the organization, the Everyone group must
+    be assigned this right to prevent all access. In an Active Directory Domain, denying logons to the Enterprise Admins and
+    Domain Admins groups on lower trust systems helps mitigate the risk of privilege escalation from credential theft attacks,
+    which could lead to the compromise of an entire domain. Local accounts on domain-joined systems must also be assigned
+    this right to decrease the risk of lateral movement resulting from credential theft attacks. The Guests group must be
+    assigned this right to prevent unauthenticated access.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:microsoft:windows_11
+  effective_platforms:
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-cpe-dictionary.xml
+      definition_id: oval:mil.disa.stig.windows11:def:1
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:microsoft:windows_11
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:microsoft:windows_11
+    ref: cpe:/o:microsoft:windows_11
+  extends: null
+  fix: 'Configure the policy value for Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >>
+    User Rights Assignment >> "Deny log on through Remote Desktop Services" to include the following: If Remote Desktop Services
+    is not used by the organization, assign the Everyone group this right to prevent all access. Domain Systems Only: Enterprise
+    Admins group Domain Admins group Local account (see Note below) All Systems: Guests group Privileged Access Workstations
+    (PAWs) dedicated to the management of Active Directory are exempt from denying the Enterprise Admins and Domain Admins
+    groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.) Note: "Local account" is a built-in
+    security group used to assign user rights and permissions to all local accounts.'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-253495
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000213
+  - system: http://cyber.mil/cci
+    value: CCI-002314
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows 11 DISA DPMS Target Microsoft Windows 11 5471
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253495
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253495
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253495
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253495
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+        If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right, this
+        is a finding: If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of
+        the groups listed below. Domain Systems Only: Enterprise Admins group Domain Admins group Local account (see Note
+        below) All Systems: Guests group Privileged Access Workstations (PAWs) dedicated to the management of Active Directory
+        are exempt from denying the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation
+        STIG for PAW requirements.) Note: "Local account" is a built-in security group used to assign user rights and permissions
+        to all local accounts.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+            Run "gpedit.msc".
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right,
+            this is a finding:
+
+
+            If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of the groups
+            listed below.
+
+
+            Domain Systems Only:
+
+            Enterprise Admins group
+
+            Domain Admins group
+
+            Local account (see Note below)
+
+
+            All Systems:
+
+            Guests group
+
+
+            Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying
+            the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.)
+
+
+            Note: "Local account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      name: oval:mil.disa.stig.windows11:def:253495
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253495
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      name: oval:mil.disa.stig.windows11:def:253495
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253495
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+    exports: []
+    inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+      Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+      If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right, this
+      is a finding: If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of the
+      groups listed below. Domain Systems Only: Enterprise Admins group Domain Admins group Local account (see Note below)
+      All Systems: Guests group Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are
+      exempt from denying the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG
+      for PAW requirements.) Note: "Local account" is a built-in security group used to assign user rights and permissions
+      to all local accounts.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+          Run "gpedit.msc".
+
+
+          Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies
+          >> User Rights Assignment.
+
+
+          If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right,
+          this is a finding:
+
+
+          If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of the groups listed
+          below.
+
+
+          Domain Systems Only:
+
+          Enterprise Admins group
+
+          Domain Admins group
+
+          Local account (see Note below)
+
+
+          All Systems:
+
+          Guests group
+
+
+          Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying the
+          Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.)
+
+
+          Note: "Local account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN11-UR-000090
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations must be configured to
+        prevent access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access
+        on all systems.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Inappropriate granting of user rights can provide system, administrative, and other high-level
+        capabilities.
+
+
+        The "Deny log on through Remote Desktop Services" right defines the accounts that are prevented from logging on using
+        Remote Desktop Services.
+
+
+        If Remote Desktop Services is not used by the organization, the Everyone group must be assigned this right to prevent
+        all access.
+
+
+        In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust systems
+        helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to the compromise
+        of an entire domain.
+
+
+        Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement
+        resulting from credential theft attacks.
+
+
+        The Guests group must be assigned this right to prevent unauthenticated access.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows 11
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows 11
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5471'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000213
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002314
+    - attributes:
+        fixref: F-56898r829568_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure the policy value for Computer Configuration >> Windows Settings >> Security Settings >> Local Policies
+        >> User Rights Assignment >> "Deny log on through Remote Desktop Services" to include the following:
+
+
+        If Remote Desktop Services is not used by the organization, assign the Everyone group this right to prevent all access.
+
+
+        Domain Systems Only:
+
+        Enterprise Admins group
+
+        Domain Admins group
+
+        Local account (see Note below)
+
+
+        All Systems:
+
+        Guests group
+
+
+        Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying the
+        Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.)
+
+
+        Note: "Local account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+    - attributes:
+        id: F-56898r829568_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253495
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+          name: oval:mil.disa.stig.windows11:def:253495
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:46701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+          Run "gpedit.msc".
+
+
+          Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies
+          >> User Rights Assignment.
+
+
+          If the following groups or accounts are not defined for the "Deny log on through Remote Desktop Services" right,
+          this is a finding:
+
+
+          If Remote Desktop Services is not used by the organization, the "Everyone" group can replace all of the groups listed
+          below.
+
+
+          Domain Systems Only:
+
+          Enterprise Admins group
+
+          Domain Admins group
+
+          Local account (see Note below)
+
+
+          All Systems:
+
+          Guests group
+
+
+          Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying the
+          Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.)
+
+
+          Note: "Local account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: The "Deny log on through Remote Desktop Services" user right on Windows 11 workstations must be configured to prevent
+    access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access on all systems.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: f9630e2f618491fccca087154ffe3bb8105fde4f110ddaf440fc4636d7a6ae7d
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-253495r1137691_rule
+  status: legacy_compatible

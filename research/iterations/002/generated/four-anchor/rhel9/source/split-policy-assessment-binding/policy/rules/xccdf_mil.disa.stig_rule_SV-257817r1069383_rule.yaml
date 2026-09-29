@@ -1,0 +1,416 @@
+scap_ng: 0.1-prototype
+prototype: true
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-257817r1069383_rule
+  title: RHEL 9 must implement nonexecutable data to protect its memory from unauthorized code execution.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-257817
+  description: '<VulnDiscussion>ExecShield uses the segmentation feature on all x86 systems to prevent execution in memory
+    higher than a certain address. It writes an address as a limit in the code segment descriptor, to control where code can
+    be executed, on a per-process basis. When the kernel places a process''s memory regions such as the stack and heap higher
+    than this address, the hardware prevents execution in that address range. This is enabled by default on the latest Red
+    Hat and Fedora systems if supported by the hardware. Checking dmesg will return a false-positive if the system has generated
+    enough kernel messages that the "(Execute Disable) protection: active" line is no longer present in the output from dmesg(1).
+    A better way to ensure that ExecShield is enabled is to first ensure all processors support the NX feature, and then to
+    check that noexec was not passed to the kernel command line.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:almalinux:almalinux:9
+  - cpe:/o:rocky:rocky:9
+  - cpe:/o:redhat:enterprise_linux:9.0
+  effective_platforms:
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.almalinux9:def:301
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:almalinux:almalinux:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:almalinux:almalinux:9
+    ref: cpe:/o:almalinux:almalinux:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.rocky9:def:201
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:rocky:rocky:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:rocky:rocky:9
+    ref: cpe:/o:rocky:rocky:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:mil.disa.stig.rhel9os:def:101
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:redhat:enterprise_linux:9.0
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:redhat:enterprise_linux:9.0
+    ref: cpe:/o:redhat:enterprise_linux:9.0
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-002824
+  requires: []
+  conflicts: []
+  check: 'Verify ExecShield is enabled on 64-bit RHEL 9 systems. Run the following command: $ grep ^flags /proc/cpuinfo |
+    grep -Ev ''([^[:alnum:]])(nx)([^[:alnum:]]|$)'' If any output is returned, this is a finding. Next, run the following
+    command: $ sudo grubby --info=ALL | grep args | grep -E ''([^[:alnum:]])(noexec)([^[:alnum:]])'' If any output is returned,
+    this is a finding.'
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7901
+    exports: []
+    inline_content: 'Verify ExecShield is enabled on 64-bit RHEL 9 systems. Run the following command: $ grep ^flags /proc/cpuinfo
+      | grep -Ev ''([^[:alnum:]])(nx)([^[:alnum:]]|$)'' If any output is returned, this is a finding. Next, run the following
+      command: $ sudo grubby --info=ALL | grep args | grep -E ''([^[:alnum:]])(noexec)([^[:alnum:]])'' If any output is returned,
+      this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify ExecShield is enabled on 64-bit RHEL 9 systems.
+
+
+          Run the following command:
+
+
+          $ grep ^flags /proc/cpuinfo | grep -Ev ''([^[:alnum:]])(nx)([^[:alnum:]]|$)''
+
+
+          If any output is returned, this is a finding.
+
+
+          Next, run the following command:
+
+
+          $ sudo grubby --info=ALL | grep args | grep -E ''([^[:alnum:]])(noexec)([^[:alnum:]])''
+
+
+          If any output is returned, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7901
+      exports: []
+      inline_content: 'Verify ExecShield is enabled on 64-bit RHEL 9 systems. Run the following command: $ grep ^flags /proc/cpuinfo
+        | grep -Ev ''([^[:alnum:]])(nx)([^[:alnum:]]|$)'' If any output is returned, this is a finding. Next, run the following
+        command: $ sudo grubby --info=ALL | grep args | grep -E ''([^[:alnum:]])(noexec)([^[:alnum:]])'' If any output is
+        returned, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify ExecShield is enabled on 64-bit RHEL 9 systems.
+
+
+            Run the following command:
+
+
+            $ grep ^flags /proc/cpuinfo | grep -Ev ''([^[:alnum:]])(nx)([^[:alnum:]]|$)''
+
+
+            If any output is returned, this is a finding.
+
+
+            Next, run the following command:
+
+
+            $ sudo grubby --info=ALL | grep args | grep -E ''([^[:alnum:]])(noexec)([^[:alnum:]])''
+
+
+            If any output is returned, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: 'If /proc/cpuinfo shows that one or more processors do not enable ExecShield (lack the "nx" feature flag), verify that
+    the NX/XD feature is not disabled in the BIOS or UEFI. If it is disabled, enable it. If the noexec option is present on
+    the kernel command line, update the GRUB 2 bootloader configuration to remove it by running the following command: $ sudo
+    grubby --update-kernel=ALL --remove-args=noexec'
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-257817r1069383_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-213110
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL 9 must implement nonexecutable data to protect its memory from unauthorized code execution.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>ExecShield uses the segmentation feature on all x86 systems to prevent execution in memory higher
+        than a certain address. It writes an address as a limit in the code segment descriptor, to control where code can
+        be executed, on a per-process basis. When the kernel places a process''s memory regions such as the stack and heap
+        higher than this address, the hardware prevents execution in that address range. This is enabled by default on the
+        latest Red Hat and Fedora systems if supported by the hardware.
+
+
+        Checking dmesg will return a false-positive if the system has generated enough kernel messages that the "(Execute
+        Disable) protection: active" line is no longer present in the output from dmesg(1). A better way to ensure that ExecShield
+        is enabled is to first ensure all processors support the NX feature, and then to check that noexec was not passed
+        to the kernel command line.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002824
+    - attributes:
+        fixref: F-61482r1069382_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'If /proc/cpuinfo shows that one or more processors do not enable ExecShield (lack the "nx" feature flag), verify
+        that the NX/XD feature is not disabled in the BIOS or UEFI. If it is disabled, enable it.
+
+
+        If the noexec option is present on the kernel command line, update the GRUB 2 bootloader configuration to remove it
+        by running the following command:
+
+
+        $ sudo grubby --update-kernel=ALL --remove-args=noexec'
+    - attributes:
+        id: F-61482r1069382_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257817
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:7901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify ExecShield is enabled on 64-bit RHEL 9 systems.
+
+
+          Run the following command:
+
+
+          $ grep ^flags /proc/cpuinfo | grep -Ev ''([^[:alnum:]])(nx)([^[:alnum:]]|$)''
+
+
+          If any output is returned, this is a finding.
+
+
+          Next, run the following command:
+
+
+          $ sudo grubby --info=ALL | grep args | grep -E ''([^[:alnum:]])(noexec)([^[:alnum:]])''
+
+
+          If any output is returned, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257817r1069383_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257817r1069383_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257817r1069383_rule
+    assessment_version: 1
+  default_check: default

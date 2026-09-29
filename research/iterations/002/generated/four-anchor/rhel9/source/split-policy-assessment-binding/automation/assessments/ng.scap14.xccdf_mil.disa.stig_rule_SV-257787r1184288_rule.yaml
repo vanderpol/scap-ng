@@ -1,0 +1,320 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257787r1184288_rule
+  version: 1
+  description: RHEL 9 must require a boot loader superuser password.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.ind:obj:25778700:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25778700
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '3'
+      comment: /etc/grub2.cfg:superusers
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/grub2.cfg
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*set\s+superusers\s*=\s*"(\S+)"\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25778701:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25778701
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /boot/grub2/grubenv:kernelopts
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /boot/grub2/user.cfg
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*GRUB2_PASSWORD=(\S+)\b
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive: {}
+  predicates:
+    oval:mil.disa.stig.ind:ste:25778701:
+      source_state_id: oval:mil.disa.stig.ind:ste:25778701
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^grub\.pbkdf2\.sha512\.
+      comment: GRUB superuser password
+    oval:mil.disa.stig.ind:ste:25778700:
+      source_state_id: oval:mil.disa.stig.ind:ste:25778700
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\S+$
+      comment: GRUB superuser name
+  evaluate:
+    tests:
+      oval:mil.disa.stig.ind:tst:25778701:
+        source_test_id: oval:mil.disa.stig.ind:tst:25778701
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25778701
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25778701
+        source_other: []
+      oval:mil.disa.stig.ind:tst:25778700:
+        source_test_id: oval:mil.disa.stig.ind:tst:25778700
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /etc/grub2.cfg:superusers exists and has a name.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25778700
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25778700
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.defs:def:257787:
+        source_definition_id: oval:mil.disa.stig.defs:def:257787
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: /etc/grub2.cfg:superusers exists and has a name.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25778700
+          - comment: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25778701
+          comment: Verify a BIOS GRUB superuser password is configured.
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must require a boot loader superuser password.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.rhel9os:def:257787:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:257787
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257787
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-212010 - RHEL 9 must require a boot loader superuser password.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'To mitigate the risk of unauthorized access to sensitive information by entities that have been issued
+              certificates by DOD-approved PKIs, all DOD systems (e.g., web servers and web portals) must be properly configured
+              to incorporate access control methods that do not rely solely on the possession of a certificate for access.
+              Successful authentication must not automatically give an entity access to an asset or security boundary. Authorization
+              procedures and controls must be implemented to ensure each authenticated entity also has a validated and current
+              authorization. Authorization is the process of determining whether an entity, once authenticated, is permitted
+              to access a specific asset. Information systems use access control policies and enforcement mechanisms to implement
+              this requirement.
+
+
+              Password protection on the boot loader configuration ensures users with physical access cannot trivially alter
+              important bootloader settings. These include which kernel to use, and whether to enter single-user mode.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.rhel9os:def:257787
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257787
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:257787
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257787
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:257787
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-257787r1184288_rule
+    title: RHEL 9 must require a boot loader superuser password.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257787
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257787
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257787
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257787
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:1901
+      exports: []
+      inline_content: 'Note: For systems that use UEFI, this is not applicable. Verify the boot loader superuser password
+        has been set with the following command: $ sudo grep password_pbkdf2 /etc/grub2.cfg password_pbkdf2 <superusers-accountname>
+        ${GRUB2_PASSWORD} To verify the boot loader superuser account password has been set and the password encrypted, run
+        the following command: $ sudo cat /boot/grub2/user.cfg GRUB2_PASSWORD=grub.pbkdf2.sha512.10000.C4E08AC72FBFF7E837FD267BFAD7AEB3D42DDC
+        2C99F2A94DD5E2E75C2DC331B719FE55D9411745F82D1B6CFD9E927D61925F9BBDD1CFAA0080E0 916F7AB46E0D.1302284FCCC52CD73BA3671C6C12C26FF50BA873293B24EE2A96EE3B57963E6D7
+        0C83964B473EC8F93B07FE749AA6710269E904A9B08A6BBACB00A2D242AD828 If a "GRUB2_PASSWORD" is not set, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:1901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Note: For systems that use UEFI, this is not applicable.\n\nVerify the boot loader superuser password has\
+            \ been set with the following command:\n\n$ sudo grep password_pbkdf2 /etc/grub2.cfg \n\npassword_pbkdf2  <superusers-accountname>\
+            \   ${GRUB2_PASSWORD}  \n\nTo verify the boot loader superuser account password has been set and the password\
+            \ encrypted, run the following command:\n\n$ sudo cat /boot/grub2/user.cfg \n\nGRUB2_PASSWORD=grub.pbkdf2.sha512.10000.C4E08AC72FBFF7E837FD267BFAD7AEB3D42DDC\n\
+            2C99F2A94DD5E2E75C2DC331B719FE55D9411745F82D1B6CFD9E927D61925F9BBDD1CFAA0080E0\n916F7AB46E0D.1302284FCCC52CD73BA3671C6C12C26FF50BA873293B24EE2A96EE3B57963E6D7\n\
+            0C83964B473EC8F93B07FE749AA6710269E904A9B08A6BBACB00A2D242AD828 \n\nIf a \"GRUB2_PASSWORD\" is not set, this is\
+            \ a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257787r1184288_rule
+    semantic_ir_sha256: 98e9b90b53fce81825b5a89c6b22f1dc17f307b11bdea93e7ef0a4621a95c482
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 13ed7099f3bc00648599b77d790fc8c33ecc850427599a7d99807d87cb52bc01

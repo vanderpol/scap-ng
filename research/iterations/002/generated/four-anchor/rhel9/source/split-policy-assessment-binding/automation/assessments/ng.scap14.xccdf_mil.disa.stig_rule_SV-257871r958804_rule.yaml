@@ -1,0 +1,380 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257871r958804_rule
+  version: 1
+  description: RHEL 9 must mount /var/log with the noexec option.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.linux:obj:23051600:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23051600
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /var/log
+    oval:mil.disa.stig.ind:obj:23051601:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23051601
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/fstab
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23051600:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:23051600
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.defs:var:23051600
+  derive:
+    oval:mil.disa.stig.defs:var:23051600:
+      source_variable_id: oval:mil.disa.stig.defs:var:23051600
+      source_type: local_variable
+      datatype: string
+      comment: Mount options for /var/log in /etc/fstab
+      semantic_ast:
+        datatype: string
+        expression:
+          args:
+          - item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23051601
+            op: object_component
+            record_field: null
+          attributes:
+            delimiter: ','
+          op: split
+        id: oval:mil.disa.stig.defs:var:23051600
+        type: local_variable
+      resolution:
+        blocked_by:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23051601
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        operation: split
+        reason: split_child_not_static:object_component_requires_collection:textfilecontent54_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        blocked_by:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23051601
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23051601
+          operations:
+          - object_component
+          - split
+          variables: []
+        expression:
+          args:
+          - item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23051601
+            op: object_component
+            record_field: null
+          attributes:
+            delimiter: ','
+          op: split
+        mode: target_dependent
+        reason: split_child_not_static:object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23051600
+        variable_type: local_variable
+  predicates:
+    oval:mil.disa.stig.ind:ste:23051600:
+      source_state_id: oval:mil.disa.stig.ind:ste:23051600
+      source_type: variable_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          entity_check: at least one
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: noexec
+      comment: null
+    oval:mil.disa.stig.linux:ste:23051600:
+      source_state_id: oval:mil.disa.stig.linux:ste:23051600
+      source_type: partition_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      operator: AND
+      entities:
+      - attributes:
+          entity_check: at least one
+        kind: element
+        name: mount_options
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: noexec
+      comment: null
+  evaluate:
+    tests:
+      oval:mil.disa.stig.ind:tst:23051601:
+        source_test_id: oval:mil.disa.stig.ind:tst:23051601
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /var/log is configured in /etc/fstab
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23051601
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.linux:tst:23051600:
+        source_test_id: oval:mil.disa.stig.linux:tst:23051600
+        source_type: partition_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: /var/log is mounted with the noexec option
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23051600
+        predicates:
+        - oval:mil.disa.stig.linux:ste:23051600
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23051600:
+        source_test_id: oval:mil.disa.stig.ind:tst:23051600
+        source_type: variable_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /var/log is configured with the noexec option in /etc/fstab
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23051600
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23051600
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.defs:def:230516:
+        source_definition_id: oval:mil.disa.stig.defs:def:230516
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23051600
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23051600
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23051601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /var/log with the noexec option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.rhel9os:def:257871:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:257871
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230516
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-231150 - RHEL 9 must mount /var/log with the noexec option.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "noexec" mount option causes the system to not execute binary files. This option must be used for mounting
+              any file system not containing approved binary files, as they may be incompatible. Executing files from untrusted
+              file systems increases the opportunity for nonprivileged users to attain unauthorized administrative access.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.rhel9os:def:257871
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257871
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:257871
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257871
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:257871
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-257871r958804_rule
+    title: RHEL 9 must mount /var/log with the noexec option.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257871
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257871
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257871
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257871
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:18501
+      exports: []
+      inline_content: 'Verify "/var/log" is mounted with the "noexec" option: $ mount | grep /var/log /dev/mapper/rhel-var-log
+        on /var/log type xfs (rw,nodev,nosuid,noexec,seclabel) If the "/var/log" file system is mounted without the "noexec"
+        option, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:18501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify "/var/log" is mounted with the "noexec" option:
+
+
+            $ mount | grep /var/log
+
+
+            /dev/mapper/rhel-var-log on /var/log type xfs (rw,nodev,nosuid,noexec,seclabel)
+
+
+            If the "/var/log" file system is mounted without the "noexec" option, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257871r958804_rule
+    semantic_ir_sha256: 43c8d07ab2a3b10f1699f26d70c93a8f16f0b54aee870bc10602680d831f27fa
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: fafa2847d639b0b6c6cd8201a0c0a5ab48678599de0b52440f99ee367c347e75

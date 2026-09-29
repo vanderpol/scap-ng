@@ -1,0 +1,454 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258133r1045263_rule
+  version: 1
+  description: RHEL 9 must prohibit the use of cached authenticators after one day.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: RHEL 9 must prohibit the use of cached authenticators after one day.
+  steps:
+  - name: Collect oval:mil.disa.stig.ind:obj:23037600
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - attributes:
+          ignore_case: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/sssd.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*cache_credentials\s*=\s*true\b$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23037600
+      source_type: textfilecontent54_object
+      version: '2'
+    register: oval:mil.disa.stig.ind:obj:23037600
+  - name: Collect oval:mil.disa.stig.ind:obj:23037602
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/sssd.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23037602
+      source_type: textfilecontent54_object
+      version: '1'
+    register: oval:mil.disa.stig.ind:obj:23037602
+  - name: Collect oval:mil.disa.stig.ind:obj:23037603
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - attributes:
+          ignore_case: 'true'
+          max_depth: '-1'
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/conf.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.+\.conf$
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*cache_credentials\s*=\s*true\b$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23037603
+      source_type: textfilecontent54_object
+      version: '2'
+    register: oval:mil.disa.stig.ind:obj:23037603
+  - name: Collect oval:mil.disa.stig.ind:obj:23037605
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - attributes:
+          max_depth: '-1'
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/conf.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.+\.conf$
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23037605
+      source_type: textfilecontent54_object
+      version: '1'
+    register: oval:mil.disa.stig.ind:obj:23037605
+  - name: Collect oval:mil.disa.stig.ind:obj:23037606
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23037600
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23037603
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23037606
+      source_type: textfilecontent54_object
+      version: '1'
+    register: oval:mil.disa.stig.ind:obj:23037606
+  - name: Collect oval:mil.disa.stig.ind:obj:23037608
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23037602
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23037605
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23037608
+      source_type: textfilecontent54_object
+      version: '1'
+    register: oval:mil.disa.stig.ind:obj:23037608
+  predicates:
+    oval:mil.disa.stig.ind:ste:20000003:
+      comment: null
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:20000003
+      source_type: textfilecontent54_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230376:
+        class: compliance
+        criteria:
+          children:
+          - comment: /etc/sssd/sssd.conf:cache_credentials = true does not exist
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23037600
+          - comment: /etc/sssd/sssd.conf:offline_credentials_expiration = 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23037602
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prohibit the use of cached authentications after one day.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230376
+        version: '2'
+      oval:mil.disa.stig.rhel9os:def:258133:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230376
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-631020 - RHEL 9 must prohibit the use of cached authenticators after one day.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: If cached authentication information is out-of-date, the validity of the authentication information may
+              be questionable.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:258133
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23037600:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:mil.disa.stig.ind:obj:23037606
+        comment: /etc/sssd/sssd.conf:cache_credentials = false
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23037600
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:23037602:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23037608
+        comment: /etc/sssd/sssd.conf:offline_credentials_expiration = 1
+        predicates:
+        - oval:mil.disa.stig.ind:ste:20000003
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23037602
+        source_type: textfilecontent54_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:258133
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:258133
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:258133
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:258133
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-258133r1045263_rule
+    title: RHEL 9 must prohibit the use of cached authenticators after one day.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258133
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258133
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258133
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258133
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:66901
+      exports: []
+      inline_content: 'Verify that the System Security Services Daemon (SSSD) prohibits the use of cached authentications
+        after one day. Note: Cached authentication settings should be configured even if smart card authentication is not
+        used on the system. Check that SSSD allows cached authentications with the following command: $ sudo grep -ir cache_credentials
+        /etc/sssd/sssd.conf /etc/sssd/conf.d/ cache_credentials = true If "cache_credentials" is set to "false" or missing
+        from the configuration file, this is not a finding and no further checks are required. If "cache_credentials" is set
+        to "true", check that SSSD prohibits the use of cached authentications after one day with the following command: $
+        sudo grep -ir offline_credentials_expiration /etc/sssd/sssd.conf /etc/sssd/conf.d/ offline_credentials_expiration
+        = 1 If "offline_credentials_expiration" is not set to a value of "1", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:66901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that the System Security Services Daemon (SSSD) prohibits the use of cached authentications after
+            one day.
+
+
+            Note: Cached authentication settings should be configured even if smart card authentication is not used on the
+            system.
+
+
+            Check that SSSD allows cached authentications with the following command:
+
+
+            $ sudo grep -ir cache_credentials /etc/sssd/sssd.conf /etc/sssd/conf.d/
+
+
+            cache_credentials = true
+
+
+            If "cache_credentials" is set to "false" or missing from the configuration file, this is not a finding and no
+            further checks are required.
+
+
+            If "cache_credentials" is set to "true", check that SSSD prohibits the use of cached authentications after one
+            day with the following command:
+
+
+            $ sudo grep -ir offline_credentials_expiration /etc/sssd/sssd.conf /etc/sssd/conf.d/
+
+
+            offline_credentials_expiration = 1
+
+
+            If "offline_credentials_expiration" is not set to a value of "1", this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.rhel9os:def:258133
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: d76c2ddd258e361a4bd0c677c33d9c290b9b3d4f26846bc5ddd11b585a96f033
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-258133r1045263_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: ef1f18cd499f094f061ac5aee4d472e010147fd02119f8ab7d9fd6f79faa8059

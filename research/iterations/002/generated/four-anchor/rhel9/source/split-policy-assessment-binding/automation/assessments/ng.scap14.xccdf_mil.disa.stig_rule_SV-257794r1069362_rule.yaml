@@ -1,0 +1,323 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257794r1069362_rule
+  version: 1
+  description: RHEL 9 must clear memory when it is freed to prevent use-after-free attacks.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.ind:obj:25779301:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25779301
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /etc/default/grub GRUB_CMDLINE_LINUX
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/default/grub
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^GRUB_CMDLINE_LINUX="(.*)"
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25779300:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25779300
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: BLS options
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /boot/loader/entries
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.*\.conf$
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^options\s+(.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive: {}
+  predicates:
+    oval:mil.disa.stig.ind:ste:23027900:
+      source_state_id: oval:mil.disa.stig.ind:ste:23027900
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (^|\s)init_on_free=1(\s|$)
+      comment: null
+  evaluate:
+    tests:
+      oval:mil.disa.stig.ind:tst:23027901:
+        source_test_id: oval:mil.disa.stig.ind:tst:23027901
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain init_on_free=1
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25779301
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23027900
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23027900:
+        source_test_id: oval:mil.disa.stig.ind:tst:23027900
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: BLS options contain init_on_free=1
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25779300
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23027900
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.rhel9os:def:257794:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:257794
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230279
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-212045 - RHEL 9 must clear memory when it is freed to prevent use-after-free attacks.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Some adversaries launch attacks with the intent of executing code in nonexecutable regions of memory or
+              in memory locations that are prohibited. Security safeguards employed to protect memory include, for example,
+              data execution prevention and address space layout randomization. Data execution prevention safeguards can be
+              either hardware-enforced or software-enforced with hardware providing the greater strength of mechanism.
+
+
+              Poisoning writes an arbitrary value to freed pages, so any modification or reference to that page after being
+              freed or before being initialized will be detected and prevented. This prevents many types of use-after-free
+              vulnerabilities at little performance cost. Also prevents leak of data and detection of corrupted memory.
+
+
+              init_on_free is a Linux kernel boot parameter that enhances security by initializing memory regions when they
+              are freed, preventing data leakage. This process ensures that stale data in freed memory cannot be accessed
+              by malicious programs.
+
+
+              SLUB canaries add a randomized value (canary) at the end of SLUB-allocated objects to detect memory corruption
+              caused by buffer overflows or underflows. Redzoning adds padding (red zones) around SLUB-allocated objects to
+              detect overflows or underflows by triggering a fault when adjacent memory is accessed. SLUB canaries are often
+              more efficient and provide stronger detection against buffer overflows compared to redzoning. SLUB canaries
+              are supported in hardened Linux kernels like the ones provided by Linux-hardened.
+
+
+              SLAB objects are blocks of physically contiguous memory. SLUB is the unqueued SLAB allocator.
+
+
+              Satisfies: SRG-OS-000433-GPOS-00192, SRG-OS-000134-GPOS-00068'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230279:
+        source_definition_id: oval:mil.disa.stig.defs:def:230279
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23027900
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23027901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must clear memory when it is freed to prevent use-after-free attacks.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.rhel9os:def:257794
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257794
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:257794
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257794
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:257794
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-257794r1069362_rule
+    title: RHEL 9 must clear memory when it is freed to prevent use-after-free attacks.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257794
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257794
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257794
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257794
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:3301
+      exports: []
+      inline_content: 'Verify that GRUB2 is configured to mitigate use-after-free vulnerabilities by employing memory poisoning.
+        Inspect the "GRUB_CMDLINE_LINUX" entry of /etc/default/grub as follows: $ sudo grep -i grub_cmdline_linux /etc/default/grub
+        GRUB_CMDLINE_LINUX="... init_on_free=1" If "init_on_free=1" is missing or commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:3301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that GRUB2 is configured to mitigate use-after-free vulnerabilities by employing memory poisoning.
+
+
+            Inspect the "GRUB_CMDLINE_LINUX" entry of /etc/default/grub as follows:
+
+            $ sudo grep -i grub_cmdline_linux /etc/default/grub
+
+            GRUB_CMDLINE_LINUX="... init_on_free=1"
+
+
+            If "init_on_free=1" is missing or commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257794r1069362_rule
+    semantic_ir_sha256: 04292fce19614bfed0b2442e107ef8dfe9ada8ef30764d6cebf3a2a21666aa50
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: ab50e8068bfc89c02a2140b35676e0b77042a7d12de25a308cb1554260491954

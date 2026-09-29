@@ -1,0 +1,370 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271585r1091467_rule
+  version: 1
+  description: OL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit log.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: OL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit log.
+  steps:
+  - name: Collect oval:mil.disa.stig.ind:obj:20000001
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: Audit log file
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/auditd.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*log_file\s*=\s*(\S+)\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:20000001
+      source_type: textfilecontent54_object
+      version: '1'
+    register: oval:mil.disa.stig.ind:obj:20000001
+  - name: Collect oval:mil.disa.stig.unix:obj:20000011
+    collect:
+      capability: scapng.collect.unix.file
+      comment: Audit log file location
+      query:
+      - attributes:
+          var_ref: oval:mil.disa.stig.defs:var:20000004
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:20000011
+      source_type: file_object
+      version: '1'
+    register: oval:mil.disa.stig.unix:obj:20000011
+  - name: Derive oval:mil.disa.stig.defs:var:20000004
+    derive:
+      comment: Audit log location from /etc/audit/auditd.conf
+      datatype: string
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:20000001
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:20000001
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:20000004
+        variable_type: local_variable
+      resolution:
+        datatype: string
+        item_field: subexpression
+        object_ref: oval:mil.disa.stig.ind:obj:20000001
+        operation: object_component
+        reason: object_component_requires_collection:textfilecontent54_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:20000001
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:20000004
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:20000004
+    register: oval:mil.disa.stig.defs:var:20000004
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000004:
+      comment: Mode 0600 or less permissive
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: suid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sgid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sticky
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: uexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: gread
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: gwrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: gexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: oread
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: oexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:20000004
+      source_type: file_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230396:
+        class: compliance
+        criteria:
+          children:
+          - comment: Audit log is mode 0600 or less permissive
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23039600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system audit logs must have a mode of 0600 or less permissive to prevent unauthorized read
+              access.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230396
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271585:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230396
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000795 - OL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access
+              to the audit log.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Only authorized personnel should be aware of errors and the details of the errors. Error messages are an\
+              \ indicator of an organization's operational state or can identify the OL 9 system or platform. Additionally,\
+              \ Personally Identifiable Information (PII) and operational information must not be revealed through error messages\
+              \ to unauthorized personnel or their designated representatives.\n\n\tThe structure and content of error messages\
+              \ must be carefully considered by the organization and development team. The extent to which the information\
+              \ system is able to identify and handle error conditions is guided by organizational policy and operational\
+              \ requirements.\n\n\tSatisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029,\
+              \ SRG-OS-000206-GPOS-00084"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271585
+        version: '1'
+    tests:
+      oval:mil.disa.stig.unix:tst:23039600:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.unix:obj:20000011
+        comment: Audit log is mode 0600 or less permissive
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000004
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:23039600
+        source_type: file_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.ol9os:def:271585
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271585
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.ol9os:def:271585
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271585
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271585r1091467_rule
+    title: OL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit log.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271585
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271585
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271585
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271585
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29901
+      exports: []
+      inline_content: 'Verify that OL 9 audit logs have a mode of "0600". First determine where the audit logs are stored
+        with the following command: $ sudo grep -iw log_file /etc/audit/auditd.conf log_file = /var/log/audit/audit.log Then
+        using the location of the audit log file, determine if the audit log files as a mode of "0640" with the following
+        command: $ sudo ls -la /var/log/audit/*.log rw-------. 2 root root 237923 Jun 11 11:56 /var/log/audit/audit.log If
+        the audit logs have a mode more permissive than "0600", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:29901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 audit logs have a mode of \"0600\". \n\nFirst determine where the audit logs are stored\
+            \ with the following command:\n\n$ sudo grep -iw log_file /etc/audit/auditd.conf\nlog_file = /var/log/audit/audit.log\n\
+            \nThen using the location of the audit log file, determine if the audit log files as a mode of \"0640\" with the\
+            \ following command:\n\n$ sudo ls -la /var/log/audit/*.log\nrw-------. 2 root root 237923 Jun 11 11:56 /var/log/audit/audit.log\n\
+            \nIf the audit logs have a mode more permissive than \"0600\", this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271585
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 9ad4017c605bc165c60bdeb289153ba69909d01a60d0149dcc929d2b9f481069
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271585r1091467_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 7dc8035dfb3457d58f75a40cfcdc60f7d89bbea971c365281a101460c1d2364e

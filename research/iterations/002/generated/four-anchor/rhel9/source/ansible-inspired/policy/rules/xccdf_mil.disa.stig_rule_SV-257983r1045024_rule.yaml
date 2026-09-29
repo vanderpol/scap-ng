@@ -1,0 +1,397 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication method,
+    this requirement is Not Applicable. Verify that RHEL 9 SSH daemon accepts public key encryption with the following command:
+    $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo grep -iH
+    ''^\s*pubkeyauthentication'' PubkeyAuthentication yes If "PubkeyAuthentication" is set to no, the line is commented out,
+    or the line is missing, this is a finding.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257983r1045024_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257983r1045024_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257983r1045024_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
+  cluster_id: null
+  conflicts: []
+  default_check: default
+  description: '<VulnDiscussion>Without the use of multifactor authentication, the ease of access to privileged functions
+    is greatly increased. Multifactor authentication requires using two or more factors to achieve authentication. A privileged
+    account is defined as an information system account with authorizations of a privileged user. A DOD common access card
+    (CAC) with DOD-approved PKI is an example of multifactor authentication. Satisfies: SRG-OS-000105-GPOS-00052, SRG-OS-000106-GPOS-00053,
+    SRG-OS-000107-GPOS-00054, SRG-OS-000108-GPOS-00055</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:almalinux:almalinux:9
+  - cpe:/o:rocky:rocky:9
+  - cpe:/o:redhat:enterprise_linux:9.0
+  effective_platforms:
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.almalinux9:def:301
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:almalinux:almalinux:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:almalinux:almalinux:9
+    ref: cpe:/o:almalinux:almalinux:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.rocky9:def:201
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:rocky:rocky:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:rocky:rocky:9
+    ref: cpe:/o:rocky:rocky:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:mil.disa.stig.rhel9os:def:101
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:redhat:enterprise_linux:9.0
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:redhat:enterprise_linux:9.0
+    ref: cpe:/o:redhat:enterprise_linux:9.0
+  extends: null
+  fix: 'To configure the system, add or modify the following line in "/etc/ssh/sshd_config" or in a file in "/etc/ssh/sshd_config.d".
+    PubkeyAuthentication yes Restart the SSH daemon for the settings to take effect: $ sudo systemctl restart sshd.service'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-257983
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-257983r1045024_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000765
+  - system: http://cyber.mil/cci
+    value: CCI-000766
+  - system: http://cyber.mil/cci
+    value: CCI-000767
+  - system: http://cyber.mil/cci
+    value: CCI-000768
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257983
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257983
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257983
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257983
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40301
+      exports: []
+      inline_content: 'Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication
+        method, this requirement is Not Applicable. Verify that RHEL 9 SSH daemon accepts public key encryption with the following
+        command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+        grep -iH ''^\s*pubkeyauthentication'' PubkeyAuthentication yes If "PubkeyAuthentication" is set to no, the line is
+        commented out, or the line is missing, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication\
+            \ method, this requirement is Not Applicable.\n\nVerify that RHEL 9 SSH daemon accepts public key encryption with\
+            \ the following command:\n \n$ sudo /usr/sbin/sshd -dd 2>&1 | awk '/filename/ {print $4}' | tr -d '\\r' | tr '\\\
+            n' ' ' | xargs sudo grep -iH '^\\s*pubkeyauthentication'\n\nPubkeyAuthentication yes\n \nIf \"PubkeyAuthentication\"\
+            \ is set to no, the line is commented out, or the line is missing, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:257983
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257983
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:257983
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257983
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40301
+    exports: []
+    inline_content: 'Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication
+      method, this requirement is Not Applicable. Verify that RHEL 9 SSH daemon accepts public key encryption with the following
+      command: $ sudo /usr/sbin/sshd -dd 2>&1 | awk ''/filename/ {print $4}'' | tr -d ''\r'' | tr ''\n'' '' '' | xargs sudo
+      grep -iH ''^\s*pubkeyauthentication'' PubkeyAuthentication yes If "PubkeyAuthentication" is set to no, the line is commented
+      out, or the line is missing, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication\
+          \ method, this requirement is Not Applicable.\n\nVerify that RHEL 9 SSH daemon accepts public key encryption with\
+          \ the following command:\n \n$ sudo /usr/sbin/sshd -dd 2>&1 | awk '/filename/ {print $4}' | tr -d '\\r' | tr '\\\
+          n' ' ' | xargs sudo grep -iH '^\\s*pubkeyauthentication'\n\nPubkeyAuthentication yes\n \nIf \"PubkeyAuthentication\"\
+          \ is set to no, the line is commented out, or the line is missing, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-257983r1045024_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-255035
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL 9 SSHD must accept public key authentication.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Without the use of multifactor authentication, the ease of access to privileged functions is
+        greatly increased. Multifactor authentication requires using two or more factors to achieve authentication. A privileged
+        account is defined as an information system account with authorizations of a privileged user. A DOD common access
+        card (CAC) with DOD-approved PKI is an example of multifactor authentication.
+
+
+        Satisfies: SRG-OS-000105-GPOS-00052, SRG-OS-000106-GPOS-00053, SRG-OS-000107-GPOS-00054, SRG-OS-000108-GPOS-00055</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000765
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000766
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000767
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000768
+    - attributes:
+        fixref: F-61648r1045023_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'To configure the system, add or modify the following line in "/etc/ssh/sshd_config" or in a file in "/etc/ssh/sshd_config.d".
+
+
+        PubkeyAuthentication yes
+
+
+        Restart the SSH daemon for the settings to take effect:
+
+
+        $ sudo systemctl restart sshd.service'
+    - attributes:
+        id: F-61648r1045023_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257983
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257983
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:40301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Note: If the system administrator demonstrates the use of an approved alternate multifactor authentication\
+          \ method, this requirement is Not Applicable.\n\nVerify that RHEL 9 SSH daemon accepts public key encryption with\
+          \ the following command:\n \n$ sudo /usr/sbin/sshd -dd 2>&1 | awk '/filename/ {print $4}' | tr -d '\\r' | tr '\\\
+          n' ' ' | xargs sudo grep -iH '^\\s*pubkeyauthentication'\n\nPubkeyAuthentication yes\n \nIf \"PubkeyAuthentication\"\
+          \ is set to no, the line is commented out, or the line is missing, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: RHEL 9 SSHD must accept public key authentication.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 87d4f0a96086712edaea744e116640d89410cf4f361da823f286a7900f573a17
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-257983r1045024_rule
+  status: legacy_compatible

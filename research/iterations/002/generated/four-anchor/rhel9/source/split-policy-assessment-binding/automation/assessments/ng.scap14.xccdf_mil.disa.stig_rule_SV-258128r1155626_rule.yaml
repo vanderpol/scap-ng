@@ -1,0 +1,258 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
+  version: 1
+  description: RHEL 9 must require authentication to access emergency mode.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.ind:obj:24452300:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:24452300
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /usr/lib/systemd/system/emergency.service ExecStart
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /usr/lib/systemd/system/emergency.service
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^ExecStart=(.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive: {}
+  predicates:
+    oval:mil.disa.stig.ind:ste:24452300:
+      source_state_id: oval:mil.disa.stig.ind:ste:24452300
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: -/usr/lib/systemd/systemd-sulogin-shell emergency
+      comment: emergency.service ExecStart
+  evaluate:
+    tests:
+      oval:mil.disa.stig.ind:tst:24452300:
+        source_test_id: oval:mil.disa.stig.ind:tst:24452300
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: emergency.service config correct
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:24452300
+        predicates:
+        - oval:mil.disa.stig.ind:ste:24452300
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.rhel9os:def:258128:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:258128
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:244523
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-611195 - RHEL 9 must require authentication to access emergency mode.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'To mitigate the risk of unauthorized access to sensitive information by entities that have been issued
+              certificates by DOD-approved PKIs, all DOD systems (e.g., web servers and web portals) must be properly configured
+              to incorporate access control methods that do not rely solely on the possession of a certificate for access.
+              Successful authentication must not automatically give an entity access to an asset or security boundary. Authorization
+              procedures and controls must be implemented to ensure each authenticated entity also has a validated and current
+              authorization. Authorization is the process of determining whether an entity, once authenticated, is permitted
+              to access a specific asset. Information systems use access control policies and enforcement mechanisms to implement
+              this requirement.
+
+
+              This requirement prevents attackers with physical access from trivially bypassing security on the machine and
+              gaining root access. Such accesses are further prevented by configuring the bootloader password.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:244523:
+        source_definition_id: oval:mil.disa.stig.defs:def:244523
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: emergency.service config correct
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:24452300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system operating systems must require authentication upon booting into emergency mode.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.rhel9os:def:258128
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:258128
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:258128
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:258128
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:258128
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
+    title: RHEL 9 must require authentication to access emergency mode.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258128
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258128
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258128
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258128
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:66101
+      exports: []
+      inline_content: 'Verify RHEL 9 requires authentication for emergency mode with the following command: $ grep sulogin
+        /usr/lib/systemd/system/emergency.service ExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency If the line
+        is not returned from the default systemd file, use the following command to look for modifications to the emergency.service:
+        $ grep sulogin /etc/systemd/system/emergency.service.d/*.conf If the line is not returned from either location this
+        is a finding. Note: The configuration setting can only be in either the default location, or in the drop in file,
+        not both locations.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:66101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify RHEL 9 requires authentication for emergency mode with the following command:\n\n$ grep sulogin /usr/lib/systemd/system/emergency.service\
+            \ \n\nExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency\n\nIf the line is not returned from the default\
+            \ systemd file, use the following command to look for modifications to the emergency.service:\n\n$ grep sulogin\
+            \ /etc/systemd/system/emergency.service.d/*.conf \n\nIf the line is not returned from either location this is\
+            \ a finding.\n\nNote: The configuration setting can only be in either the default location, or in the drop in\
+            \ file, not both locations."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-258128r1155626_rule
+    semantic_ir_sha256: 8a16e08c756abf00600a1ddbdcb920fde3ce31fe608d5dba60480920e3abeb54
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 2c529bf9af429f5b5819f2221191ea5b6205e3cd8ad60039f7ab67adfc2a0e21

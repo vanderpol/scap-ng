@@ -1,0 +1,280 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253335r991573_rule
+  version: 1
+  description: The system must be configured to audit System - System Integrity failures.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: The system must be configured to audit System - System Integrity failures.
+  steps:
+  - name: Collect oval:mil.disa.stig.win:obj:20000000
+    collect:
+      capability: scapng.collect.windows.auditeventpolicysubcategories
+      comment: null
+      query: []
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:20000000
+      source_type: auditeventpolicysubcategories_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:20000000
+  predicates:
+    oval:mil.disa.stig.win:ste:25333500:
+      comment: Audit - System Integrity - Failure only
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: system_integrity
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_FAILURE
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25333500
+      source_type: auditeventpolicysubcategories_state
+    oval:mil.disa.stig.win:ste:25333501:
+      comment: Audit - System Integrity - Success and Failure
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: system_integrity
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25333501
+      source_type: auditeventpolicysubcategories_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253335:
+        class: compliance
+        criteria:
+          children:
+          - comment: Audit - System Integrity - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333500
+          - comment: Audit - System Integrity - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333501
+          comment: Audit - System Integrity - Failure
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit System - System Integrity failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253335
+        version: '1'
+      oval:mil.disa.stig.windows11:def:253335:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253335
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-AU-000155 - The system must be configured to audit System - System Integrity failures.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot
+              service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary
+              to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential
+              for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.
+
+
+              System Integrity records events related to violations of integrity to the security subsystem.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows11:def:253335
+        version: '2'
+    tests:
+      oval:mil.disa.stig.win:tst:25333500:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        comment: Audit - System Integrity - Failure only
+        predicates:
+        - oval:mil.disa.stig.win:ste:25333500
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25333500
+        source_type: auditeventpolicysubcategories_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25333501:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        comment: Audit - System Integrity - Success and Failure
+        predicates:
+        - oval:mil.disa.stig.win:ste:25333501
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25333501
+        source_type: auditeventpolicysubcategories_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.windows11:def:253335
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253335
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.windows11:def:253335
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253335
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-253335r991573_rule
+    title: The system must be configured to audit System - System Integrity failures.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253335
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253335
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253335
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253335
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:15501
+      exports: []
+      inline_content: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+        must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective. Use the AuditPol
+        tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges ("Run as Administrator").
+        Enter "AuditPol /get /category:*". Compare the AuditPol settings with the following. If the system does not audit
+        the following, this is a finding: System >> System Integrity - Failure'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:15501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+            must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective.
+
+
+            Use the AuditPol tool to review the current Audit Policy configuration:
+
+            Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+            Enter "AuditPol /get /category:*".
+
+
+            Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+            System >> System Integrity - Failure'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.windows11:def:253335
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: b48fec0d06c6af342a774f45fe1b8276e0164fa195e1d3afc44d2a6f6d2fafe3
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-253335r991573_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: ec309a05e88fddd21ce0cc1ac6766bf3ce3f7b8216423b5da7fbb1e2c5af4de3

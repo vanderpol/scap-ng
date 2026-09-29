@@ -1,0 +1,429 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271861r1092295_rule
+  version: 1
+  description: OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured.
+  steps:
+  - name: Collect oval:mil.disa.stig.ind:obj:23031600
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: /etc/nsswitch.conf hosts entry
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/nsswitch.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*hosts:\s*(.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23031600
+      source_type: textfilecontent54_object
+      version: '2'
+    register: oval:mil.disa.stig.ind:obj:23031600
+  - name: Collect oval:mil.disa.stig.ind:obj:23031601
+    collect:
+      capability: scapng.collect.independent.variable
+      comment: count of unique name servers
+      query:
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.ind:var:23031600
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23031601
+      source_type: variable_object
+      version: '1'
+    register: oval:mil.disa.stig.ind:obj:23031601
+  - name: Collect oval:mil.disa.stig.ind:obj:23031602
+    collect:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: /etc/resolv.conf nameserver entries
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/resolv.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^nameserver\s+(.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23031602
+      source_type: textfilecontent54_object
+      version: '2'
+    register: oval:mil.disa.stig.ind:obj:23031602
+  - name: Derive oval:mil.disa.stig.ind:var:23031600
+    derive:
+      comment: count of unique name servers
+      datatype: int
+      evaluation_plan:
+        blocked_by:
+          blocked_by:
+            item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23031602
+            operation: object_component
+            reason: object_component_requires_collection:textfilecontent54_object
+            record_field: null
+            status: dynamic_object_dependency
+          operation: unique
+          reason: unique_child_not_static:object_component_requires_collection:textfilecontent54_object
+          status: dynamic_object_dependency
+        datatype: int
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23031602
+          operations:
+          - count
+          - object_component
+          - unique
+          variables: []
+        expression:
+          args:
+          - args:
+            - item_field: subexpression
+              object_ref: oval:mil.disa.stig.ind:obj:23031602
+              op: object_component
+              record_field: null
+            attributes: {}
+            op: unique
+          attributes: {}
+          op: count
+        mode: target_dependent
+        reason: count_child_not_static:unique_child_not_static:object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.ind:var:23031600
+        variable_type: local_variable
+      resolution:
+        blocked_by:
+          blocked_by:
+            item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23031602
+            operation: object_component
+            reason: object_component_requires_collection:textfilecontent54_object
+            record_field: null
+            status: dynamic_object_dependency
+          operation: unique
+          reason: unique_child_not_static:object_component_requires_collection:textfilecontent54_object
+          status: dynamic_object_dependency
+        datatype: int
+        operation: count
+        reason: count_child_not_static:unique_child_not_static:object_component_requires_collection:textfilecontent54_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: int
+        expression:
+          args:
+          - args:
+            - item_field: subexpression
+              object_ref: oval:mil.disa.stig.ind:obj:23031602
+              op: object_component
+              record_field: null
+            attributes: {}
+            op: unique
+          attributes: {}
+          op: count
+        id: oval:mil.disa.stig.ind:var:23031600
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.ind:var:23031600
+    register: oval:mil.disa.stig.ind:var:23031600
+  predicates:
+    oval:mil.disa.stig.ind:ste:23031600:
+      comment: hosts entry contains dns
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (^|\s)dns(\s|$)
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23031600
+      source_type: textfilecontent54_state
+    oval:mil.disa.stig.ind:ste:23031601:
+      comment: /etc/resolv.conf is configured with at least two name servers
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '2'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23031601
+      source_type: variable_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230316:
+        class: compliance
+        criteria:
+          children:
+          - comment: The system is not using DNS
+            kind: test_ref
+            negate: true
+            test_ref: oval:mil.disa.stig.ind:tst:23031600
+          - children:
+            - comment: The system is using DNS
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23031600
+            - comment: /etc/resolv.conf contains at least one nameserver entry
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23031602
+            - comment: /etc/resolv.conf is configured with at least two name servers
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23031601
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: For Systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230316
+        version: '2'
+      oval:mil.disa.stig.ol9os:def:271861:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230316
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-006003 - OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers
+              configured.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: To provide availability for name resolution services, multiple redundant name servers are mandated. A failure
+              in name resolution could lead to the failure of security functions requiring name resolution, which may include
+              time synchronization, centralized authentication, and remote system logging.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271861
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23031600:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23031600
+        comment: The system is using DNS
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23031600
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23031600
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:23031601:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23031601
+        comment: /etc/resolv.conf is configured with at least two name servers
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23031601
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23031601
+        source_type: variable_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:23031602:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23031602
+        comment: /etc/resolv.conf contains at least one nameserver entry
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23031602
+        source_type: textfilecontent54_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.ol9os:def:271861
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271861
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.ol9os:def:271861
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271861
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271861r1092295_rule
+    title: OL 9 systems using Domain Name Servers (DNS) resolution must have at least two name servers configured.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271861
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271861
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271861
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271861
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:83701
+      exports: []
+      inline_content: 'Verify that OL 9 configures name servers used by the system with the following command: $ grep nameserver
+        /etc/resolv.conf nameserver 192.168.1.2 nameserver 192.168.1.3 If less than two lines are returned that are not commented
+        out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:83701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 configures name servers used by the system with the following command:
+
+
+            $ grep nameserver /etc/resolv.conf
+
+            nameserver 192.168.1.2
+
+            nameserver 192.168.1.3
+
+
+            If less than two lines are returned that are not commented out, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271861
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 99e8283436188c279dc62aa9c644dfcf01d9b09ef30374d49c3f1d51cac3ef93
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271861r1092295_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 37dcfb903735c52afdf95a3434f50d1fcf0f7e6caadeda8e36c0316ea5b75de2

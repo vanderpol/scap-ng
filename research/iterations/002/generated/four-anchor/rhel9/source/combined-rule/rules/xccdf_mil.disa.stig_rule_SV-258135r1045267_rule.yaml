@@ -1,0 +1,640 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-258135r1045267_rule
+  title: RHEL 9 must routinely check the baseline configuration for unauthorized changes and notify the system administrator
+    when anomalies in the operation of any security functions are discovered.
+  severity: medium
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-258135
+  description: '<VulnDiscussion>Unauthorized changes to the baseline configuration could make the system vulnerable to various
+    attacks or allow unauthorized access to the operating system. Changes to operating system configurations can have unintended
+    side effects, some of which may be relevant to security. Detecting such changes and providing an automated response can
+    help avoid unintended, negative consequences that could ultimately affect the security state of the operating system.
+    The operating system''s information management officer (IMO)/information system security officer (ISSO) and system administrators
+    (SAs) must be notified via email and/or monitoring system trap when there is an unauthorized modification of a configuration
+    item. Notifications provided by information systems include messages to local computer consoles, and/or hardware indications,
+    such as lights. This capability must take into account operational requirements for availability for selecting an appropriate
+    response. The organization may choose to shut down or restart the information system upon security function anomaly detection.
+    Satisfies: SRG-OS-000363-GPOS-00150, SRG-OS-000446-GPOS-00200, SRG-OS-000447-GPOS-00201</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:almalinux:almalinux:9
+  - cpe:/o:rocky:rocky:9
+  - cpe:/o:redhat:enterprise_linux:9.0
+  effective_platforms:
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.almalinux9:def:301
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:almalinux:almalinux:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:almalinux:almalinux:9
+    ref: cpe:/o:almalinux:almalinux:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.rocky9:def:201
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:rocky:rocky:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:rocky:rocky:9
+    ref: cpe:/o:rocky:rocky:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:mil.disa.stig.rhel9os:def:101
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:redhat:enterprise_linux:9.0
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:redhat:enterprise_linux:9.0
+    ref: cpe:/o:redhat:enterprise_linux:9.0
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-001744
+  - system: http://cyber.mil/cci
+    value: CCI-002699
+  - system: http://cyber.mil/cci
+    value: CCI-002702
+  requires: []
+  conflicts: []
+  check: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The command used
+    in the example will use a daily occurrence. Check the cron directories for scripts controlling the execution and notification
+    of results of the file integrity application. For example, if AIDE is installed on the system, use the following commands:
+    $ sudo ls -al /etc/cron.* | grep aide -rwxr-xr-x 1 root root 29 Nov 22 2015 aide $ sudo grep aide /etc/crontab /var/spool/cron/root
+    /etc/crontab: 30 04 * * * root usr/sbin/aide /var/spool/cron/root: 30 04 * * * root usr/sbin/aide $ sudo more /etc/cron.daily/aide
+    #!/bin/bash /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root@sysname.mil If the
+    file integrity application does not exist, a script file controlling the execution of the file integrity application does
+    not exist, or the file integrity application does not notify designated personnel of changes, this is a finding.'
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+    exports: []
+    inline_content: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The command
+      used in the example will use a daily occurrence. Check the cron directories for scripts controlling the execution and
+      notification of results of the file integrity application. For example, if AIDE is installed on the system, use the
+      following commands: $ sudo ls -al /etc/cron.* | grep aide -rwxr-xr-x 1 root root 29 Nov 22 2015 aide $ sudo grep aide
+      /etc/crontab /var/spool/cron/root /etc/crontab: 30 04 * * * root usr/sbin/aide /var/spool/cron/root: 30 04 * * * root
+      usr/sbin/aide $ sudo more /etc/cron.daily/aide #!/bin/bash /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily
+      aide integrity check run" root@sysname.mil If the file integrity application does not exist, a script file controlling
+      the execution of the file integrity application does not exist, or the file integrity application does not notify designated
+      personnel of changes, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The command
+          used in the example will use a daily occurrence.
+
+
+          Check the cron directories for scripts controlling the execution and notification of results of the file integrity
+          application. For example, if AIDE is installed on the system, use the following commands:
+
+
+          $ sudo ls -al /etc/cron.* | grep aide
+
+
+          -rwxr-xr-x 1 root root 29 Nov 22 2015 aide
+
+
+          $ sudo grep aide /etc/crontab /var/spool/cron/root
+
+
+          /etc/crontab: 30 04 * * * root usr/sbin/aide
+
+          /var/spool/cron/root: 30 04 * * * root usr/sbin/aide
+
+
+          $ sudo more /etc/cron.daily/aide
+
+
+          #!/bin/bash
+
+          /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root@sysname.mil
+
+
+          If the file integrity application does not exist, a script file controlling the execution of the file integrity
+          application does not exist, or the file integrity application does not notify designated personnel of changes, this
+          is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+      exports: []
+      inline_content: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The
+        command used in the example will use a daily occurrence. Check the cron directories for scripts controlling the execution
+        and notification of results of the file integrity application. For example, if AIDE is installed on the system, use
+        the following commands: $ sudo ls -al /etc/cron.* | grep aide -rwxr-xr-x 1 root root 29 Nov 22 2015 aide $ sudo grep
+        aide /etc/crontab /var/spool/cron/root /etc/crontab: 30 04 * * * root usr/sbin/aide /var/spool/cron/root: 30 04 *
+        * * root usr/sbin/aide $ sudo more /etc/cron.daily/aide #!/bin/bash /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME
+        - Daily aide integrity check run" root@sysname.mil If the file integrity application does not exist, a script file
+        controlling the execution of the file integrity application does not exist, or the file integrity application does
+        not notify designated personnel of changes, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The command
+            used in the example will use a daily occurrence.
+
+
+            Check the cron directories for scripts controlling the execution and notification of results of the file integrity
+            application. For example, if AIDE is installed on the system, use the following commands:
+
+
+            $ sudo ls -al /etc/cron.* | grep aide
+
+
+            -rwxr-xr-x 1 root root 29 Nov 22 2015 aide
+
+
+            $ sudo grep aide /etc/crontab /var/spool/cron/root
+
+
+            /etc/crontab: 30 04 * * * root usr/sbin/aide
+
+            /var/spool/cron/root: 30 04 * * * root usr/sbin/aide
+
+
+            $ sudo more /etc/cron.daily/aide
+
+
+            #!/bin/bash
+
+            /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root@sysname.mil
+
+
+            If the file integrity application does not exist, a script file controlling the execution of the file integrity
+            application does not exist, or the file integrity application does not notify designated personnel of changes,
+            this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: 'Configure the file integrity tool to run automatically on the system at least weekly and to notify designated personnel
+    if baseline configurations are changed in an unauthorized manner. The AIDE tool can be configured to email designated
+    personnel with the use of the cron system. The following example output is generic. It will set cron to run AIDE daily
+    and to send email at the completion of the analysis $ sudo more /etc/cron.daily/aide #!/bin/bash /usr/sbin/aide --check
+    | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root@sysname.mil'
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-258135r1045267_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-651015
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL 9 must routinely check the baseline configuration for unauthorized changes and notify the system administrator
+        when anomalies in the operation of any security functions are discovered.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Unauthorized changes to the baseline configuration could make the system vulnerable to various
+        attacks or allow unauthorized access to the operating system. Changes to operating system configurations can have
+        unintended side effects, some of which may be relevant to security.
+
+
+        Detecting such changes and providing an automated response can help avoid unintended, negative consequences that could
+        ultimately affect the security state of the operating system. The operating system''s information management officer
+        (IMO)/information system security officer (ISSO) and system administrators (SAs) must be notified via email and/or
+        monitoring system trap when there is an unauthorized modification of a configuration item.
+
+
+        Notifications provided by information systems include messages to local computer consoles, and/or hardware indications,
+        such as lights.
+
+
+        This capability must take into account operational requirements for availability for selecting an appropriate response.
+        The organization may choose to shut down or restart the information system upon security function anomaly detection.
+
+
+        Satisfies: SRG-OS-000363-GPOS-00150, SRG-OS-000446-GPOS-00200, SRG-OS-000447-GPOS-00201</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-001744
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002699
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002702
+    - attributes:
+        fixref: F-61800r926391_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: "Configure the file integrity tool to run automatically on the system at least weekly and to notify designated\
+        \ personnel if baseline configurations are changed in an unauthorized manner. The AIDE tool can be configured to email\
+        \ designated personnel with the use of the cron system.\n \nThe following example output is generic. It will set cron\
+        \ to run AIDE daily and to send email at the completion of the analysis\n\n$ sudo more /etc/cron.daily/aide\n \n#!/bin/bash\n\
+        /usr/sbin/aide --check | /bin/mail -s \"$HOSTNAME - Daily aide integrity check run\" root@sysname.mil"
+    - attributes:
+        id: F-61800r926391_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The command
+          used in the example will use a daily occurrence.
+
+
+          Check the cron directories for scripts controlling the execution and notification of results of the file integrity
+          application. For example, if AIDE is installed on the system, use the following commands:
+
+
+          $ sudo ls -al /etc/cron.* | grep aide
+
+
+          -rwxr-xr-x 1 root root 29 Nov 22 2015 aide
+
+
+          $ sudo grep aide /etc/crontab /var/spool/cron/root
+
+
+          /etc/crontab: 30 04 * * * root usr/sbin/aide
+
+          /var/spool/cron/root: 30 04 * * * root usr/sbin/aide
+
+
+          $ sudo more /etc/cron.daily/aide
+
+
+          #!/bin/bash
+
+          /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root@sysname.mil
+
+
+          If the file integrity application does not exist, a script file controlling the execution of the file integrity
+          application does not exist, or the file integrity application does not notify designated personnel of changes, this
+          is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258135r1045267_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258135r1045267_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
+    id: ng.manual.xccdf_mil.disa.stig_rule_SV-258135r1045267_rule
+    version: 1
+    description: RHEL 9 must routinely check the baseline configuration for unauthorized changes and notify the system administrator
+      when anomalies in the operation of any security functions are discovered.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+      exports: []
+      inline_content: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The
+        command used in the example will use a daily occurrence. Check the cron directories for scripts controlling the execution
+        and notification of results of the file integrity application. For example, if AIDE is installed on the system, use
+        the following commands: $ sudo ls -al /etc/cron.* | grep aide -rwxr-xr-x 1 root root 29 Nov 22 2015 aide $ sudo grep
+        aide /etc/crontab /var/spool/cron/root /etc/crontab: 30 04 * * * root usr/sbin/aide /var/spool/cron/root: 30 04 *
+        * * root usr/sbin/aide $ sudo more /etc/cron.daily/aide #!/bin/bash /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME
+        - Daily aide integrity check run" root@sysname.mil If the file integrity application does not exist, a script file
+        controlling the execution of the file integrity application does not exist, or the file integrity application does
+        not notify designated personnel of changes, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The command
+            used in the example will use a daily occurrence.
+
+
+            Check the cron directories for scripts controlling the execution and notification of results of the file integrity
+            application. For example, if AIDE is installed on the system, use the following commands:
+
+
+            $ sudo ls -al /etc/cron.* | grep aide
+
+
+            -rwxr-xr-x 1 root root 29 Nov 22 2015 aide
+
+
+            $ sudo grep aide /etc/crontab /var/spool/cron/root
+
+
+            /etc/crontab: 30 04 * * * root usr/sbin/aide
+
+            /var/spool/cron/root: 30 04 * * * root usr/sbin/aide
+
+
+            $ sudo more /etc/cron.daily/aide
+
+
+            #!/bin/bash
+
+            /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root@sysname.mil
+
+
+            If the file integrity application does not exist, a script file controlling the execution of the file integrity
+            application does not exist, or the file integrity application does not notify designated personnel of changes,
+            this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      - content_refs:
+        - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+        exports: []
+        inline_content: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The
+          command used in the example will use a daily occurrence. Check the cron directories for scripts controlling the
+          execution and notification of results of the file integrity application. For example, if AIDE is installed on the
+          system, use the following commands: $ sudo ls -al /etc/cron.* | grep aide -rwxr-xr-x 1 root root 29 Nov 22 2015
+          aide $ sudo grep aide /etc/crontab /var/spool/cron/root /etc/crontab: 30 04 * * * root usr/sbin/aide /var/spool/cron/root:
+          30 04 * * * root usr/sbin/aide $ sudo more /etc/cron.daily/aide #!/bin/bash /usr/sbin/aide --check | /bin/mail -s
+          "$HOSTNAME - Daily aide integrity check run" root@sysname.mil If the file integrity application does not exist,
+          a script file controlling the execution of the file integrity application does not exist, or the file integrity
+          application does not notify designated personnel of changes, this is a finding.'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:67301
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The command
+              used in the example will use a daily occurrence.
+
+
+              Check the cron directories for scripts controlling the execution and notification of results of the file integrity
+              application. For example, if AIDE is installed on the system, use the following commands:
+
+
+              $ sudo ls -al /etc/cron.* | grep aide
+
+
+              -rwxr-xr-x 1 root root 29 Nov 22 2015 aide
+
+
+              $ sudo grep aide /etc/crontab /var/spool/cron/root
+
+
+              /etc/crontab: 30 04 * * * root usr/sbin/aide
+
+              /var/spool/cron/root: 30 04 * * * root usr/sbin/aide
+
+
+              $ sudo more /etc/cron.daily/aide
+
+
+              #!/bin/bash
+
+              /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root@sysname.mil
+
+
+              If the file integrity application does not exist, a script file controlling the execution of the file integrity
+              application does not exist, or the file integrity application does not notify designated personnel of changes,
+              this is a finding.'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Verify that RHEL 9 routinely executes a file integrity scan for changes to the system baseline. The command
+      used in the example will use a daily occurrence. Check the cron directories for scripts controlling the execution and
+      notification of results of the file integrity application. For example, if AIDE is installed on the system, use the
+      following commands: $ sudo ls -al /etc/cron.* | grep aide -rwxr-xr-x 1 root root 29 Nov 22 2015 aide $ sudo grep aide
+      /etc/crontab /var/spool/cron/root /etc/crontab: 30 04 * * * root usr/sbin/aide /var/spool/cron/root: 30 04 * * * root
+      usr/sbin/aide $ sudo more /etc/cron.daily/aide #!/bin/bash /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily
+      aide integrity check run" root@sysname.mil If the file integrity application does not exist, a script file controlling
+      the execution of the file integrity application does not exist, or the file integrity application does not notify designated
+      personnel of changes, this is a finding.'
+    migration: &id002
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-258135r1045267_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: 396d29cc703a6c609f8e21557f5529abc9d84380423d34eadc494f0f0f3c6624
+  assessments:
+  - *id001
+  migration: *id002

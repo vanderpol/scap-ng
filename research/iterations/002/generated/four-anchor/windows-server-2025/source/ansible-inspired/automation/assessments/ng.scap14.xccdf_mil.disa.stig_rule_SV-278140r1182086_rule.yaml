@@ -1,0 +1,252 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278140r1182086_rule
+  version: 1
+  description: Windows Server 2025 Active Directory (AD) Group Policy Objects (GPOs) must have proper access control permissions.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: Windows Server 2025 Active Directory (AD) Group Policy Objects (GPOs) must have proper access control permissions.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27814001
+    collect:
+      capability: scapng.collect.independent.shellcommand
+      comment: Analyze the permissions on the Group Policy Objects and report details on any non-compliant permission found.
+      query:
+      - attributes:
+          error_if_stderr_exists: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Import-Module ActiveDirectory; $a='^SYSTEM$|^Domain Admins$|^Enterprise Admins$|^Administrators$|^Enterprise
+          Domain Controllers$|^CREATOR OWNER$'; $s='^Authenticated Users$|^Domain Computers$'; $results=foreach($gpo in (Get-ADObject
+          -Filter "objectClass -eq 'groupPolicyContainer'" -SearchBase (Get-ADDomain).SystemsContainer -Properties displayName)){$acl
+          = (Get-Acl -Path "AD:\$($gpo.DistinguishedName)").Access; foreach($rule in $acl){$t = $rule.IdentityReference.Value.Split('\')[-1];
+          if(-not $t -or $t -match $a -or $t -match $s){continue}else{"GPO=$($gpo.displayName) | Status=FAIL | Reason=Unauthorized
+          trustee $t holds explicit ACL entry on this GPO."}}}; if($results){$results}else{"GPO=All GPOs | Status=PASS | Reason=Delegation
+          secure."}
+      - kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .+
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814001
+      source_type: shellcommand_object
+      version: '1'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814001
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27814001:
+      comment: No lines shall exist listed with status of 'FAIL'
+      entities:
+      - attributes:
+          entity_check: none satisfy
+          operation: pattern match
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Status=FAIL
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27814001
+      source_type: shellcommand_state
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.windows:def:278140:
+        class: compliance
+        criteria:
+          children:
+          - comment: Windows Server Active Directory Group Policy objects must have proper access control permissions.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:27814001
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows Server 2025 Active Directory (AD) Group Policy Objects (GPOs) must have proper access control permissions.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+        version: '1'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27814001:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27814001
+        comment: Windows Server Active Directory Group Policy objects must have proper access control permissions.
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27814001
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27814001
+        source_type: shellcommand_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+      exports: []
+      href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+      exports: []
+      href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml
+      datastream_sha256: 52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+      zip_sha256: 2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0
+    rule_id: xccdf_mil.disa.stig_rule_SV-278140r1182086_rule
+    title: Windows Server 2025 Active Directory (AD) Group Policy Objects (GPOs) must have proper access control permissions.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:31101
+      exports: []
+      inline_content: 'This applies to domain controllers. It is not applicable for other systems. Review the permissions
+        on GPOs. Open "Group Policy Management" (available from various menus or run "gpmc.msc"). Navigate to "Group Policy
+        Objects" in the domain being reviewed (Forest >> Domains >> Domain). For each GPO: Select the GPO item in the left
+        pane. Select the "Delegation" tab in the right pane. Select "Advanced". Select each Group or user name. View the permissions.
+        If any standard user accounts or groups have "Allow" permissions greater than "Read" and "Apply group policy", this
+        is a finding. Other access permissions that allow the objects to be updated are considered findings unless specifically
+        documented by the information system security officer (ISSO). The default permissions noted below satisfy this requirement.
+        The permissions shown are at the summary level. More detailed permissions can be viewed by selecting the next "Advanced"
+        button, the desired Permission entry, and the "Edit" button. Authenticated Users - Read, Apply group policy, Special
+        permissions The special permissions for Authenticated Users are for Read-type Properties. If detailed permissions
+        include any Create, Delete, Modify, or Write Permissions, or Properties, this is a finding. The special permissions
+        for the following default groups are not the focus of this requirement and may include a wide range of permissions
+        and properties: CREATOR OWNER - Special permissions SYSTEM - Read, Write, Create all child objects, Delete all child
+        objects, Special permissions Domain Admins - Read, Write, Create all child objects, Delete all child objects, Special
+        permissions Enterprise Admins - Read, Write, Create all child objects, Delete all child objects, Special permissions
+        ENTERPRISE DOMAIN CONTROLLERS - Read, Special permissions The Domain Admins and Enterprise Admins will not have the
+        "Delete all child objects" permission on the two default Group Policy objects: Default Domain Policy and Default Domain
+        Controllers Policy. They will have this permission on organization created Group Policy objects.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:31101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "This applies to domain controllers. It is not applicable for other systems.\n\nReview the permissions on\
+            \ GPOs.\n\nOpen \"Group Policy Management\" (available from various menus or run \"gpmc.msc\").\n\nNavigate to\
+            \ \"Group Policy Objects\" in the domain being reviewed (Forest >> Domains >> Domain).\n\nFor each GPO:\n\nSelect\
+            \ the GPO item in the left pane.\n\nSelect the \"Delegation\" tab in the right pane.\n\nSelect \"Advanced\".\n\
+            \nSelect each Group or user name.\n\nView the permissions.\n\nIf any standard user accounts or groups have \"\
+            Allow\" permissions greater than \"Read\" and \"Apply group policy\", this is a finding.\n\nOther access permissions\
+            \ that allow the objects to be updated are considered findings unless specifically documented by the information\
+            \ system security officer (ISSO).\n\nThe default permissions noted below satisfy this requirement. \n\nThe permissions\
+            \ shown are at the summary level. More detailed permissions can be viewed by selecting the next \"Advanced\" button,\
+            \ the desired Permission entry, and the \"Edit\" button.\n\nAuthenticated Users - Read, Apply group policy, Special\
+            \ permissions\n\nThe special permissions for Authenticated Users are for Read-type Properties. If detailed permissions\
+            \ include any Create, Delete, Modify, or Write Permissions, or Properties, this is a finding.\n\nThe special permissions\
+            \ for the following default groups are not the focus of this requirement and may include a wide range of permissions\
+            \ and properties:\n\nCREATOR OWNER - Special permissions\nSYSTEM - Read, Write, Create all child objects, Delete\
+            \ all child objects, Special permissions\nDomain Admins - Read, Write, Create all child objects, Delete all child\
+            \ objects, Special permissions\nEnterprise Admins - Read, Write, Create all child objects, Delete all child objects,\
+            \ Special permissions\nENTERPRISE DOMAIN CONTROLLERS - Read, Special permissions\n\nThe Domain Admins and Enterprise\
+            \ Admins will not have the \"Delete all child objects\" permission on the two default Group Policy objects: Default\
+            \ Domain Policy and Default Domain Controllers Policy. They will have this permission on organization created\
+            \ Group Policy objects."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.windows:def:278140
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 29b6213c6f2b537aa092d7ba72423fb916a9f0e5d09d31db2b47199bb24a2980
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-278140r1182086_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 0a987a0f7d5600ee2fdb5f90a8d7e1891e90f3b3ef1325854cb3f836af3b93a9

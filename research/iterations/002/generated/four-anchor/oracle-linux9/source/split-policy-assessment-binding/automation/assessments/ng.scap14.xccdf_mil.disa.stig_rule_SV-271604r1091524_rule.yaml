@@ -1,0 +1,289 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271604r1091524_rule
+  version: 1
+  description: OL 9, for PKI-based authentication, must validate certificates by constructing a certification path (which
+    includes status information) to an accepted trust anchor.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27160401:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27160401
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '5'
+      comment: Check that the system has a valid DOD root CA installed
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: 'Issuer:'
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27160402:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27160402
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '5'
+      comment: Check that the root certicate is date/time valid
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: openssl x509 -in /etc/sssd/pki/sssd_auth_ca_db.pem -checkend 0
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: expire
+  derive: {}
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27160401:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27160401
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          check_existence: at_least_one_exists
+          operation: pattern match
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: CN\s*=\s*DoD\s+Root\s+CA
+      comment: Verify that the Issuer is a DOD Root CA
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27160402:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27160402
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          check_existence: at_least_one_exists
+          operation: pattern match
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Certificate will not expire
+      comment: Verify that the root cert is date/time valid
+  evaluate:
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27160401:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27160401
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: For PKI-based authentication, the OS must validate certificates by constructing a certification path (which
+          includes status information) to an accepted trust anchor.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27160401
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27160401
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27160402:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27160402
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: For PKI-based authentication, the OS must validate certificates by constructing a certification path (which
+          includes status information) to an accepted trust anchor.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27160402
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27160402
+        source_other: []
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271604:
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+        class: compliance
+        version: '5'
+        criteria:
+          children:
+          - comment: Verify a DOD Root CA is installed in the designated location
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27160401
+          - comment: Verify the Root CA is date/time valid
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27160402
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9, for PKI-based authentication, must validate certificates by constructing a certification path (which
+              includes status information) to an accepted trust anchor.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271604r1091524_rule
+    title: OL 9, for PKI-based authentication, must validate certificates by constructing a certification path (which includes
+      status information) to an accepted trust anchor.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:33701
+      exports: []
+      inline_content: 'Verify that OL 9 for PKI-based authentication has valid certificates by constructing a certification
+        path (which includes status information) to an accepted trust anchor. Check that the system has a valid DOD root CA
+        installed with the following command: $ sudo openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem Example output:
+        Certificate: Data: Version: 3 (0x2) Serial Number: 1 (0x1) Signature Algorithm: sha256WithRSAEncryption Issuer: C
+        = US, O = U.S. Government, OU = DOD, OU = PKI, CN = DOD Root CA 3 Validity Not Before: Mar 20 18:46:41 2012 GMT Not
+        After: Dec 30 18:46:41 2029 GMT Subject: C = US, O = U.S. Government, OU = DOD, OU = PKI, CN = DOD Root CA 3 Subject
+        Public Key Info: Public Key Algorithm: rsaEncryption If the root CA file is not a DOD-issued certificate with a valid
+        date and installed in the "/etc/sssd/pki/sssd_auth_ca_db.pem" location, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:33701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 for PKI-based authentication has valid certificates by constructing a certification path\
+            \ (which includes status information) to an accepted trust anchor.\n\nCheck that the system has a valid DOD root\
+            \ CA installed with the following command:\n\n$ sudo openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem\n\
+            \nExample output:\n\nCertificate:\n    Data:\n        Version: 3 (0x2)\n        Serial Number: 1 (0x1)\n     \
+            \   Signature Algorithm: sha256WithRSAEncryption\n        Issuer: C = US, O = U.S. Government, OU = DOD, OU =\
+            \ PKI, CN = DOD Root CA 3\n        Validity\n        Not Before: Mar 20 18:46:41 2012 GMT\n        Not After:\
+            \ Dec 30 18:46:41 2029 GMT\n        Subject: C = US, O = U.S. Government, OU = DOD, OU = PKI, CN = DOD Root CA\
+            \ 3\n        Subject Public Key Info:\n            Public Key Algorithm: rsaEncryption\n\nIf the root CA file\
+            \ is not a DOD-issued certificate with a valid date and installed in the \"/etc/sssd/pki/sssd_auth_ca_db.pem\"\
+            \ location, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271604r1091524_rule
+    semantic_ir_sha256: 98acf9359c272733784ce5a2253feb8ec5f60e73bd6777333b64f79117695f75
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 89affc0ad2f2f2bd5953caf76d931a5f71df28c7b85b61e0203dc225f353e271

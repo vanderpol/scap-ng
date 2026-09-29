@@ -1,0 +1,368 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271684r1091764_rule
+  version: 1
+  description: OL 9 must prevent a user from overriding the disabling of the graphical user smart card removal action.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.ind:obj:25802000:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25802000
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
+      query:
+      - attributes:
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:25802600
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^/org/gnome/settings-daemon/peripherals/smartcard/removal-action$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25802600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25802600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: dconf user databases
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/profile/user
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^system-db:(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive:
+    oval:mil.disa.stig.defs:var:25802600:
+      source_variable_id: oval:mil.disa.stig.defs:var:25802600
+      source_type: local_variable
+      datatype: string
+      comment: dconf user database locks directories
+      semantic_ast:
+        datatype: string
+        expression:
+          args:
+          - datatype: string
+            op: literal_component
+            value: /etc/dconf/db/
+          - item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:25802600
+            op: object_component
+            record_field: null
+          - datatype: string
+            op: literal_component
+            value: .d/locks
+          attributes: {}
+          op: concat
+        id: oval:mil.disa.stig.defs:var:25802600
+        type: local_variable
+      resolution:
+        blocked_by:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:25802600
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        operation: concat
+        reason: concat_child_not_static:object_component_requires_collection:textfilecontent54_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        blocked_by:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:25802600
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:25802600
+          operations:
+          - concat
+          - literal_component
+          - object_component
+          variables: []
+        expression:
+          args:
+          - datatype: string
+            op: literal_component
+            value: /etc/dconf/db/
+          - item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:25802600
+            op: object_component
+            record_field: null
+          - datatype: string
+            op: literal_component
+            value: .d/locks
+          attributes: {}
+          op: concat
+        mode: target_dependent
+        reason: concat_child_not_static:object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:25802600
+        variable_type: local_variable
+  predicates: {}
+  evaluate:
+    tests:
+      oval:mil.disa.stig.ind:tst:25802600:
+        source_test_id: oval:mil.disa.stig.ind:tst:25802600
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: dconf user database(s) exist
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25802600
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:25802000:
+        source_test_id: oval:mil.disa.stig.ind:tst:25802000
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
+          exists
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25802000
+        predicates: []
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.ol9os:def:271684:
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271684
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258020
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002126 - OL 9 must prevent a user from overriding the disabling of the graphical user smart card
+              removal action.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "A session lock is a temporary action taken when a user stops work and moves away from the immediate physical\
+              \ vicinity of the information system but does not want to log out because of the temporary nature of the absence.\n\
+              \n\tThe session lock is implemented at the point where session activity can be determined. Rather than be forced\
+              \ to wait for a period of time to expire before the user session can be locked, OL 9 must provide users with\
+              \ the ability to manually invoke a session lock so users can secure their session if it is necessary to temporarily\
+              \ vacate the immediate physical vicinity.\n\n\tSatisfies: SRG-OS-000028-GPOS-00009, SRG-OS-000030-GPOS-00011"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:258020:
+        source_definition_id: oval:mil.disa.stig.defs:def:258020
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: dconf user database(s) exist
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25802600
+          - comment: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
+              exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25802000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent a user from overriding the disabling of the graphical user smart card
+              removal action.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271684
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.ol9os:def:271684
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271684
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.ol9os:def:271684
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271684
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271684r1091764_rule
+    title: OL 9 must prevent a user from overriding the disabling of the graphical user smart card removal action.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271684
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271684
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271684
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271684
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:49301
+      exports: []
+      inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+        If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+        OL 9 disables ability of the user to override the smart card removal action setting. Determine which profile the system
+        database is using with the following command: $ grep system-db /etc/dconf/profile/user system-db:local Check that
+        the removal action setting is locked from nonprivileged user modification with the following command: Note: The example
+        below is using the database "local" for the system, so the path is "/etc/dconf/db/local.d". This path must be modified
+        if a database other than "local" is being used. $ grep ''removal-action'' /etc/dconf/db/local.d/locks/* /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+        If the command does not return at least the example result, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:49301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.\
+            \ If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\n\
+            Verify that OL 9 disables ability of the user to override the smart card removal action setting.\n\nDetermine\
+            \ which profile the system database is using with the following command:\n\n$ grep system-db /etc/dconf/profile/user\n\
+            system-db:local\n\nCheck that the removal action setting is locked from nonprivileged user modification with the\
+            \ following command:\n\nNote: The example below is using the database \"local\" for the system, so the path is\
+            \ \"/etc/dconf/db/local.d\". This path must be modified if a database other than \"local\" is being used.\n\n\
+            $ grep 'removal-action' /etc/dconf/db/local.d/locks/* \n/org/gnome/settings-daemon/peripherals/smartcard/removal-action\n\
+            \nIf the command does not return at least the example result, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271684r1091764_rule
+    semantic_ir_sha256: 6613dc9cbb047d5b9cf76b40a7bc5f7e4465694df2df0840fb1ab7f1cee06cf1
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: bd31c73c33319489ec478e0781c2088c3996fe7951fea6d0f1d0825e204bf982

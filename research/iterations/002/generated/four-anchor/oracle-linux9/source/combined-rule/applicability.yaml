@@ -1,0 +1,1094 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  id: ng.scap14.applicability
+  version: 1
+  description: SCAP 1.4 CPE applicability checks
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.linux:obj:25824200:
+      capability: scapng.collect.linux.rpminfo
+      source_object_id: oval:mil.disa.stig.linux:obj:25824200
+      source_type: rpminfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: bind
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: bind
+    oval:mil.disa.stig.linux:obj:10000501:
+      capability: scapng.collect.linux.dpkginfo
+      source_object_id: oval:mil.disa.stig.linux:obj:10000501
+      source_type: dpkginfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: gnome-shell
+    oval:mil.disa.stig.ind:obj:10001202:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:10001202
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: other sysctl configuration files
+      query:
+      - attributes:
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:20000005
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \.conf$
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?:^|\.*\n)\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*(\d+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.unix:obj:10000602:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:10000602
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '2'
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /sys/firmware/efi
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+    oval:mil.disa.stig.ind:obj:10001201:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:10001201
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /etc/sysctl.conf
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sysctl.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?:^|\.*\n)\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*(\d+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25785400:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25785400
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: /etc/fstab, uncommented, nfs, capturing options
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/fstab
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:10001203:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:10001203
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: all sysctl configuration files
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:10001201
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:10001202
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+    oval:mil.disa.stig.linux:obj:25784900:
+      capability: scapng.collect.linux.rpminfo
+      source_object_id: oval:mil.disa.stig.linux:obj:25784900
+      source_type: rpminfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: autofs
+    oval:mil.disa.stig.linux:obj:23055000:
+      capability: scapng.collect.linux.rpminfo
+      source_object_id: oval:mil.disa.stig.linux:obj:23055000
+      source_type: rpminfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: postfix
+    oval:mil.disa.stig.unix:obj:23031100:
+      capability: scapng.collect.unix.sysctl
+      source_object_id: oval:mil.disa.stig.unix:obj:23031100
+      source_type: sysctl_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: kernel.core_pattern
+    oval:mil.disa.stig.ind:obj:10001204:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:10001204
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /proc/cmdline contains ipv6.disable=1
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /proc/cmdline
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \bipv6\.disable=1\b
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.linux:obj:2582320000:
+      capability: scapng.collect.linux.rpminfo
+      source_object_id: oval:mil.disa.stig.linux:obj:2582320000
+      source_type: rpminfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: libreswan
+    oval:mil.disa.stig.linux:obj:10000500:
+      capability: scapng.collect.linux.rpminfo
+      source_object_id: oval:mil.disa.stig.linux:obj:10000500
+      source_type: rpminfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: gnome-shell
+    oval:mil.disa.stig.unix:obj:10001200:
+      capability: scapng.collect.unix.sysctl
+      source_object_id: oval:mil.disa.stig.unix:obj:10001200
+      source_type: sysctl_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: net.ipv6.conf.all.disable_ipv6
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:102:
+      capability: scapng.collect.linux.dpkginfo
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:102
+      source_type: dpkginfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '5'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: gnome-shell
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:101:
+      capability: scapng.collect.linux.rpminfo
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:101
+      source_type: rpminfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '5'
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: gnome-session
+  derive:
+    oval:mil.disa.stig.defs:var:20000005:
+      source_variable_id: oval:mil.disa.stig.defs:var:20000005
+      source_type: constant_variable
+      datatype: string
+      comment: Directories containing sysctl configuration files
+      semantic_ast:
+        datatype: string
+        id: oval:mil.disa.stig.defs:var:20000005
+        type: constant_variable
+        values:
+        - datatype: string
+          value: /etc/sysctl.d
+        - datatype: string
+          value: /run/sysctl.d
+        - datatype: string
+          value: /lib/sysctl.d
+        - datatype: string
+          value: /usr/lib/sysctl.d
+        - datatype: string
+          value: /usr/local/lib/sysctl.d
+      resolution:
+        datatype: string
+        status: exact_static
+        values:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d
+        variable_type: constant_variable
+      evaluation_plan:
+        datatype: string
+        mode: static
+        resolution_status: exact_static
+        values:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d
+        variable_id: oval:mil.disa.stig.defs:var:20000005
+        variable_type: constant_variable
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000010:
+      source_state_id: oval:mil.disa.stig.unix:ste:20000010
+      source_type: sysctl_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1'
+      comment: null
+    oval:mil.disa.stig.unix:ste:23031100:
+      source_state_id: oval:mil.disa.stig.unix:ste:23031100
+      source_type: sysctl_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '|/bin/false'
+      comment: null
+    oval:mil.disa.stig.ind:ste:20000003:
+      source_state_id: oval:mil.disa.stig.ind:ste:20000003
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      comment: null
+  evaluate:
+    tests:
+      oval:mil.disa.stig.unix:tst:10001200:
+        source_test_id: oval:mil.disa.stig.unix:tst:10001200
+        source_type: sysctl_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: net.ipv6.conf.all.disable_ipv6 setting in kernel is set to 1
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:10001200
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000010
+        source_other: []
+      oval:mil.disa.stig.linux:tst:10000500:
+        source_test_id: oval:mil.disa.stig.linux:tst:10000500
+        source_type: rpminfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: Gnome is installed
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:10000500
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:10001202:
+        source_test_id: oval:mil.disa.stig.ind:tst:10001202
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: ipv6.disable=1 in the kernel cmdline
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:10001204
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.linux:tst:23055000:
+        source_test_id: oval:mil.disa.stig.linux:tst:23055000
+        source_type: rpminfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: The postfix package is installed
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23055000
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.linux:tst:25824200:
+        source_test_id: oval:mil.disa.stig.linux:tst:25824200
+        source_type: rpminfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: BIND installed
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:25824200
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.linux:tst:2582320000:
+        source_test_id: oval:mil.disa.stig.linux:tst:2582320000
+        source_type: rpminfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: The libreswan package is installed.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:2582320000
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.linux:tst:25784900:
+        source_test_id: oval:mil.disa.stig.linux:tst:25784900
+        source_type: rpminfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: The autofs package is installed.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:25784900
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.linux:tst:10000501:
+        source_test_id: oval:mil.disa.stig.linux:tst:10000501
+        source_type: dpkginfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: Gnome is installed
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:10000501
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:10001201:
+        source_test_id: oval:mil.disa.stig.ind:tst:10001201
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: net.ipv6.conf.all.disable_ipv6 setting in sysctl configuration files is set to 1, and nothing else
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:10001203
+        predicates:
+        - oval:mil.disa.stig.ind:ste:20000003
+        source_other: []
+      oval:mil.disa.stig.unix:tst:23031100:
+        source_test_id: oval:mil.disa.stig.unix:tst:23031100
+        source_type: sysctl_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: kernel.core_pattern setting in kernel is set to |/bin/false
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:23031100
+        predicates:
+        - oval:mil.disa.stig.unix:ste:23031100
+        source_other: []
+      oval:mil.disa.stig.unix:tst:10000602:
+        source_test_id: oval:mil.disa.stig.unix:tst:10000602
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: /sys/firmware/efi exists
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:10000602
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:25785400:
+        source_test_id: oval:mil.disa.stig.ind:tst:25785400
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: NFS mounts are present
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25785400
+        predicates: []
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:101:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:101
+        source_type: rpminfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: The gnome-session package is installed. (RPM).
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:101
+        predicates: []
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:102:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:102
+        source_type: dpkginfo_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: The gnome-session package is installed. (DEB)
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:102
+        predicates: []
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.defs:def:25785400:
+        source_definition_id: oval:mil.disa.stig.defs:def:25785400
+        class: inventory
+        version: '2'
+        criteria:
+          children:
+          - comment: nfs mounts
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25785400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system has nfs entries in /etc/fstab
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:25795100:
+        source_definition_id: oval:mil.disa.stig.defs:def:25795100
+        class: inventory
+        version: '1'
+        criteria:
+          children:
+          - comment: The postifx package is installed.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23055000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The postifx package is installed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:25784900:
+        source_definition_id: oval:mil.disa.stig.defs:def:25784900
+        class: inventory
+        version: '1'
+        criteria:
+          children:
+          - comment: The autofs package is installed.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25784900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The autofs package is installed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.linux:def:100012:
+        source_definition_id: oval:mil.disa.stig.linux:def:100012
+        class: inventory
+        version: '1'
+        criteria:
+          children:
+          - children:
+            - comment: net.ipv6.conf.all.disable_ipv6 setting in kernel is 1
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:10001200
+            - comment: net.ipv6.conf.all.disable_ipv6 setting in sysctl configuration files is set to 1, and nothing else
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:10001201
+            comment: IPv6 is disabled via sysctl
+            kind: boolean
+            negate: false
+            operator: AND
+          - comment: ipv6.disable=1 in the kernel cmdline
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:10001202
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: IPv6 is disabled in the kernel.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Linux Systems
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: IPv6 is disabled in the kernel, either via a kernel cmdline option or sysctl.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230311:
+        source_definition_id: oval:mil.disa.stig.defs:def:230311
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: kernel.core_pattern setting in kernel is |/bin/false
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23031100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable the kernel.core_pattern.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.linux:def:100005:
+        source_definition_id: oval:mil.disa.stig.linux:def:100005
+        class: inventory
+        version: '2'
+        criteria:
+          children:
+          - comment: The Gnome-shell package is installed (RPM)
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:10000500
+          - comment: The Gnome-shell package is installed (DEB)
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:10000501
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Gnome is installed
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Linux Systems
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:25823200:
+        source_definition_id: oval:mil.disa.stig.defs:def:25823200
+        class: inventory
+        version: '1'
+        criteria:
+          children:
+          - comment: The libreswan package is installed.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:2582320000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The libreswan package is installed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.linux:def:100006:
+        source_definition_id: oval:mil.disa.stig.linux:def:100006
+        class: inventory
+        version: '6'
+        criteria:
+          children:
+          - comment: /sys/firmware/efi exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:10000602
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Linux United Extensible Firmware Interface (UEFI)
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Linux Systems
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:25824200:
+        source_definition_id: oval:mil.disa.stig.defs:def:25824200
+        class: inventory
+        version: '1'
+        criteria:
+          children:
+          - comment: BIND installed
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25824200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system has BIND installed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:navy.navwar.niwcatlantic.scc.linux:def:101:
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:101
+        class: inventory
+        version: '5'
+        criteria:
+          children:
+          - comment: Rule is applicable if Gnome installed. (RPM)
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:101
+          - comment: Rule is applicable if Gnome installed. (DEB)
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:102
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Determining if is Gnome Session package is installed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.defs:def:25824200
+    - oval:mil.disa.stig.linux:def:100005
+    - oval:mil.disa.stig.defs:def:25785400
+    - oval:mil.disa.stig.linux:def:100006
+    - oval:mil.disa.stig.defs:def:25823200
+    - oval:mil.disa.stig.linux:def:100012
+    - oval:mil.disa.stig.defs:def:230311
+    - oval:mil.disa.stig.defs:def:25795100
+    - oval:mil.disa.stig.defs:def:25784900
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:101
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.defs:def:25824200
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.defs:def:25824200
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxBIND
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.linux:def:100005
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.linux:def:100005
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxGnome
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.defs:def:25785400
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.defs:def:25785400
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxNoNFSMounts
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.linux:def:100006
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.linux:def:100006
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxUEFI
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.defs:def:25785400
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.defs:def:25785400
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxNFSMounts
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.defs:def:25823200
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.defs:def:25823200
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxLibreswan
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.linux:def:100012
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.linux:def:100012
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxIPv6enabled
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.defs:def:230311
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.defs:def:230311
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxKernelDumps
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.defs:def:25795100
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.defs:def:25795100
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxPostfix
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:mil.disa.stig.defs:def:25784900
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      name: oval:mil.disa.stig.defs:def:25784900
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      platform_id: xccdf_mil.disa.stig_platform_LinuxAutofs
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - cpe_component: null
+      cpe_name: null
+      definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:101
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.linux:def:101
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+      platform_id: xccdf_navy.navwar.niwcatlantic.scc_platform_LinuxGnome
+      source_kind: cpe_platform_expression
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: null
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: null
+    title: CPE applicability definitions
+  source_check_logic:
+    kind: applicability_check_facts
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration: &id001
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: applicability
+    semantic_ir_sha256: 8e40e91ed4a869533168dd958a54c93cd36f99db2274abc3615c55d25e90e8d9
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: ba1eeeed5cca451bb199ec015ad5fa92d12b3fc002587f2f1a337e598ad3be09
+migration: *id001
+source_diagnostic:
+  closure_counts:
+    definitions: 10
+    objects: 16
+    states: 3
+    tests: 14
+    variables: 1
+  definition_ids:
+  - oval:mil.disa.stig.defs:def:230311
+  - oval:mil.disa.stig.defs:def:25784900
+  - oval:mil.disa.stig.defs:def:25785400
+  - oval:mil.disa.stig.defs:def:25795100
+  - oval:mil.disa.stig.defs:def:25823200
+  - oval:mil.disa.stig.defs:def:25824200
+  - oval:mil.disa.stig.linux:def:100005
+  - oval:mil.disa.stig.linux:def:100006
+  - oval:mil.disa.stig.linux:def:100012
+  - oval:navy.navwar.niwcatlantic.scc.linux:def:101
+  dependency_edge_count: 34
+  path: applicability/oval.xml
+  references:
+  - definition_id: oval:mil.disa.stig.defs:def:25824200
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxBIND
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.linux:def:100005
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxGnome
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.defs:def:25785400
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxNoNFSMounts
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.linux:def:100006
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxUEFI
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.defs:def:25785400
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxNFSMounts
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.defs:def:25823200
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxLibreswan
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.linux:def:100012
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxIPv6enabled
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.defs:def:230311
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxKernelDumps
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.defs:def:25795100
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxPostfix
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:mil.disa.stig.defs:def:25784900
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    match_count: 1
+    oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+    platform_id: xccdf_mil.disa.stig_platform_LinuxAutofs
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  - definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:101
+    href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+    match_count: 1
+    oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml
+    platform_id: xccdf_navy.navwar.niwcatlantic.scc_platform_LinuxGnome
+    source_kind: cpe_platform_expression
+    status: resolved
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    xccdf_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+  schema_errors: []
+  sha256: b288cbc75798bb63cb6514f31fc6ebde33452e818f2adbd2f5e7bf26b3fb487f
+  status: split_valid

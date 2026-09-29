@@ -1,0 +1,278 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271811r1092145_rule
+  version: 1
+  description: OL 9 /etc/passwd- file must have mode 0644 or less permissive to prevent unauthorized access.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.unix:obj:25789600:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:25789600
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/passwd-
+  derive: {}
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000001:
+      source_state_id: oval:mil.disa.stig.unix:ste:20000001
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: suid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sgid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sticky
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: uexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: gwrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: gexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: oexec
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      comment: File permissions is 644 or more restrictive
+  evaluate:
+    tests:
+      oval:mil.disa.stig.unix:tst:25789600:
+        source_test_id: oval:mil.disa.stig.unix:tst:25789600
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: The /etc/passwd- file has mode 0644 or less permissive
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:25789600
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000001
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.defs:def:257896:
+        source_definition_id: oval:mil.disa.stig.defs:def:257896
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: The /etc/passwd- file has mode 0644 or less permissive
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:25789600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system /etc/passwd- file must have mode 0644 or less permissive to prevent unauthorized access.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.ol9os:def:271811:
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271811
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257896
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002549 - OL 9 /etc/passwd- file must have mode 0644 or less permissive to prevent unauthorized access.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "/etc/passwd-" file is a backup file of "/etc/passwd", and as such, contains information about the users
+              that are configured on the system. Protection of this file is critical for system security.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271811
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.ol9os:def:271811
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271811
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.ol9os:def:271811
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271811
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271811r1092145_rule
+    title: OL 9 /etc/passwd- file must have mode 0644 or less permissive to prevent unauthorized access.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271811
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271811
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271811
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271811
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:73701
+      exports: []
+      inline_content: 'Verify that OL 9 configures the "/etc/passwd-" file to have a mode of "0644" or less permissive with
+        the following command: $ stat -c "%a %n" /etc/passwd- 644 /etc/passwd- If a value of "0644" or less permissive is
+        not returned, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:73701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 configures the "/etc/passwd-" file to have a mode of "0644" or less permissive with the
+            following command:
+
+
+            $ stat -c "%a %n" /etc/passwd-
+
+            644 /etc/passwd-
+
+
+            If a value of "0644" or less permissive is not returned, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271811r1092145_rule
+    semantic_ir_sha256: 633756e23d7a4108a66bc961dd077998efe0a305df87f61d2acb685054170039
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 0803f14122d0daa77d9a5a8c81a5d8543c358d1c036c1ae34440d72a57864e63

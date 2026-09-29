@@ -1,0 +1,284 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253254r991589_rule
+  version: 1
+  description: Domain-joined systems must use Windows 11 Enterprise Edition 64-bit version.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: Domain-joined systems must use Windows 11 Enterprise Edition 64-bit version.
+  steps:
+  - name: Collect oval:mil.disa.stig.win:obj:20000017
+    collect:
+      capability: scapng.collect.windows.registry
+      comment: EditionID
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+      - attributes:
+          datatype: string
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: EditionId
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:20000017
+      source_type: registry_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:20000017
+  predicates:
+    oval:mil.disa.stig.win:ste:20000018:
+      comment: EditionID = EnterpriseS (reg_sz)
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_sz
+      - attributes:
+          datatype: string
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: EnterpriseS
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000018
+      source_type: registry_state
+    oval:mil.disa.stig.win:ste:25325400:
+      comment: EditionID = Enterprise (reg_sz)
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_sz
+      - attributes:
+          datatype: string
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Enterprise
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25325400
+      source_type: registry_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253254:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25325400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Domain-joined systems must use Windows Enterprise Edition 64-bit version.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253254
+        version: '1'
+      oval:mil.disa.stig.windows11:def:253254:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253254
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-00-000005 - Domain-joined systems must use Windows 11 Enterprise Edition 64-bit version.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Features such as Credential Guard use virtualization-based security to protect information that could be
+              used in credential theft attacks if compromised. There are a number of system requirements that must be met
+              in order for Credential Guard to be configured and enabled properly. Virtualization-based security and Credential
+              Guard are only available with Windows 11 Enterprise 64-bit version.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows11:def:253254
+        version: '2'
+    tests:
+      oval:mil.disa.stig.win:tst:25325400:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000017
+        comment: EditionID is Enterprise or EnterpriseS
+        predicates:
+        - oval:mil.disa.stig.win:ste:25325400
+        - oval:mil.disa.stig.win:ste:20000018
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25325400
+        source_type: registry_test
+        state_operator: OR
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.windows11:def:253254
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253254
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.windows11:def:253254
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253254
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-253254r991589_rule
+    title: Domain-joined systems must use Windows 11 Enterprise Edition 64-bit version.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253254
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253254
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253254
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253254
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:101
+      exports: []
+      inline_content: Verify domain-joined systems are using Windows 11 Enterprise Edition 64-bit version. For standalone
+        systems, this is NA. Open "Settings". Select "System", then "About". If "Edition" is not "Windows 11 Enterprise",
+        this is a finding. If "System type" is not "64-bit operating system...", this is a finding.
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify domain-joined systems are using Windows 11 Enterprise Edition 64-bit version.
+
+
+            For standalone systems, this is NA.
+
+
+            Open "Settings".
+
+
+            Select "System", then "About".
+
+
+            If "Edition" is not "Windows 11 Enterprise", this is a finding.
+
+
+            If "System type" is not "64-bit operating system...", this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.windows11:def:253254
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 356e3e07be42ce72e5628798dd272140530c899312bb299222cedb389feacff3
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-253254r991589_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 5c1384b7a60285b3efa00cd448fb0db6a418f0e98d8eae1df0c4f6add2f823cb

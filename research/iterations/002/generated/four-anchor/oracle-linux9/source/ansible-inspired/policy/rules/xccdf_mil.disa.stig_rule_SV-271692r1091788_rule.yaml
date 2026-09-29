@@ -1,0 +1,320 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment. If
+    the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that OL 9
+    effective dconf policy matches the policy keyfiles. Check the last modification time of the local databases, comparing
+    it to the last modification time of the related keyfiles. The following command will check every dconf database and compare
+    its modification time to the related system keyfiles: $ function dconf_needs_update { for db in $(find /etc/dconf/db -maxdepth
+    1 -type f); do db_mtime=$(stat -c %Y "$db"); keyfile_mtime=$(stat -c %Y "$db".d/* | sort -n | tail -1); if [ -n "$db_mtime"
+    ] && [ -n "$keyfile_mtime" ] && [ "$db_mtime" -lt "$keyfile_mtime" ]; then echo "$db needs update"; return 1; fi; done;
+    }; dconf_needs_update If the command has any output, then a dconf database needs to be updated, and this is a finding.'
+  checks:
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271692r1091788_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-271692r1091788_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
+  cluster_id: null
+  conflicts: []
+  default_check: default
+  description: <VulnDiscussion>Unlike text-based keyfiles, the binary database is impossible to check through most automated
+    and all manual means; therefore, to evaluate dconf configuration, both have to be true at the same time - configuration
+    files have to be compliant, and the database needs to be more recent than those keyfiles, which gives confidence that
+    it reflects them.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:oracle:linux:9:-
+  effective_platforms:
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-cpe-dictionary.xml
+      definition_id: oval:mil.disa.stig.ol9os:def:1
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:oracle:linux:9:-
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:oracle:linux:9:-
+    ref: cpe:/o:oracle:linux:9:-
+  extends: null
+  fix: 'Update the dconf databases by running the following command: $ sudo dconf update'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-271692
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-271692r1091788_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000366
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Oracle Linux 9 DISA DPMS Target Oracle Linux 9 5680
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+      exports: []
+      inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+        If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+        OL 9 effective dconf policy matches the policy keyfiles. Check the last modification time of the local databases,
+        comparing it to the last modification time of the related keyfiles. The following command will check every dconf database
+        and compare its modification time to the related system keyfiles: $ function dconf_needs_update { for db in $(find
+        /etc/dconf/db -maxdepth 1 -type f); do db_mtime=$(stat -c %Y "$db"); keyfile_mtime=$(stat -c %Y "$db".d/* | sort -n
+        | tail -1); if [ -n "$db_mtime" ] && [ -n "$keyfile_mtime" ] && [ "$db_mtime" -lt "$keyfile_mtime" ]; then echo "$db
+        needs update"; return 1; fi; done; }; dconf_needs_update If the command has any output, then a dconf database needs
+        to be updated, and this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+            If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+
+
+            Verify that OL 9 effective dconf policy matches the policy keyfiles.
+
+
+            Check the last modification time of the local databases, comparing it to the last modification time of the related
+            keyfiles. The following command will check every dconf database and compare its modification time to the related
+            system keyfiles:
+
+
+            $ function dconf_needs_update { for db in $(find /etc/dconf/db -maxdepth 1 -type f); do db_mtime=$(stat -c %Y
+            "$db"); keyfile_mtime=$(stat -c %Y "$db".d/* | sort -n | tail -1); if [ -n "$db_mtime" ] && [ -n "$keyfile_mtime"
+            ] && [ "$db_mtime" -lt "$keyfile_mtime" ]; then echo "$db needs update"; return 1; fi; done; }; dconf_needs_update
+
+
+            If the command has any output, then a dconf database needs to be updated, and this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+    exports: []
+    inline_content: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+      If the system does not have any graphical user interface installed, this requirement is Not Applicable. Verify that
+      OL 9 effective dconf policy matches the policy keyfiles. Check the last modification time of the local databases, comparing
+      it to the last modification time of the related keyfiles. The following command will check every dconf database and
+      compare its modification time to the related system keyfiles: $ function dconf_needs_update { for db in $(find /etc/dconf/db
+      -maxdepth 1 -type f); do db_mtime=$(stat -c %Y "$db"); keyfile_mtime=$(stat -c %Y "$db".d/* | sort -n | tail -1); if
+      [ -n "$db_mtime" ] && [ -n "$keyfile_mtime" ] && [ "$db_mtime" -lt "$keyfile_mtime" ]; then echo "$db needs update";
+      return 1; fi; done; }; dconf_needs_update If the command has any output, then a dconf database needs to be updated,
+      and this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+          If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+
+
+          Verify that OL 9 effective dconf policy matches the policy keyfiles.
+
+
+          Check the last modification time of the local databases, comparing it to the last modification time of the related
+          keyfiles. The following command will check every dconf database and compare its modification time to the related
+          system keyfiles:
+
+
+          $ function dconf_needs_update { for db in $(find /etc/dconf/db -maxdepth 1 -type f); do db_mtime=$(stat -c %Y "$db");
+          keyfile_mtime=$(stat -c %Y "$db".d/* | sort -n | tail -1); if [ -n "$db_mtime" ] && [ -n "$keyfile_mtime" ] && [
+          "$db_mtime" -lt "$keyfile_mtime" ]; then echo "$db needs update"; return 1; fi; done; }; dconf_needs_update
+
+
+          If the command has any output, then a dconf database needs to be updated, and this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-271692r1091788_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL09-00-002162
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: OL 9 effective dconf policy must match the policy keyfiles.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: <VulnDiscussion>Unlike text-based keyfiles, the binary database is impossible to check through most automated
+        and all manual means; therefore, to evaluate dconf configuration, both have to be true at the same time - configuration
+        files have to be compliant, and the database needs to be more recent than those keyfiles, which gives confidence that
+        it reflects them.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Oracle Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Oracle Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5680'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000366
+    - attributes:
+        fixref: F-75649r1091787_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Update the dconf databases by running the following command:
+
+
+        $ sudo dconf update'
+    - attributes:
+        id: F-75649r1091787_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:50901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This requirement assumes the use of the OL 9 default graphical user interface—the GNOME desktop environment.
+          If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+
+
+          Verify that OL 9 effective dconf policy matches the policy keyfiles.
+
+
+          Check the last modification time of the local databases, comparing it to the last modification time of the related
+          keyfiles. The following command will check every dconf database and compare its modification time to the related
+          system keyfiles:
+
+
+          $ function dconf_needs_update { for db in $(find /etc/dconf/db -maxdepth 1 -type f); do db_mtime=$(stat -c %Y "$db");
+          keyfile_mtime=$(stat -c %Y "$db".d/* | sort -n | tail -1); if [ -n "$db_mtime" ] && [ -n "$keyfile_mtime" ] && [
+          "$db_mtime" -lt "$keyfile_mtime" ]; then echo "$db needs update"; return 1; fi; done; }; dconf_needs_update
+
+
+          If the command has any output, then a dconf database needs to be updated, and this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: OL 9 effective dconf policy must match the policy keyfiles.
+  weight: '10.0'
+migration:
+  note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for manual
+    execution.
+  source: SCAP 1.4 XCCDF manual/external check
+  source_rule: xccdf_mil.disa.stig_rule_SV-271692r1091788_rule
+  status: legacy_compatible

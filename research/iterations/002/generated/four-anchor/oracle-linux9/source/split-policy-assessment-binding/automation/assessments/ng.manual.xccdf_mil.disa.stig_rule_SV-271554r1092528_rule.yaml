@@ -1,0 +1,156 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.manual.xccdf_mil.disa.stig_rule_SV-271554r1092528_rule
+  version: 1
+  description: OL 9 must audit all uses of the truncate, ftruncate, creat, open, openat, and open_by_handle_at system calls.
+  method: manual_or_external_check
+  source_checks:
+  - content_refs:
+    - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:23701
+    exports: []
+    inline_content: 'Verify that OL 9 is configured to audit successful/unsuccessful attempts to use the truncate, ftruncate,
+      creat, open, openat, and open_by_handle_at system calls with the following command: $ sudo auditctl -l | grep ''open\|truncate\|creat''
+      -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F
+      auid!=unset -k perm_access -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM
+      -F auid>=1000 -F auid!=unset -k perm_access -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at
+      -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at
+      -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access If the output does not produce rules containing "-F exit=-EPERM",
+      this is a finding. If the output does not produce rules containing "-F exit=-EACCES", this is a finding. If the command
+      does not return an audit rule for truncate, ftruncate, creat, open, openat, and open_by_handle_at or any of the lines
+      returned are commented out, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:23701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: "Verify that OL 9 is configured to audit successful/unsuccessful attempts to use the truncate, ftruncate, creat,\
+          \ open, openat, and open_by_handle_at system calls with the following command:\n\n$ sudo auditctl -l | grep 'open\\\
+          |truncate\\|creat' \n-a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM\
+          \ -F auid>=1000 -F auid!=unset -k perm_access\n-a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at\
+          \ -F exit=-EPERM -F auid>=1000 -F auid!=unset -k perm_access\n\n-a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at\
+          \ -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access\n-a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at\
+          \ -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access\n\nIf the output does not produce rules containing\
+          \ \"-F exit=-EPERM\", this is a finding.\n\nIf the output does not produce rules containing \"-F exit=-EACCES\"\
+          , this is a finding.\n\nIf the command does not return an audit rule for truncate, ftruncate, creat, open, openat,\
+          \ and open_by_handle_at or any of the lines returned are commented out, this is a finding."
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271554
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271554
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271554
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271554
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:23701
+      exports: []
+      inline_content: 'Verify that OL 9 is configured to audit successful/unsuccessful attempts to use the truncate, ftruncate,
+        creat, open, openat, and open_by_handle_at system calls with the following command: $ sudo auditctl -l | grep ''open\|truncate\|creat''
+        -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000
+        -F auid!=unset -k perm_access -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at
+        -F exit=-EPERM -F auid>=1000 -F auid!=unset -k perm_access -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at
+        -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at
+        -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access If the output does not produce rules containing "-F exit=-EPERM",
+        this is a finding. If the output does not produce rules containing "-F exit=-EACCES", this is a finding. If the command
+        does not return an audit rule for truncate, ftruncate, creat, open, openat, and open_by_handle_at or any of the lines
+        returned are commented out, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:23701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 is configured to audit successful/unsuccessful attempts to use the truncate, ftruncate,\
+            \ creat, open, openat, and open_by_handle_at system calls with the following command:\n\n$ sudo auditctl -l |\
+            \ grep 'open\\|truncate\\|creat' \n-a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at\
+            \ -F exit=-EPERM -F auid>=1000 -F auid!=unset -k perm_access\n-a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at\
+            \ -F exit=-EPERM -F auid>=1000 -F auid!=unset -k perm_access\n\n-a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at\
+            \ -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access\n-a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at\
+            \ -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access\n\nIf the output does not produce rules containing\
+            \ \"-F exit=-EPERM\", this is a finding.\n\nIf the output does not produce rules containing \"-F exit=-EACCES\"\
+            , this is a finding.\n\nIf the command does not return an audit rule for truncate, ftruncate, creat, open, openat,\
+            \ and open_by_handle_at or any of the lines returned are commented out, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  procedure: 'Verify that OL 9 is configured to audit successful/unsuccessful attempts to use the truncate, ftruncate, creat,
+    open, openat, and open_by_handle_at system calls with the following command: $ sudo auditctl -l | grep ''open\|truncate\|creat''
+    -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=unset
+    -k perm_access -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F
+    auid>=1000 -F auid!=unset -k perm_access -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at
+    -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at
+    -F exit=-EACCES -F auid>=1000 -F auid!=unset -k perm_access If the output does not produce rules containing "-F exit=-EPERM",
+    this is a finding. If the output does not produce rules containing "-F exit=-EACCES", this is a finding. If the command
+    does not return an audit rule for truncate, ftruncate, creat, open, openat, and open_by_handle_at or any of the lines
+    returned are commented out, this is a finding.'
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 XCCDF manual/external check
+    source_rule: xccdf_mil.disa.stig_rule_SV-271554r1092528_rule
+    note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for manual
+      execution.
+  semantic_fingerprint_sha256: 6c802106862d0b62d3cb9b148b8d7a64db18f8fb0804a45a80f285a1ced0ac5e

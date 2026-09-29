@@ -1,0 +1,410 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257847r1044924_rule
+  version: 1
+  description: RHEL 9 must use a separate file system for the system audit data path.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.ind:obj:23029401:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23029401
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/fstab
+      - attributes:
+          datatype: string
+          operation: pattern match
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23029401
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.linux:obj:23029400:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23029400
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23029400
+        kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+    oval:mil.disa.stig.ind:obj:23029402:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23029402
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: null
+      query:
+      - attributes:
+          ignore_case: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/auditd.conf
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive:
+    oval:mil.disa.stig.defs:var:23029401:
+      source_variable_id: oval:mil.disa.stig.defs:var:23029401
+      source_type: local_variable
+      datatype: string
+      comment: regex to find audit data partition in /etc/fstab
+      semantic_ast:
+        datatype: string
+        expression:
+          args:
+          - datatype: string
+            op: literal_component
+            value: ^[^# \t]+\s+
+          - item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23029402
+            op: object_component
+            record_field: null
+          - datatype: string
+            op: literal_component
+            value: \s+
+          attributes: {}
+          op: concat
+        id: oval:mil.disa.stig.defs:var:23029401
+        type: local_variable
+      resolution:
+        blocked_by:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23029402
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        operation: concat
+        reason: concat_child_not_static:object_component_requires_collection:textfilecontent54_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        blocked_by:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23029402
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23029402
+          operations:
+          - concat
+          - literal_component
+          - object_component
+          variables: []
+        expression:
+          args:
+          - datatype: string
+            op: literal_component
+            value: ^[^# \t]+\s+
+          - item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23029402
+            op: object_component
+            record_field: null
+          - datatype: string
+            op: literal_component
+            value: \s+
+          attributes: {}
+          op: concat
+        mode: target_dependent
+        reason: concat_child_not_static:object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23029401
+        variable_type: local_variable
+    oval:mil.disa.stig.defs:var:23029400:
+      source_variable_id: oval:mil.disa.stig.defs:var:23029400
+      source_type: local_variable
+      datatype: string
+      comment: audit data directory from /etc/audit/auditd.conf
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23029402
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:23029400
+        type: local_variable
+      resolution:
+        datatype: string
+        item_field: subexpression
+        object_ref: oval:mil.disa.stig.ind:obj:23029402
+        operation: object_component
+        reason: object_component_requires_collection:textfilecontent54_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23029402
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23029402
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23029400
+        variable_type: local_variable
+  predicates: {}
+  evaluate:
+    tests:
+      oval:mil.disa.stig.linux:tst:23029400:
+        source_test_id: oval:mil.disa.stig.linux:tst:23029400
+        source_type: partition_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: There is a separate file system for audit data directory.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23029400
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23029401:
+        source_test_id: oval:mil.disa.stig.ind:tst:23029401
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: There is a separate file system configured for audit data directory.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23029401
+        predicates: []
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.rhel9os:def:257847:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:257847
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230294
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-231030 - RHEL 9 must use a separate file system for the system audit data path.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Placing "/var/log/audit" in its own partition enables better separation between audit files and other system
+              files, and helps ensure that auditing cannot be halted due to the partition running out of space.
+
+
+              Satisfies: SRG-OS-000341-GPOS-00132, SRG-OS-000480-GPOS-00227'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230294:
+        source_definition_id: oval:mil.disa.stig.defs:def:230294
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: There is a separate file system for audit data directory.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23029400
+          - comment: There is a separate file system configured for audit data directory.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23029401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must use a separate file system for the system audit data path.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.rhel9os:def:257847
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257847
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:257847
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:257847
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:257847
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-257847r1044924_rule
+    title: RHEL 9 must use a separate file system for the system audit data path.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257847
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257847
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257847
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257847
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:13901
+      exports: []
+      inline_content: 'Verify that a separate file system/partition has been created for the system audit data path with the
+        following command: Note: /var/log/audit is used as the example as it is a common location. $ mount | grep /var/log/audit
+        /dev/mapper/rootvg-varlogaudit on /var/log/audit type xfs (rw,relatime,seclabel,attr2,inode64,logbufs=8,logbsize=32k,noquota)
+        Note: Options displayed for mount may differ. If no line is returned, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:13901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that a separate file system/partition has been created for the system audit data path with the following\
+            \ command:\n\nNote: /var/log/audit is used as the example as it is a common location.\n\n$ mount | grep /var/log/audit\
+            \ \n\n/dev/mapper/rootvg-varlogaudit on /var/log/audit type xfs (rw,relatime,seclabel,attr2,inode64,logbufs=8,logbsize=32k,noquota)\n\
+            Note: Options displayed for mount may differ.\n\nIf no line is returned, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257847r1044924_rule
+    semantic_ir_sha256: 19493f68853a2442571a1bd2894e49c6b02e0e0e7e0a1325a7628b489bbdc19f
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 4ee053402c0e653dd452558ad5ec71b15515e7661faa8acaeacd26710e3e33a0

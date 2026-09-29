@@ -1,0 +1,276 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253313r991578_rule
+  version: 1
+  description: The system must be configured to audit Logon/Logoff - Account Lockout failures.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.win:obj:20000000:
+      capability: scapng.collect.windows.auditeventpolicysubcategories
+      source_object_id: oval:mil.disa.stig.win:obj:20000000
+      source_type: auditeventpolicysubcategories_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: null
+      query: []
+  derive: {}
+  predicates:
+    oval:mil.disa.stig.win:ste:25331301:
+      source_state_id: oval:mil.disa.stig.win:ste:25331301
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: account_lockout
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      comment: '''Account Lockout'' is set to ''Success'' and ''Failure'''
+    oval:mil.disa.stig.win:ste:25331300:
+      source_state_id: oval:mil.disa.stig.win:ste:25331300
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: account_lockout
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_FAILURE
+      comment: '''Account Lockout'' is set to ''Failure'''
+  evaluate:
+    tests:
+      oval:mil.disa.stig.windows:tst:25331300:
+        source_test_id: oval:mil.disa.stig.windows:tst:25331300
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Audit Account Lockout'' is set to ''Failure'''
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25331300
+        source_other: []
+      oval:mil.disa.stig.windows:tst:25331301:
+        source_test_id: oval:mil.disa.stig.windows:tst:25331301
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Audit Account Lockout'' is set to ''Success'' and ''Failure'''
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25331301
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.windows11:def:253313:
+        source_definition_id: oval:mil.disa.stig.windows11:def:253313
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253313
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-AU-000054 - The system must be configured to audit Logon/Logoff - Account Lockout failures.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot
+              service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary
+              to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential
+              for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.
+
+
+              Account Lockout events can be used to identify potentially malicious logon attempts.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253313:
+        source_definition_id: oval:mil.disa.stig.defs:def:253313
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Account Lockout - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.windows:tst:25331300
+          - comment: Audit - Account Lockout - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.windows:tst:25331301
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Logon/Logoff - Account Lockout failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.windows11:def:253313
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.windows11:def:253313
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253313
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.windows11:def:253313
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253313
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-253313r991578_rule
+    title: The system must be configured to audit Logon/Logoff - Account Lockout failures.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253313
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253313
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253313
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253313
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:11101
+      exports: []
+      inline_content: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+        must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective. Use the AuditPol
+        tool to review the current Audit Policy configuration: Open a Command Prompt with elevated privileges ("Run as Administrator").
+        Enter "AuditPol /get /category:*" Compare the AuditPol settings with the following. If the system does not audit the
+        following, this is a finding: Logon/Logoff >> Account Lockout - Failure'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:11101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Security Option "Audit: Force audit policy subcategory settings to override audit policy category settings"
+            must be set to "Enabled" (WN11-SO-000030) for the detailed auditing subcategories to be effective.
+
+
+            Use the AuditPol tool to review the current Audit Policy configuration:
+
+
+            Open a Command Prompt with elevated privileges ("Run as Administrator").
+
+
+            Enter "AuditPol /get /category:*"
+
+
+            Compare the AuditPol settings with the following. If the system does not audit the following, this is a finding:
+
+
+            Logon/Logoff >> Account Lockout - Failure'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-253313r991578_rule
+    semantic_ir_sha256: 810ea33d0d697484a96e54aab34362e74507a051a63af41322c8bbac7e0e9d46
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: a75a41b3513375862a04123e0c6a6d9654c8d1ac964151fa2a9bfb8379539305

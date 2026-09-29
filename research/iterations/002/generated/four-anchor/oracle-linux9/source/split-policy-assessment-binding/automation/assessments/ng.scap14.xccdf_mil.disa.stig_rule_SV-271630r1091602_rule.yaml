@@ -1,0 +1,442 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271630r1091602_rule
+  version: 1
+  description: OL 9 passwords must have a 24-hour minimum password lifetime restriction in /etc/shadow.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.ind:obj:23036402:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23036402
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/shadow
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '^([^:]*):[^:]*:[^:]*:0*:'
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23036400:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23036400
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/shadow
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '^root:[^:]*:[^:]*:0*:'
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23036403:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23036403
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/passwd
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '^nobody:[^:]*:([0-9]+):'
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.unix:obj:23036401:
+      capability: scapng.collect.unix.password
+      source_object_id: oval:mil.disa.stig.unix:obj:23036401
+      source_type: password_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '2'
+      comment: Users with a password age of zero minus system users
+      query:
+      - attributes:
+          datatype: string
+          operation: equals
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23036400
+        kind: element
+        name: username
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:23036400
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:23036401
+  derive:
+    oval:mil.disa.stig.defs:var:23036400:
+      source_variable_id: oval:mil.disa.stig.defs:var:23036400
+      source_type: local_variable
+      datatype: string
+      comment: Usernames of users with a minimum password age of 0 or blank
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23036402
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:23036400
+        type: local_variable
+      resolution:
+        datatype: string
+        item_field: subexpression
+        object_ref: oval:mil.disa.stig.ind:obj:23036402
+        operation: object_component
+        reason: object_component_requires_collection:textfilecontent54_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23036402
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23036402
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23036400
+        variable_type: local_variable
+    oval:mil.disa.stig.defs:var:23036401:
+      source_variable_id: oval:mil.disa.stig.defs:var:23036401
+      source_type: local_variable
+      datatype: int
+      comment: UID for user nobody
+      semantic_ast:
+        datatype: int
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23036403
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:23036401
+        type: local_variable
+      resolution:
+        datatype: int
+        item_field: subexpression
+        object_ref: oval:mil.disa.stig.ind:obj:23036403
+        operation: object_component
+        reason: object_component_requires_collection:textfilecontent54_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        datatype: int
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23036403
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23036403
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23036401
+        variable_type: local_variable
+  predicates:
+    oval:mil.disa.stig.unix:ste:23036400:
+      source_state_id: oval:mil.disa.stig.unix:ste:23036400
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: less than
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1000'
+      comment: null
+    oval:mil.disa.stig.unix:ste:23036401:
+      source_state_id: oval:mil.disa.stig.unix:ste:23036401
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+          var_check: all
+          var_ref: oval:mil.disa.stig.defs:var:23036401
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      comment: null
+  evaluate:
+    tests:
+      oval:mil.disa.stig.unix:tst:23036401:
+        source_test_id: oval:mil.disa.stig.unix:tst:23036401
+        source_type: password_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: Non-system users do not have a minimum password age of 0 or blank
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:23036401
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23036400:
+        source_test_id: oval:mil.disa.stig.ind:tst:23036400
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Root does not have a minimum password age of 0 or blank
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23036400
+        predicates: []
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.defs:def:230364:
+        source_definition_id: oval:mil.disa.stig.defs:def:230364
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Root does not have a minimum password age of 0 or blank
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23036400
+          - comment: Non-system users do not have a minimum password age of 0 or blank
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23036401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system passwords must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.ol9os:def:271630:
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271630
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230364
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-001090 - OL 9 passwords must have a 24-hour minimum password lifetime restriction in /etc/shadow.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Enforcing a minimum password lifetime helps to prevent repeated password changes to defeat the password
+              reuse or history enforcement requirement. If users are allowed to immediately and continually change their password,
+              the password could be repeatedly changed in a short period of time to defeat the organization's policy regarding
+              password reuse.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271630
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.ol9os:def:271630
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271630
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.ol9os:def:271630
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271630
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271630r1091602_rule
+    title: OL 9 passwords must have a 24-hour minimum password lifetime restriction in /etc/shadow.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271630
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271630
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271630
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271630
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:38901
+      exports: []
+      inline_content: 'Verify that OL 9 has configured the minimum time period between password changes for each user account
+        as 24 hours or greater with the following command: $ sudo awk -F: ''$4 < 1 {print $1 " " $4}'' /etc/shadow If any
+        results are returned that are not associated with a system account, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:38901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify that OL 9 has configured the minimum time period between password changes for each user account as
+            24 hours or greater with the following command:
+
+
+            $ sudo awk -F: ''$4 < 1 {print $1 " " $4}'' /etc/shadow
+
+
+            If any results are returned that are not associated with a system account, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271630r1091602_rule
+    semantic_ir_sha256: 4ae09021517f30ffe4e052a670a624a6e57e79ff2b2d768ad6ab6cedd16654de
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 66230986cb7721c1f3fb5252af5c4620e6d4cc810d91b3ec15f2ad063988e62a

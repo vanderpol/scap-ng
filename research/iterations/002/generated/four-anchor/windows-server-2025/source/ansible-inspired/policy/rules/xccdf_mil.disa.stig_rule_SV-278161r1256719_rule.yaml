@@ -1,0 +1,389 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'This applies to domain controllers. It is not applicable for other systems. Review user account mappings to PKI
+    certificates. Open PowerShell. Enter "Get-ADUser -Filter * | FT Name, UserPrincipalName, Enabled". Exclude disabled accounts
+    (e.g., DefaultAccount, Guest) and the krbtgt account. If the User Principal Name (UPN) is not in the format of an individual''s
+    identifier for the certificate type and for the appropriate domain suffix, this is a finding. For standard NIPRNet certificates,
+    the individual''s identifier is in the format of an Electronic Data Interchange - Personnel Identifier (EDI-PI). Alt Tokens
+    and other certificates may use a different UPN format than the EDI-PI, which vary by organization. Verified these with
+    the organization. NIPRNet example: Name - User Principal Name User1 - 1234567890@mil Refer to the PKE documentation for
+    other network domain suffixes. If the mappings are to certificates issued by a CA authorized by the Component''s CIO,
+    this is a CAT II finding.'
+  checks:
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278161r1256719_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-278161r1256719_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
+  cluster_id: null
+  conflicts: []
+  default_check: default
+  description: '<VulnDiscussion>A PKI implementation depends on the practices established by the Certificate Authority (CA)
+    to ensure the implementation is secure. Without proper practices, the certificates issued by a CA have limited value in
+    authentication functions. Satisfies: SRG-OS-000066-GPOS-00034, SRG-OS-000403-GPOS-00182</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  effective_platform_refs:
+  - '#xccdf_mil.disa.stig_platform_Windows_DomainController'
+  effective_platforms:
+  - expression:
+      children:
+      - definition_binding:
+          definition_id: oval:mil.disa.stig.win:def:100005
+          source: applicability_oval_ir
+          status: resolved
+        href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml
+        id_ref: oval:mil.disa.stig.win:def:100005
+        kind: check_fact
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      kind: logical_test
+      negate: false
+      operator: AND
+    kind: local_cpe_expression
+    platform_id: xccdf_mil.disa.stig_platform_Windows_DomainController
+    ref: '#xccdf_mil.disa.stig_platform_Windows_DomainController'
+  extends: null
+  fix: Map user accounts to PKI certificates using the appropriate UPN for the network. Refer to the PKE documentation for
+    details.
+  group_path:
+  - xccdf_mil.disa.stig_group_V-278161
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-278161r1256719_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000185
+  multiple: false
+  platforms:
+  - '#xccdf_mil.disa.stig_platform_Windows_DomainController'
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows Server 2025 DISA DPMS Target Microsoft Windows Server 2025 5719
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: high
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+      exports: []
+      inline_content: 'This applies to domain controllers. It is not applicable for other systems. Review user account mappings
+        to PKI certificates. Open PowerShell. Enter "Get-ADUser -Filter * | FT Name, UserPrincipalName, Enabled". Exclude
+        disabled accounts (e.g., DefaultAccount, Guest) and the krbtgt account. If the User Principal Name (UPN) is not in
+        the format of an individual''s identifier for the certificate type and for the appropriate domain suffix, this is
+        a finding. For standard NIPRNet certificates, the individual''s identifier is in the format of an Electronic Data
+        Interchange - Personnel Identifier (EDI-PI). Alt Tokens and other certificates may use a different UPN format than
+        the EDI-PI, which vary by organization. Verified these with the organization. NIPRNet example: Name - User Principal
+        Name User1 - 1234567890@mil Refer to the PKE documentation for other network domain suffixes. If the mappings are
+        to certificates issued by a CA authorized by the Component''s CIO, this is a CAT II finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+            Review user account mappings to PKI certificates.
+
+
+            Open PowerShell.
+
+
+            Enter "Get-ADUser -Filter * | FT Name, UserPrincipalName, Enabled".
+
+
+            Exclude disabled accounts (e.g., DefaultAccount, Guest) and the krbtgt account.
+
+
+            If the User Principal Name (UPN) is not in the format of an individual''s identifier for the certificate type
+            and for the appropriate domain suffix, this is a finding.
+
+
+            For standard NIPRNet certificates, the individual''s identifier is in the format of an Electronic Data Interchange
+            - Personnel Identifier (EDI-PI).
+
+
+            Alt Tokens and other certificates may use a different UPN format than the EDI-PI, which vary by organization.
+            Verified these with the organization.
+
+
+            NIPRNet example:
+
+
+            Name - User Principal Name
+
+            User1 - 1234567890@mil
+
+
+            Refer to the PKE documentation for other network domain suffixes.
+
+
+            If the mappings are to certificates issued by a CA authorized by the Component''s CIO, this is a CAT II finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  - content_refs:
+    - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+    exports: []
+    inline_content: 'This applies to domain controllers. It is not applicable for other systems. Review user account mappings
+      to PKI certificates. Open PowerShell. Enter "Get-ADUser -Filter * | FT Name, UserPrincipalName, Enabled". Exclude disabled
+      accounts (e.g., DefaultAccount, Guest) and the krbtgt account. If the User Principal Name (UPN) is not in the format
+      of an individual''s identifier for the certificate type and for the appropriate domain suffix, this is a finding. For
+      standard NIPRNet certificates, the individual''s identifier is in the format of an Electronic Data Interchange - Personnel
+      Identifier (EDI-PI). Alt Tokens and other certificates may use a different UPN format than the EDI-PI, which vary by
+      organization. Verified these with the organization. NIPRNet example: Name - User Principal Name User1 - 1234567890@mil
+      Refer to the PKE documentation for other network domain suffixes. If the mappings are to certificates issued by a CA
+      authorized by the Component''s CIO, this is a CAT II finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+          Review user account mappings to PKI certificates.
+
+
+          Open PowerShell.
+
+
+          Enter "Get-ADUser -Filter * | FT Name, UserPrincipalName, Enabled".
+
+
+          Exclude disabled accounts (e.g., DefaultAccount, Guest) and the krbtgt account.
+
+
+          If the User Principal Name (UPN) is not in the format of an individual''s identifier for the certificate type and
+          for the appropriate domain suffix, this is a finding.
+
+
+          For standard NIPRNet certificates, the individual''s identifier is in the format of an Electronic Data Interchange
+          - Personnel Identifier (EDI-PI).
+
+
+          Alt Tokens and other certificates may use a different UPN format than the EDI-PI, which vary by organization. Verified
+          these with the organization.
+
+
+          NIPRNet example:
+
+
+          Name - User Principal Name
+
+          User1 - 1234567890@mil
+
+
+          Refer to the PKE documentation for other network domain suffixes.
+
+
+          If the mappings are to certificates issued by a CA authorized by the Component''s CIO, this is a CAT II finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-278161r1256719_rule
+      severity: high
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN25-DC-000300
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Windows Server 2025 PKI certificates associated with user accounts must be issued by a DoW PKI or an approved
+        External Certificate Authority (ECA).
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>A PKI implementation depends on the practices established by the Certificate Authority (CA) to
+        ensure the implementation is secure. Without proper practices, the certificates issued by a CA have limited value
+        in authentication functions.
+
+
+        Satisfies: SRG-OS-000066-GPOS-00034, SRG-OS-000403-GPOS-00182</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows Server 2025
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows Server 2025
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5719'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        idref: '#xccdf_mil.disa.stig_platform_Windows_DomainController'
+      name: platform
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000185
+    - attributes:
+        fixref: F-82596r1181188_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Map user accounts to PKI certificates using the appropriate UPN for the network. Refer to the PKE documentation
+        for details.
+    - attributes:
+        id: F-82596r1181188_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:35301
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'This applies to domain controllers. It is not applicable for other systems.
+
+
+          Review user account mappings to PKI certificates.
+
+
+          Open PowerShell.
+
+
+          Enter "Get-ADUser -Filter * | FT Name, UserPrincipalName, Enabled".
+
+
+          Exclude disabled accounts (e.g., DefaultAccount, Guest) and the krbtgt account.
+
+
+          If the User Principal Name (UPN) is not in the format of an individual''s identifier for the certificate type and
+          for the appropriate domain suffix, this is a finding.
+
+
+          For standard NIPRNet certificates, the individual''s identifier is in the format of an Electronic Data Interchange
+          - Personnel Identifier (EDI-PI).
+
+
+          Alt Tokens and other certificates may use a different UPN format than the EDI-PI, which vary by organization. Verified
+          these with the organization.
+
+
+          NIPRNet example:
+
+
+          Name - User Principal Name
+
+          User1 - 1234567890@mil
+
+
+          Refer to the PKE documentation for other network domain suffixes.
+
+
+          If the mappings are to certificates issued by a CA authorized by the Component''s CIO, this is a CAT II finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: Windows Server 2025 PKI certificates associated with user accounts must be issued by a DoW PKI or an approved External
+    Certificate Authority (ECA).
+  weight: '10.0'
+migration:
+  note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for manual
+    execution.
+  source: SCAP 1.4 XCCDF manual/external check
+  source_rule: xccdf_mil.disa.stig_rule_SV-278161r1256719_rule
+  status: legacy_compatible

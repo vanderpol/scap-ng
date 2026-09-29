@@ -1,0 +1,376 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-257882r991560_rule
+  version: 1
+  description: RHEL 9 system commands must have mode 755 or less permissive.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.unix:obj:25788201:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.unix:obj:25788201
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '13'
+      comment: All files in system command directories with mode 755 (gwrite should be = false.)
+      query:
+      - attributes:
+          datatype: string
+          var_check: only one
+          var_ref: oval:navy.navwar.niwcatlantic.scc.unix:var:25788201
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: .*
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788201
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788206
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788207
+    oval:navy.navwar.niwcatlantic.scc.unix:obj:25788221:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.unix:obj:25788221
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '13'
+      comment: All files in system command directories with mode 755 (owrite should be = false.)
+      query:
+      - attributes:
+          datatype: string
+          var_check: only one
+          var_ref: oval:navy.navwar.niwcatlantic.scc.unix:var:25788201
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: .*
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788202
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788206
+      - attributes:
+          action: exclude
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788207
+  derive:
+    oval:navy.navwar.niwcatlantic.scc.unix:var:25788201:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.unix:var:25788201
+      source_type: constant_variable
+      datatype: string
+      comment: system command directories
+      semantic_ast:
+        datatype: string
+        id: oval:navy.navwar.niwcatlantic.scc.unix:var:25788201
+        type: constant_variable
+        values:
+        - datatype: string
+          value: /bin
+        - datatype: string
+          value: /sbin
+        - datatype: string
+          value: /usr/bin
+        - datatype: string
+          value: /usr/libexec
+        - datatype: string
+          value: /usr/sbin
+        - datatype: string
+          value: /usr/local/bin
+        - datatype: string
+          value: /usr/local/sbin
+      resolution:
+        datatype: string
+        status: exact_static
+        values:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/libexec
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+        variable_type: constant_variable
+      evaluation_plan:
+        datatype: string
+        mode: static
+        resolution_status: exact_static
+        values:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/libexec
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+        variable_id: oval:navy.navwar.niwcatlantic.scc.unix:var:25788201
+        variable_type: constant_variable
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.unix:ste:25788202:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788202
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      comment: Mode 755 or less permissive (owrite should be = false.)
+    oval:navy.navwar.niwcatlantic.scc.unix:ste:25788206:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788206
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: symbolic link
+      comment: symbolic links
+    oval:navy.navwar.niwcatlantic.scc.unix:ste:25788201:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788201
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: gwrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'false'
+      comment: Mode 755 or less permissive (gwrite should be = false.)
+    oval:navy.navwar.niwcatlantic.scc.unix:ste:25788207:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.unix:ste:25788207
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: directory
+      comment: null
+  evaluate:
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.unix:tst:25788221:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.unix:tst:25788221
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: Files in System command dirs have mode 755 or less permissive (owrite should be = false.)
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.unix:obj:25788221
+        predicates: []
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.unix:tst:25788201:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.unix:tst:25788201
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: Files in System command dirs have mode 755 or less permissive (gwrite should be = false.)
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.unix:obj:25788201
+        predicates: []
+        source_other: []
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882:
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+        class: compliance
+        version: '13'
+        criteria:
+          children:
+          - comment: System command files have mode 755 or less permissive (gwrite should be = false.)
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.unix:tst:25788201
+          - comment: System command files have mode 755 or less permissive (owrite should be = false.)
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.unix:tst:25788221
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL 9 system commands must have mode 755 or less permissive.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'If RHEL 9 allowed any user to make changes to software libraries, then those changes might be implemented
+              without undergoing the appropriate testing and approvals that are part of a robust change management process.
+
+
+              This requirement applies to RHEL 9 with software libraries that are accessible and configurable, as in the case
+              of interpreted languages. Software libraries also include privileged programs that execute with escalated privileges.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-257882r991560_rule
+    title: RHEL 9 system commands must have mode 755 or less permissive.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:257882
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:20701
+      exports: []
+      inline_content: 'Verify the system commands contained in the following directories have mode "755" or less permissive
+        with the following command: $ sudo find -L /bin /sbin /usr/bin /usr/sbin /usr/libexec /usr/local/bin /usr/local/sbin
+        -perm /022 -exec ls -l {} \; If any system commands are found to be group-writable or world-writable, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:20701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the system commands contained in the following directories have mode "755" or less permissive with
+            the following command:
+
+
+            $ sudo find -L /bin /sbin /usr/bin /usr/sbin /usr/libexec /usr/local/bin /usr/local/sbin -perm /022 -exec ls -l
+            {} \;
+
+
+            If any system commands are found to be group-writable or world-writable, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-257882r991560_rule
+    semantic_ir_sha256: 6c4664116a4ff52c1d6795b3e199170c5f8bae054b5f2c25969124fb82f45c53
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: e2df9383b6e02a83c1d219f58a4baabfa1ab9a54632867508b344b9abf7d8d31

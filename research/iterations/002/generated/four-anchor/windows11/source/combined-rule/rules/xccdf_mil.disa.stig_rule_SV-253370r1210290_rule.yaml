@@ -1,0 +1,956 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: combined-rule
+rule:
+  id: xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+  title: Credential Guard must be running on Windows 11 systems.
+  severity: high
+  weight: '10.0'
+  role: null
+  selected: null
+  selected_default: true
+  cluster_id: null
+  extends: null
+  abstract: false
+  hidden: false
+  prohibit_changes: false
+  multiple: false
+  group_path:
+  - xccdf_mil.disa.stig_group_V-253370
+  description: <VulnDiscussion>Credential Guard uses virtualization-based security to protect information that could be used
+    in credential theft attacks if compromised. This authentication information, which was stored in the Local Security Authority
+    (LSA) in previous versions of Windows, is isolated from the rest of operating system and can only be accessed by privileged
+    system software.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+  discussion: null
+  platforms: []
+  effective_platform_refs:
+  - cpe:/o:microsoft:windows_11
+  effective_platforms:
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-cpe-dictionary.xml
+      definition_id: oval:mil.disa.stig.windows11:def:1
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:microsoft:windows_11
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:microsoft:windows_11
+    ref: cpe:/o:microsoft:windows_11
+  references:
+  - href: null
+    text: DPMS Target Microsoft Windows 11 DISA DPMS Target Microsoft Windows 11 5471
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-000366
+  requires: []
+  conflicts: []
+  check: 'Confirm Credential Guard is running. Run "PowerShell" with elevated privileges (run as administrator). Enter the
+    following: "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard" If "SecurityServicesRunning"
+    does not include a value of "1" (e.g., "{1, 2}"), this is a finding. Alternately: Run "System Information". Under "System
+    Summary", verify the following: If "virtualization-based Services Running" does not list "Credential Guard", this is a
+    finding. The policy settings referenced in the Fix section will configure the following registry value. However, due to
+    hardware requirements, the registry value alone does not ensure proper function. Registry Hive: HKEY_LOCAL_MACHINE Registry
+    Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\ Value Name: LsaCfgFlags Value Type: REG_DWORD Value: 0x00000001
+    (1) (Enabled with UEFI lock)'
+  source_checks:
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+    exports: []
+    inline_content: 'Confirm Credential Guard is running. Run "PowerShell" with elevated privileges (run as administrator).
+      Enter the following: "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard" If
+      "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding. Alternately: Run "System
+      Information". Under "System Summary", verify the following: If "virtualization-based Services Running" does not list
+      "Credential Guard", this is a finding. The policy settings referenced in the Fix section will configure the following
+      registry value. However, due to hardware requirements, the registry value alone does not ensure proper function. Registry
+      Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\ Value Name: LsaCfgFlags Value
+      Type: REG_DWORD Value: 0x00000001 (1) (Enabled with UEFI lock)'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Confirm Credential Guard is running.
+
+
+          Run "PowerShell" with elevated privileges (run as administrator).
+
+
+          Enter the following:
+
+
+          "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+
+
+          If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding.
+
+
+          Alternately:
+
+
+          Run "System Information".
+
+
+          Under "System Summary", verify the following:
+
+
+          If "virtualization-based Services Running" does not list "Credential Guard", this is a finding.
+
+
+          The policy settings referenced in the Fix section will configure the following registry value. However, due to hardware
+          requirements, the registry value alone does not ensure proper function.
+
+
+          Registry Hive: HKEY_LOCAL_MACHINE
+
+          Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\
+
+
+          Value Name: LsaCfgFlags
+
+          Value Type: REG_DWORD
+
+          Value: 0x00000001 (1) (Enabled with UEFI lock)'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+      exports: []
+      inline_content: 'Confirm Credential Guard is running. Run "PowerShell" with elevated privileges (run as administrator).
+        Enter the following: "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+        If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding. Alternately: Run
+        "System Information". Under "System Summary", verify the following: If "virtualization-based Services Running" does
+        not list "Credential Guard", this is a finding. The policy settings referenced in the Fix section will configure the
+        following registry value. However, due to hardware requirements, the registry value alone does not ensure proper function.
+        Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\ Value Name: LsaCfgFlags
+        Value Type: REG_DWORD Value: 0x00000001 (1) (Enabled with UEFI lock)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Confirm Credential Guard is running.
+
+
+            Run "PowerShell" with elevated privileges (run as administrator).
+
+
+            Enter the following:
+
+
+            "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+
+
+            If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding.
+
+
+            Alternately:
+
+
+            Run "System Information".
+
+
+            Under "System Summary", verify the following:
+
+
+            If "virtualization-based Services Running" does not list "Credential Guard", this is a finding.
+
+
+            The policy settings referenced in the Fix section will configure the following registry value. However, due to
+            hardware requirements, the registry value alone does not ensure proper function.
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\
+
+
+            Value Name: LsaCfgFlags
+
+            Value Type: REG_DWORD
+
+            Value: 0x00000001 (1) (Enabled with UEFI lock)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  fix: 'Configure the policy value for Computer Configuration >> Administrative Templates >> System >> Device Guard >> "Turn
+    On virtualization-based Security" to "Enabled" with "Enabled with UEFI lock" selected for "Credential Guard Configuration:".
+    A Microsoft TechNet article on Credential Guard, including system requirement details, can be found at the following link:
+    https://docs.microsoft.com/en-us/windows/access-protection/credential-guard/credential-guard'
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+      severity: high
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: WN11-CC-000075
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: Credential Guard must be running on Windows 11 systems.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: <VulnDiscussion>Credential Guard uses virtualization-based security to protect information that could be used
+        in credential theft attacks if compromised. This authentication information, which was stored in the Local Security
+        Authority (LSA) in previous versions of Windows, is isolated from the rest of operating system and can only be accessed
+        by privileged system software.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Microsoft Windows 11
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Microsoft Windows 11
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5471'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-000366
+    - attributes:
+        fixref: F-56773r1210201_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure the policy value for Computer Configuration >> Administrative Templates >> System >> Device Guard >>
+        "Turn On virtualization-based Security" to "Enabled" with "Enabled with UEFI lock" selected for "Credential Guard
+        Configuration:".
+
+
+        A Microsoft TechNet article on Credential Guard, including system requirement details, can be found at the following
+        link:
+
+
+        https://docs.microsoft.com/en-us/windows/access-protection/credential-guard/credential-guard'
+    - attributes:
+        id: F-56773r1210201_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Confirm Credential Guard is running.
+
+
+          Run "PowerShell" with elevated privileges (run as administrator).
+
+
+          Enter the following:
+
+
+          "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+
+
+          If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding.
+
+
+          Alternately:
+
+
+          Run "System Information".
+
+
+          Under "System Summary", verify the following:
+
+
+          If "virtualization-based Services Running" does not list "Credential Guard", this is a finding.
+
+
+          The policy settings referenced in the Fix section will configure the following registry value. However, due to hardware
+          requirements, the registry value alone does not ensure proper function.
+
+
+          Registry Hive: HKEY_LOCAL_MACHINE
+
+          Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\
+
+
+          Value Name: LsaCfgFlags
+
+          Value Type: REG_DWORD
+
+          Value: 0x00000001 (1) (Enabled with UEFI lock)'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  checks:
+  - selector: default
+    source_selector: ''
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+    assessment_version: 1
+  - selector: automated
+    source_selector: automated
+    assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+    assessment_version: 1
+  - selector: manual
+    source_selector: manual
+    assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+    assessment_version: 1
+  default_check: default
+  assessment: &id001
+    id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+    version: 1
+    description: Credential Guard must be running on Windows 11 systems.
+    semantic_model: scap-ng-generic-assessment-graph-0.1
+    collect:
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:25337001:
+        capability: scapng.collect.windows.cmdlet
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25337001
+        source_type: cmdlet_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '18'
+        comment: DeviceGuard securityservicesrunning
+        query:
+        - attributes:
+            operation: equals
+          kind: element
+          name: module_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: CimCmdlets
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: module_id
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: version
+            nil: 'true'
+          kind: element
+          name: module_version
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - kind: element
+          name: verb
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Get
+        - kind: element
+          name: noun
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: CimInstance
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: classname
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: Win32_DeviceGuard
+          - attributes:
+              name: namespace
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: root\Microsoft\Windows\DeviceGuard
+          kind: element
+          name: parameters
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: property
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: securityservicesrunning
+          kind: element
+          name: select
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+    derive: {}
+    predicates:
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:25337001:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25337001
+        source_type: cmdlet_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: securityservicesrunning
+              operation: pattern match
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '1'
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: securityservicesrunning contains 1 in array element
+    evaluate:
+      tests:
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:25337001:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25337001
+          source_type: cmdlet_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Credential Guard must be running on Windows 11 domain-joined systems.
+          check: only one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25337001
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25337001
+          source_other: []
+      definitions:
+        oval:navy.navwar.niwcatlantic.scc.windows:def:253370:
+          source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+          class: compliance
+          version: '18'
+          criteria:
+            children:
+            - comment: Credential Guard must be running on Windows 11 domain-joined systems.
+              kind: test_ref
+              negate: false
+              test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25337001
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Credential Guard must be running on Windows 11 systems.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Credential Guard uses virtualization-based security to protect information that could be used in credential
+                theft attacks if compromised. This authentication information, which was stored in the Local Security Authority
+                (LSA) in previous versions of Windows, is isolated from the rest of operating system and can only be accessed
+                by privileged system software.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    assert:
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+      combination: xccdf_source_check_semantics
+    source_check_context:
+      check_exports: []
+      checks:
+      - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        exports: []
+        href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        match_count: 1
+        multi_check: null
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        negate: null
+        oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: ''
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        exports: []
+        href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        match_count: 1
+        multi_check: null
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        negate: null
+        oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        selector: automated
+        status: resolved
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+      published_source:
+        datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+        datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+        repository: niwc-atlantic/scap-content-library
+        repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+        revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+        zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+        zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+      rule_id: xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+      title: Credential Guard must be running on Windows 11 systems.
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+        exports: []
+        inline_content: 'Confirm Credential Guard is running. Run "PowerShell" with elevated privileges (run as administrator).
+          Enter the following: "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+          If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding. Alternately: Run
+          "System Information". Under "System Summary", verify the following: If "virtualization-based Services Running" does
+          not list "Credential Guard", this is a finding. The policy settings referenced in the Fix section will configure
+          the following registry value. However, due to hardware requirements, the registry value alone does not ensure proper
+          function. Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\ Value
+          Name: LsaCfgFlags Value Type: REG_DWORD Value: 0x00000001 (1) (Enabled with UEFI lock)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Confirm Credential Guard is running.
+
+
+              Run "PowerShell" with elevated privileges (run as administrator).
+
+
+              Enter the following:
+
+
+              "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+
+
+              If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding.
+
+
+              Alternately:
+
+
+              Run "System Information".
+
+
+              Under "System Summary", verify the following:
+
+
+              If "virtualization-based Services Running" does not list "Credential Guard", this is a finding.
+
+
+              The policy settings referenced in the Fix section will configure the following registry value. However, due
+              to hardware requirements, the registry value alone does not ensure proper function.
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\
+
+
+              Value Name: LsaCfgFlags
+
+              Value Type: REG_DWORD
+
+              Value: 0x00000001 (1) (Enabled with UEFI lock)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    migration: &id002
+      status: legacy_compatible
+      source: SCAP 1.4 / OVAL 5.12.3
+      source_rule: xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+      semantic_ir_sha256: e21e3e5e415fca6be8ef0e8de32dd023f9d25a541d6f60633e6960c3d421450a
+      note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_fingerprint_sha256: b3f120584ffbc0110fddbdd52bc4fca5b7b30cc3064cc72f861b85ace10ee079
+  assessments:
+  - *id001
+  - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+    version: 1
+    description: Credential Guard must be running on Windows 11 systems.
+    method: manual_or_external_check
+    source_checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+      exports: []
+      inline_content: 'Confirm Credential Guard is running. Run "PowerShell" with elevated privileges (run as administrator).
+        Enter the following: "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+        If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding. Alternately: Run
+        "System Information". Under "System Summary", verify the following: If "virtualization-based Services Running" does
+        not list "Credential Guard", this is a finding. The policy settings referenced in the Fix section will configure the
+        following registry value. However, due to hardware requirements, the registry value alone does not ensure proper function.
+        Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\ Value Name: LsaCfgFlags
+        Value Type: REG_DWORD Value: 0x00000001 (1) (Enabled with UEFI lock)'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Confirm Credential Guard is running.
+
+
+            Run "PowerShell" with elevated privileges (run as administrator).
+
+
+            Enter the following:
+
+
+            "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+
+
+            If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding.
+
+
+            Alternately:
+
+
+            Run "System Information".
+
+
+            Under "System Summary", verify the following:
+
+
+            If "virtualization-based Services Running" does not list "Credential Guard", this is a finding.
+
+
+            The policy settings referenced in the Fix section will configure the following registry value. However, due to
+            hardware requirements, the registry value alone does not ensure proper function.
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\
+
+
+            Value Name: LsaCfgFlags
+
+            Value Type: REG_DWORD
+
+            Value: 0x00000001 (1) (Enabled with UEFI lock)'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    source_check_logic:
+      checks:
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: ''
+        source_tree:
+          attributes:
+            selector: ''
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+        exports: []
+        inline_content: null
+        multi_check: null
+        negate: null
+        selector: automated
+        source_tree:
+          attributes:
+            selector: automated
+            system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+              name: oval:navy.navwar.niwcatlantic.scc.windows:def:253370
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      - content_refs:
+        - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+        exports: []
+        inline_content: 'Confirm Credential Guard is running. Run "PowerShell" with elevated privileges (run as administrator).
+          Enter the following: "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+          If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding. Alternately: Run
+          "System Information". Under "System Summary", verify the following: If "virtualization-based Services Running" does
+          not list "Credential Guard", this is a finding. The policy settings referenced in the Fix section will configure
+          the following registry value. However, due to hardware requirements, the registry value alone does not ensure proper
+          function. Registry Hive: HKEY_LOCAL_MACHINE Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\ Value
+          Name: LsaCfgFlags Value Type: REG_DWORD Value: 0x00000001 (1) (Enabled with UEFI lock)'
+        multi_check: null
+        negate: null
+        selector: manual
+        source_tree:
+          attributes:
+            selector: manual
+            system: http://scap.nist.gov/schema/ocil/2
+          children:
+          - attributes:
+              href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+              name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:22101
+            name: check-content-ref
+            namespace: http://checklists.nist.gov/xccdf/1.2
+          - name: check-content
+            namespace: http://checklists.nist.gov/xccdf/1.2
+            text: 'Confirm Credential Guard is running.
+
+
+              Run "PowerShell" with elevated privileges (run as administrator).
+
+
+              Enter the following:
+
+
+              "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+
+
+              If "SecurityServicesRunning" does not include a value of "1" (e.g., "{1, 2}"), this is a finding.
+
+
+              Alternately:
+
+
+              Run "System Information".
+
+
+              Under "System Summary", verify the following:
+
+
+              If "virtualization-based Services Running" does not list "Credential Guard", this is a finding.
+
+
+              The policy settings referenced in the Fix section will configure the following registry value. However, due
+              to hardware requirements, the registry value alone does not ensure proper function.
+
+
+              Registry Hive: HKEY_LOCAL_MACHINE
+
+              Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\
+
+
+              Value Name: LsaCfgFlags
+
+              Value Type: REG_DWORD
+
+              Value: 0x00000001 (1) (Enabled with UEFI lock)'
+          name: check
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        system: http://scap.nist.gov/schema/ocil/2
+      kind: check_candidates
+    source_result_algebra: xccdf-1.2-complex-check-eight-state
+    procedure: 'Confirm Credential Guard is running. Run "PowerShell" with elevated privileges (run as administrator). Enter
+      the following: "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard" If "SecurityServicesRunning"
+      does not include a value of "1" (e.g., "{1, 2}"), this is a finding. Alternately: Run "System Information". Under "System
+      Summary", verify the following: If "virtualization-based Services Running" does not list "Credential Guard", this is
+      a finding. The policy settings referenced in the Fix section will configure the following registry value. However, due
+      to hardware requirements, the registry value alone does not ensure proper function. Registry Hive: HKEY_LOCAL_MACHINE
+      Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\ Value Name: LsaCfgFlags Value Type: REG_DWORD Value:
+      0x00000001 (1) (Enabled with UEFI lock)'
+    migration:
+      status: legacy_compatible
+      source: SCAP 1.4 XCCDF manual/external check
+      source_rule: xccdf_mil.disa.stig_rule_SV-253370r1210290_rule
+      note: The source Check Text/check reference is preserved. Dedicated OCIL questionnaire lowering is not required for
+        manual execution.
+    semantic_fingerprint_sha256: b9a498885181b6dc6a9f9569b288254ca84b05dbcf4d57209c54f5729e333fd8
+  migration: *id002

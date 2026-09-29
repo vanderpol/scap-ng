@@ -1,0 +1,463 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Verify RHEL 9 is configured to enable DAC on hardlinks. Check the status of the "fs.protected_hardlinks" kernel
+    parameter with the following command: $ sudo sysctl fs.protected_hardlinks fs.protected_hardlinks = 1 If "fs.protected_hardlinks"
+    is not set to "1" or is missing, this is a finding.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257801r1155703_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-257801r1155703_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-257801r1155703_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
+  cluster_id: null
+  conflicts: []
+  default_check: default
+  description: '<VulnDiscussion>DAC is based on the notion that individual users are "owners" of objects and therefore have
+    discretion over who should be authorized to access the object and in which mode (e.g., read or write). Ownership is usually
+    acquired as a consequence of creating the object or via specified ownership assignment. DAC allows the owner to determine
+    who will have access to objects they control. An example of DAC includes user-controlled file permissions. When discretionary
+    access control policies are implemented, subjects are not constrained with regard to what actions they can take with information
+    for which they have already been granted access. Thus, subjects that have been granted access to information are not prevented
+    from passing (i.e., the subjects have the discretion to pass) the information to other subjects or objects. A subject
+    that is constrained in its operation by Mandatory Access Control policies is still able to operate under the less rigorous
+    constraints of this requirement. Thus, while Mandatory Access Control imposes constraints preventing a subject from passing
+    information to another subject operating at a different sensitivity level, this requirement permits the subject to pass
+    the information to any subject at the same sensitivity level. The policy is bounded by the information system boundary.
+    Once the information is passed outside the control of the information system, additional means may be required to ensure
+    the constraints remain in effect. While the older, more traditional definitions of discretionary access control require
+    identity-based access control, that limitation is not required for this use of discretionary access control. By enabling
+    the fs.protected_hardlinks kernel parameter, users can no longer create soft or hard links to files they do not own. Disallowing
+    such hardlinks mitigate vulnerabilities based on insecure file system accessed by privileged programs, avoiding an exploitation
+    vector exploiting unsafe use of open() or creat(). The sysctl --system command will load settings from all system configuration
+    files. All configuration files are sorted by their filename in lexicographical order, regardless of the directories in
+    which they reside. If multiple files specify the same option, the entry in the file with the lexicographically latest
+    name will take precedence. Files are read from directories in the following list from top to bottom. Once a file of a
+    given filename is loaded, any file of the same name in subsequent directories is ignored. /etc/sysctl.d/*.conf /run/sysctl.d/*.conf
+    /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf Satisfies: SRG-OS-000312-GPOS-00122,
+    SRG-OS-000312-GPOS-00123, SRG-OS-000312-GPOS-00124, SRG-OS-000324-GPOS-00125</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:almalinux:almalinux:9
+  - cpe:/o:rocky:rocky:9
+  - cpe:/o:redhat:enterprise_linux:9.0
+  effective_platforms:
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.almalinux9:def:301
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:almalinux:almalinux:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:almalinux:almalinux:9
+    ref: cpe:/o:almalinux:almalinux:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.rocky9:def:201
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:rocky:rocky:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:rocky:rocky:9
+    ref: cpe:/o:rocky:rocky:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:mil.disa.stig.rhel9os:def:101
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:redhat:enterprise_linux:9.0
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:redhat:enterprise_linux:9.0
+    ref: cpe:/o:redhat:enterprise_linux:9.0
+  extends: null
+  fix: 'Configure RHEL 9 to enable DAC on hardlinks. Create a drop-in if it does not already exist: $ sudo vi /etc/sysctl.d/99-fs_protected_hardlinks.conf
+    Add the following to the file: fs.protected_hardlinks = 1 Reload settings from all system configuration files with the
+    following command: $ sudo sysctl --system'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-257801
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-257801r1155703_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-002165
+  - system: http://cyber.mil/cci
+    value: CCI-002235
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: medium
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257801
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257801
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:257801
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:257801
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4701
+      exports: []
+      inline_content: 'Verify RHEL 9 is configured to enable DAC on hardlinks. Check the status of the "fs.protected_hardlinks"
+        kernel parameter with the following command: $ sudo sysctl fs.protected_hardlinks fs.protected_hardlinks = 1 If "fs.protected_hardlinks"
+        is not set to "1" or is missing, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4701
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify RHEL 9 is configured to enable DAC on hardlinks.
+
+
+            Check the status of the "fs.protected_hardlinks" kernel parameter with the following command:
+
+
+            $ sudo sysctl fs.protected_hardlinks
+
+            fs.protected_hardlinks = 1
+
+
+            If "fs.protected_hardlinks" is not set to "1" or is missing, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:257801
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257801
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      name: oval:mil.disa.stig.rhel9os:def:257801
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257801
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4701
+    exports: []
+    inline_content: 'Verify RHEL 9 is configured to enable DAC on hardlinks. Check the status of the "fs.protected_hardlinks"
+      kernel parameter with the following command: $ sudo sysctl fs.protected_hardlinks fs.protected_hardlinks = 1 If "fs.protected_hardlinks"
+      is not set to "1" or is missing, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify RHEL 9 is configured to enable DAC on hardlinks.
+
+
+          Check the status of the "fs.protected_hardlinks" kernel parameter with the following command:
+
+
+          $ sudo sysctl fs.protected_hardlinks
+
+          fs.protected_hardlinks = 1
+
+
+          If "fs.protected_hardlinks" is not set to "1" or is missing, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-257801r1155703_rule
+      severity: medium
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-213030
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL 9 must enable kernel parameters to enforce discretionary access control (DAC) on hardlinks.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>DAC is based on the notion that individual users are "owners" of objects and therefore have discretion
+        over who should be authorized to access the object and in which mode (e.g., read or write). Ownership is usually acquired
+        as a consequence of creating the object or via specified ownership assignment. DAC allows the owner to determine who
+        will have access to objects they control. An example of DAC includes user-controlled file permissions.
+
+
+        When discretionary access control policies are implemented, subjects are not constrained with regard to what actions
+        they can take with information for which they have already been granted access. Thus, subjects that have been granted
+        access to information are not prevented from passing (i.e., the subjects have the discretion to pass) the information
+        to other subjects or objects. A subject that is constrained in its operation by Mandatory Access Control policies
+        is still able to operate under the less rigorous constraints of this requirement. Thus, while Mandatory Access Control
+        imposes constraints preventing a subject from passing information to another subject operating at a different sensitivity
+        level, this requirement permits the subject to pass the information to any subject at the same sensitivity level.
+        The policy is bounded by the information system boundary. Once the information is passed outside the control of the
+        information system, additional means may be required to ensure the constraints remain in effect. While the older,
+        more traditional definitions of discretionary access control require identity-based access control, that limitation
+        is not required for this use of discretionary access control.
+
+
+        By enabling the fs.protected_hardlinks kernel parameter, users can no longer create soft or hard links to files they
+        do not own. Disallowing such hardlinks mitigate vulnerabilities based on insecure file system accessed by privileged
+        programs, avoiding an exploitation vector exploiting unsafe use of open() or creat().
+
+
+        The sysctl --system command will load settings from all system configuration files. All configuration files are sorted
+        by their filename in lexicographical order, regardless of the directories in which they reside. If multiple files
+        specify the same option, the entry in the file with the lexicographically latest name will take precedence. Files
+        are read from directories in the following list from top to bottom. Once a file of a given filename is loaded, any
+        file of the same name in subsequent directories is ignored.
+
+
+        /etc/sysctl.d/*.conf
+
+        /run/sysctl.d/*.conf
+
+        /usr/local/lib/sysctl.d/*.conf
+
+        /usr/lib/sysctl.d/*.conf
+
+        /lib/sysctl.d/*.conf
+
+        /etc/sysctl.conf
+
+
+        Satisfies: SRG-OS-000312-GPOS-00122, SRG-OS-000312-GPOS-00123, SRG-OS-000312-GPOS-00124, SRG-OS-000324-GPOS-00125</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002165
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002235
+    - attributes:
+        fixref: F-61466r1155702_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure RHEL 9 to enable DAC on hardlinks.
+
+
+        Create a drop-in if it does not already exist:
+
+
+        $ sudo vi /etc/sysctl.d/99-fs_protected_hardlinks.conf
+
+
+        Add the following to the file:
+
+        fs.protected_hardlinks = 1
+
+
+        Reload settings from all system configuration files with the following command:
+
+
+        $ sudo sysctl --system'
+    - attributes:
+        id: F-61466r1155702_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257801
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+          name: oval:mil.disa.stig.rhel9os:def:257801
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:4701
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify RHEL 9 is configured to enable DAC on hardlinks.
+
+
+          Check the status of the "fs.protected_hardlinks" kernel parameter with the following command:
+
+
+          $ sudo sysctl fs.protected_hardlinks
+
+          fs.protected_hardlinks = 1
+
+
+          If "fs.protected_hardlinks" is not set to "1" or is missing, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: RHEL 9 must enable kernel parameters to enforce discretionary access control (DAC) on hardlinks.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: bb943af7767af6a6be89464a6b4e06dbbd56946fe8c959e293359d1c890bd14f
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-257801r1155703_rule
+  status: legacy_compatible

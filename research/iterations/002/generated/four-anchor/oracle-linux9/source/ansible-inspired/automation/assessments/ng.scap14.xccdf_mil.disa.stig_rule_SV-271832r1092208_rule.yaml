@@ -1,0 +1,407 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271832r1092208_rule
+  version: 1
+  description: OL 9 duplicate User IDs (UIDs) must not exist for interactive users.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: OL 9 duplicate User IDs (UIDs) must not exist for interactive users.
+  steps:
+  - name: Collect oval:mil.disa.stig.ind:obj:25804501
+    collect:
+      capability: scapng.collect.independent.variable
+      comment: count of passwd entries
+      query:
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.defs:var:25804500
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25804501
+      source_type: variable_object
+      version: '1'
+    register: oval:mil.disa.stig.ind:obj:25804501
+  - name: Collect oval:mil.disa.stig.unix:obj:25804500
+    collect:
+      capability: scapng.collect.unix.password
+      comment: Interactive Users
+      query:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: username
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: .*
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:25804500
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:25804500
+      source_type: password_object
+      version: '1'
+    register: oval:mil.disa.stig.unix:obj:25804500
+  - name: Derive oval:mil.disa.stig.defs:var:25804500
+    derive:
+      comment: count of passwd entries
+      datatype: int
+      evaluation_plan:
+        blocked_by:
+          item_field: user_id
+          object_ref: oval:mil.disa.stig.unix:obj:25804500
+          operation: object_component
+          reason: object_component_requires_collection:password_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: int
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.unix:obj:25804500
+          operations:
+          - count
+          - object_component
+          variables: []
+        expression:
+          args:
+          - item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            op: object_component
+            record_field: null
+          attributes: {}
+          op: count
+        mode: target_dependent
+        reason: count_child_not_static:object_component_requires_collection:password_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:25804500
+        variable_type: local_variable
+      resolution:
+        blocked_by:
+          item_field: user_id
+          object_ref: oval:mil.disa.stig.unix:obj:25804500
+          operation: object_component
+          reason: object_component_requires_collection:password_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: int
+        operation: count
+        reason: count_child_not_static:object_component_requires_collection:password_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: int
+        expression:
+          args:
+          - item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            op: object_component
+            record_field: null
+          attributes: {}
+          op: count
+        id: oval:mil.disa.stig.defs:var:25804500
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:25804500
+    register: oval:mil.disa.stig.defs:var:25804500
+  - name: Derive oval:mil.disa.stig.defs:var:25804501
+    derive:
+      comment: count of unique UIDs
+      datatype: int
+      evaluation_plan:
+        blocked_by:
+          blocked_by:
+            item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            operation: object_component
+            reason: object_component_requires_collection:password_object
+            record_field: null
+            status: dynamic_object_dependency
+          operation: unique
+          reason: unique_child_not_static:object_component_requires_collection:password_object
+          status: dynamic_object_dependency
+        datatype: int
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.unix:obj:25804500
+          operations:
+          - count
+          - object_component
+          - unique
+          variables: []
+        expression:
+          args:
+          - args:
+            - item_field: user_id
+              object_ref: oval:mil.disa.stig.unix:obj:25804500
+              op: object_component
+              record_field: null
+            attributes: {}
+            op: unique
+          attributes: {}
+          op: count
+        mode: target_dependent
+        reason: count_child_not_static:unique_child_not_static:object_component_requires_collection:password_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:25804501
+        variable_type: local_variable
+      resolution:
+        blocked_by:
+          blocked_by:
+            item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            operation: object_component
+            reason: object_component_requires_collection:password_object
+            record_field: null
+            status: dynamic_object_dependency
+          operation: unique
+          reason: unique_child_not_static:object_component_requires_collection:password_object
+          status: dynamic_object_dependency
+        datatype: int
+        operation: count
+        reason: count_child_not_static:unique_child_not_static:object_component_requires_collection:password_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: int
+        expression:
+          args:
+          - args:
+            - item_field: user_id
+              object_ref: oval:mil.disa.stig.unix:obj:25804500
+              op: object_component
+              record_field: null
+            attributes: {}
+            op: unique
+          attributes: {}
+          op: count
+        id: oval:mil.disa.stig.defs:var:25804501
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:25804501
+    register: oval:mil.disa.stig.defs:var:25804501
+  predicates:
+    oval:mil.disa.stig.ind:ste:25804500:
+      comment: count of passwd UIDs
+      entities:
+      - attributes:
+          datatype: int
+          var_ref: oval:mil.disa.stig.defs:var:25804501
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:25804500
+      source_type: variable_state
+    oval:mil.disa.stig.unix:ste:25804500:
+      comment: Interactive Users
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1000'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:25804500
+      source_type: password_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:258045:
+        class: compliance
+        criteria:
+          children:
+          - comment: GIDs are unique
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25804500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system duplicate User IDs (UIDs) must not exist for interactive users.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:258045
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271832:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258045
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-003001 - OL 9 duplicate User IDs (UIDs) must not exist for interactive users.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "To ensure accountability and prevent unauthenticated access, interactive users must be identified and authenticated\
+              \ to prevent potential misuse and compromise of the system.\n\n\tSatisfies: SRG-OS-000104-GPOS-00051, SRG-OS-000121-GPOS-00062,\
+              \ SRG-OS-000042-GPOS-00020"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271832
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:25804500:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25804501
+        comment: UIDs are unique
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25804500
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25804500
+        source_type: variable_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.ol9os:def:271832
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271832
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.ol9os:def:271832
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271832
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271832r1092208_rule
+    title: OL 9 duplicate User IDs (UIDs) must not exist for interactive users.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271832
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271832
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271832
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271832
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:77901
+      exports: []
+      inline_content: 'Verify that OL 9 contains no duplicate UIDs for interactive users with the following command: $ sudo
+        awk -F ":" ''list[$3]++{print $1, $3}'' /etc/passwd If output is produced and the accounts listed are interactive
+        user accounts, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:77901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that OL 9 contains no duplicate UIDs for interactive users with the following command:\n\n$ sudo awk\
+            \ -F \":\" 'list[$3]++{print $1, $3}' /etc/passwd \n\nIf output is produced and the accounts listed are interactive\
+            \ user accounts, this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271832
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 431086624deb2c676e6ba4f41ad29f37e1659a7beb976ac0f46074e4f1d82b5e
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271832r1092208_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 3bde93083eccb68a14e42615a3697e05c754e17efffddbb94aa71977bc701947

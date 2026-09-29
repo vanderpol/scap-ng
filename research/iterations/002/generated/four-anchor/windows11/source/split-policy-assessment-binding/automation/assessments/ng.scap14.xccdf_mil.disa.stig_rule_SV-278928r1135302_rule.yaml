@@ -1,0 +1,258 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278928r1135302_rule
+  version: 1
+  description: Windows 11 must be configured to audit handle manipulation failures.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.win:obj:20000000:
+      capability: scapng.collect.windows.auditeventpolicysubcategories
+      source_object_id: oval:mil.disa.stig.win:obj:20000000
+      source_type: auditeventpolicysubcategories_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: null
+      query: []
+  derive: {}
+  predicates:
+    oval:mil.disa.stig.win:ste:27894400:
+      source_state_id: oval:mil.disa.stig.win:ste:27894400
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: handle_manipulation
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_FAILURE
+      comment: '''Handle Manipulation'' is set to ''Failure'''
+    oval:mil.disa.stig.win:ste:27894401:
+      source_state_id: oval:mil.disa.stig.win:ste:27894401
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: handle_manipulation
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      comment: '''Handle Manipulation'' is set to ''Success'' and ''Failure'''
+  evaluate:
+    tests:
+      oval:mil.disa.stig.win:tst:27894401:
+        source_test_id: oval:mil.disa.stig.win:tst:27894401
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Audit Handle Manipulation'' is set to ''Success'' and ''Failure'''
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:27894401
+        source_other: []
+      oval:mil.disa.stig.win:tst:27894400:
+        source_test_id: oval:mil.disa.stig.win:tst:27894400
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Audit Handle Manipulation'' is set to ''Failure'''
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:27894400
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.defs:def:278944:
+        source_definition_id: oval:mil.disa.stig.defs:def:278944
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Handle Manipulation - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:27894400
+          - comment: Audit - Handle Manipulation - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:27894401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must be configured to audit handle manipulation failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.windows11:def:278928:
+        source_definition_id: oval:mil.disa.stig.windows11:def:278928
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:278944
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-AU-000583 - Windows 11 must be configured to audit handle manipulation failures.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot
+              service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary
+              to provide a trail of evidence in case the system or network is compromised. Collecting this data is essential
+              for analyzing the security of information assets and detecting signs of suspicious and unexpected behavior.
+              Credential validation records events related to validation tests on credentials for a user account logon.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.windows11:def:278928
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.windows11:def:278928
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:278928
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.windows11:def:278928
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:278928
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-278928r1135302_rule
+    title: Windows 11 must be configured to audit handle manipulation failures.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:278928
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:278928
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:278928
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:278928
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:50101
+      exports: []
+      inline_content: 'Verify that Audit Handle Manipulation auditing has been enabled: Computer Configuration >> Windows
+        Settings >> Security Settings >> Advanced Audit Policy Configuration >> System Audit Policies >> Object Access >>
+        Audit Handle Manipulation. If "Audit Handle Manipulation" is not set to "Failure", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:50101
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Verify that Audit Handle Manipulation auditing has been enabled: \n\nComputer Configuration >> Windows Settings\
+            \ >> Security Settings >> Advanced Audit Policy Configuration >> System Audit Policies >> Object Access >> Audit\
+            \ Handle Manipulation. \n\nIf \"Audit Handle Manipulation\" is not set to \"Failure\", this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-278928r1135302_rule
+    semantic_ir_sha256: c1aa8ef8d2415e2e4f061dd28b6b4a675be80a43db06be2878fc63c90fe61de2
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 605a66b23d7e0d900000b182c1a54807b3c1a8aa9e7ba643d20da2ab718b794d

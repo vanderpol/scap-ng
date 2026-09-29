@@ -1,0 +1,286 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-271732r1155329_rule
+  version: 1
+  description: OL 9 must disable acquiring, saving, and processing core dumps.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: OL 9 must disable acquiring, saving, and processing core dumps.
+  steps:
+  - name: Collect oval:mil.disa.stig.linux:obj:23031200
+    collect:
+      capability: scapng.collect.linux.systemdunitproperty
+      comment: systemd-coredump.socket LoadState
+      query:
+      - kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: systemd-coredump.socket
+      - kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: LoadState
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:23031200
+      source_type: systemdunitproperty_object
+      version: '1'
+    register: oval:mil.disa.stig.linux:obj:23031200
+  - name: Collect oval:mil.disa.stig.linux:obj:23031201
+    collect:
+      capability: scapng.collect.linux.systemdunitproperty
+      comment: systemd-coredump.socket UnitFileState
+      query:
+      - kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: systemd-coredump.socket
+      - kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: UnitFileState
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:23031201
+      source_type: systemdunitproperty_object
+      version: '1'
+    register: oval:mil.disa.stig.linux:obj:23031201
+  predicates:
+    oval:mil.disa.stig.linux:ste:20000005:
+      comment: null
+      entities:
+      - kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: masked
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:20000005
+      source_type: systemdunitproperty_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230312:
+        class: compliance
+        criteria:
+          children:
+          - comment: systemd-coredump.socket LoadState is masked if exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23031200
+          - comment: systemd-coredump.socket UnitFileState is masked if exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23031201
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable acquiring, saving, and processing core dumps.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230312
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271732:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230312
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002384 - OL 9 must disable acquiring, saving, and processing core dumps.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: A core dump includes a memory image taken at the time the operating system terminates an application. The
+              memory image could contain sensitive data and is generally useful only for developers trying to debug problems.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271732
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:23031200:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.linux:obj:23031200
+        comment: systemd-coredump.socket LoadState is masked if exists
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000005
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:23031200
+        source_type: systemdunitproperty_test
+        state_operator: AND
+      oval:mil.disa.stig.linux:tst:23031201:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.linux:obj:23031201
+        comment: systemd-coredump.socket UnitFileState is masked if exists
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000005
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:23031201
+        source_type: systemdunitproperty_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.ol9os:def:271732
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271732
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.ol9os:def:271732
+      exports: []
+      href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.ol9os:def:271732
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-xccdf.xml
+    published_source:
+      datastream_member: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml
+      datastream_sha256: a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+      zip_sha256: 6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d
+    rule_id: xccdf_mil.disa.stig_rule_SV-271732r1155329_rule
+    title: OL 9 must disable acquiring, saving, and processing core dumps.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271732
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271732
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+        name: oval:mil.disa.stig.ol9os:def:271732
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval.xml
+            name: oval:mil.disa.stig.ol9os:def:271732
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:58501
+      exports: []
+      inline_content: 'Note: If kernel dumps are disabled in accordance with OL09-00-002380, this requirement is not applicable.
+        Verify OL 9 is not configured to acquire, save, or process core dumps with the following command: $ systemctl status
+        systemd-coredump.socket systemd-coredump.socket Loaded: masked (Reason: Unit systemd-coredump.socket is masked.) Active:
+        inactive (dead) If the "systemd-coredump.socket" is loaded and not masked and the need for core dumps is not documented
+        with the information system security officer (ISSO) as an operational requirement, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:58501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Note: If kernel dumps are disabled in accordance with OL09-00-002380, this requirement is not applicable.
+
+
+            Verify OL 9 is not configured to acquire, save, or process core dumps with the following command:
+
+
+            $ systemctl status systemd-coredump.socket
+
+            systemd-coredump.socket
+
+            Loaded: masked (Reason: Unit systemd-coredump.socket is masked.)
+
+            Active: inactive (dead)
+
+
+            If the "systemd-coredump.socket" is loaded and not masked and the need for core dumps is not documented with the
+            information system security officer (ISSO) as an operational requirement, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.ol9os:def:271732
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: a24da81ee2b31f440272c4b005004521f629d66892ad1d3135bfdfa702e8dbd6
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-271732r1155329_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: e07b9c26927301ff99d54a6ed12698379a5b444dfa6a2260a49b1e3836970b50

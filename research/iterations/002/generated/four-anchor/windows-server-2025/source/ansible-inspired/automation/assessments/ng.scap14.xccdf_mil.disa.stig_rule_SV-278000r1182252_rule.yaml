@@ -1,0 +1,458 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-278000r1182252_rule
+  version: 1
+  description: Windows Server 2025 permissions for the Windows installation directory must conform to minimum requirements.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: Windows Server 2025 permissions for the Windows installation directory must conform to minimum requirements.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800001
+    collect:
+      capability: scapng.collect.windows.registry
+      comment: everyoneincludesanonymous must be configured
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SYSTEM\CurrentControlSet\Control\Lsa
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: everyoneincludesanonymous
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800001
+      source_type: registry_object
+      version: '1'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800001
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
+    collect:
+      capability: scapng.collect.independent.shellcommand
+      comment: Run Icacls command against Windows install directory
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: icacls($env:windir)
+      - kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ':'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
+      source_type: shellcommand_object
+      version: '1'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
+  - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
+    derive:
+      comment: Required Permissions
+      datatype: string
+      evaluation_plan:
+        datatype: string
+        mode: static
+        resolution_status: exact_static
+        values:
+        - (?i)NT SERVICE\\TrustedInstaller:\(F\)
+        - (?i)NT SERVICE\\TrustedInstaller:\(CI\)\(IO\)\(F\)
+        - (?i)NT AUTHORITY\\SYSTEM:\(M\)
+        - (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(IO\)\(F\)
+        - (?i)BUILTIN\\Administrators:\(M\)
+        - (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(IO\)\(F\)
+        - (?i)BUILTIN\\Users:\(RX\)
+        - (?i)BUILTIN\\Users:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        - (?i)CREATOR OWNER:\(OI\)\(CI\)\(IO\)\(F\)
+        - (?i)APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES:\(RX\)
+        - (?i)APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        - (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(RX\)
+        - (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
+        variable_type: constant_variable
+      resolution:
+        datatype: string
+        status: exact_static
+        values:
+        - (?i)NT SERVICE\\TrustedInstaller:\(F\)
+        - (?i)NT SERVICE\\TrustedInstaller:\(CI\)\(IO\)\(F\)
+        - (?i)NT AUTHORITY\\SYSTEM:\(M\)
+        - (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(IO\)\(F\)
+        - (?i)BUILTIN\\Administrators:\(M\)
+        - (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(IO\)\(F\)
+        - (?i)BUILTIN\\Users:\(RX\)
+        - (?i)BUILTIN\\Users:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        - (?i)CREATOR OWNER:\(OI\)\(CI\)\(IO\)\(F\)
+        - (?i)APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES:\(RX\)
+        - (?i)APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        - (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(RX\)
+        - (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        variable_type: constant_variable
+      semantic_ast:
+        datatype: string
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
+        type: constant_variable
+        values:
+        - datatype: string
+          value: (?i)NT SERVICE\\TrustedInstaller:\(F\)
+        - datatype: string
+          value: (?i)NT SERVICE\\TrustedInstaller:\(CI\)\(IO\)\(F\)
+        - datatype: string
+          value: (?i)NT AUTHORITY\\SYSTEM:\(M\)
+        - datatype: string
+          value: (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(IO\)\(F\)
+        - datatype: string
+          value: (?i)BUILTIN\\Administrators:\(M\)
+        - datatype: string
+          value: (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(IO\)\(F\)
+        - datatype: string
+          value: (?i)BUILTIN\\Users:\(RX\)
+        - datatype: string
+          value: (?i)BUILTIN\\Users:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        - datatype: string
+          value: (?i)CREATOR OWNER:\(OI\)\(CI\)\(IO\)\(F\)
+        - datatype: string
+          value: (?i)APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES:\(RX\)
+        - datatype: string
+          value: (?i)APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+        - datatype: string
+          value: (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(RX\)
+        - datatype: string
+          value: (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+      source_type: constant_variable
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
+    register: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001:
+      comment: Value must be equal to 0
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001
+      source_type: registry_state
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002:
+      comment: Permissions must equal expected output
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          operation: pattern match
+          var_check: at least one
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          check_existence: none_exist
+        kind: element
+        name: stderr_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002
+      source_type: shellcommand_state
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.windows:def:278000:
+        class: compliance
+        criteria:
+          children:
+          - comment: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800001
+          - comment: Permissions must conform to minimum requirements for windows directory.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows Server 2025 permissions for the Windows installation directory must conform to minimum requirements.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Permissions for the Windows installation directory must conform to minimum requirements.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+        version: '1'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800001:
+        check: only one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800001
+        comment: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800001
+        source_type: registry_test
+        state_operator: AND
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
+        comment: Permissions must conform to minimum requirements.
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002
+        source_type: shellcommand_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+      exports: []
+      href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+      exports: []
+      href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml
+      datastream_sha256: 52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+      zip_sha256: 2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0
+    rule_id: xccdf_mil.disa.stig_rule_SV-278000r1182252_rule
+    title: Windows Server 2025 permissions for the Windows installation directory must conform to minimum requirements.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3301
+      exports: []
+      inline_content: 'The default permissions are adequate when the Security Option "Network access: Let Everyone permissions
+        apply to anonymous users" is set to "Disabled" (WN25-SO-000240). Review the permissions for the Windows installation
+        directory (usually C:\Windows). Nonprivileged groups such as Users or Authenticated Users must not have greater than
+        "Read & execute" permissions. Individual accounts must not be used to assign permissions. If permissions are not as
+        restrictive as the default permissions listed below, this is a finding: Viewing in File Explorer: For each folder,
+        view the Properties. Select the "Security" tab, and then click "Advanced". Default permissions: \Windows Type - "Allow"
+        for all Inherited from - "None" for all Principal - Access - Applies to TrustedInstaller - Full control - This folder
+        and subfolders SYSTEM - Modify - This folder only SYSTEM - Full control - Subfolders and files only Administrators
+        - Modify - This folder only Administrators - Full control - Subfolders and files only Users - Read & execute - This
+        folder, subfolders, and files CREATOR OWNER - Full control - Subfolders and files only ALL APPLICATION PACKAGES -
+        Read & execute - This folder, subfolders, and files ALL RESTRICTED APPLICATION PACKAGES - Read & execute - This folder,
+        subfolders, and files Alternately, use icacls: Open a Command prompt (admin). Enter "icacls" followed by the directory:
+        "icacls c:\windows" The following results must be displayed for each when entered: c:\windows NT SERVICE\TrustedInstaller:(F)
+        NT SERVICE\TrustedInstaller:(CI)(IO)(F) NT AUTHORITY\SYSTEM:(M) NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F) BUILTIN\Administrators:(M)
+        BUILTIN\Administrators:(OI)(CI)(IO)(F) BUILTIN\Users:(RX) BUILTIN\Users:(OI)(CI)(IO)(GR,GE) CREATOR OWNER:(OI)(CI)(IO)(F)
+        APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES:(RX) APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES:(OI)(CI)(IO)(GR,GE)
+        APPLICATION PACKAGE AUTHORITY\ALL RESTRICTED APPLICATION PACKAGES:(RX) APPLICATION PACKAGE AUTHORITY\ALL RESTRICTED
+        APPLICATION PACKAGES:(OI)(CI)(IO)(GR,GE) Successfully processed 1 files; Failed processing 0 files'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:3301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'The default permissions are adequate when the Security Option "Network access: Let Everyone permissions apply
+            to anonymous users" is set to "Disabled" (WN25-SO-000240).
+
+
+            Review the permissions for the Windows installation directory (usually C:\Windows). Nonprivileged groups such
+            as Users or Authenticated Users must not have greater than "Read & execute" permissions. Individual accounts must
+            not be used to assign permissions.
+
+
+            If permissions are not as restrictive as the default permissions listed below, this is a finding:
+
+
+            Viewing in File Explorer:
+
+
+            For each folder, view the Properties.
+
+
+            Select the "Security" tab, and then click "Advanced".
+
+
+            Default permissions:
+
+            \Windows
+
+            Type - "Allow" for all
+
+            Inherited from - "None" for all
+
+
+            Principal - Access - Applies to
+
+
+            TrustedInstaller - Full control - This folder and subfolders
+
+            SYSTEM - Modify - This folder only
+
+            SYSTEM - Full control - Subfolders and files only
+
+            Administrators - Modify - This folder only
+
+            Administrators - Full control - Subfolders and files only
+
+            Users - Read & execute - This folder, subfolders, and files
+
+            CREATOR OWNER - Full control - Subfolders and files only
+
+            ALL APPLICATION PACKAGES - Read & execute - This folder, subfolders, and files
+
+            ALL RESTRICTED APPLICATION PACKAGES - Read & execute - This folder, subfolders, and files
+
+
+            Alternately, use icacls:
+
+
+            Open a Command prompt (admin).
+
+
+            Enter "icacls" followed by the directory:
+
+
+            "icacls c:\windows"
+
+
+            The following results must be displayed for each when entered:
+
+
+            c:\windows
+
+            NT SERVICE\TrustedInstaller:(F)
+
+            NT SERVICE\TrustedInstaller:(CI)(IO)(F)
+
+            NT AUTHORITY\SYSTEM:(M)
+
+            NT AUTHORITY\SYSTEM:(OI)(CI)(IO)(F)
+
+            BUILTIN\Administrators:(M)
+
+            BUILTIN\Administrators:(OI)(CI)(IO)(F)
+
+            BUILTIN\Users:(RX)
+
+            BUILTIN\Users:(OI)(CI)(IO)(GR,GE)
+
+            CREATOR OWNER:(OI)(CI)(IO)(F)
+
+            APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES:(RX)
+
+            APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES:(OI)(CI)(IO)(GR,GE)
+
+            APPLICATION PACKAGE AUTHORITY\ALL RESTRICTED APPLICATION PACKAGES:(RX)
+
+            APPLICATION PACKAGE AUTHORITY\ALL RESTRICTED APPLICATION PACKAGES:(OI)(CI)(IO)(GR,GE)
+
+            Successfully processed 1 files; Failed processing 0 files'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.windows:def:278000
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: c55a5982a254869a1369d126139d92513a8fc925da5ce9f7c177a35b992ebcab
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-278000r1182252_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: d6d2dd1827d6b9e965ae908b63b183c53f11d45646ad58363811294029e5bcaa

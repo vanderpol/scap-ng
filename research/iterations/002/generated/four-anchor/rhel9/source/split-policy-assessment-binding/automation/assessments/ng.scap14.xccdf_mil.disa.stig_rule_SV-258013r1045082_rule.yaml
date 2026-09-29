@@ -1,0 +1,364 @@
+scap_ng: 0.1-prototype
+prototype: true
+model: split-policy-assessment-binding
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
+  version: 1
+  description: RHEL 9 must prevent a user from overriding the banner-message-enable setting for the graphical user interface.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  collect:
+    oval:mil.disa.stig.ind:obj:25802600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25802600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: dconf user databases
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/profile/user
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^system-db:(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25801300:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25801300
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories
+      query:
+      - attributes:
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:25802600
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^/org/gnome/login-screen/banner-message-enable$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive:
+    oval:mil.disa.stig.defs:var:25802600:
+      source_variable_id: oval:mil.disa.stig.defs:var:25802600
+      source_type: local_variable
+      datatype: string
+      comment: dconf user database locks directories
+      semantic_ast:
+        datatype: string
+        expression:
+          args:
+          - datatype: string
+            op: literal_component
+            value: /etc/dconf/db/
+          - item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:25802600
+            op: object_component
+            record_field: null
+          - datatype: string
+            op: literal_component
+            value: .d/locks
+          attributes: {}
+          op: concat
+        id: oval:mil.disa.stig.defs:var:25802600
+        type: local_variable
+      resolution:
+        blocked_by:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:25802600
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        operation: concat
+        reason: concat_child_not_static:object_component_requires_collection:textfilecontent54_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        blocked_by:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:25802600
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:25802600
+          operations:
+          - concat
+          - literal_component
+          - object_component
+          variables: []
+        expression:
+          args:
+          - datatype: string
+            op: literal_component
+            value: /etc/dconf/db/
+          - item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:25802600
+            op: object_component
+            record_field: null
+          - datatype: string
+            op: literal_component
+            value: .d/locks
+          attributes: {}
+          op: concat
+        mode: target_dependent
+        reason: concat_child_not_static:object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:25802600
+        variable_type: local_variable
+  predicates: {}
+  evaluate:
+    tests:
+      oval:mil.disa.stig.ind:tst:25801300:
+        source_test_id: oval:mil.disa.stig.ind:tst:25801300
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25801300
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.ind:tst:25802600:
+        source_test_id: oval:mil.disa.stig.ind:tst:25802600
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: dconf user database(s) exist
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25802600
+        predicates: []
+        source_other: []
+    definitions:
+      oval:mil.disa.stig.defs:def:258013:
+        source_definition_id: oval:mil.disa.stig.defs:def:258013
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: dconf user database(s) exist
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25802600
+          - comment: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25801300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent a user from overriding the banner-message-enable setting for the graphical
+              user interface.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.rhel9os:def:258013:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:258013
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258013
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-271015 - RHEL 9 must prevent a user from overriding the banner-message-enable setting for the graphical
+              user interface.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Display of a standardized and approved use notification before granting access to the operating system
+              ensures privacy and security notification verbiage used is consistent with applicable federal laws, Executive
+              Orders, directives, policies, regulations, standards, and guidance.
+
+
+              For U.S. Government systems, system use notifications are required only for access via login interfaces with
+              human users and are not required when such human interfaces do not exist.
+
+
+              Satisfies: SRG-OS-000023-GPOS-00006, SRG-OS-000228-GPOS-00088'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  assert:
+    definition_results:
+    - oval:mil.disa.stig.rhel9os:def:258013
+    combination: xccdf_source_check_semantics
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.rhel9os:def:258013
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:258013
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.rhel9os:def:258013
+      exports: []
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.rhel9os:def:258013
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-xccdf.xml
+    published_source:
+      datastream_member: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+      datastream_sha256: bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+      zip_sha256: 70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5
+    rule_id: xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
+    title: RHEL 9 must prevent a user from overriding the banner-message-enable setting for the graphical user interface.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258013
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258013
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+        name: oval:mil.disa.stig.rhel9os:def:258013
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml
+            name: oval:mil.disa.stig.rhel9os:def:258013
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:45301
+      exports: []
+      inline_content: 'Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop
+        environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.
+        Verify RHEL 9 prevents a user from overriding settings for graphical user interfaces. Determine if the org.gnome.login-screen
+        banner-message-enable key is writable with the following command: $ gsettings writable org.gnome.login-screen banner-message-enable
+        false If "banner-message-enable" is writable or the result is "true", this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:45301
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: "Note: This requirement assumes the use of the RHEL 9 default graphical user interface, the GNOME desktop\
+            \ environment. If the system does not have any graphical user interface installed, this requirement is Not Applicable.\n\
+            \nVerify RHEL 9 prevents a user from overriding settings for graphical user interfaces. \n\nDetermine if the org.gnome.login-screen\
+            \ banner-message-enable key is writable with the following command:\n\t\n$ gsettings writable org.gnome.login-screen\
+            \ banner-message-enable\n\t \nfalse\n\t \nIf \"banner-message-enable\" is writable or the result is \"true\",\
+            \ this is a finding."
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  migration:
+    status: legacy_compatible
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-258013r1045082_rule
+    semantic_ir_sha256: e8e9c5df7dd8b2a466af7d40137a9af82779e003ccce9318a4474f4cece5972a
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_fingerprint_sha256: 014ee81b0748856594cdebe2f80042c8c5e1f6e0685548f7fb874bd9814355e9

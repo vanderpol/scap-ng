@@ -1,0 +1,684 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253340r958434_rule
+  version: 1
+  description: Windows 11 permissions for the Application event log must prevent access by non-privileged accounts.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: Windows 11 permissions for the Application event log must prevent access by non-privileged accounts.
+  steps:
+  - name: Collect oval:mil.disa.stig.win:obj:20000015
+    collect:
+      capability: scapng.collect.windows.registry
+      comment: System Root Directory
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Microsoft\Windows NT\CurrentVersion
+      - attributes:
+          datatype: string
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SystemRoot
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:20000015
+      source_type: registry_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:20000015
+  - name: Collect oval:mil.disa.stig.win:obj:25334000
+    collect:
+      capability: scapng.collect.windows.fileeffectiverights53
+      comment: Permissions of Application event log, minus those allowed. Built filepath.
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.win:obj:25334001
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000011
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000012
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000013
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000014
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000015
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: false
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25334000
+      source_type: fileeffectiverights53_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:25334000
+  - name: Collect oval:mil.disa.stig.win:obj:25334001
+    collect:
+      capability: scapng.collect.windows.fileeffectiverights53
+      comment: The Application event log. Built filepath.
+      query:
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.win:var:25334001
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: .*
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25334001
+      source_type: fileeffectiverights53_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:25334001
+  - name: Collect oval:mil.disa.stig.win:obj:25334002
+    collect:
+      capability: scapng.collect.windows.registry
+      comment: path Application.evtx
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SYSTEM\CurrentControlSet\Services\EventLog\Application
+      - attributes:
+          datatype: string
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: file
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25334002
+      source_type: registry_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:25334002
+  - name: Collect oval:mil.disa.stig.win:obj:25334003
+    collect:
+      capability: scapng.collect.windows.fileeffectiverights53
+      comment: Permissions of Application event log, minus those allowed. Strict filepath, as listed.
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.win:obj:25334004
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000011
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000012
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000013
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000014
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.win:ste:20000015
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: false
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25334003
+      source_type: fileeffectiverights53_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:25334003
+  - name: Collect oval:mil.disa.stig.win:obj:25334004
+    collect:
+      capability: scapng.collect.windows.fileeffectiverights53
+      comment: The Application event log. Strict filepath, as listed.
+      query:
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.win:var:25334002
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: .*
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25334004
+      source_type: fileeffectiverights53_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:25334004
+  - name: Derive oval:mil.disa.stig.win:var:25334001
+    derive:
+      comment: Path to Application.evtx with the SystemRoot environment variable replaced with its value.
+      datatype: string
+      evaluation_plan:
+        blocked_by:
+          item_field: value
+          object_ref: oval:mil.disa.stig.win:obj:20000015
+          operation: object_component
+          reason: object_component_requires_collection:registry_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.win:obj:20000015
+          - oval:mil.disa.stig.win:obj:25334002
+          operations:
+          - concat
+          - object_component
+          - regex_capture
+          variables: []
+        expression:
+          args:
+          - item_field: value
+            object_ref: oval:mil.disa.stig.win:obj:20000015
+            op: object_component
+            record_field: null
+          - args:
+            - item_field: value
+              object_ref: oval:mil.disa.stig.win:obj:25334002
+              op: object_component
+              record_field: null
+            attributes:
+              pattern: ^%.*%(.*)$
+            op: regex_capture
+          attributes: {}
+          op: concat
+        mode: target_dependent
+        reason: concat_child_not_static:object_component_requires_collection:registry_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.win:var:25334001
+        variable_type: local_variable
+      resolution:
+        blocked_by:
+          item_field: value
+          object_ref: oval:mil.disa.stig.win:obj:20000015
+          operation: object_component
+          reason: object_component_requires_collection:registry_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        operation: concat
+        reason: concat_child_not_static:object_component_requires_collection:registry_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: string
+        expression:
+          args:
+          - item_field: value
+            object_ref: oval:mil.disa.stig.win:obj:20000015
+            op: object_component
+            record_field: null
+          - args:
+            - item_field: value
+              object_ref: oval:mil.disa.stig.win:obj:25334002
+              op: object_component
+              record_field: null
+            attributes:
+              pattern: ^%.*%(.*)$
+            op: regex_capture
+          attributes: {}
+          op: concat
+        id: oval:mil.disa.stig.win:var:25334001
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.win:var:25334001
+    register: oval:mil.disa.stig.win:var:25334001
+  - name: Derive oval:mil.disa.stig.win:var:25334002
+    derive:
+      comment: Strict path to Application.evtx.
+      datatype: string
+      evaluation_plan:
+        blocked_by:
+          item_field: value
+          object_ref: oval:mil.disa.stig.win:obj:25334002
+          operation: object_component
+          reason: object_component_requires_collection:registry_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.win:obj:25334002
+          operations:
+          - object_component
+          - regex_capture
+          variables: []
+        expression:
+          args:
+          - item_field: value
+            object_ref: oval:mil.disa.stig.win:obj:25334002
+            op: object_component
+            record_field: null
+          attributes:
+            pattern: ^(.*)$
+          op: regex_capture
+        mode: target_dependent
+        reason: regex_capture_child_not_static:object_component_requires_collection:registry_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.win:var:25334002
+        variable_type: local_variable
+      resolution:
+        blocked_by:
+          item_field: value
+          object_ref: oval:mil.disa.stig.win:obj:25334002
+          operation: object_component
+          reason: object_component_requires_collection:registry_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: string
+        operation: regex_capture
+        reason: regex_capture_child_not_static:object_component_requires_collection:registry_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: string
+        expression:
+          args:
+          - item_field: value
+            object_ref: oval:mil.disa.stig.win:obj:25334002
+            op: object_component
+            record_field: null
+          attributes:
+            pattern: ^(.*)$
+          op: regex_capture
+        id: oval:mil.disa.stig.win:var:25334002
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.win:var:25334002
+    register: oval:mil.disa.stig.win:var:25334002
+  predicates:
+    oval:mil.disa.stig.win:ste:20000011:
+      comment: Event Log process account. Deterministically built with respect to service name.
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000011
+      source_type: fileeffectiverights53_state
+    oval:mil.disa.stig.win:ste:20000012:
+      comment: SYSTEM account.
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-18
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000012
+      source_type: fileeffectiverights53_state
+    oval:mil.disa.stig.win:ste:20000013:
+      comment: Administrators account.
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-32-544
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000013
+      source_type: fileeffectiverights53_state
+    oval:mil.disa.stig.win:ste:20000014:
+      comment: LOCAL SERVICE account, the owner.
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-19
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000014
+      source_type: fileeffectiverights53_state
+    oval:mil.disa.stig.win:ste:20000015:
+      comment: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-15-2-1
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000015
+      source_type: fileeffectiverights53_state
+    oval:mil.disa.stig.win:ste:20000016:
+      comment: '%SystemRoot% environment variable.'
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(?i)%SystemRoot%.*$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000016
+      source_type: registry_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253340:
+        class: compliance
+        criteria:
+          children:
+          - children:
+            - comment: The Application event log must have at least default permissions. Strict Path
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25334001
+            - comment: The Application event log registry specified location must have the %SystemRoot% environment variable.
+              kind: test_ref
+              negate: true
+              test_ref: oval:mil.disa.stig.win:tst:25334002
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          - children:
+            - comment: The Application event log must have at least default permissions. Built Path
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25334000
+            - comment: The Application event log registry specified location must have the %SystemRoot% environment variable.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25334002
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows permissions for the Application event log must prevent access by non-privileged accounts.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253340
+        version: '2'
+      oval:mil.disa.stig.windows11:def:253340:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253340
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-AU-000515 - Windows 11 permissions for the Application event log must prevent access by non-privileged
+              accounts.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot
+              service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are necessary
+              to provide a trail of evidence in case the system or network is compromised. The Application event log may be
+              susceptible to tampering if proper permissions are not applied.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows11:def:253340
+        version: '2'
+    tests:
+      oval:mil.disa.stig.win:tst:25334000:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:mil.disa.stig.win:obj:25334000
+        comment: The Application event log must have at least default permissions. Built Path
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25334000
+        source_type: fileeffectiverights53_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25334001:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:mil.disa.stig.win:obj:25334003
+        comment: The Application event log must have at least default permissions. Strict Path
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25334001
+        source_type: fileeffectiverights53_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25334002:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25334002
+        comment: The Application event log registry specified location must have the %SystemRoot% environment variable.
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000016
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25334002
+        source_type: registry_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.windows11:def:253340
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253340
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.windows11:def:253340
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253340
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-253340r958434_rule
+    title: Windows 11 permissions for the Application event log must prevent access by non-privileged accounts.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253340
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253340
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253340
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253340
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:16501
+      exports: []
+      inline_content: 'Verify the permissions on the Application event log (Application.evtx). Standard user accounts or groups
+        must not have access. The default permissions listed below satisfy this requirement. Eventlog - Full Control SYSTEM
+        - Full Control Administrators - Full Control The default location is the "%SystemRoot%\SYSTEM32\WINEVT\LOGS" directory.
+        They may have been moved to another folder. If the permissions for these files are not as restrictive as the ACLs
+        listed, this is a finding. Note: If "APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES" has Special Permissions,
+        this would not be a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:16501
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the permissions on the Application event log (Application.evtx). Standard user accounts or groups
+            must not have access. The default permissions listed below satisfy this requirement.
+
+
+            Eventlog - Full Control
+
+            SYSTEM - Full Control
+
+            Administrators - Full Control
+
+
+            The default location is the "%SystemRoot%\SYSTEM32\WINEVT\LOGS" directory. They may have been moved to another
+            folder.
+
+
+            If the permissions for these files are not as restrictive as the ACLs listed, this is a finding.
+
+
+            Note: If "APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES" has Special Permissions, this would not be a
+            finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.windows11:def:253340
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: eb773e40a7d0f1d5b09497cab9ef5c41b5bc36dfc77ac7b1c04974f75a14f829
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-253340r958434_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: ec04332e97479434d8f57c0404da7a1968e2892055f2325595916f4a921421fd

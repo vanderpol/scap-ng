@@ -1,0 +1,548 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253491r1137691_rule
+  version: 1
+  description: The "Deny access to this computer from the network" user right on workstations must be configured to prevent
+    access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access on all systems.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: The "Deny access to this computer from the network" user right on workstations must be configured to prevent access
+    from highly privileged domain accounts and local accounts on domain systems and unauthenticated access on all systems.
+  steps:
+  - name: Collect oval:mil.disa.stig.win:obj:10000100
+    collect:
+      capability: scapng.collect.windows.wmi57
+      comment: null
+      query:
+      - kind: element
+        name: namespace
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: root\cimv2
+      - kind: element
+        name: wql
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SELECT DomainRole FROM win32_computersystem
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:10000100
+      source_type: wmi57_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:10000100
+  - name: Collect oval:mil.disa.stig.win:obj:25349100
+    collect:
+      capability: scapng.collect.windows.userright
+      comment: null
+      query:
+      - kind: element
+        name: userright
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SE_DENY_NETWORK_LOGON_NAME
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25349100
+      source_type: userright_object
+      version: '1'
+    register: oval:mil.disa.stig.win:obj:25349100
+  predicates:
+    oval:mil.disa.stig.win:ste:10000100:
+      comment: Standalone Workstation
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '0'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:10000100
+      source_type: wmi57_state
+    oval:mil.disa.stig.win:ste:10000200:
+      comment: Domain Member Workstation
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '1'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:10000200
+      source_type: wmi57_state
+    oval:mil.disa.stig.win:ste:20000033:
+      comment: null
+      entities:
+      - attributes:
+          operation: case insensitive equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Guests
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000033
+      source_type: userright_state
+    oval:mil.disa.stig.win:ste:20000034:
+      comment: null
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(?i)(NT Authority\\)?Local account$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000034
+      source_type: userright_state
+    oval:mil.disa.stig.win:ste:20000040:
+      comment: null
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(?i)(.+\\)?Domain Admins$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000040
+      source_type: userright_state
+    oval:mil.disa.stig.win:ste:20000041:
+      comment: null
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(?i)(.+\\)?Enterprise Admins$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000041
+      source_type: userright_state
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253491:
+        class: compliance
+        criteria:
+          children:
+          - children:
+            - comment: System is a domain workstation
+              definition_ref: oval:mil.disa.stig.win:def:100002
+              kind: definition_ref
+              negate: false
+            - comment: Deny access to this computer from the network - Local account
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349104
+            - comment: Deny access to this computer from the network - Guests
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349105
+            - comment: Deny access to this computer from the network - Domain Admins
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349106
+            - comment: Deny access to this computer from the network - Enterprise Admins
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349107
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          - children:
+            - comment: System is a standalone workstation
+              definition_ref: oval:mil.disa.stig.win:def:100001
+              kind: definition_ref
+              negate: false
+            - comment: Deny access to this computer from the network - Guests
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349105
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Deny access to this computer from the network" user right on workstations must be configured to prevent
+              access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access
+              on all systems.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253491
+        version: '7'
+      oval:mil.disa.stig.win:def:100001:
+        class: inventory
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:10000100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system is a Windows Standalone Workstation
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Workstation
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.win:def:100001
+        version: '2'
+      oval:mil.disa.stig.win:def:100002:
+        class: inventory
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:10000200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system is a Windows Domain Member Workstation
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Workstation
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.win:def:100002
+        version: '2'
+      oval:mil.disa.stig.windows11:def:253491:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253491
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-UR-000070 - The "Deny access to this computer from the network" user right on workstations must be
+              configured to prevent access from highly privileged domain accounts and local accounts on domain systems and
+              unauthenticated access on all systems.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
+
+
+              The "Deny access to this computer from the network" right defines the accounts that are prevented from logging
+              on from the network.
+
+
+              In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust
+              systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to the
+              compromise of an entire domain.
+
+
+              Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement
+              resulting from credential theft attacks.
+
+
+              The Guests group must be assigned this right to prevent unauthenticated access.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows11:def:253491
+        version: '2'
+    tests:
+      oval:mil.disa.stig.win:tst:10000100:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:10000100
+        comment: The system is a Windows Standalone Workstation
+        predicates:
+        - oval:mil.disa.stig.win:ste:10000100
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:10000100
+        source_type: wmi57_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:10000200:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:10000100
+        comment: The system is a Windows Domain Member Workstation
+        predicates:
+        - oval:mil.disa.stig.win:ste:10000200
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:10000200
+        source_type: wmi57_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25349104:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349100
+        comment: Deny access to this computer from the network - Local account
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000034
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25349104
+        source_type: userright_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25349105:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349100
+        comment: Deny access to this computer from the network - Guests
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000033
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25349105
+        source_type: userright_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25349106:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349100
+        comment: Deny access to this computer from the network - Domain Admins
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000040
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25349106
+        source_type: userright_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25349107:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349100
+        comment: Deny access to this computer from the network - Enterprise Admins
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000041
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25349107
+        source_type: userright_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:mil.disa.stig.windows11:def:253491
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253491
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:mil.disa.stig.windows11:def:253491
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      match_count: 1
+      multi_check: null
+      name: oval:mil.disa.stig.windows11:def:253491
+      negate: null
+      oval_component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-253491r1137691_rule
+    title: The "Deny access to this computer from the network" user right on workstations must be configured to prevent access
+      from highly privileged domain accounts and local accounts on domain systems and unauthenticated access on all systems.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253491
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253491
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+        name: oval:mil.disa.stig.windows11:def:253491
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml
+            name: oval:mil.disa.stig.windows11:def:253491
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:45901
+      exports: []
+      inline_content: 'Verify the effective setting in Local Group Policy Editor. Run "gpedit.msc". Navigate to Local Computer
+        Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local Policies >> User Rights Assignment.
+        If the following groups or accounts are not defined for the "Deny access to this computer from the network" right,
+        this is a finding: Domain Systems Only: Enterprise Admins group Domain Admins group Local account (see Note below)
+        All Systems: Guests group Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are
+        exempt from denying the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation
+        STIG for PAW requirements.) Note: "Local account" is a built-in security group used to assign user rights and permissions
+        to all local accounts.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:45901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify the effective setting in Local Group Policy Editor.
+
+
+            Run "gpedit.msc".
+
+
+            Navigate to Local Computer Policy >> Computer Configuration >> Windows Settings >> Security Settings >> Local
+            Policies >> User Rights Assignment.
+
+
+            If the following groups or accounts are not defined for the "Deny access to this computer from the network" right,
+            this is a finding:
+
+
+            Domain Systems Only:
+
+            Enterprise Admins group
+
+            Domain Admins group
+
+            Local account (see Note below)
+
+
+            All Systems:
+
+            Guests group
+
+
+            Privileged Access Workstations (PAWs) dedicated to the management of Active Directory are exempt from denying
+            the Enterprise Admins and Domain Admins groups. (See the Windows Privileged Access Workstation STIG for PAW requirements.)
+
+
+            Note: "Local account" is a built-in security group used to assign user rights and permissions to all local accounts.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:mil.disa.stig.windows11:def:253491
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: 522edfc01274a66860ad86685185afa39bf23e84d88220f962d81e53128c143c
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-253491r1137691_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 395fb561e0f90115b3e4765a97f45d7a2f49aafd5c4cf65454bde850b95212c9

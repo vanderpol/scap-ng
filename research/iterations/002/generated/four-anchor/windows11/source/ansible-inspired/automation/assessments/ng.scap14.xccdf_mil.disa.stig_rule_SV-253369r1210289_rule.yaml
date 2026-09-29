@@ -1,0 +1,450 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+runtime_dependency: none
+assessment:
+  id: ng.scap14.xccdf_mil.disa.stig_rule_SV-253369r1210289_rule
+  version: 1
+  description: Virtualization-Based Security (VBS) must be enabled on Windows 11 with the platform security level configured
+    to Secure Boot or Secure Boot with DMA Protection.
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  name: Virtualization-Based Security (VBS) must be enabled on Windows 11 with the platform security level configured to Secure
+    Boot or Secure Boot with DMA Protection.
+  steps:
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:25336901
+    collect:
+      capability: scapng.collect.windows.cmdlet
+      comment: DeviceGuard requiredsecurityproperties
+      query:
+      - attributes:
+          operation: equals
+        kind: element
+        name: module_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: CimCmdlets
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: module_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: version
+          nil: 'true'
+        kind: element
+        name: module_version
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - kind: element
+        name: verb
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Get
+      - kind: element
+        name: noun
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: CimInstance
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: classname
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: Win32_DeviceGuard
+        - attributes:
+            name: namespace
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: root\Microsoft\Windows\DeviceGuard
+        kind: element
+        name: parameters
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: property
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: requiredsecurityproperties
+        kind: element
+        name: select
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25336901
+      source_type: cmdlet_object
+      version: '18'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:25336901
+  - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:25336902
+    collect:
+      capability: scapng.collect.windows.cmdlet
+      comment: DeviceGuard virtualizationbasedsecuritystatus
+      query:
+      - attributes:
+          operation: equals
+        kind: element
+        name: module_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: CimCmdlets
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: module_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: version
+          nil: 'true'
+        kind: element
+        name: module_version
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - kind: element
+        name: verb
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Get
+      - kind: element
+        name: noun
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: CimInstance
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: classname
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: Win32_DeviceGuard
+        - attributes:
+            name: namespace
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: root\Microsoft\Windows\DeviceGuard
+        kind: element
+        name: parameters
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: property
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: virtualizationbasedsecuritystatus
+        kind: element
+        name: select
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25336902
+      source_type: cmdlet_object
+      version: '18'
+    register: oval:navy.navwar.niwcatlantic.scc.windows:obj:25336902
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25336901:
+      comment: requiredsecurityproperties must match a pattern of 2
+      entities:
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: requiredsecurityproperties
+            operation: pattern match
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '2'
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25336901
+      source_type: cmdlet_state
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25336902:
+      comment: requiredsecurityproperties must match a pattern of 2
+      entities:
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: virtualizationbasedsecuritystatus
+            operation: pattern match
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '2'
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25336902
+      source_type: cmdlet_state
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.windows:def:253369:
+        class: compliance
+        criteria:
+          children:
+          - comment: Virtualization-based Security must be enabled with the platform security level configured to Secure Boot
+              or Secure Boot with DMA Protection.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25336901
+          - comment: Virtualization-based Security must be enabled with the platform security level configured to Secure Boot
+              or Secure Boot with DMA Protection.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:25336902
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Virtualization-Based Security (VBS) must be enabled on Windows 11 with the platform security level configured
+              to Secure Boot or Secure Boot with DMA Protection.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Virtualization-based Security must be enabled with the platform security level configured to Secure Boot
+              or Secure Boot with DMA Protection.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+        version: '18'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25336901:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25336901
+        comment: RequiredSecurityProperties should return a value of 2
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25336901
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25336901
+        source_type: cmdlet_test
+        state_operator: AND
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25336902:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25336902
+        comment: VirtualizationBasedSecurityStatus should return a value of 2
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:25336902
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25336902
+        source_type: cmdlet_test
+        state_operator: AND
+  source_check_context:
+    check_exports: []
+    checks:
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      selector: ''
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+      exports: []
+      href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      match_count: 1
+      multi_check: null
+      name: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+      negate: null
+      oval_component: scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+      selector: automated
+      status: resolved
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    component: scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-xccdf.xml
+    published_source:
+      datastream_member: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml
+      datastream_sha256: cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5
+      repository: niwc-atlantic/scap-content-library
+      repository_path: Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      revision: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+      zip_filename: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+      zip_sha256: e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d
+    rule_id: xccdf_mil.disa.stig_rule_SV-253369r1210289_rule
+    title: Virtualization-Based Security (VBS) must be enabled on Windows 11 with the platform security level configured to
+      Secure Boot or Secure Boot with DMA Protection.
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:21901
+      exports: []
+      inline_content: 'Confirm VBS is enabled and running with Secure Boot or Secure Boot and DMA Protection. If there are
+        documented operational mission needs to disable VBS, this may be reduced to a CAT III finding. Run "PowerShell" with
+        elevated privileges (run as administrator). Enter the following: "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace
+        root\Microsoft\Windows\DeviceGuard" If "RequiredSecurityProperties" does not include a value of "2" indicating "Secure
+        Boot" (e.g., "{1, 2}"), this is a finding. If "Secure Boot and DMA Protection" is configured, "3" will also be displayed
+        in the results (e.g., "{1, 2, 3}"). If "VirtualizationBasedSecurityStatus" is not a value of "2" indicating "Running",
+        this is a finding. Alternately: Run "System Information". Under "System Summary", verify the following: If "Device
+        Guard virtualization-based security" does not display "Running", this is a finding. If "Device Guard Required Security
+        Properties" does not display "Base Virtualization Support, Secure Boot", this is a finding. If "Secure Boot and DMA
+        Protection" is configured, "DMA Protection" will also be displayed (e.g., "Base Virtualization Support, Secure Boot,
+        DMA Protection"). The policy settings referenced in the Fix section will configure the following registry values.
+        However, due to hardware requirements, the registry values alone do not ensure proper function. Registry Hive: HKEY_LOCAL_MACHINE
+        Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\ Value Name: EnableVirtualizationBasedSecurity Value
+        Type: REG_DWORD Value: 1 Value Name: RequirePlatformSecurityFeatures Value Type: REG_DWORD Value: 1 (Secure Boot only)
+        or 3 (Secure Boot and DMA Protection) A Microsoft article on the Credential Guard system requirement can be found
+        at the following link: https://technet.microsoft.com/en-us/itpro/windows/keep-secure/credential-guard-requirements'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:21901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Confirm VBS is enabled and running with Secure Boot or Secure Boot and DMA Protection.
+
+
+            If there are documented operational mission needs to disable VBS, this may be reduced to a CAT III finding.
+
+
+            Run "PowerShell" with elevated privileges (run as administrator).
+
+
+            Enter the following:
+
+
+            "Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard"
+
+
+            If "RequiredSecurityProperties" does not include a value of "2" indicating "Secure Boot" (e.g., "{1, 2}"), this
+            is a finding.
+
+
+            If "Secure Boot and DMA Protection" is configured, "3" will also be displayed in the results (e.g., "{1, 2, 3}").
+
+
+            If "VirtualizationBasedSecurityStatus" is not a value of "2" indicating "Running", this is a finding.
+
+
+            Alternately:
+
+
+            Run "System Information".
+
+
+            Under "System Summary", verify the following:
+
+
+            If "Device Guard virtualization-based security" does not display "Running", this is a finding.
+
+
+            If "Device Guard Required Security Properties" does not display "Base Virtualization Support, Secure Boot", this
+            is a finding.
+
+
+            If "Secure Boot and DMA Protection" is configured, "DMA Protection" will also be displayed (e.g., "Base Virtualization
+            Support, Secure Boot, DMA Protection").
+
+
+            The policy settings referenced in the Fix section will configure the following registry values. However, due to
+            hardware requirements, the registry values alone do not ensure proper function.
+
+
+            Registry Hive: HKEY_LOCAL_MACHINE
+
+            Registry Path: \SOFTWARE\Policies\Microsoft\Windows\DeviceGuard\
+
+
+            Value Name: EnableVirtualizationBasedSecurity
+
+            Value Type: REG_DWORD
+
+            Value: 1
+
+
+            Value Name: RequirePlatformSecurityFeatures
+
+            Value Type: REG_DWORD
+
+            Value: 1 (Secure Boot only) or 3 (Secure Boot and DMA Protection)
+
+
+            A Microsoft article on the Credential Guard system requirement can be found at the following link:
+
+
+            https://technet.microsoft.com/en-us/itpro/windows/keep-secure/credential-guard-requirements'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  assert:
+    that:
+      combination: xccdf_source_check_semantics
+      definition_results:
+      - oval:navy.navwar.niwcatlantic.scc.windows:def:253369
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    semantic_ir_sha256: c6603ebe019256060ced65257526c1bfa31434dcde504e7928d82c116e4b02c3
+    source: SCAP 1.4 / OVAL 5.12.3
+    source_rule: xccdf_mil.disa.stig_rule_SV-253369r1210289_rule
+    status: legacy_compatible
+  semantic_fingerprint_sha256: 86351a52ab53ccae0861d9ca0f757867cf5130f68c009b46ae2de7f7fa40e14e

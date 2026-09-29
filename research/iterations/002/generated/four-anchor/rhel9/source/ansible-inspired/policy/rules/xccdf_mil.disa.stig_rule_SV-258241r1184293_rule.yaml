@@ -1,0 +1,536 @@
+scap_ng: 0.1-prototype
+prototype: true
+authoring_style: ansible-inspired
+rule:
+  abstract: false
+  check: 'Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy with the following command: $
+    update-crypto-policies --show FIPS If the systemwide crypto policy is not set to "FIPS", this is a finding. Note: If subpolicies
+    have been configured, they could be listed in a colon-separated list starting with "FIPS" as follows FIPS:<SUBPOLICY-NAME>.
+    This is not a finding. Note: Subpolicies like AD-SUPPORT must be configured according to the latest guidance from the
+    operating system vendor. Verify the current minimum crypto-policy configuration with the following commands: $ grep -E
+    ''rsa_size|hash'' /etc/crypto-policies/state/CURRENT.pol hash = SHA2-256 SHA2-384 SHA2-512 SHA2-224 SHA3-256 SHA3-384
+    SHA3-512 SHAKE-256 min_rsa_size = 2048 If the "hash" values do not include at least the following FIPS 140-3-compliant
+    algorithms "SHA2-256 SHA2-384 SHA2-512 SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256", this is a finding. If there are
+    algorithms that include "SHA1" or a hash value less than "224" this is a finding. If the "min_rsa_size" is not set to
+    a value of at least "2048", this is a finding. If these commands do not return any output, this is a finding.'
+  checks:
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258241r1184293_rule
+    assessment_version: 1
+    selector: default
+    source_selector: ''
+  - assessment: ng.scap14.xccdf_mil.disa.stig_rule_SV-258241r1184293_rule
+    assessment_version: 1
+    selector: automated
+    source_selector: automated
+  - assessment: ng.manual.xccdf_mil.disa.stig_rule_SV-258241r1184293_rule
+    assessment_version: 1
+    selector: manual
+    source_selector: manual
+  cluster_id: null
+  conflicts: []
+  default_check: default
+  description: '<VulnDiscussion>Centralized cryptographic policies simplify applying secure ciphers across an operating system
+    and the applications that run on that operating system. Use of weak or untested encryption algorithms undermines the purposes
+    of using encryption to protect data. Satisfies: SRG-OS-000396-GPOS-00176, SRG-OS-000393-GPOS-00173, SRG-OS-000394-GPOS-00174</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+  discussion: null
+  effective_platform_refs:
+  - cpe:/o:almalinux:almalinux:9
+  - cpe:/o:rocky:rocky:9
+  - cpe:/o:redhat:enterprise_linux:9.0
+  effective_platforms:
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.almalinux9:def:301
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:almalinux:almalinux:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:almalinux:almalinux:9
+    ref: cpe:/o:almalinux:almalinux:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:navy.navwar.niwcatlantic.scc.rocky9:def:201
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:rocky:rocky:9
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:rocky:rocky:9
+    ref: cpe:/o:rocky:rocky:9
+  - inventory_bindings:
+    - cpe_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-dictionary.xml
+      definition_id: oval:mil.disa.stig.rhel9os:def:101
+      href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      oval_component: scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-cpe-oval.xml
+      source: cpe_dictionary
+      status: split_valid
+    inventory_output:
+      emit_when: platform_true
+      identifiers:
+      - binding: uri
+        scheme: cpe
+        value: cpe:/o:redhat:enterprise_linux:9.0
+      product_kind: operating_system
+      role: descriptive_target_inventory
+    kind: cpe_name
+    name: cpe:/o:redhat:enterprise_linux:9.0
+    ref: cpe:/o:redhat:enterprise_linux:9.0
+  extends: null
+  fix: 'Configure RHEL 9 to use a FIPS 140-3-compliant systemwide cryptographic policy. Create a subpolicy for enhancements
+    to the base systemwide crypto-policy by creating the file /etc/crypto-policies/policies/modules/STIG.pmod with the following
+    content: # Define ciphers and MACs for OpenSSH and libssh cipher@SSH=AES-256-GCM AES-256-CTR AES-128-GCM AES-128-CTR mac@SSH=HMAC-SHA2-512
+    HMAC-SHA2-256 Apply the policy enhancements to the FIPS systemwide cryptographic policy level with the following command:
+    $ sudo update-crypto-policies --set FIPS:STIG Note: If additional subpolicies are being employed, they must be added to
+    the update-crypto-policies command. To make the cryptographic settings effective for already running services and applications,
+    restart the system: $ sudo reboot'
+  group_path:
+  - xccdf_mil.disa.stig_group_V-258241
+  hidden: false
+  id: xccdf_mil.disa.stig_rule_SV-258241r1184293_rule
+  idents:
+  - system: http://cyber.mil/cci
+    value: CCI-002450
+  - system: http://cyber.mil/cci
+    value: CCI-002890
+  - system: http://cyber.mil/cci
+    value: CCI-003123
+  multiple: false
+  platforms: []
+  prohibit_changes: false
+  references:
+  - href: null
+    text: DPMS Target Red Hat Enterprise Linux 9 DISA DPMS Target Red Hat Enterprise Linux 9 5551
+  requires: []
+  role: null
+  selected: null
+  selected_default: true
+  severity: high
+  source_check_logic:
+    checks:
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: ''
+      source_tree:
+        attributes:
+          selector: ''
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+        name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+      exports: []
+      inline_content: null
+      multi_check: null
+      negate: null
+      selector: automated
+      source_tree:
+        attributes:
+          selector: automated
+          system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+            name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+    - content_refs:
+      - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+        name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:86901
+      exports: []
+      inline_content: 'Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy with the following
+        command: $ update-crypto-policies --show FIPS If the systemwide crypto policy is not set to "FIPS", this is a finding.
+        Note: If subpolicies have been configured, they could be listed in a colon-separated list starting with "FIPS" as
+        follows FIPS:<SUBPOLICY-NAME>. This is not a finding. Note: Subpolicies like AD-SUPPORT must be configured according
+        to the latest guidance from the operating system vendor. Verify the current minimum crypto-policy configuration with
+        the following commands: $ grep -E ''rsa_size|hash'' /etc/crypto-policies/state/CURRENT.pol hash = SHA2-256 SHA2-384
+        SHA2-512 SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256 min_rsa_size = 2048 If the "hash" values do not include at
+        least the following FIPS 140-3-compliant algorithms "SHA2-256 SHA2-384 SHA2-512 SHA2-224 SHA3-256 SHA3-384 SHA3-512
+        SHAKE-256", this is a finding. If there are algorithms that include "SHA1" or a hash value less than "224" this is
+        a finding. If the "min_rsa_size" is not set to a value of at least "2048", this is a finding. If these commands do
+        not return any output, this is a finding.'
+      multi_check: null
+      negate: null
+      selector: manual
+      source_tree:
+        attributes:
+          selector: manual
+          system: http://scap.nist.gov/schema/ocil/2
+        children:
+        - attributes:
+            href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+            name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:86901
+          name: check-content-ref
+          namespace: http://checklists.nist.gov/xccdf/1.2
+        - name: check-content
+          namespace: http://checklists.nist.gov/xccdf/1.2
+          text: 'Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy with the following command:
+
+
+            $ update-crypto-policies --show
+
+
+            FIPS
+
+
+            If the systemwide crypto policy is not set to "FIPS", this is a finding.
+
+
+            Note: If subpolicies have been configured, they could be listed in a colon-separated list starting with "FIPS"
+            as follows FIPS:<SUBPOLICY-NAME>. This is not a finding.
+
+
+            Note: Subpolicies like AD-SUPPORT must be configured according to the latest guidance from the operating system
+            vendor.
+
+
+            Verify the current minimum crypto-policy configuration with the following commands:
+
+
+            $ grep -E ''rsa_size|hash'' /etc/crypto-policies/state/CURRENT.pol
+
+
+            hash = SHA2-256 SHA2-384 SHA2-512 SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256
+
+            min_rsa_size = 2048
+
+
+            If the "hash" values do not include at least the following FIPS 140-3-compliant algorithms "SHA2-256 SHA2-384
+            SHA2-512 SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256", this is a finding.
+
+
+            If there are algorithms that include "SHA1" or a hash value less than "224" this is a finding.
+
+
+            If the "min_rsa_size" is not set to a value of at least "2048", this is a finding.
+
+
+            If these commands do not return any output, this is a finding.'
+        name: check
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      system: http://scap.nist.gov/schema/ocil/2
+    kind: check_candidates
+  source_checks:
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: ''
+    source_tree:
+      attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+      name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+    exports: []
+    inline_content: null
+    multi_check: null
+    negate: null
+    selector: automated
+    source_tree:
+      attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+  - content_refs:
+    - href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+      name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:86901
+    exports: []
+    inline_content: 'Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy with the following
+      command: $ update-crypto-policies --show FIPS If the systemwide crypto policy is not set to "FIPS", this is a finding.
+      Note: If subpolicies have been configured, they could be listed in a colon-separated list starting with "FIPS" as follows
+      FIPS:<SUBPOLICY-NAME>. This is not a finding. Note: Subpolicies like AD-SUPPORT must be configured according to the
+      latest guidance from the operating system vendor. Verify the current minimum crypto-policy configuration with the following
+      commands: $ grep -E ''rsa_size|hash'' /etc/crypto-policies/state/CURRENT.pol hash = SHA2-256 SHA2-384 SHA2-512 SHA2-224
+      SHA3-256 SHA3-384 SHA3-512 SHAKE-256 min_rsa_size = 2048 If the "hash" values do not include at least the following
+      FIPS 140-3-compliant algorithms "SHA2-256 SHA2-384 SHA2-512 SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256", this is
+      a finding. If there are algorithms that include "SHA1" or a hash value less than "224" this is a finding. If the "min_rsa_size"
+      is not set to a value of at least "2048", this is a finding. If these commands do not return any output, this is a finding.'
+    multi_check: null
+    negate: null
+    selector: manual
+    source_tree:
+      attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:86901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy with the following command:
+
+
+          $ update-crypto-policies --show
+
+
+          FIPS
+
+
+          If the systemwide crypto policy is not set to "FIPS", this is a finding.
+
+
+          Note: If subpolicies have been configured, they could be listed in a colon-separated list starting with "FIPS" as
+          follows FIPS:<SUBPOLICY-NAME>. This is not a finding.
+
+
+          Note: Subpolicies like AD-SUPPORT must be configured according to the latest guidance from the operating system
+          vendor.
+
+
+          Verify the current minimum crypto-policy configuration with the following commands:
+
+
+          $ grep -E ''rsa_size|hash'' /etc/crypto-policies/state/CURRENT.pol
+
+
+          hash = SHA2-256 SHA2-384 SHA2-512 SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256
+
+          min_rsa_size = 2048
+
+
+          If the "hash" values do not include at least the following FIPS 140-3-compliant algorithms "SHA2-256 SHA2-384 SHA2-512
+          SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256", this is a finding.
+
+
+          If there are algorithms that include "SHA1" or a hash value less than "224" this is a finding.
+
+
+          If the "min_rsa_size" is not set to a value of at least "2048", this is a finding.
+
+
+          If these commands do not return any output, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    system: http://scap.nist.gov/schema/ocil/2
+  source_xccdf_tree:
+    attributes:
+      id: xccdf_mil.disa.stig_rule_SV-258241r1184293_rule
+      severity: high
+      weight: '10.0'
+    children:
+    - name: version
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL-09-215105
+    - name: title
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: RHEL 9 must implement a FIPS 140-3-compliant systemwide cryptographic policy.
+    - name: description
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: '<VulnDiscussion>Centralized cryptographic policies simplify applying secure ciphers across an operating system
+        and the applications that run on that operating system. Use of weak or untested encryption algorithms undermines the
+        purposes of using encryption to protect data.
+
+
+        Satisfies: SRG-OS-000396-GPOS-00176, SRG-OS-000393-GPOS-00173, SRG-OS-000394-GPOS-00174</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>'
+    - children:
+      - name: title
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target Red Hat Enterprise Linux 9
+      - name: publisher
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DISA
+      - name: type
+        namespace: http://purl.org/dc/elements/1.1/
+        text: DPMS Target
+      - name: subject
+        namespace: http://purl.org/dc/elements/1.1/
+        text: Red Hat Enterprise Linux 9
+      - name: identifier
+        namespace: http://purl.org/dc/elements/1.1/
+        text: '5551'
+      name: reference
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002450
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-002890
+    - attributes:
+        system: http://cyber.mil/cci
+      name: ident
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: CCI-003123
+    - attributes:
+        fixref: F-61906r1106301_fix
+      name: fixtext
+      namespace: http://checklists.nist.gov/xccdf/1.2
+      text: 'Configure RHEL 9 to use a FIPS 140-3-compliant systemwide cryptographic policy.
+
+
+        Create a subpolicy for enhancements to the base systemwide crypto-policy by creating the file /etc/crypto-policies/policies/modules/STIG.pmod
+        with the following content:
+
+
+        # Define ciphers and MACs for OpenSSH and libssh
+
+        cipher@SSH=AES-256-GCM AES-256-CTR AES-128-GCM AES-128-CTR
+
+        mac@SSH=HMAC-SHA2-512 HMAC-SHA2-256
+
+
+        Apply the policy enhancements to the FIPS systemwide cryptographic policy level with the following command:
+
+
+        $ sudo update-crypto-policies --set FIPS:STIG
+
+
+        Note: If additional subpolicies are being employed, they must be added to the update-crypto-policies command.
+
+
+        To make the cryptographic settings effective for already running services and applications, restart the system:
+
+
+        $ sudo reboot'
+    - attributes:
+        id: F-61906r1106301_fix
+      name: fix
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: ''
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: automated
+        system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval2.xml
+          name: oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    - attributes:
+        selector: manual
+        system: http://scap.nist.gov/schema/ocil/2
+      children:
+      - attributes:
+          href: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml
+          name: ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:86901
+        name: check-content-ref
+        namespace: http://checklists.nist.gov/xccdf/1.2
+      - name: check-content
+        namespace: http://checklists.nist.gov/xccdf/1.2
+        text: 'Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy with the following command:
+
+
+          $ update-crypto-policies --show
+
+
+          FIPS
+
+
+          If the systemwide crypto policy is not set to "FIPS", this is a finding.
+
+
+          Note: If subpolicies have been configured, they could be listed in a colon-separated list starting with "FIPS" as
+          follows FIPS:<SUBPOLICY-NAME>. This is not a finding.
+
+
+          Note: Subpolicies like AD-SUPPORT must be configured according to the latest guidance from the operating system
+          vendor.
+
+
+          Verify the current minimum crypto-policy configuration with the following commands:
+
+
+          $ grep -E ''rsa_size|hash'' /etc/crypto-policies/state/CURRENT.pol
+
+
+          hash = SHA2-256 SHA2-384 SHA2-512 SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256
+
+          min_rsa_size = 2048
+
+
+          If the "hash" values do not include at least the following FIPS 140-3-compliant algorithms "SHA2-256 SHA2-384 SHA2-512
+          SHA2-224 SHA3-256 SHA3-384 SHA3-512 SHAKE-256", this is a finding.
+
+
+          If there are algorithms that include "SHA1" or a hash value less than "224" this is a finding.
+
+
+          If the "min_rsa_size" is not set to a value of at least "2048", this is a finding.
+
+
+          If these commands do not return any output, this is a finding.'
+      name: check
+      namespace: http://checklists.nist.gov/xccdf/1.2
+    name: Rule
+    namespace: http://checklists.nist.gov/xccdf/1.2
+  title: RHEL 9 must implement a FIPS 140-3-compliant systemwide cryptographic policy.
+  weight: '10.0'
+migration:
+  note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+  semantic_ir_sha256: 9bcd9d3e4616d49b49aa572b4ac695f2d0dff15a775aaf8a558b49c1dc32e026
+  source: SCAP 1.4 / OVAL 5.12.3
+  source_rule: xccdf_mil.disa.stig_rule_SV-258241r1184293_rule
+  status: legacy_compatible
