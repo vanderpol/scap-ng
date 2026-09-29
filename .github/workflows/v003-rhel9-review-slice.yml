@@ -40,7 +40,7 @@ jobs:
           PY
       - name: Commit generated review slice
         run: |
-          if [ -z "$(git status --porcelain -- research/iterations/003/source/split-rule-assessment/rhel9-review-slice research/iterations/003/evidence/rhel9-review-slice)" ]; then
+          if [ -z "$(git status --porcelain -- research/iterations/003/source/split-rule-assessment/rhel9-review-slice research/iterations/003/evidence/rhel9-review-slice research/iterations/003/packages)" ]; then
             echo "No generated changes"
             exit 0
           fi
@@ -48,7 +48,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A research/iterations/003/source
           git add research/iterations/003/evidence/rhel9-review-slice
-          git commit -m "Generate first clean 003 RHEL9 review slice"
+          git add research/iterations/003/packages
+          git commit -m "Generate clean 003 RHEL9 review slice and package"
           git fetch origin main
           git rebase origin/main
           git push
