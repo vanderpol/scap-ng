@@ -327,6 +327,35 @@ def applicability_oval_refs(benchmark):
     return rows
 
 
+def cpe_dictionary_oval_refs(components):
+    """Return OVAL inventory checks bound to CPE names in embedded CPE dictionaries."""
+    rows=[]
+    for component_id, root in components.items():
+        if local(root.tag)!="cpe-list":
+            continue
+        for item in root.iter():
+            if not isinstance(item.tag,str) or local(item.tag)!="cpe-item":
+                continue
+            cpe_name=item.get("name")
+            if not cpe_name:
+                continue
+            for check in item:
+                if not isinstance(check.tag,str) or local(check.tag)!="check":
+                    continue
+                system=check.get("system")
+                href=check.get("href") or check.get(f"{{{XLINK_NS}}}href")
+                definition_id=" ".join("".join(check.itertext()).split()) or check.get("name")
+                rows.append({
+                    "source_kind":"cpe_dictionary",
+                    "cpe_name":cpe_name,
+                    "cpe_component":component_id,
+                    "system":system,
+                    "definition_id":definition_id,
+                    "href":href,
+                })
+    return rows
+
+
 def rule_oval_refs(benchmark):
     values = {
         e.get("id"): xccdf_node(e)
@@ -532,8 +561,10 @@ def main() -> int:
         for ref in applicability_oval_refs(benchmark):
             applicability_refs.append({
                 **ref,
+                "source_kind":"cpe_platform_expression",
                 "xccdf_component":benchmark_component_id,
             })
+    applicability_refs.extend(cpe_dictionary_oval_refs(components))
     stats["applicability_check_fact_refs"]=len(applicability_refs)
     oval_app_refs=[
         ref for ref in applicability_refs
@@ -626,6 +657,9 @@ def main() -> int:
                         "name":ref.get("definition_id"),
                         "definition_id":ref.get("definition_id"),
                         "platform_id":ref.get("platform_id"),
+                        "cpe_name":ref.get("cpe_name"),
+                        "source_kind":ref.get("source_kind"),
+                        "cpe_component":ref.get("cpe_component"),
                         "status":ref.get("status"),
                         "oval_component":ref.get("oval_component"),
                         "exports":[],
