@@ -163,11 +163,14 @@ def main() -> int:
 
     combined_profiles=load_yaml(root/"combined-rule"/"profiles.yaml")
     split_profiles=load_yaml(root/"split-policy-assessment-binding"/"profiles.yaml")
+    expected_check_selectors=canonical.get("profile_check_selectors",[])
     for name,doc in (("combined",combined_profiles),("split",split_profiles)):
         if doc.get("profiles")!=canonical.get("profiles",[]):
             failures.append(f"{name} raw profiles differ from canonical")
         if doc.get("resolved_profiles")!=canonical.get("resolved_profiles",[]):
             failures.append(f"{name} resolved profiles differ from canonical")
+        if doc.get("check_selectors",[])!=expected_check_selectors:
+            failures.append(f"{name} native profile check selectors differ from canonical")
 
     combined_benchmark=load_yaml(root/"combined-rule"/"benchmark.yaml")["benchmark"]
     split_benchmark=load_yaml(root/"split-policy-assessment-binding"/"benchmark.yaml")["benchmark"]
@@ -250,6 +253,20 @@ def main() -> int:
         split_policy=load_yaml(split_policy_path)["rule"]
         migration=entry["migration"]
 
+        source_checks=policy.get("source_checks",[]) or []
+        source_selector_names={
+            (x.get("selector") if x.get("selector") not in (None,"") else "default")
+            for x in source_checks
+        }
+        if len(source_selector_names)>1:
+            if not (
+                migration.get("status")=="unsupported"
+                and migration.get("reason")=="selectable_check_alternatives_not_lowered"
+            ):
+                failures.append(
+                    f"{rid}: multiple source check selectors were not rejected losslessly"
+                )
+
         combined_policy={
             k:v for k,v in combined.items()
             if k not in {"assessment","migration"}
@@ -277,10 +294,27 @@ def main() -> int:
                 failures.append(f"{rid}: unsupported rule unexpectedly has binding")
             continue
 
+        if source_checks:
+            policy_checks=policy.get("checks") or []
+            if len(policy_checks)!=1:
+                failures.append(f"{rid}: supported rule does not expose exactly one lowered check")
+            else:
+                lowered=policy_checks[0]
+                expected_selector=next(iter(source_selector_names))
+                if lowered.get("selector")!=expected_selector:
+                    failures.append(f"{rid}: lowered check selector differs from source")
+                if policy.get("default_check")!=expected_selector:
+                    failures.append(f"{rid}: default check does not match lowered selector")
+                if lowered.get("assessment")!=entry.get("assessment",{}).get("id"):
+                    failures.append(f"{rid}: policy check does not resolve to canonical assessment")
+
         binding=bindings.get(rid)
         if not binding:
             failures.append(f"{rid}: missing split assessment binding")
             continue
+        if policy.get("default_check") is not None:
+            if binding.get("check_selector")!=policy.get("default_check"):
+                failures.append(f"{rid}: binding selector differs from policy default check")
         aid=binding["assessment"]
         apath=root/"split-policy-assessment-binding"/"automation"/"assessments"/(
             "".join(c if c.isalnum() or c in "._-" else "_" for c in aid).strip("_")+".yaml"
