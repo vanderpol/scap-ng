@@ -115,12 +115,12 @@ A publisher profile SHALL NOT:
 The DISA XCCDF Rule identifier convention SHALL be parsed as publisher-specific
 identity metadata. For example:
 
-    xccdf_mil.disa.stig_rule_SV-280940r118473_rule
+    xccdf_mil.disa.stig_rule_SV-280940r1184730_rule
 
 normalizes to:
 
     rule.id: SV-280940
-    rule.version: r118473
+    rule.version: r1184730
 
 The `disa-stig` parser SHALL validate this convention before deriving either
 field. It SHALL NOT apply this transformation to generic SCAP/XCCDF content.
