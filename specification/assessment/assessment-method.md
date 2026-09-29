@@ -105,7 +105,39 @@ Assessment explicitly supplies the shell/interpreter it intends to use; use of
 Bash makes that Assessment operationally Unix/Linux-oriented without changing
 the capability family.
 
-## 7. Reuse
+## 7. Inventory facts from Platform Assessments
+
+A Platform Assessment MAY emit descriptive target-inventory facts in addition
+to its Boolean Platform result.
+
+Inventory emission SHALL NOT alter the truth of the Platform Assessment.
+
+A Platform Assessment that establishes an operating system or application MAY
+emit, when supported by collected evidence:
+
+- product kind, such as `operating_system` or `application`;
+- product name and version;
+- standardized product identifiers such as CPE;
+- provenance identifying the Platform Assessment and collected evidence that
+  produced the inventory fact.
+
+Illustrative output contract:
+
+    inventory:
+      product:
+        kind: operating_system
+        identifiers:
+          - scheme: cpe
+            value: "cpe:/o:redhat:enterprise_linux:9.0"
+
+Such inventory output is descriptive scan data. It SHALL NOT be consumed as an
+implicit Rule-selection, applicability, or compliance input.
+
+A processor MAY deduplicate equivalent inventory facts emitted by multiple
+Platform Assessments, provided provenance sufficient to explain the reported
+inventory is retained.
+
+## 8. Reuse
 
 Reusable Assessments SHOULD use semantic identities describing the fact they
 establish rather than the first Rule or Benchmark that used them.
@@ -115,7 +147,7 @@ demonstrated.
 
 Reuse SHALL be promoted only when semantic equivalence has been established.
 
-## 8. Source references and compiled identity
+## 9. Source references and compiled identity
 
 Authoring paths MAY be used to reference Assessment source files.
 
@@ -126,7 +158,7 @@ Assessment identities.
 
 Moving or renaming a source file SHALL NOT change Assessment identity.
 
-## 9. Historical provenance
+## 10. Historical provenance
 
 Legacy XCCDF/OVAL/OCIL lineage SHOULD be retained as authoring comments or in
 separate conversion reports when useful for migration and review.
