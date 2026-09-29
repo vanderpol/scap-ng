@@ -80,3 +80,22 @@ the Benchmark Rule to reference an implementation directly.
 Missing requested selectors are resolution errors, not requests for default
 fallback. Stage-1 migration preserves this behavior losslessly or reports a
 conversion blocker.
+
+
+## Assessment-class compatibility
+
+SCAP-NG preserves the OVAL definition-class distinction as Assessment
+`class`.
+
+| SCAP-NG class | OVAL analog | Status |
+| --- | --- | --- |
+| `compliance` | OVAL `compliance` | retained |
+| `vulnerability` | OVAL `vulnerability` | retained |
+| `patch` | OVAL `patch` | retained |
+| `inventory` | OVAL `inventory` | retained |
+| `miscellaneous` | OVAL `miscellaneous` | retained |
+| `information` | none | candidate only; requires OVAL Board / SCAP-NG governance approval |
+
+SCAP-NG adds a separate Assessment `purpose` concept so that the same
+Assessment semantics may be invoked for ordinary evaluation or applicability
+without changing the Assessment's class.
