@@ -1,0 +1,72 @@
+{
+  "fixture_version": 1,
+  "id": "split-unique-count-variable-chain",
+  "source": {
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/split-unique-count-variable-chain.source.xml",
+    "authority": "OVAL 5.12.3 oval-definitions-schema.xsd FunctionGroup semantics",
+    "note": "Synthetic schema-valid OVAL source exercising a multi-valued variable_component chain."
+  },
+  "ng_semantics": {
+    "variables": [
+      {
+        "id": "csv-values-variable",
+        "kind": "constant",
+        "datatype": "string",
+        "values": [
+          "alpha,beta,beta",
+          "beta,gamma"
+        ]
+      },
+      {
+        "id": "split-values-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "split": {
+            "delimiter": ",",
+            "component": {
+              "variable": "csv-values-variable"
+            }
+          }
+        }
+      },
+      {
+        "id": "unique-values-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "unique": {
+            "variable": "split-values-variable"
+          }
+        }
+      },
+      {
+        "id": "unique-count-variable",
+        "kind": "local",
+        "datatype": "int",
+        "expression": {
+          "count": {
+            "variable": "unique-values-variable"
+          }
+        }
+      }
+    ],
+    "expected_values": {
+      "split-values-variable": [
+        "alpha",
+        "beta",
+        "beta",
+        "beta",
+        "gamma"
+      ],
+      "unique-values-variable": [
+        "alpha",
+        "beta",
+        "gamma"
+      ],
+      "unique-count-variable": [
+        3
+      ]
+    }
+  }
+}
