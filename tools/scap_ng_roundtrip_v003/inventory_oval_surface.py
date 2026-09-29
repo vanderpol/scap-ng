@@ -23,7 +23,7 @@ def inventory_file(path):
         "test_types","object_types","state_types","variable_types","functions",
         "operations","check","check_existence","state_operator","criteria_operator",
         "set_operator","filter_action","var_check","entity_check","datatypes",
-        "behaviors","criteria_nodes",
+        "behaviors","criteria_nodes","attribute_values",
     ]}
     for el in root.iter():
         if not isinstance(el.tag,str):
@@ -54,6 +54,9 @@ def inventory_file(path):
                 vals[bucket][el.attrib[a]]+=1
         if local=="criteria" and "operator" in el.attrib:
             vals["criteria_operator"][el.attrib["operator"]]+=1
+        for an,av in sorted(el.attrib.items()):
+            if an not in {"id","version","comment"}:
+                vals["attribute_values"][f"{qname(el)}@{an}={av}"]+=1
         if local=="behaviors":
             for a,v in sorted(el.attrib.items()):
                 vals["behaviors"][f"{qname(el)}@{a}={v}"]+=1
@@ -74,7 +77,7 @@ def main():
         "test_types","object_types","state_types","variable_types","functions",
         "operations","check","check_existence","state_operator","criteria_operator",
         "set_operator","filter_action","var_check","entity_check","datatypes",
-        "behaviors","criteria_nodes",
+        "behaviors","criteria_nodes","attribute_values",
     ]}
     per_file=[]
     for p in files:
