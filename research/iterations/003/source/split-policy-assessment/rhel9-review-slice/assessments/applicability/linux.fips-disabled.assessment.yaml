@@ -1,0 +1,31 @@
+assessment:
+  id: linux.fips-disabled.assessment
+  title: RHEL9 and Not FIPS
+  mode: automated
+  checks:
+    fips-enabled-1:
+      title: fips_enabled == 1
+      collect:
+        title: /proc/sys/crypto/fips_enabled
+        capability: independent.textfilecontent54
+        select:
+          filepath: /proc/sys/crypto/fips_enabled
+          pattern:
+            operation: pattern match
+            value: ^(\d+)$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        title: null
+        existence: all_exist
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '1'
+          datatype: int
+  evaluate:
+    not:
+      check: fips-enabled-1
+  purpose: applicability
