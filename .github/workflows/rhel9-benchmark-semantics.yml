@@ -119,8 +119,13 @@ jobs:
 
       - name: Validate regenerated XCCDF 1.2
         run: |
-          xmllint --noout --schema scap-ng/third_party/scap-1.4-schemas/xccdf_1.2.xsd \
-            work/rhel9-regenerated-xccdf.xml
+          python - <<'PY'
+          from lxml import etree as E
+          schema=E.XMLSchema(E.parse('scap-ng/third_party/scap-1.4-schemas/xccdf_1.2.xsd'))
+          doc=E.parse('work/rhel9-regenerated-xccdf.xml')
+          schema.assertValid(doc)
+          print('regenerated XCCDF 1.2: schema PASS')
+          PY
 
       - name: Compare regenerated XCCDF policy semantics
         run: |
