@@ -6,7 +6,7 @@ lineage is written separately under evidence/.
 """
 
 from __future__ import annotations
-import hashlib, json, re, shutil, tempfile, urllib.request, zipfile
+import hashlib, json, os, re, shutil, tempfile, urllib.request, zipfile
 from copy import deepcopy
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -17,11 +17,13 @@ SOURCE_URL = (
     "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip"
 )
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "research/iterations/003/source/split-rule-assessment/rhel9-review-slice"
-LEGACY_OUT = ROOT / "research/iterations/003/source/split-policy-assessment/rhel9-review-slice"
-EVIDENCE = ROOT / "research/iterations/003/evidence/rhel9-review-slice"
+FULL_MODE = os.environ.get("SCAP_NG_V003_MODE", "slice").lower() == "full"
+BUILD_NAME = "rhel9-full" if FULL_MODE else "rhel9-review-slice"
+OUT = ROOT / "research/iterations/003/source/split-rule-assessment" / BUILD_NAME
+LEGACY_OUT = ROOT / "research/iterations/003/source/split-policy-assessment" / BUILD_NAME
+EVIDENCE = ROOT / "research/iterations/003/evidence" / BUILD_NAME
 PACKAGE_OUT = ROOT / "research/iterations/003/packages"
-PACKAGE_NAME = "rhel9-review-slice.scap-ng.zip"
+PACKAGE_NAME = f"{BUILD_NAME}.scap-ng.zip"
 XCCDF = "http://checklists.nist.gov/xccdf/1.2"
 NS = {"x": XCCDF}
 
@@ -299,8 +301,8 @@ def build_experimental_package(source_root, package_path):
             zf.writestr(info, data)
 
     # Write a review copy beside the package so manifest diffs are visible.
-    write_json(package_path.parent / "rhel9-review-slice.manifest.json", manifest)
-    stale_index = package_path.parent / "rhel9-review-slice.index.json"
+    write_json(package_path.parent / f"{BUILD_NAME}.manifest.json", manifest)
+    stale_index = package_path.parent / f"{BUILD_NAME}.index.json"
     if stale_index.exists():
         stale_index.unlink()
 
@@ -1226,32 +1228,21 @@ def main():
             )) == "manual"
         ]
 
-        # Golden review slice:
-        # - three baseline automated Rules;
-        # - one Rule with real source Rule-level applicability;
-        # - one manual/default Rule.
-        baseline = [r for r in rs if fully_lowerable(r, oval_bundle)][:3]
-        preferred_applicability = ["RHEL-09-211035", "RHEL-09-271010", "RHEL-09-231065"]
-        applicability_rules = []
-        for wanted in preferred_applicability:
-            candidate = next((r for r in rs if r.get("stig_id") == wanted), None)
-            if (
-                candidate
-                and candidate["platforms"]
-                and not candidate["requires"]
-                and not candidate["conflicts"]
-                and compliance_lowerable(candidate, oval_bundle)
-                and applicability_lowerable(candidate, platform_nodes, oval_bundle)
-            ):
-                applicability_rules.append(candidate)
-            if len(applicability_rules) == 2:
-                break
-        if len(applicability_rules) < 2:
-            for candidate in rs:
-                if candidate in applicability_rules:
-                    continue
+        if FULL_MODE:
+            selected = list(rs)
+        else:
+            # Golden review slice:
+            # - three baseline automated Rules;
+            # - one Rule with real source Rule-level applicability;
+            # - one manual/default Rule.
+            baseline = [r for r in rs if fully_lowerable(r, oval_bundle)][:3]
+            preferred_applicability = ["RHEL-09-211035", "RHEL-09-271010", "RHEL-09-231065"]
+            applicability_rules = []
+            for wanted in preferred_applicability:
+                candidate = next((r for r in rs if r.get("stig_id") == wanted), None)
                 if (
-                    candidate["platforms"]
+                    candidate
+                    and candidate["platforms"]
                     and not candidate["requires"]
                     and not candidate["conflicts"]
                     and compliance_lowerable(candidate, oval_bundle)
@@ -1260,25 +1251,40 @@ def main():
                     applicability_rules.append(candidate)
                 if len(applicability_rules) == 2:
                     break
-        preferred_manual = ["RHEL-09-251035", "RHEL-09-411095", "RHEL-09-211015"]
-        manual_rule = next(
-            (r for wanted in preferred_manual for r in rs if r.get("stig_id") == wanted and manual_only_lowerable(r)),
-            None,
-        )
-        if manual_rule is None:
-            manual_rule = next((r for r in rs if manual_only_lowerable(r)), None)
-
-        selected = []
-        for candidate in baseline + applicability_rules + [manual_rule]:
-            if candidate and candidate["id"] not in {r["id"] for r in selected}:
-                selected.append(candidate)
-
-        if len(selected) < 6 or len(applicability_rules) < 2 or manual_rule is None:
-            raise RuntimeError(
-                "Golden slice requirements not satisfied: "
-                f"selected={len(selected)}, applicability={len(applicability_rules)}, manual={bool(manual_rule)}"
+            if len(applicability_rules) < 2:
+                for candidate in rs:
+                    if candidate in applicability_rules:
+                        continue
+                    if (
+                        candidate["platforms"]
+                        and not candidate["requires"]
+                        and not candidate["conflicts"]
+                        and compliance_lowerable(candidate, oval_bundle)
+                        and applicability_lowerable(candidate, platform_nodes, oval_bundle)
+                    ):
+                        applicability_rules.append(candidate)
+                    if len(applicability_rules) == 2:
+                        break
+            preferred_manual = ["RHEL-09-251035", "RHEL-09-411095", "RHEL-09-211015"]
+            manual_rule = next(
+                (r for wanted in preferred_manual for r in rs if r.get("stig_id") == wanted and manual_only_lowerable(r)),
+                None,
             )
-
+            if manual_rule is None:
+                manual_rule = next((r for r in rs if manual_only_lowerable(r)), None)
+    
+            selected = []
+            for candidate in baseline + applicability_rules + [manual_rule]:
+                if candidate and candidate["id"] not in {r["id"] for r in selected}:
+                    selected.append(candidate)
+    
+            if len(selected) < 6 or len(applicability_rules) < 2 or manual_rule is None:
+                raise RuntimeError(
+                    "Golden slice requirements not satisfied: "
+                    f"selected={len(selected)}, applicability={len(applicability_rules)}, manual={bool(manual_rule)}"
+                )
+    
+    
         selected_ids = [r["id"] for r in selected]
         source_to_native = {r["source_rule_id"]: r["id"] for r in rs}
 
@@ -1317,7 +1323,7 @@ def main():
         version_node = xr.find("x:version", NS)
         benchmark_doc = {
             "benchmark": {
-                "id": "rhel9-stig-review-slice",
+                "id": "rhel9-stig-full" if FULL_MODE else "rhel9-stig-review-slice",
                 "use_case": "compliance",
                 "title": localized_texts(xr, "title"),
                 "description": localized_texts(xr, "description"),
@@ -1378,6 +1384,18 @@ def main():
 
         evidence = []
         diagnostics = []
+        if FULL_MODE:
+            for rec in selected:
+                reason = lowerability_reason(rec, oval_bundle)
+                if reason:
+                    add_diagnostic(
+                        diagnostics,
+                        "error",
+                        "RULE_NOT_FULLY_LOWERABLE",
+                        "Rule contains source semantics that the current v003 native lowerer cannot yet represent faithfully.",
+                        rule_id=rec["id"],
+                        detail=reason,
+                    )
         for item in unsupported_metadata:
             add_diagnostic(
                 diagnostics,
@@ -1430,15 +1448,48 @@ def main():
 
             if rec["platforms"]:
                 if len(rec["platforms"]) != 1:
-                    raise RuntimeError(f"{rid}: multiple Rule applicability predicates not yet supported")
-                source_platform_id = rec["platforms"][0].lstrip("#")
-                platform_node = platform_nodes.get(source_platform_id)
-                if platform_node is None:
-                    raise RuntimeError(f"{rid}: source platform predicate not found")
-                app_id, app_assessment, app_error = lower_source_platform(platform_node, oval_bundle)
-                if app_error:
-                    raise RuntimeError(f"{rid}: applicability lowering failed: {app_error}")
-                app_definition_id = source_platform_definition_id(platform_node)
+                    if FULL_MODE:
+                        add_diagnostic(
+                            diagnostics, "error", "RULE_APPLICABILITY_MULTIPLE_PREDICATES_UNSUPPORTED",
+                            "Rule has multiple source applicability predicates; current v003 lowering requires explicit design support.",
+                            rule_id=rid,
+                        )
+                        rec_platform_error = True
+                    else:
+                        raise RuntimeError(f"{rid}: multiple Rule applicability predicates not yet supported")
+                else:
+                    rec_platform_error = False
+                if rec_platform_error:
+                    platform_node = None
+                else:
+                    source_platform_id = rec["platforms"][0].lstrip("#")
+                    platform_node = platform_nodes.get(source_platform_id)
+                    if platform_node is None:
+                        if FULL_MODE:
+                            add_diagnostic(
+                                diagnostics, "error", "RULE_APPLICABILITY_SOURCE_NOT_FOUND",
+                                "Source applicability predicate could not be resolved.",
+                                rule_id=rid, source_id=source_platform_id,
+                            )
+                            rec_platform_error = True
+                        else:
+                            raise RuntimeError(f"{rid}: source platform predicate not found")
+                if not rec_platform_error:
+                    app_id, app_assessment, app_error = lower_source_platform(platform_node, oval_bundle)
+                    if app_error:
+                        if FULL_MODE:
+                            add_diagnostic(
+                                diagnostics, "error", "RULE_APPLICABILITY_LOWERING_UNSUPPORTED",
+                                "Rule applicability could not be represented faithfully by the current v003 lowerer.",
+                                rule_id=rid, detail=app_error,
+                            )
+                            rec_platform_error = True
+                        else:
+                            raise RuntimeError(f"{rid}: applicability lowering failed: {app_error}")
+                if not rec_platform_error:
+                    app_definition_id = source_platform_definition_id(platform_node)
+                else:
+                    app_definition_id = None
                 if app_definition_id:
                     oval_descriptive_metadata_diagnostics(
                         oval_bundle,
@@ -1447,10 +1498,13 @@ def main():
                         app_assessment["assessment"]["id"],
                         diagnostics,
                     )
-                rule_doc["rule"]["applicability"] = [app_id]
-                app_assessment_id = app_assessment["assessment"]["id"]
-                applicability_registry[app_id] = app_assessment_id
-                if app_assessment_id not in applicability_assessments_written:
+                if not rec_platform_error:
+                    rule_doc["rule"]["applicability"] = [app_id]
+                    app_assessment_id = app_assessment["assessment"]["id"]
+                    applicability_registry[app_id] = app_assessment_id
+                else:
+                    app_assessment_id = None
+                if app_assessment_id and app_assessment_id not in applicability_assessments_written:
                     write_yaml(
                         OUT / "assessments/applicability" / f"{app_assessment_id}.yaml",
                         app_assessment,
@@ -1486,18 +1540,45 @@ def main():
                     aid = f"{rid}.automated"
                     assessment, error = lower_definition(oval_bundle, definition_id, aid)
                     if assessment is None:
-                        raise RuntimeError(f"{rid}: automated lowering regressed: {error}")
-                    oval_descriptive_metadata_diagnostics(
-                        oval_bundle, definition_id, rid, aid, diagnostics
-                    )
-                    write_yaml(OUT / "assessments/automated" / f"{rid}.automated.assessment.yaml", assessment)
-                    definition_to_assessment[definition_id] = aid
-                checks[selector] = aid
+                        if FULL_MODE:
+                            add_diagnostic(
+                                diagnostics, "error", "AUTOMATED_ASSESSMENT_NOT_LOWERABLE",
+                                "Automated source Assessment was not emitted because it cannot be represented faithfully.",
+                                rule_id=rid, assessment_id=aid, source_id=definition_id, detail=error,
+                            )
+                            aid = None
+                        else:
+                            raise RuntimeError(f"{rid}: automated lowering regressed: {error}")
+                    else:
+                        oval_descriptive_metadata_diagnostics(
+                            oval_bundle, definition_id, rid, aid, diagnostics
+                        )
+                        write_yaml(OUT / "assessments/automated" / f"{rid}.automated.assessment.yaml", assessment)
+                        definition_to_assessment[definition_id] = aid
+                if aid is not None:
+                    checks[selector] = aid
 
             rule_doc["rule"]["checks"] = checks
-            if "default" in checks: rule_doc["rule"]["default_check"] = "default"
-            elif len(checks) == 1: rule_doc["rule"]["default_check"] = next(iter(checks))
-            else: raise RuntimeError(f"{rid}: no source default check could be preserved")
+            if "default" in checks:
+                rule_doc["rule"]["default_check"] = "default"
+            elif len(checks) == 1:
+                rule_doc["rule"]["default_check"] = next(iter(checks))
+            elif FULL_MODE and not checks:
+                add_diagnostic(
+                    diagnostics, "error", "RULE_HAS_NO_EMITTABLE_ASSESSMENT",
+                    "No Assessment could be emitted for this Rule.",
+                    rule_id=rid,
+                )
+                rule_doc["rule"]["default_check"] = None
+            elif FULL_MODE:
+                add_diagnostic(
+                    diagnostics, "error", "RULE_DEFAULT_CHECK_NOT_PRESERVED",
+                    "Multiple remaining Assessment selections exist but the source default could not be preserved.",
+                    rule_id=rid,
+                )
+                rule_doc["rule"]["default_check"] = None
+            else:
+                raise RuntimeError(f"{rid}: no source default check could be preserved")
             write_yaml(OUT / "rules" / f"{rid}.rule.yaml", rule_doc)
 
             evidence.append({
