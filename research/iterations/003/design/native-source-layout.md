@@ -109,3 +109,56 @@ properties.
 This explicit-field rule does not override Profile canonicalization decisions
 where omission itself is semantically meaningful (for example, omission of
 `disabled_rules` means the Profile does not alter Benchmark Rule selection).
+
+
+## Hierarchical Group taxonomy
+
+Groups SHALL support child Groups recursively.
+
+For the iteration-003 migration experiment, the preferred generated hierarchy
+is assessment-oriented at the top level and functional beneath it.
+
+Illustrative form:
+
+    groups:
+      - id: automated
+        title: Automated
+        groups:
+          - id: automated.ssh
+            title: SSH
+            rules:
+              - RHEL-09-...
+          - id: automated.password-policy
+            title: Password Policy
+            rules:
+              - RHEL-09-...
+
+      - id: manual-or-managerial
+        title: Manual or Managerial
+        groups:
+          - id: manual-or-managerial.account-management
+            title: Account Management
+            rules:
+              - RHEL-09-...
+          - id: manual-or-managerial.documentation
+            title: Documentation / Managerial Review
+            rules:
+              - RHEL-09-...
+
+The top-level classification SHOULD follow the Rule's effective/default
+Assessment Method, not merely the existence of an alternate manual check.
+
+A Rule whose default check is automated but that also provides a manual
+alternative belongs under `automated` unless human/managerial judgment is
+material to the effective policy decision.
+
+Functional subgrouping MAY be inferred from title, discussion, remediation,
+manual procedure, Assessment capability, and affected configuration artifact.
+
+Generated Group classification is migration metadata and navigation structure.
+It SHALL NOT alter Rule applicability, Rule selection, Assessment behavior,
+Parameter binding, or result semantics.
+
+When the converter cannot infer a useful functional subgroup with sufficient
+confidence, it SHOULD place the Rule under a `needs-grouping` child of the
+appropriate assessment-mode parent rather than fabricate a topic.
