@@ -17,7 +17,8 @@ SOURCE_URL = (
     "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip"
 )
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "research/iterations/003/source/split-policy-assessment/rhel9-review-slice"
+OUT = ROOT / "research/iterations/003/source/split-rule-assessment/rhel9-review-slice"
+LEGACY_OUT = ROOT / "research/iterations/003/source/split-policy-assessment/rhel9-review-slice"
 EVIDENCE = ROOT / "research/iterations/003/evidence/rhel9-review-slice"
 XCCDF = "http://checklists.nist.gov/xccdf/1.2"
 NS = {"x": XCCDF}
@@ -341,7 +342,7 @@ def normalized_fixes(rule):
         fixes.append(item)
     return fixes, None
 
-def policy_content(rule):
+def rule_content(rule):
     out = {}
     raw = rule.find("x:description", NS)
     if raw is not None:
@@ -802,6 +803,7 @@ def benchmark_platform_conditions():
 
 def main():
     shutil.rmtree(OUT, ignore_errors=True)
+    shutil.rmtree(LEGACY_OUT, ignore_errors=True)
     shutil.rmtree(EVIDENCE, ignore_errors=True)
     OUT.mkdir(parents=True); EVIDENCE.mkdir(parents=True)
 
@@ -1034,7 +1036,7 @@ def main():
         ]
         for rec in selected:
             rid = rec["id"]; rule = rec["element"]
-            content_fields = policy_content(rule)
+            content_fields = rule_content(rule)
             publisher_extension = {
                 "documentable": content_fields.get("documentable"),
                 "false_positives": content_fields.get("false_positives"),
@@ -1043,7 +1045,7 @@ def main():
                 "potential_impacts": content_fields.get("potential_impacts"),
                 "responsibility": content_fields.get("responsibility"),
             }
-            policy = {"policy": {
+            rule_doc = {"rule": {
                 "id": rid,
                 "title": rec["title"],
                 "severity": rec["severity"],
@@ -1076,7 +1078,7 @@ def main():
                 app_id, app_assessment, app_error = lower_source_platform(platform_node, oval_bundle)
                 if app_error:
                     raise RuntimeError(f"{rid}: applicability lowering failed: {app_error}")
-                policy["policy"]["applicability"] = [app_id]
+                rule_doc["rule"]["applicability"] = [app_id]
                 app_assessment_id = app_assessment["assessment"]["id"]
                 applicability_registry[app_id] = app_assessment_id
                 if app_assessment_id not in applicability_assessments_written:
@@ -1119,11 +1121,11 @@ def main():
                     definition_to_assessment[definition_id] = aid
                 checks[selector] = aid
 
-            policy["policy"]["checks"] = checks
-            if "default" in checks: policy["policy"]["default_check"] = "default"
-            elif len(checks) == 1: policy["policy"]["default_check"] = next(iter(checks))
+            rule_doc["rule"]["checks"] = checks
+            if "default" in checks: rule_doc["rule"]["default_check"] = "default"
+            elif len(checks) == 1: rule_doc["rule"]["default_check"] = next(iter(checks))
             else: raise RuntimeError(f"{rid}: no source default check could be preserved")
-            write_yaml(OUT / "policy" / f"{rid}.policy.yaml", policy)
+            write_yaml(OUT / "rules" / f"{rid}.rule.yaml", rule_doc)
 
             evidence.append({
                 "publisher_extension": {
