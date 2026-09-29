@@ -264,28 +264,24 @@ def build_experimental_package(source_root, package_path):
     if missing_rules:
         raise RuntimeError(f"package index cannot resolve Benchmark Rules: {missing_rules}")
 
-    index = {
-        "format": "scap-ng-object-index",
-        "format_version": "0.0.3-experimental",
-        "benchmark": benchmark_id,
-        "objects": objects,
-    }
-    index_bytes = canonical_json_bytes(index)
-    members["index.json"] = index_bytes
-
-    manifest_members = {
-        name: {
-            "sha256": sha256(data),
+    # One package manifest is both the logical-object resolver and integrity map.
+    # Avoid a separate index that would duplicate path/digest information.
+    manifest_objects = {}
+    for object_id, record in sorted(objects.items()):
+        package_member = record["path"]
+        data = members[package_member]
+        manifest_objects[object_id] = {
+            "type": record["type"],
+            "path": package_member,
+            "sha256": record["sha256"],
             "size": len(data),
         }
-        for name, data in sorted(members.items())
-    }
+
     manifest = {
         "format": "scap-ng-package-manifest",
         "format_version": "0.0.3-experimental",
         "benchmark": benchmark_id,
-        "index": "index.json",
-        "members": manifest_members,
+        "objects": manifest_objects,
     }
     manifest_bytes = canonical_json_bytes(manifest)
     members["manifest.json"] = manifest_bytes
@@ -302,9 +298,11 @@ def build_experimental_package(source_root, package_path):
             info.external_attr = 0o644 << 16
             zf.writestr(info, data)
 
-    # Write review copies beside the package so index/manifest diffs are visible.
-    write_json(package_path.parent / "rhel9-review-slice.index.json", index)
+    # Write a review copy beside the package so manifest diffs are visible.
     write_json(package_path.parent / "rhel9-review-slice.manifest.json", manifest)
+    stale_index = package_path.parent / "rhel9-review-slice.index.json"
+    if stale_index.exists():
+        stale_index.unlink()
 
     return {
         "package": str(package_path.relative_to(ROOT)),
