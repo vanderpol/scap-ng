@@ -123,3 +123,26 @@ not scanner-facing Assessment semantics.
 Information needed to identify what actually executed and produced a result,
 such as package identity, Benchmark/Profile identity, effective inputs,
 Assessment identity/version, scanner identity, and timestamps.
+
+
+## Assessment class
+
+The semantic category of an Assessment Method.
+
+The inherited class vocabulary is `compliance`, `vulnerability`, `patch`,
+`inventory`, and `miscellaneous`.
+
+Assessment class describes what a true result means. It is independent of the
+context in which the Assessment is invoked.
+
+`information` is a reserved candidate SCAP-NG class. It is not an OVAL class
+and SHALL NOT become normative without affirmative OVAL Board / SCAP-NG
+governance approval.
+
+## Assessment purpose
+
+The context in which an Assessment Method is invoked.
+
+The initial purpose vocabulary is `assessment` and `applicability`.
+
+Purpose SHALL NOT be used as a substitute for Assessment class.
