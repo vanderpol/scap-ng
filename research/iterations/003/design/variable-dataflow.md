@@ -259,3 +259,67 @@ Two complementary test corpora SHALL be used:
 
 Coverage SHALL be measured against the XSD/Schematron language surface, not only
 against constructs observed in one benchmark.
+
+
+## Working decision: named Variables and inline expression trees
+
+**Status:** working SCAP-NG design decision; SHALL be presented to the OVAL Board for review.
+
+SCAP-NG SHALL follow the existing OVAL design principle that a named Variable
+may contain a recursively nested expression tree.
+
+Functions/components within a Variable MAY be nested inline and do not require
+individual Variable identifiers merely because they produce intermediate
+results.
+
+A derived value that is referenced outside its containing expression tree SHALL
+be promoted to a named Variable and its identifier SHALL include `variable`.
+
+Authors MAY voluntarily promote any intermediate expression to a named Variable
+for:
+
+- reuse;
+- readability;
+- diagnostics;
+- debugging; or
+- breadcrumb-style dependency tracing.
+
+For example, the compact form:
+
+    unique-uid-count-variable:
+      expression:
+        count:
+          unique:
+            variable: interactive-uids-variable
+
+and the breadcrumb form:
+
+    unique-uids-variable:
+      expression:
+        unique:
+          variable: interactive-uids-variable
+
+    unique-uid-count-variable:
+      expression:
+        count:
+          variable: unique-uids-variable
+
+are semantically equivalent when the intermediate value is not otherwise
+consumed.
+
+Checks, Collections, States, Filters, and other Variables SHOULD consume named
+Variables rather than embedding arbitrary expression trees directly at those
+consumption sites. The expression tree belongs to the Variable definition.
+
+### OVAL Board review question
+
+Confirm whether SCAP-NG should retain this OVAL-derived model:
+
+> A Variable is the named/addressable value node; its internal function/component
+> expression may be arbitrarily nested. Intermediate expressions need not have
+> IDs unless referenced externally, but authors may name them for reuse or
+> debugging.
+
+The board review should include both compact and breadcrumb examples and confirm
+that no interoperability or diagnostics requirement justifies forcing every
+intermediate expression to become a separately named Variable.
