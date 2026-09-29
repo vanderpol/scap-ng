@@ -45,6 +45,14 @@ def write_json(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
+def evidence_tree(node):
+    return {
+        "element": local(node.tag),
+        "attributes": dict(node.attrib),
+        "text": text(node),
+        "children": [evidence_tree(child) for child in list(node)],
+    }
+
 def load_source_components(files):
     benchmark = oval = None
     benchmark_source = oval_source = None
@@ -605,20 +613,9 @@ def main():
             for source_name, source_root in all_xml_roots:
                 for node in source_root.iter():
                     if node.get("id") == platform_ref:
-                        matches.append({
-                            "source_file": source_name,
-                            "element": local(node.tag),
-                            "attributes": dict(node.attrib),
-                            "text": text(node),
-                            "children": [
-                                {
-                                    "element": local(child.tag),
-                                    "attributes": dict(child.attrib),
-                                    "text": text(child),
-                                }
-                                for child in list(node)
-                            ],
-                        })
+                        item = evidence_tree(node)
+                        item["source_file"] = source_name
+                        matches.append(item)
             source_platform_inventory.append({
                 "source_id": platform_ref,
                 "matches": matches,
