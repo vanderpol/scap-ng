@@ -11,6 +11,7 @@ on:
       - "tools/verify_scap14_to_scapng_conversion.py"
       - "tools/test_xccdf_check_selector_conversion.py"
       - "tools/test_xccdf_profile_resolution.py"
+      - "tools/promote_exact_shared_assessments.py"
   workflow_dispatch:
 
 permissions:
@@ -229,6 +230,16 @@ jobs:
             windows-server-2025=downloads/four-anchor-windows-server-2025/windows-server-2025-scapng/canonical-benchmark.json \
             --output scap-ng/research/iterations/001/generated/four-anchor-reuse/assessment-reuse.json
 
+      - name: Promote exact cross-STIG Assessments into shared catalog
+        run: |
+          python scap-ng/tools/promote_exact_shared_assessments.py \
+            scap-ng/research/iterations/001/generated/four-anchor-reuse/assessment-reuse.json \
+            rhel9=downloads/four-anchor-rhel9/rhel9-scapng/canonical-benchmark.json \
+            oracle-linux9=downloads/four-anchor-oracle-linux9/oracle-linux9-scapng/canonical-benchmark.json \
+            windows11=downloads/four-anchor-windows11/windows11-scapng/canonical-benchmark.json \
+            windows-server-2025=downloads/four-anchor-windows-server-2025/windows-server-2025-scapng/canonical-benchmark.json \
+            --output-dir scap-ng/research/iterations/002/generated/exact-shared-assessments
+
       - name: Render exact reuse in all three YAML designs
         run: |
           python scap-ng/tools/render_scapng_reuse_views.py \
@@ -344,6 +355,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add research/iterations/001/generated/four-anchor-reuse
           git add research/iterations/001/demonstrations/four-anchor
+          git add research/iterations/002/generated/exact-shared-assessments
           if git diff --cached --quiet; then
             echo "Four-anchor reuse evidence already matches."
             exit 0
