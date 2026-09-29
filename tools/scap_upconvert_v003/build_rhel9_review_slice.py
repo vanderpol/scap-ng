@@ -822,7 +822,7 @@ def lower_definition(oroot, definition_id, assessment_id):
             name = local(child.tag)
             if name in ("behaviors", "set", "filter"):
                 return None, f"object_{name}_not_yet_lowered"
-            if child.get("var_ref"):
+            if name == "var_ref" or child.get("var_ref"):
                 return None, "object_variable_not_yet_lowered"
             value = text(child)
             if value is not None:
@@ -841,7 +841,7 @@ def lower_definition(oroot, definition_id, assessment_id):
                 state_titles.append(node_title(state))
             conditions = []
             for child in state:
-                if child.get("var_ref"):
+                if local(child.tag) == "var_ref" or child.get("var_ref"):
                     return None, "state_variable_not_yet_lowered"
                 item = {
                     "field": local(child.tag),
