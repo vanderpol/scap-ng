@@ -37,6 +37,14 @@ jobs:
           mkdir -p work
           python scap-ng/tools/scap14_rule_splitter.py             niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --output-dir work/rhel9-split             --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd             --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5             --source-repository-path Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --benchmark-key rhel9             --fail-on-unresolved
 
+      - name: Build semantic IR for every split OVAL document
+        run: |
+          set -euo pipefail
+          while IFS= read -r oval; do
+            out="$(dirname "$oval")/oval-ir.json"
+            python scap-ng/tools/oval_semantic_ir.py "$oval" --output "$out" --fail-on-unresolved
+          done < <(find work/rhel9-split -name oval.xml -type f | sort)
+
       - name: Build complete benchmark semantic IR
         run: |
           python scap-ng/tools/scap14_benchmark_ir.py             niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --split-root work/rhel9-split             --output work/rhel9-benchmark-ir.json
