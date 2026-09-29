@@ -271,14 +271,28 @@ def compare(a,b,source_root=None,regenerated_root=None):
         result["regenerated_"+label+"_count"]=sum(B.values())
         result["equal"]=result["equal"] and result[label+"_equal"]
     if source_root:
-        if not regenerated_root:
-            if len(bm.definitions)!=1:
-                raise ValueError("regenerated root must be supplied when output contains != 1 definition")
-            regenerated_root=next(iter(bm.definitions))
-        sd=am.definition(source_root); rd=bm.definition(regenerated_root)
-        result["definition_equal"]=sd==rd
-        result["source_definition"]=repr(sd)
-        result["regenerated_definition"]=repr(rd)
+        if isinstance(source_root,(list,tuple)):
+            source_roots=list(source_root)
+            if regenerated_root is None:
+                regenerated_roots=list(bm.definitions)
+            elif isinstance(regenerated_root,(list,tuple)):
+                regenerated_roots=list(regenerated_root)
+            else:
+                regenerated_roots=[regenerated_root]
+            sd=collections.Counter(repr(am.definition(x)) for x in source_roots)
+            rd=collections.Counter(repr(bm.definition(x)) for x in regenerated_roots)
+            result["definition_equal"]=sd==rd
+            result["source_definitions"]=list(sd.elements())
+            result["regenerated_definitions"]=list(rd.elements())
+        else:
+            if not regenerated_root:
+                if len(bm.definitions)!=1:
+                    raise ValueError("regenerated root must be supplied when output contains != 1 definition")
+                regenerated_root=next(iter(bm.definitions))
+            sd=am.definition(source_root); rd=bm.definition(regenerated_root)
+            result["definition_equal"]=sd==rd
+            result["source_definition"]=repr(sd)
+            result["regenerated_definition"]=repr(rd)
         result["equal"]=result["equal"] and result["definition_equal"]
     return result
 
