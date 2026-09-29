@@ -40,6 +40,34 @@ _FORBIDDEN_KEYS = {
     "source_check_logic",
 }
 
+# Human-readable documentation may describe legacy source concepts or identifiers.
+# Cleanliness is meant to prohibit machine-facing dependence on legacy structures,
+# not erase useful explanatory text. Provenance remains separate from native
+# semantics, while descriptive fields can still say where a concept came from.
+_DOCUMENTATION_FIELDS = {
+    "assessment_title",
+    "test_title",
+    "object_title",
+    "state_title",
+    "title",
+    "description",
+    "discussion",
+    "rationale",
+    "procedure",
+    "guidance",
+    "message",
+    "comment",
+    "warnings",
+}
+
+
+def _is_documentation_path(path: str) -> bool:
+    for field in _DOCUMENTATION_FIELDS:
+        marker = f".{field}"
+        if path.endswith(marker) or marker + "[" in path or marker + "." in path:
+            return True
+    return False
+
 
 def _walk(value: Any, path: str = "$") -> Iterable[tuple[str, Any]]:
     yield path, value
@@ -67,7 +95,7 @@ def find_legacy_residue(document: Any) -> list[LegacyResidue]:
                         )
                     )
 
-        if isinstance(value, str):
+        if isinstance(value, str) and not _is_documentation_path(path):
             for pattern, reason in _PATTERNS:
                 if pattern.search(value):
                     findings.append(
