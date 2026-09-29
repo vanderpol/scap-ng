@@ -279,6 +279,21 @@ def build(data):
                 ve = ET.SubElement(vs, q(OVAL_DEF, "constant_variable"), attrs)
                 for value in var["values"]:
                     ET.SubElement(ve, q(OVAL_DEF, "value")).text = str(value)
+            elif kind == "external":
+                ve = ET.SubElement(vs, q(OVAL_DEF, "external_variable"), attrs)
+                for pv in var.get("possible_values", []):
+                    pe = ET.SubElement(ve, q(OVAL_DEF, "possible_value"), {"hint": pv["hint"]})
+                    pe.text = str(pv["value"])
+                for pr in var.get("possible_restrictions", []):
+                    pre = ET.SubElement(ve, q(OVAL_DEF, "possible_restriction"), {
+                        "hint": pr["hint"],
+                        "operator": pr.get("operator", "AND"),
+                    })
+                    for rr in pr["restrictions"]:
+                        re = ET.SubElement(pre, q(OVAL_DEF, "restriction"), {
+                            "operation": rr["operation"]
+                        })
+                        re.text = str(rr["value"])
             elif kind == "local":
                 ve = ET.SubElement(vs, q(OVAL_DEF, "local_variable"), attrs)
                 emit_expression(ve, var["expression"], ids)
