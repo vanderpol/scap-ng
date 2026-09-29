@@ -48,8 +48,8 @@ requested selector that is not exposed by the governing policy is a resolution e
 See:
 
 - `decisions/check-selection-and-tailoring.md`
-- `../../specification/policy/policy-resolution.md`
-- `../../specification/policy/profiles-and-tailoring.md`
+- `../../../specification/policy/policy-resolution.md`
+- `../../../specification/policy/profiles-and-tailoring.md`
 
 ### Rule-centric authoring context
 
@@ -86,7 +86,7 @@ See:
 
 - `decisions/user-supplied-inputs.md`
 - `decisions/parameter-model.md`
-- `../../specification/policy/parameters-and-organizational-input.md`
+- `../../../specification/policy/parameters-and-organizational-input.md`
 
 ### File naming
 
