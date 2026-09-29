@@ -206,17 +206,19 @@ When present, the preferred native field names are:
 These titles are descriptive metadata. Changing only a title SHALL NOT change
 Assessment truth or technical semantic identity.
 
-`assessment_title` is optional. Native content SHOULD NOT populate it merely
-by copying the governing Rule title. It is most useful when an Assessment has a
-meaningful standalone or reusable description that differs from the Rule.
+`assessment_title` is a standard Assessment field in the current draft and SHOULD remain
+visible in human-authored/review source even when unset. Its value MAY be null.
+Native content SHOULD NOT populate it merely by copying the governing Rule title.
+It is most useful when an Assessment has a meaningful standalone or reusable
+description that differs from the Rule.
 
 Migration tooling SHOULD preserve an OVAL Definition
 `metadata/title` as `assessment_title` when present. Migration tooling SHOULD
 also preserve useful OVAL Test/Object/State/Variable `comment` attributes by
 mapping them to the corresponding typed title fields.
 
-An absent source title SHALL remain absent/null rather than being synthesized
-solely to populate the field.
+An absent source title SHALL be represented as `assessment_title: null` rather
+than being synthesized solely to populate the field.
 
 OVAL `criteria` and `criterion` comments SHALL NOT be promoted into native
 SCAP-NG Boolean-expression titles merely because they exist in legacy content.
