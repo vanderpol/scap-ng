@@ -1,0 +1,118 @@
+{
+  "fixture_version": 1,
+  "id": "rhel-audit-log-partition",
+  "source": {
+    "repository": "vanderpol/scap-content",
+    "path": "projects/linux/rhel10/oval/U_RHEL_10_SV-280936-oval.xml",
+    "note": "Real production-derived OVAL used as a dependency-shape stress case."
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "fstab-audit-path-check",
+        "type": "independent.textfilecontent54",
+        "check_existence": "all_exist",
+        "check": "all",
+        "collection": "fstab-audit-path-collection"
+      },
+      {
+        "id": "audit-partition-check",
+        "type": "linux.partition",
+        "check_existence": "all_exist",
+        "check": "all",
+        "collection": "audit-partition-collection"
+      }
+    ],
+    "collections": [
+      {
+        "id": "auditd-log-file-collection",
+        "type": "independent.textfilecontent54",
+        "behaviors": {
+          "ignore_case": true
+        },
+        "selectors": {
+          "filepath": "/etc/audit/auditd.conf",
+          "pattern": {
+            "operation": "pattern match",
+            "value": "^\\\\s*log_file\\\\s*=\\\\s*(\\\\S+)/\\\\S+\\\\s*$"
+          },
+          "instance": {
+            "datatype": "int",
+            "operation": "greater than or equal",
+            "value": "1"
+          }
+        }
+      },
+      {
+        "id": "fstab-audit-path-collection",
+        "type": "independent.textfilecontent54",
+        "selectors": {
+          "filepath": "/etc/fstab",
+          "pattern": {
+            "datatype": "string",
+            "operation": "pattern match",
+            "variable": "fstab-audit-regex-variable",
+            "var_check": "at least one"
+          },
+          "instance": {
+            "datatype": "int",
+            "operation": "greater than or equal",
+            "value": "1"
+          }
+        }
+      },
+      {
+        "id": "audit-partition-collection",
+        "type": "linux.partition",
+        "selectors": {
+          "mount_point": {
+            "datatype": "string",
+            "variable": "audit-directory-variable",
+            "var_check": "at least one"
+          }
+        }
+      }
+    ],
+    "variables": [
+      {
+        "id": "audit-directory-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "object_component": {
+            "collection": "auditd-log-file-collection",
+            "item_field": "subexpression"
+          }
+        }
+      },
+      {
+        "id": "fstab-audit-regex-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": "^[^# \\\\t]+\\\\s+"
+            },
+            {
+              "object_component": {
+                "collection": "auditd-log-file-collection",
+                "item_field": "subexpression"
+              }
+            },
+            {
+              "literal": "\\\\s+"
+            }
+          ]
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "checks": [
+        "audit-partition-check",
+        "fstab-audit-path-check"
+      ]
+    }
+  }
+}
