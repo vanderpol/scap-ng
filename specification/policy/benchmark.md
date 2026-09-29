@@ -128,9 +128,16 @@ Platform evaluation semantics are defined in
 When any Rule references named applicability conditions, the Benchmark SHALL
 declare the applicability catalog used to resolve those identifiers.
 
-The catalog relationship SHALL be explicit.
+The catalog relationship SHALL be explicit using the Benchmark
+`applicability_catalog` field.
 
-No filename such as `applicability.yaml` has implicit meaning.
+Illustrative authoring form:
+
+    benchmark:
+      applicability_catalog: applicability.yaml
+
+The value is an explicit source reference. No filename such as
+`applicability.yaml` has implicit meaning.
 
 A Benchmark SHALL NOT rely on scanner-specific knowledge to resolve an
 applicability identifier.
