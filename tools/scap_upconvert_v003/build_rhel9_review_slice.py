@@ -932,7 +932,7 @@ def main():
         preferred_applicability = ["RHEL-09-211035", "RHEL-09-271010", "RHEL-09-231065"]
         applicability_rules = []
         for wanted in preferred_applicability:
-            candidate = next((r for r in rs if r["id"] == wanted), None)
+            candidate = next((r for r in rs if r.get("stig_id") == wanted), None)
             if (
                 candidate
                 and candidate["platforms"]
@@ -960,7 +960,7 @@ def main():
                     break
         preferred_manual = ["RHEL-09-251035", "RHEL-09-411095", "RHEL-09-211015"]
         manual_rule = next(
-            (r for wanted in preferred_manual for r in rs if r["id"] == wanted and manual_only_lowerable(r)),
+            (r for wanted in preferred_manual for r in rs if r.get("stig_id") == wanted and manual_only_lowerable(r)),
             None,
         )
         if manual_rule is None:
