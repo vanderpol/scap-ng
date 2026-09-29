@@ -166,13 +166,28 @@ def build(data):
         md = ET.SubElement(d, q(OVAL_DEF, "metadata"))
         ET.SubElement(md, q(OVAL_DEF, "title")).text = f"Round-trip fixture {data['id']}"
         ET.SubElement(md, q(OVAL_DEF, "description")).text = "Generated from SCAP-NG semantic stress fixture."
-        criteria = ET.SubElement(d, q(OVAL_DEF, "criteria"),
-                                 {"operator": sem.get("root", {}).get("operator", "AND")})
-        for cid in sem.get("root", {}).get("checks", [c["id"] for c in checks]):
-            ET.SubElement(criteria, q(OVAL_DEF, "criterion"), {
-                "test_ref": ids.get("tst", cid),
-                "comment": cid,
-            })
+        def emit_criteria(parent, node):
+            attrs={"operator": node.get("operator","AND")}
+            if node.get("negate") is not None:
+                attrs["negate"]=str(bool(node["negate"])).lower()
+            ce=ET.SubElement(parent, q(OVAL_DEF, "criteria"), attrs)
+            children=node.get("children")
+            if children is None:
+                children=[{"check":cid} for cid in node.get("checks",[c["id"] for c in checks])]
+            for child in children:
+                if "check" in child:
+                    cid=child["check"]
+                    ca={"test_ref":ids.get("tst",cid),"comment":cid}
+                    if child.get("negate") is not None:
+                        ca["negate"]=str(bool(child["negate"])).lower()
+                    ET.SubElement(ce,q(OVAL_DEF,"criterion"),ca)
+                elif "operator" in child or "children" in child or "checks" in child:
+                    emit_criteria(ce,child)
+                else:
+                    die(f"unsupported root criteria node: {child}")
+            return ce
+
+        emit_criteria(d,sem.get("root",{}))
 
         tests = ET.SubElement(root, q(OVAL_DEF, "tests"))
         for chk in checks:
@@ -189,6 +204,10 @@ def build(data):
             ET.SubElement(t, q(ns, "object"), {
                 "object_ref": ids.get("obj", chk["collection"])
             })
+            for sid in chk.get("states", []):
+                ET.SubElement(t, q(ns, "state"), {
+                    "state_ref": ids.get("ste", sid)
+                })
 
     if collections:
         objects = ET.SubElement(root, q(OVAL_DEF, "objects"))
