@@ -1,0 +1,45 @@
+{
+  "fixture_version": 1,
+  "id": "extend-definition-edge-semantics",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:100",
+    "note": "Exercises negate and applicability_check on extend_definition during dereference.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/extend-definition-edge-semantics.xml"
+  },
+  "ng_semantics": {
+    "definition_class": "compliance",
+    "checks": [
+      {
+        "id": "edge-file-check",
+        "type": "unix.file",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "edge-file-collection"
+      }
+    ],
+    "collections": [
+      {
+        "id": "edge-file-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": "/tmp/scap-ng-edge-test"
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "children": [
+        {
+          "operator": "AND",
+          "negate": true,
+          "applicability_check": true,
+          "children": [
+            {
+              "check": "edge-file-check"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
