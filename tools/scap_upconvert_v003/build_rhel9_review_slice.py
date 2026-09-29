@@ -95,57 +95,118 @@ def find_by_id(root, item_id, suffix):
     if not item_id: return None
     return next((n for n in root.iter() if n.get("id") == item_id and local(n.tag).endswith(suffix)), None)
 
-def lower_simple_definition(oroot, definition_id, assessment_id):
+def lower_definition(oroot, definition_id, assessment_id):
+    """Lower Boolean definition logic while requiring every leaf test to be exact."""
     definition = next((n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id), None)
     if definition is None: return None, "definition_not_found"
-    criteria = next((c for c in definition if local(c.tag) == "criteria"), None)
-    if criteria is None: return None, "missing_criteria"
-    children = [c for c in criteria if local(c.tag) in ("criterion", "criteria", "extend_definition")]
-    if len(children) != 1 or local(children[0].tag) != "criterion":
-        return None, "complex_criteria"
-    if (criteria.get("negate") or "false").lower() == "true" or (children[0].get("negate") or "false").lower() == "true":
-        return None, "negated_criteria"
-    test_ref = children[0].get("test_ref")
-    test = next((n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")), None)
-    if test is None: return None, "test_not_found"
-    test_name = local(test.tag)
-    ns_uri = test.tag.split("}", 1)[0].strip("{")
-    family = ns_uri.split("#")[-1].split("/")[-1]
-    capability = f"{family}.{test_name[:-5] if test_name.endswith('_test') else test_name}"
-    obj_ref = None; state_refs = []
-    for child in test:
-        if local(child.tag) == "object": obj_ref = child.get("object_ref")
-        elif local(child.tag) == "state" and child.get("state_ref"): state_refs.append(child.get("state_ref"))
-    obj = find_by_id(oroot, obj_ref, "_object")
-    if obj is None: return None, "object_not_found"
-    query = {}
-    for child in obj:
-        name = local(child.tag)
-        if name in ("behaviors", "set", "filter"): return None, f"object_{name}_not_yet_lowered"
-        if child.get("var_ref"): return None, "object_variable_not_yet_lowered"
-        value = text(child)
-        if value is not None:
-            query[name] = ({ "operation": child.get("operation"), "value": value }
-                           if child.get("operation") else value)
-    expected = []
-    for ref in state_refs:
-        state = find_by_id(oroot, ref, "_state")
-        if state is None: return None, "state_not_found"
-        for child in state:
-            if child.get("var_ref"): return None, "state_variable_not_yet_lowered"
-            item = {"field": local(child.tag), "operation": child.get("operation") or "equals", "value": text(child)}
-            if child.get("entity_check"): item["entity_check"] = child.get("entity_check")
-            if child.get("datatype"): item["datatype"] = child.get("datatype")
-            expected.append(item)
+
+    checks = {}
+    test_to_check = {}
+    counter = [0]
+    active_definitions = set()
+
+    def lower_test(test_ref):
+        if test_ref in test_to_check:
+            return {"check": test_to_check[test_ref]}, None
+        test = next((n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")), None)
+        if test is None: return None, "test_not_found"
+
+        test_name = local(test.tag)
+        ns_uri = test.tag.split("}", 1)[0].strip("{")
+        family = ns_uri.split("#")[-1].split("/")[-1]
+        capability = f"{family}.{test_name[:-5] if test_name.endswith('_test') else test_name}"
+
+        obj_ref = None; state_refs = []
+        for child in test:
+            if local(child.tag) == "object": obj_ref = child.get("object_ref")
+            elif local(child.tag) == "state" and child.get("state_ref"): state_refs.append(child.get("state_ref"))
+        obj = find_by_id(oroot, obj_ref, "_object")
+        if obj is None: return None, "object_not_found"
+
+        query = {}
+        for child in obj:
+            name = local(child.tag)
+            if name in ("behaviors", "set", "filter"): return None, f"object_{name}_not_yet_lowered"
+            if child.get("var_ref"): return None, "object_variable_not_yet_lowered"
+            value = text(child)
+            if value is not None:
+                query[name] = ({"operation": child.get("operation"), "value": value}
+                               if child.get("operation") else value)
+
+        expected = []
+        for ref in state_refs:
+            state = find_by_id(oroot, ref, "_state")
+            if state is None: return None, "state_not_found"
+            for child in state:
+                if child.get("var_ref"): return None, "state_variable_not_yet_lowered"
+                item = {"field": local(child.tag), "operation": child.get("operation") or "equals", "value": text(child)}
+                if child.get("entity_check"): item["entity_check"] = child.get("entity_check")
+                if child.get("datatype"): item["datatype"] = child.get("datatype")
+                expected.append(item)
+
+        counter[0] += 1
+        check_id = f"check-{counter[0]}"
+        test_to_check[test_ref] = check_id
+        checks[check_id] = {
+            "collect": {"capability": capability, "select": query},
+            "assert": {
+                "existence": test.get("check_existence") or "at_least_one_exists",
+                "check": test.get("check") or "all",
+                **({"state": expected} if expected else {}),
+            },
+        }
+        return {"check": check_id}, None
+
+    def lower_criteria(node):
+        operator = (node.get("operator") or "AND").upper()
+        terms = []
+        for child in node:
+            kind = local(child.tag)
+            if kind == "criterion":
+                term, error = lower_test(child.get("test_ref"))
+            elif kind == "criteria":
+                term, error = lower_criteria(child)
+            elif kind == "extend_definition":
+                ref = child.get("definition_ref")
+                if ref in active_definitions: return None, "definition_cycle"
+                target = next((n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == ref), None)
+                if target is None: return None, "extended_definition_not_found"
+                nested = next((n for n in target if local(n.tag) == "criteria"), None)
+                if nested is None: return None, "extended_definition_missing_criteria"
+                active_definitions.add(ref)
+                term, error = lower_criteria(nested)
+                active_definitions.remove(ref)
+            else:
+                continue
+            if error: return None, error
+            if (child.get("negate") or "false").lower() == "true":
+                term = {"not": term}
+            terms.append(term)
+        if not terms: return None, "empty_criteria"
+        if len(terms) == 1:
+            expr = terms[0]
+        elif operator == "AND":
+            expr = {"all": terms}
+        elif operator == "OR":
+            expr = {"any": terms}
+        else:
+            return None, f"unsupported_criteria_operator:{operator}"
+        if (node.get("negate") or "false").lower() == "true":
+            expr = {"not": expr}
+        return expr, None
+
+    root_criteria = next((c for c in definition if local(c.tag) == "criteria"), None)
+    if root_criteria is None: return None, "missing_criteria"
+    active_definitions.add(definition_id)
+    expression, error = lower_criteria(root_criteria)
+    active_definitions.remove(definition_id)
+    if error: return None, error
+
     return {"assessment": {
         "id": assessment_id,
         "mode": "automated",
-        "collect": {"capability": capability, "select": query},
-        "assert": {
-            "existence": test.get("check_existence") or "at_least_one_exists",
-            "check": test.get("check") or "all",
-            **({"state": expected} if expected else {}),
-        },
+        "checks": checks,
+        "evaluate": expression,
     }}, None
 
 def automated_refs(rec):
@@ -162,7 +223,7 @@ def fully_lowerable(rec, oroot):
     refs = automated_refs(rec)
     if not refs: return False
     for _, definition_id in {x for x in refs}:
-        assessment, _ = lower_simple_definition(oroot, definition_id, "probe")
+        assessment, _ = lower_definition(oroot, definition_id, "probe")
         if assessment is None: return False
     return True
 
@@ -233,7 +294,7 @@ def main():
                 aid = definition_to_assessment.get(definition_id)
                 if aid is None:
                     aid = f"{rid}.automated"
-                    assessment, error = lower_simple_definition(oroot, definition_id, aid)
+                    assessment, error = lower_definition(oroot, definition_id, aid)
                     if assessment is None:
                         raise RuntimeError(f"{rid}: automated lowering regressed: {error}")
                     write_yaml(OUT / "assessments/automated" / f"{rid}.automated.assessment.yaml", assessment)
