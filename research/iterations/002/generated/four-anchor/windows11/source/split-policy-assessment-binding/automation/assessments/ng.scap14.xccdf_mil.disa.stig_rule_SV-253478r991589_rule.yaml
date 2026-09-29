@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: hive
@@ -33,7 +33,7 @@ assessment:
       source_type: ntuser_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: key
@@ -53,6 +53,33 @@ assessment:
         value: oval:mil.disa.stig.win:ste:20000027
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000026:
+      source_state_id: oval:mil.disa.stig.win:ste:20000026
+      source_type: ntuser_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: enabled
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: 'false'
+      state_title: null
+    oval:mil.disa.stig.win:ste:20000027:
+      source_state_id: oval:mil.disa.stig.win:ste:20000027
+      source_type: ntuser_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than
+        kind: element
+        name: days_since_modified
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '35'
+      state_title: null
     oval:mil.disa.stig.win:ste:20000023:
       source_state_id: oval:mil.disa.stig.win:ste:20000023
       source_type: ntuser_state
@@ -69,20 +96,7 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '2'
-      comment: null
-    oval:mil.disa.stig.win:ste:20000026:
-      source_state_id: oval:mil.disa.stig.win:ste:20000026
-      source_type: ntuser_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: boolean
-        kind: element
-        name: enabled
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: 'false'
-      comment: null
+      state_title: null
     oval:mil.disa.stig.win:ste:20000002:
       source_state_id: oval:mil.disa.stig.win:ste:20000002
       source_type: registry_state
@@ -99,29 +113,15 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '2'
-      comment: null
-    oval:mil.disa.stig.win:ste:20000027:
-      source_state_id: oval:mil.disa.stig.win:ste:20000027
-      source_type: ntuser_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: greater than
-        kind: element
-        name: days_since_modified
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '35'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25347801:
         source_test_id: oval:mil.disa.stig.win:tst:25347801
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured' or
-          'Disabled'
+        test_title: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured'
+          or 'Disabled'
         check: all
         check_existence: any_exist
         state_operator: AND
@@ -134,7 +134,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25347800
         source_type: ntuser_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
+        test_title: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
         check: all
         check_existence: any_exist
         state_operator: AND
@@ -144,6 +144,34 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000023
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253478:
+        source_definition_id: oval:mil.disa.stig.defs:def:253478
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25347800
+          - comment: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured'
+              or 'Disabled'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25347801
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Zone information must be preserved when saving attachments.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253478:
         source_definition_id: oval:mil.disa.stig.windows11:def:253478
         class: compliance
@@ -175,34 +203,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Preserving zone of origin (internet, intranet, local, restricted) information on file attachments allows
               Windows to determine risk.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253478:
-        source_definition_id: oval:mil.disa.stig.defs:def:253478
-        class: compliance
-        version: '3'
-        criteria:
-          children:
-          - comment: '''Do not preserve zone information in file attachments'' is set to ''Not Configured'' or ''Disabled'''
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25347800
-          - comment: For the current user, 'Do not preserve zone information in file attachments' is set to 'Not Configured'
-              or 'Disabled'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25347801
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Zone information must be preserved when saving attachments.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -337,6 +337,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253478r991589_rule
-    semantic_ir_sha256: 45b4dc3067c14ea9b081b742e8a8de5d32b3404acc02e4a370f229d757cdc2e3
+    semantic_ir_sha256: d7f4aa2d1e46ad1831c94b8a0c19be48265ccab59b8ee2c53abbf367611c8321
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: b1279f65c10a5a7cfe109449c2579da141909bd54be076e3840015223c530367
+  semantic_fingerprint_sha256: f0c04e0fae9964de1ad27c08f8d7d2c076a713800c009717978ad845eafa8606

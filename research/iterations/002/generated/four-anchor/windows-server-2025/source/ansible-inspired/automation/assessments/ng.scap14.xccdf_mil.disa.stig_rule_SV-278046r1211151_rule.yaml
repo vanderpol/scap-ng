@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:20000015
     collect:
       capability: scapng.collect.windows.registry
-      comment: System Root Directory
+      object_title: System Root Directory
       query:
       - attributes:
           datatype: string
@@ -40,7 +40,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:27804602
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: Event Viewer Rights
+      object_title: Event Viewer Rights
       query:
       - attributes:
           datatype: string
@@ -65,7 +65,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:27804603
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: Eventvwr Rights except for TrustedInstaller
+      object_title: Eventvwr Rights except for TrustedInstaller
       query:
       - children:
         - kind: object_ref
@@ -89,7 +89,6 @@ assessment:
     register: oval:mil.disa.stig.win:obj:27804603
   - name: Derive oval:mil.disa.stig.win:var:27804600
     derive:
-      comment: Expanded value of %SystemRoot%\system32\eventvwr.exe
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -154,10 +153,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.win:var:27804600
+      variable_title: Expanded value of %SystemRoot%\system32\eventvwr.exe
     register: oval:mil.disa.stig.win:var:27804600
   predicates:
     oval:mil.disa.stig.win:ste:27804600:
-      comment: TrustedInstaller
       entities:
       - attributes:
           datatype: string
@@ -170,8 +169,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:27804600
       source_type: fileeffectiverights53_state
+      state_title: TrustedInstaller
     oval:mil.disa.stig.win:ste:27804601:
-      comment: No Rights except Read and Execute
       entities:
       - attributes:
           datatype: boolean
@@ -249,6 +248,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:27804601
       source_type: fileeffectiverights53_state
+      state_title: No Rights except Read and Execute
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:278046:
@@ -317,7 +317,6 @@ assessment:
         check_existence: any_exist
         collections:
         - oval:mil.disa.stig.win:obj:27804603
-        comment: 'Eventvwr.exe: Only Read and Execute rights for users other than TrustedInstaller'
         predicates:
         - oval:mil.disa.stig.win:ste:27804601
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -325,6 +324,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:27804600
         source_type: fileeffectiverights53_test
         state_operator: AND
+        test_title: 'Eventvwr.exe: Only Read and Execute rights for users other than TrustedInstaller'
   source_check_context:
     check_exports: []
     checks:
@@ -458,8 +458,8 @@ assessment:
       - oval:mil.disa.stig.windows2025:def:278046
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 3624f32c238b025fa3906f9c19d42ce536f7c03662e28ddf357b866bc4009724
+    semantic_ir_sha256: 4033fc3adf9faa7fc40cc2fb35fde600e92eaa8db6961bb8394e4e0275ac5e35
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278046r1211151_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: d44a7fbe7719432f3708eedd6edab1b3c7aa9e4511f7fa33a6496f6fcf69d413
+  semantic_fingerprint_sha256: 186e9ce05df46639c63d317b5f517c2a5b0e18aa84c9e2506c67b5b44239fce8

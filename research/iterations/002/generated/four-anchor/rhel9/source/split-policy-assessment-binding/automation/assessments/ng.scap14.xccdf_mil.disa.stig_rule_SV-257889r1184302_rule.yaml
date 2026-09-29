@@ -13,7 +13,7 @@ assessment:
       source_type: file_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '4'
-      comment: local initialization files of non-system users.
+      object_title: local initialization files of non-system users.
       query:
       - attributes:
           max_depth: '1'
@@ -38,13 +38,40 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.unix:ste:20000021
+    oval:mil.disa.stig.unix:obj:23032502:
+      capability: scapng.collect.unix.password
+      source_object_id: oval:mil.disa.stig.unix:obj:23032502
+      source_type: password_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      object_title: only non-system users (uid>999) home-dirs excluding root directory
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.unix:obj:20000016
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.unix:ste:20000017
+        - action: exclude
+          action_explicit: false
+          kind: filter
+          state_ref: oval:mil.disa.stig.unix:ste:23032500
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: COMPLEMENT
+        operator_explicit: true
     oval:mil.disa.stig.unix:obj:23032503:
       capability: scapng.collect.unix.password
       source_object_id: oval:mil.disa.stig.unix:obj:23032503
       source_type: password_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '1'
-      comment: only root users (uid=0) home-dirs excluding root directory
+      object_title: only root users (uid=0) home-dirs excluding root directory
       query:
       - children:
         - kind: object_ref
@@ -71,7 +98,7 @@ assessment:
       source_type: password_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '1'
-      comment: Users with an username
+      object_title: Users with an username
       query:
       - attributes:
           datatype: string
@@ -80,40 +107,13 @@ assessment:
         name: username
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '[\w]+'
-    oval:mil.disa.stig.unix:obj:23032502:
-      capability: scapng.collect.unix.password
-      source_object_id: oval:mil.disa.stig.unix:obj:23032502
-      source_type: password_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: only non-system users (uid>999) home-dirs excluding root directory
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.unix:obj:20000016
-        - action: exclude
-          action_explicit: false
-          kind: filter
-          state_ref: oval:mil.disa.stig.unix:ste:20000017
-        - action: exclude
-          action_explicit: false
-          kind: filter
-          state_ref: oval:mil.disa.stig.unix:ste:23032500
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: COMPLEMENT
-        operator_explicit: true
     oval:mil.disa.stig.unix:obj:23032501:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:23032501
       source_type: file_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '4'
-      comment: local initialization files of root user.
+      object_title: local initialization files of root user.
       query:
       - attributes:
           max_depth: '1'
@@ -143,7 +143,7 @@ assessment:
       source_variable_id: oval:mil.disa.stig.defs:var:23032501
       source_type: local_variable
       datatype: string
-      comment: The home directory of the root user.
+      variable_title: The home directory of the root user.
       semantic_ast:
         datatype: string
         expression:
@@ -184,7 +184,7 @@ assessment:
       source_variable_id: oval:mil.disa.stig.defs:var:23032500
       source_type: local_variable
       datatype: string
-      comment: The home directories of non-system users.
+      variable_title: The home directories of non-system users.
       semantic_ast:
         datatype: string
         expression:
@@ -236,7 +236,7 @@ assessment:
         name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '0'
-      comment: only uids > 0
+      state_title: only uids > 0
     oval:mil.disa.stig.unix:ste:20000021:
       source_state_id: oval:mil.disa.stig.unix:ste:20000021
       source_type: file_state
@@ -247,33 +247,7 @@ assessment:
         name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: directory
-      comment: null
-    oval:mil.disa.stig.unix:ste:23032500:
-      source_state_id: oval:mil.disa.stig.unix:ste:23032500
-      source_type: password_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - kind: element
-        name: home_dir
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /
-      comment: root directory
-    oval:mil.disa.stig.unix:ste:20000017:
-      source_state_id: oval:mil.disa.stig.unix:ste:20000017
-      source_type: password_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          entity_check: all
-          operation: less than
-        kind: element
-        name: user_id
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '1000'
-      comment: only uids < 1000
+      state_title: null
     oval:mil.disa.stig.unix:ste:20000020:
       source_state_id: oval:mil.disa.stig.unix:ste:20000020
       source_type: file_state
@@ -328,14 +302,40 @@ assessment:
         name: oexec
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: 'false'
-      comment: mode 0740 or less permissive
+      state_title: mode 0740 or less permissive
+    oval:mil.disa.stig.unix:ste:23032500:
+      source_state_id: oval:mil.disa.stig.unix:ste:23032500
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - kind: element
+        name: home_dir
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /
+      state_title: root directory
+    oval:mil.disa.stig.unix:ste:20000017:
+      source_state_id: oval:mil.disa.stig.unix:ste:20000017
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          entity_check: all
+          operation: less than
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1000'
+      state_title: only uids < 1000
   evaluate:
     tests:
       oval:mil.disa.stig.unix:tst:23032500:
         source_test_id: oval:mil.disa.stig.unix:tst:23032500
         source_type: file_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: Local initialization files for non-system users have mode 0740 or less permissive.
+        test_title: Local initialization files for non-system users have mode 0740 or less permissive.
         check: all
         check_existence: any_exist
         state_operator: AND
@@ -348,7 +348,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.unix:tst:23032501
         source_type: file_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: Local initialization files for root have mode 0740 or less permissive.
+        test_title: Local initialization files for root have mode 0740 or less permissive.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -358,6 +358,33 @@ assessment:
         - oval:mil.disa.stig.unix:ste:20000020
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230325:
+        source_definition_id: oval:mil.disa.stig.defs:def:230325
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23032500
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23032501
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: All the operating system local initialization files must have mode 0740 or less permissive.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257889:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257889
         class: compliance
@@ -389,33 +416,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Local initialization files are used to configure the user's shell environment upon logon. Malicious modification
               of these files could compromise accounts upon logon.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230325:
-        source_definition_id: oval:mil.disa.stig.defs:def:230325
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23032500
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23032501
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: All the operating system local initialization files must have mode 0740 or less permissive.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -539,6 +539,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257889r1184302_rule
-    semantic_ir_sha256: e6011572a4d17f17760383d9b7f2783fe1651075c951b9dd9421c94ba2c47da7
+    semantic_ir_sha256: 79d8a55c9042ebdc48b68bfa2480d573ce41c659d8e2c21a440285b9a0ea6f63
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 2ef1dce58d5104bbe42128301a676ea8c57c6e48643effd69c651d693db1ee7a
+  semantic_fingerprint_sha256: 59080794ebdb3108894427205fb3329d929ffb5ec058f5bd86418500f9106115

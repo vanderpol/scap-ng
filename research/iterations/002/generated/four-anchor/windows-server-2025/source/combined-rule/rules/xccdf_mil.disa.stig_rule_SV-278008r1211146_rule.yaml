@@ -336,39 +336,13 @@ rule:
     description: Windows Server 2025 must have software certificate installation files removed.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:27800802:
-        capability: scapng.collect.windows.file
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800802
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: Search for .pfx files
-        query:
-        - attributes:
-            max_depth: '-1'
-            recurse_direction: down
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: .*
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: .[Pp][Ff][Xx]$
       oval:navy.navwar.niwcatlantic.scc.windows:obj:27800801:
         capability: scapng.collect.windows.file
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800801
         source_type: file_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: Search for .p12 files
+        object_title: Search for .p12 files
         query:
         - attributes:
             max_depth: '-1'
@@ -388,32 +362,58 @@ rule:
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: .[Pp]12$
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:27800802:
+        capability: scapng.collect.windows.file
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800802
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: Search for .pfx files
+        query:
+        - attributes:
+            max_depth: '-1'
+            recurse_direction: down
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: .*
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: .[Pp][Ff][Xx]$
     derive: {}
     predicates: {}
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:27800802:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800802
-          source_type: file_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Software certificate installation files must be removed. Remove .pfx files
-          check: all
-          check_existence: none_exist
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800802
-          predicates: []
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:27800801:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800801
           source_type: file_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Software certificate installation files must be removed. Remove .p12 files
+          test_title: Software certificate installation files must be removed. Remove .p12 files
           check: all
           check_existence: none_exist
           state_operator: AND
           collections:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800801
+          predicates: []
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:27800802:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800802
+          source_type: file_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Software certificate installation files must be removed. Remove .pfx files
+          check: all
+          check_existence: none_exist
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800802
           predicates: []
           source_other: []
       definitions:
@@ -573,9 +573,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278008r1211146_rule
-      semantic_ir_sha256: dbb290f1f8fd3d85bd6e0ace0dfec661fcf150557c17a57ad5adc485846c1f74
+      semantic_ir_sha256: f567b94784b8c931430423bc7be7653af6e126618da7582caa1520af57d69ca7
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: b5c3b88e39297b02c9a560c0c126e7905d4b82e66fe94f32207d71ea64ce4845
+    semantic_fingerprint_sha256: a4691a1e1be52d9e834ae1a478756966d4849d1372f86cd5efcd231b52e3bcb0
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278008r1211146_rule

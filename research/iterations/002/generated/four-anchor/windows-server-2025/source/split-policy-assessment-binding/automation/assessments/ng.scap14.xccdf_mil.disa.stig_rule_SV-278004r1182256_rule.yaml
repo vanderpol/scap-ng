@@ -13,7 +13,8 @@ assessment:
       source_type: cmdlet_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any are found)
+      object_title: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any are
+        found)
       query:
       - kind: element
         name: module_name
@@ -68,14 +69,30 @@ assessment:
         kind: element
         name: select
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27800402:
+      capability: scapng.collect.windows.wmi57
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800402
+      source_type: wmi57_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: namespace
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: root\cimv2
+      - kind: element
+        name: wql
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SELECT DomainRole FROM win32_computersystem
     oval:navy.navwar.niwcatlantic.scc.windows:obj:27800403:
       capability: scapng.collect.windows.cmdlet
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800403
       source_type: cmdlet_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: Enabled Local Accounts with PasswordNeverExpires=False should not exist (list only the first 100, if any are
-        found)
+      object_title: Enabled Local Accounts with PasswordNeverExpires=False should not exist (list only the first 100, if any
+        are found)
       query:
       - kind: element
         name: module_name
@@ -130,26 +147,10 @@ assessment:
         kind: element
         name: select
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27800402:
-      capability: scapng.collect.windows.wmi57
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800402
-      source_type: wmi57_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: namespace
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: root\cimv2
-      - kind: element
-        name: wql
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SELECT DomainRole FROM win32_computersystem
   derive: {}
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800401:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800401
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405
       source_type: wmi57_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       operator: AND
@@ -163,11 +164,11 @@ assessment:
           kind: element
           name: field
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '2'
+          value: '5'
         kind: element
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Standalone Server
+      state_title: Primary Domain Controller
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800402:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800402
       source_type: wmi57_state
@@ -187,7 +188,47 @@ assessment:
         kind: element
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Domain Member Server
+      state_title: Domain Member Server
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '4'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      state_title: Backup Domain Controller
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800401:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800401
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '2'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      state_title: Standalone Server
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800403:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800403
       source_type: cmdlet_state
@@ -215,67 +256,14 @@ assessment:
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Accounts with passwordnotrequired = true and enabled = true shall not exist
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '4'
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Backup Domain Controller
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '5'
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Primary Domain Controller
+      state_title: Accounts with passwordnotrequired = true and enabled = true shall not exist
   evaluate:
     tests:
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800403:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800403
-        source_type: cmdlet_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Windows Domain Controller - Accounts must require passwords.
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800403
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800403
-        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800404:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800404
         source_type: wmi57_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: The system is a Windows Domain Controller
+        test_title: The system is a Windows Domain Controller
         check: all
         check_existence: at_least_one_exists
         state_operator: OR
@@ -285,11 +273,36 @@ assessment:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800404
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800405
         source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800401:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800401
+        source_type: cmdlet_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Windows Server - Accounts must require passwords.
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800401
+        predicates: []
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800403:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800403
+        source_type: cmdlet_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Windows Domain Controller - Accounts must require passwords.
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800403
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800403
+        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800402:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800402
         source_type: wmi57_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: The system is a Windows Standalone Server or a Windows Domain Member Server
+        test_title: The system is a Windows Standalone Server or a Windows Domain Member Server
         check: all
         check_existence: at_least_one_exists
         state_operator: OR
@@ -298,18 +311,6 @@ assessment:
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800401
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800402
-        source_other: []
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800401:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800401
-        source_type: cmdlet_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Windows Server - Accounts must require passwords.
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800401
-        predicates: []
         source_other: []
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:278004:
@@ -508,6 +509,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278004r1182256_rule
-    semantic_ir_sha256: 61c1c4013c7c4977610c4dff9187084f12c369e3447db692247894bd69b6e7fd
+    semantic_ir_sha256: 487b860fad3e3a6aeffa5a8b4a4303e05e601d6b1e78aba99d5bb2f6c277ec91
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 45ccbed3a8b9b74f60889ba5693102b66bc400083d525858eaf78a85f9aaebe9
+  semantic_fingerprint_sha256: 09b016b4e9e02c064be43841d82f2fac051cad2a20966bbffe2da137cf7b8ecb

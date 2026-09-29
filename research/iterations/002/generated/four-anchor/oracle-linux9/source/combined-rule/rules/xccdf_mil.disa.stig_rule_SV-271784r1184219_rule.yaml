@@ -355,32 +355,13 @@ rule:
     description: OL 9 local interactive user home directories must have mode 0750 or less permissive.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.unix:obj:25789001:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:25789001
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '1'
-        comment: home directories of local interactive users without nologin
-        query:
-        - attributes:
-            var_check: at least one
-            var_ref: oval:mil.disa.stig.defs:var:25789000
-          kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       oval:mil.disa.stig.unix:obj:25789000:
         capability: scapng.collect.unix.password
         source_object_id: oval:mil.disa.stig.unix:obj:25789000
         source_type: password_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         version: '5'
-        comment: Local interactive users without nologin
+        object_title: Local interactive users without nologin
         query:
         - attributes:
             operation: pattern match
@@ -406,12 +387,31 @@ rule:
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:mil.disa.stig.unix:ste:25789003
+      oval:mil.disa.stig.unix:obj:25789001:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:25789001
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '1'
+        object_title: home directories of local interactive users without nologin
+        query:
+        - attributes:
+            var_check: at least one
+            var_ref: oval:mil.disa.stig.defs:var:25789000
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     derive:
       oval:mil.disa.stig.defs:var:25789000:
         source_variable_id: oval:mil.disa.stig.defs:var:25789000
         source_type: local_variable
         datatype: string
-        comment: home directories of local interactive users without nologin
+        variable_title: home directories of local interactive users without nologin
         semantic_ast:
           datatype: string
           expression:
@@ -449,19 +449,6 @@ rule:
           variable_id: oval:mil.disa.stig.defs:var:25789000
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.unix:ste:25789003:
-        source_state_id: oval:mil.disa.stig.unix:ste:25789003
-        source_type: password_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-          kind: element
-          name: user_id
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: '65534'
-        comment: uid = 65534 (nobody)
       oval:mil.disa.stig.unix:ste:25789002:
         source_state_id: oval:mil.disa.stig.unix:ste:25789002
         source_type: password_state
@@ -475,7 +462,20 @@ rule:
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '1000'
-        comment: uid < 1000
+        state_title: uid < 1000
+      oval:mil.disa.stig.unix:ste:25789003:
+        source_state_id: oval:mil.disa.stig.unix:ste:25789003
+        source_type: password_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+          kind: element
+          name: user_id
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: '65534'
+        state_title: uid = 65534 (nobody)
       oval:mil.disa.stig.unix:ste:25789000:
         source_state_id: oval:mil.disa.stig.unix:ste:25789000
         source_type: password_state
@@ -488,7 +488,7 @@ rule:
           name: login_shell
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: ^.*nologin.*$
-        comment: nologin shell
+        state_title: nologin shell
       oval:mil.disa.stig.unix:ste:20000022:
         source_state_id: oval:mil.disa.stig.unix:ste:20000022
         source_type: file_state
@@ -537,14 +537,14 @@ rule:
           name: oexec
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: 'false'
-        comment: mode 0750 or less permissive
+        state_title: mode 0750 or less permissive
     evaluate:
       tests:
         oval:mil.disa.stig.unix:tst:25789000:
           source_test_id: oval:mil.disa.stig.unix:tst:25789000
           source_type: file_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          comment: All local interactive user home directories are 0750 or less
+          test_title: All local interactive user home directories are 0750 or less
           check: all
           check_existence: any_exist
           state_operator: AND
@@ -742,9 +742,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271784r1184219_rule
-      semantic_ir_sha256: 7f38f8b4dcebfc57fa2c2b69ca32ec8f8a899a3f55364394be12caaf5bc996bd
+      semantic_ir_sha256: 2fec5b4055868a4bc2211f034c6163da9773dcc6ae47fa63e15912c41849c825
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 89d8b034ab7ee09f8554402be2fa5d5cdb69fb8dbeb189001fbfa89717eb3faa
+    semantic_fingerprint_sha256: 5a6df19ff450ff3133366af40e4721664dfce108f3a34049edf6a03ee4d8c5bf
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271784r1184219_rule

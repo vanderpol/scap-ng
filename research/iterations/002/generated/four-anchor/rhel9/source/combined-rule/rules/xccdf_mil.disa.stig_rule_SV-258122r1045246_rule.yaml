@@ -386,13 +386,40 @@ rule:
     description: RHEL 9 must enable certificate based smart card authentication.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25812200:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25812200
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: 'sssd.conf: pam_cert_auth'
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/sssd/sssd.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*pam_cert_auth\s*=\s*(.*)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25812202:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25812202
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - children:
           - kind: object_ref
@@ -413,7 +440,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: '/etc/sssd/conf.d: pam_cert_auth'
+        object_title: '/etc/sssd/conf.d: pam_cert_auth'
         query:
         - attributes:
             recurse_direction: down
@@ -446,33 +473,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25812200:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25812200
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 'sssd.conf: pam_cert_auth'
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/sssd/sssd.conf
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*pam_cert_auth\s*=\s*(.*)\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:25812200:
@@ -488,14 +488,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: 'true'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:25812200:
           source_test_id: oval:mil.disa.stig.ind:tst:25812200
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: 'sssd.conf: pam_cert_auth = True'
+          test_title: 'sssd.conf: pam_cert_auth = True'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -505,29 +505,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:25812200
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:258122:
-          source_definition_id: oval:mil.disa.stig.defs:def:258122
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'sssd.conf: pam_cert_auth = True'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25812200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must enable certificate based smart card authentication.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258122:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258122
           class: compliance
@@ -564,6 +541,29 @@ rule:
 
 
                 Satisfies: SRG-OS-000375-GPOS-00160, SRG-OS-000105-GPOS-00052'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258122:
+          source_definition_id: oval:mil.disa.stig.defs:def:258122
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'sssd.conf: pam_cert_auth = True'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25812200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must enable certificate based smart card authentication.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -688,9 +688,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258122r1045246_rule
-      semantic_ir_sha256: 98b21363ad6839636223a150aab4c4167e43554f4b8eefe6a91589eaa988cd41
+      semantic_ir_sha256: 7279094c3f866af97de3a65f3be5d68da6c4bcb2d2d1c29f30e602b7682e59a4
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 0a6e43d8e327ff939e4db6753df516b2099d9179bf4f7dbc6278ad8a68fb44e8
+    semantic_fingerprint_sha256: 405a92aac8ef0499648737397ec724d9601c2f99bd3378f253ba47122c9382a5
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258122r1045246_rule

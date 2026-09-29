@@ -349,7 +349,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: hive
@@ -381,14 +381,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25345100:
           source_test_id: oval:mil.disa.stig.win:tst:25345100
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Microsoft network server: Digitally sign communications (always)'' is set to ''Enabled'''
+          test_title: '''Microsoft network server: Digitally sign communications (always)'' is set to ''Enabled'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -398,6 +398,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253451:
+          source_definition_id: oval:mil.disa.stig.defs:def:253451
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25345100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The Windows SMB server must be configured to always perform SMB packet signing.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253451:
           source_definition_id: oval:mil.disa.stig.windows11:def:253451
           class: compliance
@@ -430,29 +453,6 @@ rule:
               text: The server message block (SMB) protocol provides the basis for many network operations. Digitally signed
                 SMB packets aid in preventing man-in-the-middle attacks. If this policy is enabled, the SMB server will only
                 communicate with an SMB client that performs SMB packet signing.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253451:
-          source_definition_id: oval:mil.disa.stig.defs:def:253451
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25345100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The Windows SMB server must be configured to always perform SMB packet signing.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -584,9 +584,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253451r958908_rule
-      semantic_ir_sha256: 32e0b11c6eebe93c2ce150de2ebb6cd9660ac8d87471737fb98dc4f4af69579f
+      semantic_ir_sha256: 58e62b047d07628543dc6b3cb886252d02e172edac6ff6c45c22b9dcc1dc168a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 37ca4a7c01e4ab290223fd4a6a7c05ba6017ee1afce3e9b4b805effd2c170444
+    semantic_fingerprint_sha256: d6e75fdef681c1547711c3f839adf550fef988ed8dd9979e4863efdc1e05990b
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253451r958908_rule

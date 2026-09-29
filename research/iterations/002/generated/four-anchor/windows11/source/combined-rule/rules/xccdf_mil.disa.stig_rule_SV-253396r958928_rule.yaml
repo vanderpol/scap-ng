@@ -362,7 +362,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             datatype: string
@@ -400,14 +400,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '0'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25339600:
           source_test_id: oval:mil.disa.stig.win:tst:25339600
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Turn off Data Execution Prevention for Explorer'' is set to ''Disabled'' or ''Not Configured'''
+          test_title: '''Turn off Data Execution Prevention for Explorer'' is set to ''Disabled'' or ''Not Configured'''
           check: all
           check_existence: any_exist
           state_operator: AND
@@ -417,6 +417,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253396:
+          source_definition_id: oval:mil.disa.stig.defs:def:253396
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Verifies 'Turn off Data Execution Prevention for Explorer' is set to 'Disabled' or 'Not Configured'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25339600
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Explorer Data Execution Prevention must be enabled.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253396:
           source_definition_id: oval:mil.disa.stig.windows11:def:253396
           class: compliance
@@ -449,29 +472,6 @@ rule:
               text: Data Execution Prevention (DEP) provides additional protection by performing checks on memory to help
                 prevent malicious code from running. This setting will prevent Data Execution Prevention from being turned
                 off for File Explorer.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253396:
-          source_definition_id: oval:mil.disa.stig.defs:def:253396
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Verifies 'Turn off Data Execution Prevention for Explorer' is set to 'Disabled' or 'Not Configured'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25339600
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Explorer Data Execution Prevention must be enabled.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -606,9 +606,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253396r958928_rule
-      semantic_ir_sha256: 3fd8ec951204b1887078e76136c1c84081fee5b51b76d1f756fc7a0576493879
+      semantic_ir_sha256: c47bf3067d68e4137b55fe28d5a6362f5b0c64f2f2034cc4aff9f912cb224b3b
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: c1353eae3cfb8deba4baec88490e3cfb0973704c28be249cff43eedd29d5880c
+    semantic_fingerprint_sha256: 70067878a3816c54d20aecd5b6446c073b23378cd0cd74d02db5f6b792718fb3
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253396r958928_rule

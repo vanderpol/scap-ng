@@ -681,7 +681,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: everyoneincludesanonymous must be configured
+        object_title: everyoneincludesanonymous must be configured
         query:
         - kind: element
           name: hive
@@ -701,7 +701,7 @@ rule:
         source_type: shellcommand_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Run Icacls command against Windows install directory
+        object_title: Run Icacls command against Windows install directory
         query:
         - kind: element
           name: shell
@@ -720,7 +720,7 @@ rule:
         source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
         source_type: constant_variable
         datatype: string
-        comment: Required Permissions
+        variable_title: Required Permissions
         semantic_ast:
           datatype: string
           id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
@@ -791,20 +791,6 @@ rule:
           variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
           variable_type: constant_variable
     predicates:
-      oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: equals
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '0'
-        comment: Value must be equal to 0
       oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002
         source_type: shellcommand_state
@@ -829,27 +815,28 @@ rule:
           kind: element
           name: stderr_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Permissions must equal expected output
+        state_title: Permissions must equal expected output
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: equals
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '0'
+        state_title: Value must be equal to 0
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002
-          source_type: shellcommand_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Permissions must conform to minimum requirements.
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:27800001:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800001
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
+          test_title: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
           check: only one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -857,6 +844,19 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800001
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002
+          source_type: shellcommand_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: Permissions must conform to minimum requirements.
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:278000:
@@ -1114,9 +1114,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278000r1182252_rule
-      semantic_ir_sha256: c55a5982a254869a1369d126139d92513a8fc925da5ce9f7c177a35b992ebcab
+      semantic_ir_sha256: 892651a82466ed0c3a9e56890e24062958bc6c878e5390c57075e979a76fb8df
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d6d2dd1827d6b9e965ae908b63b183c53f11d45646ad58363811294029e5bcaa
+    semantic_fingerprint_sha256: 9349487f198ea09e3a7f432c5a07c96b2cfa7145c3c3fe273bc2f930eaec8031
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278000r1182252_rule

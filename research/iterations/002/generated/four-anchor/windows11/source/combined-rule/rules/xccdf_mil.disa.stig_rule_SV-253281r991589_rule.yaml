@@ -312,13 +312,70 @@ rule:
     description: A host-based firewall must be installed and enabled on the system.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102:
+        capability: scapng.collect.windows.cmdlet
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
+        source_type: cmdlet_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '18'
+        object_title: Gather FirewallProduct from NetSecurity
+        query:
+        - attributes:
+            operation: equals
+          kind: element
+          name: module_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: NetSecurity
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: module_id
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: version
+            nil: 'true'
+          kind: element
+          name: module_version
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - kind: element
+          name: verb
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Get
+        - kind: element
+          name: noun
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: NetFirewallProfile
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: policystore
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: ActiveStore
+          kind: element
+          name: parameters
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: property
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: name,enabled,defaultinboundaction,defaultoutboundaction,logfilename
+          kind: element
+          name: select
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101:
         capability: scapng.collect.windows.cmdlet
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101
         source_type: cmdlet_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '18'
-        comment: Gather FirewallProduct from SecurityCenter2
+        object_title: Gather FirewallProduct from SecurityCenter2
         query:
         - attributes:
             operation: equals
@@ -375,84 +432,8 @@ rule:
           kind: element
           name: select
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102:
-        capability: scapng.collect.windows.cmdlet
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
-        source_type: cmdlet_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '18'
-        comment: Gather FirewallProduct from NetSecurity
-        query:
-        - attributes:
-            operation: equals
-          kind: element
-          name: module_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: NetSecurity
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: module_id
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            datatype: version
-            nil: 'true'
-          kind: element
-          name: module_version
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - kind: element
-          name: verb
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Get
-        - kind: element
-          name: noun
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: NetFirewallProfile
-        - attributes:
-            datatype: record
-          children:
-          - attributes:
-              name: policystore
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: ActiveStore
-          kind: element
-          name: parameters
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            datatype: record
-          children:
-          - attributes:
-              name: property
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: name,enabled,defaultinboundaction,defaultoutboundaction,logfilename
-          kind: element
-          name: select
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
     derive: {}
     predicates:
-      oval:navy.navwar.niwcatlantic.scc.windows:ste:25328101:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25328101
-        source_type: cmdlet_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-          children:
-          - attributes:
-              name: productstate
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '266240'
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Product State must be 397568 (enabled)
       oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102
         source_type: cmdlet_state
@@ -471,27 +452,33 @@ rule:
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Enabled must be 'True')
+        state_title: Enabled must be 'True')
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:25328101:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25328101
+        source_type: cmdlet_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: productstate
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '266240'
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: Product State must be 397568 (enabled)
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:25328101:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328101
-          source_type: cmdlet_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Verify a 3rd party firewall is installed and enabled via Security Center.
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328101
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328102
           source_type: cmdlet_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Verify Windows defender firewall is enabled.
+          test_title: Verify Windows defender firewall is enabled.
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -499,6 +486,19 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328102
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328102
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:25328101:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328101
+          source_type: cmdlet_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Verify a 3rd party firewall is installed and enabled via Security Center.
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328101
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25328101
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:253281:
@@ -650,9 +650,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253281r991589_rule
-      semantic_ir_sha256: 498c3ee169a9986827197cc69412c28e44fad3ad948873e70d8091be41dd5edb
+      semantic_ir_sha256: b497ebd57b93393d69b2ac4b1aee7dd972158baae75bf7636eadd9008a52026d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 0ea6f539701bea9a2ea17433f90b4ba0cb62bcf0395c34b27925f3880ad4fb44
+    semantic_fingerprint_sha256: acbb1e22b021cd852b9420f5d215d413a5f4aaf713be0b0dc53ae7d2934b72b2
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253281r991589_rule

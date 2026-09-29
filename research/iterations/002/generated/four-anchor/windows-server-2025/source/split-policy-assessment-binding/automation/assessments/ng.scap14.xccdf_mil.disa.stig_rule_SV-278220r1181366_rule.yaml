@@ -14,7 +14,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           operation: case insensitive equals
@@ -52,14 +52,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25447000:
         source_test_id: oval:mil.disa.stig.win:tst:25447000
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Network security: Allow Local System to use computer identity for NTLM'' is set to ''Enabled''.'
+        test_title: '''Network security: Allow Local System to use computer identity for NTLM'' is set to ''Enabled''.'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -69,6 +69,30 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:254470:
+        source_definition_id: oval:mil.disa.stig.defs:def:254470
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25447000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows services using Local System that use Negotiate when reverting to NTLM authentication must use the
+              computer identity instead of authenticating anonymously.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278220:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278220
         class: compliance
@@ -101,30 +125,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Services using Local System that use Negotiate when reverting to NTLM authentication may gain unauthorized
               access if allowed to authenticate anonymously versus using the computer identity.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:254470:
-        source_definition_id: oval:mil.disa.stig.defs:def:254470
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25447000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Windows services using Local System that use Negotiate when reverting to NTLM authentication must use the
-              computer identity instead of authenticating anonymously.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -257,6 +257,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278220r1181366_rule
-    semantic_ir_sha256: 495049a0f6d6b476d60f02919ef4cf9fbba4231adccfe592caed3ec944111ff5
+    semantic_ir_sha256: 547005fe584be7caec85c3de4ef6deba430baafe2ed73ef9f42a518fe05454ae
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ca01af9a65950a10fe30294bcf209a7a8f2018ab2bfea22d1611b22ba9332384
+  semantic_fingerprint_sha256: 5dd685fe779ad0a3e551b298e156e5b7a5b0734d41e94dde56f154cfa91bd1fe

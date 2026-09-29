@@ -7,13 +7,26 @@ assessment:
   description: RHEL 9 audit logs file must have mode 0600 or less permissive to prevent unauthorized access to the audit log.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.unix:obj:20000011:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:20000011
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      object_title: Audit log file location
+      query:
+      - attributes:
+          var_ref: oval:mil.disa.stig.defs:var:20000004
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     oval:mil.disa.stig.ind:obj:20000001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:20000001
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: Audit log file
+      object_title: Audit log file
       query:
       - kind: element
         name: filepath
@@ -32,25 +45,12 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.unix:obj:20000011:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:20000011
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: Audit log file location
-      query:
-      - attributes:
-          var_ref: oval:mil.disa.stig.defs:var:20000004
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
   derive:
     oval:mil.disa.stig.defs:var:20000004:
       source_variable_id: oval:mil.disa.stig.defs:var:20000004
       source_type: local_variable
       datatype: string
-      comment: Audit log location from /etc/audit/auditd.conf
+      variable_title: Audit log location from /etc/audit/auditd.conf
       semantic_ast:
         datatype: string
         expression:
@@ -154,14 +154,14 @@ assessment:
         name: oexec
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: 'false'
-      comment: Mode 0600 or less permissive
+      state_title: Mode 0600 or less permissive
   evaluate:
     tests:
       oval:mil.disa.stig.unix:tst:23039600:
         source_test_id: oval:mil.disa.stig.unix:tst:23039600
         source_type: file_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: Audit log is mode 0600 or less permissive
+        test_title: Audit log is mode 0600 or less permissive
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -361,6 +361,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258167r1155630_rule
-    semantic_ir_sha256: 7325931083a42f5ba0d3b6e2878e3818b2cc9410f1b4e0bf6ad157a7abdf9255
+    semantic_ir_sha256: de4fd6f16e29d0d7d79792109a96a65dc7a880ee6136b7e905f8098defb76f35
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: a872e4de11d3cdd3655eb99499f83cd6df3d8c357f30cb7be714d56041b8e4bd
+  semantic_fingerprint_sha256: bcb822695c85683ec27cbcf27e22d52fc52e00ee5e54a5e5806d19ee9f995852

@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.ind:obj:23031600
     collect:
       capability: scapng.collect.independent.textfilecontent54
-      comment: /etc/nsswitch.conf hosts entry
+      object_title: /etc/nsswitch.conf hosts entry
       query:
       - kind: element
         name: filepath
@@ -39,7 +39,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.ind:obj:23031601
     collect:
       capability: scapng.collect.independent.variable
-      comment: count of unique name servers
+      object_title: count of unique name servers
       query:
       - kind: element
         name: var_ref
@@ -53,7 +53,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.ind:obj:23031602
     collect:
       capability: scapng.collect.independent.textfilecontent54
-      comment: /etc/resolv.conf nameserver entries
+      object_title: /etc/resolv.conf nameserver entries
       query:
       - kind: element
         name: filepath
@@ -79,7 +79,6 @@ assessment:
     register: oval:mil.disa.stig.ind:obj:23031602
   - name: Derive oval:mil.disa.stig.ind:var:23031600
     derive:
-      comment: count of unique name servers
       datatype: int
       evaluation_plan:
         blocked_by:
@@ -152,10 +151,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.ind:var:23031600
+      variable_title: count of unique name servers
     register: oval:mil.disa.stig.ind:var:23031600
   predicates:
     oval:mil.disa.stig.ind:ste:23031600:
-      comment: hosts entry contains dns
       entities:
       - attributes:
           operation: pattern match
@@ -167,8 +166,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:mil.disa.stig.ind:ste:23031600
       source_type: textfilecontent54_state
+      state_title: hosts entry contains dns
     oval:mil.disa.stig.ind:ste:23031601:
-      comment: /etc/resolv.conf is configured with at least two name servers
       entities:
       - attributes:
           datatype: int
@@ -181,6 +180,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:mil.disa.stig.ind:ste:23031601
       source_type: variable_state
+      state_title: /etc/resolv.conf is configured with at least two name servers
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:230316:
@@ -264,7 +264,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.ind:obj:23031600
-        comment: The system is using DNS
         predicates:
         - oval:mil.disa.stig.ind:ste:23031600
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -272,12 +271,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:23031600
         source_type: textfilecontent54_test
         state_operator: AND
+        test_title: The system is using DNS
       oval:mil.disa.stig.ind:tst:23031601:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.ind:obj:23031601
-        comment: /etc/resolv.conf is configured with at least two name servers
         predicates:
         - oval:mil.disa.stig.ind:ste:23031601
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -285,18 +284,19 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:23031601
         source_type: variable_test
         state_operator: AND
+        test_title: /etc/resolv.conf is configured with at least two name servers
       oval:mil.disa.stig.ind:tst:23031602:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.ind:obj:23031602
-        comment: /etc/resolv.conf contains at least one nameserver entry
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         source_other: []
         source_test_id: oval:mil.disa.stig.ind:tst:23031602
         source_type: textfilecontent54_test
         state_operator: AND
+        test_title: /etc/resolv.conf contains at least one nameserver entry
   source_check_context:
     check_exports: []
     checks:
@@ -422,8 +422,8 @@ assessment:
       - oval:mil.disa.stig.ol9os:def:271861
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 99e8283436188c279dc62aa9c644dfcf01d9b09ef30374d49c3f1d51cac3ef93
+    semantic_ir_sha256: ed2a2954e183a15fe66fb9839f4fac64f026ce369084d450450c46bc536db9ad
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271861r1092295_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 37dcfb903735c52afdf95a3434f50d1fcf0f7e6caadeda8e36c0316ea5b75de2
+  semantic_fingerprint_sha256: 44fa684549f1c9342434fa899099c75e0e503f976ddd417f4ad9614f8b6479d7

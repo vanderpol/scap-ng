@@ -388,13 +388,36 @@ rule:
     description: Windows Server 2025 Event Viewer must be protected from unauthorized modification and deletion.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:27804602:
+        capability: scapng.collect.windows.fileeffectiverights53
+        source_object_id: oval:mil.disa.stig.win:obj:27804602
+        source_type: fileeffectiverights53_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '4'
+        object_title: Event Viewer Rights
+        query:
+        - attributes:
+            datatype: string
+            operation: case insensitive equals
+            var_check: at least one
+            var_ref: oval:mil.disa.stig.win:var:27804600
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: trustee_sid
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: .*
       oval:mil.disa.stig.win:obj:27804603:
         capability: scapng.collect.windows.fileeffectiverights53
         source_object_id: oval:mil.disa.stig.win:obj:27804603
         source_type: fileeffectiverights53_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: Eventvwr Rights except for TrustedInstaller
+        object_title: Eventvwr Rights except for TrustedInstaller
         query:
         - children:
           - kind: object_ref
@@ -417,7 +440,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: System Root Directory
+        object_title: System Root Directory
         query:
         - attributes:
             datatype: string
@@ -437,35 +460,12 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SystemRoot
-      oval:mil.disa.stig.win:obj:27804602:
-        capability: scapng.collect.windows.fileeffectiverights53
-        source_object_id: oval:mil.disa.stig.win:obj:27804602
-        source_type: fileeffectiverights53_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '4'
-        comment: Event Viewer Rights
-        query:
-        - attributes:
-            datatype: string
-            operation: case insensitive equals
-            var_check: at least one
-            var_ref: oval:mil.disa.stig.win:var:27804600
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        - attributes:
-            datatype: string
-            operation: pattern match
-          kind: element
-          name: trustee_sid
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: .*
     derive:
       oval:mil.disa.stig.win:var:27804600:
         source_variable_id: oval:mil.disa.stig.win:var:27804600
         source_type: local_variable
         datatype: string
-        comment: Expanded value of %SystemRoot%\system32\eventvwr.exe
+        variable_title: Expanded value of %SystemRoot%\system32\eventvwr.exe
         semantic_ast:
           datatype: string
           expression:
@@ -541,7 +541,7 @@ rule:
           name: trustee_sid
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464
-        comment: TrustedInstaller
+        state_title: TrustedInstaller
       oval:mil.disa.stig.win:ste:27804601:
         source_state_id: oval:mil.disa.stig.win:ste:27804601
         source_type: fileeffectiverights53_state
@@ -620,14 +620,14 @@ rule:
           name: file_write_attributes
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: 'false'
-        comment: No Rights except Read and Execute
+        state_title: No Rights except Read and Execute
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:27804600:
           source_test_id: oval:mil.disa.stig.win:tst:27804600
           source_type: fileeffectiverights53_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: 'Eventvwr.exe: Only Read and Execute rights for users other than TrustedInstaller'
+          test_title: 'Eventvwr.exe: Only Read and Execute rights for users other than TrustedInstaller'
           check: all
           check_existence: any_exist
           state_operator: AND
@@ -637,29 +637,6 @@ rule:
           - oval:mil.disa.stig.win:ste:27804601
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:278046:
-          source_definition_id: oval:mil.disa.stig.defs:def:278046
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Eventvwr.exe: Read and Execute rights for Administrators, System, Users, All Application Packages'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:27804600
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows Event Viewer must be protected from unauthorized modification and deletion.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278046:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278046
           class: compliance
@@ -696,6 +673,29 @@ rule:
                 \ roles identifying the user accessing the tools and the corresponding rights the user enjoys to make access\
                 \ decisions regarding the modification or deletion of audit tools.\n\n  Satisfies: SRG-OS-000257-GPOS-00098,\
                 \ SRG-OS-000258-GPOS-00099"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:278046:
+          source_definition_id: oval:mil.disa.stig.defs:def:278046
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Eventvwr.exe: Read and Execute rights for Administrators, System, Users, All Application Packages'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:27804600
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows Event Viewer must be protected from unauthorized modification and deletion.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -833,9 +833,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278046r1211151_rule
-      semantic_ir_sha256: 3624f32c238b025fa3906f9c19d42ce536f7c03662e28ddf357b866bc4009724
+      semantic_ir_sha256: 4033fc3adf9faa7fc40cc2fb35fde600e92eaa8db6961bb8394e4e0275ac5e35
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d44a7fbe7719432f3708eedd6edab1b3c7aa9e4511f7fa33a6496f6fcf69d413
+    semantic_fingerprint_sha256: 186e9ce05df46639c63d317b5f517c2a5b0e18aa84c9e2506c67b5b44239fce8
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278046r1211151_rule

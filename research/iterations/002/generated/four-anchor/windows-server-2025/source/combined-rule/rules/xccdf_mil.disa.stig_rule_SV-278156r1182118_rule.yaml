@@ -357,24 +357,10 @@ rule:
         source_type: auditeventpolicysubcategories_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25440801:
-        source_state_id: oval:mil.disa.stig.win:ste:25440801
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-            operation: equals
-          kind: element
-          name: directory_service_access
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS_FAILURE
-        comment: Audit - Directory Service Access - Success and Failure
       oval:mil.disa.stig.win:ste:25440900:
         source_state_id: oval:mil.disa.stig.win:ste:25440900
         source_type: auditeventpolicysubcategories_state
@@ -388,14 +374,28 @@ rule:
           name: directory_service_access
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_FAILURE
-        comment: Audit - Directory Service Access - Failure only
+        state_title: Audit - Directory Service Access - Failure only
+      oval:mil.disa.stig.win:ste:25440801:
+        source_state_id: oval:mil.disa.stig.win:ste:25440801
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: equals
+          kind: element
+          name: directory_service_access
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS_FAILURE
+        state_title: Audit - Directory Service Access - Success and Failure
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25440900:
           source_test_id: oval:mil.disa.stig.win:tst:25440900
           source_type: auditeventpolicysubcategories_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Audit - Directory Service Access - Failure
+          test_title: Audit - Directory Service Access - Failure
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
@@ -406,29 +406,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25440801
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:254409:
-          source_definition_id: oval:mil.disa.stig.defs:def:254409
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: Audit - Directory Service Access - Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25440900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows must be configured to audit DS Access - Directory Service Access failures.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278156:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278156
           class: compliance
@@ -465,6 +442,29 @@ rule:
                 \ is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected\
                 \ behavior.\n\n  Audit Directory Service Access records events related to users accessing an Active Directory\
                 \ object.\n\n  Satisfies: SRG-OS-000327-GPOS-00127, SRG-OS-000458-GPOS-00203, SRG-OS-000463-GPOS-00207, SRG-OS-000468-GPOS-00212"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:254409:
+          source_definition_id: oval:mil.disa.stig.defs:def:254409
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: Audit - Directory Service Access - Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25440900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows must be configured to audit DS Access - Directory Service Access failures.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -592,9 +592,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278156r1182118_rule
-      semantic_ir_sha256: 3dac88d96c44b156eaf828632a0b656c907f864485fc1570d5127f239ea88994
+      semantic_ir_sha256: 40f3a8c4cd8ac1ff20b33ac68669606db328982b93c2c5444b8deaa4052ed27e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 962c24e985ea2a7f991b1688fb4a61c3a84fc6e3d2cdc7bdcbb538ebc889d6a2
+    semantic_fingerprint_sha256: cf20cb81618e22b258fe6c9831e618d63dd94fa137c8544d1e7cecc0506ee74d
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278156r1182118_rule

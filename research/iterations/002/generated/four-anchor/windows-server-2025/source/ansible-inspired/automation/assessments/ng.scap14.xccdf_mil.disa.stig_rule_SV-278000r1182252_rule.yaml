@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800001
     collect:
       capability: scapng.collect.windows.registry
-      comment: everyoneincludesanonymous must be configured
+      object_title: everyoneincludesanonymous must be configured
       query:
       - kind: element
         name: hive
@@ -34,7 +34,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: Run Icacls command against Windows install directory
+      object_title: Run Icacls command against Windows install directory
       query:
       - kind: element
         name: shell
@@ -55,7 +55,6 @@ assessment:
     register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
     derive:
-      comment: Required Permissions
       datatype: string
       evaluation_plan:
         datatype: string
@@ -128,10 +127,10 @@ assessment:
           value: (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
       source_type: constant_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
+      variable_title: Required Permissions
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27800001
   predicates:
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001:
-      comment: Value must be equal to 0
       entities:
       - attributes:
           datatype: int
@@ -144,8 +143,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001
       source_type: registry_state
+      state_title: Value must be equal to 0
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002:
-      comment: Permissions must equal expected output
       entities:
       - attributes:
           datatype: int
@@ -169,6 +168,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002
       source_type: shellcommand_state
+      state_title: Permissions must equal expected output
   evaluate:
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:278000:
@@ -205,7 +205,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800001
-        comment: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800001
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -213,12 +212,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800001
         source_type: registry_test
         state_operator: AND
+        test_title: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800002
-        comment: Permissions must conform to minimum requirements.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800002
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -226,6 +225,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800002
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Permissions must conform to minimum requirements.
   source_check_context:
     check_exports: []
     checks:
@@ -451,8 +451,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.windows:def:278000
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: c55a5982a254869a1369d126139d92513a8fc925da5ce9f7c177a35b992ebcab
+    semantic_ir_sha256: 892651a82466ed0c3a9e56890e24062958bc6c878e5390c57075e979a76fb8df
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278000r1182252_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: d6d2dd1827d6b9e965ae908b63b183c53f11d45646ad58363811294029e5bcaa
+  semantic_fingerprint_sha256: 9349487f198ea09e3a7f432c5a07c96b2cfa7145c3c3fe273bc2f930eaec8031

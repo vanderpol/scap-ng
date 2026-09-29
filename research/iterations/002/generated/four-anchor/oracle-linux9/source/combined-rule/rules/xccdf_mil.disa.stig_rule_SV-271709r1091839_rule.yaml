@@ -406,13 +406,59 @@ rule:
       unresponsive.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:27170902:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27170902
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '2'
+        object_title: all sshd_config and sshd_config.d/* files
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:27170900
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:27170901
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
+      oval:mil.disa.stig.ind:obj:27170900:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27170900
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:27170901:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:27170901
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: path
@@ -437,52 +483,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:27170900:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27170900
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:27170902:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27170902
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '2'
-        comment: all sshd_config and sshd_config.d/* files
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:27170900
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:27170901
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:20000003:
@@ -498,14 +498,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:27170900:
           source_test_id: oval:mil.disa.stig.ind:tst:27170900
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/ssh/sshd_config:ClientAliveCountMax = 1
+          test_title: /etc/ssh/sshd_config:ClientAliveCountMax = 1
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -721,9 +721,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271709r1091839_rule
-      semantic_ir_sha256: 6db27254b83f2d3ccd92978a2e80c3db5cd290b7e722c90ba71a033f22472c7b
+      semantic_ir_sha256: 154162ee1e527a055d726549a054256e27267627fc215a423f4d06f67cb9d00b
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5438f68edef6ce3e89e6ce7dc11e68aa5f3d946f54504b59d696270ceb0a6958
+    semantic_fingerprint_sha256: 5d4482462741210ac27d78113aab993aaad525985afafcf4e87cbf3a0a9c1356
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271709r1091839_rule

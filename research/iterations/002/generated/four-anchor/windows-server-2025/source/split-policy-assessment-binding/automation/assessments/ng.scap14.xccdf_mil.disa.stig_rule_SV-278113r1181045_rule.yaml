@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -51,14 +51,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25340300:
         source_test_id: oval:mil.disa.stig.win:tst:25340300
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Do not allow drive redirection'' is set to ''Enabled'''
+        test_title: '''Do not allow drive redirection'' is set to ''Enabled'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -68,6 +68,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253403:
+        source_definition_id: oval:mil.disa.stig.defs:def:253403
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Verifies 'Do not allow drive redirection' is set to 'Enabled'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25340300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Local drives must be prevented from sharing with Remote Desktop Session Hosts.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278113:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278113
         class: compliance
@@ -99,29 +122,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Preventing users from sharing the local drives on their client computers with Remote Session Hosts that
               they access helps reduce possible exposure of sensitive data.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253403:
-        source_definition_id: oval:mil.disa.stig.defs:def:253403
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Verifies 'Do not allow drive redirection' is set to 'Enabled'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25340300
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Local drives must be prevented from sharing with Remote Desktop Session Hosts.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -253,6 +253,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278113r1181045_rule
-    semantic_ir_sha256: 1daa1ee5b551e11b42a9809d966509687f09d4e4b1a41b53b4efe63eeedd18eb
+    semantic_ir_sha256: 30a78ef8647bd15aeee3fb5e000a5808b39c47371978336f2ad187faab852a42
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: d6558ad6deacbb020b47c88932e1f53155378e30e2d5dbb6a5f5f109ea54756b
+  semantic_fingerprint_sha256: f56403604d7e94e3bb979274795412a0474fe2e64078120a4d7ebc875e14c473

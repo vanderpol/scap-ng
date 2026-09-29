@@ -7,13 +7,25 @@ assessment:
   description: RHEL 9 must mount /var with the nodev option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.linux:obj:23029200:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23029200
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /var
     oval:mil.disa.stig.ind:obj:25786900:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25786900
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: filepath
@@ -32,20 +44,21 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.linux:obj:23029200:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23029200
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /var
   derive: {}
   predicates:
+    oval:mil.disa.stig.linux:ste:20000001:
+      source_state_id: oval:mil.disa.stig.linux:ste:20000001
+      source_type: partition_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      operator: AND
+      entities:
+      - attributes:
+          entity_check: at least one
+        kind: element
+        name: mount_options
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: nodev
+      state_title: null
     oval:mil.disa.stig.ind:ste:25785400:
       source_state_id: oval:mil.disa.stig.ind:ste:25785400
       source_type: textfilecontent54_state
@@ -59,27 +72,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: (^|,)nodev(,|$)
-      comment: nodev option
-    oval:mil.disa.stig.linux:ste:20000001:
-      source_state_id: oval:mil.disa.stig.linux:ste:20000001
-      source_type: partition_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      operator: AND
-      entities:
-      - attributes:
-          entity_check: at least one
-        kind: element
-        name: mount_options
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: nodev
-      comment: null
+      state_title: nodev option
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:25786900:
         source_test_id: oval:mil.disa.stig.ind:tst:25786900
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /var is configured in /etc/fstab with the nodev option.
+        test_title: /var is configured in /etc/fstab with the nodev option.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -92,7 +92,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.linux:tst:25786900
         source_type: partition_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: /var is mounted with the nodev option.
+        test_title: /var is mounted with the nodev option.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -102,6 +102,33 @@ assessment:
         - oval:mil.disa.stig.linux:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:257869:
+        source_definition_id: oval:mil.disa.stig.defs:def:257869
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25786900
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25786900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /var with the nodev option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257869:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257869
         class: compliance
@@ -138,33 +165,6 @@ assessment:
 
               The only legitimate location for device files is the "/dev" directory located on the root partition, with the
               exception of chroot jails if implemented.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:257869:
-        source_definition_id: oval:mil.disa.stig.defs:def:257869
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:25786900
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25786900
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must mount /var with the nodev option.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -292,6 +292,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257869r1102009_rule
-    semantic_ir_sha256: 3f7dad0c25418c9cec27d3651eb57d8c119fd372e190befd04bd2334eb340074
+    semantic_ir_sha256: ab4af1d098b3bffeefa4f6c20471b19c222f06427a2209981bc7a8053f7fffe2
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: bacedb31281cf038e9086b358c2342a0aee836a3d68d07265bc8a3e070b9f0d6
+  semantic_fingerprint_sha256: b490f7f64fdffd9083451c356a292c84891095045787e55e8bdeb41044e0a7bf

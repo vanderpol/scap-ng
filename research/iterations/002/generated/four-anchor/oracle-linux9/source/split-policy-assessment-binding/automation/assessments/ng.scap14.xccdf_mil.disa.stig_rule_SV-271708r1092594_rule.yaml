@@ -7,59 +7,13 @@ assessment:
   description: OL 9 must not permit direct logons to the root account using remote access via SSH.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23029600:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23029600
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*(?i)PermitRootLogin(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23029602:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23029602
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: all sshd_config and sshd_config.d/* files
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23029600
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23029601
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
     oval:mil.disa.stig.ind:obj:23029601:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23029601
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: path
@@ -84,6 +38,52 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23029600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23029600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)PermitRootLogin(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23029602:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23029602
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      object_title: all sshd_config and sshd_config.d/* files
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23029600
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23029601
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:20000017:
@@ -99,14 +99,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^(no|"no")$
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23029600:
         source_test_id: oval:mil.disa.stig.ind:tst:23029600
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/ssh/sshd_config:PermitRootLogin == no
+        test_title: /etc/ssh/sshd_config:PermitRootLogin == no
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -116,29 +116,6 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000017
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230296:
-        source_definition_id: oval:mil.disa.stig.defs:def:230296
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /etc/ssh/sshd_config:PermitRootLogin == no
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23029600
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must not permit direct logons to the root account using remote access via SSH.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271708:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271708
         class: compliance
@@ -172,6 +149,29 @@ assessment:
               the policy of not logging directly on as root. In addition, logging in with a user-specific account provides
               individual accountability of actions performed on the system and also helps to minimize direct attack attempts
               on root's password.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230296:
+        source_definition_id: oval:mil.disa.stig.defs:def:230296
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /etc/ssh/sshd_config:PermitRootLogin == no
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23029600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must not permit direct logons to the root account using remote access via SSH.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -301,6 +301,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271708r1092594_rule
-    semantic_ir_sha256: 41e61c84d6aad9aa0d750f9fc002f564a3af38948dddf33c8598ac5e7b986976
+    semantic_ir_sha256: 75a000685ce45bfbcea8c1bb6b9fcd96ea89585c32e2d41c099f9cc41af74679
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 02c4828ce92c8e9ddb06cf444697b623249f52463db3e12507acdee352708a0d
+  semantic_fingerprint_sha256: 1b67836692107a2e419097d2db8124482c3275c114ace661c5bf34993eeed0bd

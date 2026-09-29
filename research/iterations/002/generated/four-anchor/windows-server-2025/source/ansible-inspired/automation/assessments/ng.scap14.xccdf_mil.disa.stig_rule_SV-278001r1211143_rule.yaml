@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
+      object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
       query:
       - kind: element
         name: shell
@@ -33,7 +33,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
+      object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
       query:
       - kind: element
         name: shell
@@ -54,7 +54,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
+      object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
       query:
       - kind: element
         name: shell
@@ -75,7 +75,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105
     collect:
       capability: scapng.collect.windows.wmi57
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: namespace
@@ -92,7 +92,6 @@ assessment:
     register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
     derive:
-      comment: Required Permissions for HKEY_LOCAL_MACHINE\Security
       datatype: string
       evaluation_plan:
         datatype: string
@@ -127,10 +126,10 @@ assessment:
             False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
       source_type: constant_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
+      variable_title: Required Permissions for HKEY_LOCAL_MACHINE\Security
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27800102
     derive:
-      comment: Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\System
       datatype: string
       evaluation_plan:
         datatype: string
@@ -207,11 +206,10 @@ assessment:
           value: ''
       source_type: constant_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800102
+      variable_title: Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\System
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27800102
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
     derive:
-      comment: Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software
-        on all servers
       datatype: string
       evaluation_plan:
         datatype: string
@@ -277,10 +275,11 @@ assessment:
             None$'
       source_type: constant_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
+      variable_title: Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software
+        on all servers
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
   predicates:
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101:
-      comment: Required Permissions for HKEY_LOCAL_MACHINE\Security
       entities:
       - attributes:
           operation: pattern match
@@ -293,8 +292,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101
       source_type: shellcommand_state
+      state_title: Required Permissions for HKEY_LOCAL_MACHINE\Security
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102:
-      comment: Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\System
       entities:
       - attributes:
           operation: pattern match
@@ -307,9 +306,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102
       source_type: shellcommand_state
+      state_title: Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\System
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104:
-      comment: Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software
-        on all servers
       entities:
       - attributes:
           operation: pattern match
@@ -322,8 +320,9 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104
       source_type: shellcommand_state
+      state_title: Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software
+        on all servers
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800105:
-      comment: Backup Domain Controller
       entities:
       - attributes:
           datatype: record
@@ -342,8 +341,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800105
       source_type: wmi57_state
+      state_title: Backup Domain Controller
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106:
-      comment: Primary Domain Controller
       entities:
       - attributes:
           datatype: record
@@ -362,6 +361,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106
       source_type: wmi57_state
+      state_title: Primary Domain Controller
   evaluate:
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:278001:
@@ -429,7 +429,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101
-        comment: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -437,12 +436,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800101
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained.
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800102:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102
-        comment: Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -450,12 +449,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800102
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained.
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800103:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103
-        comment: Default Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -463,12 +462,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800103
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Default Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained.
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800104:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103
-        comment: Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -476,12 +475,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800104
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained.
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800105:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105
-        comment: The system is a Windows Domain Controller
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800105
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106
@@ -490,6 +489,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800105
         source_type: wmi57_test
         state_operator: OR
+        test_title: The system is a Windows Domain Controller
   source_check_context:
     check_exports: []
     checks:
@@ -709,8 +709,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.windows:def:278001
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 0b9c85f97770dbdaad6fe2e445ae479f7f3e9ad0d06f754b5d842db16b429d82
+    semantic_ir_sha256: 363b76e27e04048dc38059a854dcb8cc6e7a1a390459c12d6849ea44863452d2
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278001r1211143_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: a8ffe7d242e1b133bdd18203e5b56bde60f6b07e475e6eb3a378ed63129a78a1
+  semantic_fingerprint_sha256: 58a6852a2421af407cd5c02ae02f1c4207efdd5fb4989fdfe74a320906253699

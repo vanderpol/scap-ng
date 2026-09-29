@@ -397,7 +397,7 @@ rule:
         source_type: userright_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: userright
@@ -414,59 +414,7 @@ rule:
         - kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: null
-      oval:mil.disa.stig.win:ste:20000036:
-        source_state_id: oval:mil.disa.stig.win:ste:20000036
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: LOCAL SERVICE
-        comment: null
-      oval:mil.disa.stig.win:ste:25349802:
-        source_state_id: oval:mil.disa.stig.win:ste:25349802
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: RESTRICTED SERVICES\PrintSpoolerService
-        comment: null
-      oval:mil.disa.stig.win:ste:20000038:
-        source_state_id: oval:mil.disa.stig.win:ste:20000038
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SERVICE
-        comment: null
-      oval:mil.disa.stig.win:ste:20000030:
-        source_state_id: oval:mil.disa.stig.win:ste:20000030
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Administrators
-        comment: null
+        state_title: null
       oval:mil.disa.stig.win:ste:20000037:
         source_state_id: oval:mil.disa.stig.win:ste:20000037
         source_type: userright_state
@@ -479,15 +427,67 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: NETWORK SERVICE
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000036:
+        source_state_id: oval:mil.disa.stig.win:ste:20000036
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: LOCAL SERVICE
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000038:
+        source_state_id: oval:mil.disa.stig.win:ste:20000038
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SERVICE
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000030:
+        source_state_id: oval:mil.disa.stig.win:ste:20000030
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Administrators
+        state_title: null
+      oval:mil.disa.stig.win:ste:25349802:
+        source_state_id: oval:mil.disa.stig.win:ste:25349802
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: RESTRICTED SERVICES\PrintSpoolerService
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25349801:
           source_test_id: oval:mil.disa.stig.win:tst:25349801
           source_type: userright_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE, RESTRICTED
-            SERVICES\PrintSpoolerService
+          test_title: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE,
+            RESTRICTED SERVICES\PrintSpoolerService
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
@@ -502,6 +502,31 @@ rule:
           - oval:mil.disa.stig.win:ste:25349802
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253498:
+          source_definition_id: oval:mil.disa.stig.defs:def:253498
+          class: compliance
+          version: '6'
+          criteria:
+            children:
+            - comment: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE,
+                RESTRICTED SERVICES\PrintSpoolerService
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service,
+                Local Service, and Network Service.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253498:
           source_definition_id: oval:mil.disa.stig.windows11:def:253498
           class: compliance
@@ -537,31 +562,6 @@ rule:
 
                 The "Impersonate a client after authentication" user right allows a program to impersonate another user or
                 account to run on their behalf. An attacker could potentially use this to elevate privileges.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253498:
-          source_definition_id: oval:mil.disa.stig.defs:def:253498
-          class: compliance
-          version: '6'
-          criteria:
-            children:
-            - comment: Impersonate a client after authentication - Administrators, LOCAL SERVICE, NETWORK SERVICE, SERVICE,
-                RESTRICTED SERVICES\PrintSpoolerService
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25349801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Impersonate a client after authentication" user right must only be assigned to Administrators, Service,
-                Local Service, and Network Service.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -704,9 +704,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253498r1138526_rule
-      semantic_ir_sha256: 9eeef6e605f609a1e8a4fbc9665a95e1b3fb2b660302609e66a1a8a1a4fc5c7e
+      semantic_ir_sha256: 05709c91e00fc43dcf1d3fb58f5e6bc494b306e71dd1f9b49d73dda9c6d1955a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5b4b159114ad506d376f979f4642a98c83b4b7f7ce6e09c17c4b78235f8d88bf
+    semantic_fingerprint_sha256: 8e8205cd5317a293db04516c91fa25b8c569422c51e39256e5e42c40d10f2481
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253498r1138526_rule

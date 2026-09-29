@@ -13,7 +13,7 @@ assessment:
       source_type: shellcommand_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '13'
-      comment: Gather gsettings get org.gnome.desktop.session idle-delay
+      object_title: Gather gsettings get org.gnome.desktop.session idle-delay
       query:
       - kind: element
         name: shell
@@ -31,26 +31,6 @@ assessment:
         value: uint32\s+(\d+)
   derive: {}
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.linux:ste:25802301:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25802301
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-        kind: element
-        name: exit_status
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '0'
-      - attributes:
-          datatype: int
-          operation: not equal
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '0'
-      comment: idle-delay must not be equal to zero
     oval:navy.navwar.niwcatlantic.scc.linux:ste:25802302:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25802302
       source_type: shellcommand_state
@@ -70,14 +50,34 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '600'
-      comment: idle-delay must be less than or equal to 600
+      state_title: idle-delay must be less than or equal to 600
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:25802301:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:25802301
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          datatype: int
+          operation: not equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      state_title: idle-delay must not be equal to zero
   evaluate:
     tests:
       oval:navy.navwar.niwcatlantic.scc.linux:tst:25802301:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:25802301
         source_type: shellcommand_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Gnome idle-delay must not be set to 0 or greater than 600
+        test_title: Gnome idle-delay must not be set to 0 or greater than 600
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -243,6 +243,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258023r1155656_rule
-    semantic_ir_sha256: 5732f3d8e049a9906bcbdd16f34e6193704294dcd90a6de1a726595b4862f064
+    semantic_ir_sha256: 70d5aa58f2ca754e6f3bde7816ad88da9ca0c64ef7fbec9d0f7f79eebc55273a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 92d21e3112ce57f05a94df56646002d3a2af01ba1a5819d0104ca9b2bad24d14
+  semantic_fingerprint_sha256: 2a9421de22c6e7f6a28eabd6b28e2bbf76ee3db3b60317568de17438778e4a65

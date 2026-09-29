@@ -7,59 +7,13 @@ assessment:
   description: RHEL 9 SSH daemon must not allow Kerberos authentication.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25800401:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25800401
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: null
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25800402
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25800400
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
-    oval:mil.disa.stig.ind:obj:25800402:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25800402
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*(?i)KerberosAuthentication(?-i)\s+("?\w+"?)\s*(?:|(?:#.*))?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25800400:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25800400
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '2'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: path
@@ -84,13 +38,59 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:25800402:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25800402
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      object_title: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)KerberosAuthentication(?-i)\s+("?\w+"?)\s*(?:|(?:#.*))?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25800401:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25800401
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      object_title: null
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25800402
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25800400
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:25798800:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25798800
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: sshd_config includes
+      object_title: sshd_config includes
       query:
       - attributes:
           ignore_case: 'true'
@@ -118,20 +118,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:25798801:
-      source_state_id: oval:mil.disa.stig.ind:ste:25798801
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config.d/*.conf
-      comment: null
     oval:mil.disa.stig.ind:ste:20000017:
       source_state_id: oval:mil.disa.stig.ind:ste:20000017
       source_type: textfilecontent54_state
@@ -145,14 +131,28 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^(no|"no")$
-      comment: null
+      state_title: null
+    oval:mil.disa.stig.ind:ste:25798801:
+      source_state_id: oval:mil.disa.stig.ind:ste:25798801
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config.d/*.conf
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:25798801:
         source_test_id: oval:mil.disa.stig.ind:tst:25798801
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: sshd_config includes sshd_config.d
+        test_title: sshd_config includes sshd_config.d
         check: at least one
         check_existence: at_least_one_exists
         state_operator: AND
@@ -161,24 +161,11 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:25798801
         source_other: []
-      oval:mil.disa.stig.ind:tst:25800401:
-        source_test_id: oval:mil.disa.stig.ind:tst:25800401
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/ssh/sshd_config:KerberosAuthentication == no
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25800402
-        predicates:
-        - oval:mil.disa.stig.ind:ste:20000017
-        source_other: []
       oval:mil.disa.stig.ind:tst:25800400:
         source_test_id: oval:mil.disa.stig.ind:tst:25800400
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/ssh/sshd_config + sshd_config.d:KerberosAuthentication == no
+        test_title: /etc/ssh/sshd_config + sshd_config.d:KerberosAuthentication == no
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -187,7 +174,57 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:20000017
         source_other: []
+      oval:mil.disa.stig.ind:tst:25800401:
+        source_test_id: oval:mil.disa.stig.ind:tst:25800401
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: /etc/ssh/sshd_config:KerberosAuthentication == no
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25800402
+        predicates:
+        - oval:mil.disa.stig.ind:ste:20000017
+        source_other: []
     definitions:
+      oval:mil.disa.stig.rhel9os:def:258004:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:258004
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258004
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-255140 - RHEL 9 SSH daemon must not allow Kerberos authentication.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: 'Kerberos authentication for SSH is often implemented using Generic Security Service Application Program
+              Interface (GSSAPI). If Kerberos is enabled through SSH, the SSH daemon provides a means of access to the system''s
+              Kerberos implementation. Vulnerabilities in the system''s Kerberos implementations may be subject to exploitation.
+
+
+              Satisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00227'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:258004:
         source_definition_id: oval:mil.disa.stig.defs:def:258004
         class: compliance
@@ -232,43 +269,6 @@ assessment:
               validated mission requirements.
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.rhel9os:def:258004:
-        source_definition_id: oval:mil.disa.stig.rhel9os:def:258004
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:258004
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: RHEL-09-255140 - RHEL 9 SSH daemon must not allow Kerberos authentication.
-          - attributes:
-              family: unix
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Red Hat Enterprise Linux 9
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: 'Kerberos authentication for SSH is often implemented using Generic Security Service Application Program
-              Interface (GSSAPI). If Kerberos is enabled through SSH, the SSH daemon provides a means of access to the system''s
-              Kerberos implementation. Vulnerabilities in the system''s Kerberos implementations may be subject to exploitation.
-
-
-              Satisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00227'
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -400,6 +400,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258004r1045067_rule
-    semantic_ir_sha256: b716c73c70202247e0d161b24d966cf3e8613861ab749ae60f009c6b380317bc
+    semantic_ir_sha256: c29e6cf0d8eb7269166ba0f741a6d74dfc45b84833404d88451d231836bbab8f
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 5edb3270604a3522df241bde1743a608aa539db60d5519ab1ad18b778941e7e4
+  semantic_fingerprint_sha256: 1e45d106d2af50b67b96253a3c2bdba1fa111f5796fd724367a8a7d85dd248e6

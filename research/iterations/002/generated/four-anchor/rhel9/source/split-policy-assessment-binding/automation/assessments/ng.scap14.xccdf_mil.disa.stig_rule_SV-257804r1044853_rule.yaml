@@ -7,37 +7,13 @@ assessment:
   description: RHEL 9 must be configured to disable the Asynchronous Transfer Mode kernel module.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25780401:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25780401
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*blacklist[ \t]+atm[ \t]*$
-      - attributes:
-          datatype: int
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25780400:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25780400
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: filepath
@@ -55,24 +31,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23049401:
+    oval:mil.disa.stig.ind:obj:25780401:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23049401
+      source_object_id: oval:mil.disa.stig.ind:obj:25780401
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
-        name: path
+        name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: .*
+        value: /etc/modprobe.conf
       - attributes:
           operation: pattern match
         kind: element
@@ -81,7 +51,6 @@ assessment:
         value: ^[ \t]*blacklist[ \t]+atm[ \t]*$
       - attributes:
           datatype: int
-          operation: greater than or equal
         kind: element
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -92,7 +61,7 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '2'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: path
@@ -110,6 +79,37 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^[ \t]*install[ \t]+atm[ \t]+/bin/false[ \t]*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23049401:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23049401
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*blacklist[ \t]+atm[ \t]*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -121,23 +121,23 @@ assessment:
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25780401:
-        source_test_id: oval:mil.disa.stig.ind:tst:25780401
+      oval:mil.disa.stig.ind:tst:23049401:
+        source_test_id: oval:mil.disa.stig.ind:tst:23049401
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.conf contains a file that contains 'blacklist atm'
+        test_title: /etc/modprobe.d contains a file that contains 'blacklist atm'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.ind:obj:25780401
+        - oval:mil.disa.stig.ind:obj:23049401
         predicates: []
         source_other: []
       oval:mil.disa.stig.ind:tst:23049400:
         source_test_id: oval:mil.disa.stig.ind:tst:23049400
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.d contains a file that contains 'install atm /bin/false'
+        test_title: /etc/modprobe.d contains a file that contains 'install atm /bin/false'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -149,7 +149,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:25780400
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.conf contains a file that contains 'install atm /bin/false'
+        test_title: /etc/modprobe.conf contains a file that contains 'install atm /bin/false'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -157,19 +157,52 @@ assessment:
         - oval:mil.disa.stig.ind:obj:25780400
         predicates: []
         source_other: []
-      oval:mil.disa.stig.ind:tst:23049401:
-        source_test_id: oval:mil.disa.stig.ind:tst:23049401
+      oval:mil.disa.stig.ind:tst:25780401:
+        source_test_id: oval:mil.disa.stig.ind:tst:25780401
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.d contains a file that contains 'blacklist atm'
+        test_title: /etc/modprobe.conf contains a file that contains 'blacklist atm'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.ind:obj:23049401
+        - oval:mil.disa.stig.ind:obj:25780401
         predicates: []
         source_other: []
     definitions:
+      oval:mil.disa.stig.rhel9os:def:257804:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:257804
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257804
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-213045 - RHEL 9 must be configured to disable the Asynchronous Transfer Mode kernel module.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Disabling Asynchronous Transfer Mode (ATM) protects the system against exploitation of any flaws in its
+              implementation.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:257804:
         source_definition_id: oval:mil.disa.stig.defs:def:257804
         class: compliance
@@ -213,39 +246,6 @@ assessment:
             text: The operating system must disable the asynchronous transfer mode (ATM) protocol.
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.rhel9os:def:257804:
-        source_definition_id: oval:mil.disa.stig.rhel9os:def:257804
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:257804
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: RHEL-09-213045 - RHEL 9 must be configured to disable the Asynchronous Transfer Mode kernel module.
-          - attributes:
-              family: unix
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Red Hat Enterprise Linux 9
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Disabling Asynchronous Transfer Mode (ATM) protects the system against exploitation of any flaws in its
-              implementation.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -368,6 +368,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257804r1044853_rule
-    semantic_ir_sha256: 8b36f42b5b5c38b6e8587dd846782c94e4f3d973623859177fc2dbdc5dd7342d
+    semantic_ir_sha256: 8913a55bb511b2a2d229e8fa700e5756a4a910c7fc2f41c5068f399b861808cf
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 297da850144b68876104832faf0aeddf347a7098ed4aaaaa2a8c656d9aa67124
+  semantic_fingerprint_sha256: 6396098ccfb4ad48cabe5d5c7a8b1dca9592286eaa488d659819a52b03ef8035

@@ -349,7 +349,7 @@ rule:
         source_type: partition_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: mount_point
@@ -361,7 +361,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: filepath
@@ -381,19 +381,6 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:2303001:
-        source_state_id: oval:mil.disa.stig.ind:ste:2303001
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
-        comment: null
       oval:mil.disa.stig.linux:ste:20000002:
         source_state_id: oval:mil.disa.stig.linux:ste:20000002
         source_type: partition_state
@@ -406,14 +393,27 @@ rule:
           name: mount_options
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: nosuid
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.ind:ste:2303001:
+        source_state_id: oval:mil.disa.stig.ind:ste:2303001
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23051800:
           source_test_id: oval:mil.disa.stig.ind:tst:23051800
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /var/log/audit is configured in /etc/fstab with the nosuid option.
+          test_title: /var/log/audit is configured in /etc/fstab with the nosuid option.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -426,7 +426,7 @@ rule:
           source_test_id: oval:mil.disa.stig.linux:tst:23051800
           source_type: partition_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: /var/log/audit is mounted with the nosuid option.
+          test_title: /var/log/audit is mounted with the nosuid option.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -436,33 +436,6 @@ rule:
           - oval:mil.disa.stig.linux:ste:20000002
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230518:
-          source_definition_id: oval:mil.disa.stig.defs:def:230518
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23051800
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23051800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must mount /var/log/audit with the nosuid option.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271662:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271662
           class: compliance
@@ -496,6 +469,33 @@ rule:
                 This option must be used for mounting any file system not containing approved "setuid" and "setguid" files.
                 Executing files from untrusted file systems increases the opportunity for nonprivileged users to attain unauthorized
                 administrative access.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230518:
+          source_definition_id: oval:mil.disa.stig.defs:def:230518
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23051800
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23051800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must mount /var/log/audit with the nosuid option.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -626,9 +626,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271662r1091698_rule
-      semantic_ir_sha256: bb1aa1c1ef6d9593fa76aaf751b5c3d70d07ab944926ea2cdd52180036658b00
+      semantic_ir_sha256: b259dbb6b9f552f73f8418bb8b0cb6fb4d49897d3ce2cb4338750e371d9ae865
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d0e400ec6338dcb174eb6e7a1bf1a0e25febc041e89ee51b02ea387a3a6b648f
+    semantic_fingerprint_sha256: 66d0ffbe460dc41676c5af4a06ef67364a1940a2cc48658bdecd29701026c32b
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271662r1091698_rule

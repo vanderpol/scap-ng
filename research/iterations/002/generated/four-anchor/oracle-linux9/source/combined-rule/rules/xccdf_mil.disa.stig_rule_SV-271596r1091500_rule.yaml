@@ -365,13 +365,25 @@ rule:
     description: OL 9 must allocate audit record storage capacity to store at least one week's worth of audit records.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25815500:
+        capability: scapng.collect.independent.variable
+        source_object_id: oval:mil.disa.stig.ind:obj:25815500
+        source_type: variable_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: var_ref
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: oval:mil.disa.stig.defs:var:25815500
       oval:mil.disa.stig.linux:obj:23029400:
         capability: scapng.collect.linux.partition
         source_object_id: oval:mil.disa.stig.linux:obj:23029400
         source_type: partition_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             datatype: string
@@ -380,25 +392,13 @@ rule:
           kind: element
           name: mount_point
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      oval:mil.disa.stig.ind:obj:25815500:
-        capability: scapng.collect.independent.variable
-        source_object_id: oval:mil.disa.stig.ind:obj:25815500
-        source_type: variable_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: var_ref
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: oval:mil.disa.stig.defs:var:25815500
       oval:mil.disa.stig.ind:obj:23029402:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23029402
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '2'
-        comment: null
+        object_title: null
         query:
         - attributes:
             ignore_case: 'true'
@@ -428,7 +428,7 @@ rule:
         source_variable_id: oval:mil.disa.stig.defs:var:23029400
         source_type: local_variable
         datatype: string
-        comment: audit data directory from /etc/audit/auditd.conf
+        variable_title: audit data directory from /etc/audit/auditd.conf
         semantic_ast:
           datatype: string
           expression:
@@ -469,7 +469,7 @@ rule:
         source_variable_id: oval:mil.disa.stig.defs:var:25815500
         source_type: local_variable
         datatype: string
-        comment: audit partition total size in bytes
+        variable_title: audit partition total size in bytes
         semantic_ast:
           datatype: string
           expression:
@@ -548,14 +548,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '10737418240'
-        comment: 10GiB
+        state_title: 10GiB
     evaluate:
       tests:
         oval:mil.disa.stig.linux:tst:23029400:
           source_test_id: oval:mil.disa.stig.linux:tst:23029400
           source_type: partition_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: There is a separate file system for audit data directory.
+          test_title: There is a separate file system for audit data directory.
           check: all
           check_existence: all_exist
           state_operator: AND
@@ -567,7 +567,7 @@ rule:
           source_test_id: oval:mil.disa.stig.ind:tst:25815500
           source_type: variable_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit file system total space >= 10GiB
+          test_title: Audit file system total space >= 10GiB
           check: all
           check_existence: all_exist
           state_operator: AND
@@ -769,9 +769,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271596r1091500_rule
-      semantic_ir_sha256: ea79a00b986c9e2660313a57bbd38514d2aa3045ad22fe90f74302b6eaa11f3f
+      semantic_ir_sha256: a46a1b115251f37c90b58d9791c9a196577bb44853220cfc5d363f4791ad56e0
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 6e536216ffac3919203db57cb5304ea11bf1133932ea9b3a24463bc1364e5cd1
+    semantic_fingerprint_sha256: a1ccf45c7a27bf0e38c895a2076ae75bb0a70b2f7485b3161b7a08fb1fb8b40e
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271596r1091500_rule

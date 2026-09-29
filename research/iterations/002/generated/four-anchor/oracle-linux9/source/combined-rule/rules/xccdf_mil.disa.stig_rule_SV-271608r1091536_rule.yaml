@@ -407,7 +407,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: 'sssd config: certificate_verification'
+        object_title: 'sssd config: certificate_verification'
         query:
         - children:
           - kind: object_ref
@@ -422,13 +422,40 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
+      oval:mil.disa.stig.ind:obj:25812300:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25812300
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: 'sssd.conf: certificate_verification'
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/sssd/sssd.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*certificate_verification\s*=\s*(.*)\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25812301:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25812301
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: '/etc/sssd/conf.d/*.conf: certificate_verification'
+        object_title: '/etc/sssd/conf.d/*.conf: certificate_verification'
         query:
         - attributes:
             datatype: string
@@ -443,33 +470,6 @@ rule:
           name: filename
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^[^.].*\.conf$
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*certificate_verification\s*=\s*(.*)\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.ind:obj:25812300:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25812300
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 'sssd.conf: certificate_verification'
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/sssd/sssd.conf
         - attributes:
             operation: pattern match
           kind: element
@@ -498,14 +498,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (?i)(^|,)ocsp_dgst=sha512(,|$)
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:25812300:
           source_test_id: oval:mil.disa.stig.ind:tst:25812300
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: 'sssd config: certificate_verification: ocsp_dgst=sha512'
+          test_title: 'sssd config: certificate_verification: ocsp_dgst=sha512'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -515,29 +515,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:25812300
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:258123:
-          source_definition_id: oval:mil.disa.stig.defs:def:258123
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'sssd config: certificate_verification: ocsp_dgst=sha512'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25812300
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must implement certificate status checking for multifactor authentication.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271608:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271608
           class: compliance
@@ -576,6 +553,29 @@ rule:
                 \ requirement focuses on the System Security Services Daemon (SSSD). By default, SSSD performs Online Certificate\
                 \ Status Protocol (OCSP) checking and certificate verification using a sha256 digest function.\n\n\tSatisfies:\
                 \ SRG-OS-000375-GPOS-00160, SRG-OS-000377-GPOS-00162"
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258123:
+          source_definition_id: oval:mil.disa.stig.defs:def:258123
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'sssd config: certificate_verification: ocsp_dgst=sha512'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25812300
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must implement certificate status checking for multifactor authentication.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -708,9 +708,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271608r1091536_rule
-      semantic_ir_sha256: c506f5b84bc4bc107e72036d232cfd23eedf12993fb5bff74f57dcd67a75e396
+      semantic_ir_sha256: 267dadca53612893f5dd6a27e58d03bf1c5c43189742c1d2fb85310079b9a084
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: efa2682747a4cc601512c218cec9977cef3aff32abd2c51871f0db4d06d343a8
+    semantic_fingerprint_sha256: f47d8f22df8dcc8b24865f17c046c1616daf7dfc0bdd2680219766d0405c07f9
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271608r1091536_rule

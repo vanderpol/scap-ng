@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: Retrieve system wide crypto policy(ies).
+      object_title: Retrieve system wide crypto policy(ies).
       query:
       - kind: element
         name: shell
@@ -30,7 +30,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102
     collect:
       capability: scapng.collect.independent.textfilecontent54
-      comment: Retrieve the current minimum crypto-policy configuration.
+      object_title: Retrieve the current minimum crypto-policy configuration.
       query:
       - kind: element
         name: filepath
@@ -57,7 +57,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103
     collect:
       capability: scapng.collect.independent.textfilecontent54
-      comment: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
+      object_title: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
       query:
       - kind: element
         name: filepath
@@ -84,7 +84,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104
     collect:
       capability: scapng.collect.independent.textfilecontent54
-      comment: Retrieve the current minimum rsa size.
+      object_title: Retrieve the current minimum rsa size.
       query:
       - kind: element
         name: filepath
@@ -110,7 +110,6 @@ assessment:
     register: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104
   - name: Derive oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101
     derive:
-      comment: Allowed FIPS algorithms.
       datatype: string
       evaluation_plan:
         datatype: string
@@ -167,10 +166,10 @@ assessment:
           value: SHAKE-256
       source_type: constant_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101
+      variable_title: Allowed FIPS algorithms.
     register: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25824101
   predicates:
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824101:
-      comment: Confirm system wide crypto policy(ies) are correct.
       entities:
       - attributes:
           datatype: int
@@ -188,8 +187,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824101
       source_type: shellcommand_state
+      state_title: Confirm system wide crypto policy(ies) are correct.
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102:
-      comment: Confirm correct algorithms.
       entities:
       - attributes:
           operation: pattern match
@@ -202,8 +201,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102
       source_type: textfilecontent54_state
+      state_title: Confirm correct algorithms.
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103:
-      comment: Check for existence of SHA1 algorithms (negated at criterion level).
       entities:
       - attributes:
           operation: pattern match
@@ -215,8 +214,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103
       source_type: textfilecontent54_state
+      state_title: Check for existence of SHA1 algorithms (negated at criterion level).
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104:
-      comment: Confirm minimum hash values of 224.
       entities:
       - attributes:
           operation: pattern match
@@ -228,8 +227,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104
       source_type: textfilecontent54_state
+      state_title: Confirm minimum hash values of 224.
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105:
-      comment: Confirm minimum rsa size of 2048.
       entities:
       - attributes:
           datatype: int
@@ -242,6 +241,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105
       source_type: textfilecontent54_state
+      state_title: Confirm minimum rsa size of 2048.
   evaluate:
     definitions:
       oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241:
@@ -293,7 +293,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824101
-        comment: Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824101
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -301,12 +300,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824101
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy.
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824102:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102
-        comment: Verify the current minimum crypto-policy configuration.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824102
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -314,12 +313,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824102
         source_type: textfilecontent54_test
         state_operator: AND
+        test_title: Verify the current minimum crypto-policy configuration.
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824103:
         check: all
         check_existence: any_exist
         collections:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824102
-        comment: Verify no SHA1 algorithms are employed.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824103
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -327,12 +326,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824103
         source_type: textfilecontent54_test
         state_operator: AND
+        test_title: Verify no SHA1 algorithms are employed.
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824104:
         check: all
         check_existence: any_exist
         collections:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824103
-        comment: Verify minimum hash values of 224.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824104
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -340,12 +339,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824104
         source_type: textfilecontent54_test
         state_operator: AND
+        test_title: Verify minimum hash values of 224.
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25824104
-        comment: Verify minimum rsa size of 2048.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25824105
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -353,6 +352,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824105
         source_type: textfilecontent54_test
         state_operator: AND
+        test_title: Verify minimum rsa size of 2048.
   source_check_context:
     check_exports: []
     checks:
@@ -517,8 +517,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258241
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 9bcd9d3e4616d49b49aa572b4ac695f2d0dff15a775aaf8a558b49c1dc32e026
+    semantic_ir_sha256: 9100fbaba72847e530f049456e72cbb9cd4a7ae1b23e824385f14ec6ca8fda26
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258241r1184293_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: acef3d36508e6faa1fb51e03cb05af04b7ac5c22ca119bbaaa060ed3675984ce
+  semantic_fingerprint_sha256: e289d2d4e0e9d56e1712aa9a4f026a52988d27c5753506796b980a096c3758c6

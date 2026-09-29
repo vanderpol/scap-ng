@@ -16,7 +16,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:10000100
     collect:
       capability: scapng.collect.windows.wmi57
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: namespace
@@ -34,7 +34,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25349500
     collect:
       capability: scapng.collect.windows.userright
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: userright
@@ -47,7 +47,6 @@ assessment:
     register: oval:mil.disa.stig.win:obj:25349500
   predicates:
     oval:mil.disa.stig.win:ste:10000100:
-      comment: Standalone Workstation
       entities:
       - attributes:
           datatype: record
@@ -66,8 +65,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:10000100
       source_type: wmi57_state
+      state_title: Standalone Workstation
     oval:mil.disa.stig.win:ste:10000200:
-      comment: Domain Member Workstation
       entities:
       - attributes:
           datatype: record
@@ -86,8 +85,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:10000200
       source_type: wmi57_state
+      state_title: Domain Member Workstation
     oval:mil.disa.stig.win:ste:10000300:
-      comment: Standalone Server
       entities:
       - attributes:
           datatype: record
@@ -106,8 +105,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:10000300
       source_type: wmi57_state
+      state_title: Standalone Server
     oval:mil.disa.stig.win:ste:10000400:
-      comment: Domain Member Server
       entities:
       - attributes:
           datatype: record
@@ -126,8 +125,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:10000400
       source_type: wmi57_state
+      state_title: Domain Member Server
     oval:mil.disa.stig.win:ste:20000033:
-      comment: null
       entities:
       - attributes:
           operation: case insensitive equals
@@ -139,8 +138,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000033
       source_type: userright_state
+      state_title: null
     oval:mil.disa.stig.win:ste:20000034:
-      comment: null
       entities:
       - attributes:
           operation: pattern match
@@ -152,8 +151,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000034
       source_type: userright_state
+      state_title: null
     oval:mil.disa.stig.win:ste:20000040:
-      comment: null
       entities:
       - attributes:
           operation: pattern match
@@ -165,8 +164,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000040
       source_type: userright_state
+      state_title: null
     oval:mil.disa.stig.win:ste:20000041:
-      comment: null
       entities:
       - attributes:
           operation: pattern match
@@ -178,6 +177,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000041
       source_type: userright_state
+      state_title: null
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:254439:
@@ -285,7 +285,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:10000100
-        comment: The system is a standalone Windows server or workstation
         predicates:
         - oval:mil.disa.stig.win:ste:10000100
         - oval:mil.disa.stig.win:ste:10000300
@@ -294,12 +293,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:10002200
         source_type: wmi57_test
         state_operator: OR
+        test_title: The system is a standalone Windows server or workstation
       oval:mil.disa.stig.win:tst:10002300:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:10000100
-        comment: The system is a non-DC domain-joined Windows server or workstation
         predicates:
         - oval:mil.disa.stig.win:ste:10000200
         - oval:mil.disa.stig.win:ste:10000400
@@ -308,12 +307,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:10002300
         source_type: wmi57_test
         state_operator: OR
+        test_title: The system is a non-DC domain-joined Windows server or workstation
       oval:mil.disa.stig.win:tst:25349506:
         check: at least one
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25349500
-        comment: Deny log on through Remote Desktop Services - Local account
         predicates:
         - oval:mil.disa.stig.win:ste:20000034
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -321,12 +320,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25349506
         source_type: userright_test
         state_operator: AND
+        test_title: Deny log on through Remote Desktop Services - Local account
       oval:mil.disa.stig.win:tst:25349507:
         check: at least one
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25349500
-        comment: Deny log on through Remote Desktop Services - Guests
         predicates:
         - oval:mil.disa.stig.win:ste:20000033
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -334,12 +333,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25349507
         source_type: userright_test
         state_operator: AND
+        test_title: Deny log on through Remote Desktop Services - Guests
       oval:mil.disa.stig.win:tst:25349509:
         check: at least one
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25349500
-        comment: Deny log on through Remote Desktop Services - Domain Admins
         predicates:
         - oval:mil.disa.stig.win:ste:20000040
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -347,12 +346,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25349509
         source_type: userright_test
         state_operator: AND
+        test_title: Deny log on through Remote Desktop Services - Domain Admins
       oval:mil.disa.stig.win:tst:25349510:
         check: at least one
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25349500
-        comment: Deny log on through Remote Desktop Services - Enterprise Admins
         predicates:
         - oval:mil.disa.stig.win:ste:20000041
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -360,6 +359,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25349510
         source_type: userright_test
         state_operator: AND
+        test_title: Deny log on through Remote Desktop Services - Enterprise Admins
   source_check_context:
     check_exports: []
     checks:
@@ -542,8 +542,8 @@ assessment:
       - oval:mil.disa.stig.windows2025:def:278188
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 5888d0992d90f3a254dbb503252d90e13a31e7a243bc2ffab4714e8234c305ee
+    semantic_ir_sha256: 0c66c97e1c61c0bb3e051dce64c722b62b82d4b1b7c681a99377b2999e6646b3
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278188r1182303_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 2b802e35b3b3f5f2b6b65d7b49d505e9ff3a4df1c72bd2a313e4bd5061657644
+  semantic_fingerprint_sha256: 74af0f9f43de4e75f6f930733fddb1dde8bbc37bc0f7244424d8553513b4930f

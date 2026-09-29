@@ -351,7 +351,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: hive
@@ -383,14 +383,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25337400:
           source_test_id: oval:mil.disa.stig.win:tst:25337400
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Turn off downloading of print drivers over HTTP'' is set to ''Enabled'''
+          test_title: '''Turn off downloading of print drivers over HTTP'' is set to ''Enabled'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -400,6 +400,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253374:
+          source_definition_id: oval:mil.disa.stig.defs:def:253374
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25337400
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Downloading print driver packages over HTTP must be prevented.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253374:
           source_definition_id: oval:mil.disa.stig.windows11:def:253374
           class: compliance
@@ -433,29 +456,6 @@ rule:
                 for the feature. Turning off this capability will prevent potentially sensitive information from being sent
                 outside the enterprise and uncontrolled updates to the system. This setting prevents the computer from downloading
                 print driver packages over HTTP.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253374:
-          source_definition_id: oval:mil.disa.stig.defs:def:253374
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25337400
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Downloading print driver packages over HTTP must be prevented.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -587,9 +587,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253374r958478_rule
-      semantic_ir_sha256: b0f2543a8886d8ad3f21c5a260a3945196e56715f7b77f877354a4c5b7c1b4ba
+      semantic_ir_sha256: 272e11b9d8cc3671df6fb15bb510468f1dd22c07632a7846f5acf58168136ef5
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: f6aa2e7b345d338dd4f036baff665076f9914287ae19ed2fd41be2d2ea0f2382
+    semantic_fingerprint_sha256: 5e9c54b6f9694e7340f74ede7da0033a1e85110f73201fddc1a68701e26e18c6
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253374r958478_rule

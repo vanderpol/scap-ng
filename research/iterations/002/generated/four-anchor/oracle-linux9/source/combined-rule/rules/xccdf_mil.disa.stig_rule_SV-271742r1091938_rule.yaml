@@ -347,29 +347,13 @@ rule:
     description: OL 9 debug-shell systemd service must be disabled.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:23053201:
-        capability: scapng.collect.linux.systemdunitproperty
-        source_object_id: oval:mil.disa.stig.linux:obj:23053201
-        source_type: systemdunitproperty_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: unit
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: debug-shell.service
-        - kind: element
-          name: property
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: UnitFileState
       oval:mil.disa.stig.linux:obj:23053200:
         capability: scapng.collect.linux.systemdunitproperty
         source_object_id: oval:mil.disa.stig.linux:obj:23053200
         source_type: systemdunitproperty_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: unit
@@ -379,6 +363,22 @@ rule:
           name: property
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: LoadState
+      oval:mil.disa.stig.linux:obj:23053201:
+        capability: scapng.collect.linux.systemdunitproperty
+        source_object_id: oval:mil.disa.stig.linux:obj:23053201
+        source_type: systemdunitproperty_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: unit
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: debug-shell.service
+        - kind: element
+          name: property
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: UnitFileState
     derive: {}
     predicates:
       oval:mil.disa.stig.linux:ste:20000005:
@@ -391,32 +391,32 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: masked
-        comment: null
+        state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:23053200:
-          source_test_id: oval:mil.disa.stig.linux:tst:23053200
-          source_type: systemdunitproperty_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: debug-shell.service LoadState is masked if it exists.
-          check: all
-          check_existence: any_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23053200
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000005
-          source_other: []
         oval:mil.disa.stig.linux:tst:23053201:
           source_test_id: oval:mil.disa.stig.linux:tst:23053201
           source_type: systemdunitproperty_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: debug-shell.service UnitFileState is masked if it exists.
+          test_title: debug-shell.service UnitFileState is masked if it exists.
           check: all
           check_existence: any_exist
           state_operator: AND
           collections:
           - oval:mil.disa.stig.linux:obj:23053201
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000005
+          source_other: []
+        oval:mil.disa.stig.linux:tst:23053200:
+          source_test_id: oval:mil.disa.stig.linux:tst:23053200
+          source_type: systemdunitproperty_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: debug-shell.service LoadState is masked if it exists.
+          check: all
+          check_existence: any_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23053200
           predicates:
           - oval:mil.disa.stig.linux:ste:20000005
           source_other: []
@@ -612,9 +612,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271742r1091938_rule
-      semantic_ir_sha256: 4779fbedb5b4fdc4aa3d73cb7ade8439b76b1b4ae75bb2e3eec09d7c4ee57ac3
+      semantic_ir_sha256: 22e7cc0400211b0eb619305b4f24abb06ba9c71a9f7e99aeea8147adaaf4e54b
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: b28638f8f09d84beaa6bb67838ca8eeb13a219b7169fcf5ba6d5b28bf4aee24d
+    semantic_fingerprint_sha256: 44cffb75e6799ba896844da1a41d16844e16a2fdef04b0472dc9dbe58133e062
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271742r1091938_rule

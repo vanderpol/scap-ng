@@ -8,7 +8,7 @@ assessment:
   collect:
     oval:mil.disa.stig.ind:obj:25808000:
       capability: scapng.collect.independent.textfilecontent54
-      comment: /etc/security/faillock.conf dir
+      object_title: /etc/security/faillock.conf dir
       query:
       - kind: element
         name: filepath
@@ -33,7 +33,7 @@ assessment:
       version: '1'
     oval:mil.disa.stig.linux:obj:25808000:
       capability: scapng.collect.linux.selinuxsecuritycontext
-      comment: configured faillock directory selinux context
+      object_title: configured faillock directory selinux context
       query:
       - attributes:
           var_ref: oval:mil.disa.stig.defs:var:25808000
@@ -51,7 +51,6 @@ assessment:
       version: '1'
   derive:
     oval:mil.disa.stig.defs:var:25808000:
-      comment: faillock directory
       datatype: string
       evaluation_plan:
         datatype: string
@@ -91,6 +90,7 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:25808000
+      variable_title: faillock directory
   description: OL 9 must configure SELinux context type to allow the use of a nondefault faillock tally directory.
   evaluate:
     definitions:
@@ -162,19 +162,18 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.ind:obj:25808000
-        comment: /etc/security/faillock.conf dir option exists
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         source_other: []
         source_test_id: oval:mil.disa.stig.ind:tst:25808000
         source_type: textfilecontent54_test
         state_operator: AND
+        test_title: /etc/security/faillock.conf dir option exists
       oval:mil.disa.stig.linux:tst:25808000:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.linux:obj:25808000
-        comment: configured faillock directory has correct selinux context
         predicates:
         - oval:mil.disa.stig.linux:ste:25808000
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
@@ -182,6 +181,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.linux:tst:25808000
         source_type: selinuxsecuritycontext_test
         state_operator: AND
+        test_title: configured faillock directory has correct selinux context
   id: ng.shared.fd78e5ede8ebb0b95533d6b1
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
@@ -190,7 +190,6 @@ assessment:
     reuse_scope: cross-benchmark-exact-semantic-equivalence
   predicates:
     oval:mil.disa.stig.linux:ste:25808000:
-      comment: configured faillock directory selinux context correct
       entities:
       - kind: element
         name: type
@@ -200,6 +199,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
       source_state_id: oval:mil.disa.stig.linux:ste:25808000
       source_type: selinuxsecuritycontext_state
+      state_title: configured faillock directory selinux context correct
   semantic_model: scap-ng-generic-assessment-graph-0.1
   source_result_algebra: xccdf-1.2-complex-check-eight-state
   version: 1

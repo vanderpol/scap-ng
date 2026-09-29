@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -51,14 +51,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25338600:
         source_test_id: oval:mil.disa.stig.win:tst:25338600
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Disallow Autoplay for non-volume devices'' is set to ''Enabled'''
+        test_title: '''Disallow Autoplay for non-volume devices'' is set to ''Enabled'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -68,6 +68,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253386:
+        source_definition_id: oval:mil.disa.stig.defs:def:253386
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Verifies 'Disallow Autoplay for non-volume devices' is set to 'Enabled'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25338600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Autoplay must be turned off for non-volume devices.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253386:
         source_definition_id: oval:mil.disa.stig.windows11:def:253386
         class: compliance
@@ -100,29 +123,6 @@ assessment:
             text: Allowing autoplay to execute may introduce malicious code to a system. Autoplay begins reading from a drive
               as soon as media is inserted in the drive. As a result, the setup file of programs or music on audio media may
               start. This setting will disable autoplay for non-volume devices (such as Media Transfer Protocol (MTP) devices).
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253386:
-        source_definition_id: oval:mil.disa.stig.defs:def:253386
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Verifies 'Disallow Autoplay for non-volume devices' is set to 'Enabled'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25338600
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Autoplay must be turned off for non-volume devices.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -254,6 +254,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253386r958804_rule
-    semantic_ir_sha256: 2159ca875337dc1c690d751f8364a357bc1b5e77b26bc82b72645ea67f80b494
+    semantic_ir_sha256: 7b76f333d184f6710f97d683e738a0d02c213749dc1560c3fd764d3dc0adf1f7
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: b013a505579ee22d5d9d77ce0e3e9e11ca2a12e3f42225c4702a19e48a119265
+  semantic_fingerprint_sha256: bfbb1906310588e521522acefc2972066a55e832f638bb9fb60dee91c1bd317a

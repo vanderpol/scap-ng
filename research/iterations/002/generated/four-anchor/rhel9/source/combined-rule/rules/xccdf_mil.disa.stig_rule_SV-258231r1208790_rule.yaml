@@ -377,7 +377,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Filter out acceptable shadow password entries.
+        object_title: Filter out acceptable shadow password entries.
         query:
         - children:
           - kind: object_ref
@@ -404,7 +404,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Extract password hashes from /etc/shadow.
+        object_title: Extract password hashes from /etc/shadow.
         query:
         - attributes:
             datatype: string
@@ -440,7 +440,7 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^[!*]
-        comment: Exclude inactive/locked hashes (with leading '!' or '*').
+        state_title: Exclude inactive/locked hashes (with leading '!' or '*').
       oval:mil.disa.stig.ind:ste:23023201:
         source_state_id: oval:mil.disa.stig.ind:ste:23023201
         source_type: textfilecontent54_state
@@ -454,14 +454,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^[$][6][$]
-        comment: Exclude hashes with leading '$6$'.
+        state_title: Exclude hashes with leading '$6$'.
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23023200:
           source_test_id: oval:mil.disa.stig.ind:tst:23023200
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: No active password hash in /etc/shadow has a prefix other than '$6$'.
+          test_title: No active password hash in /etc/shadow has a prefix other than '$6$'.
           check: all
           check_existence: none_exist
           state_operator: AND
@@ -470,29 +470,6 @@ rule:
           predicates: []
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230232:
-          source_definition_id: oval:mil.disa.stig.defs:def:230232
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: No active password hash in /etc/shadow has a prefix other than '$6$'.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23023200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258231:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258231
           class: compliance
@@ -531,6 +508,29 @@ rule:
 
 
                 Satisfies: SRG-OS-000073-GPOS-00041, SRG-OS-000120-GPOS-00061'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230232:
+          source_definition_id: oval:mil.disa.stig.defs:def:230232
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: No active password hash in /etc/shadow has a prefix other than '$6$'.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23023200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -653,9 +653,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258231r1208790_rule
-      semantic_ir_sha256: ac4f5a1c9915ffa18645dd1fd914e1ee369bba372d3e5f204b5d23321d86fa23
+      semantic_ir_sha256: 395b76be328b62c88e12e47692f277dfde3296f5d722d91cc7a32a5ce5a2f528
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d000e1537e51941b2d4a0c3035b3d3a46c55da1452c5f7335f04cdec358b9369
+    semantic_fingerprint_sha256: 94120acb9e34c8e41a59008ad2f7005ef4f6691d030c652e86545de5bee67a37
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258231r1208790_rule

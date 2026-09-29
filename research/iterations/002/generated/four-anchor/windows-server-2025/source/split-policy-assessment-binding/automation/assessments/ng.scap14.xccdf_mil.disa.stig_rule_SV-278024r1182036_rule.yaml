@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -39,7 +39,7 @@ assessment:
       source_type: wmi57_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -56,6 +56,23 @@ assessment:
         value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000000:
+      source_state_id: oval:mil.disa.stig.win:ste:20000000
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      state_title: null
     oval:mil.disa.stig.win:ste:25328600:
       source_state_id: oval:mil.disa.stig.win:ste:25328600
       source_type: wmi57_state
@@ -77,31 +94,14 @@ assessment:
         kind: element
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2
-    oval:mil.disa.stig.win:ste:20000000:
-      source_state_id: oval:mil.disa.stig.win:ste:20000000
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_dword
-      - attributes:
-          datatype: int
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '0'
-      comment: null
+      state_title: Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25328600:
         source_test_id: oval:mil.disa.stig.win:tst:25328600
         source_type: wmi57_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
+        test_title: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -114,7 +114,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25328700
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Configure SMBv1 Server'' is set to ''Disabled'''
+        test_title: '''Configure SMBv1 Server'' is set to ''Disabled'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -319,6 +319,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278024r1182036_rule
-    semantic_ir_sha256: 688f0c0b95614a77415a024a96060529ad3fcbc7858ff175cd7c8a4f3d7775b0
+    semantic_ir_sha256: 98a6ae235b497ce86d19c8add7fa781c04a3baa0727222631ded6e6f27313302
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: eec1eb5cf470c5e120264df04c150012e388000c2056b55f3e1bbc8a2adfda72
+  semantic_fingerprint_sha256: 0e1b4a5f793d1323f4378e8a59193349f67878c29a3bda8e1bc2473e41038503

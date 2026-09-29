@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:20000016
     collect:
       capability: scapng.collect.unix.password
-      comment: Users with an username
+      object_title: Users with an username
       query:
       - attributes:
           datatype: string
@@ -29,7 +29,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:23032500
     collect:
       capability: scapng.collect.unix.file
-      comment: local initialization files of non-system users.
+      object_title: local initialization files of non-system users.
       query:
       - attributes:
           max_depth: '1'
@@ -62,7 +62,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:23032501
     collect:
       capability: scapng.collect.unix.file
-      comment: local initialization files of root user.
+      object_title: local initialization files of root user.
       query:
       - attributes:
           max_depth: '1'
@@ -95,7 +95,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:23032502
     collect:
       capability: scapng.collect.unix.password
-      comment: only non-system users (uid>999) home-dirs excluding root directory
+      object_title: only non-system users (uid>999) home-dirs excluding root directory
       query:
       - children:
         - kind: object_ref
@@ -124,7 +124,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:23032503
     collect:
       capability: scapng.collect.unix.password
-      comment: only root users (uid=0) home-dirs excluding root directory
+      object_title: only root users (uid=0) home-dirs excluding root directory
       query:
       - children:
         - kind: object_ref
@@ -152,7 +152,6 @@ assessment:
     register: oval:mil.disa.stig.unix:obj:23032503
   - name: Derive oval:mil.disa.stig.defs:var:23032500
     derive:
-      comment: The home directories of non-system users.
       datatype: string
       evaluation_plan:
         datatype: string
@@ -192,10 +191,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:23032500
+      variable_title: The home directories of non-system users.
     register: oval:mil.disa.stig.defs:var:23032500
   - name: Derive oval:mil.disa.stig.defs:var:23032501
     derive:
-      comment: The home directory of the root user.
       datatype: string
       evaluation_plan:
         datatype: string
@@ -235,10 +234,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:23032501
+      variable_title: The home directory of the root user.
     register: oval:mil.disa.stig.defs:var:23032501
   predicates:
     oval:mil.disa.stig.unix:ste:20000017:
-      comment: only uids < 1000
       entities:
       - attributes:
           datatype: int
@@ -252,8 +251,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000017
       source_type: password_state
+      state_title: only uids < 1000
     oval:mil.disa.stig.unix:ste:20000018:
-      comment: only uids > 0
       entities:
       - attributes:
           datatype: int
@@ -267,8 +266,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000018
       source_type: password_state
+      state_title: only uids > 0
     oval:mil.disa.stig.unix:ste:20000020:
-      comment: mode 0740 or less permissive
       entities:
       - attributes:
           datatype: boolean
@@ -322,8 +321,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000020
       source_type: file_state
+      state_title: mode 0740 or less permissive
     oval:mil.disa.stig.unix:ste:20000021:
-      comment: null
       entities:
       - kind: element
         name: type
@@ -333,8 +332,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000021
       source_type: file_state
+      state_title: null
     oval:mil.disa.stig.unix:ste:23032500:
-      comment: root directory
       entities:
       - kind: element
         name: home_dir
@@ -344,6 +343,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:23032500
       source_type: password_state
+      state_title: root directory
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:230325:
@@ -412,7 +412,6 @@ assessment:
         check_existence: any_exist
         collections:
         - oval:mil.disa.stig.unix:obj:23032500
-        comment: Local initialization files for non-system users have mode 0740 or less permissive.
         predicates:
         - oval:mil.disa.stig.unix:ste:20000020
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -420,12 +419,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.unix:tst:23032500
         source_type: file_test
         state_operator: AND
+        test_title: Local initialization files for non-system users have mode 0740 or less permissive.
       oval:mil.disa.stig.unix:tst:23032501:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.unix:obj:23032501
-        comment: Local initialization files for root have mode 0740 or less permissive.
         predicates:
         - oval:mil.disa.stig.unix:ste:20000020
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -433,6 +432,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.unix:tst:23032501
         source_type: file_test
         state_operator: AND
+        test_title: Local initialization files for root have mode 0740 or less permissive.
   source_check_context:
     check_exports: []
     checks:
@@ -553,8 +553,8 @@ assessment:
       - oval:mil.disa.stig.rhel9os:def:257889
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: e6011572a4d17f17760383d9b7f2783fe1651075c951b9dd9421c94ba2c47da7
+    semantic_ir_sha256: 79d8a55c9042ebdc48b68bfa2480d573ce41c659d8e2c21a440285b9a0ea6f63
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257889r1184302_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 2ef1dce58d5104bbe42128301a676ea8c57c6e48643effd69c651d693db1ee7a
+  semantic_fingerprint_sha256: 59080794ebdb3108894427205fb3329d929ffb5ec058f5bd86418500f9106115

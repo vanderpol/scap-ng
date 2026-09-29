@@ -13,23 +13,10 @@ assessment:
       source_type: auditeventpolicysubcategories_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25332500:
-      source_state_id: oval:mil.disa.stig.win:ste:25332500
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: audit_policy_change
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS
-      comment: '''Audit Policy Change'' is set to ''Success'''
     oval:mil.disa.stig.win:ste:25332501:
       source_state_id: oval:mil.disa.stig.win:ste:25332501
       source_type: auditeventpolicysubcategories_state
@@ -42,14 +29,27 @@ assessment:
         name: audit_policy_change
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
-      comment: '''Audit Policy Change'' is set to ''Success'' and ''Failure'''
+      state_title: '''Audit Policy Change'' is set to ''Success'' and ''Failure'''
+    oval:mil.disa.stig.win:ste:25332500:
+      source_state_id: oval:mil.disa.stig.win:ste:25332500
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: audit_policy_change
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS
+      state_title: '''Audit Policy Change'' is set to ''Success'''
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25332500:
         source_test_id: oval:mil.disa.stig.win:tst:25332500
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit Audit Policy Change'' is set to ''Success'''
+        test_title: '''Audit Audit Policy Change'' is set to ''Success'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -62,7 +62,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25332501
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit Audit Policy Change'' is set to ''Success'' and ''Failure'''
+        test_title: '''Audit Audit Policy Change'' is set to ''Success'' and ''Failure'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -72,33 +72,6 @@ assessment:
         - oval:mil.disa.stig.win:ste:25332501
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253325:
-        source_definition_id: oval:mil.disa.stig.defs:def:253325
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Audit Policy Change - Success only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332500
-          - comment: Audit - Audit Policy Change - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332501
-          comment: Audit - Audit Policy Change - Success
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Policy Change - Audit Policy Change successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253325:
         source_definition_id: oval:mil.disa.stig.windows11:def:253325
         class: compliance
@@ -135,6 +108,33 @@ assessment:
 
 
               Audit Policy Change records events related to changes in audit policy.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253325:
+        source_definition_id: oval:mil.disa.stig.defs:def:253325
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Audit Policy Change - Success only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332500
+          - comment: Audit - Audit Policy Change - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332501
+          comment: Audit - Audit Policy Change - Success
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Policy Change - Audit Policy Change successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -269,6 +269,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253325r991572_rule
-    semantic_ir_sha256: e635db070ea287ec6efbc4f77427a275e68eb4cfaaf1b8659b94c93b6f99f845
+    semantic_ir_sha256: 41c0c6f05252254275d5aabecbc86171d603f3a304397b7703bfaa4fdc7797eb
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: f2cf9ee8e0de36954f63cac01aafc244f10dcb351a82d2b2a09483966932931a
+  semantic_fingerprint_sha256: 7cadc8496069b4985b8f7471621899720d858d3ab67ab808196f5064920a6327

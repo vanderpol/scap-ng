@@ -7,13 +7,25 @@ assessment:
   description: OL 9 must mount /dev/shm with the noexec option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.linux:obj:23051000:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23051000
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /dev/shm
     oval:mil.disa.stig.ind:obj:23051001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23051001
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: filepath
@@ -31,33 +43,8 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.linux:obj:23051000:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23051000
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /dev/shm
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23051001:
-      source_state_id: oval:mil.disa.stig.ind:ste:23051001
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: (?:^noexec$|^noexec,|,noexec$|,noexec,)
-      comment: null
     oval:mil.disa.stig.linux:ste:20000000:
       source_state_id: oval:mil.disa.stig.linux:ste:20000000
       source_type: partition_state
@@ -70,14 +57,27 @@ assessment:
         name: mount_options
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: noexec
-      comment: null
+      state_title: null
+    oval:mil.disa.stig.ind:ste:23051001:
+      source_state_id: oval:mil.disa.stig.ind:ste:23051001
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?:^noexec$|^noexec,|,noexec$|,noexec,)
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23051001:
         source_test_id: oval:mil.disa.stig.ind:tst:23051001
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: If /dev/shm is configured in /etc/fstab, it is configured with the noexec option
+        test_title: If /dev/shm is configured in /etc/fstab, it is configured with the noexec option
         check: all
         check_existence: any_exist
         state_operator: AND
@@ -90,7 +90,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.linux:tst:23051000
         source_type: partition_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: If /dev/shm is mounted, it is mounted with the noexec option
+        test_title: If /dev/shm is mounted, it is mounted with the noexec option
         check: all
         check_existence: any_exist
         state_operator: AND
@@ -288,6 +288,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271651r1091665_rule
-    semantic_ir_sha256: f1dd92c70e403c5abeff15f00a7a3bb8788470d2399d15be63bbc727bfb9ec03
+    semantic_ir_sha256: ce2ccc8d226bcf841e204ad8d9314e4691ac53f1b37e580429d2b76cb9138dec
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 48e42da4c1f563b425e572b8aa8accfbf5f3dc99d7295765b9959d510c5f619a
+  semantic_fingerprint_sha256: 472e6ec2781e8fed2637ccb6f87602f0e1cb1a7ea1e5b9853367174e3fd4083d

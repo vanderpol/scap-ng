@@ -13,7 +13,7 @@ assessment:
       source_type: file_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '5'
-      comment: Check to see that all world-writable directories have the sticky bit set. Gather world-writable directories.
+      object_title: Check to see that all world-writable directories have the sticky bit set. Gather world-writable directories.
       query:
       - attributes:
           max_depth: '-1'
@@ -41,19 +41,6 @@ assessment:
         value: oval:navy.navwar.niwcatlantic.scc.linux:ste:27177902
   derive: {}
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.linux:ste:27177902:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27177902
-      source_type: file_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: boolean
-        kind: element
-        name: sticky
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '1'
-      comment: Filter exclude any with sticky bit.
     oval:navy.navwar.niwcatlantic.scc.linux:ste:27177901:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27177901
       source_type: file_state
@@ -66,14 +53,27 @@ assessment:
         name: owrite
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '0'
-      comment: Filter exclude directories that are not world writable.
+      state_title: Filter exclude directories that are not world writable.
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27177902:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27177902
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sticky
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1'
+      state_title: Filter exclude any with sticky bit.
   evaluate:
     tests:
       oval:navy.navwar.niwcatlantic.scc.linux:tst:27177901:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27177901
         source_type: file_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: Check that all world-writable directories have the sticky bit set.
+        test_title: Check that all world-writable directories have the sticky bit set.
         check: all
         check_existence: none_exist
         state_operator: AND
@@ -236,6 +236,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271779r1137695_rule
-    semantic_ir_sha256: 6b0ddf8fa6cc106a82525ebdc9e2c0a059c8670ca27468f590989df0f160f716
+    semantic_ir_sha256: ac2d9d823c890f4af6d8b204dff245d153dc39db108c8846435da44d3683934a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 4dbc61dea53e414c6c312c4bf015f858733aba847c495868201324fbfa9e4239
+  semantic_fingerprint_sha256: c3e1b18fefe9dacb46df7bcb1bafa22764d88fa8715f1e913c3b0f84e8dc7562

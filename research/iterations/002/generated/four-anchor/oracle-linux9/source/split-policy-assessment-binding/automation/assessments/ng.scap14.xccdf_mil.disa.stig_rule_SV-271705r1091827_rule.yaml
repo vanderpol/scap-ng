@@ -7,49 +7,13 @@ assessment:
   description: OL 9 must force a frequent session key renegotiation for SSH connections to the server.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23052701:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23052701
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '3'
-      comment: null
-      query:
-      - attributes:
-          ignore_case: 'true'
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^.+\.conf$
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*RekeyLimit\s+\d+[kmg]?\s+\d+[smdhw]?\s*
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25798800:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25798800
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: sshd_config includes
+      object_title: sshd_config includes
       query:
       - attributes:
           ignore_case: 'true'
@@ -81,7 +45,7 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '3'
-      comment: null
+      object_title: null
       query:
       - attributes:
           ignore_case: 'true'
@@ -92,6 +56,42 @@ assessment:
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*RekeyLimit\s+\d+[kmg]?\s+\d+[smdhw]?\s*
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23052701:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23052701
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '3'
+      object_title: null
+      query:
+      - attributes:
+          ignore_case: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.+\.conf$
       - attributes:
           operation: pattern match
         kind: element
@@ -120,7 +120,7 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/ssh/sshd_config.d/*.conf
-      comment: null
+      state_title: null
     oval:mil.disa.stig.ind:ste:23052700:
       source_state_id: oval:mil.disa.stig.ind:ste:23052700
       source_type: textfilecontent54_state
@@ -134,14 +134,14 @@ assessment:
         name: text
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^(?i)\s*RekeyLimit\s+[1-9][0-9]*[kmg]?\s+([1-9][0-9]*[smhdw]?)+\s*$
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23052701:
         source_test_id: oval:mil.disa.stig.ind:tst:23052701
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/ssh/sshd_config.d:RekeyLimit max data and time are greater than zero.
+        test_title: /etc/ssh/sshd_config.d:RekeyLimit max data and time are greater than zero.
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -150,24 +150,11 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:23052700
         source_other: []
-      oval:mil.disa.stig.ind:tst:25798801:
-        source_test_id: oval:mil.disa.stig.ind:tst:25798801
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: sshd_config includes sshd_config.d
-        check: at least one
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25798800
-        predicates:
-        - oval:mil.disa.stig.ind:ste:25798801
-        source_other: []
       oval:mil.disa.stig.ind:tst:23052700:
         source_test_id: oval:mil.disa.stig.ind:tst:23052700
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/ssh/sshd_config:RekeyLimit max data and time are greater than zero.
+        test_title: /etc/ssh/sshd_config:RekeyLimit max data and time are greater than zero.
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -175,6 +162,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23052700
         predicates:
         - oval:mil.disa.stig.ind:ste:23052700
+        source_other: []
+      oval:mil.disa.stig.ind:tst:25798801:
+        source_test_id: oval:mil.disa.stig.ind:tst:25798801
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: sshd_config includes sshd_config.d
+        check: at least one
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25798800
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25798801
         source_other: []
     definitions:
       oval:mil.disa.stig.ol9os:def:271705:
@@ -383,6 +383,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271705r1091827_rule
-    semantic_ir_sha256: c321c05810e7a9114c612cf66414c696cc92c072419da1ceb0218aac9f92b3dc
+    semantic_ir_sha256: 944bbb3fde4c9b064333f8cf688b94d9b220f823b7564aa335ec5e165da7cb69
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 7b5e2780458134132fd3b2cca13ee6691facc11c006d5c0e8a2ab9ba4f330896
+  semantic_fingerprint_sha256: 92307365a48f9c39df988286354bc5278457f049c33eea78e819e19f775ce685

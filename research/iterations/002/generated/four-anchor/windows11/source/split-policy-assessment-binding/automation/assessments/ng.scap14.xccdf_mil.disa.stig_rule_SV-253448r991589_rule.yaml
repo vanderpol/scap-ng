@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: hive
@@ -43,7 +43,7 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '2'
-      comment: null
+      state_title: null
     oval:mil.disa.stig.win:ste:25445900:
       source_state_id: oval:mil.disa.stig.win:ste:25445900
       source_type: registry_state
@@ -58,14 +58,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25344800:
         source_test_id: oval:mil.disa.stig.win:tst:25344800
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Interactive logon: Smart card removal behavior'' is set to ''Lock Workstation'' or ''Force Logoff'''
+        test_title: '''Interactive logon: Smart card removal behavior'' is set to ''Lock Workstation'' or ''Force Logoff'''
         check: all
         check_existence: at_least_one_exists
         state_operator: OR
@@ -76,6 +76,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25445901
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253448:
+        source_definition_id: oval:mil.disa.stig.defs:def:253448
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25344800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The Smart Card removal option must be configured to Force Logoff or Lock Workstation.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253448:
         source_definition_id: oval:mil.disa.stig.windows11:def:253448
         class: compliance
@@ -107,29 +130,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Unattended systems are susceptible to unauthorized use and must be locked. Configuring a system to lock
               when a smart card is removed will ensure the system is inaccessible when unattended.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253448:
-        source_definition_id: oval:mil.disa.stig.defs:def:253448
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25344800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The Smart Card removal option must be configured to Force Logoff or Lock Workstation.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -275,6 +275,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253448r991589_rule
-    semantic_ir_sha256: aef8697351f49e4336a1f8046de0435c42377e5fc583fc2f5baf23c0706b0b5e
+    semantic_ir_sha256: 10ddb82ed05001334cd632d27c0cc9da339a5b88f0549ed87f32b2fed26d8597
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: d627fda36ee517fa4cd21866fd13459c7e167346d937cf09708406619272a1d9
+  semantic_fingerprint_sha256: 932c0b9b146764680556b4b264c5f8044005347195a7b9e0c4b58fa1397aef3b

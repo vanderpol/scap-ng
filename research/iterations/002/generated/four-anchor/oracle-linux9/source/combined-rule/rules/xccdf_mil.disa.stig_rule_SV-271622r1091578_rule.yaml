@@ -337,7 +337,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '3'
-        comment: /etc/libuser.conf defaults section with crypt_style
+        object_title: /etc/libuser.conf defaults section with crypt_style
         query:
         - kind: element
           name: filepath
@@ -362,7 +362,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '4'
-        comment: /etc/libuser.conf defaults section with crypt_style
+        object_title: /etc/libuser.conf defaults section with crypt_style
         query:
         - kind: element
           name: filepath
@@ -395,7 +395,7 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: sha512
-        comment: sha512
+        state_title: sha512
       oval:mil.disa.stig.ind:ste:20441700:
         source_state_id: oval:mil.disa.stig.ind:ste:20441700
         source_type: textfilecontent54_state
@@ -409,14 +409,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
-        comment: defaults/crypt_style
+        state_title: defaults/crypt_style
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:20441700:
           source_test_id: oval:mil.disa.stig.ind:tst:20441700
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: libuser.conf, defaults/crypt_style exists
+          test_title: libuser.conf, defaults/crypt_style exists
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -429,7 +429,7 @@ rule:
           source_test_id: oval:mil.disa.stig.ind:tst:20441701
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: libuser.conf, crypt_style = sha512
+          test_title: libuser.conf, crypt_style = sha512
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -439,6 +439,34 @@ rule:
           - oval:mil.disa.stig.ind:ste:20441701
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:204417:
+          source_definition_id: oval:mil.disa.stig.defs:def:204417
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: libuser.conf, defaults/crypt_style exists
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:20441700
+            - comment: libuser.conf, crypt_style = sha512
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:20441701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must be configured so that user and group account administration utilities are configured
+                to store only encrypted representations of passwords.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271622:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271622
           class: compliance
@@ -475,34 +503,6 @@ rule:
                 This setting ensures user and group account administration utilities are configured to store only encrypted\
                 \ representations of passwords. Additionally, the \"crypt_style\" configuration option ensures the use of\
                 \ a strong hashing algorithm that makes password cracking attacks more difficult."
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:204417:
-          source_definition_id: oval:mil.disa.stig.defs:def:204417
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: libuser.conf, defaults/crypt_style exists
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:20441700
-            - comment: libuser.conf, crypt_style = sha512
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:20441701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must be configured so that user and group account administration utilities are configured
-                to store only encrypted representations of passwords.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -626,9 +626,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271622r1091578_rule
-      semantic_ir_sha256: 6432a12e8a0502f13931202b25d93ff2c24779c1ad3c3f91c02ba5e82273a3b2
+      semantic_ir_sha256: 9b076b52bb9bf020184a4f050e742825d7b0670fa5b9aa2c2f03b3173538add5
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 9f219e31bcd8552565a74c43551860fa07d4be2da2edcdbdc70ab5ea42edd965
+    semantic_fingerprint_sha256: e7c481b45b9d9f7686fc566fdb20dd9903e56aeebfba7eb6414bbaa8d9a094c0
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271622r1091578_rule

@@ -334,7 +334,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             datatype: string
@@ -361,7 +361,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             datatype: string
@@ -382,13 +382,37 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.unix:obj:23036401:
+        capability: scapng.collect.unix.password
+        source_object_id: oval:mil.disa.stig.unix:obj:23036401
+        source_type: password_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '2'
+        object_title: Users with a password age of zero minus system users
+        query:
+        - attributes:
+            datatype: string
+            operation: equals
+            var_check: at least one
+            var_ref: oval:mil.disa.stig.defs:var:23036400
+          kind: element
+          name: username
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - kind: element
+          name: filter
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: oval:mil.disa.stig.unix:ste:23036400
+        - kind: element
+          name: filter
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: oval:mil.disa.stig.unix:ste:23036401
       oval:mil.disa.stig.ind:obj:23036403:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23036403
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             datatype: string
@@ -409,77 +433,12 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.unix:obj:23036401:
-        capability: scapng.collect.unix.password
-        source_object_id: oval:mil.disa.stig.unix:obj:23036401
-        source_type: password_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '2'
-        comment: Users with a password age of zero minus system users
-        query:
-        - attributes:
-            datatype: string
-            operation: equals
-            var_check: at least one
-            var_ref: oval:mil.disa.stig.defs:var:23036400
-          kind: element
-          name: username
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
-          name: filter
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: oval:mil.disa.stig.unix:ste:23036400
-        - kind: element
-          name: filter
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: oval:mil.disa.stig.unix:ste:23036401
     derive:
-      oval:mil.disa.stig.defs:var:23036400:
-        source_variable_id: oval:mil.disa.stig.defs:var:23036400
-        source_type: local_variable
-        datatype: string
-        comment: Usernames of users with a minimum password age of 0 or blank
-        semantic_ast:
-          datatype: string
-          expression:
-            item_field: subexpression
-            object_ref: oval:mil.disa.stig.ind:obj:23036402
-            op: object_component
-            record_field: null
-          id: oval:mil.disa.stig.defs:var:23036400
-          type: local_variable
-        resolution:
-          datatype: string
-          item_field: subexpression
-          object_ref: oval:mil.disa.stig.ind:obj:23036402
-          operation: object_component
-          reason: object_component_requires_collection:textfilecontent54_object
-          record_field: null
-          status: dynamic_object_dependency
-          variable_type: local_variable
-        evaluation_plan:
-          datatype: string
-          dependencies:
-            objects:
-            - oval:mil.disa.stig.ind:obj:23036402
-            operations:
-            - object_component
-            variables: []
-          expression:
-            item_field: subexpression
-            object_ref: oval:mil.disa.stig.ind:obj:23036402
-            op: object_component
-            record_field: null
-          mode: target_dependent
-          reason: object_component_requires_collection:textfilecontent54_object
-          resolution_status: dynamic_object_dependency
-          variable_id: oval:mil.disa.stig.defs:var:23036400
-          variable_type: local_variable
       oval:mil.disa.stig.defs:var:23036401:
         source_variable_id: oval:mil.disa.stig.defs:var:23036401
         source_type: local_variable
         datatype: int
-        comment: UID for user nobody
+        variable_title: UID for user nobody
         semantic_ast:
           datatype: int
           expression:
@@ -516,6 +475,47 @@ rule:
           resolution_status: dynamic_object_dependency
           variable_id: oval:mil.disa.stig.defs:var:23036401
           variable_type: local_variable
+      oval:mil.disa.stig.defs:var:23036400:
+        source_variable_id: oval:mil.disa.stig.defs:var:23036400
+        source_type: local_variable
+        datatype: string
+        variable_title: Usernames of users with a minimum password age of 0 or blank
+        semantic_ast:
+          datatype: string
+          expression:
+            item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23036402
+            op: object_component
+            record_field: null
+          id: oval:mil.disa.stig.defs:var:23036400
+          type: local_variable
+        resolution:
+          datatype: string
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23036402
+          operation: object_component
+          reason: object_component_requires_collection:textfilecontent54_object
+          record_field: null
+          status: dynamic_object_dependency
+          variable_type: local_variable
+        evaluation_plan:
+          datatype: string
+          dependencies:
+            objects:
+            - oval:mil.disa.stig.ind:obj:23036402
+            operations:
+            - object_component
+            variables: []
+          expression:
+            item_field: subexpression
+            object_ref: oval:mil.disa.stig.ind:obj:23036402
+            op: object_component
+            record_field: null
+          mode: target_dependent
+          reason: object_component_requires_collection:textfilecontent54_object
+          resolution_status: dynamic_object_dependency
+          variable_id: oval:mil.disa.stig.defs:var:23036400
+          variable_type: local_variable
     predicates:
       oval:mil.disa.stig.unix:ste:23036400:
         source_state_id: oval:mil.disa.stig.unix:ste:23036400
@@ -530,7 +530,7 @@ rule:
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '1000'
-        comment: null
+        state_title: null
       oval:mil.disa.stig.unix:ste:23036401:
         source_state_id: oval:mil.disa.stig.unix:ste:23036401
         source_type: password_state
@@ -545,14 +545,14 @@ rule:
           kind: element
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.unix:tst:23036401:
           source_test_id: oval:mil.disa.stig.unix:tst:23036401
           source_type: password_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          comment: Non-system users do not have a minimum password age of 0 or blank
+          test_title: Non-system users do not have a minimum password age of 0 or blank
           check: all
           check_existence: none_exist
           state_operator: AND
@@ -564,7 +564,7 @@ rule:
           source_test_id: oval:mil.disa.stig.ind:tst:23036400
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Root does not have a minimum password age of 0 or blank
+          test_title: Root does not have a minimum password age of 0 or blank
           check: all
           check_existence: none_exist
           state_operator: AND
@@ -758,9 +758,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271630r1091602_rule
-      semantic_ir_sha256: 4ae09021517f30ffe4e052a670a624a6e57e79ff2b2d768ad6ab6cedd16654de
+      semantic_ir_sha256: 043c576b63823b8c4db9a7ddbf65351d6bf23e21df51691740c61fd46c1db8fb
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 66230986cb7721c1f3fb5252af5c4620e6d4cc810d91b3ec15f2ad063988e62a
+    semantic_fingerprint_sha256: b64671626964e815a111d4fa64fd84f5d424bbc6e903f6dc0306ed1b4528bb3b
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271630r1091602_rule

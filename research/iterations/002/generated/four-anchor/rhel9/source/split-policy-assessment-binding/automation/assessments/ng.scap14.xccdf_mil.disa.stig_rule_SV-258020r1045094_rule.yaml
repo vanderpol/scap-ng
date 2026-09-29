@@ -7,13 +7,38 @@ assessment:
   description: RHEL 9 must prevent a user from overriding the disabling of the graphical user smart card removal action.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25802600:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25802600
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      object_title: dconf user databases
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/profile/user
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^system-db:(\S+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:25802000:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25802000
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
+      object_title: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
       query:
       - attributes:
           var_check: at least one
@@ -40,37 +65,12 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25802600:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25802600
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: dconf user databases
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/dconf/profile/user
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^system-db:(\S+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
   derive:
     oval:mil.disa.stig.defs:var:25802600:
       source_variable_id: oval:mil.disa.stig.defs:var:25802600
       source_type: local_variable
       datatype: string
-      comment: dconf user database locks directories
+      variable_title: dconf user database locks directories
       semantic_ast:
         datatype: string
         expression:
@@ -145,7 +145,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:25802000
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
+        test_title: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
           exists
         check: all
         check_existence: at_least_one_exists
@@ -158,7 +158,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:25802600
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: dconf user database(s) exist
+        test_title: dconf user database(s) exist
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -167,35 +167,6 @@ assessment:
         predicates: []
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:258020:
-        source_definition_id: oval:mil.disa.stig.defs:def:258020
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: dconf user database(s) exist
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25802600
-          - comment: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
-              exists
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25802000
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must prevent a user from overriding the disabling of the graphical user smart card
-              removal action.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258020:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258020
         class: compliance
@@ -237,6 +208,35 @@ assessment:
 
 
               Satisfies: SRG-OS-000028-GPOS-00009, SRG-OS-000030-GPOS-00011'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:258020:
+        source_definition_id: oval:mil.disa.stig.defs:def:258020
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: dconf user database(s) exist
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25802600
+          - comment: /org/gnome/settings-daemon/peripherals/smartcard/removal-action in dconf user database locks directories
+              exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25802000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent a user from overriding the disabling of the graphical user smart card
+              removal action.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -361,6 +361,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258020r1045094_rule
-    semantic_ir_sha256: d79be000f6af3d325471e8586e550d3d6dd45b46f2cabc52a41a0bdc349dac24
+    semantic_ir_sha256: f2f213c45b80d58d496df72eac137218b5b3175defc0388c9bf6ce15ba81fff3
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: a475497682e47a7e5c07ed0a652408f0201d82574ecebeff2e0fca57dba3e087
+  semantic_fingerprint_sha256: e6d4403d0395b9aa3c1a5aa11b42f2f6446c77ec5c28041d08ea7dc26aaac317

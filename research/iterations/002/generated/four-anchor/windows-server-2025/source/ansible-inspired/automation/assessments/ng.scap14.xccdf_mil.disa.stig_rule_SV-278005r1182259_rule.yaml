@@ -12,7 +12,8 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800501
     collect:
       capability: scapng.collect.windows.cmdlet
-      comment: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any are found)
+      object_title: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any are
+        found)
       query:
       - kind: element
         name: module_name
@@ -75,7 +76,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502
     collect:
       capability: scapng.collect.windows.wmi57
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: namespace
@@ -93,7 +94,8 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27800503
     collect:
       capability: scapng.collect.windows.cmdlet
-      comment: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any are found)
+      object_title: Enabled Local Accounts with PasswordExpires=False should not exist (list only the first 100, if any are
+        found)
       query:
       - kind: element
         name: module_name
@@ -155,7 +157,6 @@ assessment:
     register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800503
   predicates:
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800501:
-      comment: Standalone Server
       entities:
       - attributes:
           datatype: record
@@ -174,8 +175,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800501
       source_type: wmi57_state
+      state_title: Standalone Server
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800502:
-      comment: Domain Member Server
       entities:
       - attributes:
           datatype: record
@@ -194,8 +195,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800502
       source_type: wmi57_state
+      state_title: Domain Member Server
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504:
-      comment: Backup Domain Controller
       entities:
       - attributes:
           datatype: record
@@ -214,8 +215,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504
       source_type: wmi57_state
+      state_title: Backup Domain Controller
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800505:
-      comment: Primary Domain Controller
       entities:
       - attributes:
           datatype: record
@@ -234,6 +235,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800505
       source_type: wmi57_state
+      state_title: Primary Domain Controller
   evaluate:
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:278005:
@@ -289,19 +291,18 @@ assessment:
         check_existence: none_exist
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800501
-        comment: Windows Server - Local User Account Passwords from Enabled Users must be configured to expire.
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         source_other: []
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800501
         source_type: cmdlet_test
         state_operator: AND
+        test_title: Windows Server - Local User Account Passwords from Enabled Users must be configured to expire.
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800502:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502
-        comment: The system is a Windows Standalone Server or a Windows Domain Member Server
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800501
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800502
@@ -310,25 +311,25 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800502
         source_type: wmi57_test
         state_operator: OR
+        test_title: The system is a Windows Standalone Server or a Windows Domain Member Server
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800503:
         check: all
         check_existence: none_exist
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800503
-        comment: Windows Domain Controller - Active Directory User Account Passwords for Enabled Users must be configured
-          to expire.
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         source_other: []
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800503
         source_type: cmdlet_test
         state_operator: AND
+        test_title: Windows Domain Controller - Active Directory User Account Passwords for Enabled Users must be configured
+          to expire.
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800504:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800502
-        comment: The system is a Windows Domain Controller
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800504
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800505
@@ -337,6 +338,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800504
         source_type: wmi57_test
         state_operator: OR
+        test_title: The system is a Windows Domain Controller
   source_check_context:
     check_exports: []
     checks:
@@ -484,8 +486,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.windows:def:278005
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 2f96a06c56bf297ea8768a27b6f1ea8962cf2b7d6204da247abc42885969c7e7
+    semantic_ir_sha256: 7fc428106478eac9d61526d0e2014d4d1797ac9f686d89a03be95b8866d252d7
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278005r1182259_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 91ee3c8081ec99a2715fff809617a9c2322b6f9af01fbb57d51632d980fd2d53
+  semantic_fingerprint_sha256: a77222f0e82dbb0e9b0cd074322fda22437b3f8388253a28021046d9f108108c

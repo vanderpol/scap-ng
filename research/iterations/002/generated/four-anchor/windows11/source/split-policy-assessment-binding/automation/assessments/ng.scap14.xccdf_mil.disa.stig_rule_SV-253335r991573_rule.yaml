@@ -13,7 +13,7 @@ assessment:
       source_type: auditeventpolicysubcategories_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query: []
   derive: {}
   predicates:
@@ -30,7 +30,7 @@ assessment:
         name: system_integrity
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
-      comment: Audit - System Integrity - Success and Failure
+      state_title: Audit - System Integrity - Success and Failure
     oval:mil.disa.stig.win:ste:25333500:
       source_state_id: oval:mil.disa.stig.win:ste:25333500
       source_type: auditeventpolicysubcategories_state
@@ -44,27 +44,14 @@ assessment:
         name: system_integrity
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_FAILURE
-      comment: Audit - System Integrity - Failure only
+      state_title: Audit - System Integrity - Failure only
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25333500:
-        source_test_id: oval:mil.disa.stig.win:tst:25333500
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Audit - System Integrity - Failure only
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25333500
-        source_other: []
       oval:mil.disa.stig.win:tst:25333501:
         source_test_id: oval:mil.disa.stig.win:tst:25333501
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Audit - System Integrity - Success and Failure
+        test_title: Audit - System Integrity - Success and Failure
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -73,34 +60,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25333501
         source_other: []
+      oval:mil.disa.stig.win:tst:25333500:
+        source_test_id: oval:mil.disa.stig.win:tst:25333500
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Audit - System Integrity - Failure only
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25333500
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253335:
-        source_definition_id: oval:mil.disa.stig.defs:def:253335
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - System Integrity - Failure only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25333500
-          - comment: Audit - System Integrity - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25333501
-          comment: Audit - System Integrity - Failure
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit System - System Integrity failures.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253335:
         source_definition_id: oval:mil.disa.stig.windows11:def:253335
         class: compliance
@@ -137,6 +110,33 @@ assessment:
 
 
               System Integrity records events related to violations of integrity to the security subsystem.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253335:
+        source_definition_id: oval:mil.disa.stig.defs:def:253335
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - System Integrity - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333500
+          - comment: Audit - System Integrity - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333501
+          comment: Audit - System Integrity - Failure
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit System - System Integrity failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -271,6 +271,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253335r991573_rule
-    semantic_ir_sha256: b48fec0d06c6af342a774f45fe1b8276e0164fa195e1d3afc44d2a6f6d2fafe3
+    semantic_ir_sha256: 25d561b126645b1b031a5ab8f031d841e4b14227df02626d4a7fe881a279a4c0
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ec309a05e88fddd21ce0cc1ac6766bf3ce3f7b8216423b5da7fbb1e2c5af4de3
+  semantic_fingerprint_sha256: e85214aa3dbd3b4e62b7a85de77b4d162910c98f4c8db0cec087844f51cf2fe8

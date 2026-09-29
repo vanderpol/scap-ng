@@ -7,44 +7,13 @@ assessment:
   description: RHEL 9 SSHD must not allow blank passwords.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25798402:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25798402
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: .+
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^(?i)\s*PermitEmptyPasswords\s+(\w+)$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25798400:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25798400
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '2'
-      comment: PermitEmptyPasswords in all sshd_config and sshd_config.d/* files
+      object_title: PermitEmptyPasswords in all sshd_config and sshd_config.d/* files
       query:
       - children:
         - kind: object_ref
@@ -65,12 +34,43 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^(?i)\s*PermitEmptyPasswords\s+(\w+)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25798402:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25798402
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .+
       - attributes:
           operation: pattern match
         kind: element
@@ -99,14 +99,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^(no|"no")$
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:25798400:
         source_test_id: oval:mil.disa.stig.ind:tst:25798400
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:PermitEmptyPasswords == no
+        test_title: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:PermitEmptyPasswords == no
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -116,6 +116,29 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000017
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:257984:
+        source_definition_id: oval:mil.disa.stig.defs:def:257984
+        class: compliance
+        version: '4'
+        criteria:
+          children:
+          - comment: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:PermitEmptyPasswords == no
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25798400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system SSHD must not allow blank passwords.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257984:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257984
         class: compliance
@@ -150,29 +173,6 @@ assessment:
 
 
               Satisfies: SRG-OS-000106-GPOS-00053, SRG-OS-000480-GPOS-00229, SRG-OS-000480-GPOS-00227'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:257984:
-        source_definition_id: oval:mil.disa.stig.defs:def:257984
-        class: compliance
-        version: '4'
-        criteria:
-          children:
-          - comment: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:PermitEmptyPasswords == no
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25798400
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system SSHD must not allow blank passwords.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -302,6 +302,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257984r1045026_rule
-    semantic_ir_sha256: a6e397b14d25e1d15ee84a800876c2b193d39be70df12200accf1d7e247d3d25
+    semantic_ir_sha256: 928b1ec8c410b4a6ab5cc422169f02ca391b82fdfefe1c91cd01318da393e0b1
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 499d8dcdca57a504533ebedda594324428e6f8529cc9eca91cf6ca86d7b0e7c3
+  semantic_fingerprint_sha256: 0f5ffd427784e3ec66024658d407ebd7d73b7984eda23db417c99577a8f08e70

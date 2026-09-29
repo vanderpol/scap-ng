@@ -7,59 +7,13 @@ assessment:
   description: OL 9 passwords must be created with a minimum of 15 characters.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23036901:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23036901
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/security/pwquality.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*minlen\s*=\s*(-?\d*)\s*(?:#.*)?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
-    oval:mil.disa.stig.ind:obj:23036900:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23036900
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23036901
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23036902
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
     oval:mil.disa.stig.ind:obj:23036902:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23036902
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '2'
-      comment: null
+      object_title: null
       query:
       - attributes:
           recurse_direction: down
@@ -89,6 +43,52 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23036900:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23036900
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23036901
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23036902
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+    oval:mil.disa.stig.ind:obj:23036901:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23036901
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      object_title: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/security/pwquality.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*minlen\s*=\s*(-?\d*)\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:23036900:
@@ -104,14 +104,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '15'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23036900:
         source_test_id: oval:mil.disa.stig.ind:tst:23036900
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: passwords must have a minimum of 15 characters
+        test_title: passwords must have a minimum of 15 characters
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -121,29 +121,6 @@ assessment:
         - oval:mil.disa.stig.ind:ste:23036900
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230369:
-        source_definition_id: oval:mil.disa.stig.defs:def:230369
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: passwords must have a minimum of 15 characters
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23036900
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system passwords must have a minimum of 15 characters.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271633:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271633
         class: compliance
@@ -184,6 +161,29 @@ assessment:
               \ will those components be required, but they will not count toward the total \"score\" of \"minlen\". This\
               \ will enable \"minlen\" to require a 15-character minimum.\n\n\tThe DOD minimum password requirement is 15\
               \ characters."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230369:
+        source_definition_id: oval:mil.disa.stig.defs:def:230369
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: passwords must have a minimum of 15 characters
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23036900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system passwords must have a minimum of 15 characters.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -305,6 +305,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271633r1091611_rule
-    semantic_ir_sha256: 459f9fb0eb708bbd4712cbb5877d2d84f5d9a04b90b9709e3a9d5756252ba0b2
+    semantic_ir_sha256: 82c7525738214d7c3a4cd62c9f4a7316a75575ce28c884dbb4b3b9e115cc6b69
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 89ab6565b46042cf805df344ea40c150ad2a8a099988520eb68b7c45cfd01635
+  semantic_fingerprint_sha256: f57aeb3110c04d4e23272e95e87e2995e67ac0e7cc93d098821d3a58185fe9b0

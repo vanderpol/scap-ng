@@ -8,39 +8,13 @@ assessment:
     and integrity for at least the \\*\SYSVOL and \\*\NETLOGON shares.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:25336200:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25336200
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: Hardened Path Config for \\*\SYSVOL
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - attributes:
-          datatype: string
-        kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
-      - attributes:
-          datatype: string
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: \\*\SYSVOL
     oval:mil.disa.stig.win:obj:25336201:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25336201
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: Hardened Path Config for \\*\NETLOGON
+      object_title: Hardened Path Config for \\*\NETLOGON
       query:
       - attributes:
           datatype: string
@@ -60,45 +34,34 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: \\*\NETLOGON
+    oval:mil.disa.stig.win:obj:25336200:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25336200
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: Hardened Path Config for \\*\SYSVOL
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths
+      - attributes:
+          datatype: string
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: \\*\SYSVOL
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25336201:
-      source_state_id: oval:mil.disa.stig.win:ste:25336201
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_sz
-      - attributes:
-          datatype: string
-          entity_check: none satisfy
-          operation: pattern match
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: (^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))
-      comment: No RequireMutualAuthentication!=1
-    oval:mil.disa.stig.win:ste:25336202:
-      source_state_id: oval:mil.disa.stig.win:ste:25336202
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_sz
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: (^| *, *)RequireIntegrity=1( *, *|$)
-      comment: RequireIntegrity=1
     oval:mil.disa.stig.win:ste:25336203:
       source_state_id: oval:mil.disa.stig.win:ste:25336203
       source_type: registry_state
@@ -117,7 +80,44 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: (^| *, *)RequireIntegrity=(?!1( *, *|$))
-      comment: No RequireIntegrity!=1
+      state_title: No RequireIntegrity!=1
+    oval:mil.disa.stig.win:ste:25336201:
+      source_state_id: oval:mil.disa.stig.win:ste:25336201
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_sz
+      - attributes:
+          datatype: string
+          entity_check: none satisfy
+          operation: pattern match
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: (^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))
+      state_title: No RequireMutualAuthentication!=1
+    oval:mil.disa.stig.win:ste:25336202:
+      source_state_id: oval:mil.disa.stig.win:ste:25336202
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_sz
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: (^| *, *)RequireIntegrity=1( *, *|$)
+      state_title: RequireIntegrity=1
     oval:mil.disa.stig.win:ste:25336200:
       source_state_id: oval:mil.disa.stig.win:ste:25336200
       source_type: registry_state
@@ -135,35 +135,35 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: (^| *, *)RequireMutualAuthentication=1( *, *|$)
-      comment: RequireMutualAuthentication=1
+      state_title: RequireMutualAuthentication=1
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25336201:
-        source_test_id: oval:mil.disa.stig.win:tst:25336201
+      oval:mil.disa.stig.win:tst:25336200:
+        source_test_id: oval:mil.disa.stig.win:tst:25336200
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Mutual Authentication and Integrity for \\*\NETLOGON
+        test_title: Mutual Authentication and Integrity for \\*\SYSVOL
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.win:obj:25336201
+        - oval:mil.disa.stig.win:obj:25336200
         predicates:
         - oval:mil.disa.stig.win:ste:25336200
         - oval:mil.disa.stig.win:ste:25336201
         - oval:mil.disa.stig.win:ste:25336202
         - oval:mil.disa.stig.win:ste:25336203
         source_other: []
-      oval:mil.disa.stig.win:tst:25336200:
-        source_test_id: oval:mil.disa.stig.win:tst:25336200
+      oval:mil.disa.stig.win:tst:25336201:
+        source_test_id: oval:mil.disa.stig.win:tst:25336201
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Mutual Authentication and Integrity for \\*\SYSVOL
+        test_title: Mutual Authentication and Integrity for \\*\NETLOGON
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.win:obj:25336200
+        - oval:mil.disa.stig.win:obj:25336201
         predicates:
         - oval:mil.disa.stig.win:ste:25336200
         - oval:mil.disa.stig.win:ste:25336201
@@ -378,6 +378,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278087r1182272_rule
-    semantic_ir_sha256: 2c14888ceb4f88b45b024011f9d99024a37bda2970ef96d9d05f5c7e6289ca95
+    semantic_ir_sha256: bf76fac3e34354045b7194bc4c2dab4bec026774c4b5ffec5405aad521afd323
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 66a69664037d7207ad89e64aa3bfa4c72a31561e5199e81132677296db977b4a
+  semantic_fingerprint_sha256: 6cea4b32ec82c7c6595684923f62f7394b5cd2f55a09c4b0661eaa2dada02821

@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27799901
     collect:
       capability: scapng.collect.windows.registry
-      comment: everyoneincludesanonymous must be configured
+      object_title: everyoneincludesanonymous must be configured
       query:
       - kind: element
         name: hive
@@ -34,7 +34,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: Run Icacls command against Program Files directory
+      object_title: Run Icacls command against Program Files directory
       query:
       - kind: element
         name: shell
@@ -56,7 +56,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27799903
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: Run Icacls command against Program Files (x86) directory
+      object_title: Run Icacls command against Program Files (x86) directory
       query:
       - kind: element
         name: shell
@@ -78,7 +78,6 @@ assessment:
     register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27799903
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27799901
     derive:
-      comment: Required Permissions
       datatype: string
       evaluation_plan:
         datatype: string
@@ -151,10 +150,10 @@ assessment:
           value: (?i)APPLICATION PACKAGE AUTHORITY\\ALL RESTRICTED APPLICATION PACKAGES:\(OI\)\(CI\)\(IO\)\(GR,GE\)
       source_type: constant_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27799901
+      variable_title: Required Permissions
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27799901
   predicates:
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901:
-      comment: Value must be equal to 0
       entities:
       - attributes:
           datatype: int
@@ -167,8 +166,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901
       source_type: registry_state
+      state_title: Value must be equal to 0
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902:
-      comment: Permissions must equal expected output
       entities:
       - attributes:
           datatype: int
@@ -192,6 +191,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902
       source_type: shellcommand_state
+      state_title: Permissions must equal expected output
   evaluate:
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:277999:
@@ -232,7 +232,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799901
-        comment: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -240,12 +239,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799901
         source_type: registry_test
         state_operator: AND
+        test_title: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27799902:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902
-        comment: Program Files directory permissions must conform to minimum requirements.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -253,12 +252,12 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799902
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Program Files directory permissions must conform to minimum requirements.
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27799903:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799903
-        comment: Program Files (x86) directory permissions must conform to minimum requirements.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -266,6 +265,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799903
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Program Files (x86) directory permissions must conform to minimum requirements.
   source_check_context:
     check_exports: []
     checks:
@@ -494,8 +494,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.windows:def:277999
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 52591b8a30bec55ad9aafad6c9145f25cb4ee248438a681fd271640741888777
+    semantic_ir_sha256: 241a5fc7347c4b5dd553218da74517d529ea9559f94544786d474af1a920ac60
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-277999r1180703_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 5bf44697114f0a1eafb4ccb7777effbb9bdcaaff7ef56df31b1dc0cbc7914e6b
+  semantic_fingerprint_sha256: 21fb134dea2e910009123d04b08f6b3bbc6b8a913ca8b1e651ecab66e142d570

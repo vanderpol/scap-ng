@@ -329,7 +329,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: Check the registry value store at HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\RequireSecuritySignature
+        object_title: Check the registry value store at HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\RequireSecuritySignature
         query:
         - attributes:
             datatype: string
@@ -367,14 +367,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25344900:
           source_test_id: oval:mil.disa.stig.win:tst:25344900
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Microsoft Network Client: Digitally sign communications (always)'' is set to ''Enabled'''
+          test_title: '''Microsoft Network Client: Digitally sign communications (always)'' is set to ''Enabled'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -384,6 +384,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253449:
+          source_definition_id: oval:mil.disa.stig.defs:def:253449
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''Microsoft Network Client: Digitally sign communications (always)'' is set to ''Enabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25344900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The Windows SMB client must be configured to always perform SMB packet signing.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278210:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278210
           class: compliance
@@ -418,29 +441,6 @@ rule:
                 \ SMB packets aid in preventing man-in-the-middle attacks. If this policy is enabled, the SMB client will\
                 \ only communicate with an SMB server that performs SMB packet signing.\n\n  Satisfies: SRG-OS-000423-GPOS-00187,\
                 \ SRG-OS-000424-GPOS-00188"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253449:
-          source_definition_id: oval:mil.disa.stig.defs:def:253449
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''Microsoft Network Client: Digitally sign communications (always)'' is set to ''Enabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25344900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The Windows SMB client must be configured to always perform SMB packet signing.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -562,9 +562,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278210r1181336_rule
-      semantic_ir_sha256: aac106b4691d4bbc4ec0d4912b669bfdacddcaa0bc4c8377630aaf5b2d3ea43f
+      semantic_ir_sha256: 775cadb5b79dfaeb8bb8ae0a61b7e00f3723ee83a1b73f46e2742dbe7108f13c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 52fb9a3320755a9368a3971716b3a085c0d14d4ba9e3423998913106fc3a8e28
+    semantic_fingerprint_sha256: 6a11c1a3079f35f9b8fa37915c10aa445692ba743a5edeacb80bef0294720368
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278210r1181336_rule

@@ -351,13 +351,25 @@ rule:
     description: RHEL 9 must enable the SELinux targeted policy.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.linux:obj:23024000:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23024000
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: /sys/fs/selinux
+        query:
+        - kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /sys/fs/selinux
       oval:mil.disa.stig.ind:obj:23028200:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23028200
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: filepath
@@ -376,18 +388,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.linux:obj:23024000:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23024000
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        comment: /sys/fs/selinux
-        query:
-        - kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /sys/fs/selinux
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23028200:
@@ -400,7 +400,7 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: targeted
-        comment: null
+        state_title: null
       oval:mil.disa.stig.linux:ste:23024000:
         source_state_id: oval:mil.disa.stig.linux:ste:23024000
         source_type: partition_state
@@ -411,14 +411,14 @@ rule:
           name: fs_type
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: selinuxfs
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.linux:tst:23024000:
           source_test_id: oval:mil.disa.stig.linux:tst:23024000
           source_type: partition_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: selinux is active
+          test_title: selinux is active
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -431,7 +431,7 @@ rule:
           source_test_id: oval:mil.disa.stig.ind:tst:23028200
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: '/etc/selinux/config: SELINUXTYPE=targeted'
+          test_title: '/etc/selinux/config: SELINUXTYPE=targeted'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -623,9 +623,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258079r1045159_rule
-      semantic_ir_sha256: 9867ff5f7c6a14b15983e1e78c81ed48e58209c62ecded9b39f32f457a9e0817
+      semantic_ir_sha256: f4d364494851f23e101b3218086ac8b5861527b57a816f9fea9874c517b998e7
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 972e35412fa3e94f6ab689fd65d069bdfaee2455a0075a207b6fbe29c299a2c8
+    semantic_fingerprint_sha256: f1be03f37cafc23d5b44c2eca674fcad4d234bea0a0e048e261ac2f6f9baba1c
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258079r1045159_rule

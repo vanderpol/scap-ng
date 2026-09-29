@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25343500
     collect:
       capability: scapng.collect.windows.sid_sid
-      comment: Built-in Administrator SID
+      object_title: Built-in Administrator SID
       query:
       - attributes:
           operation: pattern match
@@ -27,7 +27,6 @@ assessment:
     register: oval:mil.disa.stig.win:obj:25343500
   - name: Derive oval:mil.disa.stig.win:var:25343501
     derive:
-      comment: localdomain\Administrator
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -92,10 +91,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.win:var:25343501
+      variable_title: localdomain\Administrator
     register: oval:mil.disa.stig.win:var:25343501
   predicates:
     oval:mil.disa.stig.win:ste:25343500:
-      comment: Not Administrator
       entities:
       - attributes:
           datatype: string
@@ -108,8 +107,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:25343500
       source_type: sid_sid_state
+      state_title: Not Administrator
     oval:mil.disa.stig.win:ste:25343501:
-      comment: Not localdomain\Administrator
       entities:
       - attributes:
           datatype: string
@@ -122,6 +121,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:25343501
       source_type: sid_sid_state
+      state_title: Not localdomain\Administrator
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:253435:
@@ -186,7 +186,6 @@ assessment:
         check_existence: any_exist
         collections:
         - oval:mil.disa.stig.win:obj:25343500
-        comment: '''Accounts: Rename administrator account'' is not set to ''Administrator'' or ''localdomain\Administrator'''
         predicates:
         - oval:mil.disa.stig.win:ste:25343500
         - oval:mil.disa.stig.win:ste:25343501
@@ -195,6 +194,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25343500
         source_type: sid_sid_test
         state_operator: AND
+        test_title: '''Accounts: Rename administrator account'' is not set to ''Administrator'' or ''localdomain\Administrator'''
   source_check_context:
     check_exports: []
     checks:
@@ -323,4 +323,4 @@ assessment:
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253435r991589_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 64435d23545744a4c37150b42c969cda8924e549884e5330369a8b9620aeafcc
+  semantic_fingerprint_sha256: 768770d0eeff3813ece8e1238779f9292926569f1b97dfe9c534b472d089268c

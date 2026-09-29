@@ -398,34 +398,13 @@ rule:
     description: RHEL 9 must log SSH connection attempts and failures to the server.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23481502:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23481502
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: all sshd_config and sshd_config.d/* files
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23481500
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23481501
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
       oval:mil.disa.stig.ind:obj:23481501:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23481501
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Pull value of /etc/ssh/sshd_config.d:LogLevel
+        object_title: Pull value of /etc/ssh/sshd_config.d:LogLevel
         query:
         - kind: element
           name: path
@@ -456,7 +435,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Pull value of /etc/ssh/sshd_config:LogLevel
+        object_title: Pull value of /etc/ssh/sshd_config:LogLevel
         query:
         - kind: element
           name: filepath
@@ -475,6 +454,27 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:23481502:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23481502
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: all sshd_config and sshd_config.d/* files
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23481500
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23481501
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23481500:
@@ -490,14 +490,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^VERBOSE$|^"VERBOSE"$
-        comment: LogLevel value is set to VERBOSE
+        state_title: LogLevel value is set to VERBOSE
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23481500:
           source_test_id: oval:mil.disa.stig.ind:tst:23481500
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/ssh/sshd_config:LogLevel == VERBOSE
+          test_title: /etc/ssh/sshd_config:LogLevel == VERBOSE
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -507,29 +507,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:23481500
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:234815:
-          source_definition_id: oval:mil.disa.stig.defs:def:234815
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /etc/ssh/sshd_config:LogLevel == VERBOSE
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23481500
-            comment: SSH LogLevel == VERBOSE
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system operating system must log SSH connection attempts and failures to the server.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257982:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257982
           class: compliance
@@ -565,6 +542,29 @@ rule:
                 activity of SSH users. In many situations, such as Incident Response, it is important to determine when a
                 particular user was active on a system. The logout record can eliminate those users who disconnected, which
                 helps narrow the field.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:234815:
+          source_definition_id: oval:mil.disa.stig.defs:def:234815
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /etc/ssh/sshd_config:LogLevel == VERBOSE
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23481500
+            comment: SSH LogLevel == VERBOSE
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system operating system must log SSH connection attempts and failures to the server.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -697,9 +697,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257982r1045021_rule
-      semantic_ir_sha256: fba3f16e24e1b4021995553f273187401b11fc37a23dad670752bc90b2cb7432
+      semantic_ir_sha256: 9615cb2287c1b8d846dc1c06d7ae88f5d654fcc591f2fea52f3aed47d12fdbde
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ce557fb9637e0cc9a84b5be67065a41b202f0d14fa5d7f70cd091a592b4d6990
+    semantic_fingerprint_sha256: 8963b22cd87e25ca4f2a8ada42ec6e4407efc80ba678f0531f2163abab4d493d
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257982r1045021_rule

@@ -7,56 +7,45 @@ assessment:
   description: Internet Explorer must be disabled for Windows 11.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:25689301:
+    oval:mil.disa.stig.edge:obj:100:
       capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25689301
+      source_object_id: oval:mil.disa.stig.edge:obj:100
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: 64-bit DisplayName registry value
       query:
-      - kind: element
+      - attributes:
+          max_depth: '1'
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: string
+        kind: element
         name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: HKEY_LOCAL_MACHINE
-      - kind: element
+      - attributes:
+          datatype: string
+        kind: element
         name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Policies\Microsoft\Internet Explorer\Main
-      - kind: element
+        value: SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall
+      - attributes:
+          datatype: string
+        kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: NotifyDisableIEOptions
-    oval:mil.disa.stig.edge:obj:102:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.edge:obj:102
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: 64-bit DisplayName equals Microsoft Edge
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.edge:obj:100
-        - action: include
-          action_explicit: true
-          kind: filter
-          state_ref: oval:mil.disa.stig.edge:ste:100
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: false
+        value: DisplayName
     oval:mil.disa.stig.edge:obj:101:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.edge:obj:101
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: 32-bit DisplayName registry value
+      object_title: 32-bit DisplayName registry value
       query:
       - attributes:
           max_depth: '1'
@@ -88,7 +77,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: 32-bit DisplayName equals Microsoft Edge
+      object_title: 32-bit DisplayName equals Microsoft Edge
       query:
       - children:
         - kind: object_ref
@@ -105,34 +94,56 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: false
-    oval:mil.disa.stig.win:obj:25689300:
-      capability: scapng.collect.windows.wmi57
-      source_object_id: oval:mil.disa.stig.win:obj:25689300
-      source_type: wmi57_object
+    oval:mil.disa.stig.win:obj:25689301:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25689301
+      source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: namespace
+      - kind: element
+        name: hive
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: root\cimv2
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: wql
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'
+        value: SOFTWARE\Policies\Microsoft\Internet Explorer\Main
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: NotifyDisableIEOptions
+    oval:mil.disa.stig.edge:obj:102:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.edge:obj:102
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: 64-bit DisplayName equals Microsoft Edge
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.edge:obj:100
+        - action: include
+          action_explicit: true
+          kind: filter
+          state_ref: oval:mil.disa.stig.edge:ste:100
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: false
     oval:mil.disa.stig.win:obj:20000017:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:20000017
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: EditionID
+      object_title: EditionID
       query:
       - attributes:
           datatype: string
@@ -152,40 +163,110 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: EditionId
-    oval:mil.disa.stig.edge:obj:100:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.edge:obj:100
-      source_type: registry_object
+    oval:mil.disa.stig.win:obj:25689300:
+      capability: scapng.collect.windows.wmi57
+      source_object_id: oval:mil.disa.stig.win:obj:25689300
+      source_type: wmi57_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: 64-bit DisplayName registry value
+      object_title: null
       query:
       - attributes:
-          max_depth: '1'
-          recurse_direction: down
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - attributes:
           datatype: string
         kind: element
-        name: hive
+        name: namespace
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
+        value: root\cimv2
       - attributes:
           datatype: string
+          operation: equals
         kind: element
-        name: key
+        name: wql
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall
-      - attributes:
-          datatype: string
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: DisplayName
+        value: SELECT installstate FROM win32_optionalfeature WHERE name = 'Internet-Explorer-Optional-amd64'
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000001:
+      source_state_id: oval:mil.disa.stig.win:ste:20000001
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '1'
+      state_title: null
+    oval:mil.disa.stig.win:ste:20000000:
+      source_state_id: oval:mil.disa.stig.win:ste:20000000
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      state_title: null
+    oval:mil.disa.stig.win:ste:20000018:
+      source_state_id: oval:mil.disa.stig.win:ste:20000018
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_sz
+      - attributes:
+          datatype: string
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: EnterpriseS
+      state_title: EditionID = EnterpriseS (reg_sz)
+    oval:mil.disa.stig.win:ste:20000002:
+      source_state_id: oval:mil.disa.stig.win:ste:20000002
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '2'
+      state_title: null
+    oval:mil.disa.stig.edge:ste:100:
+      source_state_id: oval:mil.disa.stig.edge:ste:100
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Microsoft Edge
+      state_title: registry value equals Microsoft Edge
     oval:mil.disa.stig.win:ste:20000020:
       source_state_id: oval:mil.disa.stig.win:ste:20000020
       source_type: wmi57_state
@@ -207,95 +288,14 @@ assessment:
         kind: element
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: null
-    oval:mil.disa.stig.win:ste:20000018:
-      source_state_id: oval:mil.disa.stig.win:ste:20000018
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_sz
-      - attributes:
-          datatype: string
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: EnterpriseS
-      comment: EditionID = EnterpriseS (reg_sz)
-    oval:mil.disa.stig.edge:ste:100:
-      source_state_id: oval:mil.disa.stig.edge:ste:100
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Microsoft Edge
-      comment: registry value equals Microsoft Edge
-    oval:mil.disa.stig.win:ste:20000001:
-      source_state_id: oval:mil.disa.stig.win:ste:20000001
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_dword
-      - attributes:
-          datatype: int
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '1'
-      comment: null
-    oval:mil.disa.stig.win:ste:20000000:
-      source_state_id: oval:mil.disa.stig.win:ste:20000000
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_dword
-      - attributes:
-          datatype: int
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '0'
-      comment: null
-    oval:mil.disa.stig.win:ste:20000002:
-      source_state_id: oval:mil.disa.stig.win:ste:20000002
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_dword
-      - attributes:
-          datatype: int
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '2'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25689300:
         source_test_id: oval:mil.disa.stig.win:tst:25689300
         source_type: wmi57_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Internet Explorer 11 optional feature disabled or not installed
+        test_title: Internet Explorer 11 optional feature disabled or not installed
         check: all
         check_existence: any_exist
         state_operator: AND
@@ -304,11 +304,23 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:20000020
         source_other: []
+      oval:mil.disa.stig.edge:tst:101:
+        source_test_id: oval:mil.disa.stig.edge:tst:101
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: 32-bit Microsoft Edge is installed
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.edge:obj:103
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.edge:tst:100:
         source_test_id: oval:mil.disa.stig.edge:tst:100
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 64-bit Microsoft Edge is installed
+        test_title: 64-bit Microsoft Edge is installed
         check: all
         check_existence: none_exist
         state_operator: AND
@@ -320,7 +332,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25689301
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Internet Explorer 11 is disabled as a standalone browser
+        test_title: Internet Explorer 11 is disabled as a standalone browser
         check: all
         check_existence: at_least_one_exists
         state_operator: OR
@@ -331,23 +343,11 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         - oval:mil.disa.stig.win:ste:20000002
         source_other: []
-      oval:mil.disa.stig.edge:tst:101:
-        source_test_id: oval:mil.disa.stig.edge:tst:101
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 32-bit Microsoft Edge is installed
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.edge:obj:103
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.win:tst:22070601:
         source_test_id: oval:mil.disa.stig.win:tst:22070601
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: The OS is Windows Enterprise LTSC
+        test_title: The OS is Windows Enterprise LTSC
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -563,6 +563,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-256893r958552_rule
-    semantic_ir_sha256: 680eccf5af1e7c6cc51c4c7dbd573db65ca8f1b689999c1eb591ad836a86865a
+    semantic_ir_sha256: 7abefd6c224b307fd55d30531dc9dfc8ca990269f0a492fa1b42d6c509e432c6
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 04de4bfa5878cf29dbc1f331a886443b96f2b19e65288a5d8dfc7df0dc8eea44
+  semantic_fingerprint_sha256: b558e6a664995c8678ef1c7f87e8d59b5c002fe344e19642920e5e79cc8d6778

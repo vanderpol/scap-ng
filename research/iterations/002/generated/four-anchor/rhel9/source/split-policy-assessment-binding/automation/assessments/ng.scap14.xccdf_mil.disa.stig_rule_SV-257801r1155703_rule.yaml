@@ -13,7 +13,7 @@ assessment:
       source_type: sysctl_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: name
@@ -34,14 +34,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.unix:tst:24857800:
         source_test_id: oval:mil.disa.stig.unix:tst:24857800
         source_type: sysctl_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: fs.protected_hardlinks setting in kernel is set to 1
+        test_title: fs.protected_hardlinks setting in kernel is set to 1
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -51,6 +51,29 @@ assessment:
         - oval:mil.disa.stig.unix:ste:20000010
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:248578:
+        source_definition_id: oval:mil.disa.stig.defs:def:248578
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: fs.protected_hardlinks setting in kernel is 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:24857800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must enable kernel parameters to enforce discretionary access control on hardlinks.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257801:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257801
         class: compliance
@@ -86,29 +109,6 @@ assessment:
 
 
               Satisfies: SRG-OS-000312-GPOS-00123, SRG-OS-000324-GPOS-00125'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:248578:
-        source_definition_id: oval:mil.disa.stig.defs:def:248578
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: fs.protected_hardlinks setting in kernel is 1
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:24857800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must enable kernel parameters to enforce discretionary access control on hardlinks.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -238,6 +238,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257801r1155703_rule
-    semantic_ir_sha256: bb943af7767af6a6be89464a6b4e06dbbd56946fe8c959e293359d1c890bd14f
+    semantic_ir_sha256: 07e47dfc7a85a8deabbe1d22fd07d267ed13b3bd7f437bcc4823f737d6501f95
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ffcdb6dfa4d83df5efd5dd2fd307f6eff5adb17c1fd1e2cc27ec72b7d16080a8
+  semantic_fingerprint_sha256: 5a85e7d80a53f80bc04bef7179e5b5f9bb4c9acb3ac50054a5274b96bbca8349

@@ -14,7 +14,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
     collect:
       capability: scapng.collect.windows.registry
-      comment: DSA Database file location via registry
+      object_title: DSA Database file location via registry
       query:
       - kind: element
         name: hive
@@ -36,7 +36,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27814302
     collect:
       capability: scapng.collect.windows.wmi
-      comment: All 'Local Disk' Volumes
+      object_title: All 'Local Disk' Volumes
       query:
       - attributes:
           datatype: string
@@ -58,7 +58,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27814303
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: get local shares via get-smbshare, exclude NETLOGON AND SYSVOL and admin shares
+      object_title: get local shares via get-smbshare, exclude NETLOGON AND SYSVOL and admin shares
       query:
       - kind: element
         name: shell
@@ -80,7 +80,6 @@ assessment:
     register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814303
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
     derive:
-      comment: Drive Letter that DSA Database file is found on
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -142,10 +141,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
+      variable_title: Drive Letter that DSA Database file is found on
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27814302
     derive:
-      comment: get-smbshare, exclude NETLOGON AND SYSVOL IPC$ ADMIN$ and admin shares
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -274,10 +273,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814302
+      variable_title: get-smbshare, exclude NETLOGON AND SYSVOL IPC$ ADMIN$ and admin shares
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27814302
   predicates:
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27814301:
-      comment: results do not equal same drive letter
       entities:
       - kind: element
         name: shell
@@ -294,8 +293,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27814301
       source_type: shellcommand_state
+      state_title: results do not equal same drive letter
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302:
-      comment: stdout_line does not exist
       entities:
       - attributes:
           check_existence: none_exist
@@ -306,6 +305,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302
       source_type: shellcommand_state
+      state_title: stdout_line does not exist
   evaluate:
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:278143:
@@ -340,7 +340,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27814303
-        comment: Gather Shares and ensure directory doesn't match DSA Database File drive letter
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27814301
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302
@@ -349,6 +348,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27814303
         source_type: shellcommand_test
         state_operator: OR
+        test_title: Gather Shares and ensure directory doesn't match DSA Database File drive letter
   source_check_context:
     check_exports: []
     checks:
@@ -493,8 +493,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.windows:def:278143
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 413447d02c8842c65802177af11570cd7fb0f52c32935efa16637cc0cc39e097
+    semantic_ir_sha256: 23fa423b0fb215ad38778f78b803f8b5e7c4644e092e5785c0e91c36005f8a42
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278143r1182092_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 60a679bccb7d96e54b9716912558e20e23989a209ceae28b12c261988a47e1b5
+  semantic_fingerprint_sha256: 7ff15464b01e2222dacdc97d570331c88e9776b5ada589e17c7b695f1907426c

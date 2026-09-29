@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:10000100
     collect:
       capability: scapng.collect.windows.wmi57
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: namespace
@@ -30,7 +30,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25339400
     collect:
       capability: scapng.collect.windows.registry
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -61,7 +61,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25339401
     collect:
       capability: scapng.collect.windows.registry
-      comment: DownloadMode set through the Settings App
+      object_title: DownloadMode set through the Settings App
       query:
       - attributes:
           datatype: string
@@ -91,7 +91,6 @@ assessment:
     register: oval:mil.disa.stig.win:obj:25339401
   predicates:
     oval:mil.disa.stig.win:ste:10000100:
-      comment: Standalone Workstation
       entities:
       - attributes:
           datatype: record
@@ -110,8 +109,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:10000100
       source_type: wmi57_state
+      state_title: Standalone Workstation
     oval:mil.disa.stig.win:ste:10000300:
-      comment: Standalone Server
       entities:
       - attributes:
           datatype: record
@@ -130,8 +129,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:10000300
       source_type: wmi57_state
+      state_title: Standalone Server
     oval:mil.disa.stig.win:ste:20000000:
-      comment: null
       entities:
       - kind: element
         name: type
@@ -147,8 +146,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000000
       source_type: registry_state
+      state_title: null
     oval:mil.disa.stig.win:ste:20000001:
-      comment: null
       entities:
       - kind: element
         name: type
@@ -164,8 +163,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000001
       source_type: registry_state
+      state_title: null
     oval:mil.disa.stig.win:ste:20000002:
-      comment: null
       entities:
       - kind: element
         name: type
@@ -181,8 +180,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000002
       source_type: registry_state
+      state_title: null
     oval:mil.disa.stig.win:ste:25339400:
-      comment: Reg_Dword type and value equals 99
       entities:
       - kind: element
         name: type
@@ -199,8 +198,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:25339400
       source_type: registry_state
+      state_title: Reg_Dword type and value equals 99
     oval:mil.disa.stig.win:ste:25339401:
-      comment: Reg_Dword type and value equals 100
       entities:
       - kind: element
         name: type
@@ -217,6 +216,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:25339401
       source_type: registry_state
+      state_title: Reg_Dword type and value equals 100
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:253394:
@@ -319,7 +319,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25339400
-        comment: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only, LAN, Group, Simple or Bypass'' selected.'
         predicates:
         - oval:mil.disa.stig.win:ste:20000000
         - oval:mil.disa.stig.win:ste:20000001
@@ -331,12 +330,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25339401
         source_type: registry_test
         state_operator: OR
+        test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only, LAN, Group, Simple or Bypass'' selected.'
       oval:mil.disa.stig.win:tst:25339402:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:10000100
-        comment: The system is a Windows Standalone Workstation or Server
         predicates:
         - oval:mil.disa.stig.win:ste:10000100
         - oval:mil.disa.stig.win:ste:10000300
@@ -345,12 +344,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25339402
         source_type: wmi57_test
         state_operator: OR
+        test_title: The system is a Windows Standalone Workstation or Server
       oval:mil.disa.stig.win:tst:25339403:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25339401
-        comment: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only or LAN'' selected.'
         predicates:
         - oval:mil.disa.stig.win:ste:20000000
         - oval:mil.disa.stig.win:ste:20000001
@@ -359,6 +358,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25339403
         source_type: registry_test
         state_operator: OR
+        test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only or LAN'' selected.'
   source_check_context:
     check_exports: []
     checks:
@@ -487,8 +487,8 @@ assessment:
       - oval:mil.disa.stig.windows11:def:253394
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 11e548c041729c2d2af9144f12e804d6ffdd31e56f0d8d6a34b90cd7234a463c
+    semantic_ir_sha256: 76cd5241e9dee89dd50f82f89882da8cfd76935e93d5a62c9bee941a3c0fbe8f
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253394r1256679_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 9a0b1263bc8281328261c954dce29d052db87391415c339b0caa65c4215004b8
+  semantic_fingerprint_sha256: d4139e4994fc5c615f448ca038549e92c18a99336d864e53907e2e4b1003a2a5

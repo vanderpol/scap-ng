@@ -7,38 +7,13 @@ assessment:
   description: RHEL 9 must not allow blank or null passwords.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:24454000:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:24454000
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/pam.d/system-auth
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \bnullok\b
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:24454100:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:24454100
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: filepath
@@ -57,27 +32,40 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:24454000:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:24454000
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/pam.d/system-auth
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \bnullok\b
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:24454000:
-        source_test_id: oval:mil.disa.stig.ind:tst:24454000
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: There are no instances of nullok in /etc/pam.d/system-auth.
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:24454000
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:24454100:
         source_test_id: oval:mil.disa.stig.ind:tst:24454100
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: There are no instances of nullok in /etc/pam.d/password-auth.
+        test_title: There are no instances of nullok in /etc/pam.d/password-auth.
         check: all
         check_existence: none_exist
         state_operator: AND
@@ -85,7 +73,56 @@ assessment:
         - oval:mil.disa.stig.ind:obj:24454100
         predicates: []
         source_other: []
+      oval:mil.disa.stig.ind:tst:24454000:
+        source_test_id: oval:mil.disa.stig.ind:tst:24454000
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: There are no instances of nullok in /etc/pam.d/system-auth.
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:24454000
+        predicates: []
+        source_other: []
     definitions:
+      oval:mil.disa.stig.rhel9os:def:258094:
+        source_definition_id: oval:mil.disa.stig.rhel9os:def:258094
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:244540
+            kind: definition_ref
+            negate: false
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:244541
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: RHEL-09-611025 - RHEL 9 must not allow blank or null passwords.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Red Hat Enterprise Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: If an account has an empty password, anyone could log in and run commands with the privileges of that account.
+              Accounts with empty passwords should never be used in operational environments.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:244540:
         source_definition_id: oval:mil.disa.stig.defs:def:244540
         class: compliance
@@ -130,43 +167,6 @@ assessment:
             text: The operating system must not allow blank or null passwords in the password-auth file.
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.rhel9os:def:258094:
-        source_definition_id: oval:mil.disa.stig.rhel9os:def:258094
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:244540
-            kind: definition_ref
-            negate: false
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:244541
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: RHEL-09-611025 - RHEL 9 must not allow blank or null passwords.
-          - attributes:
-              family: unix
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Red Hat Enterprise Linux 9
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: If an account has an empty password, anyone could log in and run commands with the privileges of that account.
-              Accounts with empty passwords should never be used in operational environments.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -296,6 +296,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258094r1045187_rule
-    semantic_ir_sha256: b127ae7f8216faf8ab1edec77ed86ea1d5801ff5b6158b70249f329439062660
+    semantic_ir_sha256: 73861ec9e20b86ed0c011fe9dc04877289e37b271b797323702100c3b227cc93
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: babdc19639a98369a976d76969428e7bcf5a706f8d51b09234cd7837a1553987
+  semantic_fingerprint_sha256: ce680329ec5388fbc5076d878edaaf7a3b05cacbc4855e93b021a748c8c1af1b

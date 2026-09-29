@@ -352,7 +352,7 @@ rule:
         source_type: file_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: filepath
@@ -372,14 +372,14 @@ rule:
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '0'
-        comment: owned by root
+        state_title: owned by root
     evaluate:
       tests:
         oval:mil.disa.stig.unix:tst:25779100:
           source_test_id: oval:mil.disa.stig.unix:tst:25779100
           source_type: file_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          comment: /boot/grub2/grub.cfg file is owned by root
+          test_title: /boot/grub2/grub.cfg file is owned by root
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -389,6 +389,29 @@ rule:
           - oval:mil.disa.stig.unix:ste:20000005
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:257791:
+          source_definition_id: oval:mil.disa.stig.defs:def:257791
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /boot/grub2/grub.cfg is owned by root.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:25779100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system /boot/grub2/grub.cfg file must be owned by root.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257791:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257791
           class: compliance
@@ -420,29 +443,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: The " /boot/grub2/grub.cfg" file stores sensitive system configuration. Protection of this file is critical
                 for system security.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:257791:
-          source_definition_id: oval:mil.disa.stig.defs:def:257791
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /boot/grub2/grub.cfg is owned by root.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:25779100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system /boot/grub2/grub.cfg file must be owned by root.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -563,9 +563,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257791r991589_rule
-      semantic_ir_sha256: 56d8f178ea7c1bef0bdf431fb9a0f87a9dde8c9d70a26aba8c18e2edcd13f05a
+      semantic_ir_sha256: 248153b6a9c872120c8cbc73725cc3aec2523579b77055844ced2f0be751864d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 42821a0696ee18a54d0725a26e09901985e07728fe37775427218a4ebb520a3f
+    semantic_fingerprint_sha256: e379799266d367af9c366bcf7472920034b3afbd9e78df89e8bbeba66fe7462e
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257791r991589_rule

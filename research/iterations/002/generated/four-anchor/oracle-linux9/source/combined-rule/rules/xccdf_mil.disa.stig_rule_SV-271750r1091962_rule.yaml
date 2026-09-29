@@ -355,13 +355,37 @@ rule:
     description: OL 9 must automatically exit interactive command shell user sessions after 15 minutes of inactivity.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:27175001:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27175001
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/profile
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^[^#]*\s*TMOUT=(\d+)\s*$
+        - attributes:
+            datatype: int
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:27175000:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:27175000
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - children:
           - kind: object_ref
@@ -382,7 +406,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             max_depth: '-1'
@@ -412,30 +436,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:27175001:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27175001
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/profile
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^[^#]*\s*TMOUT=(\d+)\s*$
-        - attributes:
-            datatype: int
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:27175000:
@@ -451,14 +451,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '900'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:27175000:
           source_test_id: oval:mil.disa.stig.ind:tst:27175000
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: TMOUT option is set to 900 or less in /etc/profile and /etc/profile.d/*.sh.
+          test_title: TMOUT option is set to 900 or less in /etc/profile and /etc/profile.d/*.sh.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -654,9 +654,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271750r1091962_rule
-      semantic_ir_sha256: 146d928f7806af8994335fc455e23316949e8a9ac5e2e37f59cd9b31c9753dc3
+      semantic_ir_sha256: c6b213c85871b027471671af3e9d89a23da8a5d623203ce513eebf8c7297ef50
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 22a0d4f4baf7bd7a3f6aaf192c09c2c0fce53bc344df6f64baab42300ce477e1
+    semantic_fingerprint_sha256: 830bfb9d86a942933241cd847963cb22bd51792a46a1d80ed149b11dbe2ca2c5
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271750r1091962_rule

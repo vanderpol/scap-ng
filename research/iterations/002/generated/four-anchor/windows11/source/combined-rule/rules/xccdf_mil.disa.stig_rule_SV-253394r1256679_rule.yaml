@@ -359,13 +359,29 @@ rule:
     description: Windows Update must not obtain updates from other PCs on the internet.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:10000100:
+        capability: scapng.collect.windows.wmi57
+        source_object_id: oval:mil.disa.stig.win:obj:10000100
+        source_type: wmi57_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: namespace
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: root\cimv2
+        - kind: element
+          name: wql
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SELECT DomainRole FROM win32_computersystem
       oval:mil.disa.stig.win:obj:25339400:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25339400
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             datatype: string
@@ -394,7 +410,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: DownloadMode set through the Settings App
+        object_title: DownloadMode set through the Settings App
         query:
         - attributes:
             datatype: string
@@ -417,59 +433,8 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: DODownloadMode
-      oval:mil.disa.stig.win:obj:10000100:
-        capability: scapng.collect.windows.wmi57
-        source_object_id: oval:mil.disa.stig.win:obj:10000100
-        source_type: wmi57_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: namespace
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: root\cimv2
-        - kind: element
-          name: wql
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SELECT DomainRole FROM win32_computersystem
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:20000000:
-        source_state_id: oval:mil.disa.stig.win:ste:20000000
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_dword
-        - attributes:
-            datatype: int
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '0'
-        comment: null
-      oval:mil.disa.stig.win:ste:25339401:
-        source_state_id: oval:mil.disa.stig.win:ste:25339401
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_dword
-        - attributes:
-            datatype: int
-            operation: equals
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '100'
-        comment: Reg_Dword type and value equals 100
       oval:mil.disa.stig.win:ste:20000001:
         source_state_id: oval:mil.disa.stig.win:ste:20000001
         source_type: registry_state
@@ -486,7 +451,7 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
+        state_title: null
       oval:mil.disa.stig.win:ste:10000300:
         source_state_id: oval:mil.disa.stig.win:ste:10000300
         source_type: wmi57_state
@@ -506,42 +471,7 @@ rule:
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Standalone Server
-      oval:mil.disa.stig.win:ste:20000002:
-        source_state_id: oval:mil.disa.stig.win:ste:20000002
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_dword
-        - attributes:
-            datatype: int
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '2'
-        comment: null
-      oval:mil.disa.stig.win:ste:25339400:
-        source_state_id: oval:mil.disa.stig.win:ste:25339400
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_dword
-        - attributes:
-            datatype: int
-            operation: equals
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '99'
-        comment: Reg_Dword type and value equals 99
+        state_title: Standalone Server
       oval:mil.disa.stig.win:ste:10000100:
         source_state_id: oval:mil.disa.stig.win:ste:10000100
         source_type: wmi57_state
@@ -561,28 +491,84 @@ rule:
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Standalone Workstation
+        state_title: Standalone Workstation
+      oval:mil.disa.stig.win:ste:20000002:
+        source_state_id: oval:mil.disa.stig.win:ste:20000002
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_dword
+        - attributes:
+            datatype: int
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '2'
+        state_title: null
+      oval:mil.disa.stig.win:ste:25339401:
+        source_state_id: oval:mil.disa.stig.win:ste:25339401
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_dword
+        - attributes:
+            datatype: int
+            operation: equals
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '100'
+        state_title: Reg_Dword type and value equals 100
+      oval:mil.disa.stig.win:ste:20000000:
+        source_state_id: oval:mil.disa.stig.win:ste:20000000
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_dword
+        - attributes:
+            datatype: int
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '0'
+        state_title: null
+      oval:mil.disa.stig.win:ste:25339400:
+        source_state_id: oval:mil.disa.stig.win:ste:25339400
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_dword
+        - attributes:
+            datatype: int
+            operation: equals
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '99'
+        state_title: Reg_Dword type and value equals 99
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25339402:
-          source_test_id: oval:mil.disa.stig.win:tst:25339402
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: The system is a Windows Standalone Workstation or Server
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: OR
-          collections:
-          - oval:mil.disa.stig.win:obj:10000100
-          predicates:
-          - oval:mil.disa.stig.win:ste:10000100
-          - oval:mil.disa.stig.win:ste:10000300
-          source_other: []
         oval:mil.disa.stig.win:tst:25339401:
           source_test_id: oval:mil.disa.stig.win:tst:25339401
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only, LAN, Group, Simple or Bypass'' selected.'
+          test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only, LAN, Group, Simple or Bypass'' selected.'
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
@@ -599,7 +585,7 @@ rule:
           source_test_id: oval:mil.disa.stig.win:tst:25339403
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only or LAN'' selected.'
+          test_title: '''DownloadMode'' is set to ''Enabled'' with ''HTTP only or LAN'' selected.'
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
@@ -609,42 +595,21 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
+        oval:mil.disa.stig.win:tst:25339402:
+          source_test_id: oval:mil.disa.stig.win:tst:25339402
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: The system is a Windows Standalone Workstation or Server
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: OR
+          collections:
+          - oval:mil.disa.stig.win:obj:10000100
+          predicates:
+          - oval:mil.disa.stig.win:ste:10000100
+          - oval:mil.disa.stig.win:ste:10000300
+          source_other: []
       definitions:
-        oval:mil.disa.stig.windows11:def:253394:
-          source_definition_id: oval:mil.disa.stig.windows11:def:253394
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:253394
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: WN11-CC-000206 - Windows Update must not obtain updates from other PCs on the internet.
-            - attributes:
-                family: windows
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Microsoft Windows 11
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows 11 allows Windows Update to obtain updates from additional sources instead of Microsoft. In addition
-                to Microsoft, updates can be obtained from and sent to PCs on the local network as well as on the Internet.
-                This is part of the Windows Update trusted process, however to minimize outside exposure, obtaining updates
-                from or sending to systems on the internet must be prevented.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:254357:
           source_definition_id: oval:mil.disa.stig.defs:def:254357
           class: compliance
@@ -702,6 +667,41 @@ rule:
               text: Windows Update for workstations must not obtain updates from other PCs on the internet.
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.windows11:def:253394:
+          source_definition_id: oval:mil.disa.stig.windows11:def:253394
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:253394
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: WN11-CC-000206 - Windows Update must not obtain updates from other PCs on the internet.
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows 11
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows 11 allows Windows Update to obtain updates from additional sources instead of Microsoft. In addition
+                to Microsoft, updates can be obtained from and sent to PCs on the local network as well as on the Internet.
+                This is part of the Windows Update trusted process, however to minimize outside exposure, obtaining updates
+                from or sending to systems on the internet must be prevented.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -833,9 +833,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253394r1256679_rule
-      semantic_ir_sha256: 11e548c041729c2d2af9144f12e804d6ffdd31e56f0d8d6a34b90cd7234a463c
+      semantic_ir_sha256: 76cd5241e9dee89dd50f82f89882da8cfd76935e93d5a62c9bee941a3c0fbe8f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 9a0b1263bc8281328261c954dce29d052db87391415c339b0caa65c4215004b8
+    semantic_fingerprint_sha256: d4139e4994fc5c615f448ca038549e92c18a99336d864e53907e2e4b1003a2a5
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253394r1256679_rule

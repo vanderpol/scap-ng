@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -51,14 +51,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25343400:
         source_test_id: oval:mil.disa.stig.win:tst:25343400
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Accounts: Limit local account use of blank passwords to console logon only'' is set to ''Enabled'''
+        test_title: '''Accounts: Limit local account use of blank passwords to console logon only'' is set to ''Enabled'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -68,6 +68,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253434:
+        source_definition_id: oval:mil.disa.stig.defs:def:253434
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: 'Verifies ''Accounts: Limit local account use of blank passwords to console logon only'' is set to ''Enabled'''
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25343400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Local accounts with blank passwords must be restricted to prevent access from the network.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278196:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278196
         class: compliance
@@ -102,29 +125,6 @@ assessment:
               Password policies must prevent accounts with blank passwords from existing on a system. However, if a local
               account with a blank password does exist, enabling this setting will prevent network access, limiting the account
               to local console logon only.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253434:
-        source_definition_id: oval:mil.disa.stig.defs:def:253434
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: 'Verifies ''Accounts: Limit local account use of blank passwords to console logon only'' is set to ''Enabled'''
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25343400
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Local accounts with blank passwords must be restricted to prevent access from the network.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -245,6 +245,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278196r1181294_rule
-    semantic_ir_sha256: 3db3c6f77bf92b53e3c06fb968ba4410e48585d13a3c4a47bf5d7dbef13f55c9
+    semantic_ir_sha256: f0a1b59bcb64511e7e39eab7cd580106d3f5a2c22d5c865c375851a39c7a7c7a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: b24bdffc5087426522853f42d1a400f3e8854633431f208a5a5481f36a44612c
+  semantic_fingerprint_sha256: 638b89aee0ef7d511783a56b06dcbc9d19debf3645c05346dd10ba2f961c719b

@@ -396,37 +396,13 @@ rule:
     description: RHEL 9 must automatically exit interactive command shell user sessions after 10 minutes of inactivity.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25806801:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25806801
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '3'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/profile
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^[^#]*\s*TMOUT=(\d+)\s*$
-        - attributes:
-            datatype: int
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:25806802:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25806802
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '3'
-        comment: null
+        object_title: null
         query:
         - attributes:
             max_depth: '-1'
@@ -462,7 +438,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - children:
           - kind: object_ref
@@ -477,6 +453,30 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
+      oval:mil.disa.stig.ind:obj:25806801:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25806801
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        object_title: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/profile
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^[^#]*\s*TMOUT=(\d+)\s*$
+        - attributes:
+            datatype: int
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:20000026:
@@ -492,14 +492,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '600'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:25806800:
           source_test_id: oval:mil.disa.stig.ind:tst:25806800
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: TMOUT option is set to 600 or less in /etc/profile and /etc/profile.d/*.sh.
+          test_title: TMOUT option is set to 600 or less in /etc/profile and /etc/profile.d/*.sh.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -509,6 +509,30 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000026
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:258068:
+          source_definition_id: oval:mil.disa.stig.defs:def:258068
+          class: compliance
+          version: '3'
+          criteria:
+            children:
+            - comment: TMOUT is set to 600 or less in /etc/profile and /etc/profile.d/*.sh
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25806800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must automatically exit interactive command shell user sessions after 10 minutes
+                of inactivity.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258068:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258068
           class: compliance
@@ -545,30 +569,6 @@ rule:
 
 
                 Satisfies: SRG-OS-000163-GPOS-00072, SRG-OS-000029-GPOS-00010'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:258068:
-          source_definition_id: oval:mil.disa.stig.defs:def:258068
-          class: compliance
-          version: '3'
-          criteria:
-            children:
-            - comment: TMOUT is set to 600 or less in /etc/profile and /etc/profile.d/*.sh
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25806800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must automatically exit interactive command shell user sessions after 10 minutes
-                of inactivity.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -699,9 +699,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258068r1101950_rule
-      semantic_ir_sha256: a4e3e842d98899b825a4750f5ac6674cf72ca61d3e57db7a41e7fa08a0d9fcd0
+      semantic_ir_sha256: 25e9b722ebedbeb0893292d83aed0bbb2f172114d759adc365198fc120b7237c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 8f73c680de293acc607a996d956e8f9f190900f0bb8186f084242a66379f3019
+    semantic_fingerprint_sha256: 60bce3af3d79b2aaafbc5f36f066384970be1c360005ce8ab5b3ea9cbcf665cb
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258068r1101950_rule

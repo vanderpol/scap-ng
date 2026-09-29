@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27813901
     collect:
       capability: scapng.collect.independent.shellcommand
-      comment: Run Icacls command against SYSVOL Directory
+      object_title: Run Icacls command against SYSVOL Directory
       query:
       - kind: element
         name: shell
@@ -35,7 +35,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902
     collect:
       capability: scapng.collect.windows.registry
-      comment: Filepath to SysVol
+      object_title: Filepath to SysVol
       query:
       - kind: element
         name: hive
@@ -56,7 +56,6 @@ assessment:
     register: oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27813901
     derive:
-      comment: Required Permissions
       datatype: string
       evaluation_plan:
         datatype: string
@@ -113,10 +112,10 @@ assessment:
           value: (?i)CREATOR OWNER:\(OI\)\(CI\)\(IO\)\(F\)
       source_type: constant_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27813901
+      variable_title: Required Permissions
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27813901
   - name: Derive oval:navy.navwar.niwcatlantic.scc.windows:var:27813902
     derive:
-      comment: icacls and Path to SYSVOL directory
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -198,10 +197,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27813902
+      variable_title: icacls and Path to SYSVOL directory
     register: oval:navy.navwar.niwcatlantic.scc.windows:var:27813902
   predicates:
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27813901:
-      comment: Permissions must equal expected output
       entities:
       - attributes:
           datatype: int
@@ -225,6 +224,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27813901
       source_type: shellcommand_state
+      state_title: Permissions must equal expected output
   evaluate:
     definitions:
       oval:navy.navwar.niwcatlantic.scc.windows:def:278139:
@@ -257,7 +257,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27813901
-        comment: Permissions must conform to minimum requirements.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27813901
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -265,6 +264,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27813901
         source_type: shellcommand_test
         state_operator: AND
+        test_title: Permissions must conform to minimum requirements.
   source_check_context:
     check_exports: []
     checks:
@@ -399,4 +399,4 @@ assessment:
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278139r1182083_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 308341676362b6888ddc19196ec199e17dff4832158a8cd9b9dfedebd9bee158
+  semantic_fingerprint_sha256: f2720d6f3c726f33ad4f8d1a601841497dac3f9debb6abe435d3a2524ec16d9b

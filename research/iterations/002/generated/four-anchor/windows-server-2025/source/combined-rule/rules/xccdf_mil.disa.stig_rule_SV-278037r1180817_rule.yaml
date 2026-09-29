@@ -383,24 +383,10 @@ rule:
         source_type: passwordpolicy_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25330100:
-        source_state_id: oval:mil.disa.stig.win:ste:25330100
-        source_type: passwordpolicy_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: less than or equal
-          kind: element
-          name: max_passwd_age
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '5184000'
-        comment: null
       oval:mil.disa.stig.win:ste:25330101:
         source_state_id: oval:mil.disa.stig.win:ste:25330101
         source_type: passwordpolicy_state
@@ -414,14 +400,28 @@ rule:
           name: max_passwd_age
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '0'
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.win:ste:25330100:
+        source_state_id: oval:mil.disa.stig.win:ste:25330100
+        source_type: passwordpolicy_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: less than or equal
+          kind: element
+          name: max_passwd_age
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '5184000'
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25330100:
           source_test_id: oval:mil.disa.stig.win:tst:25330100
           source_type: passwordpolicy_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Maximum Password Age is set to 60 days or less, but greater than 0.
+          test_title: Maximum Password Age is set to 60 days or less, but greater than 0.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -432,29 +432,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25330101
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253301:
-          source_definition_id: oval:mil.disa.stig.defs:def:253301
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25330100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The maximum password age must be configured to 60 days or less.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278037:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278037
           class: compliance
@@ -487,6 +464,29 @@ rule:
               text: The longer a password is in use, the greater the opportunity for someone to gain unauthorized knowledge
                 of the passwords. Scheduled changing of passwords hinders the ability of unauthorized system users to crack
                 passwords and gain access to a system.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253301:
+          source_definition_id: oval:mil.disa.stig.defs:def:253301
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25330100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The maximum password age must be configured to 60 days or less.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -630,9 +630,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278037r1180817_rule
-      semantic_ir_sha256: 90565654e4a3e8b9bb58a2440ca08e3374e6a75507b11033e92ec0149ad80a2e
+      semantic_ir_sha256: eaffb893e9511ce1242b026606f87ff187f0bbcfebacd248a2759dbd9bfd7a01
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d917c515689133c58c1d5d5e3e6294ed8fed84d887b78b0f571ad5f86c343fea
+    semantic_fingerprint_sha256: c1ec9f3b7cbb8f39bad9c650371b4d872759d9cb8b8d51214b3dae6015dd9e41
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278037r1180817_rule

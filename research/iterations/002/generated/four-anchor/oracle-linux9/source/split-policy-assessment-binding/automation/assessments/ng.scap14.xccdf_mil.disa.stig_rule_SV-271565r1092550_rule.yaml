@@ -7,38 +7,13 @@ assessment:
   description: OL 9 must audit all uses of the init_module and finit_module system calls.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23043802:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23043802
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: 32-bit finit_module syscall
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/audit/audit.rules
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+finit_module\s+|(\s+|,)finit_module(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23043801:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23043801
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: 64-bit init_module syscall
+      object_title: 64-bit init_module syscall
       query:
       - kind: element
         name: filepath
@@ -57,13 +32,13 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23043803:
+    oval:mil.disa.stig.ind:obj:23043802:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23043803
+      source_object_id: oval:mil.disa.stig.ind:obj:23043802
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: 64-bit finit_module syscall
+      object_title: 32-bit finit_module syscall
       query:
       - kind: element
         name: filepath
@@ -74,7 +49,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+finit_module\s+|(\s+|,)finit_module(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+finit_module\s+|(\s+|,)finit_module(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -88,7 +63,7 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: 32-bit init_module syscall
+      object_title: 32-bit init_module syscall
       query:
       - kind: element
         name: filepath
@@ -107,6 +82,31 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23043803:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23043803
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: 64-bit finit_module syscall
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/audit.rules
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+finit_module\s+|(\s+|,)finit_module(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates: {}
   evaluate:
@@ -115,7 +115,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:23043802
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Audit 32-bit invocations of finit_module syscall
+        test_title: Audit 32-bit invocations of finit_module syscall
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -123,23 +123,11 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23043802
         predicates: []
         source_other: []
-      oval:mil.disa.stig.ind:tst:23043803:
-        source_test_id: oval:mil.disa.stig.ind:tst:23043803
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Audit 64-bit invocations of finit_module syscall
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23043803
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:23043801:
         source_test_id: oval:mil.disa.stig.ind:tst:23043801
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Audit 64-bit invocations of init_module syscall
+        test_title: Audit 64-bit invocations of init_module syscall
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -147,11 +135,23 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23043801
         predicates: []
         source_other: []
+      oval:mil.disa.stig.ind:tst:23043803:
+        source_test_id: oval:mil.disa.stig.ind:tst:23043803
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: Audit 64-bit invocations of finit_module syscall
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23043803
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.ind:tst:23043800:
         source_test_id: oval:mil.disa.stig.ind:tst:23043800
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Audit 32-bit invocations of init_module syscall
+        test_title: Audit 32-bit invocations of init_module syscall
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -160,6 +160,42 @@ assessment:
         predicates: []
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230438:
+        source_definition_id: oval:mil.disa.stig.defs:def:230438
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit 32-bit invocations of init_module syscall
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23043800
+          - comment: Audit 64-bit invocations of init_module syscall
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23043801
+          - comment: Audit 32-bit invocations of finit_module syscall
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23043802
+          - comment: Audit 64-bit invocations of finit_module syscall
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23043803
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Successful/unsuccessful uses of the init_module and finit_module system calls in the operating system must
+              generate an audit record.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271565:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271565
         class: compliance
@@ -201,42 +237,6 @@ assessment:
               \ can be helped, however, by combining system calls into one rule whenever possible.\n\n\tSatisfies: SRG-OS-000037-GPOS-00015,\
               \ SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215,\
               \ SRG-OS-000471-GPOS-00216, SRG-OS-000477-GPOS-00222"
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230438:
-        source_definition_id: oval:mil.disa.stig.defs:def:230438
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit 32-bit invocations of init_module syscall
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23043800
-          - comment: Audit 64-bit invocations of init_module syscall
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23043801
-          - comment: Audit 32-bit invocations of finit_module syscall
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23043802
-          - comment: Audit 64-bit invocations of finit_module syscall
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23043803
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Successful/unsuccessful uses of the init_module and finit_module system calls in the operating system must
-              generate an audit record.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -369,6 +369,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271565r1092550_rule
-    semantic_ir_sha256: 3bf2f691e90307e2707d43cf5b57ebd4ba1841d5903f62220e5adff1bb303e56
+    semantic_ir_sha256: 3fdfb7a8e1001672873d414bfc6adb682e70cd63406f66b3394560b4ee7563d7
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 5fd14dcf3bdd2d4dcc930f41e8a0c6bfb5f85016d02be07071d7fac6c174010e
+  semantic_fingerprint_sha256: 4823b6be60e07523acde9cebe2402a117a806ccaf9368653d9cae79763bd937b

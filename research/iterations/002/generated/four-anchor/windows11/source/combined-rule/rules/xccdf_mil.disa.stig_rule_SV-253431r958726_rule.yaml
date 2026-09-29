@@ -634,32 +634,13 @@ rule:
     description: Default permissions for the HKEY_LOCAL_MACHINE registry hive must be maintained.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103:
-        capability: scapng.collect.independent.shellcommand
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103
-        source_type: shellcommand_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '18'
-        comment: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
-        query:
-        - kind: element
-          name: shell
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: powershell
-        - kind: element
-          name: command
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
-            | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
-            $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
-            PropagationFlags: $($_.PropagationFlags)" }'
       oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102:
         capability: scapng.collect.independent.shellcommand
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25343102
         source_type: shellcommand_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '18'
-        comment: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
+        object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
         query:
         - kind: element
           name: shell
@@ -678,7 +659,7 @@ rule:
         source_type: shellcommand_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '18'
-        comment: Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
+        object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
         query:
         - kind: element
           name: shell
@@ -691,6 +672,25 @@ rule:
             |  Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference),
             Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags:
             $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }'
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103:
+        capability: scapng.collect.independent.shellcommand
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25343103
+        source_type: shellcommand_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '18'
+        object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
+        query:
+        - kind: element
+          name: shell
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: powershell
+        - kind: element
+          name: command
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
+            | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
+            $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
+            PropagationFlags: $($_.PropagationFlags)" }'
     derive: {}
     predicates:
       oval:navy.navwar.niwcatlantic.scc.windows:ste:25343102:
@@ -709,7 +709,7 @@ rule:
             Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$|^Identity:(BUILTIN\\Users|APPLICATION
             PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES|S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681),
             Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$'
-        comment: 'System, Creator Owner, Admnistrators = Full; ALL APPLICATION PACKAGES, Users, S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681:
+        state_title: 'System, Creator Owner, Admnistrators = Full; ALL APPLICATION PACKAGES, Users, S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681:
           Read'
       oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25343101
@@ -725,14 +725,14 @@ rule:
           value: '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags:
             ContainerInherit, PropagationFlags: None$|^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions,
             Access: Allow, IsInherited: False, InheritanceFlags: ContainerInherit, PropagationFlags: None$'
-        comment: 'System Full, Administrators ReadPermission and ChangePermissions '
+        state_title: 'System Full, Administrators ReadPermission and ChangePermissions '
     evaluate:
       tests:
         oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343103
           source_type: shellcommand_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Default permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained.
+          test_title: Default permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -745,7 +745,7 @@ rule:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343101
           source_type: shellcommand_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained.
+          test_title: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -758,7 +758,7 @@ rule:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25343102
           source_type: shellcommand_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Default permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained.
+          test_title: Default permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry key must be maintained.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -1003,9 +1003,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253431r958726_rule
-      semantic_ir_sha256: df2c6cab37fa1493b4d2775c030cff2b6623a3bb2a26045b942672f7ffff3b96
+      semantic_ir_sha256: 16ecdb4d85bdb4190db6fb83b71ba7d43a340f09fa30eff5c41d4a667dd2ec6f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 0a805ff7bd92e904bfab8a5111ed20ee9ab445849b6b214986b8dfef3db6c9c9
+    semantic_fingerprint_sha256: 9eb99f60d747b8743671fdab1842d8c265991d1b381726e1a035e86f5316d322
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253431r958726_rule

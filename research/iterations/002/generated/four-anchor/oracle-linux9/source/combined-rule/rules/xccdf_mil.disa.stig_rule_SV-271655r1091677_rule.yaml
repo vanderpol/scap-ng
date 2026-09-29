@@ -346,7 +346,7 @@ rule:
         source_type: partition_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: mount_point
@@ -358,7 +358,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: filepath
@@ -378,19 +378,6 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:23051200:
-        source_state_id: oval:mil.disa.stig.ind:ste:23051200
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^.*nosuid.*$
-        comment: null
       oval:mil.disa.stig.linux:ste:20000002:
         source_state_id: oval:mil.disa.stig.linux:ste:20000002
         source_type: partition_state
@@ -403,27 +390,27 @@ rule:
           name: mount_options
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: nosuid
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.ind:ste:23051200:
+        source_state_id: oval:mil.disa.stig.ind:ste:23051200
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.*nosuid.*$
+        state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:23051200:
-          source_test_id: oval:mil.disa.stig.linux:tst:23051200
-          source_type: partition_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: /tmp is mounted with the nosuid option
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23051200
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000002
-          source_other: []
         oval:mil.disa.stig.ind:tst:23051201:
           source_test_id: oval:mil.disa.stig.ind:tst:23051201
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /tmp is configured with the nosuid option in /etc/fstab
+          test_title: /tmp is configured with the nosuid option in /etc/fstab
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -432,7 +419,47 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:23051200
           source_other: []
+        oval:mil.disa.stig.linux:tst:23051200:
+          source_test_id: oval:mil.disa.stig.linux:tst:23051200
+          source_type: partition_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          test_title: /tmp is mounted with the nosuid option
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23051200
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000002
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230512:
+          source_definition_id: oval:mil.disa.stig.defs:def:230512
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23051200
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23051201
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must mount /tmp with the nosuid option.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271655:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271655
           class: compliance
@@ -466,33 +493,6 @@ rule:
                 This option must be used for mounting any file system not containing approved "setuid" and "setguid" files.
                 Executing files from untrusted file systems increases the opportunity for nonprivileged users to attain unauthorized
                 administrative access.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230512:
-          source_definition_id: oval:mil.disa.stig.defs:def:230512
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23051200
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23051201
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must mount /tmp with the nosuid option.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -622,9 +622,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271655r1091677_rule
-      semantic_ir_sha256: 83518840a115b80ab5cd83ff5255c06b508f63ca6863170a845ee50c34c3b7ba
+      semantic_ir_sha256: 6075adcf4306fb63f5dfc71c0198f048cf7ca6e66a946b6731211b092f1b6b8e
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: f468ea3ef2abacad9c2aa2a6c32fdf33d62dd038de85271741a19974bcfb8c90
+    semantic_fingerprint_sha256: bd4ae1129c776a86ec9ccb8c4590c05ebd9916c1c3d69d291a438f4d1ab2fb22
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271655r1091677_rule

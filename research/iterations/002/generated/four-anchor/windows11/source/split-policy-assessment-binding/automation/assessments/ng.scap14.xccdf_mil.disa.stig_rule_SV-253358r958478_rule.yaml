@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: hive
@@ -45,14 +45,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '0'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25335800:
         source_test_id: oval:mil.disa.stig.win:tst:25335800
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: WDigest Authentication is disabled
+        test_title: WDigest Authentication is disabled
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -62,6 +62,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000000
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253358:
+        source_definition_id: oval:mil.disa.stig.defs:def:253358
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25335800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WDigest Authentication must be disabled.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253358:
         source_definition_id: oval:mil.disa.stig.windows11:def:253358
         class: compliance
@@ -94,29 +117,6 @@ assessment:
             text: When the WDigest Authentication protocol is enabled, plain text passwords are stored in the Local Security
               Authority Subsystem Service (LSASS) exposing them to theft. WDigest is disabled by default in Windows 11. This
               setting ensures this is enforced.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253358:
-        source_definition_id: oval:mil.disa.stig.defs:def:253358
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25335800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: WDigest Authentication must be disabled.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -248,6 +248,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253358r958478_rule
-    semantic_ir_sha256: d9db7357c7aff983452d9e2007a5d0d1022824e020ed0159839685b277ae405d
+    semantic_ir_sha256: f9ab6806150b878907efea1d76b4f67b9e687c4cad4672cc86c9b06baf7062cd
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 8a6a10afcb821fe6fd79572f8622e525da9af771657d78ee39454f84032d1a06
+  semantic_fingerprint_sha256: df6e0b1037424819f61ce0962523a529b2337391250559ea77563750cb63c393

@@ -395,53 +395,13 @@ rule:
       server data files.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:27814302:
-        capability: scapng.collect.windows.wmi
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814302
-        source_type: wmi_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: All 'Local Disk' Volumes
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: namespace
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: root\cimv2
-        - attributes:
-            datatype: string
-          kind: element
-          name: wql
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SELECT name FROM win32_logicaldisk WHERE drivetype=3
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: DSA Database file location via registry
-        query:
-        - kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SYSTEM\CurrentControlSet\Services\NTDS\Parameters
-        - kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: DSA Database file
       oval:navy.navwar.niwcatlantic.scc.windows:obj:27814303:
         capability: scapng.collect.independent.shellcommand
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814303
         source_type: shellcommand_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: get local shares via get-smbshare, exclude NETLOGON AND SYSVOL and admin shares
+        object_title: get local shares via get-smbshare, exclude NETLOGON AND SYSVOL and admin shares
         query:
         - kind: element
           name: shell
@@ -456,75 +416,52 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ([a-zA-Z]):\\
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: DSA Database file location via registry
+        query:
+        - kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SYSTEM\CurrentControlSet\Services\NTDS\Parameters
+        - kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: DSA Database file
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:27814302:
+        capability: scapng.collect.windows.wmi
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814302
+        source_type: wmi_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: All 'Local Disk' Volumes
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: namespace
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: root\cimv2
+        - attributes:
+            datatype: string
+          kind: element
+          name: wql
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SELECT name FROM win32_logicaldisk WHERE drivetype=3
     derive:
-      oval:navy.navwar.niwcatlantic.scc.windows:var:27814301:
-        source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
-        source_type: local_variable
-        datatype: string
-        comment: Drive Letter that DSA Database file is found on
-        semantic_ast:
-          datatype: string
-          expression:
-            args:
-            - item_field: value
-              object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
-              op: object_component
-              record_field: null
-            attributes:
-              substring_length: '1'
-              substring_start: '1'
-            op: substring
-          id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
-          type: local_variable
-        resolution:
-          blocked_by:
-            item_field: value
-            object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
-            operation: object_component
-            reason: object_component_requires_collection:registry_object
-            record_field: null
-            status: dynamic_object_dependency
-          datatype: string
-          operation: substring
-          reason: substring_child_not_static:object_component_requires_collection:registry_object
-          status: dynamic_object_dependency
-          variable_type: local_variable
-        evaluation_plan:
-          blocked_by:
-            item_field: value
-            object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
-            operation: object_component
-            reason: object_component_requires_collection:registry_object
-            record_field: null
-            status: dynamic_object_dependency
-          datatype: string
-          dependencies:
-            objects:
-            - oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
-            operations:
-            - object_component
-            - substring
-            variables: []
-          expression:
-            args:
-            - item_field: value
-              object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
-              op: object_component
-              record_field: null
-            attributes:
-              substring_length: '1'
-              substring_start: '1'
-            op: substring
-          mode: target_dependent
-          reason: substring_child_not_static:object_component_requires_collection:registry_object
-          resolution_status: dynamic_object_dependency
-          variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
-          variable_type: local_variable
       oval:navy.navwar.niwcatlantic.scc.windows:var:27814302:
         source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814302
         source_type: local_variable
         datatype: string
-        comment: get-smbshare, exclude NETLOGON AND SYSVOL IPC$ ADMIN$ and admin shares
+        variable_title: get-smbshare, exclude NETLOGON AND SYSVOL IPC$ ADMIN$ and admin shares
         semantic_ast:
           datatype: string
           expression:
@@ -650,19 +587,70 @@ rule:
           resolution_status: dynamic_object_dependency
           variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814302
           variable_type: local_variable
+      oval:navy.navwar.niwcatlantic.scc.windows:var:27814301:
+        source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
+        source_type: local_variable
+        datatype: string
+        variable_title: Drive Letter that DSA Database file is found on
+        semantic_ast:
+          datatype: string
+          expression:
+            args:
+            - item_field: value
+              object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
+              op: object_component
+              record_field: null
+            attributes:
+              substring_length: '1'
+              substring_start: '1'
+            op: substring
+          id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
+          type: local_variable
+        resolution:
+          blocked_by:
+            item_field: value
+            object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
+            operation: object_component
+            reason: object_component_requires_collection:registry_object
+            record_field: null
+            status: dynamic_object_dependency
+          datatype: string
+          operation: substring
+          reason: substring_child_not_static:object_component_requires_collection:registry_object
+          status: dynamic_object_dependency
+          variable_type: local_variable
+        evaluation_plan:
+          blocked_by:
+            item_field: value
+            object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
+            operation: object_component
+            reason: object_component_requires_collection:registry_object
+            record_field: null
+            status: dynamic_object_dependency
+          datatype: string
+          dependencies:
+            objects:
+            - oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
+            operations:
+            - object_component
+            - substring
+            variables: []
+          expression:
+            args:
+            - item_field: value
+              object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814301
+              op: object_component
+              record_field: null
+            attributes:
+              substring_length: '1'
+              substring_start: '1'
+            op: substring
+          mode: target_dependent
+          reason: substring_child_not_static:object_component_requires_collection:registry_object
+          resolution_status: dynamic_object_dependency
+          variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27814301
+          variable_type: local_variable
     predicates:
-      oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302
-        source_type: shellcommand_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            check_existence: none_exist
-          kind: element
-          name: stdout_line
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: stdout_line does not exist
       oval:navy.navwar.niwcatlantic.scc.windows:ste:27814301:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27814301
         source_type: shellcommand_state
@@ -680,14 +668,26 @@ rule:
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: results do not equal same drive letter
+        state_title: results do not equal same drive letter
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27814302
+        source_type: shellcommand_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            check_existence: none_exist
+          kind: element
+          name: stdout_line
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        state_title: stdout_line does not exist
     evaluate:
       tests:
         oval:navy.navwar.niwcatlantic.scc.windows:tst:27814303:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27814303
           source_type: shellcommand_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Gather Shares and ensure directory doesn't match DSA Database File drive letter
+          test_title: Gather Shares and ensure directory doesn't match DSA Database File drive letter
           check: at least one
           check_existence: at_least_one_exists
           state_operator: OR
@@ -869,9 +869,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278143r1182092_rule
-      semantic_ir_sha256: 413447d02c8842c65802177af11570cd7fb0f52c32935efa16637cc0cc39e097
+      semantic_ir_sha256: 23fa423b0fb215ad38778f78b803f8b5e7c4644e092e5785c0e91c36005f8a42
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 60a679bccb7d96e54b9716912558e20e23989a209ceae28b12c261988a47e1b5
+    semantic_fingerprint_sha256: 7ff15464b01e2222dacdc97d570331c88e9776b5ada589e17c7b695f1907426c
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278143r1182092_rule

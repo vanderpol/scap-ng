@@ -422,33 +422,13 @@ rule:
       enforce STIG compliance.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802:
-        capability: scapng.collect.independent.shellcommand
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
-        source_type: shellcommand_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '18'
-        comment: MDM is managing the device
-        query:
-        - kind: element
-          name: shell
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: powershell
-        - kind: element
-          name: command
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: Get-Service -name IntuneManagementExtension
-        - kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: IntuneManagementExtension
       oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801:
         capability: scapng.collect.windows.cmdlet
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801
         source_type: cmdlet_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '18'
-        comment: Computer GPO's applied
+        object_title: Computer GPO's applied
         query:
         - attributes:
             operation: equals
@@ -505,6 +485,26 @@ rule:
           kind: element
           name: select
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802:
+        capability: scapng.collect.independent.shellcommand
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
+        source_type: shellcommand_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '18'
+        object_title: MDM is managing the device
+        query:
+        - kind: element
+          name: shell
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: powershell
+        - kind: element
+          name: command
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: Get-Service -name IntuneManagementExtension
+        - kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: IntuneManagementExtension
     derive: {}
     predicates:
       oval:navy.navwar.niwcatlantic.scc.windows:ste:26831801:
@@ -526,7 +526,7 @@ rule:
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: At least one enabled must be True
+        state_title: At least one enabled must be True
       oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802
         source_type: shellcommand_state
@@ -539,14 +539,27 @@ rule:
           name: stdout_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: Running
-        comment: stdout_line must contain the output running
+        state_title: stdout_line must contain the output running
     evaluate:
       tests:
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:26831801:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:26831801
+          source_type: cmdlet_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Test to ensure that at least one GPO applied is enabled
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:26831801
+          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:26831802:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:26831802
           source_type: shellcommand_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Run a PowerShell command to determine if a Mobile Device Management (MDM) product is in use to enforce
+          test_title: Run a PowerShell command to determine if a Mobile Device Management (MDM) product is in use to enforce
             STIG compliance
           check: all
           check_existence: at_least_one_exists
@@ -555,19 +568,6 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:26831802
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:26831802
-          source_other: []
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:26831801:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:26831801
-          source_type: cmdlet_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Test to ensure that at least one GPO applied is enabled
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:26831801
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:26831801
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:268318:
@@ -760,9 +760,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-268318r1210288_rule
-      semantic_ir_sha256: 7a3c3121d39080dc57820e3c40edc0a6741f22bcf37fcece97ab15b353486d0d
+      semantic_ir_sha256: f36281cfe62b74254627f880b45be12354d3a2b859a96fa6ee8aa226b880b119
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 5457af5d926238f85d8d0407018c5e7cb12b6bf8631b229ff7fdd64e9bc085e3
+    semantic_fingerprint_sha256: c91ff8802afb5cf56049515c9221afb66cd640c84073bf36af7d1cac04340763
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-268318r1210288_rule

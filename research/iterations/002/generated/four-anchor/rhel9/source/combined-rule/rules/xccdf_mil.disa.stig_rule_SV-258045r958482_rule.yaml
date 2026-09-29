@@ -368,7 +368,7 @@ rule:
         source_type: password_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         version: '1'
-        comment: Interactive Users
+        object_title: Interactive Users
         query:
         - attributes:
             operation: pattern match
@@ -388,18 +388,77 @@ rule:
         source_type: variable_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: count of passwd entries
+        object_title: count of passwd entries
         query:
         - kind: element
           name: var_ref
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: oval:mil.disa.stig.defs:var:25804500
     derive:
+      oval:mil.disa.stig.defs:var:25804500:
+        source_variable_id: oval:mil.disa.stig.defs:var:25804500
+        source_type: local_variable
+        datatype: int
+        variable_title: count of passwd entries
+        semantic_ast:
+          datatype: int
+          expression:
+            args:
+            - item_field: user_id
+              object_ref: oval:mil.disa.stig.unix:obj:25804500
+              op: object_component
+              record_field: null
+            attributes: {}
+            op: count
+          id: oval:mil.disa.stig.defs:var:25804500
+          type: local_variable
+        resolution:
+          blocked_by:
+            item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            operation: object_component
+            reason: object_component_requires_collection:password_object
+            record_field: null
+            status: dynamic_object_dependency
+          datatype: int
+          operation: count
+          reason: count_child_not_static:object_component_requires_collection:password_object
+          status: dynamic_object_dependency
+          variable_type: local_variable
+        evaluation_plan:
+          blocked_by:
+            item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            operation: object_component
+            reason: object_component_requires_collection:password_object
+            record_field: null
+            status: dynamic_object_dependency
+          datatype: int
+          dependencies:
+            objects:
+            - oval:mil.disa.stig.unix:obj:25804500
+            operations:
+            - count
+            - object_component
+            variables: []
+          expression:
+            args:
+            - item_field: user_id
+              object_ref: oval:mil.disa.stig.unix:obj:25804500
+              op: object_component
+              record_field: null
+            attributes: {}
+            op: count
+          mode: target_dependent
+          reason: count_child_not_static:object_component_requires_collection:password_object
+          resolution_status: dynamic_object_dependency
+          variable_id: oval:mil.disa.stig.defs:var:25804500
+          variable_type: local_variable
       oval:mil.disa.stig.defs:var:25804501:
         source_variable_id: oval:mil.disa.stig.defs:var:25804501
         source_type: local_variable
         datatype: int
-        comment: count of unique UIDs
+        variable_title: count of unique UIDs
         semantic_ast:
           datatype: int
           expression:
@@ -469,65 +528,6 @@ rule:
           resolution_status: dynamic_object_dependency
           variable_id: oval:mil.disa.stig.defs:var:25804501
           variable_type: local_variable
-      oval:mil.disa.stig.defs:var:25804500:
-        source_variable_id: oval:mil.disa.stig.defs:var:25804500
-        source_type: local_variable
-        datatype: int
-        comment: count of passwd entries
-        semantic_ast:
-          datatype: int
-          expression:
-            args:
-            - item_field: user_id
-              object_ref: oval:mil.disa.stig.unix:obj:25804500
-              op: object_component
-              record_field: null
-            attributes: {}
-            op: count
-          id: oval:mil.disa.stig.defs:var:25804500
-          type: local_variable
-        resolution:
-          blocked_by:
-            item_field: user_id
-            object_ref: oval:mil.disa.stig.unix:obj:25804500
-            operation: object_component
-            reason: object_component_requires_collection:password_object
-            record_field: null
-            status: dynamic_object_dependency
-          datatype: int
-          operation: count
-          reason: count_child_not_static:object_component_requires_collection:password_object
-          status: dynamic_object_dependency
-          variable_type: local_variable
-        evaluation_plan:
-          blocked_by:
-            item_field: user_id
-            object_ref: oval:mil.disa.stig.unix:obj:25804500
-            operation: object_component
-            reason: object_component_requires_collection:password_object
-            record_field: null
-            status: dynamic_object_dependency
-          datatype: int
-          dependencies:
-            objects:
-            - oval:mil.disa.stig.unix:obj:25804500
-            operations:
-            - count
-            - object_component
-            variables: []
-          expression:
-            args:
-            - item_field: user_id
-              object_ref: oval:mil.disa.stig.unix:obj:25804500
-              op: object_component
-              record_field: null
-            attributes: {}
-            op: count
-          mode: target_dependent
-          reason: count_child_not_static:object_component_requires_collection:password_object
-          resolution_status: dynamic_object_dependency
-          variable_id: oval:mil.disa.stig.defs:var:25804500
-          variable_type: local_variable
     predicates:
       oval:mil.disa.stig.unix:ste:25804500:
         source_state_id: oval:mil.disa.stig.unix:ste:25804500
@@ -542,7 +542,7 @@ rule:
           name: user_id
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: '1000'
-        comment: Interactive Users
+        state_title: Interactive Users
       oval:mil.disa.stig.ind:ste:25804500:
         source_state_id: oval:mil.disa.stig.ind:ste:25804500
         source_type: variable_state
@@ -555,14 +555,14 @@ rule:
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: count of passwd UIDs
+        state_title: count of passwd UIDs
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:25804500:
           source_test_id: oval:mil.disa.stig.ind:tst:25804500
           source_type: variable_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: UIDs are unique
+          test_title: UIDs are unique
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -572,6 +572,29 @@ rule:
           - oval:mil.disa.stig.ind:ste:25804500
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:258045:
+          source_definition_id: oval:mil.disa.stig.defs:def:258045
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: GIDs are unique
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25804500
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system duplicate User IDs (UIDs) must not exist for interactive users.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258045:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258045
           class: compliance
@@ -606,29 +629,6 @@ rule:
 
 
                 Satisfies: SRG-OS-000104-GPOS-00051, SRG-OS-000121-GPOS-00062, SRG-OS-000042-GPOS-00020'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:258045:
-          source_definition_id: oval:mil.disa.stig.defs:def:258045
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: GIDs are unique
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25804500
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system duplicate User IDs (UIDs) must not exist for interactive users.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -749,9 +749,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258045r958482_rule
-      semantic_ir_sha256: 84683699b92bf168f660152b1ac5d9c028a767fbc86176ae77d10854ee9a5fcd
+      semantic_ir_sha256: 6e824864a8b9676d0e12463dc620a02ca6f89bef84e0004136dc1dd1b86fc9fe
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ab81708ab2fd5094cd406063d6afe858d27e8bccf44147df2bd9979256f61187
+    semantic_fingerprint_sha256: 25ed103fa9a67bfc35d287065a261d1e1bf5276d8ef538655d16326b0b092bf6
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258045r958482_rule

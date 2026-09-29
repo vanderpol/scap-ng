@@ -336,7 +336,7 @@ rule:
         source_type: wmi57_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: Kerberos Policy - Enforce user logon restrictions
+        object_title: Kerberos Policy - Enforce user logon restrictions
         query:
         - attributes:
             datatype: string
@@ -352,26 +352,6 @@ rule:
           value: SELECT setting FROM RSOP_SecuritySettingBoolean WHERE KeyName='TicketValidateClient'
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25438601:
-        source_state_id: oval:mil.disa.stig.win:ste:25438601
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: setting
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '1'
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Kerberos Policy - Enforce user logon restrictions - Enabled, Other tools test = 1
       oval:mil.disa.stig.win:ste:25438600:
         source_state_id: oval:mil.disa.stig.win:ste:25438600
         source_type: wmi57_state
@@ -391,14 +371,34 @@ rule:
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Kerberos Policy - Enforce user logon restrictions - Enabled, PA test = -1
+        state_title: Kerberos Policy - Enforce user logon restrictions - Enabled, PA test = -1
+      oval:mil.disa.stig.win:ste:25438601:
+        source_state_id: oval:mil.disa.stig.win:ste:25438601
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: setting
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '1'
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: Kerberos Policy - Enforce user logon restrictions - Enabled, Other tools test = 1
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25438600:
           source_test_id: oval:mil.disa.stig.win:tst:25438600
           source_type: wmi57_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Kerberos user logon restrictions must be enforced, PA test = -1 OR Other tools test = 1
+          test_title: Kerberos user logon restrictions must be enforced, PA test = -1 OR Other tools test = 1
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
@@ -590,9 +590,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278133r1182071_rule
-      semantic_ir_sha256: be381a2fba6e2594271ca171b0743ae133c7aa02f800077f119a03dd609eb297
+      semantic_ir_sha256: 2b566d267cd7c926b8fb5aab60001ce1293b3a3baf81882d40beb793bd548819
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 75d39719af4dc521c1e3725d0eea4fdcb58f55d169d436370ff419175fe1fe36
+    semantic_fingerprint_sha256: 7acbeeaf5c445515c7b6183faf2276d1b28b2149ab68a2477dde5c2b7890029d
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278133r1182071_rule

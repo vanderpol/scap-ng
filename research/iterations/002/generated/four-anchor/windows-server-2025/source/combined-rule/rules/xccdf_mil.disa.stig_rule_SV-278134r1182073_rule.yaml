@@ -341,7 +341,7 @@ rule:
         source_type: wmi57_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: Kerberos Policy - Maximum lifetime for service ticket must be 600 or less
+        object_title: Kerberos Policy - Maximum lifetime for service ticket must be 600 or less
         query:
         - attributes:
             datatype: string
@@ -378,7 +378,7 @@ rule:
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Maximum lifetime for service ticket is less than or eequal to 600
+        state_title: Maximum lifetime for service ticket is less than or eequal to 600
       oval:mil.disa.stig.win:ste:25438701:
         source_state_id: oval:mil.disa.stig.win:ste:25438701
         source_type: wmi57_state
@@ -400,14 +400,14 @@ rule:
           kind: element
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Maximum lifetime for service ticket policy is greater than 0.
+        state_title: Maximum lifetime for service ticket policy is greater than 0.
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25438700:
           source_test_id: oval:mil.disa.stig.win:tst:25438700
           source_type: wmi57_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Kerberos Policy - Maximum lifetime for service ticket - 600 minutes or less and greater than 0
+          test_title: Kerberos Policy - Maximum lifetime for service ticket - 600 minutes or less and greater than 0
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -418,6 +418,29 @@ rule:
           - oval:mil.disa.stig.win:ste:25438701
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:254387:
+          source_definition_id: oval:mil.disa.stig.defs:def:254387
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Kerberos Policy - Maximum lifetime for service ticket - 600 minutes or less and greater than 0
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25438700
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows Kerberos service ticket maximum lifetime must be limited to 600 minutes or less.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278134:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278134
           class: compliance
@@ -452,29 +475,6 @@ rule:
                 \ used to access a particular service. Session tickets are used only to authenticate new connections with\
                 \ servers. Ongoing operations are not interrupted if the session ticket used to authenticate the connection\
                 \ expires during the connection.\n\n  Satisfies: SRG-OS-000112-GPOS-00057, SRG-OS-000113-GPOS-00058"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:254387:
-          source_definition_id: oval:mil.disa.stig.defs:def:254387
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Kerberos Policy - Maximum lifetime for service ticket - 600 minutes or less and greater than 0
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25438700
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows Kerberos service ticket maximum lifetime must be limited to 600 minutes or less.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -600,9 +600,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278134r1182073_rule
-      semantic_ir_sha256: cf0c0772270f73c023a5c34dc71628ea3349bf456290f9a0d81f7774ae374a9d
+      semantic_ir_sha256: c850085ee63c7188c644579893ba51e19cc64b48b2a9f2ca0bed1e4efbc6bce5
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: e44186e72297813ea6780d029c2aca2d9c2869087758bd6d430af5c273891959
+    semantic_fingerprint_sha256: b344b71bc7bb79e5b0f7d8ed8b5346ceb57b1065c27fbf1eaa3f4d8e3c002ddd
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278134r1182073_rule

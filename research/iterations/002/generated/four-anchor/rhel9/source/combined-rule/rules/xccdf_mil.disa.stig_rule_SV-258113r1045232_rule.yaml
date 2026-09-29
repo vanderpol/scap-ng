@@ -397,13 +397,38 @@ rule:
       four when passwords are changed.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23036001:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23036001
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/security/pwquality.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*maxclassrepeat\s*=\s*(-?\d*)\s*(?:#.*)?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:23036002:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23036002
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             recurse_direction: down
@@ -439,7 +464,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - children:
           - kind: object_ref
@@ -454,31 +479,6 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
-      oval:mil.disa.stig.ind:obj:23036001:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23036001
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/security/pwquality.conf
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*maxclassrepeat\s*=\s*(-?\d*)\s*(?:#.*)?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23036000:
@@ -494,7 +494,7 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '4'
-        comment: null
+        state_title: null
       oval:mil.disa.stig.ind:ste:20000015:
         source_state_id: oval:mil.disa.stig.ind:ste:20000015
         source_type: textfilecontent54_state
@@ -508,14 +508,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '0'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23036000:
           source_test_id: oval:mil.disa.stig.ind:tst:23036000
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: The maximum number of repeating characters of the same character class be limited to four when passwords
+          test_title: The maximum number of repeating characters of the same character class be limited to four when passwords
             are changed.
           check: all
           check_existence: at_least_one_exists
@@ -718,9 +718,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258113r1045232_rule
-      semantic_ir_sha256: 92dd23f627d48653c14b1fa45b73ceb7c3584455db96a6080f52dd1f1349a04b
+      semantic_ir_sha256: c3c7d9da228122214d9a69fb49eae1426c12a7bb78ffedae59e429e979f2bcdd
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 96dce85d91d731822d729bf5bb85bbccdeb3570fd328e507cb2e2c0fbae4298b
+    semantic_fingerprint_sha256: d6c78dd10f212be5629707cca9044c5751abae84cc7c33322a1045b3ccfac801
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258113r1045232_rule

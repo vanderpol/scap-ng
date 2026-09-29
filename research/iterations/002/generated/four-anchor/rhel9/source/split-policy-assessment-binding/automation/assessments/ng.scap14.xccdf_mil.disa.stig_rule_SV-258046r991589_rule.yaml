@@ -7,27 +7,13 @@ assessment:
   description: RHEL 9 system accounts must not have an interactive login shell.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.unix:obj:25804600:
-      capability: scapng.collect.unix.password
-      source_object_id: oval:mil.disa.stig.unix:obj:25804600
-      source_type: password_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: null
-      query:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: username
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: .+
     oval:mil.disa.stig.unix:obj:25804601:
       capability: scapng.collect.unix.password
       source_object_id: oval:mil.disa.stig.unix:obj:25804601
       source_type: password_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '1'
-      comment: only system accounts
+      object_title: only system accounts
       query:
       - children:
         - kind: object_ref
@@ -48,22 +34,22 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-  derive: {}
-  predicates:
-    oval:mil.disa.stig.unix:ste:25804600:
-      source_state_id: oval:mil.disa.stig.unix:ste:25804600
-      source_type: password_state
+    oval:mil.disa.stig.unix:obj:25804600:
+      capability: scapng.collect.unix.password
+      source_object_id: oval:mil.disa.stig.unix:obj:25804600
+      source_type: password_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
+      version: '1'
+      object_title: null
+      query:
       - attributes:
-          datatype: string
           operation: pattern match
         kind: element
-        name: login_shell
+        name: username
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /sbin/nologin|/usr/sbin/nologin
-      comment: null
+        value: .+
+  derive: {}
+  predicates:
     oval:mil.disa.stig.unix:ste:25804602:
       source_state_id: oval:mil.disa.stig.unix:ste:25804602
       source_type: password_state
@@ -77,7 +63,7 @@ assessment:
         name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '0'
-      comment: null
+      state_title: null
     oval:mil.disa.stig.unix:ste:25804601:
       source_state_id: oval:mil.disa.stig.unix:ste:25804601
       source_type: password_state
@@ -91,14 +77,28 @@ assessment:
         name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '1000'
-      comment: null
+      state_title: null
+    oval:mil.disa.stig.unix:ste:25804600:
+      source_state_id: oval:mil.disa.stig.unix:ste:25804600
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: login_shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /sbin/nologin|/usr/sbin/nologin
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.unix:tst:25804600:
         source_test_id: oval:mil.disa.stig.unix:tst:25804600
         source_type: password_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: The system accounts in /etc/passwd use /sbin/nologin.
+        test_title: The system accounts in /etc/passwd use /sbin/nologin.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -303,6 +303,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258046r991589_rule
-    semantic_ir_sha256: 1fdf70378c667b207d4b167035698b9aaf0dca42f500ede0c0182a62dbba6c90
+    semantic_ir_sha256: fc77d0e59b6b959e334d4e80ee9abd6fd69832a01d6163079fb68c8414432612
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 7234c278f23a87ca1e865e137b06e3bde0e2da82ec32d357caca6948d6732618
+  semantic_fingerprint_sha256: cda988929efa9b1d163822aac8a400229dc785395a6cd8f1094038da6aa64c62

@@ -14,7 +14,7 @@ assessment:
       source_type: fileeffectiverights53_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '4'
-      comment: Files in the DSA Working Directory - Administrators permissions
+      object_title: Files in the DSA Working Directory - Administrators permissions
       query:
       - attributes:
           datatype: string
@@ -34,46 +34,44 @@ assessment:
         name: trustee_sid
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: S-1-5-32-544
-    oval:mil.disa.stig.win:obj:25439111:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25439111
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '2'
-      comment: DSA Working Directory
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - attributes:
-          datatype: string
-          operation: case insensitive equals
-        kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: System\CurrentControlSet\Services\NTDS\Parameters
-      - attributes:
-          datatype: string
-          operation: case insensitive equals
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: DSA Working Directory
-    oval:mil.disa.stig.win:obj:25439110:
+    oval:mil.disa.stig.win:obj:25439105:
       capability: scapng.collect.windows.fileeffectiverights53
-      source_object_id: oval:mil.disa.stig.win:obj:25439110
+      source_object_id: oval:mil.disa.stig.win:obj:25439105
       source_type: fileeffectiverights53_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '4'
-      comment: Files in the DSA Working Directory - Other permissions
+      object_title: Files in the same directory as the DSA Database - SYSTEM permissions
       query:
       - attributes:
           datatype: string
           var_check: all
-          var_ref: oval:mil.disa.stig.win:var:25439102
+          var_ref: oval:mil.disa.stig.win:var:25439101
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(.*)$
+      - kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-18
+    oval:mil.disa.stig.win:obj:25439104:
+      capability: scapng.collect.windows.fileeffectiverights53
+      source_object_id: oval:mil.disa.stig.win:obj:25439104
+      source_type: fileeffectiverights53_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '4'
+      object_title: Database log files - Other permissions
+      query:
+      - attributes:
+          datatype: string
+          var_check: all
+          var_ref: oval:mil.disa.stig.win:var:25439100
         kind: element
         name: path
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -103,39 +101,13 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.win:ste:25439103
-    oval:mil.disa.stig.win:obj:25439102:
-      capability: scapng.collect.windows.fileeffectiverights53
-      source_object_id: oval:mil.disa.stig.win:obj:25439102
-      source_type: fileeffectiverights53_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '4'
-      comment: Database log files - SYSTEM permissions
-      query:
-      - attributes:
-          datatype: string
-          var_check: all
-          var_ref: oval:mil.disa.stig.win:var:25439100
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: ^(.*)$
-      - kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-18
     oval:mil.disa.stig.win:obj:25439107:
       capability: scapng.collect.windows.fileeffectiverights53
       source_object_id: oval:mil.disa.stig.win:obj:25439107
       source_type: fileeffectiverights53_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '4'
-      comment: Files in the same directory as the DSA Database - Other permissions
+      object_title: Files in the same directory as the DSA Database - Other permissions
       query:
       - attributes:
           datatype: string
@@ -170,13 +142,162 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.win:ste:25439103
+    oval:mil.disa.stig.win:obj:25439101:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25439101
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '2'
+      object_title: DSA Database file
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: System\CurrentControlSet\Services\NTDS\Parameters
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: DSA Database file
+    oval:mil.disa.stig.win:obj:25439110:
+      capability: scapng.collect.windows.fileeffectiverights53
+      source_object_id: oval:mil.disa.stig.win:obj:25439110
+      source_type: fileeffectiverights53_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '4'
+      object_title: Files in the DSA Working Directory - Other permissions
+      query:
+      - attributes:
+          datatype: string
+          var_check: all
+          var_ref: oval:mil.disa.stig.win:var:25439102
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(.*)$
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: .*
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.win:ste:25439100
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.win:ste:25439101
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.win:ste:25439103
+    oval:mil.disa.stig.win:obj:25439103:
+      capability: scapng.collect.windows.fileeffectiverights53
+      source_object_id: oval:mil.disa.stig.win:obj:25439103
+      source_type: fileeffectiverights53_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '4'
+      object_title: Database log files - Administrators permissions
+      query:
+      - attributes:
+          datatype: string
+          var_check: all
+          var_ref: oval:mil.disa.stig.win:var:25439100
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(.*)$
+      - kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-32-544
+    oval:mil.disa.stig.win:obj:25439102:
+      capability: scapng.collect.windows.fileeffectiverights53
+      source_object_id: oval:mil.disa.stig.win:obj:25439102
+      source_type: fileeffectiverights53_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '4'
+      object_title: Database log files - SYSTEM permissions
+      query:
+      - attributes:
+          datatype: string
+          var_check: all
+          var_ref: oval:mil.disa.stig.win:var:25439100
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(.*)$
+      - kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-18
+    oval:mil.disa.stig.win:obj:25439100:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25439100
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '2'
+      object_title: Database log files path
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: System\CurrentControlSet\Services\NTDS\Parameters
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Database log files path
     oval:mil.disa.stig.win:obj:25439106:
       capability: scapng.collect.windows.fileeffectiverights53
       source_object_id: oval:mil.disa.stig.win:obj:25439106
       source_type: fileeffectiverights53_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '4'
-      comment: Files in the same directory as the DSA Database - Administrators permissions
+      object_title: Files in the same directory as the DSA Database - Administrators permissions
       query:
       - attributes:
           datatype: string
@@ -202,7 +323,7 @@ assessment:
       source_type: fileeffectiverights53_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '4'
-      comment: Files in the DSA Working Directory - SYSTEM permissions
+      object_title: Files in the DSA Working Directory - SYSTEM permissions
       query:
       - attributes:
           datatype: string
@@ -222,106 +343,13 @@ assessment:
         name: trustee_sid
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: S-1-5-18
-    oval:mil.disa.stig.win:obj:25439105:
-      capability: scapng.collect.windows.fileeffectiverights53
-      source_object_id: oval:mil.disa.stig.win:obj:25439105
-      source_type: fileeffectiverights53_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '4'
-      comment: Files in the same directory as the DSA Database - SYSTEM permissions
-      query:
-      - attributes:
-          datatype: string
-          var_check: all
-          var_ref: oval:mil.disa.stig.win:var:25439101
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: ^(.*)$
-      - kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-18
-    oval:mil.disa.stig.win:obj:25439103:
-      capability: scapng.collect.windows.fileeffectiverights53
-      source_object_id: oval:mil.disa.stig.win:obj:25439103
-      source_type: fileeffectiverights53_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '4'
-      comment: Database log files - Administrators permissions
-      query:
-      - attributes:
-          datatype: string
-          var_check: all
-          var_ref: oval:mil.disa.stig.win:var:25439100
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: ^(.*)$
-      - kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-32-544
-    oval:mil.disa.stig.win:obj:25439104:
-      capability: scapng.collect.windows.fileeffectiverights53
-      source_object_id: oval:mil.disa.stig.win:obj:25439104
-      source_type: fileeffectiverights53_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '4'
-      comment: Database log files - Other permissions
-      query:
-      - attributes:
-          datatype: string
-          var_check: all
-          var_ref: oval:mil.disa.stig.win:var:25439100
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: ^(.*)$
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: .*
-      - kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:mil.disa.stig.win:ste:25439100
-      - kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:mil.disa.stig.win:ste:25439101
-      - kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:mil.disa.stig.win:ste:25439103
-    oval:mil.disa.stig.win:obj:25439100:
+    oval:mil.disa.stig.win:obj:25439111:
       capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25439100
+      source_object_id: oval:mil.disa.stig.win:obj:25439111
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '2'
-      comment: Database log files path
+      object_title: DSA Working Directory
       query:
       - attributes:
           datatype: string
@@ -342,82 +370,13 @@ assessment:
         kind: element
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Database log files path
-    oval:mil.disa.stig.win:obj:25439101:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25439101
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '2'
-      comment: DSA Database file
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - attributes:
-          datatype: string
-          operation: case insensitive equals
-        kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: System\CurrentControlSet\Services\NTDS\Parameters
-      - attributes:
-          datatype: string
-          operation: case insensitive equals
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: DSA Database file
+        value: DSA Working Directory
   derive:
-    oval:mil.disa.stig.win:var:25439102:
-      source_variable_id: oval:mil.disa.stig.win:var:25439102
-      source_type: local_variable
-      datatype: string
-      comment: DSA Working Directory
-      semantic_ast:
-        datatype: string
-        expression:
-          item_field: value
-          object_ref: oval:mil.disa.stig.win:obj:25439111
-          op: object_component
-          record_field: null
-        id: oval:mil.disa.stig.win:var:25439102
-        type: local_variable
-      resolution:
-        datatype: string
-        item_field: value
-        object_ref: oval:mil.disa.stig.win:obj:25439111
-        operation: object_component
-        reason: object_component_requires_collection:registry_object
-        record_field: null
-        status: dynamic_object_dependency
-        variable_type: local_variable
-      evaluation_plan:
-        datatype: string
-        dependencies:
-          objects:
-          - oval:mil.disa.stig.win:obj:25439111
-          operations:
-          - object_component
-          variables: []
-        expression:
-          item_field: value
-          object_ref: oval:mil.disa.stig.win:obj:25439111
-          op: object_component
-          record_field: null
-        mode: target_dependent
-        reason: object_component_requires_collection:registry_object
-        resolution_status: dynamic_object_dependency
-        variable_id: oval:mil.disa.stig.win:var:25439102
-        variable_type: local_variable
     oval:mil.disa.stig.win:var:25439100:
       source_variable_id: oval:mil.disa.stig.win:var:25439100
       source_type: local_variable
       datatype: string
-      comment: Database log files path
+      variable_title: Database log files path
       semantic_ast:
         datatype: string
         expression:
@@ -458,7 +417,7 @@ assessment:
       source_variable_id: oval:mil.disa.stig.win:var:25439101
       source_type: local_variable
       datatype: string
-      comment: DSA Database working path
+      variable_title: DSA Database working path
       semantic_ast:
         datatype: string
         expression:
@@ -515,29 +474,48 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:mil.disa.stig.win:var:25439101
         variable_type: local_variable
+    oval:mil.disa.stig.win:var:25439102:
+      source_variable_id: oval:mil.disa.stig.win:var:25439102
+      source_type: local_variable
+      datatype: string
+      variable_title: DSA Working Directory
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: value
+          object_ref: oval:mil.disa.stig.win:obj:25439111
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.win:var:25439102
+        type: local_variable
+      resolution:
+        datatype: string
+        item_field: value
+        object_ref: oval:mil.disa.stig.win:obj:25439111
+        operation: object_component
+        reason: object_component_requires_collection:registry_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.win:obj:25439111
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: value
+          object_ref: oval:mil.disa.stig.win:obj:25439111
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:registry_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.win:var:25439102
+        variable_type: local_variable
   predicates:
-    oval:mil.disa.stig.win:ste:25439101:
-      source_state_id: oval:mil.disa.stig.win:ste:25439101
-      source_type: fileeffectiverights53_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-18
-      comment: Local System Rights
-    oval:mil.disa.stig.win:ste:25439100:
-      source_state_id: oval:mil.disa.stig.win:ste:25439100
-      source_type: fileeffectiverights53_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: S-1-5-32-544
-      comment: Administrators Rights
     oval:mil.disa.stig.win:ste:25439102:
       source_state_id: oval:mil.disa.stig.win:ste:25439102
       source_type: fileeffectiverights53_state
@@ -646,7 +624,29 @@ assessment:
         name: file_write_attributes
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: 'true'
-      comment: Full Rights
+      state_title: Full Rights
+    oval:mil.disa.stig.win:ste:25439100:
+      source_state_id: oval:mil.disa.stig.win:ste:25439100
+      source_type: fileeffectiverights53_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-32-544
+      state_title: Administrators Rights
+    oval:mil.disa.stig.win:ste:25439101:
+      source_state_id: oval:mil.disa.stig.win:ste:25439101
+      source_type: fileeffectiverights53_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: S-1-5-18
+      state_title: Local System Rights
     oval:mil.disa.stig.win:ste:25439103:
       source_state_id: oval:mil.disa.stig.win:ste:25439103
       source_type: fileeffectiverights53_state
@@ -755,27 +755,26 @@ assessment:
         name: file_write_attributes
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: 'false'
-      comment: No Rights
+      state_title: No Rights
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25439104:
-        source_test_id: oval:mil.disa.stig.win:tst:25439104
+      oval:mil.disa.stig.win:tst:25439108:
+        source_test_id: oval:mil.disa.stig.win:tst:25439108
         source_type: fileeffectiverights53_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'DSA Database file: BUILTIN\Administrators has full control'
+        test_title: 'DSA Working Directory: No other permissions'
         check: all
-        check_existence: at_least_one_exists
+        check_existence: none_exist
         state_operator: AND
         collections:
-        - oval:mil.disa.stig.win:obj:25439106
-        predicates:
-        - oval:mil.disa.stig.win:ste:25439102
+        - oval:mil.disa.stig.win:obj:25439110
+        predicates: []
         source_other: []
       oval:mil.disa.stig.win:tst:25439106:
         source_test_id: oval:mil.disa.stig.win:tst:25439106
         source_type: fileeffectiverights53_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'DSA Working Directory: NT Authority\SYSTEM has full control'
+        test_title: 'DSA Working Directory: NT Authority\SYSTEM has full control'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -784,47 +783,11 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25439102
         source_other: []
-      oval:mil.disa.stig.win:tst:25439105:
-        source_test_id: oval:mil.disa.stig.win:tst:25439105
-        source_type: fileeffectiverights53_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'DSA Database file: No other permissions'
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25439107
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.win:tst:25439102:
-        source_test_id: oval:mil.disa.stig.win:tst:25439102
-        source_type: fileeffectiverights53_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'Database log files: No other permissions'
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25439104
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.win:tst:25439108:
-        source_test_id: oval:mil.disa.stig.win:tst:25439108
-        source_type: fileeffectiverights53_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'DSA Working Directory: No other permissions'
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25439110
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.win:tst:25439107:
         source_test_id: oval:mil.disa.stig.win:tst:25439107
         source_type: fileeffectiverights53_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'DSA Working Directory: BUILTIN\Administrators has full control'
+        test_title: 'DSA Working Directory: BUILTIN\Administrators has full control'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -837,7 +800,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25439100
         source_type: fileeffectiverights53_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'Database log files: NT Authority\SYSTEM has full control'
+        test_title: 'Database log files: NT Authority\SYSTEM has full control'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -846,11 +809,48 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25439102
         source_other: []
+      oval:mil.disa.stig.win:tst:25439105:
+        source_test_id: oval:mil.disa.stig.win:tst:25439105
+        source_type: fileeffectiverights53_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: 'DSA Database file: No other permissions'
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25439107
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.win:tst:25439102:
+        source_test_id: oval:mil.disa.stig.win:tst:25439102
+        source_type: fileeffectiverights53_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: 'Database log files: No other permissions'
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25439104
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.win:tst:25439104:
+        source_test_id: oval:mil.disa.stig.win:tst:25439104
+        source_type: fileeffectiverights53_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: 'DSA Database file: BUILTIN\Administrators has full control'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25439106
+        predicates:
+        - oval:mil.disa.stig.win:ste:25439102
+        source_other: []
       oval:mil.disa.stig.win:tst:25439101:
         source_test_id: oval:mil.disa.stig.win:tst:25439101
         source_type: fileeffectiverights53_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'Database log files: BUILTIN\Administrators has full control'
+        test_title: 'Database log files: BUILTIN\Administrators has full control'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -863,7 +863,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25439103
         source_type: fileeffectiverights53_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: 'DSA Database file: NT Authority\SYSTEM has full control'
+        test_title: 'DSA Database file: NT Authority\SYSTEM has full control'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -1124,6 +1124,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278138r1182081_rule
-    semantic_ir_sha256: 3cf0113c7c43ce655a63ccf898eb52b93a3e43f670c47dca264fcda38c0b797f
+    semantic_ir_sha256: 38f4830e5d1f15780f007c51e82b9846e9d66b30f789c0af04698ee2cc1ece5f
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 93a47de72e6638094776fa0bde7b4ff777ab64db656aa3b737ec1404aba4a738
+  semantic_fingerprint_sha256: 669963f78762fd7dcae598333730021b6a08f7e67f301082c85edba4c5c48728

@@ -13,7 +13,7 @@ assessment:
       source_type: auditeventpolicysubcategories_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query: []
   derive: {}
   predicates:
@@ -27,7 +27,7 @@ assessment:
         name: security_group_management
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
-      comment: null
+      state_title: null
     oval:mil.disa.stig.win:ste:25330800:
       source_state_id: oval:mil.disa.stig.win:ste:25330800
       source_type: auditeventpolicysubcategories_state
@@ -38,14 +38,14 @@ assessment:
         name: security_group_management
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25330800:
         source_test_id: oval:mil.disa.stig.win:tst:25330800
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit Security Group Management'' is set to ''Success'' or ''Success and Failure'''
+        test_title: '''Audit Security Group Management'' is set to ''Success'' or ''Success and Failure'''
         check: all
         check_existence: at_least_one_exists
         state_operator: OR
@@ -56,6 +56,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25330801
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253308:
+        source_definition_id: oval:mil.disa.stig.defs:def:253308
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Account Management - Security Group Management successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253308:
         source_definition_id: oval:mil.disa.stig.windows11:def:253308
         class: compliance
@@ -93,29 +116,6 @@ assessment:
 
               Security Group Management records events such as creating, deleting or changing of security groups, including
               changes in group members.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253308:
-        source_definition_id: oval:mil.disa.stig.defs:def:253308
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25330800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Account Management - Security Group Management successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -250,6 +250,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253308r971541_rule
-    semantic_ir_sha256: 27cd7e41b64343e2cb8f3d2b8641c0db21ea1f17e39f41ea1c028ae625771af9
+    semantic_ir_sha256: df1577e593e2b1020cbdd606a11e516ff11a6f9069b7ef2963dd612b837971e1
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 4627b85eef792785f286455df88b9d832b6fa07faba7c48f046588a2096802ed
+  semantic_fingerprint_sha256: 93450628b078b8f270af9df300820ea85b8341a83e04a2fe62ddb1d5aef5fee9

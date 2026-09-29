@@ -401,37 +401,37 @@ rule:
       by the ISSM) to select which auditable events are to be audited.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.unix:obj:23047100:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:23047100
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: /etc/audit/auditd.conf
       oval:mil.disa.stig.unix:obj:23047102:
         capability: scapng.collect.unix.file
         source_object_id: oval:mil.disa.stig.unix:obj:23047102
         source_type: file_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: /etc/audit/audit.rules
+      oval:mil.disa.stig.unix:obj:23047100:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:23047100
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: /etc/audit/auditd.conf
       oval:mil.disa.stig.unix:obj:23047101:
         capability: scapng.collect.unix.file
         source_object_id: oval:mil.disa.stig.unix:obj:23047101
         source_type: file_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: path
@@ -511,14 +511,27 @@ rule:
           name: oexec
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: 'false'
-        comment: Mode 0600 or less permissive
+        state_title: Mode 0600 or less permissive
     evaluate:
       tests:
+        oval:mil.disa.stig.unix:tst:23047100:
+          source_test_id: oval:mil.disa.stig.unix:tst:23047100
+          source_type: file_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          test_title: /etc/audit/auditd.conf has mode 0600 or less permissive
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.unix:obj:23047100
+          predicates:
+          - oval:mil.disa.stig.unix:ste:20000004
+          source_other: []
         oval:mil.disa.stig.unix:tst:23047101:
           source_test_id: oval:mil.disa.stig.unix:tst:23047101
           source_type: file_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          comment: .rules files in /etc/audit/rules.d have mode 0600 or less permissive
+          test_title: .rules files in /etc/audit/rules.d have mode 0600 or less permissive
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -531,7 +544,7 @@ rule:
           source_test_id: oval:mil.disa.stig.unix:tst:23047102
           source_type: file_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          comment: /etc/audit/audit.rules has mode 0600 or less permissive
+          test_title: /etc/audit/audit.rules has mode 0600 or less permissive
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -540,20 +553,39 @@ rule:
           predicates:
           - oval:mil.disa.stig.unix:ste:20000004
           source_other: []
-        oval:mil.disa.stig.unix:tst:23047100:
-          source_test_id: oval:mil.disa.stig.unix:tst:23047100
-          source_type: file_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          comment: /etc/audit/auditd.conf has mode 0600 or less permissive
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.unix:obj:23047100
-          predicates:
-          - oval:mil.disa.stig.unix:ste:20000004
-          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230471:
+          source_definition_id: oval:mil.disa.stig.defs:def:230471
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: /etc/audit/auditd.conf has mode 0600 or less permissive
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23047100
+            - comment: .rules files in /etc/audit/rules.d have mode 0600 or less permissive
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23047101
+            - comment: /etc/audit/audit.rules has mode 0600 or less permissive
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.unix:tst:23047102
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must allow only the Information System Security Manager (ISSM) (or individuals or
+                roles appointed by the ISSM) to select which auditable events are to be audited.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258171:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258171
           class: compliance
@@ -589,38 +621,6 @@ rule:
                 the system's performance by overwhelming the audit log. Misconfigured audits may also make it more difficult
                 to establish, correlate, and investigate the events relating to an incident or identify those responsible
                 for one.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230471:
-          source_definition_id: oval:mil.disa.stig.defs:def:230471
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: /etc/audit/auditd.conf has mode 0600 or less permissive
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23047100
-            - comment: .rules files in /etc/audit/rules.d have mode 0600 or less permissive
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23047101
-            - comment: /etc/audit/audit.rules has mode 0600 or less permissive
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.unix:tst:23047102
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must allow only the Information System Security Manager (ISSM) (or individuals or
-                roles appointed by the ISSM) to select which auditable events are to be audited.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -756,9 +756,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258171r1208777_rule
-      semantic_ir_sha256: 87d5e2d00b37ee5992a756b76aeb4447bece03dacaa5813802c7b88438afdb3a
+      semantic_ir_sha256: 8494cbb051ddfbdd11e949fce9eba92052b300a08f67849ee97f36d79367c21b
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 6b3dd870fad35d7c02489a0c366035d7481a9833a61fc89791170f45b52cd0e4
+    semantic_fingerprint_sha256: 2d159a45ad062a1fe3de56899a440c4adb2fcd7d025d1777ef6d823c504b5ce7
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258171r1208777_rule

@@ -7,13 +7,39 @@ assessment:
   description: Software certificate installation files must be removed from Windows 11.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002:
+      capability: scapng.collect.windows.file
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '18'
+      object_title: Search for .pfx files
+      query:
+      - attributes:
+          max_depth: '-1'
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: \.[Pp][Ff][Xx]$
     oval:navy.navwar.niwcatlantic.scc.windows:obj:25328001:
       capability: scapng.collect.windows.file
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328001
       source_type: file_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '18'
-      comment: Search for .p12 files
+      object_title: Search for .p12 files
       query:
       - attributes:
           max_depth: '-1'
@@ -45,47 +71,8 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:navy.navwar.niwcatlantic.scc.windows:ste:25328002
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002:
-      capability: scapng.collect.windows.file
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '18'
-      comment: Search for .pfx files
-      query:
-      - attributes:
-          max_depth: '-1'
-          recurse_direction: down
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: .*
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: \.[Pp][Ff][Xx]$
   derive: {}
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:25328002:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25328002
-      source_type: file_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '[Ee]wallet\.p12$'
-      comment: ewallet.p12 Oracle Wallet Manager should not report failure
     oval:navy.navwar.niwcatlantic.scc.windows:ste:25328001:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25328001
       source_type: file_state
@@ -98,31 +85,44 @@ assessment:
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '[Aa]dobe.+Preflight\.p12$'
-      comment: Preflight.p12 Adobe file should not report failure
+      state_title: Preflight.p12 Adobe file should not report failure
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25328002:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25328002
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '[Ee]wallet\.p12$'
+      state_title: ewallet.p12 Oracle Wallet Manager should not report failure
   evaluate:
     tests:
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:25328001:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328001
-        source_type: file_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Software certificate installation files must be removed. .p12 files
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328001
-        predicates: []
-        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:25328002:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328002
         source_type: file_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Software certificate installation files must be removed. .pfx files
+        test_title: Software certificate installation files must be removed. .pfx files
         check: all
         check_existence: none_exist
         state_operator: AND
         collections:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328002
+        predicates: []
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:25328001:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25328001
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Software certificate installation files must be removed. .p12 files
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:25328001
         predicates: []
         source_other: []
     definitions:
@@ -282,6 +282,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253280r991589_rule
-    semantic_ir_sha256: 3f9a9f7b27e94be5d4a1ea97e1ce9b1483ac3dccff7dfa7cc5eab9bee4e75b35
+    semantic_ir_sha256: 9a69d9c4c86dffa2560d79d05868096658b66c95b3dee60b7cbe355509d56654
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: e530ed277133e330749b6642401e1336158c8fce278aeb0910d6b9a078d78ea5
+  semantic_fingerprint_sha256: 1b930d0a66fe3a7d96a87b38a531bfcad977db9f9423a23d582f35e41d5955a2

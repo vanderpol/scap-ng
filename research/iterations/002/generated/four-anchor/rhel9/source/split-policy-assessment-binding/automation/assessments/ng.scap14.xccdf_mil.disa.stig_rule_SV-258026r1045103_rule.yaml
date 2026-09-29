@@ -13,7 +13,7 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '2'
-      comment: dconf user databases
+      object_title: dconf user databases
       query:
       - kind: element
         name: filepath
@@ -38,7 +38,7 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories
+      object_title: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories
       query:
       - attributes:
           var_check: at least one
@@ -70,7 +70,7 @@ assessment:
       source_variable_id: oval:mil.disa.stig.defs:var:25802600
       source_type: local_variable
       datatype: string
-      comment: dconf user database locks directories
+      variable_title: dconf user database locks directories
       semantic_ast:
         datatype: string
         expression:
@@ -141,23 +141,11 @@ assessment:
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25802600:
-        source_test_id: oval:mil.disa.stig.ind:tst:25802600
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: dconf user database(s) exist
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25802600
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:25802601:
         source_test_id: oval:mil.disa.stig.ind:tst:25802601
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories exists
+        test_title: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories exists
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -165,7 +153,47 @@ assessment:
         - oval:mil.disa.stig.ind:obj:25802601
         predicates: []
         source_other: []
+      oval:mil.disa.stig.ind:tst:25802600:
+        source_test_id: oval:mil.disa.stig.ind:tst:25802600
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: dconf user database(s) exist
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25802600
+        predicates: []
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:258026:
+        source_definition_id: oval:mil.disa.stig.defs:def:258026
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: dconf user database(s) exist
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25802600
+          - comment: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25802601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent a user from overriding the session lock-delay setting for the graphical
+              user interface.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258026:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258026
         class: compliance
@@ -201,34 +229,6 @@ assessment:
               Rather than relying on the user to manually lock their operating system session prior to vacating the vicinity,
               the GNOME desktop can be configured to identify when a user's session has idled and take action to initiate
               the session lock. As such, users should not be allowed to change session settings.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:258026:
-        source_definition_id: oval:mil.disa.stig.defs:def:258026
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: dconf user database(s) exist
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25802600
-          - comment: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories exists
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25802601
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must prevent a user from overriding the session lock-delay setting for the graphical
-              user interface.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -352,6 +352,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258026r1045103_rule
-    semantic_ir_sha256: 4f1d489e72d8b4ff1ec2544251a5176a81869ca486a7e1485a3d61c9791a2822
+    semantic_ir_sha256: 5df3feb5c01c48f5b52cc8055d74daa41a5d6187635a20ad67de866dc96628f7
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 931372a5177128f8d778ff3447c3521cac3942e397e80cf928fa79e3dce9f65b
+  semantic_fingerprint_sha256: 8388aa9b08fea757212b053e696fc08e34377bf89f756ceed47b7f83dd4b7bbd

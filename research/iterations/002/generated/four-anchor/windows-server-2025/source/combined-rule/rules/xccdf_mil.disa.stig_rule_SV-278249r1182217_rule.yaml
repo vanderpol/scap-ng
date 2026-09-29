@@ -431,7 +431,7 @@ rule:
         source_type: wmi57_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '4'
-        comment: null
+        object_title: null
         query:
         - attributes:
             datatype: string
@@ -452,7 +452,7 @@ rule:
         source_type: userright_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: userright
@@ -460,19 +460,6 @@ rule:
           value: SE_CREATE_SYMBOLIC_LINK_NAME
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25449900:
-        source_state_id: oval:mil.disa.stig.win:ste:25449900
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(NT VIRTUAL MACHINE\\)?Virtual Machines$
-        comment: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -485,7 +472,7 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
-        comment: null
+        state_title: null
       oval:mil.disa.stig.win:ste:20000029:
         source_state_id: oval:mil.disa.stig.win:ste:20000029
         source_type: userright_state
@@ -495,14 +482,41 @@ rule:
         - kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.win:ste:25449900:
+        source_state_id: oval:mil.disa.stig.win:ste:25449900
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(NT VIRTUAL MACHINE\\)?Virtual Machines$
+        state_title: null
     evaluate:
       tests:
+        oval:mil.disa.stig.win:tst:25348901:
+          source_test_id: oval:mil.disa.stig.win:tst:25348901
+          source_type: userright_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Create symbolic links - Administrators
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: OR
+          collections:
+          - oval:mil.disa.stig.win:obj:25348900
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000029
+          - oval:mil.disa.stig.win:ste:20000030
+          source_other: []
         oval:mil.disa.stig.win:tst:25449903:
           source_test_id: oval:mil.disa.stig.win:tst:25449903
           source_type: userright_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Create symbolic links - Administrators, Virtual Machines
+          test_title: Create symbolic links - Administrators, Virtual Machines
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
@@ -513,25 +527,11 @@ rule:
           - oval:mil.disa.stig.win:ste:20000030
           - oval:mil.disa.stig.win:ste:25449900
           source_other: []
-        oval:mil.disa.stig.win:tst:25348901:
-          source_test_id: oval:mil.disa.stig.win:tst:25348901
-          source_type: userright_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Create symbolic links - Administrators
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: OR
-          collections:
-          - oval:mil.disa.stig.win:obj:25348900
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000029
-          - oval:mil.disa.stig.win:ste:20000030
-          source_other: []
         oval:mil.disa.stig.win:tst:25449902:
           source_test_id: oval:mil.disa.stig.win:tst:25449902
           source_type: wmi57_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Hyper-V Role is installed
+          test_title: Hyper-V Role is installed
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -764,9 +764,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278249r1182217_rule
-      semantic_ir_sha256: cd1f410c68314d29ffe79a24698814139e1703b6daffad3f68023fced9fa690f
+      semantic_ir_sha256: d180f8cc052d2cd7996bf4cb414427239951e3f71cc96e3c8e06fc7018170667
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ccc410cf4b4f2de049a48978ec3366018e6bd8098ff0b0339f5a13ffdaa14f21
+    semantic_fingerprint_sha256: dc5889d8bfee1ba8b7db3b2e72b0fa35779fcb3cdc6c3f37c844144580e4de04
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278249r1182217_rule

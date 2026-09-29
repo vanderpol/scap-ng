@@ -13,7 +13,7 @@ assessment:
       source_type: systemdunitproperty_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: unit
@@ -23,29 +23,13 @@ assessment:
         name: property
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: UnitFileState
-    oval:mil.disa.stig.linux:obj:23031002:
-      capability: scapng.collect.linux.systemdunitproperty
-      source_object_id: oval:mil.disa.stig.linux:obj:23031002
-      source_type: systemdunitproperty_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: unit
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: kdump.service
-      - kind: element
-        name: property
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: ActiveState
     oval:mil.disa.stig.linux:obj:23031000:
       capability: scapng.collect.linux.systemdunitproperty
       source_object_id: oval:mil.disa.stig.linux:obj:23031000
       source_type: systemdunitproperty_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: unit
@@ -55,19 +39,24 @@ assessment:
         name: property
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: LoadState
+    oval:mil.disa.stig.linux:obj:23031002:
+      capability: scapng.collect.linux.systemdunitproperty
+      source_object_id: oval:mil.disa.stig.linux:obj:23031002
+      source_type: systemdunitproperty_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: kdump.service
+      - kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: ActiveState
   derive: {}
   predicates:
-    oval:mil.disa.stig.linux:ste:20000007:
-      source_state_id: oval:mil.disa.stig.linux:ste:20000007
-      source_type: systemdunitproperty_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      operator: AND
-      entities:
-      - kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: inactive
-      comment: null
     oval:mil.disa.stig.linux:ste:20000005:
       source_state_id: oval:mil.disa.stig.linux:ste:20000005
       source_type: systemdunitproperty_state
@@ -78,27 +67,25 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: masked
-      comment: null
+      state_title: null
+    oval:mil.disa.stig.linux:ste:20000007:
+      source_state_id: oval:mil.disa.stig.linux:ste:20000007
+      source_type: systemdunitproperty_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      operator: AND
+      entities:
+      - kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: inactive
+      state_title: null
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:23031002:
-        source_test_id: oval:mil.disa.stig.linux:tst:23031002
-        source_type: systemdunitproperty_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: kdump.service ActiveState is inactive if it exists.
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:23031002
-        predicates:
-        - oval:mil.disa.stig.linux:ste:20000007
-        source_other: []
       oval:mil.disa.stig.linux:tst:23031000:
         source_test_id: oval:mil.disa.stig.linux:tst:23031000
         source_type: systemdunitproperty_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: kdump.service LoadState is masked if it exists.
+        test_title: kdump.service LoadState is masked if it exists.
         check: all
         check_existence: any_exist
         state_operator: AND
@@ -107,11 +94,24 @@ assessment:
         predicates:
         - oval:mil.disa.stig.linux:ste:20000005
         source_other: []
+      oval:mil.disa.stig.linux:tst:23031002:
+        source_test_id: oval:mil.disa.stig.linux:tst:23031002
+        source_type: systemdunitproperty_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        test_title: kdump.service ActiveState is inactive if it exists.
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23031002
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000007
+        source_other: []
       oval:mil.disa.stig.linux:tst:23031001:
         source_test_id: oval:mil.disa.stig.linux:tst:23031001
         source_type: systemdunitproperty_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: kdump.service UnitFileState is masked if it exists.
+        test_title: kdump.service UnitFileState is masked if it exists.
         check: all
         check_existence: any_exist
         state_operator: AND
@@ -310,6 +310,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271733r1092598_rule
-    semantic_ir_sha256: 15ac63d0dfeb92627817b941eb1cdf37c10ea733cc91dd9bc593188b3ecd8b1c
+    semantic_ir_sha256: b3760984b3f5851eed8e301dfadce28149931579763201ce08c329e457ba56fd
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: cdfec2e5d74052ca0b78745783b934a52722055413ce6a380509967fd0c31de7
+  semantic_fingerprint_sha256: a305b6588b8f599604d76e1e73eae78c27fcf992433c9101a9bc738f64806ecc

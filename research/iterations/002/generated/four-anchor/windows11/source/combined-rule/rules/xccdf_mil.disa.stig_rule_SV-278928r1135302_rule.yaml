@@ -320,23 +320,10 @@ rule:
         source_type: auditeventpolicysubcategories_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:27894400:
-        source_state_id: oval:mil.disa.stig.win:ste:27894400
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: handle_manipulation
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_FAILURE
-        comment: '''Handle Manipulation'' is set to ''Failure'''
       oval:mil.disa.stig.win:ste:27894401:
         source_state_id: oval:mil.disa.stig.win:ste:27894401
         source_type: auditeventpolicysubcategories_state
@@ -349,14 +336,27 @@ rule:
           name: handle_manipulation
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
-        comment: '''Handle Manipulation'' is set to ''Success'' and ''Failure'''
+        state_title: '''Handle Manipulation'' is set to ''Success'' and ''Failure'''
+      oval:mil.disa.stig.win:ste:27894400:
+        source_state_id: oval:mil.disa.stig.win:ste:27894400
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          kind: element
+          name: handle_manipulation
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_FAILURE
+        state_title: '''Handle Manipulation'' is set to ''Failure'''
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:27894401:
           source_test_id: oval:mil.disa.stig.win:tst:27894401
           source_type: auditeventpolicysubcategories_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Audit Handle Manipulation'' is set to ''Success'' and ''Failure'''
+          test_title: '''Audit Handle Manipulation'' is set to ''Success'' and ''Failure'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -369,7 +369,7 @@ rule:
           source_test_id: oval:mil.disa.stig.win:tst:27894400
           source_type: auditeventpolicysubcategories_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Audit Handle Manipulation'' is set to ''Failure'''
+          test_title: '''Audit Handle Manipulation'' is set to ''Failure'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -379,33 +379,6 @@ rule:
           - oval:mil.disa.stig.win:ste:27894400
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:278944:
-          source_definition_id: oval:mil.disa.stig.defs:def:278944
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - Handle Manipulation - Failure only
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:27894400
-            - comment: Audit - Handle Manipulation - Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:27894401
-            comment: null
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must be configured to audit handle manipulation failures.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:278928:
           source_definition_id: oval:mil.disa.stig.windows11:def:278928
           class: compliance
@@ -441,6 +414,33 @@ rule:
                 is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected
                 behavior. Credential validation records events related to validation tests on credentials for a user account
                 logon.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:278944:
+          source_definition_id: oval:mil.disa.stig.defs:def:278944
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - Handle Manipulation - Failure only
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:27894400
+            - comment: Audit - Handle Manipulation - Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:27894401
+            comment: null
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must be configured to audit handle manipulation failures.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -561,9 +561,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278928r1135302_rule
-      semantic_ir_sha256: c1aa8ef8d2415e2e4f061dd28b6b4a675be80a43db06be2878fc63c90fe61de2
+      semantic_ir_sha256: c40774f07f78e4f83867abbc87eaa5e94409a6358ff47dcddcb1a0c44c7c8bce
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 605a66b23d7e0d900000b182c1a54807b3c1a8aa9e7ba643d20da2ab718b794d
+    semantic_fingerprint_sha256: f53b819789dd3d6bd773091c892be163e2fb5386708b51d2357dd19bb0bae652
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278928r1135302_rule

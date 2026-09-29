@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:23036700
     collect:
       capability: scapng.collect.unix.shadow
-      comment: /etc/shadow max password ages for non-system users
+      object_title: /etc/shadow max password ages for non-system users
       query:
       - attributes:
           datatype: string
@@ -35,7 +35,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:23036701
     collect:
       capability: scapng.collect.unix.password
-      comment: interactive non-anonymous users
+      object_title: interactive non-anonymous users
       query:
       - attributes:
           datatype: string
@@ -64,7 +64,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:23036702
     collect:
       capability: scapng.collect.unix.shadow
-      comment: /etc/shadow max password age for root
+      object_title: /etc/shadow max password age for root
       query:
       - attributes:
           datatype: string
@@ -79,7 +79,6 @@ assessment:
     register: oval:mil.disa.stig.unix:obj:23036702
   - name: Derive oval:mil.disa.stig.defs:var:23036700
     derive:
-      comment: Pattern to match lines starting with usernames of system users
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -150,10 +149,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:23036700
+      variable_title: Pattern to match lines starting with usernames of system users
     register: oval:mil.disa.stig.defs:var:23036700
   - name: Derive oval:mil.disa.stig.defs:var:23036701
     derive:
-      comment: anonymous UIDs
       datatype: int
       evaluation_plan:
         datatype: int
@@ -190,10 +189,10 @@ assessment:
           value: '4294967295'
       source_type: constant_variable
       source_variable_id: oval:mil.disa.stig.defs:var:23036701
+      variable_title: anonymous UIDs
     register: oval:mil.disa.stig.defs:var:23036701
   predicates:
     oval:mil.disa.stig.unix:ste:23036700:
-      comment: greater than zero
       entities:
       - attributes:
           datatype: int
@@ -206,8 +205,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:23036700
       source_type: shadow_state
+      state_title: greater than zero
     oval:mil.disa.stig.unix:ste:23036701:
-      comment: less than or equal to sixty
       entities:
       - attributes:
           datatype: int
@@ -220,8 +219,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:23036701
       source_type: shadow_state
+      state_title: less than or equal to sixty
     oval:mil.disa.stig.unix:ste:23036702:
-      comment: Lines starting with usernames of system users
       entities:
       - attributes:
           datatype: string
@@ -235,8 +234,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:23036702
       source_type: shadow_state
+      state_title: Lines starting with usernames of system users
     oval:mil.disa.stig.unix:ste:23036703:
-      comment: anonymous users
       entities:
       - attributes:
           datatype: int
@@ -250,8 +249,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:23036703
       source_type: password_state
+      state_title: anonymous users
     oval:mil.disa.stig.unix:ste:23036704:
-      comment: null
       entities:
       - attributes:
           datatype: int
@@ -264,6 +263,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:23036704
       source_type: password_state
+      state_title: null
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:230367:
@@ -334,7 +334,6 @@ assessment:
         check_existence: any_exist
         collections:
         - oval:mil.disa.stig.unix:obj:23036700
-        comment: No password in /etc/shadow has a maximum password age of 0 or greater than 60
         predicates:
         - oval:mil.disa.stig.unix:ste:23036700
         - oval:mil.disa.stig.unix:ste:23036701
@@ -343,12 +342,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.unix:tst:23036700
         source_type: shadow_test
         state_operator: AND
+        test_title: No password in /etc/shadow has a maximum password age of 0 or greater than 60
       oval:mil.disa.stig.unix:tst:23036701:
         check: all
         check_existence: all_exist
         collections:
         - oval:mil.disa.stig.unix:obj:23036702
-        comment: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
         predicates:
         - oval:mil.disa.stig.unix:ste:23036700
         - oval:mil.disa.stig.unix:ste:23036701
@@ -357,6 +356,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.unix:tst:23036701
         source_type: shadow_test
         state_operator: AND
+        test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
   source_check_context:
     check_exports: []
     checks:
@@ -481,8 +481,8 @@ assessment:
       - oval:mil.disa.stig.rhel9os:def:258042
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 5550ee304b41f9aa2dd4f06eafe269f1ab3a9ebf12e243f1731f9f81aba5985a
+    semantic_ir_sha256: 4520f2c1afd25c64407250ccb1f2a1572462c6c08efbf3fbbe365133ec6fdc97
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258042r1045133_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: ebde87104c0fadfe9a530085c01e7227b7ad0831f5eef14f84b583158fe4049b
+  semantic_fingerprint_sha256: f79e08dce06a0101817a3cb00344101d46bb3492f8a5f8f225129b59b0fe26d7

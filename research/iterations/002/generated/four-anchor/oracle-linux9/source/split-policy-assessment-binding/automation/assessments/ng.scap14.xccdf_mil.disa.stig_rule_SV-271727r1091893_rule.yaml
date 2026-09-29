@@ -13,7 +13,7 @@ assessment:
       source_type: sysctl_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: name
@@ -34,14 +34,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '0'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.unix:tst:23054800:
         source_test_id: oval:mil.disa.stig.unix:tst:23054800
         source_type: sysctl_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: user.max_user_namespaces is set to 0 in kernel
+        test_title: user.max_user_namespaces is set to 0 in kernel
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -51,6 +51,29 @@ assessment:
         - oval:mil.disa.stig.unix:ste:20000009
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:271727:
+        source_definition_id: oval:mil.disa.stig.defs:def:271727
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: user.max_user_namespaces is set to 0
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23054800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable the use of user namespaces.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271727:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271727
         class: compliance
@@ -81,29 +104,6 @@ assessment:
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: User namespaces are used primarily for Linux containers. The value "0" disallows the use of user namespaces.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:271727:
-        source_definition_id: oval:mil.disa.stig.defs:def:271727
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: user.max_user_namespaces is set to 0
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23054800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must disable the use of user namespaces.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -235,6 +235,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271727r1091893_rule
-    semantic_ir_sha256: 791ff39190da78be686ec0e3574077ecd2c976821bb3f428018a75c0f114ed42
+    semantic_ir_sha256: e6609bbb8e410d66ce749a2ad394841dc781f0dc4c8b9a9e059ccfc78a27618c
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 2acfb3b1e969b72cf596d33eb08332b08ca8fb49cb5d5ce86a7dd62c5d7c6e8a
+  semantic_fingerprint_sha256: ffa221ce0640dd45338c9c52982390df5d69edaa2f68a5d3ed77bed261388fb0

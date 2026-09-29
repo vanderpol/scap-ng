@@ -14,7 +14,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:10000100
     collect:
       capability: scapng.collect.windows.wmi57
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: namespace
@@ -32,7 +32,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25349200
     collect:
       capability: scapng.collect.windows.userright
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: userright
@@ -45,7 +45,6 @@ assessment:
     register: oval:mil.disa.stig.win:obj:25349200
   predicates:
     oval:mil.disa.stig.win:ste:10000300:
-      comment: Standalone Server
       entities:
       - attributes:
           datatype: record
@@ -64,8 +63,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:10000300
       source_type: wmi57_state
+      state_title: Standalone Server
     oval:mil.disa.stig.win:ste:10000400:
-      comment: Domain Member Server
       entities:
       - attributes:
           datatype: record
@@ -84,8 +83,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:10000400
       source_type: wmi57_state
+      state_title: Domain Member Server
     oval:mil.disa.stig.win:ste:20000033:
-      comment: null
       entities:
       - attributes:
           operation: case insensitive equals
@@ -97,8 +96,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000033
       source_type: userright_state
+      state_title: null
     oval:mil.disa.stig.win:ste:20000040:
-      comment: null
       entities:
       - attributes:
           operation: pattern match
@@ -110,8 +109,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000040
       source_type: userright_state
+      state_title: null
     oval:mil.disa.stig.win:ste:20000041:
-      comment: null
       entities:
       - attributes:
           operation: pattern match
@@ -123,6 +122,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000041
       source_type: userright_state
+      state_title: null
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:254436:
@@ -286,7 +286,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:10000100
-        comment: The system is a Windows Standalone Server
         predicates:
         - oval:mil.disa.stig.win:ste:10000300
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -294,12 +293,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:10000300
         source_type: wmi57_test
         state_operator: AND
+        test_title: The system is a Windows Standalone Server
       oval:mil.disa.stig.win:tst:10000400:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:10000100
-        comment: The system is a Windows Domain Member Server
         predicates:
         - oval:mil.disa.stig.win:ste:10000400
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -307,12 +306,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:10000400
         source_type: wmi57_test
         state_operator: AND
+        test_title: The system is a Windows Domain Member Server
       oval:mil.disa.stig.win:tst:25349202:
         check: at least one
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25349200
-        comment: Deny log on as a batch job - Domain Admins
         predicates:
         - oval:mil.disa.stig.win:ste:20000040
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -320,12 +319,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25349202
         source_type: userright_test
         state_operator: AND
+        test_title: Deny log on as a batch job - Domain Admins
       oval:mil.disa.stig.win:tst:25349203:
         check: at least one
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25349200
-        comment: Deny log on as a batch job - Enterprise Admins
         predicates:
         - oval:mil.disa.stig.win:ste:20000041
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -333,12 +332,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25349203
         source_type: userright_test
         state_operator: AND
+        test_title: Deny log on as a batch job - Enterprise Admins
       oval:mil.disa.stig.win:tst:25443601:
         check: at least one
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25349200
-        comment: Deny log on as a batch job - Guests
         predicates:
         - oval:mil.disa.stig.win:ste:20000033
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -346,6 +345,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25443601
         source_type: userright_test
         state_operator: AND
+        test_title: Deny log on as a batch job - Guests
   source_check_context:
     check_exports: []
     checks:
@@ -519,8 +519,8 @@ assessment:
       - oval:mil.disa.stig.windows2025:def:278185
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 53c077747b4e4b6e2afc57cdb9fe6596a6398df491772af1446c63962f620e30
+    semantic_ir_sha256: 4f8cb84ef3aa94731af5116a39260dfd7960768fa0796934f4ebef2310cb2d92
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278185r1182296_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: b942291d7e5dac681ec4899177ffb1c9a9fec5b5c47e7828805076ed470ad74a
+  semantic_fingerprint_sha256: 21c70ea0a6a4fd281948aa5dc66356bed19f93692769f7ee750431c1fe891331

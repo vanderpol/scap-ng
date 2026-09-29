@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:20000015
     collect:
       capability: scapng.collect.windows.registry
-      comment: System Root Directory
+      object_title: System Root Directory
       query:
       - attributes:
           datatype: string
@@ -40,7 +40,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25334100
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: Permissions of Security event log, minus those allowed. Built filepath.
+      object_title: Permissions of Security event log, minus those allowed. Built filepath.
       query:
       - children:
         - kind: object_ref
@@ -81,7 +81,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25334101
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: The Security event log. Built filepath.
+      object_title: The Security event log. Built filepath.
       query:
       - attributes:
           datatype: string
@@ -106,7 +106,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25334102
     collect:
       capability: scapng.collect.windows.registry
-      comment: path Security.evtx
+      object_title: path Security.evtx
       query:
       - attributes:
           datatype: string
@@ -134,7 +134,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25334103
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: Permissions of Security event log, minus those allowed. Strict filepath, as listed.
+      object_title: Permissions of Security event log, minus those allowed. Strict filepath, as listed.
       query:
       - children:
         - kind: object_ref
@@ -175,7 +175,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25334104
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: The Security event log. Strict filepath, as listed.
+      object_title: The Security event log. Strict filepath, as listed.
       query:
       - attributes:
           datatype: string
@@ -199,7 +199,6 @@ assessment:
     register: oval:mil.disa.stig.win:obj:25334104
   - name: Derive oval:mil.disa.stig.win:var:25334101
     derive:
-      comment: Path to Security.evtx with the SystemRoot environment variable replaced with its value.
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -275,10 +274,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.win:var:25334101
+      variable_title: Path to Security.evtx with the SystemRoot environment variable replaced with its value.
     register: oval:mil.disa.stig.win:var:25334101
   - name: Derive oval:mil.disa.stig.win:var:25334102
     derive:
-      comment: Strict path to Security.evtx.
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -338,10 +337,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.win:var:25334102
+      variable_title: Strict path to Security.evtx.
     register: oval:mil.disa.stig.win:var:25334102
   predicates:
     oval:mil.disa.stig.win:ste:20000011:
-      comment: Event Log process account. Deterministically built with respect to service name.
       entities:
       - attributes:
           datatype: string
@@ -353,8 +352,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000011
       source_type: fileeffectiverights53_state
+      state_title: Event Log process account. Deterministically built with respect to service name.
     oval:mil.disa.stig.win:ste:20000012:
-      comment: SYSTEM account.
       entities:
       - attributes:
           datatype: string
@@ -366,8 +365,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000012
       source_type: fileeffectiverights53_state
+      state_title: SYSTEM account.
     oval:mil.disa.stig.win:ste:20000013:
-      comment: Administrators account.
       entities:
       - attributes:
           datatype: string
@@ -379,8 +378,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000013
       source_type: fileeffectiverights53_state
+      state_title: Administrators account.
     oval:mil.disa.stig.win:ste:20000014:
-      comment: LOCAL SERVICE account, the owner.
       entities:
       - attributes:
           datatype: string
@@ -392,8 +391,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000014
       source_type: fileeffectiverights53_state
+      state_title: LOCAL SERVICE account, the owner.
     oval:mil.disa.stig.win:ste:20000015:
-      comment: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
       entities:
       - attributes:
           datatype: string
@@ -405,8 +404,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000015
       source_type: fileeffectiverights53_state
+      state_title: APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES account.
     oval:mil.disa.stig.win:ste:20000016:
-      comment: '%SystemRoot% environment variable.'
       entities:
       - attributes:
           datatype: string
@@ -419,6 +418,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000016
       source_type: registry_state
+      state_title: '%SystemRoot% environment variable.'
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:253341:
@@ -508,31 +508,30 @@ assessment:
         check_existence: none_exist
         collections:
         - oval:mil.disa.stig.win:obj:25334100
-        comment: The Security event log must have at least default permissions. Built Path
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         source_other: []
         source_test_id: oval:mil.disa.stig.win:tst:25334100
         source_type: fileeffectiverights53_test
         state_operator: AND
+        test_title: The Security event log must have at least default permissions. Built Path
       oval:mil.disa.stig.win:tst:25334101:
         check: all
         check_existence: none_exist
         collections:
         - oval:mil.disa.stig.win:obj:25334103
-        comment: The Security event log must have at least default permissions. Strict Path
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         source_other: []
         source_test_id: oval:mil.disa.stig.win:tst:25334101
         source_type: fileeffectiverights53_test
         state_operator: AND
+        test_title: The Security event log must have at least default permissions. Strict Path
       oval:mil.disa.stig.win:tst:25334102:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25334102
-        comment: The Security event log registry specified location must have the %SystemRoot% environment variable.
         predicates:
         - oval:mil.disa.stig.win:ste:20000016
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -540,6 +539,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25334102
         source_type: registry_test
         state_operator: AND
+        test_title: The Security event log registry specified location must have the %SystemRoot% environment variable.
   source_check_context:
     check_exports: []
     checks:
@@ -677,8 +677,8 @@ assessment:
       - oval:mil.disa.stig.windows11:def:253341
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 209e07672b03d3544458c37e7b822498d277491f043a63e636ea6708ee4cc5e2
+    semantic_ir_sha256: d4d9c541e3e3dc30b8999ee5fe3b9e0baac8ffec936d6d2b59901522a58c7ba8
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253341r958434_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 900b104ad4b02de199dd0bac2af4b04036979d2de5544d246a0d1158647856f1
+  semantic_fingerprint_sha256: 14fd94508225d71294514e12750bfb4cade86f592d466d2a0d504f2661d1bcc6

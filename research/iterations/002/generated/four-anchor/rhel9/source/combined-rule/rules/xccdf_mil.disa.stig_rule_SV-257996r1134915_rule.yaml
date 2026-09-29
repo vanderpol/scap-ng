@@ -476,13 +476,38 @@ rule:
       10 minutes of becoming unresponsive.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25799600:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25799600
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)ClientAliveInterval(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25799601:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25799601
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '2'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: path
@@ -507,38 +532,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25799600:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25799600
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)ClientAliveInterval(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:25799602:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25799602
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - children:
           - kind: object_ref
@@ -568,7 +568,7 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '600'
-        comment: null
+        state_title: null
       oval:mil.disa.stig.ind:ste:25799601:
         source_state_id: oval:mil.disa.stig.ind:ste:25799601
         source_type: textfilecontent54_state
@@ -582,14 +582,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '0'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:25799600:
           source_test_id: oval:mil.disa.stig.ind:tst:25799600
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.*:ClientAliveInterval == 600
+          test_title: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.*:ClientAliveInterval == 600
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -819,9 +819,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257996r1134915_rule
-      semantic_ir_sha256: 3c9245e9f5e9e049ce49ca99581ed8cb8fa55b4110702e7cfc4008ebb5bb3850
+      semantic_ir_sha256: 78bc5a774c6cd96f2243ed396a89f0e9dba03ed306750d8b62d95ced6649e56a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 8ebc51d4804f4e8aa3e1a9f4d8d4adbd9bf5bf2020fc98cbffd42b01af0f1182
+    semantic_fingerprint_sha256: 631cd8c8ffc42fb7fdbc326d9522f58607e8384ee44897cd7564ee2663b01f2f
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257996r1134915_rule

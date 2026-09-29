@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: hive
@@ -29,23 +29,6 @@ assessment:
         value: LDAPClientIntegrity
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:20000001:
-      source_state_id: oval:mil.disa.stig.win:ste:20000001
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_dword
-      - attributes:
-          datatype: int
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '1'
-      comment: null
     oval:mil.disa.stig.win:ste:20000002:
       source_state_id: oval:mil.disa.stig.win:ste:20000002
       source_type: registry_state
@@ -62,14 +45,31 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '2'
-      comment: null
+      state_title: null
+    oval:mil.disa.stig.win:ste:20000001:
+      source_state_id: oval:mil.disa.stig.win:ste:20000001
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '1'
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25346300:
         source_test_id: oval:mil.disa.stig.win:tst:25346300
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Network security: LDAP client signing requirements'' is set to ''Negotiate signing'' or ''Require signing'''
+        test_title: '''Network security: LDAP client signing requirements'' is set to ''Negotiate signing'' or ''Require signing'''
         check: all
         check_existence: at_least_one_exists
         state_operator: OR
@@ -80,6 +80,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000002
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253463:
+        source_definition_id: oval:mil.disa.stig.defs:def:253463
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25346300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to the required LDAP client signing level.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278226:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278226
         class: compliance
@@ -111,29 +134,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: This setting controls the signing requirements for LDAP clients. This must be set to "Negotiate signing"
               or "Require signing", depending on the environment and type of LDAP server in use.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253463:
-        source_definition_id: oval:mil.disa.stig.defs:def:253463
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25346300
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to the required LDAP client signing level.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -254,6 +254,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278226r1181384_rule
-    semantic_ir_sha256: 3189498d97b4e58d79faf8dd6ec43ea7787228de8ca78a7e343440f41387a91c
+    semantic_ir_sha256: dec2f6c432b8712487f816e900a3e31aa8811c3f289bb06601aa99d4bc1472a1
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 8afae40ae9b2fb0867b9d6d87bd545e13bd75f50d455ece860df95e8aace8df9
+  semantic_fingerprint_sha256: 66c117afe40dee679fb926f2b78bdc042d902fe8c3d7f7f66cf95fe0c60feb30

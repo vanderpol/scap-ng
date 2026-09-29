@@ -7,27 +7,13 @@ assessment:
   description: The built-in guest account must be disabled.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:20000016:
-      capability: scapng.collect.windows.sid_sid
-      source_object_id: oval:mil.disa.stig.win:obj:20000016
-      source_type: sid_sid_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: Built-in Guest SID
-      query:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: trustee_sid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: ^S-1-5-[0-9-]+-501$
     oval:mil.disa.stig.win:obj:25343300:
       capability: scapng.collect.windows.user_sid55
       source_object_id: oval:mil.disa.stig.win:obj:25343300
       source_type: user_sid55_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: Built-in Guest account
+      object_title: Built-in Guest account
       query:
       - attributes:
           datatype: string
@@ -35,12 +21,26 @@ assessment:
         kind: element
         name: user_sid
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+    oval:mil.disa.stig.win:obj:20000016:
+      capability: scapng.collect.windows.sid_sid
+      source_object_id: oval:mil.disa.stig.win:obj:20000016
+      source_type: sid_sid_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: Built-in Guest SID
+      query:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: trustee_sid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^S-1-5-[0-9-]+-501$
   derive:
     oval:mil.disa.stig.win:var:25343300:
       source_variable_id: oval:mil.disa.stig.win:var:25343300
       source_type: local_variable
       datatype: string
-      comment: Built-in Guest
+      variable_title: Built-in Guest
       semantic_ast:
         datatype: string
         expression:
@@ -90,14 +90,14 @@ assessment:
         name: enabled
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '0'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25343300:
         source_test_id: oval:mil.disa.stig.win:tst:25343300
         source_type: user_sid55_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: The built-in guest account is disabled.
+        test_title: The built-in guest account is disabled.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -289,6 +289,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253433r958504_rule
-    semantic_ir_sha256: 542c1c50b49ddc5977bb9fd1da8e92184f50716e4d222aa6df0818c0aa075e55
+    semantic_ir_sha256: 37c3635bff4ddf4502595b21acccc6aa950978808bcea16a51a8d40eb893599a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 51ccf9ff76b5ca0704d334ba75f8a409f5ac8d7ccfd844c223cfd3295b2ae82d
+  semantic_fingerprint_sha256: 97dd2c1e899c5d2b2a7b90ebd789782d6bc625967e1c17f1e9c97a26d108b99c

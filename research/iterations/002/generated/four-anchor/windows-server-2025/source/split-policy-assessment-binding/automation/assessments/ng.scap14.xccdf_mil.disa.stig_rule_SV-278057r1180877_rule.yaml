@@ -13,7 +13,7 @@ assessment:
       source_type: auditeventpolicysubcategories_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query: []
   derive: {}
   predicates:
@@ -27,7 +27,7 @@ assessment:
         name: group_membership
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
-      comment: '''Audit Group Membership'' is set to ''Success'''
+      state_title: '''Audit Group Membership'' is set to ''Success'''
     oval:mil.disa.stig.win:ste:25331401:
       source_state_id: oval:mil.disa.stig.win:ste:25331401
       source_type: auditeventpolicysubcategories_state
@@ -38,27 +38,14 @@ assessment:
         name: group_membership
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
-      comment: '''Audit Group Membership'' is set to ''Success and Failure'''
+      state_title: '''Audit Group Membership'' is set to ''Success and Failure'''
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25331401:
-        source_test_id: oval:mil.disa.stig.win:tst:25331401
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Audit - Logon/Logoff - Group Membership - Success and Failure
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25331401
-        source_other: []
       oval:mil.disa.stig.win:tst:25331400:
         source_test_id: oval:mil.disa.stig.win:tst:25331400
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Audit - Logon/Logoff - Group Membership - Success Only
+        test_title: Audit - Logon/Logoff - Group Membership - Success Only
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -67,34 +54,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25331400
         source_other: []
+      oval:mil.disa.stig.win:tst:25331401:
+        source_test_id: oval:mil.disa.stig.win:tst:25331401
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: Audit - Logon/Logoff - Group Membership - Success and Failure
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25331401
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253314:
-        source_definition_id: oval:mil.disa.stig.defs:def:253314
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Logon/Logoff - Group Membership - Success Only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25331400
-          - comment: Audit - Logon/Logoff - Group Membership - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25331401
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Logon/Logoff - Group Membership successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278057:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278057
         class: compliance
@@ -130,6 +103,33 @@ assessment:
               \ is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected\
               \ behavior.\n\n  Audit Group Membership records information related to the group membership of a user's logon\
               \ token."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253314:
+        source_definition_id: oval:mil.disa.stig.defs:def:253314
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Logon/Logoff - Group Membership - Success Only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25331400
+          - comment: Audit - Logon/Logoff - Group Membership - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25331401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Logon/Logoff - Group Membership successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -256,6 +256,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278057r1180877_rule
-    semantic_ir_sha256: 2843886b65510d9209766792ecb77cf1e1cda3b076d3827ccde41a731bd235e5
+    semantic_ir_sha256: 540dda4b6e1df1a32cb4fc429fe76573819d2a68deb43582ebc174567185fce9
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ac6f1854d052ef0a04442ed1b27b0d3c8ca0f0e807dd1300e28b41f0a7ba78c4
+  semantic_fingerprint_sha256: 6d8844c0baa195c74d60317779112e659add724e4d478f84b49b45e79efc8365

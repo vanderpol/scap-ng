@@ -7,13 +7,48 @@ assessment:
   description: OL 9 SSH server configuration file must be group-owned by root.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.unix:obj:25799900:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:25799900
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/ssh/sshd_config
+    oval:mil.disa.stig.unix:obj:25799901:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:25799901
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '2'
+      object_title: null
+      query:
+      - attributes:
+          recurse: directories
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/ssh/sshd_config.d
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
     oval:mil.disa.stig.unix:obj:25799902:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:25799902
       source_type: file_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '2'
-      comment: null
+      object_title: null
       query:
       - attributes:
           recurse: directories
@@ -31,41 +66,6 @@ assessment:
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: .*
-    oval:mil.disa.stig.unix:obj:25799900:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:25799900
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /etc/ssh/sshd_config
-    oval:mil.disa.stig.unix:obj:25799901:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:25799901
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '2'
-      comment: null
-      query:
-      - attributes:
-          recurse: directories
-          recurse_direction: down
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /etc/ssh/sshd_config.d
-      - attributes:
-          nil: 'true'
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
   derive: {}
   predicates:
     oval:mil.disa.stig.unix:ste:20000006:
@@ -80,27 +80,14 @@ assessment:
         name: group_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '0'
-      comment: group-owned by root
+      state_title: group-owned by root
   evaluate:
     tests:
-      oval:mil.disa.stig.unix:tst:25799702:
-        source_test_id: oval:mil.disa.stig.unix:tst:25799702
-        source_type: file_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: The /etc/ssh/sshd_config.d files are group-owned by root.
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.unix:obj:25799902
-        predicates:
-        - oval:mil.disa.stig.unix:ste:20000006
-        source_other: []
       oval:mil.disa.stig.unix:tst:25799701:
         source_test_id: oval:mil.disa.stig.unix:tst:25799701
         source_type: file_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: The /etc/ssh/sshd_config.d directory and sub-directories are group-owned by root.
+        test_title: The /etc/ssh/sshd_config.d directory and sub-directories are group-owned by root.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -109,11 +96,24 @@ assessment:
         predicates:
         - oval:mil.disa.stig.unix:ste:20000006
         source_other: []
+      oval:mil.disa.stig.unix:tst:25799702:
+        source_test_id: oval:mil.disa.stig.unix:tst:25799702
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        test_title: The /etc/ssh/sshd_config.d files are group-owned by root.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:25799902
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000006
+        source_other: []
       oval:mil.disa.stig.unix:tst:25799700:
         source_test_id: oval:mil.disa.stig.unix:tst:25799700
         source_type: file_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: The /etc/ssh/sshd_config file is group-owned by root.
+        test_title: The /etc/ssh/sshd_config file is group-owned by root.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -312,6 +312,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271776r1092040_rule
-    semantic_ir_sha256: 4bad0bdf5d03e227e91e4688b05e7aa7521c9451ce4612539e6a39c69ef433dd
+    semantic_ir_sha256: 5f1c693d48329add1a6392614eb8ac53a41c55dad97193f4c40ef0f2a4e9d375
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: f6cd6c6430cbf991464f6eef711b14f1033576333dcfb9dc4b7fef660a47b6be
+  semantic_fingerprint_sha256: d32de2674cbda5c494c122b18032cab6725b37b35ceff0eb69f691899ab0d6da

@@ -7,39 +7,13 @@ assessment:
   description: Run as different user must be removed from context menus.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:25335900:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25335900
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: null
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - attributes:
-          datatype: string
-        kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Classes\batfile\shell\runasuser
-      - attributes:
-          datatype: string
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SuppressionPolicy
     oval:mil.disa.stig.win:obj:25335903:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25335903
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -65,7 +39,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -91,7 +65,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -105,6 +79,32 @@ assessment:
         name: key
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SOFTWARE\Classes\cmdfile\shell\runasuser
+      - attributes:
+          datatype: string
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SuppressionPolicy
+    oval:mil.disa.stig.win:obj:25335900:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25335900
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Classes\batfile\shell\runasuser
       - attributes:
           datatype: string
         kind: element
@@ -130,40 +130,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '4096'
-      comment: Reg_Dword type and value equals 4096
+      state_title: Reg_Dword type and value equals 4096
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25335902:
-        source_test_id: oval:mil.disa.stig.win:tst:25335902
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (exefile)'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25335902
-        predicates:
-        - oval:mil.disa.stig.win:ste:25335900
-        source_other: []
-      oval:mil.disa.stig.win:tst:25335900:
-        source_test_id: oval:mil.disa.stig.win:tst:25335900
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (batfile)'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25335900
-        predicates:
-        - oval:mil.disa.stig.win:ste:25335900
-        source_other: []
       oval:mil.disa.stig.win:tst:25335901:
         source_test_id: oval:mil.disa.stig.win:tst:25335901
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (cmdfile)'
+        test_title: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (cmdfile)'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -172,11 +146,37 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25335900
         source_other: []
+      oval:mil.disa.stig.win:tst:25335900:
+        source_test_id: oval:mil.disa.stig.win:tst:25335900
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (batfile)'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25335900
+        predicates:
+        - oval:mil.disa.stig.win:ste:25335900
+        source_other: []
+      oval:mil.disa.stig.win:tst:25335902:
+        source_test_id: oval:mil.disa.stig.win:tst:25335902
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (exefile)'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25335902
+        predicates:
+        - oval:mil.disa.stig.win:ste:25335900
+        source_other: []
       oval:mil.disa.stig.win:tst:25335903:
         source_test_id: oval:mil.disa.stig.win:tst:25335903
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (mscfile)'
+        test_title: '''Remove ''Run as Different User'' from context menus'' is set to ''Enabled'' (mscfile)'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -186,40 +186,6 @@ assessment:
         - oval:mil.disa.stig.win:ste:25335900
         source_other: []
     definitions:
-      oval:mil.disa.stig.windows11:def:253359:
-        source_definition_id: oval:mil.disa.stig.windows11:def:253359
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:253359
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: WN11-CC-000039 - Run as different user must be removed from context menus.
-          - attributes:
-              family: windows
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Microsoft Windows 11
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The "Run as different user" selection from context menus allows the use of credentials other than the currently
-              logged on user. Using privileged credentials in a standard user session can expose those credentials to theft.
-              Removing this option from context menus helps prevent this from occurring.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:253359:
         source_definition_id: oval:mil.disa.stig.defs:def:253359
         class: compliance
@@ -253,6 +219,40 @@ assessment:
             text: Run as different user must be removed from context menus.
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.windows11:def:253359:
+        source_definition_id: oval:mil.disa.stig.windows11:def:253359
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253359
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN11-CC-000039 - Run as different user must be removed from context menus.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows 11
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Run as different user" selection from context menus allows the use of credentials other than the currently
+              logged on user. Using privileged credentials in a standard user session can expose those credentials to theft.
+              Removing this option from context menus helps prevent this from occurring.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -376,6 +376,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253359r958478_rule
-    semantic_ir_sha256: fd52449ed6bde613b639675bfaabfd6044beffbc36b893eec1c2f4d9b0b7d179
+    semantic_ir_sha256: c4024c11f8476cfcd666518e373963b3b4133dbadb39f26c0594d7c48b6c478d
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 52cbdc7a0e82140cc04b904371ce8ce2c4ce46fbf2b0659e14154ff880e17482
+  semantic_fingerprint_sha256: b216d8ff58446538d66525786d927b7fdcdad8849ca30f14127ccec71d6c4317

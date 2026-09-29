@@ -8,7 +8,7 @@ assessment:
   collect:
     oval:mil.disa.stig.unix:obj:20000016:
       capability: scapng.collect.unix.password
-      comment: Users with an username
+      object_title: Users with an username
       query:
       - attributes:
           datatype: string
@@ -23,7 +23,7 @@ assessment:
       version: '1'
     oval:mil.disa.stig.unix:obj:23032500:
       capability: scapng.collect.unix.file
-      comment: local initialization files of non-system users.
+      object_title: local initialization files of non-system users.
       query:
       - attributes:
           max_depth: '1'
@@ -54,7 +54,7 @@ assessment:
       version: '4'
     oval:mil.disa.stig.unix:obj:23032501:
       capability: scapng.collect.unix.file
-      comment: local initialization files of root user.
+      object_title: local initialization files of root user.
       query:
       - attributes:
           max_depth: '1'
@@ -85,7 +85,7 @@ assessment:
       version: '4'
     oval:mil.disa.stig.unix:obj:23032502:
       capability: scapng.collect.unix.password
-      comment: only non-system users (uid>999) home-dirs excluding root directory
+      object_title: only non-system users (uid>999) home-dirs excluding root directory
       query:
       - children:
         - kind: object_ref
@@ -112,7 +112,7 @@ assessment:
       version: '1'
     oval:mil.disa.stig.unix:obj:23032503:
       capability: scapng.collect.unix.password
-      comment: only root users (uid=0) home-dirs excluding root directory
+      object_title: only root users (uid=0) home-dirs excluding root directory
       query:
       - children:
         - kind: object_ref
@@ -139,7 +139,6 @@ assessment:
       version: '1'
   derive:
     oval:mil.disa.stig.defs:var:23032500:
-      comment: The home directories of non-system users.
       datatype: string
       evaluation_plan:
         datatype: string
@@ -179,8 +178,8 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:23032500
+      variable_title: The home directories of non-system users.
     oval:mil.disa.stig.defs:var:23032501:
-      comment: The home directory of the root user.
       datatype: string
       evaluation_plan:
         datatype: string
@@ -220,6 +219,7 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:23032501
+      variable_title: The home directory of the root user.
   description: OL 9 local initialization files must have mode 0740 or less permissive.
   evaluate:
     definitions:
@@ -289,7 +289,6 @@ assessment:
         check_existence: any_exist
         collections:
         - oval:mil.disa.stig.unix:obj:23032500
-        comment: Local initialization files for non-system users have mode 0740 or less permissive.
         predicates:
         - oval:mil.disa.stig.unix:ste:20000020
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -297,12 +296,12 @@ assessment:
         source_test_id: oval:mil.disa.stig.unix:tst:23032500
         source_type: file_test
         state_operator: AND
+        test_title: Local initialization files for non-system users have mode 0740 or less permissive.
       oval:mil.disa.stig.unix:tst:23032501:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.unix:obj:23032501
-        comment: Local initialization files for root have mode 0740 or less permissive.
         predicates:
         - oval:mil.disa.stig.unix:ste:20000020
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -310,6 +309,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.unix:tst:23032501
         source_type: file_test
         state_operator: AND
+        test_title: Local initialization files for root have mode 0740 or less permissive.
   id: ng.shared.0f1028aecbfc5f572561a700
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
@@ -318,7 +318,6 @@ assessment:
     reuse_scope: cross-benchmark-exact-semantic-equivalence
   predicates:
     oval:mil.disa.stig.unix:ste:20000017:
-      comment: only uids < 1000
       entities:
       - attributes:
           datatype: int
@@ -332,8 +331,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000017
       source_type: password_state
+      state_title: only uids < 1000
     oval:mil.disa.stig.unix:ste:20000018:
-      comment: only uids > 0
       entities:
       - attributes:
           datatype: int
@@ -347,8 +346,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000018
       source_type: password_state
+      state_title: only uids > 0
     oval:mil.disa.stig.unix:ste:20000020:
-      comment: mode 0740 or less permissive
       entities:
       - attributes:
           datatype: boolean
@@ -402,8 +401,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000020
       source_type: file_state
+      state_title: mode 0740 or less permissive
     oval:mil.disa.stig.unix:ste:20000021:
-      comment: null
       entities:
       - kind: element
         name: type
@@ -413,8 +412,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000021
       source_type: file_state
+      state_title: null
     oval:mil.disa.stig.unix:ste:23032500:
-      comment: root directory
       entities:
       - kind: element
         name: home_dir
@@ -424,6 +423,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:23032500
       source_type: password_state
+      state_title: root directory
   semantic_model: scap-ng-generic-assessment-graph-0.1
   source_result_algebra: xccdf-1.2-complex-check-eight-state
   version: 1

@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '2'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -54,14 +54,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25345400:
         source_test_id: oval:mil.disa.stig.win:tst:25345400
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Network access: Do not allow anonymous enumeration of SAM accounts and shares'' is set to ''Enabled'''
+        test_title: '''Network access: Do not allow anonymous enumeration of SAM accounts and shares'' is set to ''Enabled'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -71,6 +71,30 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253454:
+        source_definition_id: oval:mil.disa.stig.defs:def:253454
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: 'Verifies ''Network access: Do not allow anonymous enumeration of SAM accounts and shares'' is set to
+              ''Enabled'''
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25345400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Anonymous enumeration of shares must be restricted.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278217:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278217
         class: compliance
@@ -102,30 +126,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Allowing anonymous logon users (null session connections) to list all account names and enumerate all shared
               resources can provide a map of potential points to attack the system.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253454:
-        source_definition_id: oval:mil.disa.stig.defs:def:253454
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: 'Verifies ''Network access: Do not allow anonymous enumeration of SAM accounts and shares'' is set to
-              ''Enabled'''
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25345400
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Anonymous enumeration of shares must be restricted.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -246,6 +246,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278217r1181357_rule
-    semantic_ir_sha256: 46b7d0ef21dac3d35ce422f5f296aaf3d2d812d317f26daf6857e42141bc9d1b
+    semantic_ir_sha256: d08ea59883a508911a4ce3587e39584e1ad2a1ad95c3e8c69dcec9bfb8f6fada
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 876731fd45dcb58c191e0af65f26dddc994e20daac03902f2631539331822299
+  semantic_fingerprint_sha256: 41be841efbbd215c59d70c096a757ab9ea6dc2fca8e150f3fc5fc940dcdcb96f

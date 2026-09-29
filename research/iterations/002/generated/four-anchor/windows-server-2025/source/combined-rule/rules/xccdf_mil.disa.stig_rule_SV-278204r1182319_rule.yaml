@@ -355,7 +355,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: hive
@@ -371,24 +371,6 @@ rule:
           value: MaximumPasswordAge
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25344200:
-        source_state_id: oval:mil.disa.stig.win:ste:25344200
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_dword
-        - attributes:
-            datatype: int
-            operation: greater than
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '0'
-        comment: null
       oval:mil.disa.stig.win:ste:25344201:
         source_state_id: oval:mil.disa.stig.win:ste:25344201
         source_type: registry_state
@@ -406,14 +388,32 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '30'
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.win:ste:25344200:
+        source_state_id: oval:mil.disa.stig.win:ste:25344200
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_dword
+        - attributes:
+            datatype: int
+            operation: greater than
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '0'
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25344200:
           source_test_id: oval:mil.disa.stig.win:tst:25344200
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Domain member: Maximum machine account password age'' is set to 30 or less (but not 0).'
+          test_title: '''Domain member: Maximum machine account password age'' is set to 30 or less (but not 0).'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -424,29 +424,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25344201
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253442:
-          source_definition_id: oval:mil.disa.stig.defs:def:253442
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25344200
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The maximum age for machine account passwords must be configured to 30 days or less.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278204:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278204
           class: compliance
@@ -480,6 +457,29 @@ rule:
               text: Computer account passwords are changed automatically on a regular basis. This setting controls the maximum
                 password age that a machine account may have. This must be set to no more than 30 days, ensuring the machine
                 changes its password monthly.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253442:
+          source_definition_id: oval:mil.disa.stig.defs:def:253442
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25344200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The maximum age for machine account passwords must be configured to 30 days or less.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -604,9 +604,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278204r1182319_rule
-      semantic_ir_sha256: 7bf5f0f132432796edf90ed4dbd6bc0b14ccdfd2353a74915d3b4d3adb035d97
+      semantic_ir_sha256: 395b56ad89f800739b444aa92cc26c7e9a5f1ad9a99f1e6d8f97fb935343e963
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 9b1d4f75af0fb971acd1052f92bd0459e5250d475748310b5e208e3b3d1a5ed0
+    semantic_fingerprint_sha256: 999e04754ea29cbda28752b71eba9c295683e46b5ce4d4a1dd80b8dfac910d40
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278204r1182319_rule

@@ -8,38 +8,13 @@ assessment:
     execution of authorized software programs.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:27018000:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:27018000
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/fapolicyd/fapolicyd.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*permissive\s*=\s*(\d+)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:27018001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:27018001
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '2'
-      comment: The last non-whitespace line of /etc/fapolicyd/compiled.rules
+      object_title: The last non-whitespace line of /etc/fapolicyd/compiled.rules
       query:
       - attributes:
           multiline: 'false'
@@ -63,8 +38,46 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:27018000:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:27018000
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/fapolicyd/fapolicyd.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*permissive\s*=\s*(\d+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
+    oval:mil.disa.stig.ind:ste:27018000:
+      source_state_id: oval:mil.disa.stig.ind:ste:27018000
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?:^|\n)(?:deny|deny_log|deny_audit)[ \t]+perm=any[ \t]+all[ \t]+:[ \t]+all(?:$|\n)
+      state_title: null
     oval:mil.disa.stig.ind:ste:20000002:
       source_state_id: oval:mil.disa.stig.ind:ste:20000002
       source_type: textfilecontent54_state
@@ -78,40 +91,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '0'
-      comment: null
-    oval:mil.disa.stig.ind:ste:27018000:
-      source_state_id: oval:mil.disa.stig.ind:ste:27018000
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: (?:^|\n)(?:deny|deny_log|deny_audit)[ \t]+perm=any[ \t]+all[ \t]+:[ \t]+all(?:$|\n)
-      comment: null
+      state_title: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:27018001:
-        source_test_id: oval:mil.disa.stig.ind:tst:27018001
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: '/etc/fapolicyd/compiled.rules: deny all'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:27018001
-        predicates:
-        - oval:mil.disa.stig.ind:ste:27018000
-        source_other: []
       oval:mil.disa.stig.ind:tst:27018000:
         source_test_id: oval:mil.disa.stig.ind:tst:27018000
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: '/etc/fapolicyd/fapolicyd.conf: permissive = 0'
+        test_title: '/etc/fapolicyd/fapolicyd.conf: permissive = 0'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -120,7 +107,48 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:20000002
         source_other: []
+      oval:mil.disa.stig.ind:tst:27018001:
+        source_test_id: oval:mil.disa.stig.ind:tst:27018001
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: '/etc/fapolicyd/compiled.rules: deny all'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:27018001
+        predicates:
+        - oval:mil.disa.stig.ind:ste:27018000
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:270180:
+        source_definition_id: oval:mil.disa.stig.defs:def:270180
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: '/etc/fapolicyd/fapolicyd.conf: permissive = 0'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:27018000
+          - comment: '/etc/fapolicyd/compiled.rules: deny all'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:27018001
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system fapolicy module must be configured to employ a deny-all, permit-by-exception policy
+              to allow the execution of authorized software programs.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:270180:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:270180
         class: compliance
@@ -175,34 +203,6 @@ assessment:
 
 
               Satisfies: SRG-OS-000368-GPOS-00154, SRG-OS-000370-GPOS-00155, SRG-OS-000480-GPOS-00232'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:270180:
-        source_definition_id: oval:mil.disa.stig.defs:def:270180
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: '/etc/fapolicyd/fapolicyd.conf: permissive = 0'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:27018000
-          - comment: '/etc/fapolicyd/compiled.rules: deny all'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:27018001
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system fapolicy module must be configured to employ a deny-all, permit-by-exception policy
-              to allow the execution of authorized software programs.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -358,6 +358,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-270180r1184327_rule
-    semantic_ir_sha256: fd4cc8f68e82a8f62f80077d74a2aba18c5f60578b09d03b0a28a6d26a432ef4
+    semantic_ir_sha256: d15cf4a64272ea33aa9af524876db257b0abe7deaa616aa98678b1e3a0706072
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 9220ce2168948dc016ed8d20c8da1df71126b12e000e82fd0ffad7b7a2773d73
+  semantic_fingerprint_sha256: eaeadaabfb3738c3f659cff2c478163cf0a740fc03e911a0905da69cf1667a78

@@ -402,7 +402,7 @@ rule:
         source_type: userright_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: userright
@@ -422,7 +422,7 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ^(?i)(.+\\)?Enterprise Admins$
-        comment: null
+        state_title: null
       oval:mil.disa.stig.win:ste:20000040:
         source_state_id: oval:mil.disa.stig.win:ste:20000040
         source_type: userright_state
@@ -435,14 +435,14 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ^(?i)(.+\\)?Domain Admins$
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25349303:
           source_test_id: oval:mil.disa.stig.win:tst:25349303
           source_type: userright_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Deny log on as a service - Enterprise Admins
+          test_title: Deny log on as a service - Enterprise Admins
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -455,7 +455,7 @@ rule:
           source_test_id: oval:mil.disa.stig.win:tst:25349302
           source_type: userright_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Deny log on as a service - Domain Admins
+          test_title: Deny log on as a service - Domain Admins
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -465,6 +465,34 @@ rule:
           - oval:mil.disa.stig.win:ste:20000040
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253493:
+          source_definition_id: oval:mil.disa.stig.defs:def:253493
+          class: compliance
+          version: '7'
+          criteria:
+            children:
+            - comment: Deny log on as a service - Domain Admins
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349302
+            - comment: Deny log on as a service - Enterprise Admins
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349303
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Deny log on as a service" user right on Windows domain-joined systems must be configured to prevent
+                access from highly privileged domain accounts.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253493:
           source_definition_id: oval:mil.disa.stig.windows11:def:253493
           class: compliance
@@ -507,34 +535,6 @@ rule:
 
 
                 Incorrect configurations could prevent services from starting and result in a DoS.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253493:
-          source_definition_id: oval:mil.disa.stig.defs:def:253493
-          class: compliance
-          version: '7'
-          criteria:
-            children:
-            - comment: Deny log on as a service - Domain Admins
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25349302
-            - comment: Deny log on as a service - Enterprise Admins
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25349303
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Deny log on as a service" user right on Windows domain-joined systems must be configured to prevent
-                access from highly privileged domain accounts.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -675,9 +675,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253493r1137691_rule
-      semantic_ir_sha256: 81ba58d6502abd9e1cdb7fc43d8d7e0a8af39f5263e75beb1877e05e563dc31f
+      semantic_ir_sha256: 3052b6f486d079974113f9f535789c53376d64ca7fcfdbae26360fdf11559695
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 0fc04300a76fccb2c01a738a13f8ecdf19396364a5d1ba6ad4aa8cd9f8e92366
+    semantic_fingerprint_sha256: b168a830fc56bf74a0f16accb82981517d1a83476bcb50a2f8a0a66d86bf7ff6
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253493r1137691_rule

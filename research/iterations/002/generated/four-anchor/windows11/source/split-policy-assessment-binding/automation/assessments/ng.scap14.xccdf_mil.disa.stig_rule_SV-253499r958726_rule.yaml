@@ -13,7 +13,7 @@ assessment:
       source_type: userright_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: userright
@@ -30,7 +30,7 @@ assessment:
       - kind: element
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: null
+      state_title: null
     oval:mil.disa.stig.win:ste:20000030:
       source_state_id: oval:mil.disa.stig.win:ste:20000030
       source_type: userright_state
@@ -43,14 +43,14 @@ assessment:
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: Administrators
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25349901:
         source_test_id: oval:mil.disa.stig.win:tst:25349901
         source_type: userright_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Load and unload device drivers - Administrators
+        test_title: Load and unload device drivers - Administrators
         check: all
         check_existence: at_least_one_exists
         state_operator: OR
@@ -61,6 +61,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000030
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253499:
+        source_definition_id: oval:mil.disa.stig.defs:def:253499
+        class: compliance
+        version: '4'
+        criteria:
+          children:
+          - comment: Load and unload device drivers - Administrators
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25349901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Load and unload device drivers" user right must only be assigned to the Administrators group.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253499:
         source_definition_id: oval:mil.disa.stig.windows11:def:253499
         class: compliance
@@ -96,29 +119,6 @@ assessment:
 
               The "Load and unload device drivers" user right allows device drivers to dynamically be loaded on a system by
               a user. This could potentially be used to install malicious code by an attacker.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253499:
-        source_definition_id: oval:mil.disa.stig.defs:def:253499
-        class: compliance
-        version: '4'
-        criteria:
-          children:
-          - comment: Load and unload device drivers - Administrators
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25349901
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The "Load and unload device drivers" user right must only be assigned to the Administrators group.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -251,6 +251,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253499r958726_rule
-    semantic_ir_sha256: ff2456f41320e8914ce2bdd994577fec9740419c42cbc2f5b501207bc1410269
+    semantic_ir_sha256: 24e798a12b2e6a9de59131906b74a1fa7bb00d9322f038267cbbe42c0b38aaa9
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: b4a2865a27b7e2c26e777590371f1c62aeaa4f876b0845f5cc8582794f9f9491
+  semantic_fingerprint_sha256: 78d0f2b0409dbfde28ed26766e99d7ea77762039f8c7892ddfd29f3543a30291

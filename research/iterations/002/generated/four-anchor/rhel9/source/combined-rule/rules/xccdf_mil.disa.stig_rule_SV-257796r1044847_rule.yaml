@@ -414,13 +414,38 @@ rule:
     description: RHEL 9 must enable auditing of processes that start prior to the audit daemon.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25779301:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25779301
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: /etc/default/grub GRUB_CMDLINE_LINUX
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/default/grub
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^GRUB_CMDLINE_LINUX="(.*)"
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25779300:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25779300
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: BLS options
+        object_title: BLS options
         query:
         - kind: element
           name: path
@@ -445,31 +470,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25779301:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25779301
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: /etc/default/grub GRUB_CMDLINE_LINUX
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/default/grub
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^GRUB_CMDLINE_LINUX="(.*)"
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23046800:
@@ -484,14 +484,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (^|\s)audit=1(\s|$)
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23046800:
           source_test_id: oval:mil.disa.stig.ind:tst:23046800
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: BLS options contain audit=1
+          test_title: BLS options contain audit=1
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -504,7 +504,7 @@ rule:
           source_test_id: oval:mil.disa.stig.ind:tst:23046801
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain audit=1
+          test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain audit=1
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -514,33 +514,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:23046800
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230468:
-          source_definition_id: oval:mil.disa.stig.defs:def:230468
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23046800
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23046801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must enable auditing of processes that start prior to the audit daemon.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257796:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257796
           class: compliance
@@ -581,6 +554,33 @@ rule:
 
                 Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000042-GPOS-00020, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172,
                 SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215, SRG-OS-000473-GPOS-00218, SRG-OS-000254-GPOS-00095'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230468:
+          source_definition_id: oval:mil.disa.stig.defs:def:230468
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23046800
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23046801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must enable auditing of processes that start prior to the audit daemon.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -705,9 +705,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257796r1044847_rule
-      semantic_ir_sha256: 96c2041b2aeb03b2a9e17b21f6f8e8b48e71ef0b1f8f79ed4ada5613de8d65bb
+      semantic_ir_sha256: 710dc2402bd6aad3d0d4e00933272669939ea909f724399367a6fab4f0cb58de
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 0b07556bc517d0d00e627bae42052b595fda789028c6c810ce60068e4835e3af
+    semantic_fingerprint_sha256: 8f54c67657abe4b59c5664b9385bbe9e2f63aacefabe5b356b306aab9f1d2a49
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257796r1044847_rule

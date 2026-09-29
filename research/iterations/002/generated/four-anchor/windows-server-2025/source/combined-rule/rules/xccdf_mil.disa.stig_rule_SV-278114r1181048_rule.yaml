@@ -352,7 +352,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: hive
@@ -384,14 +384,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25340400:
           source_test_id: oval:mil.disa.stig.win:tst:25340400
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Always prompt for password upon connection'' is set to ''Enabled'''
+          test_title: '''Always prompt for password upon connection'' is set to ''Enabled'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -401,6 +401,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253404:
+          source_definition_id: oval:mil.disa.stig.defs:def:253404
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25340400
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Remote Desktop Services must always prompt a client for passwords upon connection.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278114:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278114
           class: compliance
@@ -434,29 +457,6 @@ rule:
               text: "This setting controls the ability of users to supply passwords automatically as part of their remote\
                 \ desktop connection. Disabling this setting would allow anyone to use the stored credentials in a connection\
                 \ item to connect to the terminal server.\n\n  Satisfies: SRG-OS-000373-GPOS-00156, SRG-OS-000373-GPOS-00157"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253404:
-          source_definition_id: oval:mil.disa.stig.defs:def:253404
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25340400
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Remote Desktop Services must always prompt a client for passwords upon connection.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -588,9 +588,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278114r1181048_rule
-      semantic_ir_sha256: 21ea136c438866b18d12c33e87b9c2f08335b8d3a333dc2f0f82f1e9aebf5d67
+      semantic_ir_sha256: beef9cea15426a97c6ff6b4fbf8a337ba38ff792fcd617193b0f68f7e304c785
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: ab0db0f968b9ea0369c630c179337e5ab8ffb64292e473479cac7f7c097de157
+    semantic_fingerprint_sha256: 8529d454ff091f043372a76170853af13ff23ba990427ddfb354053f16353748
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278114r1181048_rule

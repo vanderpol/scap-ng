@@ -13,7 +13,7 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '5'
-      comment: 'Retrieve configuration from file: /etc/pam.d/system-auth.'
+      object_title: 'Retrieve configuration from file: /etc/pam.d/system-auth.'
       query:
       - attributes:
           ignore_case: 'false'
@@ -41,45 +41,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183703:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183703
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \n\s*account\s+required\s+pam_faillock.so\b
-      comment: Check that account required pam_faillock.so line exists.
-    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
-      comment: Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
-    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth\b
-      comment: Check that auth required pam_faillock.so preath line exists.
     oval:navy.navwar.niwcatlantic.scc.linux:ste:27183702:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183702
       source_type: textfilecontent54_state
@@ -92,14 +53,53 @@ assessment:
         name: text
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: \n\s*auth\s+required\s+pam_faillock.so\s+authfail\b
-      comment: Check that auth required pam_faillock.so authfail line exists.
+      state_title: Check that auth required pam_faillock.so authfail line exists.
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183701
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth\b
+      state_title: Check that auth required pam_faillock.so preath line exists.
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183703:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183703
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*account\s+required\s+pam_faillock.so\b
+      state_title: Check that account required pam_faillock.so line exists.
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183704
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
+      state_title: Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
   evaluate:
     tests:
       oval:navy.navwar.niwcatlantic.scc.linux:tst:27183701:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27183701
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Verify the pam_faillock.so module is present in the '/etc/pam.d/system-auth' file.
+        test_title: Verify the pam_faillock.so module is present in the '/etc/pam.d/system-auth' file.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -269,6 +269,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271837r1092223_rule
-    semantic_ir_sha256: 273278a282010dd313e60f3d24a2b14c5d26d41057a153199768669adc3f71ad
+    semantic_ir_sha256: 5670c90a58b2dda8c2e1d31ad505bd94b95acc817e90ab76161d4eecd7e82ac3
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 168b6a34eaf8aada12f11052b6f89e10b6a7315f572ea621ed3d6c0288c1d9eb
+  semantic_fingerprint_sha256: 9912c2dd10d8c232a808816f4834ba2139053a27a19db671362376cf293d3b7d

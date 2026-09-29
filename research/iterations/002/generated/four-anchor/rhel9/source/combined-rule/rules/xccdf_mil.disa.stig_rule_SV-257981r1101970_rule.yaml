@@ -455,13 +455,38 @@ rule:
       access to the system via a SSH logon.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25798100:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25798100
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: Pull value of /etc/ssh/sshd_config:banner
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)banner(?-i)[ \t\"]+([\w\/]+)[\"\s]*(?:|(?:#.*))?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25798105:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25798105
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: all sshd_config and sshd_config.d/* files
+        object_title: all sshd_config and sshd_config.d/* files
         query:
         - children:
           - kind: object_ref
@@ -476,18 +501,24 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
-      oval:mil.disa.stig.ind:obj:25798103:
+      oval:mil.disa.stig.ind:obj:25798104:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25798103
+        source_object_id: oval:mil.disa.stig.ind:obj:25798104
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Pull value of /etc/ssh/sshd_config:banner
+        object_title: Pull value of /etc/ssh/sshd_config.d:banner
         query:
         - kind: element
-          name: filepath
+          name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
+          value: /etc/ssh/sshd_config.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: .+
         - attributes:
             operation: pattern match
           kind: element
@@ -507,7 +538,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Pull value of /etc/ssh/sshd_config.d:banner
+        object_title: Pull value of /etc/ssh/sshd_config.d:banner
         query:
         - kind: element
           name: path
@@ -532,13 +563,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25798100:
+      oval:mil.disa.stig.ind:obj:25798103:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25798100
+        source_object_id: oval:mil.disa.stig.ind:obj:25798103
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: Pull value of /etc/ssh/sshd_config:banner
+        object_title: Pull value of /etc/ssh/sshd_config:banner
         query:
         - kind: element
           name: filepath
@@ -549,7 +580,7 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)banner(?-i)[ \t\"]+([\w\/]+)[\"\s]*(?:|(?:#.*))?$
+          value: ^\s*(?i)banner(?-i)[ \t]*(?:none[\s]*|(?:#.*))?$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -563,7 +594,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: all sshd_config and sshd_config.d/* files
+        object_title: all sshd_config and sshd_config.d/* files
         query:
         - children:
           - kind: object_ref
@@ -578,37 +609,6 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
-      oval:mil.disa.stig.ind:obj:25798104:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25798104
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: Pull value of /etc/ssh/sshd_config.d:banner
-        query:
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config.d
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: .+
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)banner(?-i)[ \t]*(?:none[\s]*|(?:#.*))?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:25798100:
@@ -624,26 +624,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\/.+$
-        comment: banner value is set to /etc/issue
+        state_title: banner value is set to /etc/issue
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:25798101:
-          source_test_id: oval:mil.disa.stig.ind:tst:25798101
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/ssh/sshd_config:banner == none
-          check: all
-          check_existence: none_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25798105
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:25798100:
           source_test_id: oval:mil.disa.stig.ind:tst:25798100
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/ssh/sshd_config:banner == /etc/issue
+          test_title: /etc/ssh/sshd_config:banner == /etc/issue
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -651,6 +639,18 @@ rule:
           - oval:mil.disa.stig.ind:obj:25798102
           predicates:
           - oval:mil.disa.stig.ind:ste:25798100
+          source_other: []
+        oval:mil.disa.stig.ind:tst:25798101:
+          source_test_id: oval:mil.disa.stig.ind:tst:25798101
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /etc/ssh/sshd_config:banner == none
+          check: all
+          check_existence: none_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25798105
+          predicates: []
           source_other: []
       definitions:
         oval:mil.disa.stig.rhel9os:def:257981:
@@ -856,9 +856,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257981r1101970_rule
-      semantic_ir_sha256: b2e12507f374531c5ac4c85f05e669e069e2c10197e4c937ed059dfacc840a3d
+      semantic_ir_sha256: 6f6c6a114384ebd366c43bf7da38f8cceac0576e92813e1f51ad4922e8ab5152
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 8607e378b89567d77439def1957cde7e46b2936f02460ce663abfb431484d228
+    semantic_fingerprint_sha256: de6c46dad0f29d164d2ffd37e3e55b3bab6a5c3c0daca884c757b30e4cdd07dc
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257981r1101970_rule

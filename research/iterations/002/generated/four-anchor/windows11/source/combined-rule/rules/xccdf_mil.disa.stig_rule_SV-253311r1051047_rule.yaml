@@ -351,7 +351,7 @@ rule:
         source_type: auditeventpolicysubcategories_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query: []
     derive: {}
     predicates:
@@ -365,7 +365,7 @@ rule:
           name: pnp_activity
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS
-        comment: '''Plug and Play Events'' is set to ''Success'''
+        state_title: '''Plug and Play Events'' is set to ''Success'''
       oval:mil.disa.stig.win:ste:25331101:
         source_state_id: oval:mil.disa.stig.win:ste:25331101
         source_type: auditeventpolicysubcategories_state
@@ -376,27 +376,14 @@ rule:
           name: pnp_activity
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_SUCCESS_FAILURE
-        comment: '''Plug and Play Events'' is set to ''Success and Failure'''
+        state_title: '''Plug and Play Events'' is set to ''Success and Failure'''
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25331100:
-          source_test_id: oval:mil.disa.stig.win:tst:25331100
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Audit - Detailed Tracking - PNP Activity - Success Only
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:25331100
-          source_other: []
         oval:mil.disa.stig.win:tst:25331101:
           source_test_id: oval:mil.disa.stig.win:tst:25331101
           source_type: auditeventpolicysubcategories_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Audit - Detailed Tracking - PNP Activity - Success and Failure
+          test_title: Audit - Detailed Tracking - PNP Activity - Success and Failure
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -405,7 +392,47 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25331101
           source_other: []
+        oval:mil.disa.stig.win:tst:25331100:
+          source_test_id: oval:mil.disa.stig.win:tst:25331100
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Audit - Detailed Tracking - PNP Activity - Success Only
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:25331100
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253311:
+          source_definition_id: oval:mil.disa.stig.defs:def:253311
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: Audit - Detailed Tracking - PNP Activity - Success Only
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25331100
+            - comment: Audit - Detailed Tracking - PNP Activity - Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25331101
+            comment: null
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system must be configured to audit Detailed Tracking - PNP Activity successes.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253311:
           source_definition_id: oval:mil.disa.stig.windows11:def:253311
           class: compliance
@@ -443,33 +470,6 @@ rule:
 
 
                 Plug and Play activity records events related to the successful connection of external devices.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253311:
-          source_definition_id: oval:mil.disa.stig.defs:def:253311
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: Audit - Detailed Tracking - PNP Activity - Success Only
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25331100
-            - comment: Audit - Detailed Tracking - PNP Activity - Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25331101
-            comment: null
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system must be configured to audit Detailed Tracking - PNP Activity successes.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -595,9 +595,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253311r1051047_rule
-      semantic_ir_sha256: 5ae72ad67aae0e606288b4162d98d60eca228644a6039526d5c046e55d652eeb
+      semantic_ir_sha256: 72a78b686e0b6c7ef3867129b2952e74211564386e633037736d709a50cd48be
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 139180328b56e1d89123956a8a877004fc01a2f13b904ed7ca4e30d029a8dd8e
+    semantic_fingerprint_sha256: 9ae7c86b2193f9d5509eb06515242e188caccf1e4cee413e26962145fd9d4956
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253311r1051047_rule

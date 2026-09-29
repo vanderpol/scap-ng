@@ -13,7 +13,7 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: path
@@ -40,20 +40,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23026400:
-      source_state_id: oval:mil.disa.stig.ind:ste:23026400
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
-      comment: null
     oval:mil.disa.stig.ind:ste:23026401:
       source_state_id: oval:mil.disa.stig.ind:ste:23026401
       source_type: textfilecontent54_state
@@ -67,27 +53,28 @@ assessment:
         name: text
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: \n\s*gpgcheck\s*=\s*(False|0|no)\s*(\n|$)
-      comment: null
+      state_title: null
+    oval:mil.disa.stig.ind:ste:23026400:
+      source_state_id: oval:mil.disa.stig.ind:ste:23026400
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
+      state_title: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23026401:
-        source_test_id: oval:mil.disa.stig.ind:tst:23026401
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 0.
-        check: none satisfy
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23026400
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23026401
-        source_other: []
       oval:mil.disa.stig.ind:tst:23026400:
         source_test_id: oval:mil.disa.stig.ind:tst:23026400
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 1.
+        test_title: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 1.
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -96,7 +83,49 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:23026400
         source_other: []
+      oval:mil.disa.stig.ind:tst:23026401:
+        source_test_id: oval:mil.disa.stig.ind:tst:23026401
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 0.
+        check: none satisfy
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23026400
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23026401
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230264:
+        source_definition_id: oval:mil.disa.stig.defs:def:230264
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck entry set to 1.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23026400
+          - comment: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck entry set to 0.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23026401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent the installation of software, patches, service packs, device drivers,
+              or operating system components from a repository without verification they have been digitally signed using
+              a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271525:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271525
         class: compliance
@@ -132,35 +161,6 @@ assessment:
               \ by the organization.\n\n\tVerifying the authenticity of software prior to installation validates the integrity\
               \ of the software package received from a vendor. This verifies the software has not been tampered with and\
               \ that it has been provided by a trusted vendor."
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230264:
-        source_definition_id: oval:mil.disa.stig.defs:def:230264
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck entry set to 1.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23026400
-          - comment: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck entry set to 0.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23026401
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must prevent the installation of software, patches, service packs, device drivers,
-              or operating system components from a repository without verification they have been digitally signed using
-              a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -288,6 +288,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271525r1091287_rule
-    semantic_ir_sha256: 0dc314bbdf419bee6731ecd9b72f45903f1277005037ad5bc65a780f0c495d1f
+    semantic_ir_sha256: 5a39238587b7e570a753341f69e9578bd8970d8b856c53c62c68facc5bdbd845
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 03a1f91420924ea269307ed79be712053500e8123397b47432f5e8cb968fa5e0
+  semantic_fingerprint_sha256: ec97a4ba22f944d57ba4b0e86af07577b195b42c88326408ad3b28401933a477

@@ -353,53 +353,10 @@ rule:
         source_type: lockoutpolicy_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25329700:
-        source_state_id: oval:mil.disa.stig.win:ste:25329700
-        source_type: lockoutpolicy_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            entity_check: all
-            operation: less than or equal
-          kind: element
-          name: lockout_duration
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '0'
-        comment: Lockout Duration equals -1
-      oval:mil.disa.stig.win:ste:25329801:
-        source_state_id: oval:mil.disa.stig.win:ste:25329801
-        source_type: lockoutpolicy_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: greater than
-          kind: element
-          name: lockout_threshold
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '0'
-        comment: Lockout Threshold is greater than 0
-      oval:mil.disa.stig.win:ste:25329701:
-        source_state_id: oval:mil.disa.stig.win:ste:25329701
-        source_type: lockoutpolicy_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: equals
-          kind: element
-          name: lockout_duration
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '4294967295'
-        comment: Lockout Duration equals 4294967295
       oval:mil.disa.stig.win:ste:25329702:
         source_state_id: oval:mil.disa.stig.win:ste:25329702
         source_type: lockoutpolicy_state
@@ -414,14 +371,57 @@ rule:
           name: lockout_duration
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '900'
-        comment: Lockout Duration greater than or equals 900
+        state_title: Lockout Duration greater than or equals 900
+      oval:mil.disa.stig.win:ste:25329701:
+        source_state_id: oval:mil.disa.stig.win:ste:25329701
+        source_type: lockoutpolicy_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: equals
+          kind: element
+          name: lockout_duration
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '4294967295'
+        state_title: Lockout Duration equals 4294967295
+      oval:mil.disa.stig.win:ste:25329801:
+        source_state_id: oval:mil.disa.stig.win:ste:25329801
+        source_type: lockoutpolicy_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: greater than
+          kind: element
+          name: lockout_threshold
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '0'
+        state_title: Lockout Threshold is greater than 0
+      oval:mil.disa.stig.win:ste:25329700:
+        source_state_id: oval:mil.disa.stig.win:ste:25329700
+        source_type: lockoutpolicy_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            entity_check: all
+            operation: less than or equal
+          kind: element
+          name: lockout_duration
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '0'
+        state_title: Lockout Duration equals -1
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25329701:
           source_test_id: oval:mil.disa.stig.win:tst:25329701
           source_type: lockoutpolicy_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Account lockout duration'' is set to ''15 minutes'' or greater'
+          test_title: '''Account lockout duration'' is set to ''15 minutes'' or greater'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -434,7 +434,7 @@ rule:
           source_test_id: oval:mil.disa.stig.win:tst:25329700
           source_type: lockoutpolicy_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Account lockout duration'' is set to ''0'''
+          test_title: '''Account lockout duration'' is set to ''0'''
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
@@ -448,7 +448,7 @@ rule:
           source_test_id: oval:mil.disa.stig.win:tst:25329801
           source_type: lockoutpolicy_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Account lockout threshold'' is not set to ''0'''
+          test_title: '''Account lockout threshold'' is not set to ''0'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -458,40 +458,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25329801
           source_other: []
       definitions:
-        oval:mil.disa.stig.windows11:def:253297:
-          source_definition_id: oval:mil.disa.stig.windows11:def:253297
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:253297
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: WN11-AC-000005 - Windows 11 account lockout duration must be configured to 15 minutes or greater.
-            - attributes:
-                family: windows
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Microsoft Windows 11
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The account lockout feature, when enabled, prevents brute-force password attacks on the system. This parameter
-                specifies the amount of time that an account will remain locked after the specified number of failed logon
-                attempts.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:253297:
           source_definition_id: oval:mil.disa.stig.defs:def:253297
           class: compliance
@@ -526,6 +492,40 @@ rule:
               text: Windows account lockout duration must be configured to 15 minutes or greater.
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.windows11:def:253297:
+          source_definition_id: oval:mil.disa.stig.windows11:def:253297
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:253297
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: WN11-AC-000005 - Windows 11 account lockout duration must be configured to 15 minutes or greater.
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows 11
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The account lockout feature, when enabled, prevents brute-force password attacks on the system. This parameter
+                specifies the amount of time that an account will remain locked after the specified number of failed logon
+                attempts.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -658,9 +658,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253297r958736_rule
-      semantic_ir_sha256: 4e6cdf3ae0aa83eed248942fdd600b077dab3461284146be6801ef83ed35fae1
+      semantic_ir_sha256: 953e66edce5b51c8e638c04228eaa5b57405a8bd943b6097280a074385f4c6a1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 909d9a7e14a2cbef858663b322ef2bdf4f3996709f9b98f9d2a5af5ffab899d0
+    semantic_fingerprint_sha256: 4e3c178c92d7559ad8ea195e88096b4065345d719cfa49c934f6bc85bd973dbb
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253297r958736_rule

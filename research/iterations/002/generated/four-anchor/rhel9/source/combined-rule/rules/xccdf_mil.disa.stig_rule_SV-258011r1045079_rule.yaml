@@ -389,13 +389,40 @@ rule:
     description: RHEL 9 SSH daemon must prevent remote hosts from connecting to the proxy display.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23055601:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23055601
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '4'
+        object_title: sshd_config X11UseLocalhost
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)X11useLocalhost(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:23055600:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23055600
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '2'
-        comment: sshd_config X11UseLocalhost
+        object_title: sshd_config X11UseLocalhost
         query:
         - children:
           - kind: object_ref
@@ -416,7 +443,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '4'
-        comment: null
+        object_title: null
         query:
         - attributes:
             max_depth: '-1'
@@ -446,33 +473,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23055601:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23055601
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '4'
-        comment: sshd_config X11UseLocalhost
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)X11useLocalhost(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:20000016:
@@ -488,14 +488,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^(yes|"yes")$
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23055600:
           source_test_id: oval:mil.disa.stig.ind:tst:23055600
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: sshd_config X11UseLocalhost is set to yes.
+          test_title: sshd_config X11UseLocalhost is set to yes.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -690,9 +690,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258011r1045079_rule
-      semantic_ir_sha256: b795c5f56a68fc10941292a3dd3d51af223e77cb1ee61b3647b7c2ccda4e04f2
+      semantic_ir_sha256: f2d84f3108ab44cb3e6d8ad4c79c700db682957540fdee96f6bbde5b171e0930
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: cddeeadbb7841228d975f1bd5a69b2502b9efcc34159d3056c76059c8f14cb03
+    semantic_fingerprint_sha256: 02e46c4654997282622511845ee6ec00d4f8a6826536c6aeadd2864d020921de
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258011r1045079_rule

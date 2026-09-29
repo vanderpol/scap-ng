@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.ind:obj:25804501
     collect:
       capability: scapng.collect.independent.variable
-      comment: count of passwd entries
+      object_title: count of passwd entries
       query:
       - kind: element
         name: var_ref
@@ -26,7 +26,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.unix:obj:25804500
     collect:
       capability: scapng.collect.unix.password
-      comment: Interactive Users
+      object_title: Interactive Users
       query:
       - attributes:
           operation: pattern match
@@ -47,7 +47,6 @@ assessment:
     register: oval:mil.disa.stig.unix:obj:25804500
   - name: Derive oval:mil.disa.stig.defs:var:25804500
     derive:
-      comment: count of passwd entries
       datatype: int
       evaluation_plan:
         blocked_by:
@@ -105,10 +104,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:25804500
+      variable_title: count of passwd entries
     register: oval:mil.disa.stig.defs:var:25804500
   - name: Derive oval:mil.disa.stig.defs:var:25804501
     derive:
-      comment: count of unique UIDs
       datatype: int
       evaluation_plan:
         blocked_by:
@@ -181,10 +180,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:25804501
+      variable_title: count of unique UIDs
     register: oval:mil.disa.stig.defs:var:25804501
   predicates:
     oval:mil.disa.stig.ind:ste:25804500:
-      comment: count of passwd UIDs
       entities:
       - attributes:
           datatype: int
@@ -196,8 +195,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:mil.disa.stig.ind:ste:25804500
       source_type: variable_state
+      state_title: count of passwd UIDs
     oval:mil.disa.stig.unix:ste:25804500:
-      comment: Interactive Users
       entities:
       - attributes:
           datatype: int
@@ -210,6 +209,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:25804500
       source_type: password_state
+      state_title: Interactive Users
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:258045:
@@ -277,7 +277,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.ind:obj:25804501
-        comment: UIDs are unique
         predicates:
         - oval:mil.disa.stig.ind:ste:25804500
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -285,6 +284,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:25804500
         source_type: variable_test
         state_operator: AND
+        test_title: UIDs are unique
   source_check_context:
     check_exports: []
     checks:
@@ -402,8 +402,8 @@ assessment:
       - oval:mil.disa.stig.rhel9os:def:258045
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 84683699b92bf168f660152b1ac5d9c028a767fbc86176ae77d10854ee9a5fcd
+    semantic_ir_sha256: 6e824864a8b9676d0e12463dc620a02ca6f89bef84e0004136dc1dd1b86fc9fe
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258045r958482_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: ab81708ab2fd5094cd406063d6afe858d27e8bccf44147df2bd9979256f61187
+  semantic_fingerprint_sha256: 25ed103fa9a67bfc35d287065a261d1e1bf5276d8ef538655d16326b0b092bf6

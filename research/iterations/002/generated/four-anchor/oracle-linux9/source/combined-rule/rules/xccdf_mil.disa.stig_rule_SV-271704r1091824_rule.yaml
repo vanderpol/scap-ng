@@ -353,43 +353,13 @@ rule:
     description: OL 9 SSH daemon must not allow Generic Security Service Application Program Interface (GSSAPI) authentication.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:24452801:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:24452801
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - attributes:
-            ignore_case: 'true'
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*(?i)GSSAPIAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:24452800:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:24452800
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             ignore_case: 'true'
@@ -419,13 +389,43 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:24452801:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:24452801
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - attributes:
+            ignore_case: 'true'
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*(?i)GSSAPIAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25798800:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25798800
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: sshd_config includes
+        object_title: sshd_config includes
         query:
         - attributes:
             ignore_case: 'true'
@@ -453,20 +453,6 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:20000017:
-        source_state_id: oval:mil.disa.stig.ind:ste:20000017
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-            operation: pattern match
-          kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^(no|"no")$
-        comment: null
       oval:mil.disa.stig.ind:ste:25798801:
         source_state_id: oval:mil.disa.stig.ind:ste:25798801
         source_type: textfilecontent54_state
@@ -480,14 +466,41 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/ssh/sshd_config.d/*.conf
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.ind:ste:20000017:
+        source_state_id: oval:mil.disa.stig.ind:ste:20000017
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^(no|"no")$
+        state_title: null
     evaluate:
       tests:
+        oval:mil.disa.stig.ind:tst:24452801:
+          source_test_id: oval:mil.disa.stig.ind:tst:24452801
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: '/etc/ssh/sshd_config: GSSAPIAuthentication is set to no'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:24452801
+          predicates:
+          - oval:mil.disa.stig.ind:ste:20000017
+          source_other: []
         oval:mil.disa.stig.ind:tst:24452800:
           source_test_id: oval:mil.disa.stig.ind:tst:24452800
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: '/etc/ssh/sshd_config.d: GSSAPIAuthentication is set to no'
+          test_title: '/etc/ssh/sshd_config.d: GSSAPIAuthentication is set to no'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -500,7 +513,7 @@ rule:
           source_test_id: oval:mil.disa.stig.ind:tst:25798801
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: sshd_config includes sshd_config.d
+          test_title: sshd_config includes sshd_config.d
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -509,55 +522,7 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:25798801
           source_other: []
-        oval:mil.disa.stig.ind:tst:24452801:
-          source_test_id: oval:mil.disa.stig.ind:tst:24452801
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: '/etc/ssh/sshd_config: GSSAPIAuthentication is set to no'
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:24452801
-          predicates:
-          - oval:mil.disa.stig.ind:ste:20000017
-          source_other: []
       definitions:
-        oval:mil.disa.stig.ol9os:def:271704:
-          source_definition_id: oval:mil.disa.stig.ol9os:def:271704
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:244528
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: OL09-00-002341 - OL 9 SSH daemon must not allow Generic Security Service Application Program Interface
-                (GSSAPI) authentication.
-            - attributes:
-                family: unix
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Oracle Linux 9
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: GSSAPI authentication is used to provide additional authentication mechanisms to applications. Allowing
-                GSSAPI authentication through SSH exposes the system's GSSAPI to remote hosts, increasing the attack surface
-                of the system.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:244528:
           source_definition_id: oval:mil.disa.stig.defs:def:244528
           class: compliance
@@ -593,6 +558,41 @@ rule:
                 validated mission requirements.
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.ol9os:def:271704:
+          source_definition_id: oval:mil.disa.stig.ol9os:def:271704
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:244528
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: OL09-00-002341 - OL 9 SSH daemon must not allow Generic Security Service Application Program Interface
+                (GSSAPI) authentication.
+            - attributes:
+                family: unix
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Oracle Linux 9
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: GSSAPI authentication is used to provide additional authentication mechanisms to applications. Allowing
+                GSSAPI authentication through SSH exposes the system's GSSAPI to remote hosts, increasing the attack surface
+                of the system.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -724,9 +724,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271704r1091824_rule
-      semantic_ir_sha256: 1904cc8e0b0513b37fa0691fe10af283d9351918706fb569a50ba87206a01856
+      semantic_ir_sha256: 9189971c2579b9cccff577ca7cd93ac8da058dbd08cf672aab2d7b58689d4012
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 8866a472491df0d830ee7e8fc9ffb0ed7b6912ee302ef02cd069833c5cbac3c4
+    semantic_fingerprint_sha256: 3695ce8c4d12a2d7fe6026d2b07f9c2fb17365cf86b4fd2df21e676a859e44fa
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271704r1091824_rule

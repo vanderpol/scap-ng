@@ -7,59 +7,13 @@ assessment:
   description: OL 9 must log SSH connection attempts and failures to the server.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23481502:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23481502
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: all sshd_config and sshd_config.d/* files
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23481500
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23481501
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
-    oval:mil.disa.stig.ind:obj:23481500:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23481500
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: Pull value of /etc/ssh/sshd_config:LogLevel
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/ssh/sshd_config
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23481501:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23481501
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: Pull value of /etc/ssh/sshd_config.d:LogLevel
+      object_title: Pull value of /etc/ssh/sshd_config.d:LogLevel
       query:
       - kind: element
         name: path
@@ -84,6 +38,52 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23481500:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23481500
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: Pull value of /etc/ssh/sshd_config:LogLevel
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/ssh/sshd_config
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23481502:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23481502
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: all sshd_config and sshd_config.d/* files
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23481500
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23481501
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:23481500:
@@ -99,14 +99,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^VERBOSE$|^"VERBOSE"$
-      comment: LogLevel value is set to VERBOSE
+      state_title: LogLevel value is set to VERBOSE
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23481500:
         source_test_id: oval:mil.disa.stig.ind:tst:23481500
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/ssh/sshd_config:LogLevel == VERBOSE
+        test_title: /etc/ssh/sshd_config:LogLevel == VERBOSE
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -305,6 +305,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271703r1091821_rule
-    semantic_ir_sha256: 4beeb819fc99d6952ec94fc070de1a1a76d8e8270d911d2deaa90c4aacfe1b57
+    semantic_ir_sha256: b273f8a95204aa57a8c289be8ef5536ad27fd40ef4f6904dc76c8ff70c5b04ce
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: ad51dcd6fdf540bb87cd53d0529ca89167a4792cc0d67057a5a2ae254285c17e
+  semantic_fingerprint_sha256: cdacf0055ae69facd807bf44cf299a54dba140201a35da2686bdd39ecfdbd6fc

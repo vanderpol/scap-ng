@@ -341,13 +341,25 @@ rule:
     description: OL 9 must mount /var/log with the nosuid option.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23051501:
+        capability: scapng.collect.independent.variable
+        source_object_id: oval:mil.disa.stig.ind:obj:23051501
+        source_type: variable_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: var_ref
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: oval:mil.disa.stig.ind:var:23051500
       oval:mil.disa.stig.ind:obj:23051502:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23051502
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: filepath
@@ -365,25 +377,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23051501:
-        capability: scapng.collect.independent.variable
-        source_object_id: oval:mil.disa.stig.ind:obj:23051501
-        source_type: variable_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: var_ref
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: oval:mil.disa.stig.ind:var:23051500
       oval:mil.disa.stig.linux:obj:23051500:
         capability: scapng.collect.linux.partition
         source_object_id: oval:mil.disa.stig.linux:obj:23051500
         source_type: partition_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: mount_point
@@ -394,7 +394,7 @@ rule:
         source_variable_id: oval:mil.disa.stig.ind:var:23051500
         source_type: local_variable
         datatype: string
-        comment: Mount options for /var/log in /etc/fstab
+        variable_title: Mount options for /var/log in /etc/fstab
         semantic_ast:
           datatype: string
           expression:
@@ -452,19 +452,6 @@ rule:
           variable_id: oval:mil.disa.stig.ind:var:23051500
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.linux:ste:20000002:
-        source_state_id: oval:mil.disa.stig.linux:ste:20000002
-        source_type: partition_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          kind: element
-          name: mount_options
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: nosuid
-        comment: null
       oval:mil.disa.stig.ind:ste:23051500:
         source_state_id: oval:mil.disa.stig.ind:ste:23051500
         source_type: variable_state
@@ -477,27 +464,27 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: nosuid
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.linux:ste:20000002:
+        source_state_id: oval:mil.disa.stig.linux:ste:20000002
+        source_type: partition_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          kind: element
+          name: mount_options
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: nosuid
+        state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23051501:
-          source_test_id: oval:mil.disa.stig.ind:tst:23051501
-          source_type: variable_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /var/log is configured with the nosuid option in /etc/fstab
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23051501
-          predicates:
-          - oval:mil.disa.stig.ind:ste:23051500
-          source_other: []
         oval:mil.disa.stig.ind:tst:23051502:
           source_test_id: oval:mil.disa.stig.ind:tst:23051502
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /var/log is configured in /etc/fstab
+          test_title: /var/log is configured in /etc/fstab
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -509,7 +496,7 @@ rule:
           source_test_id: oval:mil.disa.stig.linux:tst:23051500
           source_type: partition_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: /var/log is mounted with the nosuid option
+          test_title: /var/log is mounted with the nosuid option
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -517,6 +504,19 @@ rule:
           - oval:mil.disa.stig.linux:obj:23051500
           predicates:
           - oval:mil.disa.stig.linux:ste:20000002
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23051501:
+          source_test_id: oval:mil.disa.stig.ind:tst:23051501
+          source_type: variable_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /var/log is configured with the nosuid option in /etc/fstab
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23051501
+          predicates:
+          - oval:mil.disa.stig.ind:ste:23051500
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:230515:
@@ -712,9 +712,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271659r1091689_rule
-      semantic_ir_sha256: 6e2064e27e11ed349e690d7c666a7931f79397ef26ec1bed64042a55dda06606
+      semantic_ir_sha256: 418b52e916e6e1c9b02e46a512196542398f6ba52b02c53e4077eac28a99637a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 75dd64dabceab0c75eec03694d4c08bef9293a5b989fa206260597acf7f875d2
+    semantic_fingerprint_sha256: d7058fc35ce4c6cc42898674fc357bb649119e8c5249a5757e09fd439619ccb4
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271659r1091689_rule

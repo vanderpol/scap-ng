@@ -357,7 +357,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: /etc/ipsec.conf includes
+        object_title: /etc/ipsec.conf includes
         query:
         - kind: element
           name: filepath
@@ -382,7 +382,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: /etc/ipsec.d/*.conf includes
+        object_title: /etc/ipsec.d/*.conf includes
         query:
         - kind: element
           name: path
@@ -409,17 +409,6 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:25823201:
-        source_state_id: oval:mil.disa.stig.ind:ste:25823201
-        source_type: textfilecontent54_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - kind: element
-          name: subexpression
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ipsec.d/*.conf
-        comment: null
       oval:mil.disa.stig.ind:ste:25823200:
         source_state_id: oval:mil.disa.stig.ind:ste:25823200
         source_type: textfilecontent54_state
@@ -430,14 +419,38 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: /etc/crypto-policies/back-ends/libreswan.config
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.ind:ste:25823201:
+        source_state_id: oval:mil.disa.stig.ind:ste:25823201
+        source_type: textfilecontent54_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - kind: element
+          name: subexpression
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ipsec.d/*.conf
+        state_title: null
     evaluate:
       tests:
+        oval:mil.disa.stig.ind:tst:25823202:
+          source_test_id: oval:mil.disa.stig.ind:tst:25823202
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /etc/ipsec.d/*.conf includes crypto-policy
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25823201
+          predicates:
+          - oval:mil.disa.stig.ind:ste:25823200
+          source_other: []
         oval:mil.disa.stig.ind:tst:25823200:
           source_test_id: oval:mil.disa.stig.ind:tst:25823200
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: ipsec.conf includes crypto-policy
+          test_title: ipsec.conf includes crypto-policy
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -450,7 +463,7 @@ rule:
           source_test_id: oval:mil.disa.stig.ind:tst:25823201
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: ipsec.conf includes /etc/ipsec.d/*.conf
+          test_title: ipsec.conf includes /etc/ipsec.d/*.conf
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -458,19 +471,6 @@ rule:
           - oval:mil.disa.stig.ind:obj:25823200
           predicates:
           - oval:mil.disa.stig.ind:ste:25823201
-          source_other: []
-        oval:mil.disa.stig.ind:tst:25823202:
-          source_test_id: oval:mil.disa.stig.ind:tst:25823202
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /etc/ipsec.d/*.conf includes crypto-policy
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25823201
-          predicates:
-          - oval:mil.disa.stig.ind:ste:25823200
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:258232:
@@ -672,9 +672,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258232r1184335_rule
-      semantic_ir_sha256: 7e21424fe64dd45d9f3ad978a3f3b5014cdd0c17fe6e96da65f4e7feb7ded0fd
+      semantic_ir_sha256: 22bfe4bb784f7474e3c2dc0b4ded6d8e794c615e4b73c11ec039d2756b609e7c
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 059f9604b3eb61bf95a8808614ec69b8b9306dc0fdaf334bd7b15929fa2e7653
+    semantic_fingerprint_sha256: 706c183a957012368c18064dea051153c92d6623f82e7a174b78ca35aa98af8b
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258232r1184335_rule

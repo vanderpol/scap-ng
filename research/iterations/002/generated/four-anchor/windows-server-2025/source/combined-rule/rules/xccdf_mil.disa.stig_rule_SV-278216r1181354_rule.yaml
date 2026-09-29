@@ -314,7 +314,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '3'
-        comment: Check for HKLM\System\CurrentControlSet\Control\Lsa\RestrictAnonymousSAM
+        object_title: Check for HKLM\System\CurrentControlSet\Control\Lsa\RestrictAnonymousSAM
         query:
         - attributes:
             datatype: string
@@ -353,14 +353,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25345300:
           source_test_id: oval:mil.disa.stig.win:tst:25345300
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Network access: Do not allow anonymous enumeration of SAM accounts'' is set to ''Enabled'''
+          test_title: '''Network access: Do not allow anonymous enumeration of SAM accounts'' is set to ''Enabled'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -370,6 +370,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253453:
+          source_definition_id: oval:mil.disa.stig.defs:def:253453
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: 'Verifies ''Network access: Do not allow anonymous enumeration of SAM accounts'' is set to ''Enabled'''
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25345300
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Anonymous enumeration of SAM accounts must not be allowed.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278216:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278216
           class: compliance
@@ -402,29 +425,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Anonymous enumeration of SAM accounts allows anonymous logon users (null session connections) to list
                 all accounts names, thus providing a list of potential points to attack the system.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253453:
-          source_definition_id: oval:mil.disa.stig.defs:def:253453
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: 'Verifies ''Network access: Do not allow anonymous enumeration of SAM accounts'' is set to ''Enabled'''
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25345300
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Anonymous enumeration of SAM accounts must not be allowed.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -545,9 +545,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278216r1181354_rule
-      semantic_ir_sha256: 51da7fa6ab074656914172dd006020c3caac522d588075c97f22002cdf6043ab
+      semantic_ir_sha256: 3e41affb18e43907721c27d83d987e1ae1f2424ad787880c8f1c41ee5dfa4718
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 82b329657532f078de0c2c189f365cee6be71787acc69c2854377912100a0c69
+    semantic_fingerprint_sha256: a1c8e563f436c7abd4aa718d09bb8e4bf6f3fe9513b920346eba07cbcc8ab84e
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278216r1181354_rule

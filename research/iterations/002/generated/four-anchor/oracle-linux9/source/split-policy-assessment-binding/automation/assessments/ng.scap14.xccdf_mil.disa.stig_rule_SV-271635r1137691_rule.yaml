@@ -7,40 +7,13 @@ assessment:
   description: OL 9 must require a boot loader superuser password.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25778700:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25778700
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '3'
-      comment: /etc/grub2.cfg:superusers
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/grub2.cfg
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*set\s+superusers\s*=\s*"(\S+)"\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25778701:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25778701
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: /boot/grub2/grubenv:kernelopts
+      object_title: /boot/grub2/grubenv:kernelopts
       query:
       - attributes:
           datatype: string
@@ -54,6 +27,33 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^\s*GRUB2_PASSWORD=(\S+)\b
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:25778700:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25778700
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '3'
+      object_title: /etc/grub2.cfg:superusers
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/grub2.cfg
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*set\s+superusers\s*=\s*"(\S+)"\s*$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -76,7 +76,7 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^\S+$
-      comment: GRUB superuser name
+      state_title: GRUB superuser name
     oval:mil.disa.stig.ind:ste:25778701:
       source_state_id: oval:mil.disa.stig.ind:ste:25778701
       source_type: textfilecontent54_state
@@ -90,14 +90,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^grub\.pbkdf2\.sha512\.
-      comment: GRUB superuser password
+      state_title: GRUB superuser password
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:25778700:
         source_test_id: oval:mil.disa.stig.ind:tst:25778700
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/grub2.cfg:superusers exists and has a name.
+        test_title: /etc/grub2.cfg:superusers exists and has a name.
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -110,7 +110,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:25778701
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
+        test_title: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -120,6 +120,33 @@ assessment:
         - oval:mil.disa.stig.ind:ste:25778701
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:257787:
+        source_definition_id: oval:mil.disa.stig.defs:def:257787
+        class: compliance
+        version: '3'
+        criteria:
+          children:
+          - comment: /etc/grub2.cfg:superusers exists and has a name.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25778700
+          - comment: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25778701
+          comment: Verify a BIOS GRUB superuser password is configured.
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must require a boot loader superuser password.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271635:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271635
         class: compliance
@@ -159,33 +186,6 @@ assessment:
               \ implement this requirement.\n\n\tPassword protection on the boot loader configuration ensures users with physical\
               \ access cannot trivially alter important bootloader settings. These include which kernel to use, and whether\
               \ to enter single-user mode."
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:257787:
-        source_definition_id: oval:mil.disa.stig.defs:def:257787
-        class: compliance
-        version: '3'
-        criteria:
-          children:
-          - comment: /etc/grub2.cfg:superusers exists and has a name.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25778700
-          - comment: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25778701
-          comment: Verify a BIOS GRUB superuser password is configured.
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must require a boot loader superuser password.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -313,6 +313,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271635r1137691_rule
-    semantic_ir_sha256: fa603f794dbaccc971af75e1b455c7d185402667238126415b4858d4973e6d25
+    semantic_ir_sha256: 05b319a8c6d75837e28aeb1a6670d525b24178098ba62b7c13c121f721ab3132
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: de33a99d96efed422101f47bc695a18d61f2c83e74727a128b2963fb00dcddd1
+  semantic_fingerprint_sha256: 1f2196d6a1786ef9f61507cfcd1a0cc20871e76e05ef01217d336938bbb88e3e

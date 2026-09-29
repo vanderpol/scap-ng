@@ -326,7 +326,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: hive
@@ -346,7 +346,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: hive
@@ -378,14 +378,28 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '2'
-        comment: null
+        state_title: null
     evaluate:
       tests:
+        oval:mil.disa.stig.win:tst:25342200:
+          source_test_id: oval:mil.disa.stig.win:tst:25342200
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: '''Let Windows apps activate with voice'' is set to ''Enabled'' with ''Default for all Apps'' set to
+            ''Force Deny'''
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25342200
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000002
+          source_other: []
         oval:mil.disa.stig.win:tst:25342201:
           source_test_id: oval:mil.disa.stig.win:tst:25342201
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Let Windows apps activate with voice while the system is locked'' is set to ''Enabled'' with ''Default
+          test_title: '''Let Windows apps activate with voice while the system is locked'' is set to ''Enabled'' with ''Default
             for all Apps'' set to ''Force Deny'''
           check: all
           check_existence: at_least_one_exists
@@ -395,48 +409,7 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000002
           source_other: []
-        oval:mil.disa.stig.win:tst:25342200:
-          source_test_id: oval:mil.disa.stig.win:tst:25342200
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Let Windows apps activate with voice'' is set to ''Enabled'' with ''Default for all Apps'' set to ''Force
-            Deny'''
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25342200
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000002
-          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253422:
-          source_definition_id: oval:mil.disa.stig.defs:def:253422
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25342200
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25342201
-            comment: null
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Windows must be configured to prevent Windows apps from being activated by voice while the system is locked.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253422:
           source_definition_id: oval:mil.disa.stig.windows11:def:253422
           class: compliance
@@ -469,6 +442,33 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Allowing Windows apps to be activated by voice from the lock screen could allow for unauthorized use.
                 Requiring logon will ensure the apps are only used by authorized personnel.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253422:
+          source_definition_id: oval:mil.disa.stig.defs:def:253422
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25342200
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25342201
+            comment: null
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Windows must be configured to prevent Windows apps from being activated by voice while the system is locked.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -592,9 +592,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253422r1256685_rule
-      semantic_ir_sha256: e52203adb3ec370268d9c5a8fc48051fc89b4fa4855d45a7770068ebea9d2b34
+      semantic_ir_sha256: 788f24d42c15f630a39d99999aaee2bce3b563f6fd35e0b1fdd034f19b79becd
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: b87cc7ed1d2fa2fd41ef88e59336eee58ad0e57366309cc674d6e642a65ba10d
+    semantic_fingerprint_sha256: 3030ad36ca9edd481350c301997c6cbaba9514ed12dabca6ba1d1fbc41684a98
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253422r1256685_rule

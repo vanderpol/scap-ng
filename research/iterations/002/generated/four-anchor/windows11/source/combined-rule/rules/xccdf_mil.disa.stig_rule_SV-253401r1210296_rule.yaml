@@ -375,39 +375,13 @@ rule:
     description: Windows 11 must be configured to require a minimum PIN length of six characters or greater.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:25340101:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25340101
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: Group Policy registry entry for MinimumPINLength
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            datatype: string
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Policies\Microsoft\PassportForWork\PINComplexity
-        - attributes:
-            datatype: string
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: MinimumPINLength
       oval:mil.disa.stig.win:obj:25340102:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25340102
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '4'
-        comment: Intune registry entry for MinimumPINLength
+        object_title: Intune registry entry for MinimumPINLength
         query:
         - attributes:
             datatype: string
@@ -434,7 +408,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '4'
-        comment: Registry object for the Tenant ID of the account currently in use
+        object_title: Registry object for the Tenant ID of the account currently in use
         query:
         - attributes:
             datatype: string
@@ -460,7 +434,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '2'
-        comment: Registry entries for MinimumPINLength
+        object_title: Registry entries for MinimumPINLength
         query:
         - children:
           - kind: object_ref
@@ -475,12 +449,38 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
+      oval:mil.disa.stig.win:obj:25340101:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25340101
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: Group Policy registry entry for MinimumPINLength
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Policies\Microsoft\PassportForWork\PINComplexity
+        - attributes:
+            datatype: string
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: MinimumPINLength
     derive:
       oval:mil.disa.stig.defs:var:25340100:
         source_variable_id: oval:mil.disa.stig.defs:var:25340100
         source_type: local_variable
         datatype: string
-        comment: GUID of current Tenant
+        variable_title: GUID of current Tenant
         semantic_ast:
           datatype: string
           expression:
@@ -583,14 +583,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '6'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25340100:
           source_test_id: oval:mil.disa.stig.win:tst:25340100
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Minimum PIN length is 6 or greater
+          test_title: Minimum PIN length is 6 or greater
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -795,9 +795,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253401r1210296_rule
-      semantic_ir_sha256: 0339f698cd9327052e115e1332dcee10579537d621ca19162e42d4e59d5e2b95
+      semantic_ir_sha256: f66844090f542d21d41b9e4a8b3ef70d9016568ee7c167c4b81ab83912786ccf
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 705f024bfeee0f5c1647e6573ce08027467a5acc383ecc305d9dd5513df0ed91
+    semantic_fingerprint_sha256: 5981dfcdad96872e7f7dd535d30a17f45d099e921928da6e8466f1582ad0fe77
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253401r1210296_rule

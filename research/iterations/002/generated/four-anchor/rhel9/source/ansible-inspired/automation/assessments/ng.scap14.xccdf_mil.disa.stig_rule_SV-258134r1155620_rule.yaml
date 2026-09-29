@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813401
     collect:
       capability: scapng.collect.linux.rpminfo
-      comment: Confirm the aide file integrity tool package is installed.
+      object_title: Confirm the aide file integrity tool package is installed.
       query:
       - kind: element
         name: name
@@ -26,7 +26,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
     collect:
       capability: scapng.collect.unix.file
-      comment: Find the aide.conf file.
+      object_title: Find the aide.conf file.
       query:
       - attributes:
           max_depth: '-1'
@@ -52,7 +52,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813403
     collect:
       capability: scapng.collect.unix.file
-      comment: Retrieve details of the working DB file.
+      object_title: Retrieve details of the working DB file.
       query:
       - attributes:
           var_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402
@@ -67,7 +67,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813404
     collect:
       capability: scapng.collect.independent.textfilecontent54
-      comment: Retrieve path to the working DB file.
+      object_title: Retrieve path to the working DB file.
       query:
       - attributes:
           var_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
@@ -94,7 +94,7 @@ assessment:
   - name: Collect oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813405
     collect:
       capability: scapng.collect.independent.textfilecontent54
-      comment: Retrieve filename of the working DB file.
+      object_title: Retrieve filename of the working DB file.
       query:
       - attributes:
           var_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
@@ -120,7 +120,6 @@ assessment:
     register: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813405
   - name: Derive oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
     derive:
-      comment: Retrieve location of the aide.conf file.
       datatype: string
       evaluation_plan:
         datatype: string
@@ -160,10 +159,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
+      variable_title: Retrieve location of the aide.conf file.
     register: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
   - name: Derive oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402
     derive:
-      comment: Retrieve location of the working aide database file.
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -237,10 +236,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402
+      variable_title: Retrieve location of the working aide database file.
     register: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402
   predicates:
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25813403:
-      comment: Confirm existence of DB file.
       entities:
       - attributes:
           operation: pattern match
@@ -252,6 +251,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25813403
       source_type: file_state
+      state_title: Confirm existence of DB file.
   evaluate:
     definitions:
       oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258134:
@@ -296,19 +296,18 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813401
-        comment: Confirm the aide file integrity tool package is installed.
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         source_other: []
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25813401
         source_type: rpminfo_test
         state_operator: AND
+        test_title: Confirm the aide file integrity tool package is installed.
       oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25813403:
         check: all
         check_existence: at_least_one_exists
         collections:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813403
-        comment: Verify the working DB file configured in the 'aide.conf file' exists.
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25813403
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -316,6 +315,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25813403
         source_type: file_test
         state_operator: AND
+        test_title: Verify the working DB file configured in the 'aide.conf file' exists.
   source_check_context:
     check_exports: []
     checks:
@@ -460,8 +460,8 @@ assessment:
       - oval:navy.navwar.niwcatlantic.scc.rhel9os:def:258134
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: 0382b86478e7def4a342500b68c8ebdd0d6731aaddeb9d7956299267a025f7d7
+    semantic_ir_sha256: 07f19673913fe64d2b137e1332807f3efe3dc20f585e896bd7db44054b55a5eb
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258134r1155620_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: e816889ffd37f04ae88a211960c03b25e205155da520bde343d8256d5c3267bb
+  semantic_fingerprint_sha256: e7c0f8111efafca5633543e584b69343a5d2b0e4aad97ac06d16ea6b54e20538

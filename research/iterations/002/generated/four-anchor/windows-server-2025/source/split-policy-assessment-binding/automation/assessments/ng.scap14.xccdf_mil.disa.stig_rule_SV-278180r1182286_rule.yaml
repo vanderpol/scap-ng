@@ -14,7 +14,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '2'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -55,14 +55,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25338300:
         source_test_id: oval:mil.disa.stig.win:tst:25338300
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Restrict Unauthenticated RPC clients'' is set to ''Enabled'' and ''Authenticated'''
+        test_title: '''Restrict Unauthenticated RPC clients'' is set to ''Enabled'' and ''Authenticated'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -72,6 +72,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253383:
+        source_definition_id: oval:mil.disa.stig.defs:def:253383
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Verifies 'Restrict Unauthenticated RPC clients' is set to 'Enabled' and 'Authenticated'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25338300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Unauthenticated RPC clients must be restricted from connecting to the RPC server.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278180:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278180
         class: compliance
@@ -104,29 +127,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: Unauthenticated RPC clients may allow anonymous access to sensitive information. Configuring RPC to restrict
               unauthenticated RPC clients from connecting to the RPC server will prevent anonymous connections.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253383:
-        source_definition_id: oval:mil.disa.stig.defs:def:253383
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Verifies 'Restrict Unauthenticated RPC clients' is set to 'Enabled' and 'Authenticated'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25338300
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Unauthenticated RPC clients must be restricted from connecting to the RPC server.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -264,6 +264,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278180r1182286_rule
-    semantic_ir_sha256: 2610eb3d805e182ab16764e0498a5805f4242037352685ace4ed4bff758d4a0b
+    semantic_ir_sha256: f654d2e44078ddfa3123940346bb940713b45d0459eddbac7fbf1010629f7234
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 7fc05f160a65f9c87ffb972a9cbdef9a529b1413b27532b1efaf1fd4193af59d
+  semantic_fingerprint_sha256: 0159a7fea7ed33eb6909d9ecd57010748b5c9574cf76aa1b410ef995cfc22b06

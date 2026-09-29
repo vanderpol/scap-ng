@@ -341,33 +341,13 @@ rule:
     description: The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:25346612:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25346612
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '2'
-        comment: Intune registry entry for FIPS-compliant algorithms
-        query:
-        - kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Microsoft\PolicyManager\current\device\Cryptography
-        - kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AllowFipsAlgorithmPolicy_ProviderSet
       oval:mil.disa.stig.win:obj:25346610:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25346610
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: Registry entries for FIPS-compliant algorithms
+        object_title: Registry entries for FIPS-compliant algorithms
         query:
         - children:
           - kind: object_ref
@@ -382,13 +362,33 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: false
+      oval:mil.disa.stig.win:obj:25346612:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25346612
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '2'
+        object_title: Intune registry entry for FIPS-compliant algorithms
+        query:
+        - kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Microsoft\PolicyManager\current\device\Cryptography
+        - kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AllowFipsAlgorithmPolicy_ProviderSet
       oval:mil.disa.stig.win:obj:25346611:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25346611
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '2'
-        comment: GPO registry entry for FIPS-compliant algorithms
+        object_title: GPO registry entry for FIPS-compliant algorithms
         query:
         - kind: element
           name: hive
@@ -420,14 +420,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25346610:
           source_test_id: oval:mil.disa.stig.win:tst:25346610
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: FIPS-compliant algorithms are enabled
+          test_title: FIPS-compliant algorithms are enabled
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -622,9 +622,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253466r1210303_rule
-      semantic_ir_sha256: ba7c6b735397635a445f75d49d2419729a836ae413ef60e6f5d2f57a037b01ae
+      semantic_ir_sha256: 8f208ca9fac69522b74538457698f9bd1139e7587591c49ae0712d35bde184ab
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 0a95ba3bef6e742b2261f98f1b18a39d8cb785a2253244bcbe4fd22191af2358
+    semantic_fingerprint_sha256: f2704faaacc34e8712b89e8f5ace2e577b7c810cffd88206acb54fd50fcf29fd
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253466r1210303_rule

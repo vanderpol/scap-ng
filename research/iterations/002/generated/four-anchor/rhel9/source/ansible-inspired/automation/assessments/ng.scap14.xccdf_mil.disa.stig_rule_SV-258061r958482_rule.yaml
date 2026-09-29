@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.ind:obj:25806100
     collect:
       capability: scapng.collect.independent.textfilecontent54
-      comment: /etc/group GIDs
+      object_title: /etc/group GIDs
       query:
       - kind: element
         name: filepath
@@ -39,7 +39,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.ind:obj:25806101
     collect:
       capability: scapng.collect.independent.variable
-      comment: count of group entries
+      object_title: count of group entries
       query:
       - kind: element
         name: var_ref
@@ -52,7 +52,6 @@ assessment:
     register: oval:mil.disa.stig.ind:obj:25806101
   - name: Derive oval:mil.disa.stig.defs:var:25806100
     derive:
-      comment: count of group entries
       datatype: int
       evaluation_plan:
         blocked_by:
@@ -110,10 +109,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:25806100
+      variable_title: count of group entries
     register: oval:mil.disa.stig.defs:var:25806100
   - name: Derive oval:mil.disa.stig.defs:var:25806101
     derive:
-      comment: count of unique GIDs
       datatype: int
       evaluation_plan:
         blocked_by:
@@ -186,10 +185,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:25806101
+      variable_title: count of unique GIDs
     register: oval:mil.disa.stig.defs:var:25806101
   predicates:
     oval:mil.disa.stig.ind:ste:25806100:
-      comment: count of unique GIDs
       entities:
       - attributes:
           datatype: int
@@ -201,6 +200,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       source_state_id: oval:mil.disa.stig.ind:ste:25806100
       source_type: variable_state
+      state_title: count of unique GIDs
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:258061:
@@ -265,7 +265,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.ind:obj:25806101
-        comment: GIDs are unique
         predicates:
         - oval:mil.disa.stig.ind:ste:25806100
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -273,6 +272,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.ind:tst:25806100
         source_type: variable_test
         state_operator: AND
+        test_title: GIDs are unique
   source_check_context:
     check_exports: []
     checks:
@@ -392,4 +392,4 @@ assessment:
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258061r958482_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: 3fb1238b67fa5121bece5c3b8b1fd0dfdc6fe8532c3ed384d4bdb8e00ad000e6
+  semantic_fingerprint_sha256: b9516f16a19d5a8cf088a2a389a8c64bfddc022b7db66d7996179bc538da4f8a

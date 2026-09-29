@@ -7,13 +7,137 @@ assessment:
   description: Windows Server 2025 FTP servers must be configured to prevent access to the system drive.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: If the site includes Windows Directory this is a finding.
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - attributes:
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802801
+        kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802821:
+      capability: scapng.collect.independent.environmentvariable58
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802821
+      source_type: environmentvariable58_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: Get the Program Files(x86) Directory
+      query:
+      - attributes:
+          datatype: int
+          nil: 'true'
+        kind: element
+        name: pid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: PROGRAMFILES(X86)
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802802:
+      capability: scapng.collect.independent.environmentvariable58
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802802
+      source_type: environmentvariable58_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: Get boot drive
+      query:
+      - attributes:
+          datatype: int
+          nil: 'true'
+        kind: element
+        name: pid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: SYSTEMDRIVE
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: If the site includes root of the drive this is a finding.
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - attributes:
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802801
+        kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831:
+      capability: scapng.collect.independent.environmentvariable58
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
+      source_type: environmentvariable58_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: Get the Windows Directory
+      query:
+      - attributes:
+          datatype: int
+          nil: 'true'
+        kind: element
+        name: pid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: WINDIR
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811:
+      capability: scapng.collect.independent.environmentvariable58
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
+      source_type: environmentvariable58_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: Get the Program Files Directory
+      query:
+      - attributes:
+          datatype: int
+          nil: 'true'
+        kind: element
+        name: pid
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: PROGRAMFILES
     oval:navy.navwar.niwcatlantic.scc.windows:obj:27802803:
       capability: scapng.collect.windows.appcmd
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802803
       source_type: appcmd_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: Get Website Bindings with filter applied for ones that include FTP
+      object_title: Get Website Bindings with filter applied for ones that include FTP
       query:
       - kind: element
         name: identifier_type
@@ -35,101 +159,13 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802802
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802802:
-      capability: scapng.collect.independent.environmentvariable58
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802802
-      source_type: environmentvariable58_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: Get boot drive
-      query:
-      - attributes:
-          datatype: int
-          nil: 'true'
-        kind: element
-        name: pid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: SYSTEMDRIVE
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: If the site includes root of the drive this is a finding.
-      query:
-      - kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: powershell
-      - attributes:
-          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802801
-        kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          action: include
-        kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811:
-      capability: scapng.collect.independent.environmentvariable58
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
-      source_type: environmentvariable58_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: Get the Program Files Directory
-      query:
-      - attributes:
-          datatype: int
-          nil: 'true'
-        kind: element
-        name: pid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: PROGRAMFILES
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: If the site includes Windows Directory this is a finding.
-      query:
-      - kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: powershell
-      - attributes:
-          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802801
-        kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - attributes:
-          action: include
-        kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830
     oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820:
       capability: scapng.collect.independent.shellcommand
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820
       source_type: shellcommand_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: If the site includes Program Files(x86) this is a finding.
+      object_title: If the site includes Program Files(x86) this is a finding.
       query:
       - kind: element
         name: shell
@@ -149,49 +185,13 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802821:
-      capability: scapng.collect.independent.environmentvariable58
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802821
-      source_type: environmentvariable58_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: Get the Program Files(x86) Directory
-      query:
-      - attributes:
-          datatype: int
-          nil: 'true'
-        kind: element
-        name: pid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: PROGRAMFILES(X86)
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831:
-      capability: scapng.collect.independent.environmentvariable58
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
-      source_type: environmentvariable58_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: Get the Windows Directory
-      query:
-      - attributes:
-          datatype: int
-          nil: 'true'
-        kind: element
-        name: pid
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: WINDIR
     oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810:
       capability: scapng.collect.independent.shellcommand
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810
       source_type: shellcommand_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: If the site includes Program Files this is a finding.
+      object_title: If the site includes Program Files this is a finding.
       query:
       - kind: element
         name: shell
@@ -212,37 +212,37 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802810
   derive:
-    oval:navy.navwar.niwcatlantic.scc.windows:var:27802805:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802805
+    oval:navy.navwar.niwcatlantic.scc.windows:var:27802802:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802802
       source_type: constant_variable
       datatype: string
-      comment: Forward Slash
+      variable_title: ''''
       semantic_ast:
         datatype: string
-        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802805
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802802
         type: constant_variable
         values:
         - datatype: string
-          value: \
+          value: Get-Website '
       resolution:
         datatype: string
         status: exact_static
         values:
-        - \
+        - Get-Website '
         variable_type: constant_variable
       evaluation_plan:
         datatype: string
         mode: static
         resolution_status: exact_static
         values:
-        - \
-        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802805
+        - Get-Website '
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802802
         variable_type: constant_variable
     oval:navy.navwar.niwcatlantic.scc.windows:var:27802804:
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802804
       source_type: local_variable
       datatype: string
-      comment: Boot Drive with Forward Slash Added
+      variable_title: Boot Drive with Forward Slash Added
       semantic_ast:
         datatype: string
         expression:
@@ -303,24 +303,50 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802804
         variable_type: local_variable
-    oval:navy.navwar.niwcatlantic.scc.windows:var:27802830:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802830
+    oval:navy.navwar.niwcatlantic.scc.windows:var:27802805:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802805
+      source_type: constant_variable
+      datatype: string
+      variable_title: Forward Slash
+      semantic_ast:
+        datatype: string
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802805
+        type: constant_variable
+        values:
+        - datatype: string
+          value: \
+      resolution:
+        datatype: string
+        status: exact_static
+        values:
+        - \
+        variable_type: constant_variable
+      evaluation_plan:
+        datatype: string
+        mode: static
+        resolution_status: exact_static
+        values:
+        - \
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802805
+        variable_type: constant_variable
+    oval:navy.navwar.niwcatlantic.scc.windows:var:27802810:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802810
       source_type: local_variable
       datatype: string
-      comment: Windows Directory
+      variable_title: Program Files
       semantic_ast:
         datatype: string
         expression:
           item_field: value
-          object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
+          object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
           op: object_component
           record_field: null
-        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802830
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802810
         type: local_variable
       resolution:
         datatype: string
         item_field: value
-        object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
+        object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
         operation: object_component
         reason: object_component_requires_collection:environmentvariable58_object
         record_field: null
@@ -330,51 +356,51 @@ assessment:
         datatype: string
         dependencies:
           objects:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
           operations:
           - object_component
           variables: []
         expression:
           item_field: value
-          object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
+          object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
           op: object_component
           record_field: null
         mode: target_dependent
         reason: object_component_requires_collection:environmentvariable58_object
         resolution_status: dynamic_object_dependency
-        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802830
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802810
         variable_type: local_variable
-    oval:navy.navwar.niwcatlantic.scc.windows:var:27802802:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802802
+    oval:navy.navwar.niwcatlantic.scc.windows:var:27802803:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802803
       source_type: constant_variable
       datatype: string
-      comment: ''''
+      variable_title: ''''
       semantic_ast:
         datatype: string
-        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802802
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802803
         type: constant_variable
         values:
         - datatype: string
-          value: Get-Website '
+          value: ''' | Select-Object -ExpandProperty physicalPath'
       resolution:
         datatype: string
         status: exact_static
         values:
-        - Get-Website '
+        - ''' | Select-Object -ExpandProperty physicalPath'
         variable_type: constant_variable
       evaluation_plan:
         datatype: string
         mode: static
         resolution_status: exact_static
         values:
-        - Get-Website '
-        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802802
+        - ''' | Select-Object -ExpandProperty physicalPath'
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802803
         variable_type: constant_variable
     oval:navy.navwar.niwcatlantic.scc.windows:var:27802820:
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802820
       source_type: local_variable
       datatype: string
-      comment: Program Files(x86)
+      variable_title: Program Files(x86)
       semantic_ast:
         datatype: string
         expression:
@@ -415,7 +441,7 @@ assessment:
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802801
       source_type: local_variable
       datatype: string
-      comment: update
+      variable_title: update
       semantic_ast:
         datatype: string
         expression:
@@ -481,24 +507,24 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802801
         variable_type: local_variable
-    oval:navy.navwar.niwcatlantic.scc.windows:var:27802810:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802810
+    oval:navy.navwar.niwcatlantic.scc.windows:var:27802830:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802830
       source_type: local_variable
       datatype: string
-      comment: Program Files
+      variable_title: Windows Directory
       semantic_ast:
         datatype: string
         expression:
           item_field: value
-          object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
+          object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
           op: object_component
           record_field: null
-        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802810
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802830
         type: local_variable
       resolution:
         datatype: string
         item_field: value
-        object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
+        object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
         operation: object_component
         reason: object_component_requires_collection:environmentvariable58_object
         record_field: null
@@ -508,47 +534,60 @@ assessment:
         datatype: string
         dependencies:
           objects:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
           operations:
           - object_component
           variables: []
         expression:
           item_field: value
-          object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811
+          object_ref: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831
           op: object_component
           record_field: null
         mode: target_dependent
         reason: object_component_requires_collection:environmentvariable58_object
         resolution_status: dynamic_object_dependency
-        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802810
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802830
         variable_type: local_variable
-    oval:navy.navwar.niwcatlantic.scc.windows:var:27802803:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802803
-      source_type: constant_variable
-      datatype: string
-      comment: ''''
-      semantic_ast:
-        datatype: string
-        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802803
-        type: constant_variable
-        values:
-        - datatype: string
-          value: ''' | Select-Object -ExpandProperty physicalPath'
-      resolution:
-        datatype: string
-        status: exact_static
-        values:
-        - ''' | Select-Object -ExpandProperty physicalPath'
-        variable_type: constant_variable
-      evaluation_plan:
-        datatype: string
-        mode: static
-        resolution_status: exact_static
-        values:
-        - ''' | Select-Object -ExpandProperty physicalPath'
-        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27802803
-        variable_type: constant_variable
   predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: case insensitive equals
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802804
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      state_title: Boot Drive with Forward Slash Added
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: case insensitive equals
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802830
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      state_title: Windows Directory
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: case insensitive equals
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802820
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      state_title: Program Files(x86)
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27802802:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802802
       source_type: appcmd_state
@@ -562,33 +601,7 @@ assessment:
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: ftp
-      comment: results include FTP
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: case insensitive equals
-          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802820
-        kind: element
-        name: stdout_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      comment: Program Files(x86)
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: case insensitive equals
-          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802830
-        kind: element
-        name: stdout_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      comment: Windows Directory
+      state_title: results include FTP
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27802810:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802810
       source_type: shellcommand_state
@@ -601,39 +614,14 @@ assessment:
         kind: element
         name: stdout_line
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      comment: Program Files
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: case insensitive equals
-          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27802804
-        kind: element
-        name: stdout_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      comment: Boot Drive with Forward Slash Added
+      state_title: Program Files
   evaluate:
     tests:
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803
-        source_type: shellcommand_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: If the site includes Program Files(x86) this is a finding.
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820
-        predicates: []
-        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27802804:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27802804
         source_type: shellcommand_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: If the site includes Windows Directory this is a finding.
+        test_title: If the site includes Windows Directory this is a finding.
         check: all
         check_existence: none_exist
         state_operator: AND
@@ -641,11 +629,23 @@ assessment:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830
         predicates: []
         source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        test_title: If the site includes Program Files(x86) this is a finding.
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820
+        predicates: []
+        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27802801:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27802801
         source_type: shellcommand_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: If the site includes root of the drive this is a finding.
+        test_title: If the site includes root of the drive this is a finding.
         check: all
         check_existence: none_exist
         state_operator: AND
@@ -657,7 +657,7 @@ assessment:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27802802
         source_type: shellcommand_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: If the site includes Program Files this is a finding.
+        test_title: If the site includes Program Files this is a finding.
         check: all
         check_existence: none_exist
         state_operator: AND
@@ -855,6 +855,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278028r1182265_rule
-    semantic_ir_sha256: 463c42e3dda15683ef3a37b61629fcb0431f94e477e8e01a0fdab45b9cbe4bcd
+    semantic_ir_sha256: 2540d99044c527b512ea16d5c14168b9334b3b50f73dc3b3261ff6c03bcc9e1a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 18b568285a4b8ece89dd6b83dcc81705e6c66425df5dc35f74eb98cf90457833
+  semantic_fingerprint_sha256: a58803ad095bc2dcd4239e705888394db2b1a293ab0de251d72674be00d6e4ea

@@ -7,34 +7,38 @@ assessment:
   description: RHEL 9 must elevate the SELinux context when an administrator calls the sudo command.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:27249602:
+    oval:mil.disa.stig.ind:obj:27249600:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:27249602
+      source_object_id: oval:mil.disa.stig.ind:obj:27249600
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:27249600
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:27249601
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sudoers
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^(.*\bsysadm_r\b.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:27249601:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:27249601
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           ignore_case: 'true'
@@ -66,31 +70,27 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:27249600:
+    oval:mil.disa.stig.ind:obj:27249602:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:27249600
+      source_object_id: oval:mil.disa.stig.ind:obj:27249602
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sudoers
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^(.*\bsysadm_r\b.*)$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:27249600
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:27249601
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:27249600:
@@ -105,14 +105,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^[ \t]*%[a-zA-Z0-9_-]+[ \t]+ALL=\(ALL\)[ \t]+TYPE=sysadm_t[ \t]+ROLE=sysadm_r[ \t]+ALL[ \t]*$
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:27249600:
         source_test_id: oval:mil.disa.stig.ind:tst:27249600
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: elevate the SELinux context when an administrator calls the sudo command
+        test_title: elevate the SELinux context when an administrator calls the sudo command
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -326,6 +326,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-272496r1155582_rule
-    semantic_ir_sha256: 722c984c4398f8b7c0ed74d7ccd0242feecba20556d6dbfb494c332541f7d805
+    semantic_ir_sha256: c24a394683614a7947299cbf6d2e56b352f06724e0dba692b6e898cd094424ce
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 5ee2388855b488a3bb492a7294c9e55d5c08028cc614cb9fdad3a593f11f29c7
+  semantic_fingerprint_sha256: ca926b193ce878df68e9b4c314d897d4972601d90f20961e251ccb73a3aa3ff7

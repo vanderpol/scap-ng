@@ -7,25 +7,13 @@ assessment:
   description: OL 9 must enable the SELinux targeted policy.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:23024000:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23024000
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: /sys/fs/selinux
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /sys/fs/selinux
     oval:mil.disa.stig.ind:obj:23028200:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23028200
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - kind: element
         name: filepath
@@ -44,6 +32,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.linux:obj:23024000:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23024000
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      object_title: /sys/fs/selinux
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /sys/fs/selinux
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:23028200:
@@ -56,7 +56,7 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: targeted
-      comment: null
+      state_title: null
     oval:mil.disa.stig.linux:ste:23024000:
       source_state_id: oval:mil.disa.stig.linux:ste:23024000
       source_type: partition_state
@@ -67,14 +67,14 @@ assessment:
         name: fs_type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: selinuxfs
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23028200:
         source_test_id: oval:mil.disa.stig.ind:tst:23028200
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: '/etc/selinux/config: SELINUXTYPE=targeted'
+        test_title: '/etc/selinux/config: SELINUXTYPE=targeted'
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -87,7 +87,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.linux:tst:23024000
         source_type: partition_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: selinux is active
+        test_title: selinux is active
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -283,6 +283,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271453r1091071_rule
-    semantic_ir_sha256: f5dd073df318841f7d2b64ff1b3e7821e03ba4ef8fd8c21105afceaa14752fcf
+    semantic_ir_sha256: 21e813348b00b249e0a7b85c8ff6a7811186fb3e86aec230239a729f08b45cc6
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: e7930dcc4a726b8ec6f9e6fc5ff01f239a21aa417fbc483d7e1b5aa44519d7d9
+  semantic_fingerprint_sha256: 993ec5b74d9c0900b8b6ac21f3b2fc13f35be53ad760d980e46d1dacaff9dd45

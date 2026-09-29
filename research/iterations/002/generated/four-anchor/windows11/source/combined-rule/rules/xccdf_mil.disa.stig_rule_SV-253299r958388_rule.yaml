@@ -337,7 +337,7 @@ rule:
         source_type: lockoutpolicy_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query: []
     derive: {}
     predicates:
@@ -354,7 +354,7 @@ rule:
           name: lockout_threshold
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '0'
-        comment: Lockout Threshold is greater than 0
+        state_title: Lockout Threshold is greater than 0
       oval:mil.disa.stig.win:ste:25329900:
         source_state_id: oval:mil.disa.stig.win:ste:25329900
         source_type: lockoutpolicy_state
@@ -368,14 +368,14 @@ rule:
           name: lockout_observation_window
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '900'
-        comment: Lockout Observation Window is greater than or equal to variable
+        state_title: Lockout Observation Window is greater than or equal to variable
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25329900:
           source_test_id: oval:mil.disa.stig.win:tst:25329900
           source_type: lockoutpolicy_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Reset account lockout counter after'' is set to at least the required value'
+          test_title: '''Reset account lockout counter after'' is set to at least the required value'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -388,7 +388,7 @@ rule:
           source_test_id: oval:mil.disa.stig.win:tst:25329801
           source_type: lockoutpolicy_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Account lockout threshold'' is not set to ''0'''
+          test_title: '''Account lockout threshold'' is not set to ''0'''
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -398,33 +398,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25329801
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253299:
-          source_definition_id: oval:mil.disa.stig.defs:def:253299
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Verifies 'Reset account lockout counter after' is set to at least the required value
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25329900
-            - comment: Verifies 'Account lockout threshold' is not set to '0'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25329801
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The period of time before the bad logon counter is reset must be configured to 15 minutes.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253299:
           source_definition_id: oval:mil.disa.stig.windows11:def:253299
           class: compliance
@@ -458,6 +431,33 @@ rule:
                 specifies the period of time that must pass after failed logon attempts before the counter is reset to 0.
                 The smaller this value is, the less effective the account lockout feature will be in protecting the local
                 system.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253299:
+          source_definition_id: oval:mil.disa.stig.defs:def:253299
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Verifies 'Reset account lockout counter after' is set to at least the required value
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25329900
+            - comment: Verifies 'Account lockout threshold' is not set to '0'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25329801
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The period of time before the bad logon counter is reset must be configured to 15 minutes.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -585,9 +585,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253299r958388_rule
-      semantic_ir_sha256: f4e6c8370613ae718f17562eab98d2a4452a63218232bfbf3072e3fc1f29d6d3
+      semantic_ir_sha256: 5ce48889b28794a5f6714568822b2e680727e344a481c1aaf845a4badedadd83
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: afabe4e7e88486402ba98d753375523d1452dff613df3515e709b1b5edd9a5fe
+    semantic_fingerprint_sha256: 558d01c886f541da175d4c7218298a8f06552ce381a8ac8366630b531bc9705d
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253299r958388_rule

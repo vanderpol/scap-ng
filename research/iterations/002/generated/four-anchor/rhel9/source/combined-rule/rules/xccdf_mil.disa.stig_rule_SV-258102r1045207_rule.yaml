@@ -402,13 +402,34 @@ rule:
     description: RHEL 9 must enforce password complexity by requiring that at least one lowercase character be used.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:23035800:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23035800
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        object_title: null
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23035801
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23035802
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
       oval:mil.disa.stig.ind:obj:23035802:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23035802
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             recurse_direction: down
@@ -444,7 +465,7 @@ rule:
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: filepath
@@ -463,27 +484,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23035800:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23035800
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '3'
-        comment: null
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23035801
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23035802
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:20000020:
@@ -499,14 +499,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '0'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23035800:
           source_test_id: oval:mil.disa.stig.ind:tst:23035800
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: at least one lowercase character is required
+          test_title: at least one lowercase character is required
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -516,30 +516,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000020
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230358:
-          source_definition_id: oval:mil.disa.stig.defs:def:230358
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: at least one lowercase character is required
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23035800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must enforce password complexity by requiring that at least one lower-case character
-                be used.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258102:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258102
           class: compliance
@@ -576,6 +552,30 @@ rule:
                 \ long it takes to crack a password. The more complex the password, the greater the number of possible combinations\
                 \ that need to be tested before the password is compromised. Requiring a minimum number of lowercase characters\
                 \ makes password guessing attacks more difficult by ensuring a larger search space."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230358:
+          source_definition_id: oval:mil.disa.stig.defs:def:230358
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: at least one lowercase character is required
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23035800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must enforce password complexity by requiring that at least one lower-case character
+                be used.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -707,9 +707,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258102r1045207_rule
-      semantic_ir_sha256: 60ff2936102face9a1b4d09944781595ca1a949fc0a5e32df8c801edacd2051c
+      semantic_ir_sha256: e75fa01d9271351a146a1ce182ea47d94ca5f5bdd39b433305fe8ec6f9c1f129
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: f7a70b2b512740cb160299badecca4b1f9fbf77ec4a57edf87b5434f333d3b2c
+    semantic_fingerprint_sha256: d8254d7144d22ae8431702bb9efb2e3eb43d74c66f0664747f16fcae7f7bd2e3
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258102r1045207_rule

@@ -7,34 +7,13 @@ assessment:
   description: The Server Message Block (SMB) v1 protocol must be disabled on the SMB client.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:25328600:
-      capability: scapng.collect.windows.wmi57
-      source_object_id: oval:mil.disa.stig.win:obj:25328600
-      source_type: wmi57_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: null
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: namespace
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: root\cimv2
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: wql
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
     oval:mil.disa.stig.win:obj:25328800:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25328800
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -54,8 +33,46 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: Start
+    oval:mil.disa.stig.win:obj:25328600:
+      capability: scapng.collect.windows.wmi57
+      source_object_id: oval:mil.disa.stig.win:obj:25328600
+      source_type: wmi57_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      object_title: null
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: namespace
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: root\cimv2
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: wql
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:20000004:
+      source_state_id: oval:mil.disa.stig.win:ste:20000004
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '4'
+      state_title: Reg_Dword type and value equals 4
     oval:mil.disa.stig.win:ste:25328600:
       source_state_id: oval:mil.disa.stig.win:ste:25328600
       source_type: wmi57_state
@@ -77,32 +94,15 @@ assessment:
         kind: element
         name: result
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2
-    oval:mil.disa.stig.win:ste:20000004:
-      source_state_id: oval:mil.disa.stig.win:ste:20000004
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_dword
-      - attributes:
-          datatype: int
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '4'
-      comment: Reg_Dword type and value equals 4
+      state_title: Check SMB v1 Protocol Win32_OptionalFeature object InstallState is equal to 2
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25328800:
         source_test_id: oval:mil.disa.stig.win:tst:25328800
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Configure SMBv1 client driver'' is set to ''Enabled'' with ''Disable driver (recommended)'' selected for
-          ''Configure MrxSmb10 driver'''
+        test_title: '''Configure SMBv1 client driver'' is set to ''Enabled'' with ''Disable driver (recommended)'' selected
+          for ''Configure MrxSmb10 driver'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -115,7 +115,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25328600
         source_type: wmi57_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
+        test_title: '''SMB 1.0/CIFS File Sharing Support'' feature is not installed'
         check: all
         check_existence: all_exist
         state_operator: AND
@@ -125,6 +125,34 @@ assessment:
         - oval:mil.disa.stig.win:ste:25328600
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253288:
+        source_definition_id: oval:mil.disa.stig.defs:def:253288
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25328600
+          - comment: Verifies 'Configure SMBv1 client driver' is set to 'Enabled' with 'Disable driver (recommended)' selected
+              for 'Configure MrxSmb10 driver'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25328800
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The Server Message Block (SMB) v1 protocol must be disabled on the SMB client.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253288:
         source_definition_id: oval:mil.disa.stig.windows11:def:253288
         class: compliance
@@ -162,34 +190,6 @@ assessment:
               support SMBv1. File shares and print services hosted on Windows Server 2003 are an example, however Windows
               Server 2003 is no longer a supported operating system. Some older network attached devices may only support
               SMBv1.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253288:
-        source_definition_id: oval:mil.disa.stig.defs:def:253288
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: Verifies 'SMB 1.0/CIFS File Sharing Support' feature is not installed
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25328600
-          - comment: Verifies 'Configure SMBv1 client driver' is set to 'Enabled' with 'Disable driver (recommended)' selected
-              for 'Configure MrxSmb10 driver'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25328800
-          comment: null
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The Server Message Block (SMB) v1 protocol must be disabled on the SMB client.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -324,6 +324,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253288r958478_rule
-    semantic_ir_sha256: 97243e0cb03ceb26d4bda3ce773627dc359872890c82d29128d1343b1522cc7c
+    semantic_ir_sha256: 73a875538fc4a039b3c1bf4fafb9da6eecf25437e0e7dc5954a1fa2dd9872bf3
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 6c0156cc803e2e021f9f397b8a59900ced1dd7e316c0d9101e173bac3012218e
+  semantic_fingerprint_sha256: 688663a1c329644dd4f670603c6032b9ca07d6ab4c24f3ffc7472d6cdd522ac6

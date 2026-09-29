@@ -390,59 +390,13 @@ rule:
     description: RHEL 9 must not allow users to override SSH environment variables.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:27172000:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27172000
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:27172001
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:27172002
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
-      oval:mil.disa.stig.ind:obj:27172001:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:27172001
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^(?i)\s*PermitUserEnvironment\s+(\w+)$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:27172002:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:27172002
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             max_depth: '-1'
@@ -473,6 +427,52 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:27172001:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27172001
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^(?i)\s*PermitUserEnvironment\s+(\w+)$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:27172000:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:27172000
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:27172001
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:27172002
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:20000017:
@@ -488,14 +488,14 @@ rule:
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^(no|"no")$
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:27172000:
           source_test_id: oval:mil.disa.stig.ind:tst:27172000
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: The PermitUserEnvironment option is not set to yes in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf.
+          test_title: The PermitUserEnvironment option is not set to yes in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf.
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -505,6 +505,29 @@ rule:
           - oval:mil.disa.stig.ind:ste:20000017
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:271720:
+          source_definition_id: oval:mil.disa.stig.defs:def:271720
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Check to see if PermitUserEnvironment is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:27172000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must not allow users to override SSH environment variables.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257993:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257993
           class: compliance
@@ -535,29 +558,6 @@ rule:
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: SSH environment options potentially allow users to bypass access restriction in some configurations.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:271720:
-          source_definition_id: oval:mil.disa.stig.defs:def:271720
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Check to see if PermitUserEnvironment is set to no in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:27172000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must not allow users to override SSH environment variables.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -690,9 +690,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257993r1045049_rule
-      semantic_ir_sha256: 3c5cea0161783e9caf955e8c40e01765b430c82867651088d13af9e441bc73e5
+      semantic_ir_sha256: 731f17f096916c7209e23ca7024534ab6348170b6f6546259427155e5662598d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 1045ccf95d580e0c707d1597da7d53a096ed2c7e0d6192f6c28a4ab98814da20
+    semantic_fingerprint_sha256: 075f6d657265a7bf13b5e9e024e9b3ce440b2a535a8b7183cfdaace82dafa27f
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257993r1045049_rule

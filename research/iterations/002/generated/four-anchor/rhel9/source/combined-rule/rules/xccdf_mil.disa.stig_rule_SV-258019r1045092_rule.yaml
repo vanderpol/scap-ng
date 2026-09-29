@@ -382,13 +382,42 @@ rule:
       smart card is removed.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.unix:obj:23035100:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:23035100
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '2'
+        object_title: dconf database directories
+        query:
+        - attributes:
+            max_depth: '1'
+            recurse_direction: down
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: /etc/dconf/db
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - attributes:
+            action: include
+          kind: element
+          name: filter
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: oval:mil.disa.stig.unix:ste:23035100
       oval:mil.disa.stig.ind:obj:23035100:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23035100
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '4'
-        comment: dconf org/gnome/settings-daemon/peripherals/smartcard sections
+        object_title: dconf org/gnome/settings-daemon/peripherals/smartcard sections
         query:
         - attributes:
             datatype: string
@@ -417,41 +446,12 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.unix:obj:23035100:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:23035100
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '2'
-        comment: dconf database directories
-        query:
-        - attributes:
-            max_depth: '1'
-            recurse_direction: down
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: /etc/dconf/db
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - attributes:
-            action: include
-          kind: element
-          name: filter
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: oval:mil.disa.stig.unix:ste:23035100
     derive:
       oval:mil.disa.stig.defs:var:23035100:
         source_variable_id: oval:mil.disa.stig.defs:var:23035100
         source_type: local_variable
         datatype: string
-        comment: dconf database directories
+        variable_title: dconf database directories
         semantic_ast:
           datatype: string
           expression:
@@ -501,7 +501,7 @@ rule:
           name: path
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: ^/etc/dconf/db/.*\.d$
-        comment: dconf database directories
+        state_title: dconf database directories
       oval:mil.disa.stig.ind:ste:23035100:
         source_state_id: oval:mil.disa.stig.ind:ste:23035100
         source_type: textfilecontent54_state
@@ -515,14 +515,14 @@ rule:
           name: text
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \nremoval-action='lock-screen'\s*(\n|$)
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:23035100:
           source_test_id: oval:mil.disa.stig.ind:tst:23035100
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: dconf smartcard removal-action lock-screen
+          test_title: dconf smartcard removal-action lock-screen
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -532,6 +532,30 @@ rule:
           - oval:mil.disa.stig.ind:ste:23035100
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230351:
+          source_definition_id: oval:mil.disa.stig.defs:def:230351
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: /proc/sys/crypto/fips_enabled is set to 1
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23035100
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must be able to initiate directly a session lock for all connection types using smartcard
+                when the smartcard is removed.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:258019:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:258019
           class: compliance
@@ -573,30 +597,6 @@ rule:
 
 
                 Satisfies: SRG-OS-000028-GPOS-00009, SRG-OS-000030-GPOS-00011'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230351:
-          source_definition_id: oval:mil.disa.stig.defs:def:230351
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: /proc/sys/crypto/fips_enabled is set to 1
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23035100
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must be able to initiate directly a session lock for all connection types using smartcard
-                when the smartcard is removed.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -722,9 +722,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
-      semantic_ir_sha256: 558017203db26260c7dca298596c29935ab9c056c909ecc307249b7be66ea860
+      semantic_ir_sha256: ffab6c92b30f17f6a701f1232aa738a1880b2b8a485d508f7ce11f55101a9426
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d82d3d290789bc0017b6d40297f8075d187bc9a4f132676b1eccc2acf022fca3
+    semantic_fingerprint_sha256: d32686f96ef0d1e8d173395c4be4a03dd72e71c67618439794d831a7916d8c6b
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-258019r1045092_rule

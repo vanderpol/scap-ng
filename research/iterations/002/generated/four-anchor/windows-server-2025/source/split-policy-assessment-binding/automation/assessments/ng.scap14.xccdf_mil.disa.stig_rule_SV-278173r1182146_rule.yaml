@@ -13,7 +13,7 @@ assessment:
       source_type: registry_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -54,14 +54,14 @@ assessment:
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '1'
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:27142700:
         source_test_id: oval:mil.disa.stig.win:tst:27142700
         source_type: registry_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: UseStrongNameMatches == 1
+        test_title: UseStrongNameMatches == 1
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -71,6 +71,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:271427:
+        source_definition_id: oval:mil.disa.stig.defs:def:271427
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: UseStrongNameMatches == 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:27142700
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must be configured for name-based strong mappings for certificates.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278173:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278173
         class: compliance
@@ -104,29 +127,6 @@ assessment:
               be correctly mapped to the intended user account in Active Directory. A lack of strong name-based mappings allows
               certain weak certificate mappings, such as Issuer/Subject AltSecID and User Principal Names (UPN) mappings,
               to be treated as strong mappings.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:271427:
-        source_definition_id: oval:mil.disa.stig.defs:def:271427
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: UseStrongNameMatches == 1
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:27142700
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must be configured for name-based strong mappings for certificates.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -259,6 +259,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278173r1182146_rule
-    semantic_ir_sha256: a0f3db85fbff64935fc3bc0eee40df08a3e39660814534fc53f0f54d8f7fa194
+    semantic_ir_sha256: f70d11c28824d6d61a7474a5f619267ddb054ec1163ef3df21f32da6cadde4b5
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: dffad09d398f83488818a5d6a4d252c9e891f68b01f4310d81dc128a64820986
+  semantic_fingerprint_sha256: ae5fa4e97b24e4624040de969a82ed3f200e4dcee57bd3d8121abb3dc9784d18

@@ -359,7 +359,7 @@ rule:
         source_type: cmdlet_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '18'
-        comment: Check for TPM Specific Version
+        object_title: Check for TPM Specific Version
         query:
         - attributes:
             operation: equals
@@ -422,7 +422,7 @@ rule:
         source_type: cmdlet_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '18'
-        comment: Check for TPM values
+        object_title: Check for TPM values
         query:
         - kind: element
           name: module_name
@@ -466,6 +466,26 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
     derive: {}
     predicates:
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:25325502:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25325502
+        source_type: cmdlet_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+          children:
+          - attributes:
+              name: specversion
+              operation: pattern match
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: 2\.0
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        state_title: Specific Version must be 2.0
       oval:navy.navwar.niwcatlantic.scc.windows:ste:25325501:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25325501
         source_type: cmdlet_state
@@ -499,47 +519,14 @@ rule:
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: TPM values must be equal to True
-      oval:navy.navwar.niwcatlantic.scc.windows:ste:25325502:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25325502
-        source_type: cmdlet_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-          children:
-          - attributes:
-              name: specversion
-              operation: pattern match
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: 2\.0
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Specific Version must be 2.0
+        state_title: TPM values must be equal to True
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:25325502:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25325502
-          source_type: cmdlet_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Windows TPM Specific Version should be version 2.0
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25325502
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25325502
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:25325501:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25325501
           source_type: cmdlet_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Windows must have TPM and must be ready to use
+          test_title: Windows must have TPM and must be ready to use
           check: at least one
           check_existence: at_least_one_exists
           state_operator: AND
@@ -547,6 +534,19 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:25325501
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:25325501
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:25325502:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:25325502
+          source_type: cmdlet_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: Windows TPM Specific Version should be version 2.0
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:25325502
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:25325502
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:253255:
@@ -710,9 +710,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253255r1210279_rule
-      semantic_ir_sha256: 16ceeb3ac5e93b269afa8d4e9e3a08235e91f1575d500fbe706fccb2e2099266
+      semantic_ir_sha256: 7c4d6373a0a3cc82c4d366e6a4fc80f97d5e9ff2df2c31855d46a581427ffd03
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 3112cda0252a142b9d75a5b8a49923e87b2a776483bd25ea866990bf2e9f73aa
+    semantic_fingerprint_sha256: 98f036258d69affea8b9a830a0f20fc0a7d3c1e1b4accd42174ddb2eb4ebc59c
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253255r1210279_rule

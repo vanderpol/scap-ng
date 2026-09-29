@@ -383,7 +383,7 @@ rule:
         source_type: systemdunitproperty_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         version: '1'
-        comment: sshd.service ActiveState
+        object_title: sshd.service ActiveState
         query:
         - kind: element
           name: unit
@@ -405,14 +405,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: active
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.linux:tst:25797900:
           source_test_id: oval:mil.disa.stig.linux:tst:25797900
           source_type: systemdunitproperty_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: Check if SSH is in 'active' state
+          test_title: Check if SSH is in 'active' state
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -422,6 +422,30 @@ rule:
           - oval:mil.disa.stig.linux:ste:20000003
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:257979:
+          source_definition_id: oval:mil.disa.stig.defs:def:257979
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: The SSH daemon is active
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:25797900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: All the operating system networked systems must have and implement SSH to protect the confidentiality
+                and integrity of transmitted and received information, as well as information during preparation for transmission.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271483:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271483
           class: compliance
@@ -462,30 +486,6 @@ rule:
                 \ systems) or by logical means (e.g., employing cryptographic techniques). If physical means of protection\
                 \ are employed, then logical means (cryptography) do not have to be employed, and vice versa.\n\n\tSatisfies:\
                 \ SRG-OS-000423-GPOS-00187, SRG-OS-000424-GPOS-00188, SRG-OS-000425-GPOS-00189, SRG-OS-000426-GPOS-00190"
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:257979:
-          source_definition_id: oval:mil.disa.stig.defs:def:257979
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: The SSH daemon is active
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:25797900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: All the operating system networked systems must have and implement SSH to protect the confidentiality
-                and integrity of transmitted and received information, as well as information during preparation for transmission.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -618,9 +618,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271483r1091161_rule
-      semantic_ir_sha256: 6df4f2ec195881a3892e1a45a4a399a8dc9765ca933f132de228e6c59e255978
+      semantic_ir_sha256: c6123a24c2eb93a001765a0abd0d8c9460c17eb6a6d4e4367d243e33fad7e0e2
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: c84ad05ffdb61ab302844134f55fda02a5c8e8960b3ab9f17de39dc6009a0c8d
+    semantic_fingerprint_sha256: 3ae4426d24439840b6a13802573c70a796c6ad0a1489e905e26920325694a995
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-271483r1091161_rule

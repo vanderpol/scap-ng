@@ -341,13 +341,33 @@ rule:
     description: Toast notifications to the lock screen must be turned off.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:25347701:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25347701
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_CURRENT_USER
+        - kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Software\Policies\Microsoft\Windows\CurrentVersion\PushNotifications
+        - kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: NoToastApplicationNotificationOnLockScreen
       oval:mil.disa.stig.win:obj:25347700:
         capability: scapng.collect.windows.ntuser
         source_object_id: oval:mil.disa.stig.win:obj:25347700
         source_type: ntuser_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: key
@@ -365,28 +385,21 @@ rule:
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:mil.disa.stig.win:ste:20000027
-      oval:mil.disa.stig.win:obj:25347701:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25347701
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_CURRENT_USER
-        - kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Software\Policies\Microsoft\Windows\CurrentVersion\PushNotifications
-        - kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: NoToastApplicationNotificationOnLockScreen
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000026:
+        source_state_id: oval:mil.disa.stig.win:ste:20000026
+        source_type: ntuser_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: boolean
+          kind: element
+          name: enabled
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: 'false'
+        state_title: null
       oval:mil.disa.stig.win:ste:20000001:
         source_state_id: oval:mil.disa.stig.win:ste:20000001
         source_type: registry_state
@@ -403,20 +416,21 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
-      oval:mil.disa.stig.win:ste:20000026:
-        source_state_id: oval:mil.disa.stig.win:ste:20000026
+        state_title: null
+      oval:mil.disa.stig.win:ste:20000027:
+        source_state_id: oval:mil.disa.stig.win:ste:20000027
         source_type: ntuser_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
         entities:
         - attributes:
-            datatype: boolean
+            datatype: int
+            operation: greater than
           kind: element
-          name: enabled
+          name: days_since_modified
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: 'false'
-        comment: null
+          value: '35'
+        state_title: null
       oval:mil.disa.stig.win:ste:20000022:
         source_state_id: oval:mil.disa.stig.win:ste:20000022
         source_type: ntuser_state
@@ -433,41 +447,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '1'
-        comment: null
-      oval:mil.disa.stig.win:ste:20000027:
-        source_state_id: oval:mil.disa.stig.win:ste:20000027
-        source_type: ntuser_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: greater than
-          kind: element
-          name: days_since_modified
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '35'
-        comment: null
+        state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25347701:
-          source_test_id: oval:mil.disa.stig.win:tst:25347701
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: For the current user, 'Turn off toast notifications on the lock screen' is set to 'Enabled'
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25347701
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000001
-          source_other: []
         oval:mil.disa.stig.win:tst:25347700:
           source_test_id: oval:mil.disa.stig.win:tst:25347700
           source_type: ntuser_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Turn off toast notifications on the lock screen'' is set to ''Enabled'''
+          test_title: '''Turn off toast notifications on the lock screen'' is set to ''Enabled'''
           check: all
           check_existence: all_exist
           state_operator: AND
@@ -476,7 +463,47 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000022
           source_other: []
+        oval:mil.disa.stig.win:tst:25347701:
+          source_test_id: oval:mil.disa.stig.win:tst:25347701
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: For the current user, 'Turn off toast notifications on the lock screen' is set to 'Enabled'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25347701
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000001
+          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253477:
+          source_definition_id: oval:mil.disa.stig.defs:def:253477
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: '''Turn off toast notifications on the lock screen'' is set to ''Enabled''.'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25347700
+            - comment: For the current user, 'Turn off toast notifications on the lock screen' is set to 'Enabled'.
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25347701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Toast notifications to the lock screen must be turned off.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253477:
           source_definition_id: oval:mil.disa.stig.windows11:def:253477
           class: compliance
@@ -508,33 +535,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Toast notifications that are displayed on the lock screen could display sensitive information to unauthorized
                 personnel. Turning off this feature will limit access to the information to a logged on user.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253477:
-          source_definition_id: oval:mil.disa.stig.defs:def:253477
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: '''Turn off toast notifications on the lock screen'' is set to ''Enabled''.'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25347700
-            - comment: For the current user, 'Turn off toast notifications on the lock screen' is set to 'Enabled'.
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25347701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Toast notifications to the lock screen must be turned off.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -666,9 +666,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253477r958478_rule
-      semantic_ir_sha256: 78c6ecfc858979c188b00187f1a816b770cfc99a6e7b397ba4e6489e147b4f6f
+      semantic_ir_sha256: adbf71e8987e02786a169f611791881bbf2f34f9fd639aaa80891b8ce83cffea
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 70b2bbd5666040ba37c6346550862fe66ed81b47b01e71f4d38ad9f682cdfdba
+    semantic_fingerprint_sha256: a74aaf9786edb56073e23cd93842a8fdfa27399df5b541ced6b26f6662d09905
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253477r958478_rule

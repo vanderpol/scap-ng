@@ -372,37 +372,13 @@ rule:
     description: RHEL 9 must mount /var/log/audit with the nodev option.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23051701:
-        capability: scapng.collect.independent.variable
-        source_object_id: oval:mil.disa.stig.ind:obj:23051701
-        source_type: variable_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: var_ref
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: oval:mil.disa.stig.linux:var:23051700
-      oval:mil.disa.stig.linux:obj:23051700:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23051700
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /var/log/audit
       oval:mil.disa.stig.ind:obj:23051702:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23051702
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: filepath
@@ -420,12 +396,36 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.linux:obj:23051700:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23051700
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /var/log/audit
+      oval:mil.disa.stig.ind:obj:23051701:
+        capability: scapng.collect.independent.variable
+        source_object_id: oval:mil.disa.stig.ind:obj:23051701
+        source_type: variable_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: null
+        query:
+        - kind: element
+          name: var_ref
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: oval:mil.disa.stig.linux:var:23051700
     derive:
       oval:mil.disa.stig.linux:var:23051700:
         source_variable_id: oval:mil.disa.stig.linux:var:23051700
         source_type: local_variable
         datatype: string
-        comment: Mount options for /var/log/audit in /etc/fstab
+        variable_title: Mount options for /var/log/audit in /etc/fstab
         semantic_ast:
           datatype: string
           expression:
@@ -483,19 +483,6 @@ rule:
           variable_id: oval:mil.disa.stig.linux:var:23051700
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.ind:ste:23051700:
-        source_state_id: oval:mil.disa.stig.ind:ste:23051700
-        source_type: variable_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: nodev
-        comment: null
       oval:mil.disa.stig.linux:ste:20000001:
         source_state_id: oval:mil.disa.stig.linux:ste:20000001
         source_type: partition_state
@@ -508,14 +495,40 @@ rule:
           name: mount_options
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: nodev
-        comment: null
+        state_title: null
+      oval:mil.disa.stig.ind:ste:23051700:
+        source_state_id: oval:mil.disa.stig.ind:ste:23051700
+        source_type: variable_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: nodev
+        state_title: null
     evaluate:
       tests:
+        oval:mil.disa.stig.ind:tst:23051701:
+          source_test_id: oval:mil.disa.stig.ind:tst:23051701
+          source_type: variable_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          test_title: /var/log/audit is configured with the nodev option in /etc/fstab
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23051701
+          predicates:
+          - oval:mil.disa.stig.ind:ste:23051700
+          source_other: []
         oval:mil.disa.stig.linux:tst:23051700:
           source_test_id: oval:mil.disa.stig.linux:tst:23051700
           source_type: partition_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: /var/log/audit is mounted with the nodev option
+          test_title: /var/log/audit is mounted with the nodev option
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -528,7 +541,7 @@ rule:
           source_test_id: oval:mil.disa.stig.ind:tst:23051702
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /var/log/audit is configured in /etc/fstab
+          test_title: /var/log/audit is configured in /etc/fstab
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
@@ -536,51 +549,7 @@ rule:
           - oval:mil.disa.stig.ind:obj:23051702
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:23051701:
-          source_test_id: oval:mil.disa.stig.ind:tst:23051701
-          source_type: variable_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /var/log/audit is configured with the nodev option in /etc/fstab
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23051701
-          predicates:
-          - oval:mil.disa.stig.ind:ste:23051700
-          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230517:
-          source_definition_id: oval:mil.disa.stig.defs:def:230517
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23051700
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23051701
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23051702
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must mount /var/log/audit with the nodev option.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.rhel9os:def:257873:
           source_definition_id: oval:mil.disa.stig.rhel9os:def:257873
           class: compliance
@@ -617,6 +586,37 @@ rule:
 
                 The only legitimate location for device files is the "/dev" directory located on the root partition, with
                 the exception of chroot jails if implemented.'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230517:
+          source_definition_id: oval:mil.disa.stig.defs:def:230517
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23051700
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23051701
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23051702
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must mount /var/log/audit with the nodev option.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -744,9 +744,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257873r958804_rule
-      semantic_ir_sha256: dd29742a32a3d99756b977bfcd25c322fb98571254ecadb393d1a504ac8b6400
+      semantic_ir_sha256: 657dac057d998ca60fc597d5ac9923c924e0016e72a3bdb28214b83f9b9d2bdf
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: baa524eca23f151772ef28f1dfde27f85255ac9912c4facf58c78bdca43a255a
+    semantic_fingerprint_sha256: 70098f2b8cbfb6458d81af7cc50e8040c42cbac175fca58bf0b0debdcdc0e3d8
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-257873r958804_rule

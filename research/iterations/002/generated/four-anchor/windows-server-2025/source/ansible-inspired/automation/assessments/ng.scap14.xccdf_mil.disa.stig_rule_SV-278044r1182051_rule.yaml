@@ -12,7 +12,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:20000015
     collect:
       capability: scapng.collect.windows.registry
-      comment: System Root Directory
+      object_title: System Root Directory
       query:
       - attributes:
           datatype: string
@@ -40,7 +40,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25334101
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: The Security event log. Built filepath.
+      object_title: The Security event log. Built filepath.
       query:
       - attributes:
           datatype: string
@@ -65,7 +65,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25334102
     collect:
       capability: scapng.collect.windows.registry
-      comment: path Security.evtx
+      object_title: path Security.evtx
       query:
       - attributes:
           datatype: string
@@ -93,7 +93,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25334104
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: The Security event log. Strict filepath, as listed.
+      object_title: The Security event log. Strict filepath, as listed.
       query:
       - attributes:
           datatype: string
@@ -118,7 +118,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25429700
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: Permissions of Security event log, minus those allowed. Built filepath.
+      object_title: Permissions of Security event log, minus those allowed. Built filepath.
       query:
       - children:
         - kind: object_ref
@@ -155,7 +155,7 @@ assessment:
   - name: Collect oval:mil.disa.stig.win:obj:25429701
     collect:
       capability: scapng.collect.windows.fileeffectiverights53
-      comment: Permissions of Security event log, minus those allowed. Strict filepath, as listed.
+      object_title: Permissions of Security event log, minus those allowed. Strict filepath, as listed.
       query:
       - children:
         - kind: object_ref
@@ -191,7 +191,6 @@ assessment:
     register: oval:mil.disa.stig.win:obj:25429701
   - name: Derive oval:mil.disa.stig.win:var:25334101
     derive:
-      comment: Path to Security.evtx with the SystemRoot environment variable replaced with its value.
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -267,10 +266,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.win:var:25334101
+      variable_title: Path to Security.evtx with the SystemRoot environment variable replaced with its value.
     register: oval:mil.disa.stig.win:var:25334101
   - name: Derive oval:mil.disa.stig.win:var:25334102
     derive:
-      comment: Strict path to Security.evtx.
       datatype: string
       evaluation_plan:
         blocked_by:
@@ -330,10 +329,10 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.win:var:25334102
+      variable_title: Strict path to Security.evtx.
     register: oval:mil.disa.stig.win:var:25334102
   predicates:
     oval:mil.disa.stig.win:ste:20000011:
-      comment: Event Log process account. Deterministically built with respect to service name.
       entities:
       - attributes:
           datatype: string
@@ -345,8 +344,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000011
       source_type: fileeffectiverights53_state
+      state_title: Event Log process account. Deterministically built with respect to service name.
     oval:mil.disa.stig.win:ste:20000012:
-      comment: SYSTEM account.
       entities:
       - attributes:
           datatype: string
@@ -358,8 +357,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000012
       source_type: fileeffectiverights53_state
+      state_title: SYSTEM account.
     oval:mil.disa.stig.win:ste:20000013:
-      comment: Administrators account.
       entities:
       - attributes:
           datatype: string
@@ -371,8 +370,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000013
       source_type: fileeffectiverights53_state
+      state_title: Administrators account.
     oval:mil.disa.stig.win:ste:20000014:
-      comment: LOCAL SERVICE account, the owner.
       entities:
       - attributes:
           datatype: string
@@ -384,8 +383,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000014
       source_type: fileeffectiverights53_state
+      state_title: LOCAL SERVICE account, the owner.
     oval:mil.disa.stig.win:ste:20000016:
-      comment: '%SystemRoot% environment variable.'
       entities:
       - attributes:
           datatype: string
@@ -398,6 +397,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       source_state_id: oval:mil.disa.stig.win:ste:20000016
       source_type: registry_state
+      state_title: '%SystemRoot% environment variable.'
   evaluate:
     definitions:
       oval:mil.disa.stig.defs:def:254297:
@@ -488,7 +488,6 @@ assessment:
         check_existence: at_least_one_exists
         collections:
         - oval:mil.disa.stig.win:obj:25334102
-        comment: The Security event log registry specified location must have the %SystemRoot% environment variable.
         predicates:
         - oval:mil.disa.stig.win:ste:20000016
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -496,30 +495,31 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25334102
         source_type: registry_test
         state_operator: AND
+        test_title: The Security event log registry specified location must have the %SystemRoot% environment variable.
       oval:mil.disa.stig.win:tst:25429700:
         check: all
         check_existence: none_exist
         collections:
         - oval:mil.disa.stig.win:obj:25429700
-        comment: The Security event log must have at least default permissions. Built Path
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         source_other: []
         source_test_id: oval:mil.disa.stig.win:tst:25429700
         source_type: fileeffectiverights53_test
         state_operator: AND
+        test_title: The Security event log must have at least default permissions. Built Path
       oval:mil.disa.stig.win:tst:25429701:
         check: all
         check_existence: none_exist
         collections:
         - oval:mil.disa.stig.win:obj:25429701
-        comment: The Security event log must have at least default permissions. Strict Path
         predicates: []
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         source_other: []
         source_test_id: oval:mil.disa.stig.win:tst:25429701
         source_type: fileeffectiverights53_test
         state_operator: AND
+        test_title: The Security event log must have at least default permissions. Strict Path
   source_check_context:
     check_exports: []
     checks:
@@ -648,8 +648,8 @@ assessment:
       - oval:mil.disa.stig.windows2025:def:278044
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_ir_sha256: dc320c61d20aa319ce24ced9ee45b0e01204b769818e73d7d3bb5b878a45ebfd
+    semantic_ir_sha256: ebb2be582513d57ce79cea6ee42ede7ebc815f5e666f55664d55139815c42f85
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278044r1182051_rule
     status: legacy_compatible
-  semantic_fingerprint_sha256: c070d6e111729f5ae516b16e6584919fd247bbd65487d2a3270243a972191c22
+  semantic_fingerprint_sha256: 03f4479201385ddf3edea4f3d68c4943c205dc2d905c05a7298a59d155ed4c19

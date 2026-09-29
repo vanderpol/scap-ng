@@ -358,7 +358,7 @@ rule:
         source_type: userright_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - kind: element
           name: userright
@@ -375,7 +375,7 @@ rule:
         - kind: element
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: null
+        state_title: null
       oval:mil.disa.stig.win:ste:20000030:
         source_state_id: oval:mil.disa.stig.win:ste:20000030
         source_type: userright_state
@@ -388,14 +388,14 @@ rule:
           name: trustee_name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: Administrators
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25349701:
           source_test_id: oval:mil.disa.stig.win:tst:25349701
           source_type: userright_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Force shutdown from a remote system - Administrators
+          test_title: Force shutdown from a remote system - Administrators
           check: all
           check_existence: at_least_one_exists
           state_operator: OR
@@ -406,6 +406,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000030
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253497:
+          source_definition_id: oval:mil.disa.stig.defs:def:253497
+          class: compliance
+          version: '4'
+          criteria:
+            children:
+            - comment: Force shutdown from a remote system - Administrators
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Force shutdown from a remote system" user right must only be assigned to the Administrators group.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253497:
           source_definition_id: oval:mil.disa.stig.windows11:def:253497
           class: compliance
@@ -441,29 +464,6 @@ rule:
 
                 Accounts with the "Force shutdown from a remote system" user right can remotely shut down a system which could
                 result in a DoS.'
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253497:
-          source_definition_id: oval:mil.disa.stig.defs:def:253497
-          class: compliance
-          version: '4'
-          criteria:
-            children:
-            - comment: Force shutdown from a remote system - Administrators
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25349701
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Force shutdown from a remote system" user right must only be assigned to the Administrators group.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -596,9 +596,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253497r958726_rule
-      semantic_ir_sha256: bac4a971087bc63e6e66130eb7572f5994ef54d2e41412cd221dbceee3aa1a35
+      semantic_ir_sha256: 86a8319b62026733d31a44d99fd95b816637894c203db8bdde1ecf97a64fc07d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: d924adfff63ada1322ed2a1820fbbfc910c7891e7a701bf0a146cce02b8bc552
+    semantic_fingerprint_sha256: 185d3a4e0c68a6305f65fda5006055c83d37563116fab8563817734826066a97
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-253497r958726_rule

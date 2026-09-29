@@ -7,13 +7,34 @@ assessment:
   description: The systemd Ctrl-Alt-Delete burst key sequence in RHEL 9 must be disabled.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:23499000:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23499000
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      object_title: CtrlAltDelBurstAction in /etc/systemd/system.conf and /etc/systemd/system.conf.d/*
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23499001
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:23499002
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:23499001:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23499001
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -40,7 +61,7 @@ assessment:
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      object_title: null
       query:
       - attributes:
           datatype: string
@@ -67,27 +88,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23499000:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23499000
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: CtrlAltDelBurstAction in /etc/systemd/system.conf and /etc/systemd/system.conf.d/*
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23499001
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:23499002
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:20000014:
@@ -103,14 +103,14 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: none
-      comment: null
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23499000:
         source_test_id: oval:mil.disa.stig.ind:tst:23499000
         source_type: textfilecontent54_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
+        test_title: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -306,6 +306,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257784r1208766_rule
-    semantic_ir_sha256: b81ae6143ddeefb7dc67d37c0605d4427c7e2bdffb51a394577b78d3f6faa716
+    semantic_ir_sha256: 7289733700d917604413735dc392795014530e0be713b6148e0b0579757114dc
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 421adb706600188215acc4650b295c613ebb71b8168e8cedf0a7e7ecbc536ade
+  semantic_fingerprint_sha256: 2eb6e89b915b86cbe14936dc0c0ce6cc8118d858405d0b188e1eec7f62b39266

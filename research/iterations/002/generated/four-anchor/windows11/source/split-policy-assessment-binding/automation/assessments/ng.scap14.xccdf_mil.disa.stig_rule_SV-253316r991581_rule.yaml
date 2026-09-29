@@ -13,7 +13,7 @@ assessment:
       source_type: auditeventpolicysubcategories_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query: []
   derive: {}
   predicates:
@@ -29,7 +29,7 @@ assessment:
         name: logon
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_FAILURE
-      comment: '''Log On'' is set to ''Failure'''
+      state_title: '''Log On'' is set to ''Failure'''
     oval:mil.disa.stig.win:ste:25331601:
       source_state_id: oval:mil.disa.stig.win:ste:25331601
       source_type: auditeventpolicysubcategories_state
@@ -42,27 +42,14 @@ assessment:
         name: logon
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
-      comment: '''Log On'' is set to ''Success'' and ''Failure'''
+      state_title: '''Log On'' is set to ''Success'' and ''Failure'''
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25331600:
-        source_test_id: oval:mil.disa.stig.win:tst:25331600
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit Logon'' is set to ''Failure'''
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25331600
-        source_other: []
       oval:mil.disa.stig.win:tst:25331601:
         source_test_id: oval:mil.disa.stig.win:tst:25331601
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit Logon'' is set to ''Success'' and ''Failure'''
+        test_title: '''Audit Logon'' is set to ''Success'' and ''Failure'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -71,7 +58,47 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25331601
         source_other: []
+      oval:mil.disa.stig.win:tst:25331600:
+        source_test_id: oval:mil.disa.stig.win:tst:25331600
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        test_title: '''Audit Logon'' is set to ''Failure'''
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25331600
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253316:
+        source_definition_id: oval:mil.disa.stig.defs:def:253316
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Logon - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25331600
+          - comment: Audit - Logon - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25331601
+          comment: Audit - Logon - Failure
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Logon/Logoff - Logon failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253316:
         source_definition_id: oval:mil.disa.stig.windows11:def:253316
         class: compliance
@@ -109,33 +136,6 @@ assessment:
 
               Logon records user logons. If this is an interactive logon, it is recorded on the local system. If it is to
               a network share, it is recorded on the system accessed.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253316:
-        source_definition_id: oval:mil.disa.stig.defs:def:253316
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Logon - Failure only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25331600
-          - comment: Audit - Logon - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25331601
-          comment: Audit - Logon - Failure
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Logon/Logoff - Logon failures.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -270,6 +270,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253316r991581_rule
-    semantic_ir_sha256: e4f96f7d6604fc8d85d8921b0079d3a317e1072017825fb464d44a0bb9cedc8e
+    semantic_ir_sha256: c1d2380af81a28ed7a70e0b22ab065eb0a2b923c86083ba79b7e3810e7e593b3
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: a6f20df3e0ee0c50273da0912801bdf2634f070553e9f5ac0a4b1f9c8a77654c
+  semantic_fingerprint_sha256: 907ce394c1c1bf44acf95d23755cb0d47bb4e4c21edc863a7bd711e66cb052ad

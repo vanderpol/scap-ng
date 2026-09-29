@@ -8,7 +8,7 @@ assessment:
   collect:
     oval:mil.disa.stig.unix:obj:25789000:
       capability: scapng.collect.unix.password
-      comment: Local interactive users without nologin
+      object_title: Local interactive users without nologin
       query:
       - attributes:
           operation: pattern match
@@ -40,7 +40,7 @@ assessment:
       version: '5'
     oval:mil.disa.stig.unix:obj:25789001:
       capability: scapng.collect.unix.file
-      comment: home directories of local interactive users without nologin
+      object_title: home directories of local interactive users without nologin
       query:
       - attributes:
           var_check: at least one
@@ -59,7 +59,6 @@ assessment:
       version: '1'
   derive:
     oval:mil.disa.stig.defs:var:25789000:
-      comment: home directories of local interactive users without nologin
       datatype: string
       evaluation_plan:
         datatype: string
@@ -99,6 +98,7 @@ assessment:
         type: local_variable
       source_type: local_variable
       source_variable_id: oval:mil.disa.stig.defs:var:25789000
+      variable_title: home directories of local interactive users without nologin
   description: OL 9 local interactive user home directories must have mode 0750 or less permissive.
   evaluate:
     definitions:
@@ -164,7 +164,6 @@ assessment:
         check_existence: any_exist
         collections:
         - oval:mil.disa.stig.unix:obj:25789001
-        comment: All local interactive user home directories are 0750 or less
         predicates:
         - oval:mil.disa.stig.unix:ste:20000022
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
@@ -172,6 +171,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.unix:tst:25789000
         source_type: file_test
         state_operator: AND
+        test_title: All local interactive user home directories are 0750 or less
   id: ng.shared.638af41de6055923de6e890b
   migration:
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
@@ -180,7 +180,6 @@ assessment:
     reuse_scope: cross-benchmark-exact-semantic-equivalence
   predicates:
     oval:mil.disa.stig.unix:ste:20000022:
-      comment: mode 0750 or less permissive
       entities:
       - attributes:
           datatype: boolean
@@ -228,8 +227,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:20000022
       source_type: file_state
+      state_title: mode 0750 or less permissive
     oval:mil.disa.stig.unix:ste:25789000:
-      comment: nologin shell
       entities:
       - attributes:
           operation: pattern match
@@ -241,8 +240,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:25789000
       source_type: password_state
+      state_title: nologin shell
     oval:mil.disa.stig.unix:ste:25789002:
-      comment: uid < 1000
       entities:
       - attributes:
           datatype: int
@@ -255,8 +254,8 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:25789002
       source_type: password_state
+      state_title: uid < 1000
     oval:mil.disa.stig.unix:ste:25789003:
-      comment: uid = 65534 (nobody)
       entities:
       - attributes:
           datatype: int
@@ -268,6 +267,7 @@ assessment:
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       source_state_id: oval:mil.disa.stig.unix:ste:25789003
       source_type: password_state
+      state_title: uid = 65534 (nobody)
   semantic_model: scap-ng-generic-assessment-graph-0.1
   source_result_algebra: xccdf-1.2-complex-check-eight-state
   version: 1

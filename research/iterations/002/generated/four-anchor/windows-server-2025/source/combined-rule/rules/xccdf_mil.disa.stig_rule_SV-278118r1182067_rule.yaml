@@ -384,7 +384,7 @@ rule:
         source_type: registry_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         version: '1'
-        comment: null
+        object_title: null
         query:
         - attributes:
             datatype: string
@@ -425,14 +425,14 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '0'
-        comment: null
+        state_title: null
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:25340800:
           source_test_id: oval:mil.disa.stig.win:tst:25340800
           source_type: registry_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Turn on Basic feed authentication over HTTP'' is set to ''Not Configured'' or ''Disabled'''
+          test_title: '''Turn on Basic feed authentication over HTTP'' is set to ''Not Configured'' or ''Disabled'''
           check: all
           check_existence: any_exist
           state_operator: AND
@@ -442,6 +442,29 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:253408:
+          source_definition_id: oval:mil.disa.stig.defs:def:253408
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Verifies 'Turn on Basic feed authentication over HTTP' is set to 'Not Configured' or 'Disabled'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25340800
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Basic authentication for RSS feeds over HTTP must not be used.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278118:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278118
           class: compliance
@@ -473,29 +496,6 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: Basic authentication uses plain-text passwords that could be used to compromise a system. Disabling Basic
                 authentication will reduce this potential.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:253408:
-          source_definition_id: oval:mil.disa.stig.defs:def:253408
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Verifies 'Turn on Basic feed authentication over HTTP' is set to 'Not Configured' or 'Disabled'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25340800
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Basic authentication for RSS feeds over HTTP must not be used.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -638,9 +638,9 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278118r1182067_rule
-      semantic_ir_sha256: b9db6972c97c3fa8a0464d9de90198c8adf3a97725442fe8126aae37e80d769e
+      semantic_ir_sha256: 7babf74d77e23cb3454bc842278596182fe7580d80792265d0767814fb7346c1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 4f5d33b521dd740a7c3b54de02755dfe83d6da033c06c03dc77f4e11e966c8ae
+    semantic_fingerprint_sha256: db1f173b2c51816033384b11d552295eb79ddd03459c5164e0e5f2ab5ae42019
   assessments:
   - *id001
   - id: ng.manual.xccdf_mil.disa.stig_rule_SV-278118r1182067_rule

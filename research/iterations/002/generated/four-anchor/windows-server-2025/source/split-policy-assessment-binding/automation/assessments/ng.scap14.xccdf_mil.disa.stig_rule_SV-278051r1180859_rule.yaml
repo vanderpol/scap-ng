@@ -13,23 +13,10 @@ assessment:
       source_type: auditeventpolicysubcategories_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25331000:
-      source_state_id: oval:mil.disa.stig.win:ste:25331000
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: user_account_management
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS
-      comment: '''User Account Management'' is set to ''Success'''
     oval:mil.disa.stig.win:ste:25331001:
       source_state_id: oval:mil.disa.stig.win:ste:25331001
       source_type: auditeventpolicysubcategories_state
@@ -42,14 +29,27 @@ assessment:
         name: user_account_management
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
-      comment: '''User Account Management'' is set to ''Success'' and ''Failure'''
+      state_title: '''User Account Management'' is set to ''Success'' and ''Failure'''
+    oval:mil.disa.stig.win:ste:25331000:
+      source_state_id: oval:mil.disa.stig.win:ste:25331000
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: user_account_management
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS
+      state_title: '''User Account Management'' is set to ''Success'''
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25331001:
         source_test_id: oval:mil.disa.stig.win:tst:25331001
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit User Account Management'' is set to ''Success'' and ''Failure'''
+        test_title: '''Audit User Account Management'' is set to ''Success'' and ''Failure'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -62,7 +62,7 @@ assessment:
         source_test_id: oval:mil.disa.stig.win:tst:25331000
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit User Account Management'' is set to ''Success'''
+        test_title: '''Audit User Account Management'' is set to ''Success'''
         check: all
         check_existence: at_least_one_exists
         state_operator: AND
@@ -72,33 +72,6 @@ assessment:
         - oval:mil.disa.stig.win:ste:25331000
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253310:
-        source_definition_id: oval:mil.disa.stig.defs:def:253310
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - User Account Management - Success only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25331000
-          - comment: Audit - User Account Management - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25331001
-          comment: Audit - User Account Management - Success
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Account Management - User Account Management successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278051:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278051
         class: compliance
@@ -136,6 +109,33 @@ assessment:
               \ behavior.\n\n  User Account Management records events such as creating, changing, deleting, renaming, disabling,\
               \ or enabling user accounts.\n\n  Satisfies: SRG-OS-000004-GPOS-00004, SRG-OS-000239-GPOS-00089, SRG-OS-000240-GPOS-00090,\
               \ SRG-OS-000241-GPOS-00091, SRG-OS-000303-GPOS-00120, SRG-OS-000476-GPOS-00221"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253310:
+        source_definition_id: oval:mil.disa.stig.defs:def:253310
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - User Account Management - Success only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25331000
+          - comment: Audit - User Account Management - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25331001
+          comment: Audit - User Account Management - Success
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Account Management - User Account Management successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -262,6 +262,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278051r1180859_rule
-    semantic_ir_sha256: 1c484ed7fa386d14a0ace09488c6a1631448551f49df547c8ec7678166b4176b
+    semantic_ir_sha256: 9e0af0bca7e413d3071e287b72dd7017507bd4dd2124a6e1d1a99771fc201c75
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 8029cc670fed46dd3a1b2dec0ec3e96ccba5d7474f8e632d9debe94e12b3b220
+  semantic_fingerprint_sha256: 633da78d3c713983d3f6761a61788402f4c72af9008492aa138dd816c642ce2c

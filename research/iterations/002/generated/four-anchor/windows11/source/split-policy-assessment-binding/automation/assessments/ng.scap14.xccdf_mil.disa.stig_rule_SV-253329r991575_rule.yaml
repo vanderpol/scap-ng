@@ -13,21 +13,10 @@ assessment:
       source_type: auditeventpolicysubcategories_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       version: '1'
-      comment: null
+      object_title: null
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25332901:
-      source_state_id: oval:mil.disa.stig.win:ste:25332901
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: sensitive_privilege_use
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS_FAILURE
-      comment: null
     oval:mil.disa.stig.win:ste:25332900:
       source_state_id: oval:mil.disa.stig.win:ste:25332900
       source_type: auditeventpolicysubcategories_state
@@ -38,14 +27,25 @@ assessment:
         name: sensitive_privilege_use
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
-      comment: null
+      state_title: null
+    oval:mil.disa.stig.win:ste:25332901:
+      source_state_id: oval:mil.disa.stig.win:ste:25332901
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: sensitive_privilege_use
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      state_title: null
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25332900:
         source_test_id: oval:mil.disa.stig.win:tst:25332900
         source_type: auditeventpolicysubcategories_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Sensitive Privilege Use'' is set to ''Success'' or ''Success and Failure'''
+        test_title: '''Sensitive Privilege Use'' is set to ''Success'' or ''Success and Failure'''
         check: all
         check_existence: at_least_one_exists
         state_operator: OR
@@ -56,6 +56,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25332901
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:253329:
+        source_definition_id: oval:mil.disa.stig.defs:def:253329
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25332900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Privilege Use - Sensitive Privilege Use successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253329:
         source_definition_id: oval:mil.disa.stig.windows11:def:253329
         class: compliance
@@ -93,29 +116,6 @@ assessment:
 
               Sensitive Privilege Use records events related to use of sensitive privileges, such as "Act as part of the operating
               system" or "Debug programs".'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:253329:
-        source_definition_id: oval:mil.disa.stig.defs:def:253329
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25332900
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit Privilege Use - Sensitive Privilege Use successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -250,6 +250,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253329r991575_rule
-    semantic_ir_sha256: 6fc3aeb7cbec38efaea64857d3a6f5a505d344c9994de4ba605ec96ba2627c2b
+    semantic_ir_sha256: 8c3038b431103a662b68c23d355c2bdedc98bb5fc1f9b4482ebcac7acee49ee2
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-  semantic_fingerprint_sha256: 379c68e4e1014e7c615d6985c600e5d1ef7a58cbf1907344729f126ffceef089
+  semantic_fingerprint_sha256: 92c3788cb6d468818274b4b53fa416c406c49702cdd3c460140b0f2c3e705dbe
