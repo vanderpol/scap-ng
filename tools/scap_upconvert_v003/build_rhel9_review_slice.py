@@ -156,7 +156,7 @@ def lower_source_platform(platform_node, oval_bundle):
     negate = (logical.get("negate") or "false").lower() == "true"
     if negate:
         assessment["assessment"]["evaluate"] = {"not": assessment["assessment"]["evaluate"]}
-    assessment["assessment"]["title"] = (
+    assessment["assessment"]["assessment_title"] = (
         text(next((n for n in platform_node if local(n.tag) == "title"), None))
         or assessment["assessment"].get("title")
     )
@@ -215,6 +215,37 @@ def benchmark_references(root):
             "url": ref.get("href"),
         })
     return values
+
+def normalize_front_matter(root):
+    values = []
+    original = localized_texts(root, "front-matter")
+    for item in original:
+        value = item["text"]
+        if value:
+            value = re.sub(
+                r"enhanced with OCIL manual questions",
+                "enhanced with manual assessment procedures",
+                value,
+                flags=re.I,
+            )
+        values.append({"text": value, "language": item["language"]})
+    return values, original
+
+def normalize_rear_matter(root):
+    values = []
+    original = localized_texts(root, "rear-matter")
+    for item in original:
+        value = item["text"]
+        if value:
+            value = re.sub(
+                r"\s*filename:--:[^\s]+-xccdf\.xml",
+                "",
+                value,
+                flags=re.I,
+            )
+            value = " ".join(value.split())
+        values.append({"text": value, "language": item["language"]})
+    return values, original
 
 def benchmark_notices(root):
     values = []
@@ -476,7 +507,7 @@ def lower_definition(oroot, definition_id, assessment_id):
         test_to_check[test_ref] = check_id
 
         assertion = {
-            "title": " / ".join(state_titles) if state_titles else None,
+            "state_title": " / ".join(state_titles) if state_titles else None,
             "existence": test.get("check_existence") or "at_least_one_exists",
             "check": test.get("check") or "all",
             "state": None,
@@ -493,9 +524,9 @@ def lower_definition(oroot, definition_id, assessment_id):
                 return None, f"unsupported_state_operator:{state_operator}"
 
         checks[check_id] = {
-            "title": test_title,
+            "test_title": test_title,
             "collect": {
-                "title": node_title(obj),
+                "object_title": node_title(obj),
                 "capability": capability,
                 "select": query,
             },
@@ -563,7 +594,7 @@ def lower_definition(oroot, definition_id, assessment_id):
 
     return {"assessment": {
         "id": assessment_id,
-        "title": assessment_title,
+        "assessment_title": assessment_title,
         "mode": "automated",
         "checks": checks,
         "evaluate": expression,
@@ -711,19 +742,19 @@ def benchmark_platform_assessment(platform_id, title, distro_ids):
     return {
         "assessment": {
             "id": platform_id + ".assessment",
-            "title": title,
+            "assessment_title": title,
             "mode": "automated",
             "purpose": "applicability",
             "checks": {
                 "operating-system-identity": {
-                    "title": title,
+                    "test_title": title,
                     "collect": {
-                        "title": "Operating system identity",
+                        "object_title": "Operating system identity",
                         "capability": "linux.os-release",
                         "select": {},
                     },
                     "assert": {
-                        "title": title,
+                        "state_title": title,
                         "existence": "at_least_one_exists",
                         "check": "all",
                         "state": {
@@ -925,6 +956,8 @@ def main():
 
         groups, grouping_evidence = build_groups(selected)
         metadata, unsupported_metadata = benchmark_metadata(xr)
+        front_matter, original_front_matter = normalize_front_matter(xr)
+        rear_matter, original_rear_matter = normalize_rear_matter(xr)
         version_node = xr.find("x:version", NS)
         benchmark_doc = {
             "benchmark": {
@@ -940,8 +973,8 @@ def main():
                 },
                 "metadata": metadata,
                 "notices": benchmark_notices(xr),
-                "front_matter": localized_texts(xr, "front-matter"),
-                "rear_matter": localized_texts(xr, "rear-matter"),
+                "front_matter": front_matter,
+                "rear_matter": rear_matter,
                 "references": benchmark_references(xr),
                 "text_blocks": benchmark_text_blocks(xr),
                 "platform": {
@@ -1054,7 +1087,7 @@ def main():
                     write_yaml(OUT / "assessments/manual" / f"{rid}.manual.assessment.yaml",
                                {"assessment": {
                                    "id": aid,
-                                   "title": f"Manual assessment for {rid}",
+                                   "assessment_title": f"Manual assessment for {rid}",
                                    "mode": "manual",
                                    "procedure": procedure,
                                    "inputs": [],
@@ -1101,6 +1134,14 @@ def main():
                     {"id": app_id, "assessment": assessment_id}
                     for app_id, assessment_id in sorted(applicability_registry.items())
                 ]
+            },
+        )
+
+        write_json(
+            EVIDENCE / "legacy-publication-prose.json",
+            {
+                "front_matter": original_front_matter,
+                "rear_matter": original_rear_matter,
             },
         )
 
