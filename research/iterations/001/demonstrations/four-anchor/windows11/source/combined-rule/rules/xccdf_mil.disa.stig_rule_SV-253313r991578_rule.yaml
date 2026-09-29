@@ -359,19 +359,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25331301:
-        source_state_id: oval:mil.disa.stig.win:ste:25331301
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: account_lockout
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS_FAILURE
-        comment: '''Account Lockout'' is set to ''Success'' and ''Failure'''
       oval:mil.disa.stig.win:ste:25331300:
         source_state_id: oval:mil.disa.stig.win:ste:25331300
         source_type: auditeventpolicysubcategories_state
@@ -385,21 +372,21 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_FAILURE
         comment: '''Account Lockout'' is set to ''Failure'''
+      oval:mil.disa.stig.win:ste:25331301:
+        source_state_id: oval:mil.disa.stig.win:ste:25331301
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          kind: element
+          name: account_lockout
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS_FAILURE
+        comment: '''Account Lockout'' is set to ''Success'' and ''Failure'''
     evaluate:
       tests:
-        oval:mil.disa.stig.windows:tst:25331300:
-          source_test_id: oval:mil.disa.stig.windows:tst:25331300
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Audit Account Lockout'' is set to ''Failure'''
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:25331300
-          source_other: []
         oval:mil.disa.stig.windows:tst:25331301:
           source_test_id: oval:mil.disa.stig.windows:tst:25331301
           source_type: auditeventpolicysubcategories_test
@@ -413,34 +400,20 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25331301
           source_other: []
+        oval:mil.disa.stig.windows:tst:25331300:
+          source_test_id: oval:mil.disa.stig.windows:tst:25331300
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: '''Audit Account Lockout'' is set to ''Failure'''
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:25331300
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253313:
-          source_definition_id: oval:mil.disa.stig.defs:def:253313
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - Account Lockout - Failure only
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.windows:tst:25331300
-            - comment: Audit - Account Lockout - Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.windows:tst:25331301
-            comment: null
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system must be configured to audit Logon/Logoff - Account Lockout failures.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253313:
           source_definition_id: oval:mil.disa.stig.windows11:def:253313
           class: compliance
@@ -478,6 +451,33 @@ rule:
 
 
                 Account Lockout events can be used to identify potentially malicious logon attempts.'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253313:
+          source_definition_id: oval:mil.disa.stig.defs:def:253313
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - Account Lockout - Failure only
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.windows:tst:25331300
+            - comment: Audit - Account Lockout - Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.windows:tst:25331301
+            comment: null
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system must be configured to audit Logon/Logoff - Account Lockout failures.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -614,7 +614,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253313r991578_rule
-      semantic_ir_sha256: 87b16d1d0928f68373e6abd41fe7423c28213f7c5a384ef3ff2a35c8aa511ed6
+      semantic_ir_sha256: 2c3427994aa075f1edc40e42aad422b2d529759df568dbe91924c8750127fbb7
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: a75a41b3513375862a04123e0c6a6d9654c8d1ac964151fa2a9bfb8379539305
   assessments:

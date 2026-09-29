@@ -327,19 +327,6 @@ rule:
         query: []
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:25330701:
-        source_state_id: oval:mil.disa.stig.win:ste:25330701
-        source_type: auditeventpolicysubcategories_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: credential_validation
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AUDIT_SUCCESS_FAILURE
-        comment: '''Credential Validation'' is set to ''Success'' and ''Failure'''
       oval:mil.disa.stig.win:ste:25330600:
         source_state_id: oval:mil.disa.stig.win:ste:25330600
         source_type: auditeventpolicysubcategories_state
@@ -353,21 +340,21 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: AUDIT_FAILURE
         comment: '''Credential Validation'' is set to ''Failure'''
+      oval:mil.disa.stig.win:ste:25330701:
+        source_state_id: oval:mil.disa.stig.win:ste:25330701
+        source_type: auditeventpolicysubcategories_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          kind: element
+          name: credential_validation
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AUDIT_SUCCESS_FAILURE
+        comment: '''Credential Validation'' is set to ''Success'' and ''Failure'''
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25330701:
-          source_test_id: oval:mil.disa.stig.win:tst:25330701
-          source_type: auditeventpolicysubcategories_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Audit Credential Validation'' is set to ''Success'' and ''Failure'''
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:25330701
-          source_other: []
         oval:mil.disa.stig.win:tst:25330600:
           source_test_id: oval:mil.disa.stig.win:tst:25330600
           source_type: auditeventpolicysubcategories_test
@@ -381,34 +368,20 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:25330600
           source_other: []
+        oval:mil.disa.stig.win:tst:25330701:
+          source_test_id: oval:mil.disa.stig.win:tst:25330701
+          source_type: auditeventpolicysubcategories_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: '''Audit Credential Validation'' is set to ''Success'' and ''Failure'''
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:25330701
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253306:
-          source_definition_id: oval:mil.disa.stig.defs:def:253306
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: Audit - Credential Validation - Failure only
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25330600
-            - comment: Audit - Credential Validation - Success and Failure
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25330701
-            comment: Audit - Credential Validation - Failure
-            kind: boolean
-            negate: false
-            operator: OR
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system must be configured to audit Account Logon - Credential Validation failures.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:278048:
           source_definition_id: oval:mil.disa.stig.windows2025:def:278048
           class: compliance
@@ -445,6 +418,33 @@ rule:
                 \ is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected\
                 \ behavior.\n\n  Credential Validation records events related to validation tests on credentials for a user\
                 \ account logon."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253306:
+          source_definition_id: oval:mil.disa.stig.defs:def:253306
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: Audit - Credential Validation - Failure only
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25330600
+            - comment: Audit - Credential Validation - Success and Failure
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25330701
+            comment: Audit - Credential Validation - Failure
+            kind: boolean
+            negate: false
+            operator: OR
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system must be configured to audit Account Logon - Credential Validation failures.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -571,7 +571,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278048r1180850_rule
-      semantic_ir_sha256: fffa5aa729a384139770861d9fe639d170b74f860c33699ad82972a727701662
+      semantic_ir_sha256: 019fa7f41eac798deb166330f4fcd9ce33859d724e05cb1f4226496b67b0ac01
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 0d9624be8f97a870df7dd271b5b2dd824c81654f854839c0c3f4111d8fc04383
   assessments:

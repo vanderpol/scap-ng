@@ -309,6 +309,48 @@ rule:
     description: RHEL 9 must use a separate file system for the system audit data path.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.linux:obj:23029400:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23029400
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            var_check: at least one
+            var_ref: oval:mil.disa.stig.defs:var:23029400
+          kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      oval:mil.disa.stig.ind:obj:23029401:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23029401
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/fstab
+        - attributes:
+            datatype: string
+            operation: pattern match
+            var_check: at least one
+            var_ref: oval:mil.disa.stig.defs:var:23029401
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:23029402:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23029402
@@ -340,48 +382,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23029401:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23029401
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/fstab
-        - attributes:
-            datatype: string
-            operation: pattern match
-            var_check: at least one
-            var_ref: oval:mil.disa.stig.defs:var:23029401
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
-      oval:mil.disa.stig.linux:obj:23029400:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23029400
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        comment: null
-        query:
-        - attributes:
-            datatype: string
-            var_check: at least one
-            var_ref: oval:mil.disa.stig.defs:var:23029400
-          kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
     derive:
       oval:mil.disa.stig.defs:var:23029400:
         source_variable_id: oval:mil.disa.stig.defs:var:23029400
@@ -707,7 +707,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257847r1044924_rule
-      semantic_ir_sha256: f6a938b17b852c66842b6a3e492e2f7af7b28f3634671f7bd3622d8fd5cea0e9
+      semantic_ir_sha256: 6e0d62404370529998ba802c3e945776866a788e0462f5a67b72d65a7f618226
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 4ee053402c0e653dd452558ad5ec71b15515e7661faa8acaeacd26710e3e33a0
   assessments:

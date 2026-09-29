@@ -358,6 +358,27 @@ rule:
           name: trustee_sid
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: S-1-5-32-544
+      oval:mil.disa.stig.win:obj:28532000:
+        capability: scapng.collect.windows.fileeffectiverights53
+        source_object_id: oval:mil.disa.stig.win:obj:28532000
+        source_type: fileeffectiverights53_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '2'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            operation: case insensitive equals
+          kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: C:\ProgramData\ssh\sshd_config
+        - attributes:
+            datatype: string
+          kind: element
+          name: trustee_sid
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: S-1-5-18
       oval:mil.disa.stig.win:obj:28532002:
         capability: scapng.collect.windows.fileeffectiverights53
         source_object_id: oval:mil.disa.stig.win:obj:28532002
@@ -413,31 +434,10 @@ rule:
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:mil.disa.stig.win:ste:20000048
-      oval:mil.disa.stig.win:obj:28532000:
-        capability: scapng.collect.windows.fileeffectiverights53
-        source_object_id: oval:mil.disa.stig.win:obj:28532000
-        source_type: fileeffectiverights53_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '2'
-        comment: null
-        query:
-        - attributes:
-            datatype: string
-            operation: case insensitive equals
-          kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: C:\ProgramData\ssh\sshd_config
-        - attributes:
-            datatype: string
-          kind: element
-          name: trustee_sid
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: S-1-5-18
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:20000013:
-        source_state_id: oval:mil.disa.stig.win:ste:20000013
+      oval:mil.disa.stig.win:ste:20000048:
+        source_state_id: oval:mil.disa.stig.win:ste:20000048
         source_type: fileeffectiverights53_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
@@ -447,8 +447,21 @@ rule:
           kind: element
           name: trustee_sid
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: S-1-5-32-544
-        comment: Administrators account.
+          value: S-1-5-11
+        comment: Authenticated Users account
+      oval:mil.disa.stig.win:ste:20000012:
+        source_state_id: oval:mil.disa.stig.win:ste:20000012
+        source_type: fileeffectiverights53_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          kind: element
+          name: trustee_sid
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: S-1-5-18
+        comment: SYSTEM account.
       oval:mil.disa.stig.win:ste:20000050:
         source_state_id: oval:mil.disa.stig.win:ste:20000050
         source_type: fileeffectiverights53_state
@@ -558,8 +571,8 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: 'false'
         comment: Read and Execute Rights
-      oval:mil.disa.stig.win:ste:20000048:
-        source_state_id: oval:mil.disa.stig.win:ste:20000048
+      oval:mil.disa.stig.win:ste:20000013:
+        source_state_id: oval:mil.disa.stig.win:ste:20000013
         source_type: fileeffectiverights53_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         operator: AND
@@ -569,8 +582,8 @@ rule:
           kind: element
           name: trustee_sid
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: S-1-5-11
-        comment: Authenticated Users account
+          value: S-1-5-32-544
+        comment: Administrators account.
       oval:mil.disa.stig.win:ste:20000049:
         source_state_id: oval:mil.disa.stig.win:ste:20000049
         source_type: fileeffectiverights53_state
@@ -680,31 +693,18 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: 'true'
         comment: Full Rights
-      oval:mil.disa.stig.win:ste:20000012:
-        source_state_id: oval:mil.disa.stig.win:ste:20000012
-        source_type: fileeffectiverights53_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: trustee_sid
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: S-1-5-18
-        comment: SYSTEM account.
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:28532001:
-          source_test_id: oval:mil.disa.stig.win:tst:28532001
+        oval:mil.disa.stig.win:tst:28532000:
+          source_test_id: oval:mil.disa.stig.win:tst:28532000
           source_type: fileeffectiverights53_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: 'C:\ProgramData\ssh\sshd_config: BUILTIN\Administrators (F)'
+          comment: 'C:\ProgramData\ssh\sshd_config: NT Authority\SYSTEM (F)'
           check: all
           check_existence: at_least_one_exists
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.win:obj:28532001
+          - oval:mil.disa.stig.win:obj:28532000
           predicates:
           - oval:mil.disa.stig.win:ste:20000049
           source_other: []
@@ -721,6 +721,19 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000050
           source_other: []
+        oval:mil.disa.stig.win:tst:28532001:
+          source_test_id: oval:mil.disa.stig.win:tst:28532001
+          source_type: fileeffectiverights53_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: 'C:\ProgramData\ssh\sshd_config: BUILTIN\Administrators (F)'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:28532001
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000049
+          source_other: []
         oval:mil.disa.stig.win:tst:28532003:
           source_test_id: oval:mil.disa.stig.win:tst:28532003
           source_type: fileeffectiverights53_test
@@ -732,19 +745,6 @@ rule:
           collections:
           - oval:mil.disa.stig.win:obj:28532003
           predicates: []
-          source_other: []
-        oval:mil.disa.stig.win:tst:28532000:
-          source_test_id: oval:mil.disa.stig.win:tst:28532000
-          source_type: fileeffectiverights53_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: 'C:\ProgramData\ssh\sshd_config: NT Authority\SYSTEM (F)'
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:28532000
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000049
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:285320:
@@ -940,7 +940,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-285320r1256736_rule
-      semantic_ir_sha256: a219725cb153113a304b52e1b9d6f29eb1870b3547a65dda7ae604e45dfa6ba6
+      semantic_ir_sha256: a68591244f4b8e7ba3659424c5aa16c83ad2255d6c948f67c69e1aaa89cb6129
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c25641e815bb4549e0c5e8ec13aff61c7e3baf4a7ce00f921940240ee1fcd3f6
   assessments:

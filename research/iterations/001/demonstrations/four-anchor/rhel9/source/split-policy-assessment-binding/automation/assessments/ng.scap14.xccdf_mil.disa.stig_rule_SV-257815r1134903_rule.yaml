@@ -54,19 +54,6 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:23031200:
-        source_test_id: oval:mil.disa.stig.linux:tst:23031200
-        source_type: systemdunitproperty_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: systemd-coredump.socket LoadState is masked if exists
-        check: all
-        check_existence: any_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:23031200
-        predicates:
-        - oval:mil.disa.stig.linux:ste:20000005
-        source_other: []
       oval:mil.disa.stig.linux:tst:23031201:
         source_test_id: oval:mil.disa.stig.linux:tst:23031201
         source_type: systemdunitproperty_test
@@ -80,7 +67,47 @@ assessment:
         predicates:
         - oval:mil.disa.stig.linux:ste:20000005
         source_other: []
+      oval:mil.disa.stig.linux:tst:23031200:
+        source_test_id: oval:mil.disa.stig.linux:tst:23031200
+        source_type: systemdunitproperty_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: systemd-coredump.socket LoadState is masked if exists
+        check: all
+        check_existence: any_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23031200
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000005
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230312:
+        source_definition_id: oval:mil.disa.stig.defs:def:230312
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: systemd-coredump.socket LoadState is masked if exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23031200
+          - comment: systemd-coredump.socket UnitFileState is masked if exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23031201
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable acquiring, saving, and processing core dumps.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257815:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257815
         class: compliance
@@ -112,33 +139,6 @@ assessment:
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: A core dump includes a memory image taken at the time the operating system terminates an application. The
               memory image could contain sensitive data and is generally useful only for developers trying to debug problems.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230312:
-        source_definition_id: oval:mil.disa.stig.defs:def:230312
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: systemd-coredump.socket LoadState is masked if exists
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23031200
-          - comment: systemd-coredump.socket UnitFileState is masked if exists
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23031201
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must disable acquiring, saving, and processing core dumps.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -276,6 +276,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257815r1134903_rule
-    semantic_ir_sha256: 9dc7af471d74dd2f5b5d2060197e33782b587f760f8248e8dcc87b4fba2cfeff
+    semantic_ir_sha256: 5bdd47130248922cb0587d8201364474611685e61a175ebdc0c5872a87cc9585
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: d453d8e8ccee207edf251e6bc124dbeb3f5c93e359582bf73749fcd059ec4e3e

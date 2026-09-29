@@ -1,0 +1,142 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278084
+  collect:
+    oval:mil.disa.stig.win:obj:25335500:
+      capability: scapng.collect.windows.registry
+      comment: null
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SYSTEM\CurrentControlSet\Services\Tcpip\Parameters
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: EnableICMPRedirect
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25335500
+      source_type: registry_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 must be configured to prevent Internet Control Message Protocol (ICMP) redirects from overriding
+    Open Shortest Path First (OSPF)-generated routes.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253355:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25335500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to prevent Internet Control Message Protocol (ICMP) redirects from overriding
+              Open Shortest Path First (OSPF) generated routes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253355
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278084:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253355
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-CC-000050 - Windows Server 2025 must be configured to prevent Internet Control Message Protocol (ICMP)
+              redirects from overriding Open Shortest Path First (OSPF)-generated routes.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Allowing ICMP redirect of routes can lead to traffic not being routed properly. When disabled, this forces
+              ICMP to be routed via the shortest path first.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278084
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25335500:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25335500
+        comment: '''MSS: (EnableICMPRedirect) Allow ICMP redirects to override OSPF generated routes'' is set to ''Disabled'''
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000000
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25335500
+        source_type: registry_test
+        state_operator: AND
+  id: ng.shared.afda46f32658b60ad59e5e63
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:20000000:
+      comment: null
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000000
+      source_type: registry_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: afda46f32658b60ad59e5e634cdb1404ad3ef1d07f92938de9e7839a6aa03d17
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278084r1180958_rule
+    title: Windows Server 2025 must be configured to prevent Internet Control Message Protocol (ICMP) redirects from overriding
+      Open Shortest Path First (OSPF)-generated routes.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253355r991589_rule
+    title: The system must be configured to prevent Internet Control Message Protocol (ICMP) redirects from overriding Open
+      Shortest Path First (OSPF) generated routes.

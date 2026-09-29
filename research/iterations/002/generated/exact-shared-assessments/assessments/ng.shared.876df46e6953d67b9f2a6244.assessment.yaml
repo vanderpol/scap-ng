@@ -1,0 +1,95 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:271689
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27168901:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: Gnome presents DoD Banner.
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/db/local.d/01-banner-message
+      - kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: banner-message-text='You\s+are\s+accessing\s+a\s+U.S.\s+Government\s+\(USG\)\s+Information\s+System\s+\(IS\)\s+that\s+is\s+provided\s+for\s+USG-authorized\s+use\s+only\.[\\n\s]+By\s+using\s+this\s+IS\s+\(which\s+includes\s+any\s+device\s+attached\s+to\s+this\s+IS\),\s+you\s+consent\s+to\s+the\s+following\s+conditions:[\\n\s]+-The\s+USG\s+routinely\s+intercepts\s+and\s+monitors\s+communications\s+on\s+this\s+IS\s+for\s+purposes\s+including,\s+but\s+not\s+limited\s+to,\s+penetration\s+testing,\s+COMSEC\s+monitoring,\s+network\s+operations\s+and\s+defense,\s+personnel\s+misconduct\s+\(PM\),\s+law\s+enforcement\s+\(LE\),\s+and\s+counterintelligence\s+\(CI\)\s+investigations.[\\n\s]+-At\s+any\s+time,\s+the\s+USG\s+may\s+inspect\s+and\s+seize\s+data\s+stored\s+on\s+this\s+IS.[\\n\s]+-Communications\s+using,\s+or\s+data\s+stored\s+on,\s+this\s+IS\s+are\s+not\s+private,\s+are\s+subject\s+to\s+routine\s+monitoring,\s+interception,\s+and\s+search,\s+and\s+may\s+be\s+disclosed\s+or\s+used\s+for\s+any\s+USG-authorized\s+purpose.[\\n\s]+-This\s+IS\s+includes\s+security\s+measures\s+\(e.g.,\s+authentication\s+and\s+access\s+controls\)\s+to\s+protect\s+USG\s+interests-\-not\s+for\s+your\s+personal\s+benefit\s+or\s+privacy.[\\n\s]+-Notwithstanding\s+the\s+above,\s+using\s+this\s+IS\s+does\s+not\s+constitute\s+consent\s+to\s+PM,\s+LE\s+or\s+CI\s+investigative\s+searching\s+or\s+monitoring\s+of\s+the\s+content\s+of\s+privileged\s+communications,\s+or\s+work\s+product,\s+related\s+to\s+personal\s+representation\s+or\s+services\s+by\s+attorneys,\s+psychotherapists,\s+or\s+clergy,\s+and\s+their\s+assistants.\s+Such\s+communications\s+and\s+work\s+product\s+are\s+private\s+and\s+confidential.\s+See\s+User\s+Agreement\s+for\s+details.[\\n\s]*'
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27168901
+      source_type: textfilecontent54_object
+      version: '5'
+  derive: {}
+  description: OL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote access
+    to the system via a graphical user logon.
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271689:
+        class: compliance
+        criteria:
+          children:
+          - comment: Display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to
+              the system via a graphical user logon.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27168901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote access
+              to the system via a graphical user logon.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the
+              system via a graphical user logon.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271689
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27168901:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27168901
+        comment: Gnome config produces required Banner text.
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27168901
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.876df46e6953d67b9f2a6244
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 876df46e6953d67b9f2a62442576f763f44a28277ee369bbe1db600f4ba01ec0
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271689r1091779_rule
+    title: OL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote access to
+      the system via a graphical user logon.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-270174r1044831_rule
+    title: RHEL 9 must display the Standard Mandatory DOD Notice and Consent Banner before granting local or remote access
+      to the system via a graphical user logon.

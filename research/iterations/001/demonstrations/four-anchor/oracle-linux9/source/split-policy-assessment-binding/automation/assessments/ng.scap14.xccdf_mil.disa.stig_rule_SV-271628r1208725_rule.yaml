@@ -63,20 +63,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23023200:
-      source_state_id: oval:mil.disa.stig.ind:ste:23023200
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[!*]
-      comment: Exclude inactive/locked hashes (with leading '!' or '*').
     oval:mil.disa.stig.ind:ste:23023201:
       source_state_id: oval:mil.disa.stig.ind:ste:23023201
       source_type: textfilecontent54_state
@@ -91,6 +77,20 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^[$][6][$]
       comment: Exclude hashes with leading '$6$'.
+    oval:mil.disa.stig.ind:ste:23023200:
+      source_state_id: oval:mil.disa.stig.ind:ste:23023200
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[!*]
+      comment: Exclude inactive/locked hashes (with leading '!' or '*').
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:23023200:
@@ -106,29 +106,6 @@ assessment:
         predicates: []
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230232:
-        source_definition_id: oval:mil.disa.stig.defs:def:230232
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: No active password hash in /etc/shadow has a prefix other than '$6$'.
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23023200
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271628:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271628
         class: compliance
@@ -162,6 +139,29 @@ assessment:
               \ at all times, and encryption is the standard method for protecting passwords. If passwords are not encrypted,\
               \ they can be plainly read (i.e., clear text) and easily compromised.\n\n\tSatisfies: SRG-OS-000073-GPOS-00041,\
               \ SRG-OS-000120-GPOS-00061"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230232:
+        source_definition_id: oval:mil.disa.stig.defs:def:230232
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: No active password hash in /etc/shadow has a prefix other than '$6$'.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23023200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -284,6 +284,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271628r1208725_rule
-    semantic_ir_sha256: 5d4dd8efdc03ba1568d3a22231370bde0740d0764242ddce062801f4b94f8cd7
+    semantic_ir_sha256: a4f8a61a30346665039f4a5090297eabeaa78046b7871e62dc45215b15276ac0
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: eeafb4248bcb68364bd5b3b928616b4004044f3766b2e92d4627db2452592505

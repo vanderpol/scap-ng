@@ -7,9 +7,9 @@ assessment:
   description: RHEL 9 must prohibit the use of cached authenticators after one day.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23037603:
+    oval:mil.disa.stig.ind:obj:23037600:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23037603
+      source_object_id: oval:mil.disa.stig.ind:obj:23037600
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '2'
@@ -17,21 +17,13 @@ assessment:
       query:
       - attributes:
           ignore_case: 'true'
-          max_depth: '-1'
-          recurse_direction: down
         kind: element
         name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       - kind: element
-        name: path
+        name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sssd/conf.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^.+\.conf$
+        value: /etc/sssd/sssd.conf
       - attributes:
           operation: pattern match
         kind: element
@@ -66,24 +58,37 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-    oval:mil.disa.stig.ind:obj:23037602:
+    oval:mil.disa.stig.ind:obj:23037603:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23037602
+      source_object_id: oval:mil.disa.stig.ind:obj:23037603
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
+      version: '2'
       comment: null
       query:
-      - kind: element
-        name: filepath
+      - attributes:
+          ignore_case: 'true'
+          max_depth: '-1'
+          recurse_direction: down
+        kind: element
+        name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sssd/sssd.conf
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/conf.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.+\.conf$
       - attributes:
           operation: pattern match
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+        value: ^\s*cache_credentials\s*=\s*true\b$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -128,19 +133,14 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23037600:
+    oval:mil.disa.stig.ind:obj:23037602:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23037600
+      source_object_id: oval:mil.disa.stig.ind:obj:23037602
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
+      version: '1'
       comment: null
       query:
-      - attributes:
-          ignore_case: 'true'
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       - kind: element
         name: filepath
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
@@ -150,7 +150,7 @@ assessment:
         kind: element
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*cache_credentials\s*=\s*true\b$
+        value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -197,18 +197,6 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23037600:
-        source_test_id: oval:mil.disa.stig.ind:tst:23037600
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/sssd/sssd.conf:cache_credentials = false
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23037606
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:23037602:
         source_test_id: oval:mil.disa.stig.ind:tst:23037602
         source_type: textfilecontent54_test
@@ -221,6 +209,18 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23037608
         predicates:
         - oval:mil.disa.stig.ind:ste:20000003
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23037600:
+        source_test_id: oval:mil.disa.stig.ind:tst:23037600
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /etc/sssd/sssd.conf:cache_credentials = false
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23037606
+        predicates: []
         source_other: []
     definitions:
       oval:mil.disa.stig.rhel9os:def:258133:
@@ -435,6 +435,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258133r1045263_rule
-    semantic_ir_sha256: 90ed27da2cb19c16fa1900235885210c43f72e02ddd5d06afadbc7b9b4325b33
+    semantic_ir_sha256: 99cb16bce4c18eae28b917d168c9f4985a39dc7abb5cb70d77a08061728f3b6a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ef1f18cd499f094f061ac5aee4d472e010147fd02119f8ab7d9fd6f79faa8059

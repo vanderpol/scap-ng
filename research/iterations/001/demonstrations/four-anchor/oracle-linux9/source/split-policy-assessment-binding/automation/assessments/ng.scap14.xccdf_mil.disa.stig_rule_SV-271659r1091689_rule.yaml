@@ -7,18 +7,6 @@ assessment:
   description: OL 9 must mount /var/log with the nosuid option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:23051500:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23051500
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /var/log
     oval:mil.disa.stig.ind:obj:23051502:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23051502
@@ -43,6 +31,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.linux:obj:23051500:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23051500
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /var/log
     oval:mil.disa.stig.ind:obj:23051501:
       capability: scapng.collect.independent.variable
       source_object_id: oval:mil.disa.stig.ind:obj:23051501
@@ -146,6 +146,19 @@ assessment:
       comment: null
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:23051501:
+        source_test_id: oval:mil.disa.stig.ind:tst:23051501
+        source_type: variable_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /var/log is configured with the nosuid option in /etc/fstab
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23051501
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23051500
+        source_other: []
       oval:mil.disa.stig.linux:tst:23051500:
         source_test_id: oval:mil.disa.stig.linux:tst:23051500
         source_type: partition_test
@@ -170,19 +183,6 @@ assessment:
         collections:
         - oval:mil.disa.stig.ind:obj:23051502
         predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23051501:
-        source_test_id: oval:mil.disa.stig.ind:tst:23051501
-        source_type: variable_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /var/log is configured with the nosuid option in /etc/fstab
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23051501
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23051500
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:230515:
@@ -378,6 +378,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271659r1091689_rule
-    semantic_ir_sha256: f035a2baba549507aa56dcd073c3628681eaa8ef48718d3fd3d74ad9474a5341
+    semantic_ir_sha256: e7311e1b56ae2ede08e917e52ae27d5116890aca8019e040c1811a6e2a6a57ea
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 75dd64dabceab0c75eec03694d4c08bef9293a5b989fa206260597acf7f875d2

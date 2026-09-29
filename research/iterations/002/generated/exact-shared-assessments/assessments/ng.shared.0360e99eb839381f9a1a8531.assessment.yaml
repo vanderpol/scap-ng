@@ -1,0 +1,203 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271608
+  collect:
+    oval:mil.disa.stig.ind:obj:25812300:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: 'sssd.conf: certificate_verification'
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/sssd.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*certificate_verification\s*=\s*(.*)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25812300
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.ind:obj:25812301:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: '/etc/sssd/conf.d/*.conf: certificate_verification'
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/conf.d
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[^.].*\.conf$
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*certificate_verification\s*=\s*(.*)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25812301
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.ind:obj:25812302:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: 'sssd config: certificate_verification'
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25812300
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25812301
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25812302
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must implement certificate status checking for multifactor authentication (MFA).
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:258123:
+        class: compliance
+        criteria:
+          children:
+          - comment: 'sssd config: certificate_verification: ocsp_dgst=sha512'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25812300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must implement certificate status checking for multifactor authentication.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:258123
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271608:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258123
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000930 - OL 9 must implement certificate status checking for multifactor authentication (MFA).
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Using an authentication device, such as a DOD Common Access Card (CAC) or token that is separate from the\
+              \ information system, ensures that even if the information system is compromised, credentials stored on the\
+              \ authentication device will not be affected.\n\n\tMultifactor solutions that require devices separate from\
+              \ information systems gaining access include, for example, hardware tokens providing time-based or challenge-response\
+              \ authenticators and smart cards such as the U.S. Government Personal Identity Verification (PIV) card and the\
+              \ DOD CAC.\n\n\tOL 9 includes multiple options for configuring certificate status checking, but for this requirement\
+              \ focuses on the System Security Services Daemon (SSSD). By default, SSSD performs Online Certificate Status\
+              \ Protocol (OCSP) checking and certificate verification using a sha256 digest function.\n\n\tSatisfies: SRG-OS-000375-GPOS-00160,\
+              \ SRG-OS-000377-GPOS-00162"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271608
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:25812300:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25812302
+        comment: 'sssd config: certificate_verification: ocsp_dgst=sha512'
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25812300
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25812300
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.0360e99eb839381f9a1a8531
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:25812300:
+      comment: null
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?i)(^|,)ocsp_dgst=sha512(,|$)
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:25812300
+      source_type: textfilecontent54_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 0360e99eb839381f9a1a8531acce9db7911f4c7374f22fef21eb8b2789dc5e5c
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271608r1091536_rule
+    title: OL 9 must implement certificate status checking for multifactor authentication (MFA).
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258123r1134923_rule
+    title: RHEL 9 must implement certificate status checking for multifactor authentication.

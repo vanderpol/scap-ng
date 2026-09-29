@@ -7,26 +7,6 @@ assessment:
   description: Enhanced diagnostic data must be limited to the minimum required to support Windows Analytics.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:25339201:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25339201
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '18'
-      comment: DataCollection LimitEnhancedDiagnosticDataWindowsAnalytics Setting
-      query:
-      - kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Policies\Microsoft\Windows\DataCollection
-      - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: LimitEnhancedDiagnosticDataWindowsAnalytics
     oval:navy.navwar.niwcatlantic.scc.windows:obj:25339202:
       capability: scapng.collect.windows.registry
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25339202
@@ -47,8 +27,41 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AllowTelemetry
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:25339201:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:25339201
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '18'
+      comment: DataCollection LimitEnhancedDiagnosticDataWindowsAnalytics Setting
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Policies\Microsoft\Windows\DataCollection
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: LimitEnhancedDiagnosticDataWindowsAnalytics
   derive: {}
   predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:25339201:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25339201
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          operation: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '1'
+      comment: Value Equal To 1
     oval:navy.navwar.niwcatlantic.scc.windows:ste:25339202:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25339202
       source_type: registry_state
@@ -58,19 +71,6 @@ assessment:
       - attributes:
           datatype: int
           operation: less than or equal
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '1'
-      comment: Value Equal To 1
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:25339201:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:25339201
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          operation: equals
         kind: element
         name: value
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -271,6 +271,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253392r991589_rule
-    semantic_ir_sha256: dd51b00085c9e9adcd20e5fb1306303aaf56b7196664e09998238d3c5be48634
+    semantic_ir_sha256: fdd193579f722bc0dcf57d777126c603466fb7dd7ef36c1b08efef350c885b6c
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 7e2145c78df83067908ec1fbde642c7cccbd2080ed7b2a19f5538429d8e2dcaf

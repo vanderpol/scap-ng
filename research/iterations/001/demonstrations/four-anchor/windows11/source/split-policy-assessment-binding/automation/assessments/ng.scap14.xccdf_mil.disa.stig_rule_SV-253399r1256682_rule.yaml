@@ -7,6 +7,32 @@ assessment:
   description: Windows 11 must be configured to disable Windows Game Recording and Broadcasting.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.win:obj:25339902:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25339902
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: Intune registry entry for AllowGameDVR
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Microsoft\PolicyManager\current\device\ApplicationManagement
+      - attributes:
+          datatype: string
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AllowGameDVR
     oval:mil.disa.stig.win:obj:25339901:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25339901
@@ -54,32 +80,6 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
-    oval:mil.disa.stig.win:obj:25339902:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25339902
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: Intune registry entry for AllowGameDVR
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - attributes:
-          datatype: string
-        kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Microsoft\PolicyManager\current\device\ApplicationManagement
-      - attributes:
-          datatype: string
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AllowGameDVR
   derive: {}
   predicates:
     oval:mil.disa.stig.win:ste:20000000:
@@ -293,6 +293,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253399r1256682_rule
-    semantic_ir_sha256: c88b2415c66323906dda87e6bec31f95c4d8f8ef606eb9db1f7c42784ba2f4eb
+    semantic_ir_sha256: 3361d82e3ebd741f06b22dc6cdd853b473f5acdc838719f1a0dd264031a9e17b
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 9a72c2bbd0e9285e85ab03931d05bda760da25a1fb3461bb2d45184c48963742

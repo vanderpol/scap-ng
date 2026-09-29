@@ -386,31 +386,27 @@ rule:
     description: RHEL 9 must disable core dumps for all users.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23031302:
+      oval:mil.disa.stig.ind:obj:23031300:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23031302
+        source_object_id: oval:mil.disa.stig.ind:obj:23031300
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
         comment: null
         query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/security/limits.conf
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23031302
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23031303
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
       oval:mil.disa.stig.ind:obj:23031305:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23031305
@@ -473,27 +469,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23031301:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23031301
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23031304
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23031305
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
       oval:mil.disa.stig.ind:obj:23031304:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23031304
@@ -519,9 +494,34 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23031300:
+      oval:mil.disa.stig.ind:obj:23031302:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23031300
+        source_object_id: oval:mil.disa.stig.ind:obj:23031302
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/security/limits.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23031301:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23031301
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
@@ -529,9 +529,9 @@ rule:
         query:
         - children:
           - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23031302
+            object_ref: oval:mil.disa.stig.ind:obj:23031304
           - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23031303
+            object_ref: oval:mil.disa.stig.ind:obj:23031305
           evaluation_semantics:
             complement_is_relative: true
             filter_default_action: exclude
@@ -785,7 +785,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257814r1156057_rule
-      semantic_ir_sha256: 055eda3a60ccf3d7afbe1db09dd8fdbf897bd4b517bbc730abd54e81e426d46a
+      semantic_ir_sha256: 01a9c46ba2f91ef3958799bfe43f7ca1376f5c3b0e17c32fbbf756e45b4e2aa9
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 5f74886e7d62e404a5e2309c7efa7a2fe2bd805d6546eabbdfcf3bf6e427fd61
   assessments:

@@ -334,32 +334,6 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
-      oval:mil.disa.stig.win:obj:25340911:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25340911
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: Registry entry for AllowIndexingEncryptedStoresOrItems used by Group Policy
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            datatype: string
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Policies\Microsoft\Windows\Windows Search
-        - attributes:
-            datatype: string
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: AllowIndexingEncryptedStoresOrItems
       oval:mil.disa.stig.win:obj:25340912:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25340912
@@ -380,6 +354,32 @@ rule:
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SOFTWARE\Microsoft\Policymanager\current\device\search
+        - attributes:
+            datatype: string
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: AllowIndexingEncryptedStoresOrItems
+      oval:mil.disa.stig.win:obj:25340911:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25340911
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: Registry entry for AllowIndexingEncryptedStoresOrItems used by Group Policy
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Policies\Microsoft\Windows\Windows Search
         - attributes:
             datatype: string
           kind: element
@@ -421,29 +421,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000000
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:25340900:
-          source_definition_id: oval:mil.disa.stig.defs:def:25340900
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: AllowIndexingEncryptedStoresOrItems is disabled
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25340910
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Indexing of encrypted files must be turned off.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253409:
           source_definition_id: oval:mil.disa.stig.windows11:def:253409
           class: compliance
@@ -478,6 +455,29 @@ rule:
 
 
                 Note: A different registry location is needed when systems are managed by Intune versus GPO.'
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:25340900:
+          source_definition_id: oval:mil.disa.stig.defs:def:25340900
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: AllowIndexingEncryptedStoresOrItems is disabled
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25340910
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Indexing of encrypted files must be turned off.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -601,7 +601,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253409r1210297_rule
-      semantic_ir_sha256: cca7a69c33eb6ad8b044244c28a86da3130ae49765f9a97a633a7331e8125365
+      semantic_ir_sha256: 63e770402e9e73786b7a2f90cbf7c86dce599d78b3ecc90352da067cd7990959
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 7a7190447960c7459b8fd2cb252126263fc348e344c01ddca67ec728e4465afc
   assessments:

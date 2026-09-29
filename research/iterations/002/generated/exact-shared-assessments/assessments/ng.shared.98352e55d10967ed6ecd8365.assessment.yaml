@@ -1,0 +1,180 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271476
+  collect:
+    oval:mil.disa.stig.ind:obj:25808700:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - attributes:
+          ignore_case: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sudoers
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*ALL\s+ALL\=\(ALL(?:|\:ALL)\)\s+ALL\s*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25808700
+      source_type: textfilecontent54_object
+      version: '2'
+    oval:mil.disa.stig.ind:obj:25808701:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - attributes:
+          ignore_case: 'true'
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sudoers.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.*$
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*ALL\s+ALL\=\(ALL(?:|\:ALL)\)\s+ALL\s*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25808701
+      source_type: textfilecontent54_object
+      version: '2'
+  derive: {}
+  description: OL 9 must restrict privilege elevation to authorized personnel.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:258087:
+        class: compliance
+        criteria:
+          children:
+          - comment: ALL is not configured in /etc/sudoers
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25808700
+          - comment: ALL is not configured in /etc/sudoers.d
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25808701
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must restrict privilege elevation to authorized personnel.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:258087
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271476:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258087
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000232 - OL 9 must restrict privilege elevation to authorized personnel.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: If the sudoers file is not configured correctly, any user defined on the system can initiate privileged
+              actions on the target system.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271476
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:25808700:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:mil.disa.stig.ind:obj:25808700
+        comment: ALL does not exist /etc/sudoers
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25808700
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:25808701:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:mil.disa.stig.ind:obj:25808701
+        comment: ALL does not exist in /etc/sudoers.d
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25808701
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.98352e55d10967ed6ecd8365
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 98352e55d10967ed6ecd8365e9340f97dc539d6b567fb6ccc014c6205a7c0d63
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271476r1091140_rule
+    title: OL 9 must restrict privilege elevation to authorized personnel.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258087r1102071_rule
+    title: RHEL 9 must restrict privilege elevation to authorized personnel.

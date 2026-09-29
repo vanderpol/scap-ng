@@ -414,31 +414,6 @@ rule:
     description: RHEL 9 must audit all uses of the chown, fchown, fchownat, and lchown system calls.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23045501:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045501
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 64-bit chown syscall
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+chown\s+|(\s+|,)chown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:23045500:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23045500
@@ -457,6 +432,31 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+chown\s+|(\s+|,)chown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23045506:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23045506
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 32-bit fchown syscall
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fchown\s+|(\s+|,)fchown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -489,13 +489,13 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23045506:
+      oval:mil.disa.stig.ind:obj:23045501:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045506
+        source_object_id: oval:mil.disa.stig.ind:obj:23045501
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
-        comment: 32-bit fchown syscall
+        comment: 64-bit chown syscall
         query:
         - kind: element
           name: filepath
@@ -506,7 +506,32 @@ rule:
           kind: element
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fchown\s+|(\s+|,)fchown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+chown\s+|(\s+|,)chown(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23045505:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23045505
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: 64-bit fchownat syscall
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/audit/audit.rules
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fchownat\s+|(\s+|,)fchownat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -589,45 +614,44 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23045505:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23045505
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: 64-bit fchownat syscall
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/audit/audit.rules
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fchownat\s+|(\s+|,)fchownat(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23045504:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045504
+        oval:mil.disa.stig.ind:tst:23045500:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045500
           source_type: textfilecontent54_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 32-bit invocations of fchownat syscall
+          comment: Audit 32-bit invocations of chown syscall
           check: all
           check_existence: all_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.ind:obj:23045504
+          - oval:mil.disa.stig.ind:obj:23045500
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23045505:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045505
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 64-bit invocations of fchownat syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045505
+          predicates: []
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23045501:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045501
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 64-bit invocations of chown syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045501
           predicates: []
           source_other: []
         oval:mil.disa.stig.ind:tst:23045502:
@@ -654,30 +678,6 @@ rule:
           - oval:mil.disa.stig.ind:obj:23045506
           predicates: []
           source_other: []
-        oval:mil.disa.stig.ind:tst:23045501:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045501
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 64-bit invocations of chown syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045501
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23045505:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045505
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 64-bit invocations of fchownat syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045505
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:23045503:
           source_test_id: oval:mil.disa.stig.ind:tst:23045503
           source_type: textfilecontent54_test
@@ -690,6 +690,18 @@ rule:
           - oval:mil.disa.stig.ind:obj:23045503
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:23045504:
+          source_test_id: oval:mil.disa.stig.ind:tst:23045504
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Audit 32-bit invocations of fchownat syscall
+          check: all
+          check_existence: all_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23045504
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.ind:tst:23045507:
           source_test_id: oval:mil.disa.stig.ind:tst:23045507
           source_type: textfilecontent54_test
@@ -700,18 +712,6 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:23045507
-          predicates: []
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23045500:
-          source_test_id: oval:mil.disa.stig.ind:tst:23045500
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Audit 32-bit invocations of chown syscall
-          check: all
-          check_existence: all_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23045500
           predicates: []
           source_other: []
       definitions:
@@ -952,7 +952,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-258178r1155599_rule
-      semantic_ir_sha256: 124a021c6b893b0a4a8190ba8af79c98a2f678efc647219d7dd66b72980ec930
+      semantic_ir_sha256: 1da0266664f0666a44257a088202b404b78c37d4ec9bffa4287ded7a0bce1a3f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 2613281b1038f3b4016d4449ecef22567667b9f8ee92aa3b34b62b4548d6736f
   assessments:

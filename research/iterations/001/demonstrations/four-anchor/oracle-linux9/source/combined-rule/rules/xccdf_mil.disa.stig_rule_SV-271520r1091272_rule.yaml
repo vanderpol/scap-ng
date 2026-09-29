@@ -507,22 +507,6 @@ rule:
     description: OL 9 audit service must be enabled.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.linux:obj:25815201:
-        capability: scapng.collect.linux.systemdunitproperty
-        source_object_id: oval:mil.disa.stig.linux:obj:25815201
-        source_type: systemdunitproperty_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: unit
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: auditd.service
-        - kind: element
-          name: property
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: SubState
       oval:mil.disa.stig.linux:obj:25815200:
         capability: scapng.collect.linux.systemdunitproperty
         source_object_id: oval:mil.disa.stig.linux:obj:25815200
@@ -539,19 +523,24 @@ rule:
           name: property
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: ActiveState
+      oval:mil.disa.stig.linux:obj:25815201:
+        capability: scapng.collect.linux.systemdunitproperty
+        source_object_id: oval:mil.disa.stig.linux:obj:25815201
+        source_type: systemdunitproperty_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: unit
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: auditd.service
+        - kind: element
+          name: property
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: SubState
     derive: {}
     predicates:
-      oval:mil.disa.stig.linux:ste:20000004:
-        source_state_id: oval:mil.disa.stig.linux:ste:20000004
-        source_type: systemdunitproperty_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: running
-        comment: null
       oval:mil.disa.stig.linux:ste:20000003:
         source_state_id: oval:mil.disa.stig.linux:ste:20000003
         source_type: systemdunitproperty_state
@@ -563,21 +552,19 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: active
         comment: null
+      oval:mil.disa.stig.linux:ste:20000004:
+        source_state_id: oval:mil.disa.stig.linux:ste:20000004
+        source_type: systemdunitproperty_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: running
+        comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:25815200:
-          source_test_id: oval:mil.disa.stig.linux:tst:25815200
-          source_type: systemdunitproperty_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: auditd.service is active
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:25815200
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000003
-          source_other: []
         oval:mil.disa.stig.linux:tst:25815201:
           source_test_id: oval:mil.disa.stig.linux:tst:25815201
           source_type: systemdunitproperty_test
@@ -590,6 +577,19 @@ rule:
           - oval:mil.disa.stig.linux:obj:25815201
           predicates:
           - oval:mil.disa.stig.linux:ste:20000004
+          source_other: []
+        oval:mil.disa.stig.linux:tst:25815200:
+          source_test_id: oval:mil.disa.stig.linux:tst:25815200
+          source_type: systemdunitproperty_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          comment: auditd.service is active
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:25815200
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000003
           source_other: []
       definitions:
         oval:mil.disa.stig.ol9os:def:271520:
@@ -790,7 +790,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271520r1091272_rule
-      semantic_ir_sha256: 68a175522357c4309dc54d08a2a6cf6c13b0e5db1d20fa1aac270f5a19d5d534
+      semantic_ir_sha256: a296a0f8bbc52a84e2cdb2502cc7efcb5ad37127214d9f79214bdcbfc639520f
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 602d90a7f6f7c0c0b69b1fe6c937c6690eec84eedf2894c1f7f20fcc376a4128
   assessments:

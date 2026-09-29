@@ -29,28 +29,6 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: UseAdvancedStartup
-    oval:mil.disa.stig.win:obj:25326000:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25326000
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SOFTWARE\Policies\Microsoft\FVE
-      - attributes:
-          operation: case insensitive equals
-        kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: OSManageNKP
     oval:mil.disa.stig.win:obj:25326003:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25326003
@@ -73,6 +51,28 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: UseTPMKeyPIN
+    oval:mil.disa.stig.win:obj:25326000:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25326000
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Policies\Microsoft\FVE
+      - attributes:
+          operation: case insensitive equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: OSManageNKP
     oval:mil.disa.stig.win:obj:25326002:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25326002
@@ -133,32 +133,6 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25326001:
-        source_test_id: oval:mil.disa.stig.win:tst:25326001
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Require additional authentication at startup'' is Enabled.'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25326001
-        predicates:
-        - oval:mil.disa.stig.win:ste:20000001
-        source_other: []
-      oval:mil.disa.stig.win:tst:25326000:
-        source_test_id: oval:mil.disa.stig.win:tst:25326000
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Allow network unlock at startup'' is Enabled.'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25326000
-        predicates:
-        - oval:mil.disa.stig.win:ste:20000001
-        source_other: []
       oval:mil.disa.stig.win:tst:25326003:
         source_test_id: oval:mil.disa.stig.win:tst:25326003
         source_type: registry_test
@@ -169,6 +143,19 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.win:obj:25326003
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000001
+        source_other: []
+      oval:mil.disa.stig.win:tst:25326002:
+        source_test_id: oval:mil.disa.stig.win:tst:25326002
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Configure TPM startup PIN'' is set to ''Require startup PIN with TPM''.'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25326002
         predicates:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
@@ -185,6 +172,32 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:20000002
         source_other: []
+      oval:mil.disa.stig.win:tst:25326000:
+        source_test_id: oval:mil.disa.stig.win:tst:25326000
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Allow network unlock at startup'' is Enabled.'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25326000
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000001
+        source_other: []
+      oval:mil.disa.stig.win:tst:25326001:
+        source_test_id: oval:mil.disa.stig.win:tst:25326001
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Require additional authentication at startup'' is Enabled.'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25326001
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000001
+        source_other: []
       oval:mil.disa.stig.win:tst:25326005:
         source_test_id: oval:mil.disa.stig.win:tst:25326005
         source_type: registry_test
@@ -197,19 +210,6 @@ assessment:
         - oval:mil.disa.stig.win:obj:25326003
         predicates:
         - oval:mil.disa.stig.win:ste:20000002
-        source_other: []
-      oval:mil.disa.stig.win:tst:25326002:
-        source_test_id: oval:mil.disa.stig.win:tst:25326002
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Configure TPM startup PIN'' is set to ''Require startup PIN with TPM''.'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25326002
-        predicates:
-        - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
       oval:mil.disa.stig.windows11:def:253260:
@@ -503,6 +503,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253260r1210283_rule
-    semantic_ir_sha256: f74df2b644c98f12757a8a74f563cf4b9e03d65e9024ba77733f6a4c6488774b
+    semantic_ir_sha256: 9a6c2b36fdf0f63f3a4a8006df2d3fb2426c0cf9e1498e652ae368a502ea230b
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: c2fcb62c2435914041570af52a1c7573ae88903e7e9eddbf2bc250a429319245

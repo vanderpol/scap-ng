@@ -363,6 +363,26 @@ rule:
     description: Windows Server 2025 must preserve zone information when saving attachments.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:25347801:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25347801
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_CURRENT_USER
+        - kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Software\Microsoft\Windows\CurrentVersion\Policies\Attachments
+        - kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SaveZoneInformation
       oval:mil.disa.stig.win:obj:25347800:
         capability: scapng.collect.windows.ntuser
         source_object_id: oval:mil.disa.stig.win:obj:25347800
@@ -387,28 +407,39 @@ rule:
           name: filter
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           value: oval:mil.disa.stig.win:ste:20000027
-      oval:mil.disa.stig.win:obj:25347801:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25347801
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_CURRENT_USER
-        - kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Software\Microsoft\Windows\CurrentVersion\Policies\Attachments
-        - kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SaveZoneInformation
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000027:
+        source_state_id: oval:mil.disa.stig.win:ste:20000027
+        source_type: ntuser_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: greater than
+          kind: element
+          name: days_since_modified
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '35'
+        comment: null
+      oval:mil.disa.stig.win:ste:20000002:
+        source_state_id: oval:mil.disa.stig.win:ste:20000002
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_dword
+        - attributes:
+            datatype: int
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '2'
+        comment: null
       oval:mil.disa.stig.win:ste:20000026:
         source_state_id: oval:mil.disa.stig.win:ste:20000026
         source_type: ntuser_state
@@ -438,37 +469,6 @@ rule:
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '2'
-        comment: null
-      oval:mil.disa.stig.win:ste:20000002:
-        source_state_id: oval:mil.disa.stig.win:ste:20000002
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_dword
-        - attributes:
-            datatype: int
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '2'
-        comment: null
-      oval:mil.disa.stig.win:ste:20000027:
-        source_state_id: oval:mil.disa.stig.win:ste:20000027
-        source_type: ntuser_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: greater than
-          kind: element
-          name: days_since_modified
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '35'
         comment: null
     evaluate:
       tests:
@@ -701,7 +701,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278240r1182207_rule
-      semantic_ir_sha256: 831827fc2345119f624689c3fa8e307b6bf99697510e58d3327262af943fcb7d
+      semantic_ir_sha256: 962cfb7241a5510487807308d045fcef3e58cb703b37fe9ccbfdcfe0df1429c7
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 203939d30af746c74c9961589ff147ad4ef54ebbc2e0aff682302e1a5f7b437f
   assessments:

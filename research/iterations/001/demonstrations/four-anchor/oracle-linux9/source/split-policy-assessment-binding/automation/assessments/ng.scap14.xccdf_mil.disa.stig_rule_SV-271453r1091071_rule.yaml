@@ -7,18 +7,6 @@ assessment:
   description: OL 9 must enable the SELinux targeted policy.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.linux:obj:23024000:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23024000
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: /sys/fs/selinux
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /sys/fs/selinux
     oval:mil.disa.stig.ind:obj:23028200:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23028200
@@ -44,6 +32,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.linux:obj:23024000:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23024000
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: /sys/fs/selinux
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /sys/fs/selinux
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:23028200:
@@ -97,33 +97,6 @@ assessment:
         - oval:mil.disa.stig.linux:ste:23024000
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230282:
-        source_definition_id: oval:mil.disa.stig.defs:def:230282
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: selinux is active
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23024000
-          - comment: '/etc/selinux/config: SELINUXTYPE=targeted'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23028200
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must enable the SELinux targeted policy.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.ol9os:def:271453:
         source_definition_id: oval:mil.disa.stig.ol9os:def:271453
         class: compliance
@@ -158,6 +131,33 @@ assessment:
               \ During the development or debugging of SELinux modules, it is common to temporarily place nonproduction systems\
               \ in \"permissive\" mode. In such temporary cases, SELinux policies should be developed, and once work is completed,\
               \ the system should be reconfigured to \"targeted\"."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230282:
+        source_definition_id: oval:mil.disa.stig.defs:def:230282
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: selinux is active
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23024000
+          - comment: '/etc/selinux/config: SELINUXTYPE=targeted'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23028200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must enable the SELinux targeted policy.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -283,6 +283,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271453r1091071_rule
-    semantic_ir_sha256: f0a9f904a03d698058c4e3ab16e7c56886fa557ea82bf47462824a8020261685
+    semantic_ir_sha256: 21e813348b00b249e0a7b85c8ff6a7811186fb3e86aec230239a729f08b45cc6
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: e7930dcc4a726b8ec6f9e6fc5ff01f239a21aa417fbc483d7e1b5aa44519d7d9

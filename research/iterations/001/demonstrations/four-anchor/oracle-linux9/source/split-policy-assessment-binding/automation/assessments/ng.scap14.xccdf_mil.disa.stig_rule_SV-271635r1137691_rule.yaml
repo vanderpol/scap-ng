@@ -7,33 +7,6 @@ assessment:
   description: OL 9 must require a boot loader superuser password.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25778701:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25778701
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: /boot/grub2/grubenv:kernelopts
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /boot/grub2/user.cfg
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*GRUB2_PASSWORD=(\S+)\b
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25778700:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25778700
@@ -61,22 +34,35 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-  derive: {}
-  predicates:
-    oval:mil.disa.stig.ind:ste:25778700:
-      source_state_id: oval:mil.disa.stig.ind:ste:25778700
-      source_type: textfilecontent54_state
+    oval:mil.disa.stig.ind:obj:25778701:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25778701
+      source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
+      version: '1'
+      comment: /boot/grub2/grubenv:kernelopts
+      query:
       - attributes:
           datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /boot/grub2/user.cfg
+      - attributes:
           operation: pattern match
         kind: element
-        name: subexpression
+        name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\S+$
-      comment: GRUB superuser name
+        value: ^\s*GRUB2_PASSWORD=(\S+)\b
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+  derive: {}
+  predicates:
     oval:mil.disa.stig.ind:ste:25778701:
       source_state_id: oval:mil.disa.stig.ind:ste:25778701
       source_type: textfilecontent54_state
@@ -91,6 +77,20 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: ^grub\.pbkdf2\.sha512\.
       comment: GRUB superuser password
+    oval:mil.disa.stig.ind:ste:25778700:
+      source_state_id: oval:mil.disa.stig.ind:ste:25778700
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\S+$
+      comment: GRUB superuser name
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:25778701:
@@ -313,6 +313,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271635r1137691_rule
-    semantic_ir_sha256: c2cf09c1922521aa38f6dff405f5e3293fed179777f18f04c0e2d21db6f3a91c
+    semantic_ir_sha256: f4c110b2c6a644872cb99379b84c0e3c15d0e0192d43d530f2b551f7a98fc404
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: de33a99d96efed422101f47bc695a18d61f2c83e74727a128b2963fb00dcddd1

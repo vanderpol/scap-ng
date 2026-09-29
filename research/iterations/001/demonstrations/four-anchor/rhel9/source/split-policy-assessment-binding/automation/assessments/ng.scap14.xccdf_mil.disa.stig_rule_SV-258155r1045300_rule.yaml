@@ -7,18 +7,21 @@ assessment:
   description: RHEL 9 must allocate audit record storage capacity to store at least one week's worth of audit records.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25815500:
-      capability: scapng.collect.independent.variable
-      source_object_id: oval:mil.disa.stig.ind:obj:25815500
-      source_type: variable_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+    oval:mil.disa.stig.linux:obj:23029400:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23029400
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
       version: '1'
       comment: null
       query:
-      - kind: element
-        name: var_ref
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: oval:mil.disa.stig.defs:var:25815500
+      - attributes:
+          datatype: string
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23029400
+        kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
     oval:mil.disa.stig.ind:obj:23029402:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23029402
@@ -50,63 +53,19 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.linux:obj:23029400:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23029400
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+    oval:mil.disa.stig.ind:obj:25815500:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:25815500
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
       comment: null
       query:
-      - attributes:
-          datatype: string
-          var_check: at least one
-          var_ref: oval:mil.disa.stig.defs:var:23029400
-        kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.defs:var:25815500
   derive:
-    oval:mil.disa.stig.defs:var:23029400:
-      source_variable_id: oval:mil.disa.stig.defs:var:23029400
-      source_type: local_variable
-      datatype: string
-      comment: audit data directory from /etc/audit/auditd.conf
-      semantic_ast:
-        datatype: string
-        expression:
-          item_field: subexpression
-          object_ref: oval:mil.disa.stig.ind:obj:23029402
-          op: object_component
-          record_field: null
-        id: oval:mil.disa.stig.defs:var:23029400
-        type: local_variable
-      resolution:
-        datatype: string
-        item_field: subexpression
-        object_ref: oval:mil.disa.stig.ind:obj:23029402
-        operation: object_component
-        reason: object_component_requires_collection:textfilecontent54_object
-        record_field: null
-        status: dynamic_object_dependency
-        variable_type: local_variable
-      evaluation_plan:
-        datatype: string
-        dependencies:
-          objects:
-          - oval:mil.disa.stig.ind:obj:23029402
-          operations:
-          - object_component
-          variables: []
-        expression:
-          item_field: subexpression
-          object_ref: oval:mil.disa.stig.ind:obj:23029402
-          op: object_component
-          record_field: null
-        mode: target_dependent
-        reason: object_component_requires_collection:textfilecontent54_object
-        resolution_status: dynamic_object_dependency
-        variable_id: oval:mil.disa.stig.defs:var:23029400
-        variable_type: local_variable
     oval:mil.disa.stig.defs:var:25815500:
       source_variable_id: oval:mil.disa.stig.defs:var:25815500
       source_type: local_variable
@@ -176,6 +135,47 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:mil.disa.stig.defs:var:25815500
         variable_type: local_variable
+    oval:mil.disa.stig.defs:var:23029400:
+      source_variable_id: oval:mil.disa.stig.defs:var:23029400
+      source_type: local_variable
+      datatype: string
+      comment: audit data directory from /etc/audit/auditd.conf
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23029402
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:23029400
+        type: local_variable
+      resolution:
+        datatype: string
+        item_field: subexpression
+        object_ref: oval:mil.disa.stig.ind:obj:23029402
+        operation: object_component
+        reason: object_component_requires_collection:textfilecontent54_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23029402
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23029402
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23029400
+        variable_type: local_variable
   predicates:
     oval:mil.disa.stig.ind:ste:25815500:
       source_state_id: oval:mil.disa.stig.ind:ste:25815500
@@ -193,18 +193,6 @@ assessment:
       comment: 10GiB
   evaluate:
     tests:
-      oval:mil.disa.stig.linux:tst:23029400:
-        source_test_id: oval:mil.disa.stig.linux:tst:23029400
-        source_type: partition_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        comment: There is a separate file system for audit data directory.
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.linux:obj:23029400
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:25815500:
         source_test_id: oval:mil.disa.stig.ind:tst:25815500
         source_type: variable_test
@@ -217,6 +205,18 @@ assessment:
         - oval:mil.disa.stig.ind:obj:25815500
         predicates:
         - oval:mil.disa.stig.ind:ste:25815500
+        source_other: []
+      oval:mil.disa.stig.linux:tst:23029400:
+        source_test_id: oval:mil.disa.stig.linux:tst:23029400
+        source_type: partition_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        comment: There is a separate file system for audit data directory.
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.linux:obj:23029400
+        predicates: []
         source_other: []
     definitions:
       oval:mil.disa.stig.rhel9os:def:258155:
@@ -417,6 +417,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258155r1045300_rule
-    semantic_ir_sha256: 97a05b9199cc1871051643792f7f02cff189873c1c3cdd3edac2b3c2ecd23f14
+    semantic_ir_sha256: 5d09ddbc5c32eab42a20525e6abaca9c782afd0bc307a24c1c073b44895ea291
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 1734603f4d1b68eb6b0d80019ef3ac6eb8e35b9fcc010618d17e054a09a3d3c2

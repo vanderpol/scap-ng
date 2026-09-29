@@ -7,31 +7,6 @@ assessment:
   description: Successful/unsuccessful uses of the umount2 system call in RHEL 9 must generate an audit record.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25821601:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25821601
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: 64-bit umount2 syscall
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/audit/audit.rules
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+umount2\s+|(\s+|,)umount2(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25821600:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25821600
@@ -57,22 +32,35 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:25821601:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25821601
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: 64-bit umount2 syscall
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/audit.rules
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+umount2\s+|(\s+|,)umount2(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:25821600:
-        source_test_id: oval:mil.disa.stig.ind:tst:25821600
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Audit 32-bit invocations of umount2 syscall
-        check: all
-        check_existence: all_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25821600
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:25821601:
         source_test_id: oval:mil.disa.stig.ind:tst:25821601
         source_type: textfilecontent54_test
@@ -85,34 +73,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:25821601
         predicates: []
         source_other: []
+      oval:mil.disa.stig.ind:tst:25821600:
+        source_test_id: oval:mil.disa.stig.ind:tst:25821600
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Audit 32-bit invocations of umount2 syscall
+        check: all
+        check_existence: all_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25821600
+        predicates: []
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:258216:
-        source_definition_id: oval:mil.disa.stig.defs:def:258216
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit 32-bit invocations of umount2 syscall
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25821600
-          - comment: Audit 64-bit invocations of umount2 syscall
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25821601
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Successful/unsuccessful uses of the umount2 system call in the operating system must generate an audit record.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258216:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258216
         class: compliance
@@ -150,6 +123,33 @@ assessment:
 
               Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000062-GPOS-00031, SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206,
               SRG-OS-000471-GPOS-00215'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:258216:
+        source_definition_id: oval:mil.disa.stig.defs:def:258216
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit 32-bit invocations of umount2 syscall
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25821600
+          - comment: Audit 64-bit invocations of umount2 syscall
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25821601
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Successful/unsuccessful uses of the umount2 system call in the operating system must generate an audit record.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -280,6 +280,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258216r1155613_rule
-    semantic_ir_sha256: 1f89a48f836744d05e8dd9fc0d9523669d7f9b3ec45cac4a9af123aa18fdde2f
+    semantic_ir_sha256: 1de2637b021192334bc06a97e58701597673fa67c20e07473d1bd509f87d00d0
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ad71e1bec16727d710390b794940b408acd52e81b9c49703bcc8db44db121f15

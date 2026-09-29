@@ -1,0 +1,124 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271698
+  collect:
+    oval:mil.disa.stig.ind:obj:23048600:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/chrony.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*cmdport[ \t]+0[ \t]*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23048600
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must disable network management of the chrony daemon.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230486:
+        class: compliance
+        criteria:
+          children:
+          - comment: '/etc/chrony.conf: cmdport option is set to 0'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23048600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable network management of the chrony daemon.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230486
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271698:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230486
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002321 - OL 9 must disable network management of the chrony daemon.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Not exposing the management interface of the chrony daemon on the network diminishes the attack space.\n\
+              \n\tSatisfies: SRG-OS-000096-GPOS-00050, SRG-OS-000095-GPOS-00049"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271698
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23048600:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23048600
+        comment: '/etc/chrony.conf: cmdport option is set to 0'
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23048600
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.bed2b9e89a78849d7a60def6
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: bed2b9e89a78849d7a60def685c4b2ed531c82ee22687f65b6b921006ac87cdd
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271698r1091806_rule
+    title: OL 9 must disable network management of the chrony daemon.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257947r958480_rule
+    title: RHEL 9 must disable network management of the chrony daemon.

@@ -693,26 +693,6 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ':'
-      oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902:
-        capability: scapng.collect.independent.shellcommand
-        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902
-        source_type: shellcommand_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: Run Icacls command against Program Files directory
-        query:
-        - kind: element
-          name: shell
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: powershell
-        - kind: element
-          name: command
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: icacls (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion" -Name ProgramFilesDir).ProgramFilesDir
-        - kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ':'
       oval:navy.navwar.niwcatlantic.scc.windows:obj:27799901:
         capability: scapng.collect.windows.registry
         source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27799901
@@ -733,6 +713,26 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: everyoneincludesanonymous
+      oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902:
+        capability: scapng.collect.independent.shellcommand
+        source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902
+        source_type: shellcommand_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: Run Icacls command against Program Files directory
+        query:
+        - kind: element
+          name: shell
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: powershell
+        - kind: element
+          name: command
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: icacls (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion" -Name ProgramFilesDir).ProgramFilesDir
+        - kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ':'
     derive:
       oval:navy.navwar.niwcatlantic.scc.windows:var:27799901:
         source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27799901
@@ -809,6 +809,20 @@ rule:
           variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27799901
           variable_type: constant_variable
     predicates:
+      oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901:
+        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            operation: equals
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '0'
+        comment: Value must be equal to 0
       oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902:
         source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902
         source_type: shellcommand_state
@@ -834,35 +848,8 @@ rule:
           name: stderr_line
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         comment: Permissions must equal expected output
-      oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901:
-        source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            operation: equals
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '0'
-        comment: Value must be equal to 0
     evaluate:
       tests:
-        oval:navy.navwar.niwcatlantic.scc.windows:tst:27799902:
-          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799902
-          source_type: shellcommand_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Program Files directory permissions must conform to minimum requirements.
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902
-          predicates:
-          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902
-          source_other: []
         oval:navy.navwar.niwcatlantic.scc.windows:tst:27799903:
           source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799903
           source_type: shellcommand_test
@@ -888,6 +875,19 @@ rule:
           - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799901
           predicates:
           - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799901
+          source_other: []
+        oval:navy.navwar.niwcatlantic.scc.windows:tst:27799902:
+          source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27799902
+          source_type: shellcommand_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Program Files directory permissions must conform to minimum requirements.
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:navy.navwar.niwcatlantic.scc.windows:obj:27799902
+          predicates:
+          - oval:navy.navwar.niwcatlantic.scc.windows:ste:27799902
           source_other: []
       definitions:
         oval:navy.navwar.niwcatlantic.scc.windows:def:277999:
@@ -1151,7 +1151,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-277999r1180703_rule
-      semantic_ir_sha256: 2d7ec2a471db466b6d7d32178d67268f4cc9880698e7ff75a061634651946317
+      semantic_ir_sha256: 3167c03e6d14465bab2414401a69375a9e16907ad50f2be3effada25c8746dab
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 5bf44697114f0a1eafb4ccb7777effbb9bdcaaff7ef56df31b1dc0cbc7914e6b
   assessments:

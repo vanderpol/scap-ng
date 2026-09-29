@@ -17,19 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25333401:
-      source_state_id: oval:mil.disa.stig.win:ste:25333401
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-        kind: element
-        name: security_system_extension
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS_FAILURE
-      comment: '''Security System Extension'' is set to ''Success'' and ''Failure'''
     oval:mil.disa.stig.win:ste:25333400:
       source_state_id: oval:mil.disa.stig.win:ste:25333400
       source_type: auditeventpolicysubcategories_state
@@ -43,21 +30,21 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS
       comment: '''Security System Extension'' is set to ''Success'''
+    oval:mil.disa.stig.win:ste:25333401:
+      source_state_id: oval:mil.disa.stig.win:ste:25333401
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: security_system_extension
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      comment: '''Security System Extension'' is set to ''Success'' and ''Failure'''
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25333401:
-        source_test_id: oval:mil.disa.stig.win:tst:25333401
-        source_type: auditeventpolicysubcategories_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Audit Security System Extension'' is set to ''Success'' and ''Failure'''
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:20000000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25333401
-        source_other: []
       oval:mil.disa.stig.win:tst:25333400:
         source_test_id: oval:mil.disa.stig.win:tst:25333400
         source_type: auditeventpolicysubcategories_test
@@ -71,34 +58,20 @@ assessment:
         predicates:
         - oval:mil.disa.stig.win:ste:25333400
         source_other: []
+      oval:mil.disa.stig.win:tst:25333401:
+        source_test_id: oval:mil.disa.stig.win:tst:25333401
+        source_type: auditeventpolicysubcategories_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Audit Security System Extension'' is set to ''Success'' and ''Failure'''
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25333401
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:253334:
-        source_definition_id: oval:mil.disa.stig.defs:def:253334
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: Audit - Security System Extension - Success only
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25333400
-          - comment: Audit - Security System Extension - Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25333401
-          comment: Audit - Security System Extension - Success
-          kind: boolean
-          negate: false
-          operator: OR
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to audit System - Security System Extension successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253334:
         source_definition_id: oval:mil.disa.stig.windows11:def:253334
         class: compliance
@@ -135,6 +108,33 @@ assessment:
 
 
               Security System Extension records events related to extension code being loaded by the security subsystem.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:253334:
+        source_definition_id: oval:mil.disa.stig.defs:def:253334
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: Audit - Security System Extension - Success only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333400
+          - comment: Audit - Security System Extension - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25333401
+          comment: Audit - Security System Extension - Success
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit System - Security System Extension successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -269,6 +269,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253334r991575_rule
-    semantic_ir_sha256: 672feca9364b7ff18fc6780b5bad323141385e5678d36d0336748d052c283ea6
+    semantic_ir_sha256: 8f48e04e63d40016dafa201ab77b353e7c47733e11283811030f22347b11b7e9
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 3101654458888a19e603068bf179a259f5bb2fa880c5c1d40d84cdfbeec69d4c

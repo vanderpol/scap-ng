@@ -7,60 +7,6 @@ assessment:
   description: Windows Server 2025 default permissions for the HKEY_LOCAL_MACHINE registry hive must be maintained.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
-      query:
-      - kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: powershell
-      - kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Security", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
-          |  Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
-          $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
-          PropagationFlags: $($_.PropagationFlags)" }'
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102:
-      capability: scapng.collect.independent.shellcommand
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102
-      source_type: shellcommand_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
-      query:
-      - kind: element
-        name: shell
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: powershell
-      - kind: element
-        name: command
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Software", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
-          | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
-          $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
-          PropagationFlags: $($_.PropagationFlags)" }'
-    oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105:
-      capability: scapng.collect.windows.wmi57
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105
-      source_type: wmi57_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: namespace
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: root\cimv2
-      - kind: element
-        name: wql
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SELECT DomainRole FROM win32_computersystem
     oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103:
       capability: scapng.collect.independent.shellcommand
       source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103
@@ -80,42 +26,128 @@ assessment:
           | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
           $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
           PropagationFlags: $($_.PropagationFlags)" }'
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Security", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
+          |  Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
+          $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
+          PropagationFlags: $($_.PropagationFlags)" }'
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105:
+      capability: scapng.collect.windows.wmi57
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800105
+      source_type: wmi57_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: namespace
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: root\cimv2
+      - kind: element
+        name: wql
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SELECT DomainRole FROM win32_computersystem
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102:
+      capability: scapng.collect.independent.shellcommand
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27800102
+      source_type: shellcommand_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: powershell
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Software", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
+          | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object { "Identity:$($_.IdentityReference), Rights:
+          $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags),
+          PropagationFlags: $($_.PropagationFlags)" }'
   derive:
-    oval:navy.navwar.niwcatlantic.scc.windows:var:27800101:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
+    oval:navy.navwar.niwcatlantic.scc.windows:var:27800103:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
       source_type: constant_variable
       datatype: string
-      comment: Required Permissions for HKEY_LOCAL_MACHINE\Security
+      comment: Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software
+        on all servers
       semantic_ast:
         datatype: string
-        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
         type: constant_variable
         values:
+        - datatype: string
+          value: '^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+            PropagationFlags: None$'
+        - datatype: string
+          value: '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags:
+            (ContainerInherit|None), PropagationFlags: None$'
         - datatype: string
           value: '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags:
             (ContainerInherit|None), PropagationFlags: None$'
         - datatype: string
-          value: '^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited:
+          value: '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+            PropagationFlags: (None|InheritOnly)$'
+        - datatype: string
+          value: '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited:
             False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - datatype: string
+          value: '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
+            Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
+            None$'
       resolution:
         datatype: string
         status: exact_static
         values:
+        - '^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        - '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
         - '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
           PropagationFlags: None$'
-        - '^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited: False,
-          InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: (None|InheritOnly)$'
+        - '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
+          Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
+          None$'
         variable_type: constant_variable
       evaluation_plan:
         datatype: string
         mode: static
         resolution_status: exact_static
         values:
+        - '^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        - '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
         - '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
           PropagationFlags: None$'
-        - '^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited: False,
-          InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
-        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
+        - '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: (None|InheritOnly)$'
+        - '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
+          Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
+          None$'
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
         variable_type: constant_variable
     oval:navy.navwar.niwcatlantic.scc.windows:var:27800102:
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800102
@@ -195,95 +227,43 @@ assessment:
         - ''
         variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800102
         variable_type: constant_variable
-    oval:navy.navwar.niwcatlantic.scc.windows:var:27800103:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
+    oval:navy.navwar.niwcatlantic.scc.windows:var:27800101:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
       source_type: constant_variable
       datatype: string
-      comment: Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software
-        on all servers
+      comment: Required Permissions for HKEY_LOCAL_MACHINE\Security
       semantic_ast:
         datatype: string
-        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
+        id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
         type: constant_variable
         values:
-        - datatype: string
-          value: '^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
-            PropagationFlags: None$'
-        - datatype: string
-          value: '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags:
-            (ContainerInherit|None), PropagationFlags: None$'
         - datatype: string
           value: '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags:
             (ContainerInherit|None), PropagationFlags: None$'
         - datatype: string
-          value: '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
-            PropagationFlags: (None|InheritOnly)$'
-        - datatype: string
-          value: '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited:
+          value: '^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited:
             False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
-        - datatype: string
-          value: '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
-            Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
-            None$'
       resolution:
         datatype: string
         status: exact_static
         values:
-        - '^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
-          PropagationFlags: None$'
-        - '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
-          PropagationFlags: None$'
         - '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
           PropagationFlags: None$'
-        - '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
-          PropagationFlags: (None|InheritOnly)$'
-        - '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited:
-          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
-        - '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
-          Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
-          None$'
+        - '^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited: False,
+          InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
         variable_type: constant_variable
       evaluation_plan:
         datatype: string
         mode: static
         resolution_status: exact_static
         values:
-        - '^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
-          PropagationFlags: None$'
-        - '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
-          PropagationFlags: None$'
         - '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
           PropagationFlags: None$'
-        - '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
-          PropagationFlags: (None|InheritOnly)$'
-        - '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited:
-          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
-        - '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
-          Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
-          None$'
-        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800103
+        - '^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited: False,
+          InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        variable_id: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
         variable_type: constant_variable
   predicates:
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106
-      source_type: wmi57_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: record
-          operation: equals
-        children:
-        - attributes:
-            name: domainrole
-          kind: element
-          name: field
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: '5'
-        kind: element
-        name: result
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: Primary Domain Controller
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800105:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800105
       source_type: wmi57_state
@@ -319,20 +299,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       comment: Required Permissions for Non-Domain Controllers HKEY_LOCAL_MACHINE\System and for HKEY_LOCAL_MACHINE\Software
         on all servers
-    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101:
-      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101
-      source_type: shellcommand_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          operation: pattern match
-          var_check: at least one
-          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
-        kind: element
-        name: stdout_line
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      comment: Required Permissions for HKEY_LOCAL_MACHINE\Security
     oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102:
       source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102
       source_type: shellcommand_state
@@ -347,8 +313,68 @@ assessment:
         name: stdout_line
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       comment: Required Permissions for Domain Controllers HKEY_LOCAL_MACHINE\System
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101
+      source_type: shellcommand_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          operation: pattern match
+          var_check: at least one
+          var_ref: oval:navy.navwar.niwcatlantic.scc.windows:var:27800101
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      comment: Required Permissions for HKEY_LOCAL_MACHINE\Security
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106:
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27800106
+      source_type: wmi57_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '5'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      comment: Primary Domain Controller
   evaluate:
     tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800103:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800103
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Default Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102
+        source_other: []
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800101:
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800101
+        source_type: shellcommand_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained.
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101
+        source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800102:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800102
         source_type: shellcommand_test
@@ -374,32 +400,6 @@ assessment:
         - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103
         predicates:
         - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800104
-        source_other: []
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800101:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800101
-        source_type: shellcommand_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry key must be maintained.
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800101
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800101
-        source_other: []
-      oval:navy.navwar.niwcatlantic.scc.windows:tst:27800103:
-        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800103
-        source_type: shellcommand_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: Default Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM registry key must be maintained.
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27800103
-        predicates:
-        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27800102
         source_other: []
       oval:navy.navwar.niwcatlantic.scc.windows:tst:27800105:
         source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27800105
@@ -695,6 +695,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278001r1211143_rule
-    semantic_ir_sha256: 45c4eb645acbc74563841d969126b8b48247d454651eec17214a696860ed7bbb
+    semantic_ir_sha256: a50414d6385c7c42104b1feb59bfa95167d65d43687d9dad181522fa20e2eb19
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: a8ffe7d242e1b133bdd18203e5b56bde60f6b07e475e6eb3a378ed63129a78a1

@@ -17,20 +17,6 @@ assessment:
       query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25432500:
-      source_state_id: oval:mil.disa.stig.win:ste:25432500
-      source_type: auditeventpolicysubcategories_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: ipsec_driver
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: AUDIT_SUCCESS
-      comment: Audit - IPSec Driver - Success only
     oval:mil.disa.stig.win:ste:25432501:
       source_state_id: oval:mil.disa.stig.win:ste:25432501
       source_type: auditeventpolicysubcategories_state
@@ -45,6 +31,20 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: AUDIT_SUCCESS_FAILURE
       comment: Audit - IPSec Driver - Success and Failure
+    oval:mil.disa.stig.win:ste:25432500:
+      source_state_id: oval:mil.disa.stig.win:ste:25432500
+      source_type: auditeventpolicysubcategories_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: ipsec_driver
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS
+      comment: Audit - IPSec Driver - Success only
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25432500:
@@ -62,6 +62,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25432501
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:254325:
+        source_definition_id: oval:mil.disa.stig.defs:def:254325
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: Audit - IPSec Driver - Success only OR Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25432500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows must be configured to audit System - IPsec Driver successes.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278072:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278072
         class: compliance
@@ -97,29 +120,6 @@ assessment:
               \ is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected\
               \ behavior.\n\n  IPsec Driver records events related to the IPsec Driver, such as dropped packets.\n\n  Satisfies:\
               \ SRG-OS-000327-GPOS-00127, SRG-OS-000458-GPOS-00203, SRG-OS-000463-GPOS-00207, SRG-OS-000468-GPOS-00212"
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:254325:
-        source_definition_id: oval:mil.disa.stig.defs:def:254325
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: Audit - IPSec Driver - Success only OR Success and Failure
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25432500
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Windows must be configured to audit System - IPsec Driver successes.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -246,6 +246,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278072r1180922_rule
-    semantic_ir_sha256: cf61e06946945c1b86f86552825d59441454963096eca42f27afcde7943cadd6
+    semantic_ir_sha256: 26dbaf52b209847b53e7f39695a5b3327ef132e2f3a9d37504535c1f563bd858
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 3ed5853e6f0251231b23a2c6d0bb06072a1e19029c374cae33e2b32cb93d3183

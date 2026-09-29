@@ -1,0 +1,241 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271690
+  collect:
+    oval:mil.disa.stig.ind:obj:23035100:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: dconf org/gnome/settings-daemon/peripherals/smartcard sections
+      query:
+      - attributes:
+          datatype: string
+          var_check: at least one
+          var_ref: oval:mil.disa.stig.defs:var:23035100
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\[org/gnome/settings-daemon/peripherals/smartcard](?:\r?\n(?:[^[\r\n].*)?)*
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23035100
+      source_type: textfilecontent54_object
+      version: '4'
+    oval:mil.disa.stig.unix:obj:23035100:
+      capability: scapng.collect.unix.file
+      comment: dconf database directories
+      query:
+      - attributes:
+          max_depth: '1'
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/dconf/db
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:23035100
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:23035100
+      source_type: file_object
+      version: '2'
+  derive:
+    oval:mil.disa.stig.defs:var:23035100:
+      comment: dconf database directories
+      datatype: string
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.unix:obj:23035100
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: path
+          object_ref: oval:mil.disa.stig.unix:obj:23035100
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:file_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23035100
+        variable_type: local_variable
+      resolution:
+        datatype: string
+        item_field: path
+        object_ref: oval:mil.disa.stig.unix:obj:23035100
+        operation: object_component
+        reason: object_component_requires_collection:file_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: path
+          object_ref: oval:mil.disa.stig.unix:obj:23035100
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:23035100
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:23035100
+  description: OL 9 must be able to directly initiate a session lock for all connection types using smart card when the smart
+    card is removed.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230351:
+        class: compliance
+        criteria:
+          children:
+          - comment: /proc/sys/crypto/fips_enabled is set to 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23035100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must be able to initiate directly a session lock for all connection types using smartcard
+              when the smartcard is removed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230351
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271690:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230351
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002160 - OL 9 must be able to directly initiate a session lock for all connection types using smart
+              card when the smart card is removed.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "A session lock is a temporary action taken when a user stops work and moves away from the immediate physical\
+              \ vicinity of the information system but does not want to log out because of the temporary nature of the absence.\n\
+              \n\tThe session lock is implemented at the point where session activity can be determined. Rather than be forced\
+              \ to wait for a period of time to expire before the user session can be locked, OL 9 needs to provide users\
+              \ with the ability to manually invoke a session lock so users can secure their session if it is necessary to\
+              \ temporarily vacate the immediate physical vicinity.\n\n\tSatisfies: SRG-OS-000028-GPOS-00009, SRG-OS-000030-GPOS-00011"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271690
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23035100:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23035100
+        comment: dconf smartcard removal-action lock-screen
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23035100
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23035100
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.cb5b31e5ea0085f7fd23f371
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:23035100:
+      comment: null
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: \nremoval-action='lock-screen'\s*(\n|$)
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23035100
+      source_type: textfilecontent54_state
+    oval:mil.disa.stig.unix:ste:23035100:
+      comment: dconf database directories
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: ^/etc/dconf/db/.*\.d$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:23035100
+      source_type: file_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: cb5b31e5ea0085f7fd23f371f0f47e4d04b3858d7757db92f3a25743d61508b8
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271690r1092634_rule
+    title: OL 9 must be able to directly initiate a session lock for all connection types using smart card when the smart
+      card is removed.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258019r1045092_rule
+    title: RHEL 9 must be able to initiate directly a session lock for all connection types using smart card when the smart
+      card is removed.

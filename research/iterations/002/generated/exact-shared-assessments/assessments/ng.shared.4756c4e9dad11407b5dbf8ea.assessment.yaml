@@ -1,0 +1,129 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271766
+  collect:
+    oval:mil.disa.stig.unix:obj:23026600:
+      capability: scapng.collect.unix.sysctl
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: kernel.kexec_load_disabled
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:23026600
+      source_type: sysctl_object
+      version: '1'
+  derive: {}
+  description: OL 9 must prevent the loading of a new kernel for later execution.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:271766:
+        class: compliance
+        criteria:
+          children:
+          - comment: kernel.kexec_load_disabled = 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23026600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent the loading of a new kernel for later execution.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:271766
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271766:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:271766
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002428 - OL 9 must prevent the loading of a new kernel for later execution.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Changes to any software components can have significant effects on the overall security of the operating\
+              \ system. This requirement ensures the software has not been tampered with and that it has been provided by\
+              \ a trusted vendor.\n\n\tDisabling kexec_load prevents an unsigned kernel image (that could be a windows kernel\
+              \ or modified vulnerable kernel) from being loaded. Kexec can be used subvert the entire secureboot process\
+              \ and should be avoided at all costs especially since it can load unsigned kernel images."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271766
+        version: '2'
+    tests:
+      oval:mil.disa.stig.unix:tst:23026600:
+        check: all
+        check_existence: all_exist
+        collections:
+        - oval:mil.disa.stig.unix:obj:23026600
+        comment: kernel.kexec_load_disabled setting in kernel is set to 1
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000010
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:23026600
+        source_type: sysctl_test
+        state_operator: AND
+  id: ng.shared.4756c4e9dad11407b5dbf8ea
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000010:
+      comment: null
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:20000010
+      source_type: sysctl_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 4756c4e9dad11407b5dbf8eaf1c3c5fd453ec8433a3783163439aae68ea4f56e
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271766r1092010_rule
+    title: OL 9 must prevent the loading of a new kernel for later execution.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257799r1155697_rule
+    title: RHEL 9 must prevent the loading of a new kernel for later execution.

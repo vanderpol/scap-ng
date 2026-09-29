@@ -311,32 +311,6 @@ rule:
     description: Run as different user must be removed from context menus.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:25335900:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25335900
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            datatype: string
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Classes\batfile\shell\runasuser
-        - attributes:
-            datatype: string
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SuppressionPolicy
       oval:mil.disa.stig.win:obj:25335902:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25335902
@@ -409,6 +383,32 @@ rule:
           name: key
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SOFTWARE\Classes\mscfile\shell\runasuser
+        - attributes:
+            datatype: string
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SuppressionPolicy
+      oval:mil.disa.stig.win:obj:25335900:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25335900
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Classes\batfile\shell\runasuser
         - attributes:
             datatype: string
           kind: element
@@ -490,40 +490,6 @@ rule:
           - oval:mil.disa.stig.win:ste:25335900
           source_other: []
       definitions:
-        oval:mil.disa.stig.windows11:def:253359:
-          source_definition_id: oval:mil.disa.stig.windows11:def:253359
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:253359
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: WN11-CC-000039 - Run as different user must be removed from context menus.
-            - attributes:
-                family: windows
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Microsoft Windows 11
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The "Run as different user" selection from context menus allows the use of credentials other than the
-                currently logged on user. Using privileged credentials in a standard user session can expose those credentials
-                to theft. Removing this option from context menus helps prevent this from occurring.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:253359:
           source_definition_id: oval:mil.disa.stig.defs:def:253359
           class: compliance
@@ -557,6 +523,40 @@ rule:
               text: Run as different user must be removed from context menus.
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.windows11:def:253359:
+          source_definition_id: oval:mil.disa.stig.windows11:def:253359
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: null
+              definition_ref: oval:mil.disa.stig.defs:def:253359
+              kind: definition_ref
+              negate: false
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: WN11-CC-000039 - Run as different user must be removed from context menus.
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows 11
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The "Run as different user" selection from context menus allows the use of credentials other than the
+                currently logged on user. Using privileged credentials in a standard user session can expose those credentials
+                to theft. Removing this option from context menus helps prevent this from occurring.
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -680,7 +680,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253359r958478_rule
-      semantic_ir_sha256: fed1dbbb7e1b99c53f5c8720865cf1cb424404bbcd384438e0ab6273c05c3e19
+      semantic_ir_sha256: 5d51c40df5de5c61abc526d5604c81f9f4eaedd5a5e55df1350d84e7d43aa045
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 52cbdc7a0e82140cc04b904371ce8ce2c4ce46fbf2b0659e14154ff880e17482
   assessments:

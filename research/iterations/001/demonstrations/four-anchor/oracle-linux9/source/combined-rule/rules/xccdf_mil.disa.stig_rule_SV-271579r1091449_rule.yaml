@@ -377,8 +377,8 @@ rule:
           value: '1'
     derive: {}
     predicates:
-      oval:mil.disa.stig.ind:ste:23039001:
-        source_state_id: oval:mil.disa.stig.ind:ste:23039001
+      oval:mil.disa.stig.ind:ste:23039002:
+        source_state_id: oval:mil.disa.stig.ind:ste:23039002
         source_type: textfilecontent54_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         operator: AND
@@ -388,7 +388,7 @@ rule:
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (?i)^single$
+          value: (?i)^halt$
         comment: null
       oval:mil.disa.stig.ind:ste:23039000:
         source_state_id: oval:mil.disa.stig.ind:ste:23039000
@@ -403,8 +403,8 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: (?i)^syslog$
         comment: null
-      oval:mil.disa.stig.ind:ste:23039002:
-        source_state_id: oval:mil.disa.stig.ind:ste:23039002
+      oval:mil.disa.stig.ind:ste:23039001:
+        source_state_id: oval:mil.disa.stig.ind:ste:23039001
         source_type: textfilecontent54_state
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         operator: AND
@@ -414,7 +414,7 @@ rule:
           kind: element
           name: subexpression
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: (?i)^halt$
+          value: (?i)^single$
         comment: null
     evaluate:
       tests:
@@ -434,6 +434,29 @@ rule:
           - oval:mil.disa.stig.ind:ste:23039002
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230390:
+          source_definition_id: oval:mil.disa.stig.defs:def:230390
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: '/etc/audit/auditd.conf: disk_error_action = SYSLOG, SINGLE, or HALT'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23039000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system System must take appropriate action when an audit processing failure occurs.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271579:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271579
           class: compliance
@@ -468,29 +491,6 @@ rule:
                 it takes action to mitigate the failure. Audit processing failures include software/hardware errors; failures
                 in the audit capturing mechanisms; and audit storage capacity being reached or exceeded. Responses to audit
                 failure depend upon the nature of the failure mode.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230390:
-          source_definition_id: oval:mil.disa.stig.defs:def:230390
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: '/etc/audit/auditd.conf: disk_error_action = SYSLOG, SINGLE, or HALT'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23039000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system System must take appropriate action when an audit processing failure occurs.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -625,7 +625,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271579r1091449_rule
-      semantic_ir_sha256: fd014d8e8e34b7d2327e921b6f1f2c613734d077587130d9fb3e16bb584d9cd4
+      semantic_ir_sha256: d9fcf07f6405bb269901c23354e27c0e816a9da52cebc7cd39347a3666ed10a8
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 649fad47631e61de55ad3ea2ed98dc13bf0ffd90c9960399f7b2b1262f95b0b9
   assessments:

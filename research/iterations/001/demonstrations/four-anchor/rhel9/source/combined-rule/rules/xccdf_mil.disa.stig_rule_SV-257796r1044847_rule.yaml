@@ -369,6 +369,31 @@ rule:
     description: RHEL 9 must enable auditing of processes that start prior to the audit daemon.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25779301:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25779301
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: /etc/default/grub GRUB_CMDLINE_LINUX
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/default/grub
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^GRUB_CMDLINE_LINUX="(.*)"
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25779300:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25779300
@@ -400,31 +425,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25779301:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25779301
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: /etc/default/grub GRUB_CMDLINE_LINUX
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/default/grub
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^GRUB_CMDLINE_LINUX="(.*)"
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23046800:
@@ -442,19 +442,6 @@ rule:
         comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23046800:
-          source_test_id: oval:mil.disa.stig.ind:tst:23046800
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: BLS options contain audit=1
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25779300
-          predicates:
-          - oval:mil.disa.stig.ind:ste:23046800
-          source_other: []
         oval:mil.disa.stig.ind:tst:23046801:
           source_test_id: oval:mil.disa.stig.ind:tst:23046801
           source_type: textfilecontent54_test
@@ -465,6 +452,19 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:25779301
+          predicates:
+          - oval:mil.disa.stig.ind:ste:23046800
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23046800:
+          source_test_id: oval:mil.disa.stig.ind:tst:23046800
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: BLS options contain audit=1
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25779300
           predicates:
           - oval:mil.disa.stig.ind:ste:23046800
           source_other: []
@@ -660,7 +660,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257796r1044847_rule
-      semantic_ir_sha256: 9d4f1a18feea622a7189b0678910b03568291216de8a292a6c0a6e221a3ee780
+      semantic_ir_sha256: 419502676a678ac9bacad1446a36edc956431d34adc7e10251099003bce1520a
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 0b07556bc517d0d00e627bae42052b595fda789028c6c810ce60068e4835e3af
   assessments:

@@ -1,0 +1,121 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278215
+  collect:
+    oval:mil.disa.stig.win:obj:20000002:
+      capability: scapng.collect.windows.passwordpolicy
+      comment: null
+      query: []
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:20000002
+      source_type: passwordpolicy_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 must not allow anonymous SID/Name translation.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253452:
+        class: compliance
+        criteria:
+          children:
+          - comment: '''Network access: Allow anonymous SID/Name translation'' is set to ''Disabled'''
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25345200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Anonymous SID/Name translation must not be allowed.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253452
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278215:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253452
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-SO-000210 - Windows Server 2025 must not allow anonymous SID/Name translation.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Allowing anonymous SID/Name translation can provide sensitive information for accessing a system. Only authorized
+              users must be able to perform such translations.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278215
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25345200:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000002
+        comment: '''Network access: Allow anonymous SID/Name translation'' is set to ''Disabled'''
+        predicates:
+        - oval:mil.disa.stig.win:ste:25345200
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25345200
+        source_type: passwordpolicy_test
+        state_operator: AND
+  id: ng.shared.cfa61b77080dcc5d94a8709b
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:25345200:
+      comment: null
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: anonymous_name_lookup
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25345200
+      source_type: passwordpolicy_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: cfa61b77080dcc5d94a8709b3855aaa6a9c8e10c5a4ebdd2d3d2e90cb845c85a
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278215r1181351_rule
+    title: Windows Server 2025 must not allow anonymous SID/Name translation.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253452r991589_rule
+    title: Anonymous SID/Name translation must not be allowed.

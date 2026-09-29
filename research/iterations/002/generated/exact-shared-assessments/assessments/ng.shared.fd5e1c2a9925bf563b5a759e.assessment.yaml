@@ -1,0 +1,148 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278122
+  collect:
+    oval:mil.disa.stig.win:obj:25341200:
+      capability: scapng.collect.windows.registry
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Software\Policies\Microsoft\Windows\Installer
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SafeForScripting
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25341200
+      source_type: registry_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 users must be notified if a web-based program attempts to install software.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253412:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verifies 'Prevent Internet Explorer security prompt for Windows Installer scripts' is set to 'Not Configured'
+              or 'Disabled'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25341200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Users must be notified if a web-based program attempts to install software.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253412
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278122:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253412
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-CC-000440 - Windows Server 2025 users must be notified if a web-based program attempts to install software.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Web-based programs may attempt to install malicious software on a system. Ensuring users are notified if
+              a web-based program attempts to install software allows them to refuse the installation.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278122
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25341200:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.win:obj:25341200
+        comment: '''Prevent Internet Explorer security prompt for Windows Installer scripts'' is set to ''Not Configured''
+          or ''Disabled'''
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000000
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25341200
+        source_type: registry_test
+        state_operator: AND
+  id: ng.shared.fd5e1c2a9925bf563b5a759e
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:20000000:
+      comment: null
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000000
+      source_type: registry_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: fd5e1c2a9925bf563b5a759e3ad6a5a02c5982c2b9a37333e5b6abab762ec7e2
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278122r1182069_rule
+    title: Windows Server 2025 users must be notified if a web-based program attempts to install software.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253412r991589_rule
+    title: Users must be notified if a web-based program attempts to install software.

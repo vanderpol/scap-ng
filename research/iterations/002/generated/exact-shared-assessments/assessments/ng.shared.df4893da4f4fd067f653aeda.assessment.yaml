@@ -1,0 +1,139 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278114
+  collect:
+    oval:mil.disa.stig.win:obj:25340400:
+      capability: scapng.collect.windows.registry
+      comment: null
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: fPromptForPassword
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25340400
+      source_type: registry_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 Remote Desktop Services must always prompt a client for passwords upon connection.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253404:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25340400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Remote Desktop Services must always prompt a client for passwords upon connection.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253404
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278114:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253404
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-CC-000360 - Windows Server 2025 Remote Desktop Services must always prompt a client for passwords upon
+              connection.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "This setting controls the ability of users to supply passwords automatically as part of their remote desktop\
+              \ connection. Disabling this setting would allow anyone to use the stored credentials in a connection item to\
+              \ connect to the terminal server.\n\n  Satisfies: SRG-OS-000373-GPOS-00156, SRG-OS-000373-GPOS-00157"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278114
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25340400:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25340400
+        comment: '''Always prompt for password upon connection'' is set to ''Enabled'''
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000001
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25340400
+        source_type: registry_test
+        state_operator: AND
+  id: ng.shared.df4893da4f4fd067f653aeda
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:20000001:
+      comment: null
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000001
+      source_type: registry_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: df4893da4f4fd067f653aeda63102f69167e4f3254abc59f666d38b70dceb7b3
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278114r1181048_rule
+    title: Windows Server 2025 Remote Desktop Services must always prompt a client for passwords upon connection.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253404r1051052_rule
+    title: Remote Desktop Services must always prompt a client for passwords upon connection.

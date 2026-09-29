@@ -1,0 +1,126 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271654
+  collect:
+    oval:mil.disa.stig.linux:obj:23029500:
+      capability: scapng.collect.linux.partition
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /tmp
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:23029500
+      source_type: partition_object
+      version: '1'
+  derive: {}
+  description: OL 9 must mount /tmp with the noexec option.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:257867:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23051300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /tmp with the noexec option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:257867
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271654:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257867
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002051 - OL 9 must mount /tmp with the noexec option.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "noexec" mount option causes the system to not execute binary files. This option must be used for mounting
+              any file system not containing approved binary files, as they may be incompatible. Executing files from untrusted
+              file systems increases the opportunity for nonprivileged users to attain unauthorized administrative access.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271654
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:23051300:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.linux:obj:23029500
+        comment: /tmp is mounted with the noexec option
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000000
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:23051300
+        source_type: partition_test
+        state_operator: AND
+  id: ng.shared.b89f5d5b828f8ac355de1fc5
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.linux:ste:20000000:
+      comment: null
+      entities:
+      - attributes:
+          entity_check: at least one
+        kind: element
+        name: mount_options
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: noexec
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:20000000
+      source_type: partition_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: b89f5d5b828f8ac355de1fc57b320ddc38b9b705063c2b27c8cc70196e10a8f6
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271654r1091674_rule
+    title: OL 9 must mount /tmp with the noexec option.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257867r958804_rule
+    title: RHEL 9 must mount /tmp with the noexec option.

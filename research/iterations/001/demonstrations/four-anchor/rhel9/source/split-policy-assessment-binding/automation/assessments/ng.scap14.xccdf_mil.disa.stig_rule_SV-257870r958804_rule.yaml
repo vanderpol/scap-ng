@@ -31,18 +31,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:23051401:
-      capability: scapng.collect.independent.variable
-      source_object_id: oval:mil.disa.stig.ind:obj:23051401
-      source_type: variable_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: var_ref
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: oval:mil.disa.stig.ind:var:23051400
     oval:mil.disa.stig.linux:obj:23051400:
       capability: scapng.collect.linux.partition
       source_object_id: oval:mil.disa.stig.linux:obj:23051400
@@ -55,6 +43,18 @@ assessment:
         name: mount_point
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: /var/log
+    oval:mil.disa.stig.ind:obj:23051401:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:23051401
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.ind:var:23051400
   derive:
     oval:mil.disa.stig.ind:var:23051400:
       source_variable_id: oval:mil.disa.stig.ind:var:23051400
@@ -118,19 +118,6 @@ assessment:
         variable_id: oval:mil.disa.stig.ind:var:23051400
         variable_type: local_variable
   predicates:
-    oval:mil.disa.stig.ind:ste:23051400:
-      source_state_id: oval:mil.disa.stig.ind:ste:23051400
-      source_type: variable_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          entity_check: at least one
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: nodev
-      comment: null
     oval:mil.disa.stig.linux:ste:20000001:
       source_state_id: oval:mil.disa.stig.linux:ste:20000001
       source_type: partition_state
@@ -142,6 +129,19 @@ assessment:
         kind: element
         name: mount_options
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: nodev
+      comment: null
+    oval:mil.disa.stig.ind:ste:23051400:
+      source_state_id: oval:mil.disa.stig.ind:ste:23051400
+      source_type: variable_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          entity_check: at least one
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: nodev
       comment: null
   evaluate:
@@ -185,37 +185,6 @@ assessment:
         - oval:mil.disa.stig.linux:ste:20000001
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230514:
-        source_definition_id: oval:mil.disa.stig.defs:def:230514
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23051400
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23051401
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23051402
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must mount /var/log with the nodev option.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257870:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257870
         class: compliance
@@ -252,6 +221,37 @@ assessment:
 
               The only legitimate location for device files is the "/dev" directory located on the root partition, with the
               exception of chroot jails if implemented.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230514:
+        source_definition_id: oval:mil.disa.stig.defs:def:230514
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23051400
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23051401
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23051402
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /var/log with the nodev option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -379,6 +379,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257870r958804_rule
-    semantic_ir_sha256: ae64d1e4dd00daefb2ba889d125fc9c382637ec610d44eaf90d7928afe3e7d11
+    semantic_ir_sha256: f6a2a7f83e4f25f2f88239aa070bd81a2cdb340470001785568dafca7d53b391
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 14781deac8d6fe2bc53689dca81f29688e2868b87506bb72bdfb6e58f0ab5a44

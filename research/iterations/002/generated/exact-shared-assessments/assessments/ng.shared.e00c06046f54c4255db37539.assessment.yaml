@@ -1,0 +1,143 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.windows:def:278031
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.windows:obj:27803101:
+      capability: scapng.collect.windows.cmdlet
+      comment: Secure Boot State Setting
+      query:
+      - kind: element
+        name: module_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Microsoft.Powershell.Management
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: module_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: version
+          nil: 'true'
+        kind: element
+        name: module_version
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - kind: element
+        name: verb
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Get
+      - kind: element
+        name: noun
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ComputerInfo
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: parameters
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: property
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: biosfirmwaretype
+        kind: element
+        name: select
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.windows:obj:27803101
+      source_type: cmdlet_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 systems must have Unified Extensible Firmware Interface (UEFI) firmware and be configured
+    to run in UEFI mode, not Legacy BIOS.
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.windows:def:278031:
+        class: compliance
+        criteria:
+          children:
+          - comment: Unified Extensible Firmware Interface (UEFI) firmware must be preset and be configured to run in UEFI
+              mode, not Legacy BIOS.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.windows:tst:27803101
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Windows Server 2025 systems must have Unified Extensible Firmware Interface (UEFI) firmware and be configured
+              to run in UEFI mode, not Legacy BIOS.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Unified Extensible Firmware Interface (UEFI) firmware must be preset and be configured to run in UEFI mode,
+              not Legacy BIOS.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.windows:def:278031
+        version: '1'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.windows:tst:27803101:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.windows:obj:27803101
+        comment: Unified Extensible Firmware Interface (UEFI) firmware must exist and be configured to run in UEFI mode, not
+          Legacy BIOS.
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.windows:ste:27803101
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.windows:tst:27803101
+        source_type: cmdlet_test
+        state_operator: AND
+  id: ng.shared.e00c06046f54c4255db37539
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.windows:ste:27803101:
+      comment: BIOS Firmware Type must be equal to UEFI
+      entities:
+      - attributes:
+          datatype: record
+        children:
+        - attributes:
+            name: biosfirmwaretype
+            operation: case insensitive equals
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: UEFI
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.windows:ste:27803101
+      source_type: cmdlet_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: e00c06046f54c4255db37539e27568219caa33509d89aa4eb6b6dc494cc8d75d
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278031r1182046_rule
+    title: Windows Server 2025 systems must have Unified Extensible Firmware Interface (UEFI) firmware and be configured to
+      run in UEFI mode, not Legacy BIOS.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253256r1210280_rule
+    title: Windows 11 systems must have Unified Extensible Firmware Interface (UEFI) firmware and be configured to run in
+      UEFI mode, not Legacy BIOS.

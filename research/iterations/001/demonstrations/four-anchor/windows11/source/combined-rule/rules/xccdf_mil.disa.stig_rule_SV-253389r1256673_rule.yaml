@@ -318,6 +318,32 @@ rule:
     description: Enhanced anti-spoofing for facial recognition must be enabled on Windows 11.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:25338901:
+        capability: scapng.collect.windows.registry
+        source_object_id: oval:mil.disa.stig.win:obj:25338901
+        source_type: registry_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: Group Policy registry entry for facial recognition enhanced anti-spoofing
+        query:
+        - attributes:
+            datatype: string
+          kind: element
+          name: hive
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: HKEY_LOCAL_MACHINE
+        - attributes:
+            datatype: string
+          kind: element
+          name: key
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SOFTWARE\Policies\Microsoft\Biometrics\FacialFeatures
+        - attributes:
+            datatype: string
+          kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: EnhancedAntiSpoofing
       oval:mil.disa.stig.win:obj:25338900:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:25338900
@@ -365,32 +391,6 @@ rule:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: FacialFeaturesUseEnhancedAntiSpoofing
-      oval:mil.disa.stig.win:obj:25338901:
-        capability: scapng.collect.windows.registry
-        source_object_id: oval:mil.disa.stig.win:obj:25338901
-        source_type: registry_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: Group Policy registry entry for facial recognition enhanced anti-spoofing
-        query:
-        - attributes:
-            datatype: string
-          kind: element
-          name: hive
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: HKEY_LOCAL_MACHINE
-        - attributes:
-            datatype: string
-          kind: element
-          name: key
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SOFTWARE\Policies\Microsoft\Biometrics\FacialFeatures
-        - attributes:
-            datatype: string
-          kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: EnhancedAntiSpoofing
     derive: {}
     predicates:
       oval:mil.disa.stig.win:ste:20000001:
@@ -426,29 +426,6 @@ rule:
           - oval:mil.disa.stig.win:ste:20000001
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:253389:
-          source_definition_id: oval:mil.disa.stig.defs:def:253389
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: Enhanced anti-spoofing for facial recognition must be enabled
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:25338900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Enhanced anti-spoofing for facial recognition must be enabled on Windows.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows11:def:253389:
           source_definition_id: oval:mil.disa.stig.windows11:def:253389
           class: compliance
@@ -481,6 +458,29 @@ rule:
               text: "Enhanced anti-spoofing provides additional protections when using facial recognition with devices that\
                 \ support it. \n\nNote: A different registry location is needed when systems are managed by Intune versus\
                 \ GPO."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:253389:
+          source_definition_id: oval:mil.disa.stig.defs:def:253389
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: Enhanced anti-spoofing for facial recognition must be enabled
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25338900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Enhanced anti-spoofing for facial recognition must be enabled on Windows.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -605,7 +605,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253389r1256673_rule
-      semantic_ir_sha256: 6d8c6835cc05faf2174a39827b06a627591f036534f8e63f54b27a2e7ab87b58
+      semantic_ir_sha256: bd78a4838511be489d5c603d073bf9b99ae83f7b6d243afbda18f0cbb468ea25
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 95cfd265ef7a52f1c3380f4fdd3f97833b543c70674474beb4072c2d766f4582
   assessments:

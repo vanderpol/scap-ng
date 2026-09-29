@@ -7,33 +7,6 @@ assessment:
   description: RHEL 9 passwords must have a 24 hours minimum password lifetime restriction in /etc/shadow.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23036400:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23036400
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/shadow
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '^root:[^:]*:[^:]*:0*:'
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23036402:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23036402
@@ -54,6 +27,33 @@ assessment:
         name: pattern
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '^([^:]*):[^:]*:[^:]*:0*:'
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+    oval:mil.disa.stig.ind:obj:23036400:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23036400
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/shadow
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '^root:[^:]*:[^:]*:0*:'
       - attributes:
           datatype: int
           operation: greater than or equal
@@ -113,47 +113,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
   derive:
-    oval:mil.disa.stig.defs:var:23036401:
-      source_variable_id: oval:mil.disa.stig.defs:var:23036401
-      source_type: local_variable
-      datatype: int
-      comment: UID for user nobody
-      semantic_ast:
-        datatype: int
-        expression:
-          item_field: subexpression
-          object_ref: oval:mil.disa.stig.ind:obj:23036403
-          op: object_component
-          record_field: null
-        id: oval:mil.disa.stig.defs:var:23036401
-        type: local_variable
-      resolution:
-        datatype: int
-        item_field: subexpression
-        object_ref: oval:mil.disa.stig.ind:obj:23036403
-        operation: object_component
-        reason: object_component_requires_collection:textfilecontent54_object
-        record_field: null
-        status: dynamic_object_dependency
-        variable_type: local_variable
-      evaluation_plan:
-        datatype: int
-        dependencies:
-          objects:
-          - oval:mil.disa.stig.ind:obj:23036403
-          operations:
-          - object_component
-          variables: []
-        expression:
-          item_field: subexpression
-          object_ref: oval:mil.disa.stig.ind:obj:23036403
-          op: object_component
-          record_field: null
-        mode: target_dependent
-        reason: object_component_requires_collection:textfilecontent54_object
-        resolution_status: dynamic_object_dependency
-        variable_id: oval:mil.disa.stig.defs:var:23036401
-        variable_type: local_variable
     oval:mil.disa.stig.defs:var:23036400:
       source_variable_id: oval:mil.disa.stig.defs:var:23036400
       source_type: local_variable
@@ -195,21 +154,48 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:mil.disa.stig.defs:var:23036400
         variable_type: local_variable
+    oval:mil.disa.stig.defs:var:23036401:
+      source_variable_id: oval:mil.disa.stig.defs:var:23036401
+      source_type: local_variable
+      datatype: int
+      comment: UID for user nobody
+      semantic_ast:
+        datatype: int
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23036403
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:23036401
+        type: local_variable
+      resolution:
+        datatype: int
+        item_field: subexpression
+        object_ref: oval:mil.disa.stig.ind:obj:23036403
+        operation: object_component
+        reason: object_component_requires_collection:textfilecontent54_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        datatype: int
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:23036403
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:23036403
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:23036401
+        variable_type: local_variable
   predicates:
-    oval:mil.disa.stig.unix:ste:23036400:
-      source_state_id: oval:mil.disa.stig.unix:ste:23036400
-      source_type: password_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: less than
-        kind: element
-        name: user_id
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '1000'
-      comment: null
     oval:mil.disa.stig.unix:ste:23036401:
       source_state_id: oval:mil.disa.stig.unix:ste:23036401
       source_type: password_state
@@ -224,6 +210,20 @@ assessment:
         kind: element
         name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      comment: null
+    oval:mil.disa.stig.unix:ste:23036400:
+      source_state_id: oval:mil.disa.stig.unix:ste:23036400
+      source_type: password_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: less than
+        kind: element
+        name: user_id
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1000'
       comment: null
   evaluate:
     tests:
@@ -437,6 +437,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258105r1045212_rule
-    semantic_ir_sha256: c37cf070ca7f87b6ff3d62856bb04e88a5f32d0ff9557cb63c3d58753d9e113f
+    semantic_ir_sha256: 0b75cd89cb4c3f0c8673b0a2ca1a36acb517b966ff5b6e87fee9d55eee05080e
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 76dee9c3d8fbe7c66e2b69eedd9e041307ffa2d28c21754039288f625a93eabd

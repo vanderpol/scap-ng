@@ -1,0 +1,155 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278048
+  collect:
+    oval:mil.disa.stig.win:obj:20000000:
+      capability: scapng.collect.windows.auditeventpolicysubcategories
+      comment: null
+      query: []
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:20000000
+      source_type: auditeventpolicysubcategories_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 must be configured to audit Account Logon - Credential Validation failures.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253306:
+        class: compliance
+        criteria:
+          children:
+          - comment: Audit - Credential Validation - Failure only
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330600
+          - comment: Audit - Credential Validation - Success and Failure
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25330701
+          comment: Audit - Credential Validation - Failure
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to audit Account Logon - Credential Validation failures.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253306
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278048:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253306
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-AU-000080 - Windows Server 2025 must be configured to audit Account Logon - Credential Validation failures.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Maintaining an audit trail of system activity logs can help identify configuration errors, troubleshoot\
+              \ service disruptions, and analyze compromises that have occurred, as well as detect attacks. Audit logs are\
+              \ necessary to provide a trail of evidence in case the system or network is compromised. Collecting this data\
+              \ is essential for analyzing the security of information assets and detecting signs of suspicious and unexpected\
+              \ behavior.\n\n  Credential Validation records events related to validation tests on credentials for a user\
+              \ account logon."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278048
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25330600:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        comment: '''Audit Credential Validation'' is set to ''Failure'''
+        predicates:
+        - oval:mil.disa.stig.win:ste:25330600
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25330600
+        source_type: auditeventpolicysubcategories_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25330701:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:20000000
+        comment: '''Audit Credential Validation'' is set to ''Success'' and ''Failure'''
+        predicates:
+        - oval:mil.disa.stig.win:ste:25330701
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25330701
+        source_type: auditeventpolicysubcategories_test
+        state_operator: AND
+  id: ng.shared.faad785dcd6ac736c6091175
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:25330600:
+      comment: '''Credential Validation'' is set to ''Failure'''
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: credential_validation
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_FAILURE
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25330600
+      source_type: auditeventpolicysubcategories_state
+    oval:mil.disa.stig.win:ste:25330701:
+      comment: '''Credential Validation'' is set to ''Success'' and ''Failure'''
+      entities:
+      - attributes:
+          datatype: string
+        kind: element
+        name: credential_validation
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: AUDIT_SUCCESS_FAILURE
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25330701
+      source_type: auditeventpolicysubcategories_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: faad785dcd6ac736c60911755d99e224e682a67780b2456770a4cc02b513f8a3
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278048r1180850_rule
+    title: Windows Server 2025 must be configured to audit Account Logon - Credential Validation failures.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253306r991570_rule
+    title: The system must be configured to audit Account Logon - Credential Validation failures.

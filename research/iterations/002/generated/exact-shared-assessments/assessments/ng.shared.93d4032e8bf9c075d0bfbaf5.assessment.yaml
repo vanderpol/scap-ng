@@ -1,0 +1,271 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271446
+  collect:
+    oval:mil.disa.stig.ind:obj:23049600:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23049600
+      source_type: textfilecontent54_object
+      version: '2'
+    oval:mil.disa.stig.ind:obj:23049601:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*blacklist[ \t]+sctp[ \t]*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23049601
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.ind:obj:25780700:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*install[ \t]+sctp[ \t]+/bin/false[ \t]*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25780700
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.ind:obj:25780701:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*blacklist[ \t]+sctp[ \t]*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25780701
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must disable the Stream Control Transmission Protocol (SCTP) kernel module.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:257807:
+        class: compliance
+        criteria:
+          children:
+          - children:
+            - comment: /etc/modprobe.d contains a file that contains 'install sctp /bin/false'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23049600
+            - comment: /etc/modprobe.d contains a file that contains 'blacklist sctp'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23049601
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          - children:
+            - comment: /etc/modprobe.conf contains 'install sctp /bin/false'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25780700
+            - comment: /etc/modprobe.conf contains 'blacklist sctp'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25780701
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable the stream control transmission protocol (SCTP).
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:257807
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271446:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257807
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000043 - OL 9 must disable the Stream Control Transmission Protocol (SCTP) kernel module.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "It is detrimental for operating systems to provide, or install by default, functionality exceeding requirements\
+              \ or mission objectives. These unnecessary capabilities or services are often overlooked and therefore may remain\
+              \ unsecured. They increase the risk to the platform by providing additional attack vectors.\n\n\tFailing to\
+              \ disconnect unused protocols can result in a system compromise.\n\n\tThe SCTP is a transport layer protocol,\
+              \ designed to support the idea of message-oriented communication, with several streams of messages within one\
+              \ connection. Disabling SCTP protects the system against exploitation of any flaws in its implementation."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271446
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23049600:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23049600
+        comment: /etc/modprobe.d contains a file that contains 'install sctp /bin/false'
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23049600
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:23049601:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23049601
+        comment: /etc/modprobe.d contains a file that contains 'blacklist sctp'
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23049601
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:25780700:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25780700
+        comment: /etc/modprobe.conf contains 'install sctp /bin/false'
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25780700
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:25780701:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25780701
+        comment: /etc/modprobe.conf contains 'blacklist sctp'
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25780701
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.93d4032e8bf9c075d0bfbaf5
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 93d4032e8bf9c075d0bfbaf50af3920ae899dc7c6522d22c4dd6a83ab2419c33
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271446r1155293_rule
+    title: OL 9 must disable the Stream Control Transmission Protocol (SCTP) kernel module.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257807r1044862_rule
+    title: RHEL 9 must disable the Stream Control Transmission Protocol (SCTP) kernel module.

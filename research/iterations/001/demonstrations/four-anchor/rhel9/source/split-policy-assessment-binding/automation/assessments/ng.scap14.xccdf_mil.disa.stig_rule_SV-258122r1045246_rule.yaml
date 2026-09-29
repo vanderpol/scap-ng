@@ -7,33 +7,27 @@ assessment:
   description: RHEL 9 must enable certificate based smart card authentication.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25812200:
+    oval:mil.disa.stig.ind:obj:25812202:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25812200
+      source_object_id: oval:mil.disa.stig.ind:obj:25812202
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: 'sssd.conf: pam_cert_auth'
+      comment: null
       query:
-      - attributes:
-          datatype: string
-        kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/sssd/sssd.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*pam_cert_auth\s*=\s*(.*)\s*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25812200
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25812201
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:25812201:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25812201
@@ -73,27 +67,33 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25812202:
+    oval:mil.disa.stig.ind:obj:25812200:
       capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25812202
+      source_object_id: oval:mil.disa.stig.ind:obj:25812200
       source_type: textfilecontent54_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
       version: '1'
-      comment: null
+      comment: 'sssd.conf: pam_cert_auth'
       query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25812200
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25812201
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/sssd/sssd.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*pam_cert_auth\s*=\s*(.*)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:25812200:
@@ -126,29 +126,6 @@ assessment:
         - oval:mil.disa.stig.ind:ste:25812200
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:258122:
-        source_definition_id: oval:mil.disa.stig.defs:def:258122
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: 'sssd.conf: pam_cert_auth = True'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25812200
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must enable certificate based smart card authentication.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258122:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258122
         class: compliance
@@ -185,6 +162,29 @@ assessment:
 
 
               Satisfies: SRG-OS-000375-GPOS-00160, SRG-OS-000105-GPOS-00052'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:258122:
+        source_definition_id: oval:mil.disa.stig.defs:def:258122
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: 'sssd.conf: pam_cert_auth = True'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25812200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must enable certificate based smart card authentication.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -308,6 +308,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258122r1045246_rule
-    semantic_ir_sha256: edb8fdbad66f683884fba7f2354cfb7df207be84e3b74735c8bc677ee5a467d8
+    semantic_ir_sha256: c36f9922a5ea50e3f912121803c4389ff2ac0f46c741cbad47713840808f59b7
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 0a6e43d8e327ff939e4db6753df516b2099d9179bf4f7dbc6278ad8a68fb44e8

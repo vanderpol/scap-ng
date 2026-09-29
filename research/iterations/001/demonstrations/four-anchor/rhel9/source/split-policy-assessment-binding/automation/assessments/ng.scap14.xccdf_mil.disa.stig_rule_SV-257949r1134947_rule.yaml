@@ -7,31 +7,6 @@ assessment:
   description: RHEL 9 must configure a DNS processing mode in Network Manager.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25794901:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25794901
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: NetworkManager.conf main section
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/NetworkManager/NetworkManager.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\[main\]((?:\r?\n(?:[^[\r\n].*)?)*)
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25794900:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25794900
@@ -57,22 +32,33 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:25794901:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25794901
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: NetworkManager.conf main section
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/NetworkManager/NetworkManager.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\[main\]((?:\r?\n(?:[^[\r\n].*)?)*)
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:25794902:
-      source_state_id: oval:mil.disa.stig.ind:ste:25794902
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: equals
-        kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: default
-      comment: null
     oval:mil.disa.stig.ind:ste:25794903:
       source_state_id: oval:mil.disa.stig.ind:ste:25794903
       source_type: textfilecontent54_state
@@ -115,6 +101,20 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: \ndns=
       comment: null
+    oval:mil.disa.stig.ind:ste:25794902:
+      source_state_id: oval:mil.disa.stig.ind:ste:25794902
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: default
+      comment: null
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:25794900:
@@ -146,6 +146,33 @@ assessment:
         - oval:mil.disa.stig.ind:ste:25794900
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:257949:
+        source_definition_id: oval:mil.disa.stig.defs:def:257949
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: DNS setting exists in NetworkManager.conf and is default or none
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25794900
+          - comment: DNS setting exists in NetworkManager.conf main section
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25794901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must configure a DNS processing mode set be Network Manager.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257949:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257949
         class: compliance
@@ -176,33 +203,6 @@ assessment:
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             text: In order to ensure that DNS resolver settings are respected, a DNS mode in Network Manager must be configured.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:257949:
-        source_definition_id: oval:mil.disa.stig.defs:def:257949
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: DNS setting exists in NetworkManager.conf and is default or none
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25794900
-          - comment: DNS setting exists in NetworkManager.conf main section
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25794901
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must configure a DNS processing mode set be Network Manager.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -337,6 +337,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257949r1134947_rule
-    semantic_ir_sha256: 279e8341e0653b21fdcf468c8f303bbac92f293d35f8b80f037fc76c5161e10d
+    semantic_ir_sha256: 4d8fd8953bfb4f15065f9a60c0de729e68285bdfc439729b6b13fd23a788a62a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 98a26a80efadf5c4378ba9ef39ceac32aff8bfb2153dc846acf6bedde2642184

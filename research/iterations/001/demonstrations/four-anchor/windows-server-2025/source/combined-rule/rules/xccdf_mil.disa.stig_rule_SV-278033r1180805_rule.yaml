@@ -392,21 +392,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '4294967295'
         comment: Lockout Duration equals 4294967295
-      oval:mil.disa.stig.win:ste:25329700:
-        source_state_id: oval:mil.disa.stig.win:ste:25329700
-        source_type: lockoutpolicy_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: int
-            entity_check: all
-            operation: less than or equal
-          kind: element
-          name: lockout_duration
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: '0'
-        comment: Lockout Duration equals -1
       oval:mil.disa.stig.win:ste:25329702:
         source_state_id: oval:mil.disa.stig.win:ste:25329702
         source_type: lockoutpolicy_state
@@ -436,8 +421,36 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: '0'
         comment: Lockout Threshold is greater than 0
+      oval:mil.disa.stig.win:ste:25329700:
+        source_state_id: oval:mil.disa.stig.win:ste:25329700
+        source_type: lockoutpolicy_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: int
+            entity_check: all
+            operation: less than or equal
+          kind: element
+          name: lockout_duration
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: '0'
+        comment: Lockout Duration equals -1
     evaluate:
       tests:
+        oval:mil.disa.stig.win:tst:25329801:
+          source_test_id: oval:mil.disa.stig.win:tst:25329801
+          source_type: lockoutpolicy_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: '''Account lockout threshold'' is not set to ''0'''
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:20000001
+          predicates:
+          - oval:mil.disa.stig.win:ste:25329801
+          source_other: []
         oval:mil.disa.stig.win:tst:25329700:
           source_test_id: oval:mil.disa.stig.win:tst:25329700
           source_type: lockoutpolicy_test
@@ -464,19 +477,6 @@ rule:
           - oval:mil.disa.stig.win:obj:20000001
           predicates:
           - oval:mil.disa.stig.win:ste:25329702
-          source_other: []
-        oval:mil.disa.stig.win:tst:25329801:
-          source_test_id: oval:mil.disa.stig.win:tst:25329801
-          source_type: lockoutpolicy_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: '''Account lockout threshold'' is not set to ''0'''
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:20000001
-          predicates:
-          - oval:mil.disa.stig.win:ste:25329801
           source_other: []
       definitions:
         oval:mil.disa.stig.defs:def:253297:
@@ -691,7 +691,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278033r1180805_rule
-      semantic_ir_sha256: 5a75204de28f0aaa14f2657364a97caa6600d0c5fdbd9a261b254fb516717f56
+      semantic_ir_sha256: ab82b449ab4a248322f01967b32703c692fb7677ab18e76e741fd5053a3ac239
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 67f9d3dc74ed28b974aa94150886f9aed2242315d978f912b04d792feeca4fc8
   assessments:

@@ -7,18 +7,6 @@ assessment:
   description: RHEL 9 must mount /tmp with the nodev option.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23051101:
-      capability: scapng.collect.independent.variable
-      source_object_id: oval:mil.disa.stig.ind:obj:23051101
-      source_type: variable_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: var_ref
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: oval:mil.disa.stig.linux:var:23051100
     oval:mil.disa.stig.ind:obj:23051102:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23051102
@@ -43,6 +31,18 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23051101:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:23051101
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.linux:var:23051100
     oval:mil.disa.stig.linux:obj:23051100:
       capability: scapng.collect.linux.partition
       source_object_id: oval:mil.disa.stig.linux:obj:23051100
@@ -159,6 +159,18 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:23051100
         source_other: []
+      oval:mil.disa.stig.ind:tst:23051102:
+        source_test_id: oval:mil.disa.stig.ind:tst:23051102
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /tmp is configured in /etc/fstab
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23051102
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.linux:tst:23051100:
         source_test_id: oval:mil.disa.stig.linux:tst:23051100
         source_type: partition_test
@@ -172,19 +184,38 @@ assessment:
         predicates:
         - oval:mil.disa.stig.linux:ste:20000001
         source_other: []
-      oval:mil.disa.stig.ind:tst:23051102:
-        source_test_id: oval:mil.disa.stig.ind:tst:23051102
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /tmp is configured in /etc/fstab
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23051102
-        predicates: []
-        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230511:
+        source_definition_id: oval:mil.disa.stig.defs:def:230511
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23051100
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23051101
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23051102
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /tmp with the nodev option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257866:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257866
         class: compliance
@@ -221,37 +252,6 @@ assessment:
 
               The only legitimate location for device files is the "/dev" directory located on the root partition, with the
               exception of chroot jails if implemented.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230511:
-        source_definition_id: oval:mil.disa.stig.defs:def:230511
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.linux:tst:23051100
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23051101
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23051102
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must mount /tmp with the nodev option.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -379,6 +379,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257866r958804_rule
-    semantic_ir_sha256: 9f30997f7421ae5a7c559266daf9125e685a0f6a5f90492e8fa682c6c9a3f7b2
+    semantic_ir_sha256: 1a0e9be4b36434613e0818772b0bce51cabf73fac9c6012f2f49ac9d4c9e63e8
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 34e24056da760c1bdf7572f4731c86869e9a015e88fc4968495ba1fc3d706072

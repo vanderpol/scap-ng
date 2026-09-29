@@ -340,18 +340,6 @@ rule:
           name: var_ref
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: oval:mil.disa.stig.linux:var:23051100
-      oval:mil.disa.stig.linux:obj:23051100:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23051100
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: /tmp
       oval:mil.disa.stig.ind:obj:23051102:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23051102
@@ -376,6 +364,18 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.linux:obj:23051100:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23051100
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: /tmp
     derive:
       oval:mil.disa.stig.linux:var:23051100:
         source_variable_id: oval:mil.disa.stig.linux:var:23051100
@@ -439,19 +439,6 @@ rule:
           variable_id: oval:mil.disa.stig.linux:var:23051100
           variable_type: local_variable
     predicates:
-      oval:mil.disa.stig.ind:ste:23051100:
-        source_state_id: oval:mil.disa.stig.ind:ste:23051100
-        source_type: variable_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: nodev
-        comment: null
       oval:mil.disa.stig.linux:ste:20000001:
         source_state_id: oval:mil.disa.stig.linux:ste:20000001
         source_type: partition_state
@@ -465,8 +452,33 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: nodev
         comment: null
+      oval:mil.disa.stig.ind:ste:23051100:
+        source_state_id: oval:mil.disa.stig.ind:ste:23051100
+        source_type: variable_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: nodev
+        comment: null
     evaluate:
       tests:
+        oval:mil.disa.stig.ind:tst:23051102:
+          source_test_id: oval:mil.disa.stig.ind:tst:23051102
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: /tmp is configured in /etc/fstab
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23051102
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.ind:tst:23051101:
           source_test_id: oval:mil.disa.stig.ind:tst:23051101
           source_type: variable_test
@@ -493,19 +505,38 @@ rule:
           predicates:
           - oval:mil.disa.stig.linux:ste:20000001
           source_other: []
-        oval:mil.disa.stig.ind:tst:23051102:
-          source_test_id: oval:mil.disa.stig.ind:tst:23051102
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: /tmp is configured in /etc/fstab
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23051102
-          predicates: []
-          source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:230511:
+          source_definition_id: oval:mil.disa.stig.defs:def:230511
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23051100
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23051101
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23051102
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must mount /tmp with the nodev option.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271653:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271653
           class: compliance
@@ -539,37 +570,6 @@ rule:
                 \ character or block special devices from untrusted file systems increases the opportunity for nonprivileged\
                 \ users to attain unauthorized administrative access.\n\n\tThe only legitimate location for device files is\
                 \ the \"/dev\" directory located on the root partition, with the exception of chroot jails if implemented."
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:230511:
-          source_definition_id: oval:mil.disa.stig.defs:def:230511
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23051100
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23051101
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23051102
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must mount /tmp with the nodev option.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -699,7 +699,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271653r1091671_rule
-      semantic_ir_sha256: 8e214f5a3fac13671a485bb66290e0115f271a0ecfc23b65f0aa9438f5d750f6
+      semantic_ir_sha256: e7d8e2cb7e1548e6c61f54e2e2409b5ea631933b27bddcb054741d454f08f078
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: b2bfd29a752ecd0715850a37c1ba25ff6c11b1d344c6cd33041ff5515d6a8cb1
   assessments:

@@ -367,35 +367,6 @@ rule:
     description: OL 9 must disable the ability of a user to restart the system from the login screen.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.unix:obj:23035100:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:23035100
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '2'
-        comment: dconf database directories
-        query:
-        - attributes:
-            max_depth: '1'
-            recurse_direction: down
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: /etc/dconf/db
-        - attributes:
-            nil: 'true'
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - attributes:
-            action: include
-          kind: element
-          name: filter
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: oval:mil.disa.stig.unix:ste:23035100
       oval:mil.disa.stig.ind:obj:25802900:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25802900
@@ -431,6 +402,35 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.unix:obj:23035100:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:23035100
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '2'
+        comment: dconf database directories
+        query:
+        - attributes:
+            max_depth: '1'
+            recurse_direction: down
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: /etc/dconf/db
+        - attributes:
+            nil: 'true'
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - attributes:
+            action: include
+          kind: element
+          name: filter
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: oval:mil.disa.stig.unix:ste:23035100
     derive:
       oval:mil.disa.stig.defs:var:23035100:
         source_variable_id: oval:mil.disa.stig.defs:var:23035100
@@ -474,6 +474,19 @@ rule:
           variable_id: oval:mil.disa.stig.defs:var:23035100
           variable_type: local_variable
     predicates:
+      oval:mil.disa.stig.unix:ste:23035100:
+        source_state_id: oval:mil.disa.stig.unix:ste:23035100
+        source_type: file_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: ^/etc/dconf/db/.*\.d$
+        comment: dconf database directories
       oval:mil.disa.stig.ind:ste:25802900:
         source_state_id: oval:mil.disa.stig.ind:ste:25802900
         source_type: textfilecontent54_state
@@ -488,19 +501,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: \ndisable-restart-buttons=(true|'true')\s*(\n|$)
         comment: null
-      oval:mil.disa.stig.unix:ste:23035100:
-        source_state_id: oval:mil.disa.stig.unix:ste:23035100
-        source_type: file_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: ^/etc/dconf/db/.*\.d$
-        comment: dconf database directories
     evaluate:
       tests:
         oval:mil.disa.stig.ind:tst:25802900:
@@ -517,6 +517,29 @@ rule:
           - oval:mil.disa.stig.ind:ste:25802900
           source_other: []
       definitions:
+        oval:mil.disa.stig.defs:def:258029:
+          source_definition_id: oval:mil.disa.stig.defs:def:258029
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: dconf disable-restart-buttons true
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25802900
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must disable the ability of a user to restart the system from the login screen.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271685:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271685
           class: compliance
@@ -549,29 +572,6 @@ rule:
               text: A user who is at the console can reboot the system at the login screen. If restart or shutdown buttons
                 are pressed at the login screen, this can create the risk of short-term loss of availability of systems due
                 to reboot.
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.defs:def:258029:
-          source_definition_id: oval:mil.disa.stig.defs:def:258029
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: dconf disable-restart-buttons true
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25802900
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must disable the ability of a user to restart the system from the login screen.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -705,7 +705,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271685r1091767_rule
-      semantic_ir_sha256: fdad3cfb0b7a42b18dc0d8cae7cdacc8811dd66451229c54f2636e3c80de8089
+      semantic_ir_sha256: 693c8381413b9f08c0412379578b9ee64ffc6772d983b71f2cf8d673be42bc88
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 51a8f3abd476ce49811bfca9dad42e037186cb8abfa8d99765d189c457d69651
   assessments:

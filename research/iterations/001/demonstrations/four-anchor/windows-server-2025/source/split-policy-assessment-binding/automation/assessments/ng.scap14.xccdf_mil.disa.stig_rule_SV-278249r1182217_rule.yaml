@@ -7,6 +7,18 @@ assessment:
   description: The Windows Server 2025 "Create symbolic links" user right must only be assigned to the Administrators group.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.win:obj:25348900:
+      capability: scapng.collect.windows.userright
+      source_object_id: oval:mil.disa.stig.win:obj:25348900
+      source_type: userright_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: userright
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SE_CREATE_SYMBOLIC_LINK_NAME
     oval:mil.disa.stig.win:obj:20000014:
       capability: scapng.collect.windows.wmi57
       source_object_id: oval:mil.disa.stig.win:obj:20000014
@@ -28,30 +40,8 @@ assessment:
         name: wql
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: SELECT ID FROM Win32_ServerFeature
-    oval:mil.disa.stig.win:obj:25348900:
-      capability: scapng.collect.windows.userright
-      source_object_id: oval:mil.disa.stig.win:obj:25348900
-      source_type: userright_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: userright
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SE_CREATE_SYMBOLIC_LINK_NAME
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:20000029:
-      source_state_id: oval:mil.disa.stig.win:ste:20000029
-      source_type: userright_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: trustee_name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      comment: null
     oval:mil.disa.stig.win:ste:25449900:
       source_state_id: oval:mil.disa.stig.win:ste:25449900
       source_type: userright_state
@@ -64,6 +54,16 @@ assessment:
         name: trustee_name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: ^(?i)(NT VIRTUAL MACHINE\\)?Virtual Machines$
+      comment: null
+    oval:mil.disa.stig.win:ste:20000029:
+      source_state_id: oval:mil.disa.stig.win:ste:20000029
+      source_type: userright_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
       comment: null
     oval:mil.disa.stig.win:ste:20000030:
       source_state_id: oval:mil.disa.stig.win:ste:20000030
@@ -80,20 +80,17 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25449903:
-        source_test_id: oval:mil.disa.stig.win:tst:25449903
-        source_type: userright_test
+      oval:mil.disa.stig.win:tst:25449902:
+        source_test_id: oval:mil.disa.stig.win:tst:25449902
+        source_type: wmi57_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Create symbolic links - Administrators, Virtual Machines
-        check: all
+        comment: Hyper-V Role is installed
+        check: at least one
         check_existence: at_least_one_exists
-        state_operator: OR
+        state_operator: AND
         collections:
-        - oval:mil.disa.stig.win:obj:25348900
-        predicates:
-        - oval:mil.disa.stig.win:ste:20000029
-        - oval:mil.disa.stig.win:ste:20000030
-        - oval:mil.disa.stig.win:ste:25449900
+        - oval:mil.disa.stig.win:obj:20000014
+        predicates: []
         source_other: []
       oval:mil.disa.stig.win:tst:25348901:
         source_test_id: oval:mil.disa.stig.win:tst:25348901
@@ -109,17 +106,20 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000029
         - oval:mil.disa.stig.win:ste:20000030
         source_other: []
-      oval:mil.disa.stig.win:tst:25449902:
-        source_test_id: oval:mil.disa.stig.win:tst:25449902
-        source_type: wmi57_test
+      oval:mil.disa.stig.win:tst:25449903:
+        source_test_id: oval:mil.disa.stig.win:tst:25449903
+        source_type: userright_test
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Hyper-V Role is installed
-        check: at least one
+        comment: Create symbolic links - Administrators, Virtual Machines
+        check: all
         check_existence: at_least_one_exists
-        state_operator: AND
+        state_operator: OR
         collections:
-        - oval:mil.disa.stig.win:obj:20000014
-        predicates: []
+        - oval:mil.disa.stig.win:obj:25348900
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000029
+        - oval:mil.disa.stig.win:ste:20000030
+        - oval:mil.disa.stig.win:ste:25449900
         source_other: []
     definitions:
       oval:mil.disa.stig.windows2025:def:278249:
@@ -346,6 +346,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278249r1182217_rule
-    semantic_ir_sha256: e4775f76eb4b5f2444d0659b278fafd0a77d45764a7f5865b4f2c603c7a28962
+    semantic_ir_sha256: 6b08ee29032d87f4a01ebb7df69fa82ac2b0f56708b6d11fc68f84798043caef
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ccc410cf4b4f2de049a48978ec3366018e6bd8098ff0b0339f5a13ffdaa14f21

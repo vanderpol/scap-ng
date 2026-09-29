@@ -1,0 +1,174 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27160401:
+      capability: scapng.collect.independent.shellcommand
+      comment: Check that the system has a valid DOD root CA installed
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: 'Issuer:'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27160401
+      source_type: shellcommand_object
+      version: '5'
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27160402:
+      capability: scapng.collect.independent.shellcommand
+      comment: Check that the root certicate is date/time valid
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: openssl x509 -in /etc/sssd/pki/sssd_auth_ca_db.pem -checkend 0
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: expire
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27160402
+      source_type: shellcommand_object
+      version: '5'
+  derive: {}
+  description: OL 9, for PKI-based authentication, must validate certificates by constructing a certification path (which
+    includes status information) to an accepted trust anchor.
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271604:
+        class: compliance
+        criteria:
+          children:
+          - comment: Verify a DOD Root CA is installed in the designated location
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27160401
+          - comment: Verify the Root CA is date/time valid
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27160402
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9, for PKI-based authentication, must validate certificates by constructing a certification path (which
+              includes status information) to an accepted trust anchor.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271604
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27160401:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27160401
+        comment: For PKI-based authentication, the OS must validate certificates by constructing a certification path (which
+          includes status information) to an accepted trust anchor.
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27160401
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27160401
+        source_type: shellcommand_test
+        state_operator: AND
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27160402:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27160402
+        comment: For PKI-based authentication, the OS must validate certificates by constructing a certification path (which
+          includes status information) to an accepted trust anchor.
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27160402
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27160402
+        source_type: shellcommand_test
+        state_operator: AND
+  id: ng.shared.787701f86256e91a835e972f
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27160401:
+      comment: Verify that the Issuer is a DOD Root CA
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          check_existence: at_least_one_exists
+          operation: pattern match
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: CN\s*=\s*DoD\s+Root\s+CA
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27160401
+      source_type: shellcommand_state
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27160402:
+      comment: Verify that the root cert is date/time valid
+      entities:
+      - attributes:
+          datatype: int
+        kind: element
+        name: exit_status
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '0'
+      - attributes:
+          check_existence: at_least_one_exists
+          operation: pattern match
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: Certificate will not expire
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27160402
+      source_type: shellcommand_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 787701f86256e91a835e972fd802e860e35982de03dd8358f62b343964647da3
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271604r1091524_rule
+    title: OL 9, for PKI-based authentication, must validate certificates by constructing a certification path (which includes
+      status information) to an accepted trust anchor.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258131r1134927_rule
+    title: RHEL 9, for PKI-based authentication, must validate certificates by constructing a certification path (which includes
+      status information) to an accepted trust anchor.

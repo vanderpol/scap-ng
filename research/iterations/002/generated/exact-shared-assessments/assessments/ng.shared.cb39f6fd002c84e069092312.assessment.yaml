@@ -1,0 +1,186 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271736
+  collect:
+    oval:mil.disa.stig.ind:obj:25779300:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: BLS options
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /boot/loader/entries
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^.*\.conf$
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^options\s+(.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25779300
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.ind:obj:25779301:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: /etc/default/grub GRUB_CMDLINE_LINUX
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/default/grub
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^GRUB_CMDLINE_LINUX="(.*)"
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25779301
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must disable the ability of systemd to spawn an interactive boot process.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:257788:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: true
+            test_ref: oval:mil.disa.stig.ind:tst:25778800
+          - comment: null
+            kind: test_ref
+            negate: true
+            test_ref: oval:mil.disa.stig.ind:tst:25778801
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must disable the ability of systemd to spawn an interactive boot process.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:257788
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271736:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257788
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002392 - OL 9 must disable the ability of systemd to spawn an interactive boot process.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Using interactive or recovery boot, the console user could disable auditing, firewalls, or other services,
+              weakening system security.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271736
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:25778800:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25779300
+        comment: BLS options contain systemd.confirm_spawn
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25778800
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25778800
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:25778801:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25779301
+        comment: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain systemd.confirm_spawn
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25778800
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25778801
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.cb39f6fd002c84e069092312
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:25778800:
+      comment: null
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (^|\s)systemd\.confirm_spawn(\s|$)
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:25778800
+      source_type: textfilecontent54_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: cb39f6fd002c84e0690923121ca0ca67d2dabc120e26ff56f5b0212f6db4253c
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271736r1091920_rule
+    title: OL 9 must disable the ability of systemd to spawn an interactive boot process.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257788r1044838_rule
+    title: RHEL 9 must disable the ability of systemd to spawn an interactive boot process.

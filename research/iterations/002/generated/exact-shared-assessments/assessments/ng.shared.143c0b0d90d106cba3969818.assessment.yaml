@@ -1,0 +1,133 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271687
+  collect:
+    oval:mil.disa.stig.ind:obj:25803200:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: /org/gnome/settings-daemon/plugins/media-keys/logout in /etc/dconf/db/local.d/locks/*
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dconf/db/local.d/locks
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^/org/gnome/settings-daemon/plugins/media-keys/logout$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25803200
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must prevent a user from overriding the Ctrl-Alt-Del sequence settings for the graphical user interface.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:258032:
+        class: compliance
+        criteria:
+          children:
+          - comment: /org/gnome/settings-daemon/plugins/media-keys/logout is locked in /etc/dconf/db/local.d/locks/*
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25803200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must prevent a user from overriding the Ctrl-Alt-Del sequence settings for the graphical
+              user interface.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:258032
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271687:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258032
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002129 - OL 9 must prevent a user from overriding the Ctrl-Alt-Del sequence settings for the graphical
+              user interface.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: A locally logged-in user who presses Ctrl-Alt-Del, when at the console, can reboot the system. If accidentally
+              pressed, as could happen in the case of mixed OS environment, this can create the risk of short-term loss of
+              availability of systems due to unintentional reboot.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271687
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:25803200:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25803200
+        comment: /org/gnome/settings-daemon/plugins/media-keys/logout is locked in /etc/dconf/db/local.d/locks/*
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25803200
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.143c0b0d90d106cba3969818
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 143c0b0d90d106cba3969818420304dcb4ff970b4c0a198eccf39fff61a8465a
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271687r1091773_rule
+    title: OL 9 must prevent a user from overriding the Ctrl-Alt-Del sequence settings for the graphical user interface.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258032r1045117_rule
+    title: RHEL 9 must prevent a user from overriding the Ctrl-Alt-Del sequence settings for the graphical user interface.

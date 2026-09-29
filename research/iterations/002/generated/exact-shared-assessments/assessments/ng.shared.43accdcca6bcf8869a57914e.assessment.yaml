@@ -1,0 +1,176 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271599
+  collect:
+    oval:mil.disa.stig.ind:obj:23048300:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/audit/auditd.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?i)^\s*space_left\s*=\s*([\d]+)%\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23048300
+      source_type: textfilecontent54_object
+      version: '2'
+  derive: {}
+  description: OL 9 must take action when allocated audit record storage volume reaches 75 percent of the repository maximum
+    audit record storage capacity.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230483:
+        class: compliance
+        criteria:
+          children:
+          - comment: '/etc/audit/auditd.conf: space_left greater than or equal to 25%'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23048300
+          - comment: '/etc/audit/auditd.conf: space_left less than 100%'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23048301
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must take action when allocated audit record storage volume reaches 75 percent of the
+              repository maximum audit record storage capacity.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230483
+        version: '2'
+      oval:mil.disa.stig.ol9os:def:271599:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230483
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000865 - OL 9 must take action when allocated audit record storage volume reaches 75 percent of
+              the repository maximum audit record storage capacity.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: If security personnel are not notified immediately when storage volume reaches a maximum of 75 percent utilization,
+              they are unable to plan for audit record storage capacity expansion. The notification can be set to trigger
+              at lower utilization thresholds at the ISSO's discretion.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271599
+        version: '2'
+    tests:
+      oval:mil.disa.stig.ind:tst:23048300:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23048300
+        comment: '/etc/audit/auditd.conf: space_left greater than or equal to 25%'
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23048300
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23048300
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.ind:tst:23048301:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23048300
+        comment: '/etc/audit/auditd.conf: space_left less than 100%'
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23048301
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23048301
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.43accdcca6bcf8869a57914e
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:23048300:
+      comment: null
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '25'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23048300
+      source_type: textfilecontent54_state
+    oval:mil.disa.stig.ind:ste:23048301:
+      comment: null
+      entities:
+      - attributes:
+          datatype: int
+          operation: less than
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '100'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23048301
+      source_type: textfilecontent54_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 43accdcca6bcf8869a57914e1afdb0c19a7d1dc085a4c11458419e37f07e6b84
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271599r1134856_rule
+    title: OL 9 must take action when allocated audit record storage volume reaches 75 percent of the repository maximum audit
+      record storage capacity.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258156r1106364_rule
+    title: RHEL 9 must take action when allocated audit record storage volume reaches 75 percent of the repository maximum
+      audit record storage capacity.

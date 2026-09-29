@@ -1,0 +1,141 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271694
+  collect:
+    oval:mil.disa.stig.ind:obj:23038501:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/csh.cshrc
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*(?i)umask\s*(\d+)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23038501
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must define default permissions for the c shell.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:258073:
+        class: compliance
+        criteria:
+          children:
+          - comment: UMASK is set to only 077 in /etc/csh.cshrc
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23038501
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must define default permissions for the c shell.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:258073
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271694:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258073
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002302 - OL 9 must define default permissions for the c shell.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The umask controls the default access mode assigned to newly created files. A umask of 077 limits new files
+              to mode 600 or less permissive. Although umask can be represented as a four-digit number, the first digit representing
+              special access modes is typically ignored or required to be "0". This requirement applies to the globally configured
+              system defaults and the local interactive user defaults for each account on the system.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271694
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23038501:
+        check: all
+        check_existence: all_exist
+        collections:
+        - oval:mil.disa.stig.ind:obj:23038501
+        comment: UMASK is set to only 077 in /etc/csh.cshrc
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23038500
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23038501
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.bc2de7e1b88f2bc5c1f3bd39
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:23038500:
+      comment: null
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '077'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23038500
+      source_type: textfilecontent54_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: bc2de7e1b88f2bc5c1f3bd392f0d04f511bb49589491ed3cecebec10cef2a985
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271694r1091794_rule
+    title: OL 9 must define default permissions for the c shell.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258073r1184322_rule
+    title: RHEL 9 must define default permissions for the c shell.

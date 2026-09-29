@@ -316,27 +316,31 @@ rule:
     description: OL 9 must require the change of at least eight characters when passwords are changed.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23036300:
+      oval:mil.disa.stig.ind:obj:23036301:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23036300
+        source_object_id: oval:mil.disa.stig.ind:obj:23036301
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '2'
         comment: null
         query:
-        - children:
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23036301
-          - kind: object_ref
-            object_ref: oval:mil.disa.stig.ind:obj:23036302
-          evaluation_semantics:
-            complement_is_relative: true
-            filter_default_action: exclude
-            filters_apply_before_set_operator: true
-            unique_items: true
-          kind: set
-          operator: UNION
-          operator_explicit: true
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/security/pwquality.conf
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*difok\s*=\s*(-?\d*)\s*(?:#.*)?$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:23036302:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23036302
@@ -373,31 +377,27 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:23036301:
+      oval:mil.disa.stig.ind:obj:23036300:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23036301
+        source_object_id: oval:mil.disa.stig.ind:obj:23036300
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '2'
         comment: null
         query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/security/pwquality.conf
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*difok\s*=\s*(-?\d*)\s*(?:#.*)?$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
+        - children:
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23036301
+          - kind: object_ref
+            object_ref: oval:mil.disa.stig.ind:obj:23036302
+          evaluation_semantics:
+            complement_is_relative: true
+            filter_default_action: exclude
+            filters_apply_before_set_operator: true
+            unique_items: true
+          kind: set
+          operator: UNION
+          operator_explicit: true
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23036300:
@@ -430,29 +430,6 @@ rule:
           - oval:mil.disa.stig.ind:ste:23036300
           source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230363:
-          source_definition_id: oval:mil.disa.stig.defs:def:230363
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: at least 8 characters must change when passwords are changed
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23036300
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must require the change of at least 8 characters when passwords are changed.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271617:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271617
           class: compliance
@@ -489,6 +466,29 @@ rule:
                 \ combinations that need to be tested before the password is compromised. Requiring a minimum number of different\
                 \ characters during password changes ensures that newly changed passwords will not resemble previously compromised\
                 \ ones. Note that passwords changed on compromised systems will still be compromised."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230363:
+          source_definition_id: oval:mil.disa.stig.defs:def:230363
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: at least 8 characters must change when passwords are changed
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23036300
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must require the change of at least 8 characters when passwords are changed.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -611,7 +611,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271617r1091563_rule
-      semantic_ir_sha256: de7177539b31de15bf26df243683cc9fde70c07bd7b9ad27cfdf13e594feccc2
+      semantic_ir_sha256: d1e54915cfd2b22e3a604b0af5b6b279bd5595cf08ac365ae4ee66ad2d2a0351
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: c99f5478fc7ce40ad22c4c572dc46c3b643c669dff0165ee223a44fb3f10776b
   assessments:

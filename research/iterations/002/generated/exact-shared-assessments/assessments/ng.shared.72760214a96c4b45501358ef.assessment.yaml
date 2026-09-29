@@ -1,0 +1,181 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271652
+  collect:
+    oval:mil.disa.stig.ind:obj:23050900:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/fstab
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*[^#\s]+\s+/dev/shm\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23050900
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.linux:obj:23050900:
+      capability: scapng.collect.linux.partition
+      comment: null
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /dev/shm
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:23050900
+      source_type: partition_object
+      version: '1'
+  derive: {}
+  description: OL 9 must mount /dev/shm with the nosuid option.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230509:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23050900
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23050900
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must mount /dev/shm with the nosuid option.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230509
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271652:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230509
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002042 - OL 9 must mount /dev/shm with the nosuid option.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "nosuid" mount option causes the system to not execute "setuid" and "setgid" files with owner privileges.
+              This option must be used for mounting any file system not containing approved "setuid" and "setguid" files.
+              Executing files from untrusted file systems increases the opportunity for nonprivileged users to attain unauthorized
+              administrative access.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271652
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23050900:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.ind:obj:23050900
+        comment: If /dev/shm is configured in /etc/fstab, it is configured with the nosuid option
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23050900
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23050900
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.linux:tst:23050900:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.linux:obj:23050900
+        comment: If /dev/shm is mounted, it is mounted with the nosuid option
+        predicates:
+        - oval:mil.disa.stig.linux:ste:23050900
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:23050900
+        source_type: partition_test
+        state_operator: AND
+  id: ng.shared.72760214a96c4b45501358ef
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:23050900:
+      comment: null
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:23050900
+      source_type: textfilecontent54_state
+    oval:mil.disa.stig.linux:ste:23050900:
+      comment: null
+      entities:
+      - attributes:
+          entity_check: at least one
+        kind: element
+        name: mount_options
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: nosuid
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:23050900
+      source_type: partition_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 72760214a96c4b45501358ef033326a45fb9a9333e3d1f47228dfd8e8f3a9b93
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271652r1094966_rule
+    title: OL 9 must mount /dev/shm with the nosuid option.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257865r1184297_rule
+    title: RHEL 9 must mount /dev/shm with the nosuid option.

@@ -1,0 +1,101 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:271834
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27183401:
+      capability: scapng.collect.independent.shellcommand
+      comment: Return any user who does not have a valid primary group
+      query:
+      - kind: element
+        name: shell
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: bash
+      - kind: element
+        name: command
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: pwck -r
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: no group
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27183401
+      source_type: shellcommand_object
+      version: '5'
+  derive: {}
+  description: OL 9 interactive users must have a primary group that exists.
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271834:
+        class: compliance
+        criteria:
+          children:
+          - comment: Interactive users must have a primary group that exists.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27183401
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 interactive users must have a primary group that exists.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271834
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27183401:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27183401
+        comment: Interactive users must have a primary group that exists.
+        predicates:
+        - oval:navy.navwar.niwcatlantic.scc.linux:ste:27183401
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27183401
+        source_type: shellcommand_test
+        state_operator: AND
+  id: ng.shared.b7f48cd0a783452ed38b68e6
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27183401:
+      comment: Confirm no users are reported that have an invalid primary group
+      entities:
+      - attributes:
+          check_existence: none_exist
+        kind: element
+        name: stdout_line
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27183401
+      source_type: shellcommand_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: b7f48cd0a783452ed38b68e64911f91850e64198d4b3b4b5214ace05b43c0e23
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271834r1208734_rule
+    title: OL 9 interactive users must have a primary group that exists.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258048r1069380_rule
+    title: All RHEL 9 interactive users must have a primary group that exists.

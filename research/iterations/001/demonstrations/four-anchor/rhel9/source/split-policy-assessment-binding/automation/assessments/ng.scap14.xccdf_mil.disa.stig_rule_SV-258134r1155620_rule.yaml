@@ -7,31 +7,30 @@ assessment:
   description: RHEL 9 must have the AIDE package installed.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813403:
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402:
       capability: scapng.collect.unix.file
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813403
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
       source_type: file_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '13'
-      comment: Retrieve details of the working DB file.
+      comment: Find the aide.conf file.
       query:
       - attributes:
-          var_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402
+          max_depth: '-1'
+          recurse: directories
+          recurse_direction: down
+          recurse_file_system: local
         kind: element
-        name: filepath
+        name: behaviors
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813401:
-      capability: scapng.collect.linux.rpminfo
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813401
-      source_type: rpminfo_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '13'
-      comment: Confirm the aide file integrity tool package is installed.
-      query:
       - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: aide
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /
+      - kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: aide.conf
     oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813405:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813405
@@ -57,30 +56,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '13'
-      comment: Find the aide.conf file.
-      query:
-      - attributes:
-          max_depth: '-1'
-          recurse: directories
-          recurse_direction: down
-          recurse_file_system: local
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /
-      - kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: aide.conf
     oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813404:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813404
@@ -106,48 +81,32 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813401:
+      capability: scapng.collect.linux.rpminfo
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813401
+      source_type: rpminfo_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '13'
+      comment: Confirm the aide file integrity tool package is installed.
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: aide
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813403:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813403
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '13'
+      comment: Retrieve details of the working DB file.
+      query:
+      - attributes:
+          var_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
   derive:
-    oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401:
-      source_variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
-      source_type: local_variable
-      datatype: string
-      comment: Retrieve location of the aide.conf file.
-      semantic_ast:
-        datatype: string
-        expression:
-          item_field: filepath
-          object_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
-          op: object_component
-          record_field: null
-        id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
-        type: local_variable
-      resolution:
-        datatype: string
-        item_field: filepath
-        object_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
-        operation: object_component
-        reason: object_component_requires_collection:file_object
-        record_field: null
-        status: dynamic_object_dependency
-        variable_type: local_variable
-      evaluation_plan:
-        datatype: string
-        dependencies:
-          objects:
-          - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
-          operations:
-          - object_component
-          variables: []
-        expression:
-          item_field: filepath
-          object_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
-          op: object_component
-          record_field: null
-        mode: target_dependent
-        reason: object_component_requires_collection:file_object
-        resolution_status: dynamic_object_dependency
-        variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
-        variable_type: local_variable
     oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402:
       source_variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402
       source_type: local_variable
@@ -222,6 +181,47 @@ assessment:
         reason: concat_child_not_static:object_component_requires_collection:textfilecontent54_object
         resolution_status: dynamic_object_dependency
         variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813402
+        variable_type: local_variable
+    oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401:
+      source_variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
+      source_type: local_variable
+      datatype: string
+      comment: Retrieve location of the aide.conf file.
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: filepath
+          object_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
+          op: object_component
+          record_field: null
+        id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
+        type: local_variable
+      resolution:
+        datatype: string
+        item_field: filepath
+        object_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
+        operation: object_component
+        reason: object_component_requires_collection:file_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: filepath
+          object_ref: oval:navy.navwar.niwcatlantic.scc.rhel9os:obj:25813402
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:file_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:navy.navwar.niwcatlantic.scc.rhel9os:var:25813401
         variable_type: local_variable
   predicates:
     oval:navy.navwar.niwcatlantic.scc.rhel9os:ste:25813403:
@@ -446,6 +446,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258134r1155620_rule
-    semantic_ir_sha256: e4fa390d5a4deb8adbda6e7f8de8577a2560026b1002703638bca487d89277e0
+    semantic_ir_sha256: 89b9272446146c22951af3de67a13e07d3a46a0116a1d84291968628493702db
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: e816889ffd37f04ae88a211960c03b25e205155da520bde343d8256d5c3267bb

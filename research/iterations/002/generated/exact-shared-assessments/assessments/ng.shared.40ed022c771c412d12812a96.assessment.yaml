@@ -1,0 +1,341 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278187
+  collect:
+    oval:mil.disa.stig.win:obj:10000100:
+      capability: scapng.collect.windows.wmi57
+      comment: null
+      query:
+      - kind: element
+        name: namespace
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: root\cimv2
+      - kind: element
+        name: wql
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SELECT DomainRole FROM win32_computersystem
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:10000100
+      source_type: wmi57_object
+      version: '1'
+    oval:mil.disa.stig.win:obj:25349400:
+      capability: scapng.collect.windows.userright
+      comment: null
+      query:
+      - kind: element
+        name: userright
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SE_DENY_INTERACTIVE_LOGON_NAME
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25349400
+      source_type: userright_object
+      version: '1'
+  derive: {}
+  description: The Windows Server 2025 "Deny log on locally" user right on domain-joined member servers must be configured
+    to prevent access from highly privileged domain accounts and from unauthenticated access on all systems.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253494:
+        class: compliance
+        criteria:
+          children:
+          - children:
+            - comment: System is a member of a domain
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:10002300
+            - comment: Deny log on locally - Domain Admins
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349404
+            - comment: Deny log on locally - Enterprise Admins
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349406
+            - comment: Deny log on locally - Guests
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349405
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          - children:
+            - comment: System is not a member of a domain
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:10002200
+            - comment: Deny log on locally - Guests
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:25349405
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          comment: null
+          kind: boolean
+          negate: false
+          operator: OR
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Deny log on locally" user right on workstations must be configured to prevent access from highly privileged
+              domain accounts on domain systems and unauthenticated access on all systems.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253494
+        version: '5'
+      oval:mil.disa.stig.windows2025:def:278187:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253494
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-MS-000110 - The Windows Server 2025 "Deny log on locally" user right on domain-joined member servers
+              must be configured to prevent access from highly privileged domain accounts and from unauthenticated access
+              on all systems.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
+              \n  The \"Deny log on locally\" user right defines accounts that are prevented from logging on interactively.\n\
+              \n  In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower-trust\
+              \ systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to\
+              \ the compromise of an entire domain.\n\n  The Guests group must be assigned this right to prevent unauthenticated\
+              \ access."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278187
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:10002200:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:10000100
+        comment: The system is a standalone Windows server or workstation
+        predicates:
+        - oval:mil.disa.stig.win:ste:10000100
+        - oval:mil.disa.stig.win:ste:10000300
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:10002200
+        source_type: wmi57_test
+        state_operator: OR
+      oval:mil.disa.stig.win:tst:10002300:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:10000100
+        comment: The system is a non-DC domain-joined Windows server or workstation
+        predicates:
+        - oval:mil.disa.stig.win:ste:10000200
+        - oval:mil.disa.stig.win:ste:10000400
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:10002300
+        source_type: wmi57_test
+        state_operator: OR
+      oval:mil.disa.stig.win:tst:25349404:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349400
+        comment: Deny log on locally - Domain Admins
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000040
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25349404
+        source_type: userright_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25349405:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349400
+        comment: Deny log on locally - Guests
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000033
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25349405
+        source_type: userright_test
+        state_operator: AND
+      oval:mil.disa.stig.win:tst:25349406:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349400
+        comment: Deny log on locally - Enterprise Admins
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000041
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25349406
+        source_type: userright_test
+        state_operator: AND
+  id: ng.shared.40ed022c771c412d12812a96
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:10000100:
+      comment: Standalone Workstation
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '0'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:10000100
+      source_type: wmi57_state
+    oval:mil.disa.stig.win:ste:10000200:
+      comment: Domain Member Workstation
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '1'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:10000200
+      source_type: wmi57_state
+    oval:mil.disa.stig.win:ste:10000300:
+      comment: Standalone Server
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '2'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:10000300
+      source_type: wmi57_state
+    oval:mil.disa.stig.win:ste:10000400:
+      comment: Domain Member Server
+      entities:
+      - attributes:
+          datatype: record
+          operation: equals
+        children:
+        - attributes:
+            name: domainrole
+          kind: element
+          name: field
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: '3'
+        kind: element
+        name: result
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:10000400
+      source_type: wmi57_state
+    oval:mil.disa.stig.win:ste:20000033:
+      comment: null
+      entities:
+      - attributes:
+          operation: case insensitive equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Guests
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000033
+      source_type: userright_state
+    oval:mil.disa.stig.win:ste:20000040:
+      comment: null
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(?i)(.+\\)?Domain Admins$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000040
+      source_type: userright_state
+    oval:mil.disa.stig.win:ste:20000041:
+      comment: null
+      entities:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: ^(?i)(.+\\)?Enterprise Admins$
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000041
+      source_type: userright_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 40ed022c771c412d12812a968cd3c75c582f66a3303c3b41f874f955a18abaee
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278187r1182301_rule
+    title: The Windows Server 2025 "Deny log on locally" user right on domain-joined member servers must be configured to
+      prevent access from highly privileged domain accounts and from unauthenticated access on all systems.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253494r1137691_rule
+    title: The "Deny log on locally" user right on workstations must be configured to prevent access from highly privileged
+      domain accounts on domain systems and unauthenticated access on all systems.

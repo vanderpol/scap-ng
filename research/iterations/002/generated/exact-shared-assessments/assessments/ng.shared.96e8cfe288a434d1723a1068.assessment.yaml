@@ -1,0 +1,117 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271462
+  collect:
+    oval:mil.disa.stig.linux:obj:25782600:
+      capability: scapng.collect.linux.rpminfo
+      comment: null
+      query:
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: ftp
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:25782600
+      source_type: rpminfo_object
+      version: '1'
+  derive: {}
+  description: OL 9 must not have a File Transfer Protocol (FTP) server package installed.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:257826:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25782600
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: A File Transfer Protocol (FTP) server package must not be installed unless mission essential on the operating
+              system.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:257826
+        version: '2'
+      oval:mil.disa.stig.ol9os:def:271462:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257826
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000130 - OL 9 must not have a File Transfer Protocol (FTP) server package installed.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "The FTP service provides an unencrypted remote access that does not provide for the confidentiality and\
+              \ integrity of user passwords or the remote session. If a privileged user were to log on using this service,\
+              \ the privileged user password could be compromised. SSH or other encrypted file transfer methods must be used\
+              \ in place of this service.\n\n\tRemoving the \"vsftpd\" package decreases the risk of accidental activation.\n\
+              \n\tSatisfies: SRG-OS-000074-GPOS-00042, SRG-OS-000095-GPOS-00049"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271462
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:25782600:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:mil.disa.stig.linux:obj:25782600
+        comment: No File Transfer Protocol (FTP) server packages are installed
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:25782600
+        source_type: rpminfo_test
+        state_operator: AND
+  id: ng.shared.96e8cfe288a434d1723a1068
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 96e8cfe288a434d1723a10681e173c7f8436db93132f486d13932aaf58c8bd85
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271462r1184169_rule
+    title: OL 9 must not have a File Transfer Protocol (FTP) server package installed.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257826r1208770_rule
+    title: RHEL 9 must not have a File Transfer Protocol (FTP) server package installed.

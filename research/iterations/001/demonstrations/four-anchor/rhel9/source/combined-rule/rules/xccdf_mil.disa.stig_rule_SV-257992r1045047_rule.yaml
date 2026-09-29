@@ -352,18 +352,30 @@ rule:
     description: RHEL 9 must not allow a noncertificate trusted host SSH logon to the system.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25799201:
+      oval:mil.disa.stig.ind:obj:25799202:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25799201
+        source_object_id: oval:mil.disa.stig.ind:obj:25799202
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
         comment: null
         query:
-        - kind: element
-          name: filepath
+        - attributes:
+            max_depth: '-1'
+            recurse_direction: down
+          kind: element
+          name: behaviors
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/ssh/sshd_config.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^.+\.conf$
         - attributes:
             operation: pattern match
           kind: element
@@ -397,30 +409,18 @@ rule:
           kind: set
           operator: UNION
           operator_explicit: true
-      oval:mil.disa.stig.ind:obj:25799202:
+      oval:mil.disa.stig.ind:obj:25799201:
         capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25799202
+        source_object_id: oval:mil.disa.stig.ind:obj:25799201
         source_type: textfilecontent54_object
         source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         version: '1'
         comment: null
         query:
-        - attributes:
-            max_depth: '-1'
-            recurse_direction: down
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         - kind: element
-          name: path
+          name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/ssh/sshd_config.d
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^.+\.conf$
+          value: /etc/ssh/sshd_config
         - attributes:
             operation: pattern match
           kind: element
@@ -653,7 +653,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257992r1045047_rule
-      semantic_ir_sha256: 2f23da65446c186c6776a99211369d78c7e5613d6d07a49c47b3c7d5d11a3e93
+      semantic_ir_sha256: 77893ca26d3b21eb9c6ee5af513533637a4a5997c61fcc8eda26b0b800581325
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 683e216de4828348a2653e828145857912df366bb1a0369ad2a27199a34270ba
   assessments:

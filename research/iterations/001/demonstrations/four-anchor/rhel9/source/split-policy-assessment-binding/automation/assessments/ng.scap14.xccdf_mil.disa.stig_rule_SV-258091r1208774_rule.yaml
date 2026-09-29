@@ -8,30 +8,6 @@ assessment:
     less.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25809101:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25809101
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/security/pwquality.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^\s*retry\s*=\s*(-?\d*)\s*(?:#.*)?$
-      - attributes:
-          datatype: int
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25809102:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25809102
@@ -88,6 +64,30 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: true
+    oval:mil.disa.stig.ind:obj:25809101:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25809101
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/security/pwquality.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*retry\s*=\s*(-?\d*)\s*(?:#.*)?$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:20000018:
@@ -120,6 +120,30 @@ assessment:
         - oval:mil.disa.stig.ind:ste:20000018
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:258091:
+        source_definition_id: oval:mil.disa.stig.defs:def:258091
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: /etc/security/pwquality.conf:retry not greater than 3 and not 0
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25809100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured
+              for three retries or less.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258091:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258091
         class: compliance
@@ -165,30 +189,6 @@ assessment:
 
               By limiting the number of attempts to meet the pwquality module complexity requirements before returning with
               an error, the system will audit abnormal attempts at password changes.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:258091:
-        source_definition_id: oval:mil.disa.stig.defs:def:258091
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: /etc/security/pwquality.conf:retry not greater than 3 and not 0
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25809100
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Systems below version 8.4 must ensure the password complexity module in the system-auth file is configured
-              for three retries or less.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -310,6 +310,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258091r1208774_rule
-    semantic_ir_sha256: 9c55bd12deb59fe7529ca1db334fef43513eb7cce543ac07d3c7fc94552a95c8
+    semantic_ir_sha256: b040cd8e7abcd02b14e73d3034236f55ca72d787ec9aa12bf084b55a23027357
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: f2653103617ee4100c3b1332343e841033e7da7e9a8d9583fcd9f30f5c0d6f4d

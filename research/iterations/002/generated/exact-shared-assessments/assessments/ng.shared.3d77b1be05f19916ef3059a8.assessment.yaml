@@ -1,0 +1,127 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271871
+  collect:
+    oval:mil.disa.stig.unix:obj:20461100:
+      capability: scapng.collect.unix.sysctl
+      comment: null
+      query:
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: net.ipv4.conf.default.rp_filter
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:mil.disa.stig.unix:obj:20461100
+      source_type: sysctl_object
+      version: '1'
+  derive: {}
+  description: OL 9 must use a reverse-path filter for IPv4 network traffic, when possible, by default.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:271871:
+        class: compliance
+        criteria:
+          children:
+          - comment: net.ipv4.conf.default.rp_filter setting in kernel is set to 1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:20461100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must use a reverse-path filter for IPv4 network traffic, when possible, by default.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:271871
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271871:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:271871
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-006027 - OL 9 must use a reverse-path filter for IPv4 network traffic, when possible, by default.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Enabling reverse path filtering drops packets with source addresses that should not have been able to be
+              received on the interface on which they were received. It must not be used on systems that are routers for complicated
+              networks but is helpful for end hosts and routers serving small networks.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271871
+        version: '2'
+    tests:
+      oval:mil.disa.stig.unix:tst:20461100:
+        check: all
+        check_existence: all_exist
+        collections:
+        - oval:mil.disa.stig.unix:obj:20461100
+        comment: net.ipv4.conf.default.rp_filter setting in kernel is set to 1
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000010
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:mil.disa.stig.unix:tst:20461100
+        source_type: sysctl_test
+        state_operator: AND
+  id: ng.shared.3d77b1be05f19916ef3059a8
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.unix:ste:20000010:
+      comment: null
+      entities:
+      - attributes:
+          datatype: int
+          operation: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:mil.disa.stig.unix:ste:20000010
+      source_type: sysctl_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 3d77b1be05f19916ef3059a8695efbb1186bec4c8b8f670d11b66b5fd14c877f
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271871r1172843_rule
+    title: OL 9 must use a reverse-path filter for IPv4 network traffic, when possible, by default.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257965r1155646_rule
+    title: RHEL 9 must use a reverse-path filter for IPv4 network traffic when possible by default.

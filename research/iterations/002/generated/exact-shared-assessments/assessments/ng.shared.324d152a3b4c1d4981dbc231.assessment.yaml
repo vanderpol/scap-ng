@@ -1,0 +1,127 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:navy.navwar.niwcatlantic.scc.linux:def:271779
+  collect:
+    oval:navy.navwar.niwcatlantic.scc.linux:obj:27177901:
+      capability: scapng.collect.unix.file
+      comment: Check to see that all world-writable directories have the sticky bit set. Gather world-writable directories.
+      query:
+      - attributes:
+          max_depth: '-1'
+          recurse: directories
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:27177901
+      - kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:navy.navwar.niwcatlantic.scc.linux:ste:27177902
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_object_id: oval:navy.navwar.niwcatlantic.scc.linux:obj:27177901
+      source_type: file_object
+      version: '5'
+  derive: {}
+  description: OL 9 must be configured so that a sticky bit must be set on all public directories.
+  evaluate:
+    definitions:
+      oval:navy.navwar.niwcatlantic.scc.linux:def:271779:
+        class: compliance
+        criteria:
+          children:
+          - comment: A sticky bit must be set on all public directories to prevent unauthorized and unintended information
+              transferred via shared system resources.
+            kind: test_ref
+            negate: false
+            test_ref: oval:navy.navwar.niwcatlantic.scc.linux:tst:27177901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL 9 must be configured so that a sticky bit must be set on all public directories.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: A sticky bit must be set on all public directories to prevent unauthorized and unintended information transferred
+              via shared system resources.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:navy.navwar.niwcatlantic.scc.linux:def:271779
+        version: '5'
+    tests:
+      oval:navy.navwar.niwcatlantic.scc.linux:tst:27177901:
+        check: all
+        check_existence: none_exist
+        collections:
+        - oval:navy.navwar.niwcatlantic.scc.linux:obj:27177901
+        comment: Check that all world-writable directories have the sticky bit set.
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        source_other: []
+        source_test_id: oval:navy.navwar.niwcatlantic.scc.linux:tst:27177901
+        source_type: file_test
+        state_operator: AND
+  id: ng.shared.324d152a3b4c1d4981dbc231
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27177901:
+      comment: Filter exclude directories that are not world writable.
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27177901
+      source_type: file_state
+    oval:navy.navwar.niwcatlantic.scc.linux:ste:27177902:
+      comment: Filter exclude any with sticky bit.
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: sticky
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      source_state_id: oval:navy.navwar.niwcatlantic.scc.linux:ste:27177902
+      source_type: file_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 324d152a3b4c1d4981dbc23122bc5b5e82bd1b1ab837730bc1efcf097f80dfd3
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271779r1137695_rule
+    title: OL 9 must be configured so that a sticky bit must be set on all public directories.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257929r1137695_rule
+    title: A sticky bit must be set on all RHEL 9 public directories.

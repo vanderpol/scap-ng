@@ -107,20 +107,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23052700:
-      source_state_id: oval:mil.disa.stig.ind:ste:23052700
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: string
-          operation: pattern match
-        kind: element
-        name: text
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^(?i)\s*RekeyLimit\s+[1-9][0-9]*[kmg]?\s+([1-9][0-9]*[smhdw]?)+\s*$
-      comment: null
     oval:mil.disa.stig.ind:ste:25798801:
       source_state_id: oval:mil.disa.stig.ind:ste:25798801
       source_type: textfilecontent54_state
@@ -135,8 +121,35 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: /etc/ssh/sshd_config.d/*.conf
       comment: null
+    oval:mil.disa.stig.ind:ste:23052700:
+      source_state_id: oval:mil.disa.stig.ind:ste:23052700
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: text
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^(?i)\s*RekeyLimit\s+[1-9][0-9]*[kmg]?\s+([1-9][0-9]*[smhdw]?)+\s*$
+      comment: null
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:25798801:
+        source_test_id: oval:mil.disa.stig.ind:tst:25798801
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: sshd_config includes sshd_config.d
+        check: at least one
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25798800
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25798801
+        source_other: []
       oval:mil.disa.stig.ind:tst:23052700:
         source_test_id: oval:mil.disa.stig.ind:tst:23052700
         source_type: textfilecontent54_test
@@ -162,19 +175,6 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23052701
         predicates:
         - oval:mil.disa.stig.ind:ste:23052700
-        source_other: []
-      oval:mil.disa.stig.ind:tst:25798801:
-        source_test_id: oval:mil.disa.stig.ind:tst:25798801
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: sshd_config includes sshd_config.d
-        check: at least one
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25798800
-        predicates:
-        - oval:mil.disa.stig.ind:ste:25798801
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:230527:
@@ -383,6 +383,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271705r1091827_rule
-    semantic_ir_sha256: 83567e79b314df379b82421404e07433a1566c4d96612e620d57e758e0b7e123
+    semantic_ir_sha256: 138a60241d67f457d3ab3f47edc5c527f0afee499eefd1c5d5f76c625f7caf12
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 7b5e2780458134132fd3b2cca13ee6691facc11c006d5c0e8a2ab9ba4f330896

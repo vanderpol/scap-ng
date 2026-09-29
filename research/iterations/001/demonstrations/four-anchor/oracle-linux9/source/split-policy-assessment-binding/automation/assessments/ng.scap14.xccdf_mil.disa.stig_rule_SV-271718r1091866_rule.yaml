@@ -7,6 +7,27 @@ assessment:
   description: OL 9 SSH daemon must not allow Kerberos authentication.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25800401:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25800401
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: null
+      query:
+      - children:
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25800402
+        - kind: object_ref
+          object_ref: oval:mil.disa.stig.ind:obj:25800400
+        evaluation_semantics:
+          complement_is_relative: true
+          filter_default_action: exclude
+          filters_apply_before_set_operator: true
+          unique_items: true
+        kind: set
+        operator: UNION
+        operator_explicit: true
     oval:mil.disa.stig.ind:obj:25800402:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25800402
@@ -95,27 +116,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25800401:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25800401
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: null
-      query:
-      - children:
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25800402
-        - kind: object_ref
-          object_ref: oval:mil.disa.stig.ind:obj:25800400
-        evaluation_semantics:
-          complement_is_relative: true
-          filter_default_action: exclude
-          filters_apply_before_set_operator: true
-          unique_items: true
-        kind: set
-        operator: UNION
-        operator_explicit: true
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:25798801:
@@ -161,19 +161,6 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:20000017
         source_other: []
-      oval:mil.disa.stig.ind:tst:25798801:
-        source_test_id: oval:mil.disa.stig.ind:tst:25798801
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: sshd_config includes sshd_config.d
-        check: at least one
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25798800
-        predicates:
-        - oval:mil.disa.stig.ind:ste:25798801
-        source_other: []
       oval:mil.disa.stig.ind:tst:25800401:
         source_test_id: oval:mil.disa.stig.ind:tst:25800401
         source_type: textfilecontent54_test
@@ -187,7 +174,54 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:20000017
         source_other: []
+      oval:mil.disa.stig.ind:tst:25798801:
+        source_test_id: oval:mil.disa.stig.ind:tst:25798801
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: sshd_config includes sshd_config.d
+        check: at least one
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25798800
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25798801
+        source_other: []
     definitions:
+      oval:mil.disa.stig.ol9os:def:271718:
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271718
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258004
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002356 - OL 9 SSH daemon must not allow Kerberos authentication.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Kerberos authentication for SSH is often implemented using Generic Security Service Application Program
+              Interface (GSSAPI). If Kerberos is enabled through SSH, the SSH daemon provides a means of access to the system's
+              Kerberos implementation. Vulnerabilities in the system's Kerberos implementations may be subject to exploitation.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.defs:def:258004:
         source_definition_id: oval:mil.disa.stig.defs:def:258004
         class: compliance
@@ -232,40 +266,6 @@ assessment:
               validated mission requirements.
           - name: description
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.ol9os:def:271718:
-        source_definition_id: oval:mil.disa.stig.ol9os:def:271718
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            definition_ref: oval:mil.disa.stig.defs:def:258004
-            kind: definition_ref
-            negate: false
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: OL09-00-002356 - OL 9 SSH daemon must not allow Kerberos authentication.
-          - attributes:
-              family: unix
-            children:
-            - name: platform
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: Oracle Linux 9
-            name: affected
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Kerberos authentication for SSH is often implemented using Generic Security Service Application Program
-              Interface (GSSAPI). If Kerberos is enabled through SSH, the SSH daemon provides a means of access to the system's
-              Kerberos implementation. Vulnerabilities in the system's Kerberos implementations may be subject to exploitation.
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -396,6 +396,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271718r1091866_rule
-    semantic_ir_sha256: e3ad2278b963858b16b753205861c3fcae321bb67b352912f09743c513054a8f
+    semantic_ir_sha256: 1f72a427404364bb78df43d9d334cc2f367deeac9f39aca8e96ab046ed9600ba
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 430a926d0dba2ce4b4f8b5a598f25be443c11a749401e7444c7747713731cd9d

@@ -357,6 +357,30 @@ rule:
     description: The RHEL 9 SSH server configuration file must be owned by root.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.unix:obj:25799902:
+        capability: scapng.collect.unix.file
+        source_object_id: oval:mil.disa.stig.unix:obj:25799902
+        source_type: file_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        version: '2'
+        comment: null
+        query:
+        - attributes:
+            recurse: directories
+            recurse_direction: down
+          kind: element
+          name: behaviors
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        - kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: /etc/ssh/sshd_config.d
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+          value: .*
       oval:mil.disa.stig.unix:obj:25799901:
         capability: scapng.collect.unix.file
         source_object_id: oval:mil.disa.stig.unix:obj:25799901
@@ -392,30 +416,6 @@ rule:
           name: filepath
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
           value: /etc/ssh/sshd_config
-      oval:mil.disa.stig.unix:obj:25799902:
-        capability: scapng.collect.unix.file
-        source_object_id: oval:mil.disa.stig.unix:obj:25799902
-        source_type: file_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        version: '2'
-        comment: null
-        query:
-        - attributes:
-            recurse: directories
-            recurse_direction: down
-          kind: element
-          name: behaviors
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        - kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: /etc/ssh/sshd_config.d
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-          value: .*
     derive: {}
     predicates:
       oval:mil.disa.stig.unix:ste:20000005:
@@ -673,7 +673,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-257998r1082181_rule
-      semantic_ir_sha256: 0bb21b60f149bea3f83702c5b08a2097f3f5855def4e8e8468354c2363f41574
+      semantic_ir_sha256: 2c8ce824b57ebc844216ce63c6af73305d59e1eb1c5085f6d3ee40aa2dfbd760
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: caeff9d10bcc89b57796c0d5aeefc17b454b46894618e1452c400335f45b1c1c
   assessments:

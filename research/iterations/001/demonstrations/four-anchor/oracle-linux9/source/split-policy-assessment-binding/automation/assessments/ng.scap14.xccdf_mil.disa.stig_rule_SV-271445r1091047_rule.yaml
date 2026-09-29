@@ -69,30 +69,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25780601:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25780601
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.conf
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*blacklist[ \t]+firewire-core[ \t]*$
-      - attributes:
-          datatype: int
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:25780600:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25780600
@@ -117,10 +93,46 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:25780601:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25780601
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*blacklist[ \t]+firewire-core[ \t]*$
+      - attributes:
+          datatype: int
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates: {}
   evaluate:
     tests:
+      oval:mil.disa.stig.ind:tst:23049900:
+        source_test_id: oval:mil.disa.stig.ind:tst:23049900
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23049900
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.ind:tst:25780601:
         source_test_id: oval:mil.disa.stig.ind:tst:25780601
         source_type: textfilecontent54_test
@@ -143,18 +155,6 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.ind:obj:25780600
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.ind:tst:23049900:
-        source_test_id: oval:mil.disa.stig.ind:tst:23049900
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23049900
         predicates: []
         source_other: []
       oval:mil.disa.stig.ind:tst:23049901:
@@ -367,6 +367,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271445r1091047_rule
-    semantic_ir_sha256: 483b9d088f62a2e0098aaacd3e9958a374eb23ad447acf76c254ceaee42b0669
+    semantic_ir_sha256: 8b1200a5a8666c618eae7c4efc3d01e6f7ed3fbc6b607f6be149cc95672477be
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 704a4cf528fe98d449e0eaec47b0b00b7eed99b809dfe93c876e1fac28ecb12c

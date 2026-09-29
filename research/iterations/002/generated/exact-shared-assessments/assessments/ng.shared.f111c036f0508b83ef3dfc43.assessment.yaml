@@ -1,0 +1,152 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278178
+  collect:
+    oval:mil.disa.stig.win:obj:25335700:
+      capability: scapng.collect.windows.registry
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+      - attributes:
+          datatype: string
+          operation: case insensitive equals
+        kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: LocalAccountTokenFilterPolicy
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25335700
+      source_type: registry_object
+      version: '2'
+  derive: {}
+  description: Windows Server 2025 local administrator accounts must have their privileged token filtered to prevent elevated
+    privileges from being used over the network on domain-joined member servers.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253357:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25335700
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Local administrator accounts must have their privileged token filtered to prevent elevated privileges from
+              being used over the network on domain systems.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253357
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278178:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253357
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-MS-000020 - Windows Server 2025 local administrator accounts must have their privileged token filtered
+              to prevent elevated privileges from being used over the network on domain-joined member servers.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "A compromised local administrator account can provide means for an attacker to move laterally between domain\
+              \ systems.\n\n  With User Account Control enabled, filtering the privileged token for local administrator accounts\
+              \ will prevent the elevated privileges of these accounts from being used over the network."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278178
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25335700:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25335700
+        comment: Local admin accounts filtered token policy is enabled
+        predicates:
+        - oval:mil.disa.stig.win:ste:25335700
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25335700
+        source_type: registry_test
+        state_operator: AND
+  id: ng.shared.f111c036f0508b83ef3dfc43
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:25335700:
+      comment: null
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '0'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:25335700
+      source_type: registry_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: f111c036f0508b83ef3dfc43a1aa2d84f6ef0d0795d0659213cf139784db8cd8
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278178r1182282_rule
+    title: Windows Server 2025 local administrator accounts must have their privileged token filtered to prevent elevated
+      privileges from being used over the network on domain-joined member servers.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253357r958518_rule
+    title: Local administrator accounts must have their privileged token filtered to prevent elevated privileges from being
+      used over the network on domain systems.

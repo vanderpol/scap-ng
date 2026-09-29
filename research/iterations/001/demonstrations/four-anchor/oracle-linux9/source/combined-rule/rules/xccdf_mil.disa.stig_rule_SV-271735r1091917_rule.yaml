@@ -328,6 +328,31 @@ rule:
     description: OL 9 must enable mitigations against processor-based vulnerabilities.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.ind:obj:25779301:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25779301
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: /etc/default/grub GRUB_CMDLINE_LINUX
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/default/grub
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^GRUB_CMDLINE_LINUX="(.*)"
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
       oval:mil.disa.stig.ind:obj:25779300:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25779300
@@ -359,31 +384,6 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.ind:obj:25779301:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25779301
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: /etc/default/grub GRUB_CMDLINE_LINUX
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/default/grub
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^GRUB_CMDLINE_LINUX="(.*)"
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
     derive: {}
     predicates:
       oval:mil.disa.stig.ind:ste:23049100:
@@ -401,19 +401,6 @@ rule:
         comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:23049101:
-          source_test_id: oval:mil.disa.stig.ind:tst:23049101
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain pti=on
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25779301
-          predicates:
-          - oval:mil.disa.stig.ind:ste:23049100
-          source_other: []
         oval:mil.disa.stig.ind:tst:23049100:
           source_test_id: oval:mil.disa.stig.ind:tst:23049100
           source_type: textfilecontent54_test
@@ -424,6 +411,19 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.ind:obj:25779300
+          predicates:
+          - oval:mil.disa.stig.ind:ste:23049100
+          source_other: []
+        oval:mil.disa.stig.ind:tst:23049101:
+          source_test_id: oval:mil.disa.stig.ind:tst:23049101
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain pti=on
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25779301
           predicates:
           - oval:mil.disa.stig.ind:ste:23049100
           source_other: []
@@ -612,7 +612,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271735r1091917_rule
-      semantic_ir_sha256: a49b296be3d81f583ce9e75cc8f585700d7eaf0de0aa6e64f0e4a2b2f041c755
+      semantic_ir_sha256: 9a733251197feb359ba750e18378714696b453777cbf805f2ae6ffcd72033ef2
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: e2c4829e01a12404b03c05c88e1c9cb1dc8bb70dd816c87a0fbef19c24ae8d5d
   assessments:

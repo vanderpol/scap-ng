@@ -181,20 +181,20 @@ assessment:
         variable_id: oval:mil.disa.stig.defs:var:23036700
         variable_type: local_variable
   predicates:
-    oval:mil.disa.stig.unix:ste:23036701:
-      source_state_id: oval:mil.disa.stig.unix:ste:23036701
-      source_type: shadow_state
+    oval:mil.disa.stig.unix:ste:23036704:
+      source_state_id: oval:mil.disa.stig.unix:ste:23036704
+      source_type: password_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       operator: AND
       entities:
       - attributes:
           datatype: int
-          operation: less than or equal
+          operation: greater than or equal
         kind: element
-        name: chg_req
+        name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '60'
-      comment: less than or equal to sixty
+        value: '1000'
+      comment: null
     oval:mil.disa.stig.unix:ste:23036700:
       source_state_id: oval:mil.disa.stig.unix:ste:23036700
       source_type: shadow_state
@@ -209,6 +209,20 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '0'
       comment: greater than zero
+    oval:mil.disa.stig.unix:ste:23036701:
+      source_state_id: oval:mil.disa.stig.unix:ste:23036701
+      source_type: shadow_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: less than or equal
+        kind: element
+        name: chg_req
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: '60'
+      comment: less than or equal to sixty
     oval:mil.disa.stig.unix:ste:23036702:
       source_state_id: oval:mil.disa.stig.unix:ste:23036702
       source_type: shadow_state
@@ -239,20 +253,6 @@ assessment:
         name: user_id
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       comment: anonymous users
-    oval:mil.disa.stig.unix:ste:23036704:
-      source_state_id: oval:mil.disa.stig.unix:ste:23036704
-      source_type: password_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: user_id
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: '1000'
-      comment: null
   evaluate:
     tests:
       oval:mil.disa.stig.unix:tst:23036701:
@@ -284,34 +284,6 @@ assessment:
         - oval:mil.disa.stig.unix:ste:23036701
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230367:
-        source_definition_id: oval:mil.disa.stig.defs:def:230367
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: No password in /etc/shadow has a maximum password age of 0 or greater than 60
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23036700
-          - comment: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.unix:tst:23036701
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system user account passwords must be configured so that existing passwords are restricted
-              to a 60-day maximum lifetime.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258042:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258042
         class: compliance
@@ -344,6 +316,34 @@ assessment:
             text: Any password, no matter how complex, can eventually be cracked; therefore, passwords need to be changed
               periodically. If RHEL 9 does not limit the lifetime of passwords and force users to change their passwords,
               there is the risk that RHEL 9 passwords could be compromised.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230367:
+        source_definition_id: oval:mil.disa.stig.defs:def:230367
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: No password in /etc/shadow has a maximum password age of 0 or greater than 60
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23036700
+          - comment: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.unix:tst:23036701
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system user account passwords must be configured so that existing passwords are restricted
+              to a 60-day maximum lifetime.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -471,6 +471,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258042r1045133_rule
-    semantic_ir_sha256: b04ae89f6d5a9c2b0798549d84b489341314fa1ab45e68a562a0cb277fa7cd7f
+    semantic_ir_sha256: e3f5866b8d29c38edd32298ccab9e255b082621ee03cc1cb430a5ab018852895
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ebde87104c0fadfe9a530085c01e7227b7ad0831f5eef14f84b583158fe4049b

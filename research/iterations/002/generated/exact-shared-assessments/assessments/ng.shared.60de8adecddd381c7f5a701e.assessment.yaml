@@ -1,0 +1,144 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278098
+  collect:
+    oval:mil.disa.stig.win:obj:25338500:
+      capability: scapng.collect.windows.registry
+      comment: null
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SOFTWARE\Policies\Microsoft\Windows\AppCompat
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: DisableInventory
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25338500
+      source_type: registry_object
+      version: '1'
+  derive: {}
+  description: Windows Server 2025 Application Compatibility Program Inventory must be prevented from collecting data and
+    sending the information to Microsoft.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253385:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25338500
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The Application Compatibility Program Inventory must be prevented from collecting data and sending the information
+              to Microsoft.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253385
+        version: '1'
+      oval:mil.disa.stig.windows2025:def:278098:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253385
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-CC-000200 - Windows Server 2025 Application Compatibility Program Inventory must be prevented from
+              collecting data and sending the information to Microsoft.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Some features may communicate with the vendor, sending system information or downloading data or components\
+              \ for the feature. Turning off this capability will prevent potentially sensitive information from being sent\
+              \ outside the enterprise and will prevent uncontrolled updates to the system.\n\n  This setting will prevent\
+              \ the Program Inventory from collecting data about a system and sending the information to Microsoft."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278098
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25338500:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25338500
+        comment: '''Turn off Inventory Collector'' is set to ''Enabled'''
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000001
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25338500
+        source_type: registry_test
+        state_operator: AND
+  id: ng.shared.60de8adecddd381c7f5a701e
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:20000001:
+      comment: null
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000001
+      source_type: registry_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 60de8adecddd381c7f5a701e282b4a8eebd3791f58ab876a6d93cbae3372396a
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278098r1181000_rule
+    title: Windows Server 2025 Application Compatibility Program Inventory must be prevented from collecting data and sending
+      the information to Microsoft.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253385r958478_rule
+    title: The Application Compatibility Program Inventory must be prevented from collecting data and sending the information
+      to Microsoft.

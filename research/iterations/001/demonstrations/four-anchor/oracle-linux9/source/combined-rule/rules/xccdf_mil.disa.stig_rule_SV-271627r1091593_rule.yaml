@@ -328,31 +328,6 @@ rule:
     description: OL 9 shadow password suite must be configured to use a sufficient number of hashing rounds.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:23023301:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:23023301
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/login.defs
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*SHA_CRYPT_MAX_ROUNDS\s+(\d+)\b
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:23023300:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23023300
@@ -371,6 +346,31 @@ rule:
           name: pattern
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: ^\s*SHA_CRYPT_MIN_ROUNDS\s+(\d+)\b
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
+      oval:mil.disa.stig.ind:obj:23023301:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:23023301
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/login.defs
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*SHA_CRYPT_MAX_ROUNDS\s+(\d+)\b
         - attributes:
             datatype: int
             operation: greater than or equal
@@ -408,6 +408,18 @@ rule:
           - oval:mil.disa.stig.ind:obj:23023301
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:23023302:
+          source_test_id: oval:mil.disa.stig.ind:tst:23023302
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: '/etc/login.defs: SHA_CRYPT_MIN_ROUNDS is set'
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:23023300
+          predicates: []
+          source_other: []
         oval:mil.disa.stig.ind:tst:23023300:
           source_test_id: oval:mil.disa.stig.ind:tst:23023300
           source_type: textfilecontent54_test
@@ -433,18 +445,6 @@ rule:
           - oval:mil.disa.stig.ind:obj:23023301
           predicates:
           - oval:mil.disa.stig.ind:ste:23023300
-          source_other: []
-        oval:mil.disa.stig.ind:tst:23023302:
-          source_test_id: oval:mil.disa.stig.ind:tst:23023302
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: '/etc/login.defs: SHA_CRYPT_MIN_ROUNDS is set'
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:23023300
-          predicates: []
           source_other: []
       definitions:
         oval:mil.disa.stig.ol9os:def:271627:
@@ -645,7 +645,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271627r1091593_rule
-      semantic_ir_sha256: 860fba48c09f54312beb001271867fc352d045a181bfc5422ba42c8342a25077
+      semantic_ir_sha256: 3871595e64475f8e766662938a01cc0d686f57cbfa3b2eb1d22bf8231cf80c39
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: f4ac1674611b7c28b60114b444cb3f0fbbacb46d3d44814f2a73999e80273efd
   assessments:

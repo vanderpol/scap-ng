@@ -1,0 +1,141 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271624
+  collect:
+    oval:mil.disa.stig.ind:obj:23023700:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: null
+      query:
+      - attributes:
+          datatype: string
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/pam.d
+      - attributes:
+          datatype: string
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: password-auth
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*password[ \t]+sufficient[ \t]+pam_unix\.so(?:[ \t]+|(?:[ \t][^#\r\f\n]+[ \t]))sha512(?:[ \t]|$)
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:23023700
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 pam_unix.so module must be configured in the password-auth file to use a FIPS 140-3 approved cryptographic
+    hashing algorithm for system authentication.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230237:
+        class: compliance
+        criteria:
+          children:
+          - comment: /etc/pam.d/password-auth:password includes pam_unix.so sha512
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23023700
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system pam_unix.so module must be configured in the password-auth file to use a FIPS 140-2
+              approved cryptographic hashing algorithm for system authentication.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230237
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271624:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230237
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-001060 - OL 9 pam_unix.so module must be configured in the password-auth file to use a FIPS 140-3
+              approved cryptographic hashing algorithm for system authentication.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Unapproved mechanisms that are used for authentication to the cryptographic module are not verified and\
+              \ therefore, cannot be relied upon to provide confidentiality or integrity, and DOD data may be compromised.\n\
+              \n\tOL 9 systems using encryption are required to use FIPS-compliant mechanisms for authenticating to cryptographic\
+              \ modules. \n\n\tFIPS 140-3 is the current standard for validating that mechanisms used to access cryptographic\
+              \ modules use authentication that meets DOD requirements. This allows for Security Levels 1, 2, 3, or 4 for\
+              \ use on a general-purpose computing system."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271624
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:23023700:
+        check: all
+        check_existence: only_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:23023700
+        comment: /etc/pam.d/password-auth:password includes pam_unix.so sha512
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:23023700
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.1745e9838610cbddb2c427ae
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates: {}
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 1745e9838610cbddb2c427aecf975ab063b5eb1e041e3206630c929e4a6a8eb8
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271624r1091584_rule
+    title: OL 9 pam_unix.so module must be configured in the password-auth file to use a FIPS 140-3 approved cryptographic
+      hashing algorithm for system authentication.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258233r1015136_rule
+    title: RHEL 9 pam_unix.so module must be configured in the password-auth file to use a FIPS 140-3 approved cryptographic
+      hashing algorithm for system authentication.

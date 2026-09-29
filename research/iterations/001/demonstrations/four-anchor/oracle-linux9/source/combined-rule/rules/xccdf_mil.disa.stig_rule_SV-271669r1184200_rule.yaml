@@ -319,6 +319,26 @@ rule:
     description: OL 9 must prevent special devices on nonroot local partitions.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.linux:obj:23030100:
+        capability: scapng.collect.linux.partition
+        source_object_id: oval:mil.disa.stig.linux:obj:23030100
+        source_type: partition_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '3'
+        comment: null
+        query:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: mount_point
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: ^/\S+$
+        - attributes:
+            action: include
+          kind: element
+          name: filter
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          value: oval:mil.disa.stig.linux:ste:23030102
       oval:mil.disa.stig.ind:obj:23030101:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:23030101
@@ -344,28 +364,21 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
-      oval:mil.disa.stig.linux:obj:23030100:
-        capability: scapng.collect.linux.partition
-        source_object_id: oval:mil.disa.stig.linux:obj:23030100
-        source_type: partition_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '3'
-        comment: null
-        query:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: mount_point
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: ^/\S+$
-        - attributes:
-            action: include
-          kind: element
-          name: filter
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          value: oval:mil.disa.stig.linux:ste:23030102
     derive: {}
     predicates:
+      oval:mil.disa.stig.linux:ste:20000001:
+        source_state_id: oval:mil.disa.stig.linux:ste:20000001
+        source_type: partition_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        operator: AND
+        entities:
+        - attributes:
+            entity_check: at least one
+          kind: element
+          name: mount_options
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: nodev
+        comment: null
       oval:mil.disa.stig.ind:ste:23030100:
         source_state_id: oval:mil.disa.stig.ind:ste:23030100
         source_type: textfilecontent54_state
@@ -392,34 +405,8 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: ^/dev\S*$
         comment: null
-      oval:mil.disa.stig.linux:ste:20000001:
-        source_state_id: oval:mil.disa.stig.linux:ste:20000001
-        source_type: partition_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        operator: AND
-        entities:
-        - attributes:
-            entity_check: at least one
-          kind: element
-          name: mount_options
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: nodev
-        comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:23030100:
-          source_test_id: oval:mil.disa.stig.linux:tst:23030100
-          source_type: partition_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          comment: Device files are mounted with the nodev option.  Mounts on '/' are ignored.
-          check: all
-          check_existence: any_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.linux:obj:23030100
-          predicates:
-          - oval:mil.disa.stig.linux:ste:20000001
-          source_other: []
         oval:mil.disa.stig.ind:tst:23030101:
           source_test_id: oval:mil.disa.stig.ind:tst:23030101
           source_type: textfilecontent54_test
@@ -433,34 +420,20 @@ rule:
           predicates:
           - oval:mil.disa.stig.ind:ste:23030100
           source_other: []
+        oval:mil.disa.stig.linux:tst:23030100:
+          source_test_id: oval:mil.disa.stig.linux:tst:23030100
+          source_type: partition_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          comment: Device files are mounted with the nodev option.  Mounts on '/' are ignored.
+          check: all
+          check_existence: any_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.linux:obj:23030100
+          predicates:
+          - oval:mil.disa.stig.linux:ste:20000001
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:230301:
-          source_definition_id: oval:mil.disa.stig.defs:def:230301
-          class: compliance
-          version: '1'
-          criteria:
-            children:
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.linux:tst:23030100
-            - comment: null
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:23030101
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent special devices on non-root local partitions.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271669:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271669
           class: compliance
@@ -494,6 +467,33 @@ rule:
                 \ character or block special devices from untrusted file systems increases the opportunity for nonprivileged\
                 \ users to attain unauthorized administrative access.\n\n\tThe only legitimate location for device files is\
                 \ the \"/dev\" directory located on the root partition, with the exception of chroot jails if implemented."
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:230301:
+          source_definition_id: oval:mil.disa.stig.defs:def:230301
+          class: compliance
+          version: '1'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.linux:tst:23030100
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:23030101
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent special devices on non-root local partitions.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -621,7 +621,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271669r1184200_rule
-      semantic_ir_sha256: c0cf8123c7248566c045a7cb74e7531f11e927e31ed20c73ce81d9d6952a6d81
+      semantic_ir_sha256: d72a9e765bf4c2667fd9eb9ff65adf67867931feefda3a20c97e10a5800c7d74
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 3e141831d1330d72ed4938a6fc733c7f4d9e285a28008881c82e7fee18cfa83c
   assessments:

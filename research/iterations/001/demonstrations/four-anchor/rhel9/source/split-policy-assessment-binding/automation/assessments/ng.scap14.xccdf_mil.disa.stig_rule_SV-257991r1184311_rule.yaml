@@ -35,17 +35,6 @@ assessment:
         value: '1'
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:25799100:
-      source_state_id: oval:mil.disa.stig.ind:ste:25799100
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
-      comment: null
     oval:mil.disa.stig.ind:ste:25799101:
       source_state_id: oval:mil.disa.stig.ind:ste:25799101
       source_type: textfilecontent54_state
@@ -56,6 +45,17 @@ assessment:
         name: subexpression
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
+      comment: null
+    oval:mil.disa.stig.ind:ste:25799100:
+      source_state_id: oval:mil.disa.stig.ind:ste:25799100
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
       comment: null
   evaluate:
     tests:
@@ -74,6 +74,30 @@ assessment:
         - oval:mil.disa.stig.ind:ste:25799101
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:257991:
+        source_definition_id: oval:mil.disa.stig.defs:def:257991
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25799100
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system SSH server must be configured to use only Message Authentication Codes (MACs) employing
+              FIPS 140-3 validated cryptographic hash algorithms.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257991:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257991
         class: compliance
@@ -120,30 +144,6 @@ assessment:
               RHEL 9 incorporates system-wide crypto policies by default. The SSH configuration file has no effect on the
               ciphers, MACs, or algorithms unless specifically defined in the /etc/sysconfig/sshd file. The employed algorithms
               can be viewed in the /etc/crypto-policies/back-ends/opensshserver.config file.'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:257991:
-        source_definition_id: oval:mil.disa.stig.defs:def:257991
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:25799100
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system SSH server must be configured to use only Message Authentication Codes (MACs) employing
-              FIPS 140-3 validated cryptographic hash algorithms.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -278,6 +278,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257991r1184311_rule
-    semantic_ir_sha256: 020d63c645d09b77a845cada4d94ef4bb96ff5fd44b8ee85a45fb11c450af57e
+    semantic_ir_sha256: 959e9e007f4c818b658b33c7784aeeac80066c35146ac3b116c00a1943f4ef08
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: e3343fc0d0b7b0074a6dc7d4ee026ad495caa9b0be509f9fa2e3e03fb80e6b65

@@ -1,0 +1,147 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271524
+  collect:
+    oval:mil.disa.stig.ind:obj:25782000:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: /etc/dnf/dnf.conf gpgcheck
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/dnf/dnf.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^gpgcheck=(.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25782000
+      source_type: textfilecontent54_object
+      version: '1'
+  derive: {}
+  description: OL 9 must check the GPG signature of software packages originating from external software repositories before
+    installation.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:257820:
+        class: compliance
+        criteria:
+          children:
+          - comment: /etc/dnf/dnf.conf gpgcheck=1
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25782000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must check the GPG signature of software packages originating from external software
+              repositories before installation.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:257820
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271524:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:257820
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-000497 - OL 9 must check the GPG signature of software packages originating from external software
+              repositories before installation.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Changes to any software components can have significant effects on the overall security of the operating\
+              \ system. This requirement ensures the software has not been tampered with and that it has been provided by\
+              \ a trusted vendor.\n\n\tAll software packages must be signed with a cryptographic key recognized and approved\
+              \ by the organization.\n\n\tVerifying the authenticity of software prior to installation validates the integrity\
+              \ of the software package received from a vendor. This verifies the software has not been tampered with and\
+              \ that it has been provided by a trusted vendor."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271524
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:25782000:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25782000
+        comment: /etc/dnf/dnf.conf gpgcheck=1
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25782000
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25782000
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.ab1e295024d73a2001248c5e
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:25782000:
+      comment: /etc/dnf/dnf.conf gpgcheck=1
+      entities:
+      - attributes:
+          datatype: string
+          operation: equals
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:25782000
+      source_type: textfilecontent54_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: ab1e295024d73a2001248c5e75bb14b474a58cf3376ab14a7fdd0c1dc4391215
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271524r1091284_rule
+    title: OL 9 must check the GPG signature of software packages originating from external software repositories before installation.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257820r1044878_rule
+    title: RHEL 9 must check the GPG signature of software packages originating from external software repositories before
+      installation.

@@ -7,6 +7,43 @@ assessment:
   description: OL 9 library files must have mode 0755 or less permissive.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.unix:obj:26048700:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:26048700
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '3'
+      comment: null
+      query:
+      - attributes:
+          recurse_direction: down
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - attributes:
+          var_check: only one
+          var_ref: oval:mil.disa.stig.defs:var:20000018
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: \.so\S*$
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:20000015
+      - attributes:
+          action: include
+        kind: element
+        name: filter
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        value: oval:mil.disa.stig.unix:ste:26048700
     oval:mil.disa.stig.unix:obj:26048704:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:26048704
@@ -44,43 +81,6 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.unix:ste:26048704
-    oval:mil.disa.stig.unix:obj:26048702:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:26048702
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '3'
-      comment: null
-      query:
-      - attributes:
-          recurse_direction: down
-        kind: element
-        name: behaviors
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      - attributes:
-          var_check: only one
-          var_ref: oval:mil.disa.stig.defs:var:20000018
-        kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: \.so\S*$
-      - attributes:
-          action: include
-        kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:mil.disa.stig.unix:ste:20000015
-      - attributes:
-          action: include
-        kind: element
-        name: filter
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:mil.disa.stig.unix:ste:26048702
     oval:mil.disa.stig.unix:obj:26048701:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:26048701
@@ -155,9 +155,9 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.unix:ste:26048703
-    oval:mil.disa.stig.unix:obj:26048700:
+    oval:mil.disa.stig.unix:obj:26048702:
       capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:26048700
+      source_object_id: oval:mil.disa.stig.unix:obj:26048702
       source_type: file_object
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       version: '3'
@@ -191,7 +191,7 @@ assessment:
         kind: element
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        value: oval:mil.disa.stig.unix:ste:26048700
+        value: oval:mil.disa.stig.unix:ste:26048702
   derive:
     oval:mil.disa.stig.defs:var:20000018:
       source_variable_id: oval:mil.disa.stig.defs:var:20000018
@@ -232,6 +232,19 @@ assessment:
         variable_id: oval:mil.disa.stig.defs:var:20000018
         variable_type: constant_variable
   predicates:
+    oval:mil.disa.stig.unix:ste:26048704:
+      source_state_id: oval:mil.disa.stig.unix:ste:26048704
+      source_type: file_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      operator: AND
+      entities:
+      - attributes:
+          datatype: boolean
+        kind: element
+        name: owrite
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: 'true'
+      comment: null
     oval:mil.disa.stig.unix:ste:26048700:
       source_state_id: oval:mil.disa.stig.unix:ste:26048700
       source_type: file_state
@@ -258,8 +271,8 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: 'true'
       comment: null
-    oval:mil.disa.stig.unix:ste:26048704:
-      source_state_id: oval:mil.disa.stig.unix:ste:26048704
+    oval:mil.disa.stig.unix:ste:26048703:
+      source_state_id: oval:mil.disa.stig.unix:ste:26048703
       source_type: file_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       operator: AND
@@ -267,20 +280,9 @@ assessment:
       - attributes:
           datatype: boolean
         kind: element
-        name: owrite
+        name: gwrite
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: 'true'
-      comment: null
-    oval:mil.disa.stig.unix:ste:20000015:
-      source_state_id: oval:mil.disa.stig.unix:ste:20000015
-      source_type: file_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: regular
       comment: null
     oval:mil.disa.stig.unix:ste:26048702:
       source_state_id: oval:mil.disa.stig.unix:ste:26048702
@@ -295,21 +297,55 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: 'true'
       comment: null
-    oval:mil.disa.stig.unix:ste:26048703:
-      source_state_id: oval:mil.disa.stig.unix:ste:26048703
+    oval:mil.disa.stig.unix:ste:20000015:
+      source_state_id: oval:mil.disa.stig.unix:ste:20000015
       source_type: file_state
       source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
       operator: AND
       entities:
-      - attributes:
-          datatype: boolean
-        kind: element
-        name: gwrite
+      - kind: element
+        name: type
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: 'true'
+        value: regular
       comment: null
   evaluate:
     tests:
+      oval:mil.disa.stig.unix:tst:26048700:
+        source_test_id: oval:mil.disa.stig.unix:tst:26048700
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: no operating system library regular files have the SUID special permission set
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:26048700
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.unix:tst:26048701:
+        source_test_id: oval:mil.disa.stig.unix:tst:26048701
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: no operating system library regular files have the SGID special permission set
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:26048701
+        predicates: []
+        source_other: []
+      oval:mil.disa.stig.unix:tst:26048702:
+        source_test_id: oval:mil.disa.stig.unix:tst:26048702
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: no operating system library regular files have the sticky bit set
+        check: all
+        check_existence: none_exist
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:26048702
+        predicates: []
+        source_other: []
       oval:mil.disa.stig.unix:tst:26048703:
         source_test_id: oval:mil.disa.stig.unix:tst:26048703
         source_type: file_test
@@ -332,42 +368,6 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.unix:obj:26048704
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.unix:tst:26048701:
-        source_test_id: oval:mil.disa.stig.unix:tst:26048701
-        source_type: file_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: no operating system library regular files have the SGID special permission set
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.unix:obj:26048701
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.unix:tst:26048700:
-        source_test_id: oval:mil.disa.stig.unix:tst:26048700
-        source_type: file_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: no operating system library regular files have the SUID special permission set
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.unix:obj:26048700
-        predicates: []
-        source_other: []
-      oval:mil.disa.stig.unix:tst:26048702:
-        source_test_id: oval:mil.disa.stig.unix:tst:26048702
-        source_type: file_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: no operating system library regular files have the sticky bit set
-        check: all
-        check_existence: none_exist
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.unix:obj:26048702
         predicates: []
         source_other: []
     definitions:
@@ -573,6 +573,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271791r1134971_rule
-    semantic_ir_sha256: 39f0a60c4e266b4b13c00800e27b32a6ed30a886fe5f2bb9104410f01f748de5
+    semantic_ir_sha256: 41f92142382139e8db6649d4531132d7122c26a9793682664db625ac8c00946a
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 5a7e26abfb724fd5092e4eba8e6d908cbd894aea5c19a1091907313cd730201f

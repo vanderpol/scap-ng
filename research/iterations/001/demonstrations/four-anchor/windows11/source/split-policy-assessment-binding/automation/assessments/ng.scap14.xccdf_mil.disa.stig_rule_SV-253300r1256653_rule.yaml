@@ -7,14 +7,6 @@ assessment:
   description: The password history must be configured to 24 passwords remembered.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.win:obj:20000002:
-      capability: scapng.collect.windows.passwordpolicy
-      source_object_id: oval:mil.disa.stig.win:obj:20000002
-      source_type: passwordpolicy_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '1'
-      comment: null
-      query: []
     oval:mil.disa.stig.win:obj:25330000:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25330000
@@ -44,22 +36,16 @@ assessment:
         name: name
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: DevicePasswordHistory
+    oval:mil.disa.stig.win:obj:20000002:
+      capability: scapng.collect.windows.passwordpolicy
+      source_object_id: oval:mil.disa.stig.win:obj:20000002
+      source_type: passwordpolicy_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '1'
+      comment: null
+      query: []
   derive: {}
   predicates:
-    oval:mil.disa.stig.win:ste:25330000:
-      source_state_id: oval:mil.disa.stig.win:ste:25330000
-      source_type: passwordpolicy_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: password_hist_len
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '24'
-      comment: Password History Length is greater than or equal to variable
     oval:mil.disa.stig.win:ste:25330001:
       source_state_id: oval:mil.disa.stig.win:ste:25330001
       source_type: registry_state
@@ -78,21 +64,22 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '24'
       comment: null
+    oval:mil.disa.stig.win:ste:25330000:
+      source_state_id: oval:mil.disa.stig.win:ste:25330000
+      source_type: passwordpolicy_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: password_hist_len
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '24'
+      comment: Password History Length is greater than or equal to variable
   evaluate:
     tests:
-      oval:mil.disa.stig.win:tst:25330001:
-        source_test_id: oval:mil.disa.stig.win:tst:25330001
-        source_type: registry_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: '''Enforce password history'' is set to ''24'' passwords or more through Intune'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.win:obj:25330000
-        predicates:
-        - oval:mil.disa.stig.win:ste:25330001
-        source_other: []
       oval:mil.disa.stig.win:tst:25330000:
         source_test_id: oval:mil.disa.stig.win:tst:25330000
         source_type: passwordpolicy_test
@@ -105,6 +92,19 @@ assessment:
         - oval:mil.disa.stig.win:obj:20000002
         predicates:
         - oval:mil.disa.stig.win:ste:25330000
+        source_other: []
+      oval:mil.disa.stig.win:tst:25330001:
+        source_test_id: oval:mil.disa.stig.win:tst:25330001
+        source_type: registry_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: '''Enforce password history'' is set to ''24'' passwords or more through Intune'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.win:obj:25330000
+        predicates:
+        - oval:mil.disa.stig.win:ste:25330001
         source_other: []
     definitions:
       oval:mil.disa.stig.windows11:def:253300:
@@ -308,6 +308,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253300r1256653_rule
-    semantic_ir_sha256: f626d4c3f66a395fc4ae1d15e8619a4abebb284cb05cc7333cd78ab3d8526ba4
+    semantic_ir_sha256: 9a4bb8339e414405daab4c751d06c7d83a5635b5abb5a10370e7359fb4e4d53f
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: d5fc6253cf8bad14fc5e55c7e30c18a4e6765e2a56fffdc90d39d9051b86a87a

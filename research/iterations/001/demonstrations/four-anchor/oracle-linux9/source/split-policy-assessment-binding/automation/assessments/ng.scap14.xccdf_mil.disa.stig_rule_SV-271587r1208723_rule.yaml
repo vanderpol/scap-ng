@@ -8,18 +8,6 @@ assessment:
     ISSM) to select which auditable events are to be audited.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.unix:obj:23047102:
-      capability: scapng.collect.unix.file
-      source_object_id: oval:mil.disa.stig.unix:obj:23047102
-      source_type: file_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-      version: '1'
-      comment: null
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        value: /etc/audit/audit.rules
     oval:mil.disa.stig.unix:obj:23047100:
       capability: scapng.collect.unix.file
       source_object_id: oval:mil.disa.stig.unix:obj:23047100
@@ -50,6 +38,18 @@ assessment:
         name: filename
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: .rules$
+    oval:mil.disa.stig.unix:obj:23047102:
+      capability: scapng.collect.unix.file
+      source_object_id: oval:mil.disa.stig.unix:obj:23047102
+      source_type: file_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+      version: '1'
+      comment: null
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        value: /etc/audit/audit.rules
   derive: {}
   predicates:
     oval:mil.disa.stig.unix:ste:20000004:
@@ -121,6 +121,19 @@ assessment:
       comment: Mode 0600 or less permissive
   evaluate:
     tests:
+      oval:mil.disa.stig.unix:tst:23047101:
+        source_test_id: oval:mil.disa.stig.unix:tst:23047101
+        source_type: file_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
+        comment: .rules files in /etc/audit/rules.d have mode 0600 or less permissive
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.unix:obj:23047101
+        predicates:
+        - oval:mil.disa.stig.unix:ste:20000004
+        source_other: []
       oval:mil.disa.stig.unix:tst:23047102:
         source_test_id: oval:mil.disa.stig.unix:tst:23047102
         source_type: file_test
@@ -144,19 +157,6 @@ assessment:
         state_operator: AND
         collections:
         - oval:mil.disa.stig.unix:obj:23047100
-        predicates:
-        - oval:mil.disa.stig.unix:ste:20000004
-        source_other: []
-      oval:mil.disa.stig.unix:tst:23047101:
-        source_test_id: oval:mil.disa.stig.unix:tst:23047101
-        source_type: file_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
-        comment: .rules files in /etc/audit/rules.d have mode 0600 or less permissive
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.unix:obj:23047101
         predicates:
         - oval:mil.disa.stig.unix:ste:20000004
         source_other: []
@@ -352,6 +352,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-271587r1208723_rule
-    semantic_ir_sha256: 671c3c089f4fb48d92634f14534d01807e290c1ecd9c5b11e37ec17ea81b7217
+    semantic_ir_sha256: e4c0400e7212e3ea3eeca9281ceb462ece859a4b05d7e4348626fb73b3f53af1
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 8bb71a4719b2d4ea3cb8f13f29b636d31ee75b585e6f3a74eb9a01d131abb4c7

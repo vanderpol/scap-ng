@@ -342,34 +342,6 @@ rule:
     description: Windows Server 2025 OpenSSH public host key files must conform to minimum requirements.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.win:obj:28532200:
-        capability: scapng.collect.windows.fileeffectiverights53
-        source_object_id: oval:mil.disa.stig.win:obj:28532200
-        source_type: fileeffectiverights53_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - attributes:
-            datatype: string
-            operation: case insensitive equals
-          kind: element
-          name: path
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: C:\ProgramData\ssh\
-        - attributes:
-            datatype: string
-            operation: pattern match
-          kind: element
-          name: filename
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)\S+key\.pub$
-        - attributes:
-            datatype: string
-          kind: element
-          name: trustee_sid
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: S-1-5-18
       oval:mil.disa.stig.win:obj:28532202:
         capability: scapng.collect.windows.fileeffectiverights53
         source_object_id: oval:mil.disa.stig.win:obj:28532202
@@ -435,8 +407,49 @@ rule:
           name: trustee_sid
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: S-1-5-32-544
+      oval:mil.disa.stig.win:obj:28532200:
+        capability: scapng.collect.windows.fileeffectiverights53
+        source_object_id: oval:mil.disa.stig.win:obj:28532200
+        source_type: fileeffectiverights53_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - attributes:
+            datatype: string
+            operation: case insensitive equals
+          kind: element
+          name: path
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: C:\ProgramData\ssh\
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: filename
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)\S+key\.pub$
+        - attributes:
+            datatype: string
+          kind: element
+          name: trustee_sid
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: S-1-5-18
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:20000012:
+        source_state_id: oval:mil.disa.stig.win:ste:20000012
+        source_type: fileeffectiverights53_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: string
+          kind: element
+          name: trustee_sid
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: S-1-5-18
+        comment: SYSTEM account.
       oval:mil.disa.stig.win:ste:20000013:
         source_state_id: oval:mil.disa.stig.win:ste:20000013
         source_type: fileeffectiverights53_state
@@ -559,19 +572,6 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: 'true'
         comment: Full Rights
-      oval:mil.disa.stig.win:ste:20000012:
-        source_state_id: oval:mil.disa.stig.win:ste:20000012
-        source_type: fileeffectiverights53_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: string
-          kind: element
-          name: trustee_sid
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: S-1-5-18
-        comment: SYSTEM account.
     evaluate:
       tests:
         oval:mil.disa.stig.win:tst:28532201:
@@ -587,18 +587,6 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000049
           source_other: []
-        oval:mil.disa.stig.win:tst:28532202:
-          source_test_id: oval:mil.disa.stig.win:tst:28532202
-          source_type: fileeffectiverights53_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: 'C:\ProgramData\ssh\*key.pub: Other accounts'
-          check: all
-          check_existence: none_exist
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:28532202
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.win:tst:28532200:
           source_test_id: oval:mil.disa.stig.win:tst:28532200
           source_type: fileeffectiverights53_test
@@ -612,38 +600,19 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000049
           source_other: []
+        oval:mil.disa.stig.win:tst:28532202:
+          source_test_id: oval:mil.disa.stig.win:tst:28532202
+          source_type: fileeffectiverights53_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: 'C:\ProgramData\ssh\*key.pub: Other accounts'
+          check: all
+          check_existence: none_exist
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:28532202
+          predicates: []
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:285322:
-          source_definition_id: oval:mil.disa.stig.defs:def:285322
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: 'C:\ProgramData\ssh\*key.pub: NT Authority\SYSTEM (F)'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:28532200
-            - comment: 'C:\ProgramData\ssh\*key.pub: BUILTIN\Administrators (F)'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:28532201
-            - comment: 'C:\ProgramData\ssh\*key.pub: Other accounts'
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.win:tst:28532202
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system OpenSSH public host key files must conform to minimum requirements.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.windows2025:def:285322:
           source_definition_id: oval:mil.disa.stig.windows2025:def:285322
           class: compliance
@@ -674,6 +643,37 @@ rule:
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
               text: If a public host key file is modified by an unauthorized user, the SSH service may be compromised.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:285322:
+          source_definition_id: oval:mil.disa.stig.defs:def:285322
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: 'C:\ProgramData\ssh\*key.pub: NT Authority\SYSTEM (F)'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:28532200
+            - comment: 'C:\ProgramData\ssh\*key.pub: BUILTIN\Administrators (F)'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:28532201
+            - comment: 'C:\ProgramData\ssh\*key.pub: Other accounts'
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:28532202
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system OpenSSH public host key files must conform to minimum requirements.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -805,7 +805,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-285322r1211194_rule
-      semantic_ir_sha256: fa6c0d4c4d42eaa9aace00022761abada5682cbd24c2ac964644260d5b96e00b
+      semantic_ir_sha256: 466fec2656849231eb7ce5725d98180044be72485f7a7d09048e1e25a11d4a66
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 7df049fc25657231176bcec85e1e571c37295c9cb725602b0034df009f6584ce
   assessments:

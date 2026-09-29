@@ -1,0 +1,146 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271611
+  collect:
+    oval:mil.disa.stig.ind:obj:25171300:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: system-auth password required, requisite
+      query:
+      - attributes:
+          ignore_case: 'true'
+        kind: element
+        name: behaviors
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      - attributes:
+          datatype: string
+        kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/pam.d/system-auth
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*password\s+(?:required|requisite)\s+(.*)$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25171300
+      source_type: textfilecontent54_object
+      version: '2'
+  derive: {}
+  description: OL 9 must ensure the password complexity module is enabled in the system-auth file.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:251713:
+        class: compliance
+        criteria:
+          children:
+          - comment: system-auth pam_pwquality
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25171300
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must ensure the password complexity module is enabled in the system-auth file.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:251713
+        version: '1'
+      oval:mil.disa.stig.ol9os:def:271611:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:251713
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-001000 - OL 9 must ensure the password complexity module is enabled in the system-auth file.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Enabling PAM password complexity permits enforcement of strong passwords and consequently makes the system
+              less prone to dictionary attacks.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271611
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:25171300:
+        check: at least one
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25171300
+        comment: system-auth pam_pwquality
+        predicates:
+        - oval:mil.disa.stig.ind:ste:25171300
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25171300
+        source_type: textfilecontent54_test
+        state_operator: AND
+  id: ng.shared.e5f85b79d34444f23d2c40ce
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.ind:ste:25171300:
+      comment: null
+      entities:
+      - attributes:
+          datatype: string
+          operation: pattern match
+        kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^pam_pwquality.so(\s|$)
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_state_id: oval:mil.disa.stig.ind:ste:25171300
+      source_type: textfilecontent54_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: e5f85b79d34444f23d2c40ce599547740cc4bc82d5d6f60d33a706d0c42f0c16
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271611r1091545_rule
+    title: OL 9 must ensure the password complexity module is enabled in the system-auth file.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258098r1045195_rule
+    title: RHEL 9 must ensure the password complexity module is enabled in the system-auth file.

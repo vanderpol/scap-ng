@@ -1,0 +1,140 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.windows2025:def:278251
+  collect:
+    oval:mil.disa.stig.win:obj:25349700:
+      capability: scapng.collect.windows.userright
+      comment: null
+      query:
+      - kind: element
+        name: userright
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SE_REMOTE_SHUTDOWN_NAME
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_object_id: oval:mil.disa.stig.win:obj:25349700
+      source_type: userright_object
+      version: '1'
+  derive: {}
+  description: The Windows Server 2025 "Force shutdown from a remote system" user right must only be assigned to the Administrators
+    group.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:253497:
+        class: compliance
+        criteria:
+          children:
+          - comment: Force shutdown from a remote system - Administrators
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25349701
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The "Force shutdown from a remote system" user right must only be assigned to the Administrators group.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:253497
+        version: '4'
+      oval:mil.disa.stig.windows2025:def:278251:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:253497
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: WN25-UR-000110 - The Windows Server 2025 "Force shutdown from a remote system" user right must only be assigned
+              to the Administrators group.
+          - attributes:
+              family: windows
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Microsoft Windows Server 2025
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "Inappropriately granting user rights provides system, administrative, and other high-level capabilities.\n\
+              \n  Accounts with the \"Force shutdown from a remote system\" user right can remotely shut down a system, which\
+              \ could result in a denial of service."
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.windows2025:def:278251
+        version: '1'
+    tests:
+      oval:mil.disa.stig.win:tst:25349701:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.win:obj:25349700
+        comment: Force shutdown from a remote system - Administrators
+        predicates:
+        - oval:mil.disa.stig.win:ste:20000029
+        - oval:mil.disa.stig.win:ste:20000030
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        source_other: []
+        source_test_id: oval:mil.disa.stig.win:tst:25349701
+        source_type: userright_test
+        state_operator: OR
+  id: ng.shared.8c06a7b16e7d6665cef58d04
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.win:ste:20000029:
+      comment: null
+      entities:
+      - kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000029
+      source_type: userright_state
+    oval:mil.disa.stig.win:ste:20000030:
+      comment: null
+      entities:
+      - attributes:
+          operation: case insensitive equals
+        kind: element
+        name: trustee_name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Administrators
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      source_state_id: oval:mil.disa.stig.win:ste:20000030
+      source_type: userright_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: 8c06a7b16e7d6665cef58d04904427ec322130c88b74500fd565bd6a78b85ad6
+  reuse_provenance:
+  - benchmark: windows-server-2025
+    rule_id: xccdf_mil.disa.stig_rule_SV-278251r1182219_rule
+    title: The Windows Server 2025 "Force shutdown from a remote system" user right must only be assigned to the Administrators
+      group.
+  - benchmark: windows11
+    rule_id: xccdf_mil.disa.stig_rule_SV-253497r958726_rule
+    title: The "Force shutdown from a remote system" user right must only be assigned to the Administrators group.

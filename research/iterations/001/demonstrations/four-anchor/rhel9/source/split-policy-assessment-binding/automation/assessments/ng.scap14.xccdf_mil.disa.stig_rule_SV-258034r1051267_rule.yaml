@@ -7,37 +7,6 @@ assessment:
   description: RHEL 9 must be configured to disable USB mass storage.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:23050300:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:23050300
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '2'
-      comment: null
-      query:
-      - kind: element
-        name: path
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/modprobe.d
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: filename
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: .*
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^[ \t]*install[ \t]+usb-storage[ \t]+/bin/false[ \t]*$
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
     oval:mil.disa.stig.ind:obj:23050301:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23050301
@@ -69,22 +38,41 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
+    oval:mil.disa.stig.ind:obj:23050300:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:23050300
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '2'
+      comment: null
+      query:
+      - kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/modprobe.d
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: .*
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^[ \t]*install[ \t]+usb-storage[ \t]+/bin/false[ \t]*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
   derive: {}
   predicates: {}
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23050300:
-        source_test_id: oval:mil.disa.stig.ind:tst:23050300
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: /etc/modprobe.d contains a file that contains 'install usb-storage /bin/false'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23050300
-        predicates: []
-        source_other: []
       oval:mil.disa.stig.ind:tst:23050301:
         source_test_id: oval:mil.disa.stig.ind:tst:23050301
         source_type: textfilecontent54_test
@@ -97,34 +85,19 @@ assessment:
         - oval:mil.disa.stig.ind:obj:23050301
         predicates: []
         source_other: []
+      oval:mil.disa.stig.ind:tst:23050300:
+        source_test_id: oval:mil.disa.stig.ind:tst:23050300
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: /etc/modprobe.d contains a file that contains 'install usb-storage /bin/false'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23050300
+        predicates: []
+        source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:230503:
-        source_definition_id: oval:mil.disa.stig.defs:def:230503
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: /etc/modprobe.d contains a file that contains 'install usb-storage /bin/false'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23050300
-          - comment: /etc/modprobe.d contains a file that contains 'blacklist usb-storage'
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23050301
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must be configured to disable USB mass storage.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:258034:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:258034
         class: compliance
@@ -158,6 +131,33 @@ assessment:
 
 
               Satisfies: SRG-OS-000114-GPOS-00059, SRG-OS-000378-GPOS-00163, SRG-OS-000480-GPOS-00227'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:230503:
+        source_definition_id: oval:mil.disa.stig.defs:def:230503
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: /etc/modprobe.d contains a file that contains 'install usb-storage /bin/false'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23050300
+          - comment: /etc/modprobe.d contains a file that contains 'blacklist usb-storage'
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23050301
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must be configured to disable USB mass storage.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -280,6 +280,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258034r1051267_rule
-    semantic_ir_sha256: 578e6278571d45910b114d7799f6fc58166d4d4d89af3cb0f5cdbb79665e47af
+    semantic_ir_sha256: 005c0e0f6ef44e72990940ae298512c37330c6d7e531404f5f623b920e0fc7fa
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: b04e4ec9126b2412e9d2a250000e2c4871218d38061716f54ea385357817d62b

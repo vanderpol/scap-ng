@@ -7,6 +7,31 @@ assessment:
   description: RHEL 9 must clear memory when it is freed to prevent use-after-free attacks.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.ind:obj:25779301:
+      capability: scapng.collect.independent.textfilecontent54
+      source_object_id: oval:mil.disa.stig.ind:obj:25779301
+      source_type: textfilecontent54_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: /etc/default/grub GRUB_CMDLINE_LINUX
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/default/grub
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^GRUB_CMDLINE_LINUX="(.*)"
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
     oval:mil.disa.stig.ind:obj:25779300:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:25779300
@@ -38,31 +63,6 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.ind:obj:25779301:
-      capability: scapng.collect.independent.textfilecontent54
-      source_object_id: oval:mil.disa.stig.ind:obj:25779301
-      source_type: textfilecontent54_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: /etc/default/grub GRUB_CMDLINE_LINUX
-      query:
-      - kind: element
-        name: filepath
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: /etc/default/grub
-      - attributes:
-          operation: pattern match
-        kind: element
-        name: pattern
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: ^GRUB_CMDLINE_LINUX="(.*)"
-      - attributes:
-          datatype: int
-          operation: greater than or equal
-        kind: element
-        name: instance
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: '1'
   derive: {}
   predicates:
     oval:mil.disa.stig.ind:ste:23027900:
@@ -80,19 +80,6 @@ assessment:
       comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23027901:
-        source_test_id: oval:mil.disa.stig.ind:tst:23027901
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain init_on_free=1
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:25779301
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23027900
-        source_other: []
       oval:mil.disa.stig.ind:tst:23027900:
         source_test_id: oval:mil.disa.stig.ind:tst:23027900
         source_type: textfilecontent54_test
@@ -106,7 +93,47 @@ assessment:
         predicates:
         - oval:mil.disa.stig.ind:ste:23027900
         source_other: []
+      oval:mil.disa.stig.ind:tst:23027901:
+        source_test_id: oval:mil.disa.stig.ind:tst:23027901
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain init_on_free=1
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:25779301
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23027900
+        source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:230279:
+        source_definition_id: oval:mil.disa.stig.defs:def:230279
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23027900
+          - comment: null
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:23027901
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system must clear memory when it is freed to prevent use-after-free attacks.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.rhel9os:def:257794:
         source_definition_id: oval:mil.disa.stig.rhel9os:def:257794
         class: compliance
@@ -163,33 +190,6 @@ assessment:
 
 
               Satisfies: SRG-OS-000433-GPOS-00192, SRG-OS-000134-GPOS-00068'
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:230279:
-        source_definition_id: oval:mil.disa.stig.defs:def:230279
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23027900
-          - comment: null
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.ind:tst:23027901
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The operating system must clear memory when it is freed to prevent use-after-free attacks.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -318,6 +318,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-257794r1069362_rule
-    semantic_ir_sha256: a51d72786576cfc64acf5249394166de251ed41c09b68cf077825996b2715b5e
+    semantic_ir_sha256: a8f30f316752838d845500bc3a552db964f0f90f478b8e6f4054b8d98da0479e
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ab50e8068bfc89c02a2140b35676e0b77042a7d12de25a308cb1554260491954

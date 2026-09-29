@@ -446,6 +446,18 @@ rule:
       systems.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.win:obj:25349100:
+        capability: scapng.collect.windows.userright
+        source_object_id: oval:mil.disa.stig.win:obj:25349100
+        source_type: userright_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        version: '1'
+        comment: null
+        query:
+        - kind: element
+          name: userright
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: SE_DENY_NETWORK_LOGON_NAME
       oval:mil.disa.stig.win:obj:10000100:
         capability: scapng.collect.windows.wmi57
         source_object_id: oval:mil.disa.stig.win:obj:10000100
@@ -462,79 +474,8 @@ rule:
           name: wql
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: SELECT DomainRole FROM win32_computersystem
-      oval:mil.disa.stig.win:obj:25349100:
-        capability: scapng.collect.windows.userright
-        source_object_id: oval:mil.disa.stig.win:obj:25349100
-        source_type: userright_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        version: '1'
-        comment: null
-        query:
-        - kind: element
-          name: userright
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: SE_DENY_NETWORK_LOGON_NAME
     derive: {}
     predicates:
-      oval:mil.disa.stig.win:ste:10000100:
-        source_state_id: oval:mil.disa.stig.win:ste:10000100
-        source_type: wmi57_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            datatype: record
-            operation: equals
-          children:
-          - attributes:
-              name: domainrole
-            kind: element
-            name: field
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            value: '0'
-          kind: element
-          name: result
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        comment: Standalone Workstation
-      oval:mil.disa.stig.win:ste:20000040:
-        source_state_id: oval:mil.disa.stig.win:ste:20000040
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(.+\\)?Domain Admins$
-        comment: null
-      oval:mil.disa.stig.win:ste:20000034:
-        source_state_id: oval:mil.disa.stig.win:ste:20000034
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: ^(?i)(NT Authority\\)?Local account$
-        comment: null
-      oval:mil.disa.stig.win:ste:20000033:
-        source_state_id: oval:mil.disa.stig.win:ste:20000033
-        source_type: userright_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - attributes:
-            operation: case insensitive equals
-          kind: element
-          name: trustee_name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: Guests
-        comment: null
       oval:mil.disa.stig.win:ste:20000041:
         source_state_id: oval:mil.disa.stig.win:ste:20000041
         source_type: userright_state
@@ -568,34 +509,67 @@ rule:
           name: result
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         comment: Domain Member Workstation
+      oval:mil.disa.stig.win:ste:20000040:
+        source_state_id: oval:mil.disa.stig.win:ste:20000040
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(.+\\)?Domain Admins$
+        comment: null
+      oval:mil.disa.stig.win:ste:10000100:
+        source_state_id: oval:mil.disa.stig.win:ste:10000100
+        source_type: wmi57_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            datatype: record
+            operation: equals
+          children:
+          - attributes:
+              name: domainrole
+            kind: element
+            name: field
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            value: '0'
+          kind: element
+          name: result
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        comment: Standalone Workstation
+      oval:mil.disa.stig.win:ste:20000033:
+        source_state_id: oval:mil.disa.stig.win:ste:20000033
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: case insensitive equals
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: Guests
+        comment: null
+      oval:mil.disa.stig.win:ste:20000034:
+        source_state_id: oval:mil.disa.stig.win:ste:20000034
+        source_type: userright_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: trustee_name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: ^(?i)(NT Authority\\)?Local account$
+        comment: null
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25349107:
-          source_test_id: oval:mil.disa.stig.win:tst:25349107
-          source_type: userright_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Deny access to this computer from the network - Enterprise Admins
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25349100
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000041
-          source_other: []
-        oval:mil.disa.stig.win:tst:25349106:
-          source_test_id: oval:mil.disa.stig.win:tst:25349106
-          source_type: userright_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Deny access to this computer from the network - Domain Admins
-          check: at least one
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25349100
-          predicates:
-          - oval:mil.disa.stig.win:ste:20000040
-          source_other: []
         oval:mil.disa.stig.win:tst:25349104:
           source_test_id: oval:mil.disa.stig.win:tst:25349104
           source_type: userright_test
@@ -608,19 +582,6 @@ rule:
           - oval:mil.disa.stig.win:obj:25349100
           predicates:
           - oval:mil.disa.stig.win:ste:20000034
-          source_other: []
-        oval:mil.disa.stig.win:tst:10000200:
-          source_test_id: oval:mil.disa.stig.win:tst:10000200
-          source_type: wmi57_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: The system is a Windows Domain Member Workstation
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:10000100
-          predicates:
-          - oval:mil.disa.stig.win:ste:10000200
           source_other: []
         oval:mil.disa.stig.win:tst:10000100:
           source_test_id: oval:mil.disa.stig.win:tst:10000100
@@ -648,7 +609,77 @@ rule:
           predicates:
           - oval:mil.disa.stig.win:ste:20000033
           source_other: []
+        oval:mil.disa.stig.win:tst:25349106:
+          source_test_id: oval:mil.disa.stig.win:tst:25349106
+          source_type: userright_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Deny access to this computer from the network - Domain Admins
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25349100
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000040
+          source_other: []
+        oval:mil.disa.stig.win:tst:10000200:
+          source_test_id: oval:mil.disa.stig.win:tst:10000200
+          source_type: wmi57_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: The system is a Windows Domain Member Workstation
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:10000100
+          predicates:
+          - oval:mil.disa.stig.win:ste:10000200
+          source_other: []
+        oval:mil.disa.stig.win:tst:25349107:
+          source_test_id: oval:mil.disa.stig.win:tst:25349107
+          source_type: userright_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Deny access to this computer from the network - Enterprise Admins
+          check: at least one
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25349100
+          predicates:
+          - oval:mil.disa.stig.win:ste:20000041
+          source_other: []
       definitions:
+        oval:mil.disa.stig.win:def:100002:
+          source_definition_id: oval:mil.disa.stig.win:def:100002
+          class: inventory
+          version: '2'
+          criteria:
+            children:
+            - comment: null
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.win:tst:10000200
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The system is a Windows Domain Member Workstation
+            - attributes:
+                family: windows
+              children:
+              - name: platform
+                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                text: Microsoft Windows Workstation
+              name: affected
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.win:def:100001:
           source_definition_id: oval:mil.disa.stig.win:def:100001
           class: inventory
@@ -680,16 +711,16 @@ rule:
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.win:def:100002:
-          source_definition_id: oval:mil.disa.stig.win:def:100002
-          class: inventory
+        oval:mil.disa.stig.windows11:def:253491:
+          source_definition_id: oval:mil.disa.stig.windows11:def:253491
+          class: compliance
           version: '2'
           criteria:
             children:
             - comment: null
-              kind: test_ref
+              definition_ref: oval:mil.disa.stig.defs:def:253491
+              kind: definition_ref
               negate: false
-              test_ref: oval:mil.disa.stig.win:tst:10000200
             comment: null
             kind: boolean
             negate: false
@@ -698,17 +729,36 @@ rule:
             children:
             - name: title
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The system is a Windows Domain Member Workstation
+              text: WN11-UR-000070 - The "Deny access to this computer from the network" user right on workstations must be
+                configured to prevent access from highly privileged domain accounts and local accounts on domain systems and
+                unauthenticated access on all systems.
             - attributes:
                 family: windows
               children:
               - name: platform
                 namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Microsoft Windows Workstation
+                text: Microsoft Windows 11
               name: affected
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: 'Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
+
+
+                The "Deny access to this computer from the network" right defines the accounts that are prevented from logging
+                on from the network.
+
+
+                In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust
+                systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to
+                the compromise of an entire domain.
+
+
+                Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement
+                resulting from credential theft attacks.
+
+
+                The Guests group must be assigned this right to prevent unauthenticated access.'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.defs:def:253491:
@@ -768,56 +818,6 @@ rule:
                 on all systems.
             - name: description
               namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        oval:mil.disa.stig.windows11:def:253491:
-          source_definition_id: oval:mil.disa.stig.windows11:def:253491
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: null
-              definition_ref: oval:mil.disa.stig.defs:def:253491
-              kind: definition_ref
-              negate: false
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: WN11-UR-000070 - The "Deny access to this computer from the network" user right on workstations must be
-                configured to prevent access from highly privileged domain accounts and local accounts on domain systems and
-                unauthenticated access on all systems.
-            - attributes:
-                family: windows
-              children:
-              - name: platform
-                namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                text: Microsoft Windows 11
-              name: affected
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: 'Inappropriate granting of user rights can provide system, administrative, and other high-level capabilities.
-
-
-                The "Deny access to this computer from the network" right defines the accounts that are prevented from logging
-                on from the network.
-
-
-                In an Active Directory Domain, denying logons to the Enterprise Admins and Domain Admins groups on lower trust
-                systems helps mitigate the risk of privilege escalation from credential theft attacks, which could lead to
-                the compromise of an entire domain.
-
-
-                Local accounts on domain-joined systems must also be assigned this right to decrease the risk of lateral movement
-                resulting from credential theft attacks.
-
-
-                The Guests group must be assigned this right to prevent unauthenticated access.'
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -976,7 +976,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-253491r1137691_rule
-      semantic_ir_sha256: eae538a063471a19efe475a1af8a9e3f810b1006458353fbdbc3ae1ea1f66222
+      semantic_ir_sha256: 0b669151add0fc27ed2b6912ef47fe3ceeebb8c645ee533e196fa0e65841b0a1
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 395fb561e0f90115b3e4765a97f45d7a2f49aafd5c4cf65454bde850b95212c9
   assessments:

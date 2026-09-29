@@ -7,18 +7,6 @@ assessment:
   description: RHEL 9 duplicate User IDs (UIDs) must not exist for interactive users.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
-    oval:mil.disa.stig.ind:obj:25804501:
-      capability: scapng.collect.independent.variable
-      source_object_id: oval:mil.disa.stig.ind:obj:25804501
-      source_type: variable_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      version: '1'
-      comment: count of passwd entries
-      query:
-      - kind: element
-        name: var_ref
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: oval:mil.disa.stig.defs:var:25804500
     oval:mil.disa.stig.unix:obj:25804500:
       capability: scapng.collect.unix.password
       source_object_id: oval:mil.disa.stig.unix:obj:25804500
@@ -39,7 +27,78 @@ assessment:
         name: filter
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         value: oval:mil.disa.stig.unix:ste:25804500
+    oval:mil.disa.stig.ind:obj:25804501:
+      capability: scapng.collect.independent.variable
+      source_object_id: oval:mil.disa.stig.ind:obj:25804501
+      source_type: variable_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      version: '1'
+      comment: count of passwd entries
+      query:
+      - kind: element
+        name: var_ref
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: oval:mil.disa.stig.defs:var:25804500
   derive:
+    oval:mil.disa.stig.defs:var:25804500:
+      source_variable_id: oval:mil.disa.stig.defs:var:25804500
+      source_type: local_variable
+      datatype: int
+      comment: count of passwd entries
+      semantic_ast:
+        datatype: int
+        expression:
+          args:
+          - item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            op: object_component
+            record_field: null
+          attributes: {}
+          op: count
+        id: oval:mil.disa.stig.defs:var:25804500
+        type: local_variable
+      resolution:
+        blocked_by:
+          item_field: user_id
+          object_ref: oval:mil.disa.stig.unix:obj:25804500
+          operation: object_component
+          reason: object_component_requires_collection:password_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: int
+        operation: count
+        reason: count_child_not_static:object_component_requires_collection:password_object
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      evaluation_plan:
+        blocked_by:
+          item_field: user_id
+          object_ref: oval:mil.disa.stig.unix:obj:25804500
+          operation: object_component
+          reason: object_component_requires_collection:password_object
+          record_field: null
+          status: dynamic_object_dependency
+        datatype: int
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.unix:obj:25804500
+          operations:
+          - count
+          - object_component
+          variables: []
+        expression:
+          args:
+          - item_field: user_id
+            object_ref: oval:mil.disa.stig.unix:obj:25804500
+            op: object_component
+            record_field: null
+          attributes: {}
+          op: count
+        mode: target_dependent
+        reason: count_child_not_static:object_component_requires_collection:password_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:25804500
+        variable_type: local_variable
     oval:mil.disa.stig.defs:var:25804501:
       source_variable_id: oval:mil.disa.stig.defs:var:25804501
       source_type: local_variable
@@ -114,66 +173,20 @@ assessment:
         resolution_status: dynamic_object_dependency
         variable_id: oval:mil.disa.stig.defs:var:25804501
         variable_type: local_variable
-    oval:mil.disa.stig.defs:var:25804500:
-      source_variable_id: oval:mil.disa.stig.defs:var:25804500
-      source_type: local_variable
-      datatype: int
-      comment: count of passwd entries
-      semantic_ast:
-        datatype: int
-        expression:
-          args:
-          - item_field: user_id
-            object_ref: oval:mil.disa.stig.unix:obj:25804500
-            op: object_component
-            record_field: null
-          attributes: {}
-          op: count
-        id: oval:mil.disa.stig.defs:var:25804500
-        type: local_variable
-      resolution:
-        blocked_by:
-          item_field: user_id
-          object_ref: oval:mil.disa.stig.unix:obj:25804500
-          operation: object_component
-          reason: object_component_requires_collection:password_object
-          record_field: null
-          status: dynamic_object_dependency
-        datatype: int
-        operation: count
-        reason: count_child_not_static:object_component_requires_collection:password_object
-        status: dynamic_object_dependency
-        variable_type: local_variable
-      evaluation_plan:
-        blocked_by:
-          item_field: user_id
-          object_ref: oval:mil.disa.stig.unix:obj:25804500
-          operation: object_component
-          reason: object_component_requires_collection:password_object
-          record_field: null
-          status: dynamic_object_dependency
-        datatype: int
-        dependencies:
-          objects:
-          - oval:mil.disa.stig.unix:obj:25804500
-          operations:
-          - count
-          - object_component
-          variables: []
-        expression:
-          args:
-          - item_field: user_id
-            object_ref: oval:mil.disa.stig.unix:obj:25804500
-            op: object_component
-            record_field: null
-          attributes: {}
-          op: count
-        mode: target_dependent
-        reason: count_child_not_static:object_component_requires_collection:password_object
-        resolution_status: dynamic_object_dependency
-        variable_id: oval:mil.disa.stig.defs:var:25804500
-        variable_type: local_variable
   predicates:
+    oval:mil.disa.stig.ind:ste:25804500:
+      source_state_id: oval:mil.disa.stig.ind:ste:25804500
+      source_type: variable_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - attributes:
+          datatype: int
+          var_ref: oval:mil.disa.stig.defs:var:25804501
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      comment: count of passwd UIDs
     oval:mil.disa.stig.unix:ste:25804500:
       source_state_id: oval:mil.disa.stig.unix:ste:25804500
       source_type: password_state
@@ -188,19 +201,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#unix
         value: '1000'
       comment: Interactive Users
-    oval:mil.disa.stig.ind:ste:25804500:
-      source_state_id: oval:mil.disa.stig.ind:ste:25804500
-      source_type: variable_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - attributes:
-          datatype: int
-          var_ref: oval:mil.disa.stig.defs:var:25804501
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      comment: count of passwd UIDs
   evaluate:
     tests:
       oval:mil.disa.stig.ind:tst:25804500:
@@ -394,6 +394,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258045r958482_rule
-    semantic_ir_sha256: 250161c4d8b2de606c019a79c2142b4e4da41aa967155a4c32f19e7bc5818d34
+    semantic_ir_sha256: aca482ae2b89b0e0cc28a0c414b84da1ebee9f8ef6ff2b41137e9fc25ecfbc28
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: ab81708ab2fd5094cd406063d6afe858d27e8bccf44147df2bd9979256f61187

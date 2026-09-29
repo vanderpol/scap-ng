@@ -7,6 +7,26 @@ assessment:
   description: The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.win:obj:25346611:
+      capability: scapng.collect.windows.registry
+      source_object_id: oval:mil.disa.stig.win:obj:25346611
+      source_type: registry_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      version: '2'
+      comment: GPO registry entry for FIPS-compliant algorithms
+      query:
+      - kind: element
+        name: hive
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: HKEY_LOCAL_MACHINE
+      - kind: element
+        name: key
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: SYSTEM\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy
+      - kind: element
+        name: name
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: Enabled
     oval:mil.disa.stig.win:obj:25346612:
       capability: scapng.collect.windows.registry
       source_object_id: oval:mil.disa.stig.win:obj:25346612
@@ -48,26 +68,6 @@ assessment:
         kind: set
         operator: UNION
         operator_explicit: false
-    oval:mil.disa.stig.win:obj:25346611:
-      capability: scapng.collect.windows.registry
-      source_object_id: oval:mil.disa.stig.win:obj:25346611
-      source_type: registry_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      version: '2'
-      comment: GPO registry entry for FIPS-compliant algorithms
-      query:
-      - kind: element
-        name: hive
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: HKEY_LOCAL_MACHINE
-      - kind: element
-        name: key
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: SYSTEM\CurrentControlSet\Control\Lsa\FIPSAlgorithmPolicy
-      - kind: element
-        name: name
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: Enabled
   derive: {}
   predicates:
     oval:mil.disa.stig.win:ste:20000001:
@@ -103,29 +103,6 @@ assessment:
         - oval:mil.disa.stig.win:ste:20000001
         source_other: []
     definitions:
-      oval:mil.disa.stig.defs:def:25346600:
-        source_definition_id: oval:mil.disa.stig.defs:def:25346600
-        class: compliance
-        version: '1'
-        criteria:
-          children:
-          - comment: FIPS-compliant algorithms are enabled
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25346610
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows11:def:253466:
         source_definition_id: oval:mil.disa.stig.windows11:def:253466
         class: compliance
@@ -162,6 +139,29 @@ assessment:
 
 
               Note: A different registry location is needed when systems are managed by Intune versus GPO.'
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+      oval:mil.disa.stig.defs:def:25346600:
+        source_definition_id: oval:mil.disa.stig.defs:def:25346600
+        class: compliance
+        version: '1'
+        criteria:
+          children:
+          - comment: FIPS-compliant algorithms are enabled
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25346610
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The system must be configured to use FIPS-compliant algorithms for encryption, hashing, and signing.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -288,6 +288,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-253466r1210303_rule
-    semantic_ir_sha256: d4a2b56083fc38c4a9aa7506ebeddd1a96d52d1b48b72867d2da306c2579a0a5
+    semantic_ir_sha256: 682901937a159d1df91dd1a9e1ef073e25b1cd5c308f31c5debfec75043f1907
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 0a95ba3bef6e742b2261f98f1b18a39d8cb785a2253244bcbe4fd22191af2358

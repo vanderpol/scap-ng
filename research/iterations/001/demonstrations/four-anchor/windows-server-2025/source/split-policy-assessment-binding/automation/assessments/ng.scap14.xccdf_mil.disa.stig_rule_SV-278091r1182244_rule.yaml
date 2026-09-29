@@ -39,6 +39,24 @@ assessment:
         value: DriverLoadPolicy
   derive: {}
   predicates:
+    oval:mil.disa.stig.win:ste:25337200:
+      source_state_id: oval:mil.disa.stig.win:ste:25337200
+      source_type: registry_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+      operator: AND
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: reg_dword
+      - attributes:
+          datatype: int
+          operation: equals
+        kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        value: '8'
+      comment: Reg_Dword type and value equals 8
     oval:mil.disa.stig.win:ste:20000001:
       source_state_id: oval:mil.disa.stig.win:ste:20000001
       source_type: registry_state
@@ -73,24 +91,6 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
         value: '3'
       comment: null
-    oval:mil.disa.stig.win:ste:25337200:
-      source_state_id: oval:mil.disa.stig.win:ste:25337200
-      source_type: registry_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-      operator: AND
-      entities:
-      - kind: element
-        name: type
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: reg_dword
-      - attributes:
-          datatype: int
-          operation: equals
-        kind: element
-        name: value
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        value: '8'
-      comment: Reg_Dword type and value equals 8
   evaluate:
     tests:
       oval:mil.disa.stig.win:tst:25434400:
@@ -109,6 +109,29 @@ assessment:
         - oval:mil.disa.stig.win:ste:25337200
         source_other: []
     definitions:
+      oval:mil.disa.stig.defs:def:254344:
+        source_definition_id: oval:mil.disa.stig.defs:def:254344
+        class: compliance
+        version: '2'
+        criteria:
+          children:
+          - comment: Verifies 'Boot-Start Driver Initialization Policy' is not set to 'Enabled' with 'All' selected
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.win:tst:25434400
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Early Launch Antimalware, Boot-Start Driver Initialization Policy must prevent boot drivers.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
       oval:mil.disa.stig.windows2025:def:278091:
         source_definition_id: oval:mil.disa.stig.windows2025:def:278091
         class: compliance
@@ -142,29 +165,6 @@ assessment:
             text: Compromised boot drivers can introduce malware prior to protection mechanisms that load after initialization.
               The Early Launch Antimalware driver can limit allowed drivers based on classifications determined by the malware
               protection application. At a minimum, drivers determined to be bad must not be allowed.
-          name: metadata
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-      oval:mil.disa.stig.defs:def:254344:
-        source_definition_id: oval:mil.disa.stig.defs:def:254344
-        class: compliance
-        version: '2'
-        criteria:
-          children:
-          - comment: Verifies 'Boot-Start Driver Initialization Policy' is not set to 'Enabled' with 'All' selected
-            kind: test_ref
-            negate: false
-            test_ref: oval:mil.disa.stig.win:tst:25434400
-          comment: null
-          kind: boolean
-          negate: false
-          operator: AND
-        metadata:
-          children:
-          - name: title
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            text: Early Launch Antimalware, Boot-Start Driver Initialization Policy must prevent boot drivers.
-          - name: description
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
           name: metadata
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
   assert:
@@ -319,6 +319,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-278091r1182244_rule
-    semantic_ir_sha256: ba1b88e7d21bfa5193de2e1e16d60043bfad67046e6561d1aa7ca00892aef5b9
+    semantic_ir_sha256: c88c94fb7f474c35f0fcec4aa87a6854118dd7ea9161881edff7bb9ad0f2918f
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 1df8e7480cf698d64ac18b532dcd07851660f22f0f9afbc141276049ed98d78e

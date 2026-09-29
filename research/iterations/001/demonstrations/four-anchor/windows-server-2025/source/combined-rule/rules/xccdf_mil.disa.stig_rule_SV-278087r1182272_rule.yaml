@@ -481,6 +481,24 @@ rule:
           value: \\*\NETLOGON
     derive: {}
     predicates:
+      oval:mil.disa.stig.win:ste:25336202:
+        source_state_id: oval:mil.disa.stig.win:ste:25336202
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_sz
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: (^| *, *)RequireIntegrity=1( *, *|$)
+        comment: RequireIntegrity=1
       oval:mil.disa.stig.win:ste:25336201:
         source_state_id: oval:mil.disa.stig.win:ste:25336201
         source_type: registry_state
@@ -500,6 +518,24 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: (^|[ *, *])RequireMutualAuthentication=(?!1( *, *|$))
         comment: No RequireMutualAuthentication!=1
+      oval:mil.disa.stig.win:ste:25336200:
+        source_state_id: oval:mil.disa.stig.win:ste:25336200
+        source_type: registry_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+        operator: AND
+        entities:
+        - kind: element
+          name: type
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: reg_sz
+        - attributes:
+            datatype: string
+            operation: pattern match
+          kind: element
+          name: value
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          value: (^| *, *)RequireMutualAuthentication=1( *, *|$)
+        comment: RequireMutualAuthentication=1
       oval:mil.disa.stig.win:ste:25336203:
         source_state_id: oval:mil.disa.stig.win:ste:25336203
         source_type: registry_state
@@ -519,60 +555,8 @@ rule:
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: (^| *, *)RequireIntegrity=(?!1( *, *|$))
         comment: No RequireIntegrity!=1
-      oval:mil.disa.stig.win:ste:25336202:
-        source_state_id: oval:mil.disa.stig.win:ste:25336202
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_sz
-        - attributes:
-            datatype: string
-            operation: pattern match
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: (^| *, *)RequireIntegrity=1( *, *|$)
-        comment: RequireIntegrity=1
-      oval:mil.disa.stig.win:ste:25336200:
-        source_state_id: oval:mil.disa.stig.win:ste:25336200
-        source_type: registry_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-        operator: AND
-        entities:
-        - kind: element
-          name: type
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: reg_sz
-        - attributes:
-            datatype: string
-            operation: pattern match
-          kind: element
-          name: value
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          value: (^| *, *)RequireMutualAuthentication=1( *, *|$)
-        comment: RequireMutualAuthentication=1
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:25336201:
-          source_test_id: oval:mil.disa.stig.win:tst:25336201
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          comment: Mutual Authentication and Integrity for \\*\NETLOGON
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:25336201
-          predicates:
-          - oval:mil.disa.stig.win:ste:25336200
-          - oval:mil.disa.stig.win:ste:25336201
-          - oval:mil.disa.stig.win:ste:25336202
-          - oval:mil.disa.stig.win:ste:25336203
-          source_other: []
         oval:mil.disa.stig.win:tst:25336200:
           source_test_id: oval:mil.disa.stig.win:tst:25336200
           source_type: registry_test
@@ -583,6 +567,22 @@ rule:
           state_operator: AND
           collections:
           - oval:mil.disa.stig.win:obj:25336200
+          predicates:
+          - oval:mil.disa.stig.win:ste:25336200
+          - oval:mil.disa.stig.win:ste:25336201
+          - oval:mil.disa.stig.win:ste:25336202
+          - oval:mil.disa.stig.win:ste:25336203
+          source_other: []
+        oval:mil.disa.stig.win:tst:25336201:
+          source_test_id: oval:mil.disa.stig.win:tst:25336201
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          comment: Mutual Authentication and Integrity for \\*\NETLOGON
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:25336201
           predicates:
           - oval:mil.disa.stig.win:ste:25336200
           - oval:mil.disa.stig.win:ste:25336201
@@ -798,7 +798,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-278087r1182272_rule
-      semantic_ir_sha256: 642afe3f92c536b8d0fa2ef954e7232397ec11b298b5ffc6111b07c0c6fd14e9
+      semantic_ir_sha256: 7e951c9d242e49c74156e7826a2dbd1ea28a5393866e35695009f8fb02f55985
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 66a69664037d7207ad89e64aa3bfa4c72a31561e5199e81132677296db977b4a
   assessments:

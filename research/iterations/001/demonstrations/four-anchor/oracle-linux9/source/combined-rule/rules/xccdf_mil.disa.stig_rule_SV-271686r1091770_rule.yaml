@@ -353,31 +353,6 @@ rule:
     description: OL 9 must prevent a user from overriding the disable-restart-buttons setting for the graphical user interface.
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:25801700:
-        capability: scapng.collect.independent.textfilecontent54
-        source_object_id: oval:mil.disa.stig.ind:obj:25801700
-        source_type: textfilecontent54_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '3'
-        comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
-        query:
-        - kind: element
-          name: filepath
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: /etc/dconf/profile/user
-        - attributes:
-            operation: pattern match
-          kind: element
-          name: pattern
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: ^\s*system-db\s*:\s*local\s*$
-        - attributes:
-            datatype: int
-            operation: greater than or equal
-          kind: element
-          name: instance
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: '1'
       oval:mil.disa.stig.ind:obj:25803000:
         capability: scapng.collect.independent.textfilecontent54
         source_object_id: oval:mil.disa.stig.ind:obj:25803000
@@ -410,22 +385,35 @@ rule:
           name: instance
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
           value: '1'
+      oval:mil.disa.stig.ind:obj:25801700:
+        capability: scapng.collect.independent.textfilecontent54
+        source_object_id: oval:mil.disa.stig.ind:obj:25801700
+        source_type: textfilecontent54_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '3'
+        comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
+        query:
+        - kind: element
+          name: filepath
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: /etc/dconf/profile/user
+        - attributes:
+            operation: pattern match
+          kind: element
+          name: pattern
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: ^\s*system-db\s*:\s*local\s*$
+        - attributes:
+            datatype: int
+            operation: greater than or equal
+          kind: element
+          name: instance
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: '1'
     derive: {}
     predicates: {}
     evaluate:
       tests:
-        oval:mil.disa.stig.ind:tst:25803000:
-          source_test_id: oval:mil.disa.stig.ind:tst:25803000
-          source_type: textfilecontent54_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          comment: Check that the disable-restart-button setting is locked from nonprivileged user modification
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.ind:obj:25803000
-          predicates: []
-          source_other: []
         oval:mil.disa.stig.ind:tst:25801700:
           source_test_id: oval:mil.disa.stig.ind:tst:25801700
           source_type: textfilecontent54_test
@@ -438,35 +426,19 @@ rule:
           - oval:mil.disa.stig.ind:obj:25801700
           predicates: []
           source_other: []
+        oval:mil.disa.stig.ind:tst:25803000:
+          source_test_id: oval:mil.disa.stig.ind:tst:25803000
+          source_type: textfilecontent54_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          comment: Check that the disable-restart-button setting is locked from nonprivileged user modification
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.ind:obj:25803000
+          predicates: []
+          source_other: []
       definitions:
-        oval:mil.disa.stig.defs:def:258030:
-          source_definition_id: oval:mil.disa.stig.defs:def:258030
-          class: compliance
-          version: '2'
-          criteria:
-            children:
-            - comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25801700
-            - comment: Check that the disable-restart-button setting is locked from nonprivileged user modification
-              kind: test_ref
-              negate: false
-              test_ref: oval:mil.disa.stig.ind:tst:25803000
-            comment: null
-            kind: boolean
-            negate: false
-            operator: AND
-          metadata:
-            children:
-            - name: title
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-              text: The operating system must prevent a user from overriding the disable-restart-buttons setting for the graphical
-                user interface.
-            - name: description
-              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
-            name: metadata
-            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
         oval:mil.disa.stig.ol9os:def:271686:
           source_definition_id: oval:mil.disa.stig.ol9os:def:271686
           class: compliance
@@ -500,6 +472,34 @@ rule:
               text: A user who is at the console can reboot the system at the login screen. If restart or shutdown buttons
                 are pressed at the login screen, this can create the risk of short-term loss of availability of systems due
                 to reboot.
+            name: metadata
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        oval:mil.disa.stig.defs:def:258030:
+          source_definition_id: oval:mil.disa.stig.defs:def:258030
+          class: compliance
+          version: '2'
+          criteria:
+            children:
+            - comment: check that /etc/dconf/profile/user:system-db is at minimum set to local
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25801700
+            - comment: Check that the disable-restart-button setting is locked from nonprivileged user modification
+              kind: test_ref
+              negate: false
+              test_ref: oval:mil.disa.stig.ind:tst:25803000
+            comment: null
+            kind: boolean
+            negate: false
+            operator: AND
+          metadata:
+            children:
+            - name: title
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: The operating system must prevent a user from overriding the disable-restart-buttons setting for the graphical
+                user interface.
+            - name: description
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
             name: metadata
             namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
     assert:
@@ -632,7 +632,7 @@ rule:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: xccdf_mil.disa.stig_rule_SV-271686r1091770_rule
-      semantic_ir_sha256: dedb3307d0061e890130a3123fc72c1f88e98a9c6e94a2a1a399e8abd8c3ea0b
+      semantic_ir_sha256: 6536537dba9f3f9d1ae83ad16b6a038d3c4bb6a8ac637f00f5d8b9cc133f7080
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 78ba35c23cb8039926d159c8977659304d62eea11efdba31fd8e26223cc777f3
   assessments:

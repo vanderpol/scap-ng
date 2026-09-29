@@ -7,6 +7,18 @@ assessment:
   description: RHEL 9 must enable the SELinux targeted policy.
   semantic_model: scap-ng-generic-assessment-graph-0.1
   collect:
+    oval:mil.disa.stig.linux:obj:23024000:
+      capability: scapng.collect.linux.partition
+      source_object_id: oval:mil.disa.stig.linux:obj:23024000
+      source_type: partition_object
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      version: '1'
+      comment: /sys/fs/selinux
+      query:
+      - kind: element
+        name: mount_point
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: /sys/fs/selinux
     oval:mil.disa.stig.ind:obj:23028200:
       capability: scapng.collect.independent.textfilecontent54
       source_object_id: oval:mil.disa.stig.ind:obj:23028200
@@ -32,31 +44,8 @@ assessment:
         name: instance
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
         value: '1'
-    oval:mil.disa.stig.linux:obj:23024000:
-      capability: scapng.collect.linux.partition
-      source_object_id: oval:mil.disa.stig.linux:obj:23024000
-      source_type: partition_object
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-      version: '1'
-      comment: /sys/fs/selinux
-      query:
-      - kind: element
-        name: mount_point
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        value: /sys/fs/selinux
   derive: {}
   predicates:
-    oval:mil.disa.stig.ind:ste:23028200:
-      source_state_id: oval:mil.disa.stig.ind:ste:23028200
-      source_type: textfilecontent54_state
-      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-      operator: AND
-      entities:
-      - kind: element
-        name: subexpression
-        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        value: targeted
-      comment: null
     oval:mil.disa.stig.linux:ste:23024000:
       source_state_id: oval:mil.disa.stig.linux:ste:23024000
       source_type: partition_state
@@ -68,21 +57,19 @@ assessment:
         namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
         value: selinuxfs
       comment: null
+    oval:mil.disa.stig.ind:ste:23028200:
+      source_state_id: oval:mil.disa.stig.ind:ste:23028200
+      source_type: textfilecontent54_state
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      operator: AND
+      entities:
+      - kind: element
+        name: subexpression
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: targeted
+      comment: null
   evaluate:
     tests:
-      oval:mil.disa.stig.ind:tst:23028200:
-        source_test_id: oval:mil.disa.stig.ind:tst:23028200
-        source_type: textfilecontent54_test
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        comment: '/etc/selinux/config: SELINUXTYPE=targeted'
-        check: all
-        check_existence: at_least_one_exists
-        state_operator: AND
-        collections:
-        - oval:mil.disa.stig.ind:obj:23028200
-        predicates:
-        - oval:mil.disa.stig.ind:ste:23028200
-        source_other: []
       oval:mil.disa.stig.linux:tst:23024000:
         source_test_id: oval:mil.disa.stig.linux:tst:23024000
         source_type: partition_test
@@ -95,6 +82,19 @@ assessment:
         - oval:mil.disa.stig.linux:obj:23024000
         predicates:
         - oval:mil.disa.stig.linux:ste:23024000
+        source_other: []
+      oval:mil.disa.stig.ind:tst:23028200:
+        source_test_id: oval:mil.disa.stig.ind:tst:23028200
+        source_type: textfilecontent54_test
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        comment: '/etc/selinux/config: SELINUXTYPE=targeted'
+        check: all
+        check_existence: at_least_one_exists
+        state_operator: AND
+        collections:
+        - oval:mil.disa.stig.ind:obj:23028200
+        predicates:
+        - oval:mil.disa.stig.ind:ste:23028200
         source_other: []
     definitions:
       oval:mil.disa.stig.defs:def:230282:
@@ -279,6 +279,6 @@ assessment:
     status: legacy_compatible
     source: SCAP 1.4 / OVAL 5.12.3
     source_rule: xccdf_mil.disa.stig_rule_SV-258079r1045159_rule
-    semantic_ir_sha256: 44c8f295756c2479444c632ffba2e0c73300adf5566d73749c3af717cdf32d57
+    semantic_ir_sha256: cb41a481dc3e629abf4926c8ff592f491c556c9d461c36328363b7c55f49f146
     note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
   semantic_fingerprint_sha256: 972e35412fa3e94f6ab689fd65d069bdfaee2455a0075a207b6fbe29c299a2c8

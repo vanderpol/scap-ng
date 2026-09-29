@@ -1,0 +1,213 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271836
+  collect:
+    oval:mil.disa.stig.ind:obj:25808000:
+      capability: scapng.collect.independent.textfilecontent54
+      comment: /etc/security/faillock.conf dir
+      query:
+      - kind: element
+        name: filepath
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: /etc/security/faillock.conf
+      - attributes:
+          operation: pattern match
+        kind: element
+        name: pattern
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: ^\s*dir\s*=\s*(.*)\s*$
+      - attributes:
+          datatype: int
+          operation: greater than or equal
+        kind: element
+        name: instance
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        value: '1'
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+      source_object_id: oval:mil.disa.stig.ind:obj:25808000
+      source_type: textfilecontent54_object
+      version: '1'
+    oval:mil.disa.stig.linux:obj:25808000:
+      capability: scapng.collect.linux.selinuxsecuritycontext
+      comment: configured faillock directory selinux context
+      query:
+      - attributes:
+          var_ref: oval:mil.disa.stig.defs:var:25808000
+        kind: element
+        name: path
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      - attributes:
+          nil: 'true'
+        kind: element
+        name: filename
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:25808000
+      source_type: selinuxsecuritycontext_object
+      version: '1'
+  derive:
+    oval:mil.disa.stig.defs:var:25808000:
+      comment: faillock directory
+      datatype: string
+      evaluation_plan:
+        datatype: string
+        dependencies:
+          objects:
+          - oval:mil.disa.stig.ind:obj:25808000
+          operations:
+          - object_component
+          variables: []
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:25808000
+          op: object_component
+          record_field: null
+        mode: target_dependent
+        reason: object_component_requires_collection:textfilecontent54_object
+        resolution_status: dynamic_object_dependency
+        variable_id: oval:mil.disa.stig.defs:var:25808000
+        variable_type: local_variable
+      resolution:
+        datatype: string
+        item_field: subexpression
+        object_ref: oval:mil.disa.stig.ind:obj:25808000
+        operation: object_component
+        reason: object_component_requires_collection:textfilecontent54_object
+        record_field: null
+        status: dynamic_object_dependency
+        variable_type: local_variable
+      semantic_ast:
+        datatype: string
+        expression:
+          item_field: subexpression
+          object_ref: oval:mil.disa.stig.ind:obj:25808000
+          op: object_component
+          record_field: null
+        id: oval:mil.disa.stig.defs:var:25808000
+        type: local_variable
+      source_type: local_variable
+      source_variable_id: oval:mil.disa.stig.defs:var:25808000
+  description: OL 9 must configure SELinux context type to allow the use of a nondefault faillock tally directory.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:258080:
+        class: compliance
+        criteria:
+          children:
+          - comment: configured faillock directory has correct selinux context
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:25808000
+          - comment: /etc/security/faillock.conf dir option exists
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.ind:tst:25808000
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock
+              tally directory.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:258080
+        version: '2'
+      oval:mil.disa.stig.ol9os:def:271836:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:258080
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-003010 - OL 9 must configure SELinux context type to allow the use of a nondefault faillock tally
+              directory.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: Not having the correct SELinux context on the faillock directory may lead to unauthorized access to the
+              directory.
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271836
+        version: '1'
+    tests:
+      oval:mil.disa.stig.ind:tst:25808000:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.ind:obj:25808000
+        comment: /etc/security/faillock.conf dir option exists
+        predicates: []
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        source_other: []
+        source_test_id: oval:mil.disa.stig.ind:tst:25808000
+        source_type: textfilecontent54_test
+        state_operator: AND
+      oval:mil.disa.stig.linux:tst:25808000:
+        check: all
+        check_existence: at_least_one_exists
+        collections:
+        - oval:mil.disa.stig.linux:obj:25808000
+        comment: configured faillock directory has correct selinux context
+        predicates:
+        - oval:mil.disa.stig.linux:ste:25808000
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:25808000
+        source_type: selinuxsecuritycontext_test
+        state_operator: AND
+  id: ng.shared.fd78e5ede8ebb0b95533d6b1
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.linux:ste:25808000:
+      comment: configured faillock directory selinux context correct
+      entities:
+      - kind: element
+        name: type
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: faillog_t
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:25808000
+      source_type: selinuxsecuritycontext_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: fd78e5ede8ebb0b95533d6b1a69443d17c06d749a4755a45ecaa0825349a3028
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271836r1092637_rule
+    title: OL 9 must configure SELinux context type to allow the use of a nondefault faillock tally directory.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-258080r1045162_rule
+    title: RHEL 9 must configure SELinux context type to allow the use of a nondefault faillock tally directory.

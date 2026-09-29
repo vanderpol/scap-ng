@@ -1,0 +1,127 @@
+scap_ng: 0.1-prototype
+prototype: true
+assessment:
+  assert:
+    combination: xccdf_source_check_semantics
+    definition_results:
+    - oval:mil.disa.stig.ol9os:def:271639
+  collect:
+    oval:mil.disa.stig.linux:obj:23050200:
+      capability: scapng.collect.linux.systemdunitproperty
+      comment: null
+      query:
+      - kind: element
+        name: unit
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: autofs.service
+      - kind: element
+        name: property
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: ActiveState
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_object_id: oval:mil.disa.stig.linux:obj:23050200
+      source_type: systemdunitproperty_object
+      version: '1'
+  derive: {}
+  description: OL 9 file system automount function must be disabled unless required.
+  evaluate:
+    definitions:
+      oval:mil.disa.stig.defs:def:230502:
+        class: compliance
+        criteria:
+          children:
+          - comment: The autofs.service is inactive if it exists.
+            kind: test_ref
+            negate: false
+            test_ref: oval:mil.disa.stig.linux:tst:23050200
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: The operating system file system automounter must be disabled unless required.
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.defs:def:230502
+        version: '2'
+      oval:mil.disa.stig.ol9os:def:271639:
+        class: compliance
+        criteria:
+          children:
+          - comment: null
+            definition_ref: oval:mil.disa.stig.defs:def:230502
+            kind: definition_ref
+            negate: false
+          comment: null
+          kind: boolean
+          negate: false
+          operator: AND
+        metadata:
+          children:
+          - name: title
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: OL09-00-002000 - OL 9 file system automount function must be disabled unless required.
+          - attributes:
+              family: unix
+            children:
+            - name: platform
+              namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+              text: Oracle Linux 9
+            name: affected
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+          - name: description
+            namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+            text: "An authentication process resists replay attacks if it is impractical to achieve a successful authentication\
+              \ by recording and replaying a previous authentication message.\n\n\tSatisfies: SRG-OS-000114-GPOS-00059, SRG-OS-000378-GPOS-00163"
+          name: metadata
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        source_definition_id: oval:mil.disa.stig.ol9os:def:271639
+        version: '1'
+    tests:
+      oval:mil.disa.stig.linux:tst:23050200:
+        check: all
+        check_existence: any_exist
+        collections:
+        - oval:mil.disa.stig.linux:obj:23050200
+        comment: autofs.service ActiveState is inactive if it exists.
+        predicates:
+        - oval:mil.disa.stig.linux:ste:20000007
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        source_other: []
+        source_test_id: oval:mil.disa.stig.linux:tst:23050200
+        source_type: systemdunitproperty_test
+        state_operator: AND
+  id: ng.shared.a18cd509add007a9318a5251
+  migration:
+    note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
+    source: SCAP 1.4 / OVAL 5.12.3
+    status: legacy_compatible
+    reuse_scope: cross-benchmark-exact-semantic-equivalence
+  predicates:
+    oval:mil.disa.stig.linux:ste:20000007:
+      comment: null
+      entities:
+      - kind: element
+        name: value
+        namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        value: inactive
+      operator: AND
+      source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+      source_state_id: oval:mil.disa.stig.linux:ste:20000007
+      source_type: systemdunitproperty_state
+  semantic_model: scap-ng-generic-assessment-graph-0.1
+  source_result_algebra: xccdf-1.2-complex-check-eight-state
+  version: 1
+  exact_reuse_fingerprint_sha256: a18cd509add007a9318a52510bae7fdedf678c82f7f622cfdb87817511dcf9c6
+  reuse_provenance:
+  - benchmark: oracle-linux9
+    rule_id: xccdf_mil.disa.stig_rule_SV-271639r1091629_rule
+    title: OL 9 file system automount function must be disabled unless required.
+  - benchmark: rhel9
+    rule_id: xccdf_mil.disa.stig_rule_SV-257849r1044928_rule
+    title: RHEL 9 file system automount function must be disabled unless required.
