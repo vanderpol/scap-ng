@@ -36,6 +36,15 @@ def semantic_id(value, fallback):
     return "-".join(words[:10]) or fallback
 def node_title(node):
     return ((node.get("comment") or "").strip() or None) if node is not None else None
+
+def oval_definition_title(definition):
+    if definition is None:
+        return None
+    metadata = next((n for n in definition if local(n.tag) == "metadata"), None)
+    if metadata is None:
+        return None
+    title_node = next((n for n in metadata if local(n.tag) == "title"), None)
+    return text(title_node)
 def sha256(data): return hashlib.sha256(data).hexdigest()
 def write_yaml(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -493,7 +502,7 @@ def lower_definition(oroot, definition_id, assessment_id):
     if definition is None:
         return None, "definition_not_found"
 
-    assessment_title = node_title(definition)
+    assessment_title = oval_definition_title(definition)
     assessment_class = definition.get("class") or "miscellaneous"
     checks = {}
     test_to_check = {}
