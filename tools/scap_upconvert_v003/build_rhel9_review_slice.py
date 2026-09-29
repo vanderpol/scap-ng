@@ -1079,8 +1079,8 @@ def lower_definition(oroot, definition_id, assessment_id):
             return {
                 "substring": {
                     "value": lowered[0] if len(lowered) == 1 else lowered,
-                    "start": node.get("start"),
-                    "length": node.get("length"),
+                    "start": node.get("substring_start") or node.get("start"),
+                    "length": node.get("substring_length") or node.get("length"),
                 }
             }, None
         if name == "regex_capture":
@@ -1100,7 +1100,12 @@ def lower_definition(oroot, definition_id, assessment_id):
                 }
             }, None
         if name in ("begin", "end"):
-            return {name: lowered[0] if len(lowered) == 1 else lowered}, None
+            return {
+                name: {
+                    "value": lowered[0] if len(lowered) == 1 else lowered,
+                    "character": node.get("character"),
+                }
+            }, None
         if name == "time_difference":
             return {
                 "time_difference": {
