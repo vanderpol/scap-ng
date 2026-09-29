@@ -15,7 +15,7 @@ SCAP-NG conversion approach using the current native design.
       README.md
       design/
       source/
-        split-policy-assessment/
+        split-rule-assessment/
       examples/
       results/
       evidence/
@@ -34,7 +34,7 @@ Native SCAP-NG source examples.
 Each independently reviewable SCAP-NG architecture gets its own directory.
 Iteration 003 currently implements only:
 
-    source/split-policy-assessment/
+    source/split-rule-assessment/
 
 Other architectures SHALL NOT be mixed into that tree.
 
@@ -67,13 +67,13 @@ Reusable converter code remains under repository-level tools/.
 
 ## Current architecture under review
 
-Iteration 003 currently covers only the split Policy/Assessment architecture:
+Iteration 003 currently covers only the split Rule/Assessment architecture:
 
-    Benchmark Rule -> Policy -> selected check -> Assessment
+    Benchmark -> Rule -> selected check -> Assessment
 
 All native source for that model belongs under:
 
-    source/split-policy-assessment/
+    source/split-rule-assessment/
 
 A future architecture experiment MUST use a separate sibling directory rather
 than adding alternate semantics into this tree.
@@ -86,7 +86,7 @@ For an external reviewer, the intended path is:
 2. design/conversion-contract.md
 3. design/native-source-layout.md
 4. design/applicability-registry.md
-5. source/split-policy-assessment/
+5. source/split-rule-assessment/
 6. examples/
 7. results/
 8. evidence/
