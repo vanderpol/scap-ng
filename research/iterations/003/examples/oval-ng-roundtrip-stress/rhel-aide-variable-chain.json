@@ -1,0 +1,235 @@
+{
+  "fixture_version": 1,
+  "id": "rhel-aide-variable-chain",
+  "source": {
+    "repository": "vanderpol/scap-content",
+    "path": "projects/linux/rhel10/oval/U_RHEL_10_SV-280977-oval.xml",
+    "root_definition": "oval:navy.navwar.niwcatlantic.scc:def:28097700001",
+    "note": "Real production-derived OVAL exercising nested criteria, states, recursive file search, and chained Object/Variable dependencies."
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "aide-installed-check",
+        "type": "linux.rpminfo",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "aide-package-collection"
+      },
+      {
+        "id": "configured-aide-db-file-check",
+        "type": "unix.file",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "configured-aide-db-file-collection",
+        "states": [
+          "aide-db-file-state"
+        ]
+      },
+      {
+        "id": "aide-installed-alt-check",
+        "type": "linux.rpminfo",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "aide-package-alt-collection"
+      },
+      {
+        "id": "absolute-aide-db-file-check",
+        "type": "unix.file",
+        "check_existence": "all_exist",
+        "check": "all",
+        "collection": "absolute-aide-db-file-collection"
+      }
+    ],
+    "collections": [
+      {
+        "id": "aide-package-collection",
+        "type": "linux.rpminfo",
+        "selectors": {
+          "name": "aide"
+        }
+      },
+      {
+        "id": "aide-config-file-collection",
+        "type": "unix.file",
+        "behaviors": {
+          "recurse_direction": "down",
+          "recurse": "directories",
+          "max_depth": "-1",
+          "recurse_file_system": "local"
+        },
+        "selectors": {
+          "path": "/",
+          "filename": "aide.conf"
+        }
+      },
+      {
+        "id": "configured-aide-db-file-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": {
+            "variable": "configured-aide-db-path-variable"
+          }
+        }
+      },
+      {
+        "id": "aide-dbdir-collection",
+        "type": "independent.textfilecontent54",
+        "selectors": {
+          "filepath": {
+            "variable": "aide-config-path-variable"
+          },
+          "pattern": {
+            "operation": "pattern match",
+            "value": "^\\@\\@define\\s+DBDIR\\s+(\\S+)"
+          },
+          "instance": {
+            "datatype": "int",
+            "value": "1"
+          }
+        }
+      },
+      {
+        "id": "aide-dbname-collection",
+        "type": "independent.textfilecontent54",
+        "selectors": {
+          "filepath": {
+            "variable": "aide-config-path-variable"
+          },
+          "pattern": {
+            "operation": "pattern match",
+            "value": "^[ \\t]*database(?:_in)?[ \\t]*=[ \\t]*file:@@\\{DBDIR\\}/([^#\\s]+)[ \\t]*(?:#.*)?$"
+          },
+          "instance": {
+            "datatype": "int",
+            "value": "1"
+          }
+        }
+      },
+      {
+        "id": "aide-package-alt-collection",
+        "type": "linux.rpminfo",
+        "selectors": {
+          "name": "aide"
+        }
+      },
+      {
+        "id": "absolute-aide-db-path-collection",
+        "type": "independent.textfilecontent54",
+        "selectors": {
+          "filepath": {
+            "variable": "aide-config-path-variable",
+            "var_check": "all"
+          },
+          "pattern": {
+            "operation": "pattern match",
+            "value": "^[ \\t]*database(?:_in)?[ \\t]*=[ \\t]*file:(/[^#\\s]+)[ \\t]*(?:#.*)?$"
+          },
+          "instance": {
+            "datatype": "int",
+            "operation": "greater than or equal",
+            "value": "1"
+          }
+        }
+      },
+      {
+        "id": "absolute-aide-db-file-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": {
+            "variable": "absolute-aide-db-path-variable",
+            "var_check": "all"
+          }
+        }
+      }
+    ],
+    "states": [
+      {
+        "id": "aide-db-file-state",
+        "type": "unix.file",
+        "predicates": {
+          "filepath": {
+            "operation": "pattern match",
+            "value": ".*"
+          }
+        }
+      }
+    ],
+    "variables": [
+      {
+        "id": "aide-config-path-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "object_component": {
+            "collection": "aide-config-file-collection",
+            "item_field": "filepath"
+          }
+        }
+      },
+      {
+        "id": "configured-aide-db-path-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "object_component": {
+                "collection": "aide-dbdir-collection",
+                "item_field": "subexpression"
+              }
+            },
+            {
+              "literal": "/",
+              "datatype": "string"
+            },
+            {
+              "object_component": {
+                "collection": "aide-dbname-collection",
+                "item_field": "subexpression"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "absolute-aide-db-path-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "object_component": {
+            "collection": "absolute-aide-db-path-collection",
+            "item_field": "subexpression"
+          }
+        }
+      }
+    ],
+    "root": {
+      "operator": "OR",
+      "children": [
+        {
+          "operator": "AND",
+          "children": [
+            {
+              "check": "aide-installed-check"
+            },
+            {
+              "check": "configured-aide-db-file-check"
+            }
+          ]
+        },
+        {
+          "operator": "AND",
+          "children": [
+            {
+              "check": "aide-installed-alt-check"
+            },
+            {
+              "check": "absolute-aide-db-file-check"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
