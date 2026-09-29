@@ -116,6 +116,7 @@ def main():
     ap.add_argument("--schema-dir",type=Path,required=True)
     ap.add_argument("--corpus-inventory",type=Path,required=True)
     ap.add_argument("--focused-source-dir",type=Path,required=True)
+    ap.add_argument("--self-assertion-root",type=Path)
     ap.add_argument("--output",type=Path,required=True)
     a=ap.parse_args()
 
@@ -126,6 +127,11 @@ def main():
     corpus_totals={k:Counter(v) for k,v in corpus.get("totals",{}).items()}
     focused_paths=sorted(a.focused_source_dir.glob("*.xml"))
     focused=inventory_xmls(focused_paths)
+    self_assertion_paths=(
+        sorted(a.self_assertion_root.glob("**/*.xml"))
+        if a.self_assertion_root else []
+    )
+    self_assertion=inventory_xmls(self_assertion_paths)
 
     mapping={
         "SimpleDatatypeEnumeration":"datatypes",
@@ -145,6 +151,7 @@ def main():
                 "kind":name,"value":value,
                 "rhel9":value in covered_values(corpus_totals,bucket),
                 "focused":value in covered_values(focused,bucket),
+                "self_assertion":value in covered_values(self_assertion,bucket),
             })
     for name in DEF_ENUM_TYPES:
         for value in enum_values(defs,name):
@@ -153,12 +160,14 @@ def main():
                 "kind":name,"value":value,
                 "rhel9":value in covered_values(corpus_totals,bucket),
                 "focused":value in covered_values(focused,bucket),
+                "self_assertion":value in covered_values(self_assertion,bucket),
             })
 
     function_rows=[{
         "function":x,
         "rhel9":x in covered_values(corpus_totals,"functions"),
         "focused":x in covered_values(focused,"functions"),
+        "self_assertion":x in covered_values(self_assertion,"functions"),
     } for x in sorted(FUNCTION_NAMES)]
 
     core_rows=[]
@@ -168,6 +177,7 @@ def main():
                 "bucket":bucket,"value":value,
                 "rhel9":value in covered_values(corpus_totals,bucket),
                 "focused":value in covered_values(focused,bucket),
+                "self_assertion":value in covered_values(self_assertion,bucket),
             })
 
     family_rows=schema_family_surface(odir)
@@ -175,24 +185,26 @@ def main():
         bucket=row["bucket"]; key=row["key"]
         row["rhel9"]=key in covered_values(corpus_totals,bucket)
         row["focused"]=key in covered_values(focused,bucket)
+        row["self_assertion"]=key in covered_values(self_assertion,bucket)
         row["coverage_status"]=(
             "deprecated_rejected" if row["deprecated"] else
-            "covered" if (row["rhel9"] or row["focused"]) else
+            "covered" if (row["rhel9"] or row["focused"] or row["self_assertion"]) else
             "valid_not_yet_exercised"
         )
 
-    uncovered_enums=[r for r in enum_rows if not (r["rhel9"] or r["focused"])]
-    uncovered_funcs=[r for r in function_rows if not (r["rhel9"] or r["focused"])]
-    uncovered_core=[r for r in core_rows if not (r["rhel9"] or r["focused"])]
+    uncovered_enums=[r for r in enum_rows if not (r["rhel9"] or r["focused"] or r["self_assertion"])]
+    uncovered_funcs=[r for r in function_rows if not (r["rhel9"] or r["focused"] or r["self_assertion"])]
+    uncovered_core=[r for r in core_rows if not (r["rhel9"] or r["focused"] or r["self_assertion"])]
     supported_families=[r for r in family_rows if not r["deprecated"]]
     deprecated_families=[r for r in family_rows if r["deprecated"]]
-    uncovered_families=[r for r in supported_families if not (r["rhel9"] or r["focused"])]
+    uncovered_families=[r for r in supported_families if not (r["rhel9"] or r["focused"] or r["self_assertion"])]
 
     out={
         "format":"oval-ng-language-surface-coverage-0.2",
         "scope_note":"Coverage means source/round-trip representation exercised; it does not prove interpreter runtime algorithms.",
         "schema_directory":str(odir),
         "focused_fixture_count":len(focused_paths),
+        "self_assertion_file_count":len(self_assertion_paths),
         "enumerations":enum_rows,
         "functions":function_rows,
         "core_features":core_rows,
@@ -208,7 +220,7 @@ def main():
             "schema_family_nodes":len(family_rows),
             "supported_family_nodes":len(supported_families),
             "deprecated_family_nodes":len(deprecated_families),
-            "covered_supported_family_nodes":sum(1 for r in supported_families if r["rhel9"] or r["focused"]),
+            "covered_supported_family_nodes":sum(1 for r in supported_families if r["rhel9"] or r["focused"] or r["self_assertion"]),
             "uncovered_supported_family_nodes":len(uncovered_families),
         },
     }
@@ -216,6 +228,7 @@ def main():
     a.output.write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
     print(json.dumps({
         "focused_fixture_count":len(focused_paths),
+        "self_assertion_file_count":len(self_assertion_paths),
         "uncovered_enumeration_count":len(uncovered_enums),
         "uncovered_function_count":len(uncovered_funcs),
         "uncovered_core_feature_count":len(uncovered_core),
