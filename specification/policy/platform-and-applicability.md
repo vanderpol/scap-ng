@@ -56,7 +56,24 @@ A product identifier reported in target inventory SHALL NOT automatically make
 content applicable, and a content Platform identifier SHALL NOT automatically
 be emitted as observed target inventory without supporting collection evidence.
 
-## 3. External platform identifiers
+The normal SCAP-NG production path is:
+
+    Platform Assessment collects product evidence
+        -> Platform Boolean result
+        -> optional descriptive product-inventory facts
+        -> target.inventory in the result package
+
+Inventory facts emitted by a Platform Assessment are side outputs. They SHALL
+NOT feed back into that Platform decision, Rule selection, Rule applicability,
+or compliance truth.
+
+Operating-system Platform Assessments SHOULD emit an operating-system product
+inventory fact when the product identity can be established reliably.
+
+Application Platform Assessments SHOULD emit an application product inventory
+fact when the product identity can be established reliably.
+
+## 4. External platform identifiers
 
 A Platform MAY declare one or more external product/platform identifiers in
 addition to its stable SCAP-NG logical identifier.
@@ -86,7 +103,7 @@ SCAP-NG's generic external-identifier model SHOULD remain version-neutral so a
 future CPE revision can be represented without changing Platform logical
 identity.
 
-## 4. Benchmark Platform expression
+## 5. Benchmark Platform expression
 
 A Benchmark SHALL declare an explicit Platform expression.
 
@@ -112,7 +129,7 @@ target and its Rule compliance Assessments SHALL NOT be executed.
 An indeterminate/error Platform evaluation SHALL NOT be treated as a false
 Platform result merely for convenience.
 
-## 5. What belongs in Rule applicability
+## 6. What belongs in Rule applicability
 
 A Rule applicability condition is an additional target condition that is not
 part of basic product identity.
@@ -130,7 +147,7 @@ Examples include:
 When a legacy platform combines product identity with one of these conditions,
 SCAP-NG SHOULD separate the predicates when semantic equivalence is exact.
 
-## 6. Applicability catalog
+## 7. Applicability catalog
 
 A Benchmark MAY declare one explicit applicability catalog.
 
@@ -159,7 +176,7 @@ SHALL be a validation error.
 
 Unused catalog entries SHOULD produce a warning rather than an error.
 
-## 7. Rule `when` expression
+## 8. Rule `when` expression
 
 A Rule MAY declare a `when` expression composed only of named applicability
 conditions.
@@ -190,7 +207,7 @@ the Boolean operator would be implicit.
 
 Those semantics belong in the referenced applicability Assessment Methods.
 
-## 8. Effective Rule applicability
+## 9. Effective Rule applicability
 
 For an effectively selected Rule:
 
@@ -214,7 +231,7 @@ condition to `not_applicable`, `pass`, or `fail`. It SHALL use the
 appropriate indeterminate/not-evaluated/error result state defined by the final
 result vocabulary.
 
-## 9. Applicability and Rule selection
+## 10. Applicability and Rule selection
 
 Rule selection and Rule applicability are distinct.
 
@@ -231,7 +248,7 @@ If an organization does not wish to assess an otherwise applicable publisher
 Rule, it SHOULD express that as Tailoring Rule selection rather than altering
 the applicability logic.
 
-## 10. Applicability and Parameters
+## 11. Applicability and Parameters
 
 An applicability Assessment MAY consume typed Parameters or Organizational
 Input when the condition genuinely depends on organization-defined expected
@@ -242,7 +259,7 @@ Such values remain subject to the normal policy-data isolation rules.
 Missing required input SHALL make applicability indeterminate; it SHALL NOT be
 silently interpreted as false.
 
-## 11. Reuse and evaluation
+## 12. Reuse and evaluation
 
 Applicability conditions SHOULD be reusable across Rules and, when semantics
 are truly equivalent, across Benchmarks.
@@ -252,7 +269,7 @@ one run when doing so cannot change semantics.
 
 Caching SHALL NOT change result truth or hide an evaluation error.
 
-## 12. Result provenance
+## 13. Result provenance
 
 Results SHOULD preserve enough information to explain applicability decisions,
 including:
@@ -265,7 +282,7 @@ including:
 A consumer SHOULD NOT need to reconstruct legacy CPE/OVAL component graphs to
 understand why a Rule was not applicable.
 
-## 13. Manual not-applicable outcome
+## 14. Manual not-applicable outcome
 
 Pre-evaluated Rule applicability and the Manual Assessment
 `not_applicable` outcome are related but distinct.
@@ -276,7 +293,7 @@ expressed reliably.
 The Manual Assessment `not_applicable` outcome remains available for cases
 where applicability can only be established by the prescribed human review.
 
-## 14. Legacy CPE/XCCDF migration
+## 15. Legacy CPE/XCCDF migration
 
 SCAP 1.4 CPE/XCCDF applicability SHALL be interpreted semantically during
 migration.
@@ -309,7 +326,7 @@ identity/version SHOULD be visible in execution provenance when that dependency
 can affect applicability truth.
 
 
-## 15. Applicability processing algorithm
+## 16. Applicability processing algorithm
 
 For each effectively selected Rule, a processor SHALL evaluate applicability
 in the following order:
@@ -331,7 +348,7 @@ in the following order:
 Rule selection SHALL be resolved before this algorithm. A disabled Rule does
 not require applicability evaluation.
 
-## 16. Applicability truth semantics
+## 17. Applicability truth semantics
 
 Applicability truth SHALL be distinct from compliance truth.
 
@@ -349,7 +366,7 @@ For an enabled Rule:
 The final result-state names for Benchmark-out-of-scope and indeterminate
 applicability remain subject to the common results vocabulary.
 
-## 17. Applicability Assessment contract
+## 18. Applicability Assessment contract
 
 An applicability catalog entry SHALL resolve to an Assessment Method whose
 result can be interpreted as Boolean applicability truth or an explicit
@@ -366,7 +383,7 @@ An applicability Assessment:
 
 The same applicability Assessment MAY be reused by multiple Rules.
 
-## 18. Applicability catalog example
+## 19. Applicability catalog example
 
 Illustrative catalog:
 
@@ -388,7 +405,7 @@ Illustrative Rule:
 
 The Rule does not repeat either Assessment path.
 
-## 19. Shared condition evaluation
+## 20. Shared condition evaluation
 
 When multiple Rules reference the same applicability condition during one run,
 a processor SHOULD evaluate the condition once and reuse the result when:
@@ -401,7 +418,7 @@ a processor SHOULD evaluate the condition once and reuse the result when:
 A processor that reuses the result SHALL preserve enough result information to
 show which Rules depended on the condition.
 
-## 20. Applicability evidence
+## 21. Applicability evidence
 
 When a Rule is reported as not applicable, the result SHOULD identify the
 condition or Boolean branch that made it inapplicable.
@@ -417,7 +434,7 @@ For complex Boolean expressions, the result SHOULD preserve the decisive
 applicability explanation without duplicating the complete static Assessment
 definition.
 
-## 21. Applicability versus exceptions
+## 22. Applicability versus exceptions
 
 Applicability SHALL describe whether a requirement logically applies to the
 target.
@@ -429,7 +446,7 @@ policy SHALL use Tailoring Rule selection or another explicitly standardized
 policy-exception mechanism rather than falsifying target applicability.
 
 
-## 22. Worked source example
+## 23. Worked source example
 
 The Windows 11 source example demonstrates a Benchmark-scoped applicability
 catalog and reusable Rule applicability Assessments:
