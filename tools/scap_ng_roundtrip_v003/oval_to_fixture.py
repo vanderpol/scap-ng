@@ -72,15 +72,15 @@ class Converter:
         }
         self.diagnostics=[]
 
-    def root_definition(self):
+    def root_definitions(self):
         incoming=set()
         for d in self.defs.values():
             for e in d.iter(f"{{{OD}}}extend_definition"):
                 if e.get("definition_ref"): incoming.add(e.get("definition_ref"))
         candidates=[x for x in self.defs if x not in incoming]
-        if len(candidates)!=1:
-            raise ValueError(f"{self.path}: cannot identify unique root definition: {candidates}")
-        return candidates[0]
+        if not candidates:
+            raise ValueError(f"{self.path}: cannot identify any root definition")
+        return candidates
 
     def edge_attrs(self,el):
         out={}
@@ -285,28 +285,41 @@ class Converter:
         return out
 
     def convert(self):
-        root_id=self.root_definition()
-        rootdef=self.defs[root_id]
-        crit=rootdef.find(f"{{{OD}}}criteria")
-        if crit is None: raise ValueError(f"{root_id}: missing criteria")
+        root_ids=self.root_definitions()
         sem={
-            "definition_class":rootdef.get("class","compliance"),
             "checks":[self.check(k,v) for k,v in self.tests.items()],
             "collections":[self.collection(k,v) for k,v in self.objects.items()],
             "states":[self.state(k,v) for k,v in self.states.items()],
             "variables":[self.variable(k,v) for k,v in self.vars.items()],
-            "root":self.criteria(crit,(root_id,)),
         }
+        source={"local_path":str(self.path).replace("\\","/")}
+        if len(root_ids)==1:
+            root_id=root_ids[0]
+            rootdef=self.defs[root_id]
+            crit=rootdef.find(f"{{{OD}}}criteria")
+            if crit is None: raise ValueError(f"{root_id}: missing criteria")
+            sem["definition_class"]=rootdef.get("class","compliance")
+            sem["root"]=self.criteria(crit,(root_id,))
+            source["root_definition"]=root_id
+        else:
+            sem["roots"]=[]
+            source["root_definitions"]=root_ids
+            for root_id in root_ids:
+                rootdef=self.defs[root_id]
+                crit=rootdef.find(f"{{{OD}}}criteria")
+                if crit is None: raise ValueError(f"{root_id}: missing criteria")
+                sem["roots"].append({
+                    "id":self.maps["def"][root_id],
+                    "definition_class":rootdef.get("class","compliance"),
+                    "root":self.criteria(crit,(root_id,)),
+                })
         # omit empty sections to keep fixtures readable
         for k in ("states","variables"):
             if not sem[k]: sem.pop(k)
         return {
             "fixture_version":1,
             "id":self.path.parent.name.replace("_","-") or self.path.stem,
-            "source":{
-                "root_definition":root_id,
-                "local_path":str(self.path).replace("\\","/"),
-            },
+            "source":source,
             "ng_semantics":sem,
         }
 
