@@ -152,3 +152,27 @@ SHOULD remain benchmark/vendor neutral.
 
 NIWC/DISA-specific corpus orchestration belongs in research tooling or manifests,
 not in reusable converter logic.
+
+
+## 14. Native legacy-residue prohibition
+
+Native SCAP-NG output SHALL NOT contain XCCDF, OVAL, OCIL, or CPE Applicability
+Language namespaces, identifiers, hrefs, XML element names, or other
+serialization residue.
+
+This includes, but is not limited to:
+
+- identifiers beginning with legacy XCCDF/OVAL/OCIL naming conventions;
+- XML namespace URIs;
+- check-content-ref/check-content XML structures;
+- OVAL definition/test/object/state IDs;
+- OCIL questionnaire IDs;
+- source component filenames/hrefs used as runtime bindings;
+- raw CPE Applicability Language structures.
+
+Such data MAY appear in separate conversion provenance/evidence only.
+
+If the converter encounters a source case where preserving one of these legacy
+references appears necessary to preserve semantics in native NG, it SHALL stop
+that conversion path and report a design-review blocker. It SHALL NOT emit the
+legacy reference into native NG without explicit project-owner approval.
