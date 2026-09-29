@@ -55,6 +55,40 @@ are not yet fully resolved for NG:
 - remote content/reference policy, if any;
 - final result-state vocabulary across automated and manual modes.
 
+## CPE and inventory lineage
+
+SP 800-126r4 retains CPE as part of SCAP 1.4 platform/applicability processing
+and ties CPE discovery to OVAL inventory-class definitions.
+
+The legacy processing chain is conceptually:
+
+    OVAL inventory definition
+        -> determine presence of product
+        -> add corresponding CPE to target CPE set
+        -> use target CPE set for CPE/XCCDF applicability processing
+
+SCAP-NG deliberately separates the useful inventory behavior from the legacy
+applicability dependency.
+
+The NG direction is:
+
+    Platform/Inventory Assessment
+        -> establish product identity
+        -> optionally emit standardized product identifiers such as CPE
+        -> include those identifiers in target.inventory results
+
+The emitted product inventory SHALL NOT feed back into Rule selection,
+Benchmark Platform truth, Rule applicability, or compliance truth unless a
+future explicit standard/profile defines such behavior.
+
+This preserves the SCAP 1.4 inventory-to-CPE relationship while removing the
+requirement that CPE be the executable applicability mechanism.
+
+SP 800-126r4 also recommends that OVAL inventory-class definitions reference
+corresponding CPE identifiers when such mappings exist. The closest SCAP-NG
+successor is for the Platform/Inventory Assessment to declare or emit the
+corresponding standardized product identifier as result inventory metadata.
+
 ## Use-case review
 
 SCAP 1.4 formally defines compliance checking, vulnerability scanning, and
