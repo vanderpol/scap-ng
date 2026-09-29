@@ -614,8 +614,46 @@ def bind_applicability_check_facts(node: dict | None, definition_ids: set[str]) 
     return out
 
 
-def bind_platform_refs(refs: list[str], definitions: list[dict]) -> list[dict]:
+def cpe_product_kind(name: str | None) -> str | None:
+    if not name:
+        return None
+    part=None
+    if name.startswith("cpe:/"):
+        fields=name[5:].split(":")
+        part=fields[0] if fields else None
+    elif name.startswith("cpe:2.3:"):
+        fields=name.split(":")
+        part=fields[2] if len(fields)>2 else None
+    return {
+        "o":"operating_system",
+        "a":"application",
+        "h":"hardware",
+    }.get(part)
+
+
+def cpe_binding_kind(name: str | None) -> str | None:
+    if not name:
+        return None
+    if name.startswith("cpe:/"):
+        return "uri"
+    if name.startswith("cpe:2.3:"):
+        return "formatted_string"
+    return None
+
+
+def bind_platform_refs(
+    refs: list[str],
+    definitions: list[dict],
+    cpe_inventory_refs: list[dict] | None = None,
+) -> list[dict]:
     by_id={x["id"]:x for x in definitions if x.get("id")}
+    cpe_inventory_refs=cpe_inventory_refs or []
+    by_cpe={}
+    for row in cpe_inventory_refs:
+        name=row.get("cpe_name")
+        if name:
+            by_cpe.setdefault(name,[]).append(row)
+
     out=[]
     for ref in refs:
         local_id=ref[1:] if ref.startswith("#") else None
@@ -627,11 +665,35 @@ def bind_platform_refs(refs: list[str], definitions: list[dict]) -> list[dict]:
                 "expression":by_id[local_id].get("expression"),
             })
         else:
-            out.append({
+            inventory_bindings=[
+                {
+                    "definition_id":row.get("definition_id"),
+                    "href":row.get("href"),
+                    "status":row.get("status"),
+                    "oval_component":row.get("oval_component"),
+                    "cpe_component":row.get("cpe_component"),
+                    "source":"cpe_dictionary",
+                }
+                for row in by_cpe.get(ref,[])
+            ]
+            item={
                 "ref":ref,
                 "kind":"cpe_name",
                 "name":ref,
-            })
+            }
+            if inventory_bindings:
+                item["inventory_bindings"]=inventory_bindings
+                item["inventory_output"]={
+                    "emit_when":"platform_true",
+                    "role":"descriptive_target_inventory",
+                    "product_kind":cpe_product_kind(ref),
+                    "identifiers":[{
+                        "scheme":"cpe",
+                        "binding":cpe_binding_kind(ref),
+                        "value":ref,
+                    }],
+                }
+            out.append(item)
     return out
 
 
@@ -783,6 +845,10 @@ def main() -> int:
             raise FileNotFoundError(f"missing applicability OVAL IR: {app_path}")
         applicability_ir=json.loads(app_path.read_text(encoding="utf-8"))
     applicability_definition_ids=set(applicability_diag.get("definition_ids",[]))
+    cpe_inventory_refs=[
+        row for row in applicability_diag.get("references",[])
+        if row.get("source_kind")=="cpe_dictionary"
+    ]
 
     component_id, benchmark = benchmarks[0]
     benchmark_platform_refs=platforms(benchmark)
@@ -805,15 +871,15 @@ def main() -> int:
             profile["platforms"] if profile["platforms"] else list(benchmark_platform_refs)
         )
         profile["effective_platforms"]=bind_platform_refs(
-            profile["effective_platform_refs"],platform_definitions
+            profile["effective_platform_refs"],platform_definitions,cpe_inventory_refs
         )
     for rule in rules:
         rule["effective_platforms"]=bind_platform_refs(
-            rule["effective_platform_refs"],platform_definitions
+            rule["effective_platform_refs"],platform_definitions,cpe_inventory_refs
         )
     for group in groups:
         group["effective_platforms"]=bind_platform_refs(
-            group["effective_platform_refs"],platform_definitions
+            group["effective_platform_refs"],platform_definitions,cpe_inventory_refs
         )
     for platform in platform_definitions:
         platform["expression"]=bind_applicability_check_facts(
@@ -822,15 +888,15 @@ def main() -> int:
     # Refresh effective bound platform expressions after check-fact annotation.
     for profile in profiles:
         profile["effective_platforms"]=bind_platform_refs(
-            profile["effective_platform_refs"],platform_definitions
+            profile["effective_platform_refs"],platform_definitions,cpe_inventory_refs
         )
     for rule in rules:
         rule["effective_platforms"]=bind_platform_refs(
-            rule["effective_platform_refs"],platform_definitions
+            rule["effective_platform_refs"],platform_definitions,cpe_inventory_refs
         )
     for group in groups:
         group["effective_platforms"]=bind_platform_refs(
-            group["effective_platform_refs"],platform_definitions
+            group["effective_platform_refs"],platform_definitions,cpe_inventory_refs
         )
     resolved_profiles=resolve_profiles(profiles,rules,groups,values)
     traversal=build_traversal_plan(benchmark,rules,groups)
@@ -892,7 +958,7 @@ def main() -> int:
             ],
             "platforms": benchmark_platform_refs,
             "effective_platforms": bind_platform_refs(
-                benchmark_platform_refs,platform_definitions
+                benchmark_platform_refs,platform_definitions,cpe_inventory_refs
             ),
             "references": references(benchmark),
             "rule_count": len(rules),
@@ -918,6 +984,7 @@ def main() -> int:
             "platform_definitions":len(platform_definitions),
             "applicability_oval_definitions":len(applicability_definition_ids),
             "applicability_ir_present":applicability_ir is not None,
+            "cpe_inventory_bindings":len(cpe_inventory_refs),
             "traversal_items":len(traversal),
             "local_platform_refs":sum(
                 1 for ref in benchmark_platform_refs if ref.startswith("#")
