@@ -1,0 +1,31 @@
+assessment:
+  id: RHEL-09-271010.automated
+  title: null
+  mode: automated
+  checks:
+    etc-dconf-db-local-d-banner-message-enable-set-true:
+      title: /etc/dconf/db/local.d/*/banner-message-enable is set to true
+      collect:
+        title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/dconf/db/local.d
+          filename:
+            operation: pattern match
+            value: .*
+          pattern:
+            operation: pattern match
+            value: ^\s*banner-message-enable\s*=\s*(\w+)$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        title: null
+        existence: all_exist
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: 'true'
+  evaluate:
+    check: etc-dconf-db-local-d-banner-message-enable-set-true
