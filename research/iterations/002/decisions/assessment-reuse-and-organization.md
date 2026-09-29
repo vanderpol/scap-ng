@@ -152,6 +152,36 @@ more capabilities, for example:
 
 Assessment identities SHOULD NOT merely repeat the underlying capability name.
 
+## Exact duplicate promotion
+
+When two or more Assessment Methods have been shown to have identical complete
+technical semantics after removing source identifiers, provenance, comments,
+metadata, and version-only noise, they SHOULD be represented by one shared
+Assessment definition with multiple policy bindings.
+
+For automated SCAP 1.4 migration, exact equivalence SHALL be established from
+the complete normalized Assessment graph. Matching capability names, matching
+Rule titles, matching Check Text, or similar-looking YAML alone is not
+sufficient.
+
+Automatic exact-reuse promotion MAY therefore:
+
+- replace duplicate automated Assessment definitions with one shared Assessment;
+- preserve each Benchmark's Rule and policy identity;
+- preserve each Rule's check-selector identities;
+- allow multiple selectors to resolve to the same shared Assessment when that
+  matches source semantics; and
+- generate reverse consumer/provenance information from the bindings.
+
+Automatic exact-reuse promotion SHALL NOT alter the Rule's policy meaning,
+applicability, selector behavior, or result semantics.
+
+Assessments that have the same normalized semantic **shape** only after
+abstracting literal values are parameterization candidates, not proven exact
+duplicates. Such candidates SHALL NOT be automatically shared until the
+parameterization contract has been reviewed and shown to preserve policy and
+Assessment semantics.
+
 ## Reuse discovery and promotion workflow
 
 A practical development workflow is:
