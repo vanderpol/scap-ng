@@ -225,6 +225,9 @@ def build(data):
                 for ref in s["collections"]:
                     e = ET.SubElement(se, q(OVAL_DEF, "object_reference"))
                     e.text = ids.get("obj", ref)
+                for f in s.get("filters", []):
+                    fe = ET.SubElement(se, q(OVAL_DEF, "filter"), {"action": f.get("action", "exclude")})
+                    fe.text = ids.get("ste", f["state"])
             else:
                 if "behaviors" in col:
                     ET.SubElement(o, q(ns, "behaviors"),
