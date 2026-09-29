@@ -1,0 +1,175 @@
+name: RHEL 9 benchmark semantic inventory
+
+on:
+  pull_request:
+    paths:
+      - 'tools/scap14_benchmark_ir.py'
+      - 'tools/scap14_rule_splitter.py'
+      - 'tools/scap_ng_roundtrip_v003/**'
+      - '.github/workflows/rhel9-benchmark-semantics.yml'
+  workflow_dispatch:
+
+jobs:
+  benchmark-semantics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC RHEL 9 corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check lxml pyyaml
+
+      - name: Split the complete RHEL 9 benchmark
+        run: |
+          mkdir -p work
+          python scap-ng/tools/scap14_rule_splitter.py             niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --output-dir work/rhel9-split             --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd             --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5             --source-repository-path Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --benchmark-key rhel9             --fail-on-unresolved
+
+      - name: Build semantic IR for every split OVAL document
+        run: |
+          set -euo pipefail
+          while IFS= read -r oval; do
+            out="$(dirname "$oval")/oval-ir.json"
+            python scap-ng/tools/oval_semantic_ir.py "$oval" --output "$out" --fail-on-unresolved
+          done < <(find work/rhel9-split -name oval.xml -type f | sort)
+
+      - name: Build complete benchmark semantic IR
+        run: |
+          python scap-ng/tools/scap14_benchmark_ir.py             niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --split-root work/rhel9-split             --output work/rhel9-benchmark-ir.json
+
+      - name: Summarize benchmark semantics
+        run: |
+          python - <<'PY'
+          import json,collections
+          d=json.load(open('work/rhel9-benchmark-ir.json'))
+          print(json.dumps(d['summary'],indent=2,sort_keys=True))
+          print('\nProfile IDs:')
+          for p in d['profiles']:
+              print(' ',p['id'],'extends=',p.get('extends'),'actions=',len(p.get('actions',[])))
+          print('\nCheck-model kinds:')
+          c=collections.Counter(r.get('check_model',{}).get('kind') for r in d['rules'])
+          print(dict(c))
+          print('\nCheck systems:')
+          systems=collections.Counter()
+          selectors=collections.Counter()
+          for r in d['rules']:
+              for chk in r.get('checks',[]):
+                  systems[chk.get('system')]+=1
+                  selectors[chk.get('selector') or '<default>']+=1
+          print('systems',dict(systems))
+          print('selectors',dict(selectors))
+          print('\nRule policy features:')
+          for key in ('requires','conflicts','extends','platforms'):
+              print(key,sum(1 for r in d['rules'] if r.get(key)))
+          print('complex_check',sum(1 for r in d['rules'] if r.get('check_model',{}).get('kind')=='complex_check'))
+          print('\nValues:',len(d['values']))
+          for v in d['values'][:20]:
+              print(' ',v.get('id'),v.get('type'),v.get('interactive'),len(v.get('values',[])),len(v.get('choices',[])))
+          PY
+
+      - name: Regenerate current v003 native RHEL 9 source
+        env:
+          SCAP_NG_V003_MODE: full
+        run: |
+          python scap-ng/tools/scap_upconvert_v003/run_local.py rhel9 --mode full --fail-on-error
+
+      - name: Audit current NG benchmark fidelity
+        id: fidelity
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/audit_rhel9_ng_fidelity.py \
+            work/rhel9-benchmark-ir.json \
+            scap-ng/research/iterations/003/source/split-rule-assessment/rhel9-full \
+            --output work/rhel9-ng-fidelity.json
+
+      - name: Show fidelity issues
+        if: always()
+        run: |
+          if [ -f work/rhel9-ng-fidelity.json ]; then
+            python - <<'PY'
+          import json
+          d=json.load(open('work/rhel9-ng-fidelity.json'))
+          print(json.dumps({
+              'pass':d['pass'],
+              'issue_count':d['issue_count'],
+              'stats':d['stats'],
+          },indent=2))
+          for row in d['issues'][:200]:
+              print(json.dumps(row,sort_keys=True))
+          PY
+          fi
+
+      - name: Run focused OVAL semantic stress round trips
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/run_roundtrip.py \
+            --fixtures scap-ng/research/iterations/003/examples/oval-ng-roundtrip-stress \
+            --repo-root scap-ng \
+            --out work/focused-roundtrip
+
+      - name: Regenerate full XCCDF policy from NG
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/ng_to_xccdf_rhel9.py \
+            scap-ng/research/iterations/003/source/split-rule-assessment/rhel9-full \
+            -o work/rhel9-regenerated-xccdf.xml
+
+      - name: Validate regenerated XCCDF 1.2
+        run: |
+          python - <<'PY'
+          from lxml import etree as E
+          schema=E.XMLSchema(E.parse('scap-ng/third_party/scap-1.4-schemas/xccdf_1.2.xsd'))
+          doc=E.parse('work/rhel9-regenerated-xccdf.xml')
+          schema.assertValid(doc)
+          print('regenerated XCCDF 1.2: schema PASS')
+          PY
+
+      - name: Compare regenerated XCCDF policy semantics
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/compare_xccdf_policy_semantics.py \
+            work/rhel9-benchmark-ir.json \
+            work/rhel9-regenerated-xccdf.xml \
+            --output work/rhel9-xccdf-roundtrip.json
+
+      - name: Extract authoritative source XCCDF for structural diff
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/extract_xccdf_from_scap14.py \
+            niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip \
+            -o work/rhel9-source-xccdf.xml
+
+      - name: Generate benchmark XCCDF structural diffs
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/diff_xccdf_roundtrip.py \
+            work/rhel9-source-xccdf.xml \
+            work/rhel9-regenerated-xccdf.xml \
+            --out-dir work/rhel9-xccdf-diff
+
+      - name: Audit raw XCCDF XML surface
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/audit_xccdf_xml_surface.py \
+            work/rhel9-source-xccdf.xml \
+            --rule-mapping scap-ng/research/iterations/003/evidence/rhel9-full/rule-mapping.json \
+            --platform-inventory scap-ng/research/iterations/003/evidence/rhel9-full/source-platform-inventory.json \
+            --output work/rhel9-xccdf-surface-audit.json
+
+      - name: Upload benchmark semantic IR
+        uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-benchmark-semantic-ir
+          path: |
+            work/rhel9-benchmark-ir.json
+            work/rhel9-ng-fidelity.json
+            work/rhel9-regenerated-xccdf.xml
+            work/rhel9-xccdf-roundtrip.json
+            work/rhel9-xccdf-surface-audit.json
+            work/rhel9-source-xccdf.xml
+            work/rhel9-xccdf-diff/**

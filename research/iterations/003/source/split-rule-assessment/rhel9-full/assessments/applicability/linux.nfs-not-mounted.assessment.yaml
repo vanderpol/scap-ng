@@ -1,0 +1,30 @@
+assessment:
+  id: linux.nfs-not-mounted.assessment
+  version: 2
+  assessment_title: Linux with no NFS mounts configured
+  mode: automated
+  class: inventory
+  purpose: applicability
+  checks:
+    nfs-mounts-present:
+      test_title: NFS mounts are present
+      collect:
+        object_title: /etc/fstab, uncommented, nfs, capturing options
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    not:
+      check: nfs-mounts-present

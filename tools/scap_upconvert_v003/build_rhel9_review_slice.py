@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 import yaml
 
 SOURCE_URL = (
-    "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/"
+    "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/8c8e5dff860af6b1290ee9273a282db24278f8d5/Current/"
     "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip"
 )
 ROOT = Path(__file__).resolve().parents[2]
@@ -414,8 +414,9 @@ def native_applicability_id(platform_node):
     title = (text(next((n for n in platform_node if local(n.tag) == "title"), None)) or "").lower()
     mapping = [
         ("gnome", "linux.gnome-installed"),
-        ("nfs mounts configured", "linux.nfs-mounted"),
+        # Match the more-specific negative form before the positive substring.
         ("no nfs mounts", "linux.nfs-not-mounted"),
+        ("nfs mounts configured", "linux.nfs-mounted"),
         ("ipv6 enabled", "linux.ipv6-enabled"),
         ("bios boot", "linux.bios-boot"),
         ("uefi boot", "linux.uefi-boot"),
@@ -509,6 +510,8 @@ def records(root):
                 "element": rule,
                 "source_rule_id": rule.get("id"),
                 "source_group_id": group.get("id"),
+                "source_group_title": text(group.find("x:title", NS)),
+                "source_group_description": text(group.find("x:description", NS)),
                 "id": identity["rule_id"],
                 "version": identity["rule_version"],
                 "stig_id": identity["stig_id"],
@@ -1761,6 +1764,9 @@ def main():
                     if rid in selected_ids: disabled.append(rid)
             profile = {"id": safe_id((p.get("id") or "profile").split("_profile_")[-1]),
                        "title": text(p.find("x:title", NS))}
+            source_profile_description = text(p.find("x:description", NS))
+            if source_profile_description and source_profile_description != "<ProfileDescription></ProfileDescription>":
+                profile["description"] = source_profile_description
             if disabled: profile["disabled_rules"] = sorted(disabled)
             selectors = {}
             for rr in p.findall("x:refine-rule", NS):
@@ -1873,6 +1879,9 @@ def main():
                 rule_identifiers.append({"scheme": "disa-stig-id", "value": rec["stig_id"]})
             if rec.get("vulnerability_id"):
                 rule_identifiers.append({"scheme": "disa-vulnerability-id", "value": rec["vulnerability_id"]})
+            group_title = rec.get("source_group_title")
+            if group_title and re.fullmatch(r"SRG-[A-Za-z0-9-]+", group_title):
+                rule_identifiers.append({"scheme": "disa-srg-id", "value": group_title})
 
             normalized_remediation, remediation_error = normalized_fixes(rule)
             if FULL_MODE and remediation_error:

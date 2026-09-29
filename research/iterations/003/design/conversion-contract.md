@@ -239,3 +239,41 @@ is native SCAP-NG.
 
 Native-authored SCAP-NG content MAY use a cleaner decomposition than converted
 content, provided both forms have the same defined semantics.
+
+
+## OVAL extend_definition normalization
+
+For OVAL-to-NG conversion, `extend_definition` is considered a legacy
+definition-composition mechanism rather than a required native NG construct.
+
+The converter SHOULD recursively dereference `extend_definition` edges into the
+native Assessment Boolean/evaluation tree when doing so preserves the complete
+OVAL result semantics.
+
+A trivial wrapper Definition whose criteria consists only of an unmodified
+`extend_definition` MAY disappear entirely in native NG.
+
+Dereferencing SHALL preserve the logical context of the reference, including:
+
+- the containing criteria operator;
+- `negate` on the `extend_definition` edge;
+- `applicability_check` on the `extend_definition` edge;
+- nested criteria operators and negation in the referenced Definition; and
+- any sibling criterion/criteria/extend_definition nodes in the extending
+  Definition.
+
+The converter SHALL NOT replace an extending Definition with only the referenced
+base Definition when the extending Definition contributes additional evaluation
+semantics.
+
+Original Definition identities, wrapper structure, metadata, and the
+`extend_definition` relationship SHALL remain available in conversion
+provenance when needed for auditability, but need not remain as native executable
+objects.
+
+Consequently, OVAL -> NG -> OVAL round-trip validation SHALL require semantic
+equivalence after recursive definition dereferencing, not XML structural
+identity or recreation of the original `extend_definition` wrapper graph.
+
+This is an intentional structural divergence from OVAL authoring and SHOULD be
+included in OVAL Board review.

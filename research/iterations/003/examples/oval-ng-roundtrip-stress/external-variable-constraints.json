@@ -1,0 +1,72 @@
+{
+  "fixture_version": 1,
+  "id": "external-variable-constraints",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:2",
+    "note": "Schema-derived OVAL case exercising external possible_value and possible_restriction semantics.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/external-variable-constraints.xml"
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "external-path-check",
+        "type": "unix.file",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "external-path-collection"
+      }
+    ],
+    "collections": [
+      {
+        "id": "external-path-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": {
+            "datatype": "string",
+            "variable": "protected-path-variable",
+            "var_check": "at least one"
+          }
+        }
+      }
+    ],
+    "variables": [
+      {
+        "id": "protected-path-variable",
+        "kind": "external",
+        "datatype": "string",
+        "possible_values": [
+          {
+            "hint": "standard audit directory",
+            "value": "/var/log/audit"
+          },
+          {
+            "hint": "alternate audit directory",
+            "value": "/audit"
+          }
+        ],
+        "possible_restrictions": [
+          {
+            "hint": "must be an absolute path",
+            "operator": "AND",
+            "restrictions": [
+              {
+                "operation": "pattern match",
+                "value": "^/.*$"
+              },
+              {
+                "operation": "not equal",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "checks": [
+        "external-path-check"
+      ]
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "fixture_version": 1,
+  "id": "entity-check-var-check-many-to-many",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:1",
+    "note": "Schema-derived OVAL case exercising two-level entity_check + var_check semantics.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/entity-check-var-check-many-to-many.xml"
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "many-to-many-check",
+        "type": "independent.textfilecontent54",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "many-to-many-collection",
+        "states": [
+          "many-to-many-state"
+        ]
+      }
+    ],
+    "collections": [
+      {
+        "id": "many-to-many-collection",
+        "type": "independent.textfilecontent54",
+        "selectors": {
+          "filepath": "/tmp/scap-ng-many-to-many.conf",
+          "pattern": {
+            "operation": "pattern match",
+            "value": "^(foo)=(bar)$"
+          },
+          "instance": {
+            "datatype": "int",
+            "value": "1"
+          }
+        }
+      }
+    ],
+    "states": [
+      {
+        "id": "many-to-many-state",
+        "type": "independent.textfilecontent54",
+        "predicates": {
+          "subexpression": {
+            "datatype": "string",
+            "operation": "equals",
+            "variable": "accepted-subexpressions-variable",
+            "var_check": "at least one",
+            "entity_check": "at least one"
+          }
+        }
+      }
+    ],
+    "variables": [
+      {
+        "id": "accepted-subexpressions-variable",
+        "kind": "constant",
+        "datatype": "string",
+        "values": [
+          "foo",
+          "bar"
+        ]
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "checks": [
+        "many-to-many-check"
+      ]
+    }
+  }
+}

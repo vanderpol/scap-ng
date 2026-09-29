@@ -1,0 +1,105 @@
+name: RHEL 9 round-trip coverage inventory
+
+on:
+  pull_request:
+    paths:
+      - 'tools/scap_ng_roundtrip_v003/**'
+      - '.github/workflows/rhel9-roundtrip-coverage.yml'
+  workflow_dispatch:
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC RHEL 9 corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - name: Check out pinned OVAL Self-Assertion corpus
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: self-assertion
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check lxml
+
+      - name: Compile round-trip tools
+        run: python -m py_compile scap-ng/tools/scap_ng_roundtrip_v003/*.py
+
+      - name: Split the complete RHEL 9 benchmark
+        run: |
+          mkdir -p work
+          python scap-ng/tools/scap14_rule_splitter.py             niwc/Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --output-dir work/rhel9-split             --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd             --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5             --source-repository-path Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip             --benchmark-key rhel9             --fail-on-unresolved
+
+      - name: Inventory complete OVAL surface
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/inventory_oval_surface.py             work/rhel9-split             --output work/rhel9-oval-surface.json
+
+      - name: Summarize round-trip coverage target
+        run: |
+          python - <<'PY'
+          import json
+          p='work/rhel9-oval-surface.json'
+          d=json.load(open(p))
+          print(f"Automated OVAL files: {d['file_count']}")
+          for k in ('test_types','object_types','state_types','variable_types','functions',
+                    'set_operator','filter_action','var_check','entity_check','operations','behaviors'):
+              vals=d.get('totals',{}).get(k,{})
+              print(f"\n{k}: {len(vals)} unique")
+              for name,count in vals.items():
+                  print(f"  {count:5}  {name}")
+          PY
+
+      - name: Audit tracked OVAL language surface coverage
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/audit_oval_language_surface.py \
+            --schema-dir scap-ng/third_party/scap-1.4-schemas/oval_5.12.3 \
+            --corpus-inventory work/rhel9-oval-surface.json \
+            --focused-source-dir scap-ng/research/iterations/003/evidence/roundtrip-source-oval \
+            --self-assertion-root self-assertion/SCAP_1.4/OVAL_Test_Content \
+            --output work/oval-language-surface-coverage.json
+
+      - name: Run corpus-wide semantic round trip
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus.py             work/rhel9-split             --out work/rhel9-roundtrip             --strict
+
+      - name: Summarize corpus-wide round trip
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open('work/rhel9-roundtrip/summary.json'))
+          print(json.dumps({
+              'source_file_count':d['source_file_count'],
+              'counts':d['counts'],
+              'all_pass':d['all_pass'],
+              'xml_diff_summary':d.get('xml_diff_summary',{}),
+          },indent=2))
+          for row in d['rows']:
+              if row['status']!='pass':
+                  print(row['status'],row['source'],row.get('error',''))
+          PY
+
+      - name: Upload full benchmark round-trip evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-oval-roundtrip-evidence
+          path: |
+            work/rhel9-oval-surface.json
+            work/oval-language-surface-coverage.json
+            work/rhel9-roundtrip/summary.json
+            work/rhel9-roundtrip/diffs/
+

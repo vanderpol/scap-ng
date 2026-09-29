@@ -37,3 +37,14 @@ Usage:
 
 Next steps are XSD/Schematron validation and an independent semantic normalizer
 that compares original OVAL with regenerated OVAL.
+
+
+## Conformance development workflow
+
+Active round-trip/conformance development is performed on a pull-request branch
+so PR-triggered GitHub Actions runs, jobs, logs, and generated artifacts are
+visible through the GitHub integration.
+
+The branch workflow is not a semantic requirement of SCAP-NG; it is only a
+development/testing mechanism. The authoritative test requirements remain the
+XSD/Schematron validation and semantic round-trip comparisons described above.

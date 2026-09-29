@@ -1,0 +1,61 @@
+{
+  "fixture_version": 1,
+  "id": "masked-state-entity",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:60",
+    "note": "Schema-derived case proving mask and state-entity check_existence preservation.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/masked-state-entity.xml"
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "masked-state-check",
+        "type": "independent.textfilecontent54",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "masked-secret-collection",
+        "states": [
+          "masked-secret-state"
+        ]
+      }
+    ],
+    "collections": [
+      {
+        "id": "masked-secret-collection",
+        "type": "independent.textfilecontent54",
+        "selectors": {
+          "filepath": "/tmp/scap-ng-secret.conf",
+          "pattern": {
+            "operation": "pattern match",
+            "value": "^secret=(.*)$"
+          },
+          "instance": {
+            "datatype": "int",
+            "value": "1"
+          }
+        }
+      }
+    ],
+    "states": [
+      {
+        "id": "masked-secret-state",
+        "type": "independent.textfilecontent54",
+        "predicates": {
+          "subexpression": {
+            "operation": "pattern match",
+            "value": "^.+$",
+            "entity_check": "all",
+            "check_existence": "all_exist",
+            "mask": true
+          }
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "checks": [
+        "masked-state-check"
+      ]
+    }
+  }
+}

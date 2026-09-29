@@ -1,0 +1,55 @@
+{
+  "fixture_version": 1,
+  "id": "state-operator-or",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:100",
+    "note": "Schema-derived OVAL case proving non-default State operator preservation.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/state-operator-or.xml"
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "state-or-check",
+        "type": "unix.file",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "state-or-collection",
+        "states": [
+          "state-or-state"
+        ]
+      }
+    ],
+    "collections": [
+      {
+        "id": "state-or-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": "/tmp/scap-ng-state-op"
+        }
+      }
+    ],
+    "states": [
+      {
+        "id": "state-or-state",
+        "type": "unix.file",
+        "operator": "OR",
+        "predicates": {
+          "user_id": {
+            "datatype": "int",
+            "value": "0"
+          },
+          "group_id": {
+            "datatype": "int",
+            "value": "0"
+          }
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "checks": [
+        "state-or-check"
+      ]
+    }
+  }
+}

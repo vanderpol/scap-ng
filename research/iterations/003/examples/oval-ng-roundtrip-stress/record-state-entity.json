@@ -1,0 +1,79 @@
+{
+  "fixture_version": 1,
+  "id": "record-state-entity",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:70",
+    "note": "Schema-derived non-deprecated sql512 State used to prove record-valued entity and field preservation.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/record-state-entity.xml"
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "record-state-check",
+        "type": "independent.sql512",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "record-sql-collection",
+        "states": [
+          "record-result-state"
+        ]
+      }
+    ],
+    "collections": [
+      {
+        "id": "record-sql-collection",
+        "type": "independent.sql512",
+        "selectors": {
+          "engine": "mysql",
+          "version": {
+            "operation": "pattern match",
+            "value": "^8\\..*$"
+          },
+          "instance": {
+            "operation": "pattern match",
+            "value": "^.*$"
+          },
+          "database": "security",
+          "sql": "SELECT name, value FROM settings"
+        }
+      }
+    ],
+    "states": [
+      {
+        "id": "record-result-state",
+        "type": "independent.sql512",
+        "predicates": {
+          "result": {
+            "datatype": "record",
+            "operation": "equals",
+            "entity_check": "all",
+            "check_existence": "at_least_one_exists",
+            "mask": true,
+            "fields": [
+              {
+                "name": "name",
+                "datatype": "string",
+                "operation": "equals",
+                "value": "password_policy"
+              },
+              {
+                "name": "value",
+                "datatype": "string",
+                "operation": "pattern match",
+                "entity_check": "at least one",
+                "mask": true,
+                "value": "^enabled$"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "checks": [
+        "record-state-check"
+      ]
+    }
+  }
+}

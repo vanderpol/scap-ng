@@ -1,0 +1,65 @@
+{
+  "fixture_version": 1,
+  "id": "multistate-negated-criteria",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:3",
+    "note": "Schema-derived OVAL case exercising state_operator OR and a negated criterion.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/multistate-negated-criteria.xml"
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "multistate-file-check",
+        "type": "unix.file",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "state_operator": "OR",
+        "collection": "multistate-file-collection",
+        "states": [
+          "root-owner-state",
+          "service-owner-state"
+        ]
+      }
+    ],
+    "collections": [
+      {
+        "id": "multistate-file-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": "/tmp/scap-ng-multistate"
+        }
+      }
+    ],
+    "states": [
+      {
+        "id": "root-owner-state",
+        "type": "unix.file",
+        "predicates": {
+          "user_id": {
+            "datatype": "int",
+            "value": "0"
+          }
+        }
+      },
+      {
+        "id": "service-owner-state",
+        "type": "unix.file",
+        "predicates": {
+          "user_id": {
+            "datatype": "int",
+            "value": "1000"
+          }
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "children": [
+        {
+          "check": "multistate-file-check",
+          "negate": true
+        }
+      ]
+    }
+  }
+}
