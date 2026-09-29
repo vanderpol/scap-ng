@@ -35,6 +35,11 @@ def main():
     rules={}
     for p in sorted((a.ng_root/"rules").glob("*.yaml")):
         r=load(p)["rule"]; rules[r["id"]]=r
+    manual_assessments={}
+    manual_dir=a.ng_root/"assessments"/"manual"
+    if manual_dir.exists():
+        for p in sorted(manual_dir.glob("*.yaml")):
+            m=load(p)["assessment"]; manual_assessments[m["id"]]=m
 
     root=E.Element(q("Benchmark"),nsmap={None:X},id=f"xccdf_scap-ng_benchmark_{norm_id(b['id'])}",resolved="true")
     st=(b.get("status") or [{"value":"draft"}])[0]
@@ -86,8 +91,20 @@ def main():
                 ie=E.SubElement(relem,q("ident"),system="http://cyber.mil/cci")
                 ie.text=str(ident["value"])
 
+        # Preserve rule references in a schema-valid flattened representation.
+        # The source-to-NG fidelity audit separately verifies the structured
+        # reference fields, so this exporter is not the provenance authority.
+        for ref in r.get("references",[]) or []:
+            parts=[str(ref.get(k) or "") for k in ("title","publisher","type","subject","identifier")]
+            value=" ".join(x for x in parts if x)
+            if value:
+                E.SubElement(relem,q("reference")).text=value
+
         guidance=(r.get("remediation") or {}).get("guidance")
-        if guidance: E.SubElement(relem,q("fixtext")).text=guidance
+        if guidance:
+            fix_id=f"fix-{rid}"
+            E.SubElement(relem,q("fixtext"),fixref=fix_id).text=guidance
+            E.SubElement(relem,q("fix"),id=fix_id)
 
         checks=r.get("checks") or {}
         for selector,assessment in checks.items():
@@ -103,6 +120,11 @@ def main():
             E.SubElement(ce,q("check-content-ref"),
                          href=f"urn:scap-ng:assessment:{assessment}",
                          name=str(assessment))
+            if system==OCIL:
+                manual=manual_assessments.get(str(assessment))
+                procedure=(manual or {}).get("procedure")
+                if procedure:
+                    E.SubElement(ce,q("check-content")).text=str(procedure)
 
     tree=E.ElementTree(root)
     E.indent(tree,space="  ")
