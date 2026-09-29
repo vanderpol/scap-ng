@@ -22,11 +22,12 @@ jobs:
         with:
           path: scap-ng
 
-      - name: Check out authoritative SCAP/OVAL schemas
+      - name: Check out authoritative OVAL 5.12.3 schemas
         uses: actions/checkout@v4
         with:
-          repository: vanderpol/scap-content
-          path: scap-content
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
 
       - name: Install XML validator
         run: |
@@ -45,7 +46,7 @@ jobs:
       - name: Validate regenerated OVAL against SCAP 1.4 omni schema
         run: |
           set -euo pipefail
-          schema="scap-content/schemas/scap-1.4-oval-5.12.3/omni-schema.xsd"
+          schema="oval-language/schemas/oval-definitions-schema.xsd"
           for xml in out/*.xml; do
             echo "Validating $xml"
             xmllint --noout --schema "$schema" "$xml"
@@ -62,5 +63,5 @@ jobs:
           set -euo pipefail
           python scap-ng/tools/scap_ng_roundtrip_v003/run_roundtrip.py \
             --fixtures scap-ng/research/iterations/003/examples/oval-ng-roundtrip-stress \
-            --scap-content scap-content \
+            --repo-root scap-ng \
             --out semantic-out
