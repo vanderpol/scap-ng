@@ -323,3 +323,73 @@ Confirm whether SCAP-NG should retain this OVAL-derived model:
 The board review should include both compact and breadcrumb examples and confirm
 that no interoperability or diagnostics requirement justifies forcing every
 intermediate expression to become a separately named Variable.
+
+
+## Native authoring option: inline local Collections inside Variables
+
+**Status:** native-NG authoring idea; does not change lossless SCAP 1.4 conversion behavior.
+
+SCAP-NG SHOULD permit a Variable expression to obtain values either from:
+
+1. a named reusable Collection; or
+2. an inline local Collection defined inside that Variable when the collection
+   is used only to produce that Variable's value.
+
+Example using a named Collection:
+
+    collections:
+      interactive-users-collection:
+        capability: unix.password
+        ...
+
+    variables:
+      interactive-uids-variable:
+        expression:
+          values:
+            collection: interactive-users-collection
+            field: user_id
+
+Example using an inline local Collection:
+
+    variables:
+      interactive-uids-variable:
+        expression:
+          values:
+            collection:
+              capability: unix.password
+              select:
+                username:
+                  operation: pattern_match
+                  value: ".*"
+              filters:
+                - action: include
+                  match:
+                    field: user_id
+                    operation: greater_than_or_equal
+                    value: 1000
+            field: user_id
+
+The inline form avoids forcing native authors to create a top-level Collection
+that has no independent reuse or meaning outside the Variable.
+
+A local inline Collection SHALL be scoped to the containing Variable and SHALL
+not be referenceable by other nodes.
+
+If a Collection is consumed by more than one Variable, Check, Filter, Set, or
+other named node, it SHOULD be promoted to a named `*-collection`.
+
+For SCAP 1.4 conversion, existing OVAL Object boundaries SHOULD remain named
+Collections even when the resulting Collection has only one consumer. The
+inline-local form is primarily an authoring convenience for new native NG
+content and SHALL NOT be used by the converter to erase meaningful source graph
+structure.
+
+### Board review point
+
+The OVAL Board should review whether SCAP-NG should support both:
+
+- named reusable Collections; and
+- anonymous/local Collections scoped to a single Variable expression.
+
+The proposed distinction is semantic reuse/scope, not capability. Both forms
+would use the same Collection definition model and execution semantics.
