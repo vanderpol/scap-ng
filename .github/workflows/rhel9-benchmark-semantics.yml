@@ -79,6 +79,12 @@ jobs:
               print(' ',v.get('id'),v.get('type'),v.get('interactive'),len(v.get('values',[])),len(v.get('choices',[])))
           PY
 
+      - name: Regenerate current v003 native RHEL 9 source
+        env:
+          SCAP_NG_V003_MODE: full
+        run: |
+          python scap-ng/tools/scap_upconvert_v003/run_local.py rhel9 --mode full --fail-on-error
+
       - name: Audit current NG benchmark fidelity
         id: fidelity
         run: |
