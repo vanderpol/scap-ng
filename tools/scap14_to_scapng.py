@@ -220,8 +220,8 @@ def compile_oval_assessment(rule: dict, ir: dict, catalog: dict[str, dict]) -> t
     return assessment, assessment["migration"]
 
 
-def manual_assessment(rule: dict) -> tuple[dict, dict]:
-    checks = copy.deepcopy(rule.get("checks", []))
+def manual_assessment(rule: dict, checks: list[dict] | None = None) -> tuple[dict, dict]:
+    checks = copy.deepcopy(checks if checks is not None else rule.get("checks", []))
     assessment = {
         "id": f"ng.manual.{safe_id(rule['id'])}",
         "version": 1,
@@ -243,8 +243,8 @@ def manual_assessment(rule: dict) -> tuple[dict, dict]:
             "source": "SCAP 1.4 XCCDF manual/external check",
             "source_rule": rule.get("id"),
             "note": (
-                "The source check reference is preserved. Dedicated OCIL "
-                "questionnaire lowering is a separate conversion layer."
+                "The source Check Text/check reference is preserved. Dedicated "
+                "OCIL questionnaire lowering is not required for manual execution."
             ),
         },
     }
@@ -261,61 +261,111 @@ def normalized_check_selector(value) -> str:
     return value if value not in (None, "") else "default"
 
 
-def check_selection_plan(rule: dict, assessment: dict | None) -> tuple[dict | None, dict | None]:
-    """Lower XCCDF check-selector candidates without silently collapsing alternatives.
+def check_implementation_kind(check: dict) -> str:
+    """Classify one XCCDF check candidate by the implementation we can lower."""
+    system = (check.get("system") or "").lower()
+    if "oval" in system:
+        return "automated"
+    if "ocil" in system or check.get("inline_content"):
+        return "manual"
+    return "external"
 
-    The current generic converter can bind one effective assessment implementation
-    for a Rule. Multiple distinct XCCDF selector alternatives require separate
-    assessment lowering and are therefore a hard migration blocker until that
-    mapping exists.
+
+def check_selection_plan(
+    rule: dict,
+    implementations: dict[str, dict | None],
+) -> tuple[dict | None, dict | None]:
+    """Lower XCCDF check-selector candidates without losing alternatives.
+
+    Different selector names may resolve to the same Assessment implementation
+    (for example, an empty/default OVAL check and an `automated` OVAL check).
+    A manual selector may resolve to the Rule's Check Text Manual Assessment.
+    Checking-system fallback *within the same selector* is blocked unless the
+    candidates are semantically identical.
     """
     checks = copy.deepcopy(rule.get("checks", []))
     if not checks:
         return None, None
 
-    selector_rows = []
-    seen = set()
+    grouped: dict[str, list[dict]] = {}
+    source_selectors: dict[str, object] = {}
     for check in checks:
         source_selector = check.get("selector")
         selector = normalized_check_selector(source_selector)
-        if selector in seen:
-            continue
-        seen.add(selector)
-        selector_rows.append({
+        grouped.setdefault(selector, []).append(check)
+        source_selectors.setdefault(selector, source_selector)
+
+    rows = []
+    for selector, candidates in grouped.items():
+        kinds = {check_implementation_kind(x) for x in candidates}
+        if len(kinds) != 1:
+            return None, {
+                "status": "unsupported",
+                "reason": "check_system_fallback_not_lowered",
+                "selector": selector,
+                "systems": [x.get("system") for x in candidates],
+                "message": (
+                    "One XCCDF selector has multiple checking-system alternatives. "
+                    "The source fallback order must be represented explicitly before "
+                    "conversion may succeed."
+                ),
+            }
+
+        # More than one candidate under the same selector is only safe to merge
+        # when their source check semantics are identical.
+        if len(candidates) > 1:
+            semantic_keys = {
+                canonical_digest({
+                    "system": x.get("system"),
+                    "negate": x.get("negate"),
+                    "multi_check": x.get("multi_check"),
+                    "exports": x.get("exports", []),
+                    "content_refs": x.get("content_refs", []),
+                    "inline_content": x.get("inline_content"),
+                })
+                for x in candidates
+            }
+            if len(semantic_keys) != 1:
+                return None, {
+                    "status": "unsupported",
+                    "reason": "same_selector_alternatives_not_lowered",
+                    "selector": selector,
+                    "message": (
+                        "Multiple non-equivalent XCCDF check candidates share one "
+                        "selector. Their checking-system/fallback semantics must be "
+                        "lowered explicitly before conversion may succeed."
+                    ),
+                }
+
+        kind = next(iter(kinds))
+        assessment = implementations.get(kind)
+        if assessment is None:
+            return None, {
+                "status": "unsupported",
+                "reason": "check_selector_without_assessment",
+                "selector": selector,
+                "implementation_kind": kind,
+                "message": (
+                    f"XCCDF selector {selector!r} cannot be bound to a converted "
+                    f"{kind} Assessment."
+                ),
+            }
+        rows.append({
             "selector": selector,
-            "source_selector": source_selector,
-        })
-
-    if len(selector_rows) > 1:
-        return None, {
-            "status": "unsupported",
-            "reason": "selectable_check_alternatives_not_lowered",
-            "selectors": selector_rows,
-            "message": (
-                "The source Rule exposes multiple XCCDF check selectors. "
-                "The converter SHALL lower each selector to a distinct SCAP-NG "
-                "check alternative before conversion may succeed."
-            ),
-        }
-
-    if assessment is None:
-        return None, {
-            "status": "unsupported",
-            "reason": "check_selector_without_assessment",
-            "selectors": selector_rows,
-            "message": "The source check selector cannot be bound to an Assessment.",
-        }
-
-    row = selector_rows[0]
-    return {
-        "checks": [{
-            "selector": row["selector"],
-            "source_selector": row["source_selector"],
+            "source_selector": source_selectors[selector],
             "assessment": assessment.get("id"),
             "assessment_version": assessment.get("version", 1),
-        }],
-        "default_check": row["selector"],
-    }, None
+        })
+
+    default_check = (
+        "default"
+        if any(x.get("selector") in (None, "") for x in checks)
+        else None
+    )
+    result = {"checks": rows}
+    if default_check is not None:
+        result["default_check"] = default_check
+    return result, None
 
 
 def native_profile_check_selectors(source: dict) -> list[dict]:
@@ -533,34 +583,70 @@ def main() -> int:
     for rule in source.get("rules", []):
         policy = policy_rule(rule)
         assessment_source = rule.get("assessment_source") or {}
+        source_checks = copy.deepcopy(rule.get("checks", []))
+        manual_checks = [
+            x for x in source_checks if check_implementation_kind(x) == "manual"
+        ]
 
+        automated_assessment = None
+        automated_migration = None
         if assessment_source.get("kind") == "oval_semantic_ir":
-            assessment, migration = compile_oval_assessment(
+            automated_assessment, automated_migration = compile_oval_assessment(
                 rule, assessment_source["ir"], catalog
             )
-        else:
-            assessment, migration = manual_assessment(rule)
 
-        selection, selection_error = check_selection_plan(rule, assessment)
+        manual_impl = None
+        manual_migration = None
+        if manual_checks or assessment_source.get("kind") != "oval_semantic_ir":
+            manual_impl, manual_migration = manual_assessment(
+                rule, manual_checks if manual_checks else source_checks
+            )
+
+        # A failure to lower any published automated alternative blocks the Rule
+        # even when a manual alternative is available: Stage-1 conversion is
+        # lossless across the complete selectable-check set.
+        migration = automated_migration or manual_migration or {
+            "status": "unsupported",
+            "reason": "no_assessment_implementation",
+            "source_rule": rule.get("id"),
+        }
+
+        implementations = {
+            "automated": automated_assessment,
+            "manual": manual_impl,
+        }
+        selection, selection_error = check_selection_plan(rule, implementations)
         if selection_error is not None and migration.get("status") != "unsupported":
             migration = {
                 **selection_error,
                 "source": "SCAP 1.4 XCCDF check selection",
                 "source_rule": rule.get("id"),
             }
-            assessment = None
-        elif selection is not None:
+        elif selection is not None and migration.get("status") != "unsupported":
             policy = {**policy, **selection}
+
+        rule_assessments = []
+        for candidate in (automated_assessment, manual_impl):
+            if candidate is not None and candidate.get("id") not in {
+                x.get("id") for x in rule_assessments
+            }:
+                rule_assessments.append(candidate)
+
+        primary_assessment = automated_assessment or manual_impl
+        if migration.get("status") == "unsupported":
+            primary_assessment = None
+            rule_assessments = []
 
         canonical = {
             "policy": policy,
-            "assessment": assessment,
+            "assessment": primary_assessment,
+            "assessments": rule_assessments,
             "migration": migration,
             "source_split_diagnostic": copy.deepcopy(rule.get("split_diagnostic")),
         }
         canonical["semantic_fingerprint_sha256"] = canonical_digest({
             "policy": policy,
-            "assessment": assessment,
+            "assessments": rule_assessments,
             "migration_status": migration.get("status"),
         })
         canonical_rules.append(canonical)
@@ -592,7 +678,7 @@ def main() -> int:
             )
             continue
 
-        if assessment_source.get("kind") == "oval_semantic_ir":
+        if automated_assessment is not None:
             automated.append(rule["id"])
         else:
             manual.append(rule["id"])
@@ -603,7 +689,8 @@ def main() -> int:
             "model": "combined-rule",
             "rule": {
                 **policy,
-                "assessment": assessment,
+                "assessment": primary_assessment,
+                "assessments": rule_assessments,
                 "migration": migration,
             },
         }
@@ -616,24 +703,37 @@ def main() -> int:
             split_root / "policy" / "rules" / f"{safe_id(rule['id'])}.yaml",
             {"scap_ng": SPEC, "prototype": True, "rule": policy},
         )
-        aid = assessment["id"]
-        dump_yaml(
-            split_root / "automation" / "assessments" / f"{safe_id(aid)}.yaml",
-            {
-                "scap_ng": SPEC,
-                "prototype": True,
-                "model": "split-policy-assessment-binding",
-                "assessment": assessment,
-            },
-        )
+        for assessment in rule_assessments:
+            aid = assessment["id"]
+            dump_yaml(
+                split_root / "automation" / "assessments" / f"{safe_id(aid)}.yaml",
+                {
+                    "scap_ng": SPEC,
+                    "prototype": True,
+                    "model": "split-policy-assessment-binding",
+                    "assessment": assessment,
+                },
+            )
+
         binding = {
             "rule": rule["id"],
-            "assessment": aid,
-            "assessment_version": assessment.get("version", 1),
+            "checks": copy.deepcopy(policy.get("checks", [])),
             "migration_status": migration.get("status"),
         }
         if policy.get("default_check") is not None:
+            binding["default_check"] = policy["default_check"]
+            default_row = next(
+                x for x in policy.get("checks", [])
+                if x.get("selector") == policy["default_check"]
+            )
+            binding["assessment"] = default_row["assessment"]
+            binding["assessment_version"] = default_row.get("assessment_version", 1)
             binding["check_selector"] = policy["default_check"]
+        elif primary_assessment is not None:
+            # Compatibility field for prototype tooling. Runtime selection is
+            # governed by the explicit checks list, not this field.
+            binding["assessment"] = primary_assessment["id"]
+            binding["assessment_version"] = primary_assessment.get("version", 1)
         bindings.append(binding)
 
     dump_yaml(
