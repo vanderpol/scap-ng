@@ -75,6 +75,7 @@ Design source files that are:
   conversions for the four anchor STIGs.
 - `decisions/` — design decisions as they stabilize.
 - `provenance/` — migration/source linkage for review examples only.
+- `schema-creation-research.md` — research-only schema strategy and Board-review boundary; no schema approved or created yet.
 
 Nothing enters iteration 002 merely because a converter can generate it.
 Every example should be understandable and defensible as potential native
