@@ -1148,7 +1148,10 @@ def main():
             OUT / "applicability.yaml",
             {
                 "applicability": [
-                    {"id": app_id, "assessment": assessment_id}
+                    {
+                        "id": app_id,
+                        "assessment": f"assessments/applicability/{assessment_id}.yaml",
+                    }
                     for app_id, assessment_id in sorted(applicability_registry.items())
                 ]
             },
