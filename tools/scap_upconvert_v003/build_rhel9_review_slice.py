@@ -777,7 +777,7 @@ def oval_semantic_inventory(oroot):
         if name.endswith("_variable"):
             variable_kinds[name] = variable_kinds.get(name, 0) + 1
         if name in (
-            "arithmetic", "begin", "concat", "end", "escape_regex",
+            "arithmetic", "begin", "concat", "count", "end", "escape_regex",
             "literal_component", "object_component", "regex_capture",
             "split", "substring", "time_difference", "unique",
             "variable_component",
@@ -802,7 +802,7 @@ def unsupported_definition_features(oroot, definition_id):
     visited_variables = set()
 
     supported_components = {
-        "arithmetic", "begin", "concat", "end", "escape_regex",
+        "arithmetic", "begin", "concat", "count", "end", "escape_regex",
         "literal_component", "object_component", "regex_capture",
         "split", "substring", "time_difference", "unique",
         "variable_component",
@@ -1056,6 +1056,8 @@ def lower_definition(oroot, definition_id, assessment_id):
 
         if name == "concat":
             return {"concat": lowered}, None
+        if name == "count":
+            return {"count": lowered[0] if len(lowered) == 1 else lowered}, None
         if name == "unique":
             return {"unique": lowered[0] if len(lowered) == 1 else lowered}, None
         if name == "split":
