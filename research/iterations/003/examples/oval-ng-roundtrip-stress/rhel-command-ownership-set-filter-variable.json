@@ -1,0 +1,244 @@
+{
+  "fixture_version": 1,
+  "id": "rhel-command-ownership-set-filter-variable",
+  "source": {
+    "repository": "vanderpol/scap-content",
+    "path": "projects/linux/rhel10/oval/U_RHEL_10_SV-281037-oval.xml",
+    "root_definition": "oval:navy.navwar.niwcatlantic.scc:def:28103700001",
+    "note": "Real production-derived OVAL combining Variables, filtered Sets, symlink resolution, and var_check."
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "no-selected-symlinks-check",
+        "type": "unix.file",
+        "check_existence": "none_exist",
+        "check": "all",
+        "collection": "selected-symlinks-collection"
+      },
+      {
+        "id": "resolve-selected-symlinks-check",
+        "type": "unix.symlink",
+        "check_existence": "all_exist",
+        "check": "all",
+        "collection": "selected-symlink-targets-collection",
+        "states": [
+          "absolute-symlink-target-state"
+        ]
+      },
+      {
+        "id": "no-owner-violations-check",
+        "type": "unix.file",
+        "check_existence": "none_exist",
+        "check": "all",
+        "collection": "owner-violations-collection"
+      }
+    ],
+    "collections": [
+      {
+        "id": "selected-command-files-collection",
+        "type": "unix.file",
+        "behaviors": {
+          "recurse_direction": "down",
+          "max_depth": "-1",
+          "recurse": "symlinks and directories",
+          "recurse_file_system": "all"
+        },
+        "selectors": {
+          "path": {
+            "variable": "command-roots-variable",
+            "var_check": "at least one"
+          },
+          "filename": {
+            "operation": "pattern match",
+            "value": "^.*$"
+          }
+        },
+        "filters": [
+          {
+            "action": "exclude",
+            "state": "directory-state"
+          }
+        ]
+      },
+      {
+        "id": "selected-symlinks-collection",
+        "type": "unix.file",
+        "set": {
+          "operator": "UNION",
+          "collections": [
+            "selected-command-files-collection"
+          ],
+          "filters": [
+            {
+              "action": "include",
+              "state": "symlink-file-state"
+            }
+          ]
+        }
+      },
+      {
+        "id": "selected-symlink-targets-collection",
+        "type": "unix.symlink",
+        "selectors": {
+          "filepath": {
+            "variable": "selected-symlink-paths-variable",
+            "var_check": "at least one"
+          }
+        }
+      },
+      {
+        "id": "resolved-target-files-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": {
+            "variable": "resolved-target-paths-variable",
+            "var_check": "at least one"
+          }
+        },
+        "filters": [
+          {
+            "action": "exclude",
+            "state": "directory-state"
+          }
+        ]
+      },
+      {
+        "id": "selected-nonsymlinks-collection",
+        "type": "unix.file",
+        "set": {
+          "operator": "UNION",
+          "collections": [
+            "selected-command-files-collection"
+          ],
+          "filters": [
+            {
+              "action": "exclude",
+              "state": "symlink-file-state"
+            }
+          ]
+        }
+      },
+      {
+        "id": "direct-and-resolved-files-collection",
+        "type": "unix.file",
+        "set": {
+          "operator": "UNION",
+          "collections": [
+            "selected-nonsymlinks-collection",
+            "resolved-target-files-collection"
+          ]
+        }
+      },
+      {
+        "id": "owner-violations-collection",
+        "type": "unix.file",
+        "set": {
+          "operator": "UNION",
+          "collections": [
+            "direct-and-resolved-files-collection"
+          ],
+          "filters": [
+            {
+              "action": "exclude",
+              "state": "root-owner-state"
+            }
+          ]
+        }
+      }
+    ],
+    "states": [
+      {
+        "id": "directory-state",
+        "type": "unix.file",
+        "predicates": {
+          "type": "directory"
+        }
+      },
+      {
+        "id": "symlink-file-state",
+        "type": "unix.file",
+        "predicates": {
+          "type": "symbolic link"
+        }
+      },
+      {
+        "id": "absolute-symlink-target-state",
+        "type": "unix.symlink",
+        "predicates": {
+          "canonical_path": {
+            "operation": "pattern match",
+            "value": "^/"
+          }
+        }
+      },
+      {
+        "id": "root-owner-state",
+        "type": "unix.file",
+        "predicates": {
+          "user_id": {
+            "datatype": "int",
+            "value": "0"
+          }
+        }
+      }
+    ],
+    "variables": [
+      {
+        "id": "command-roots-variable",
+        "kind": "constant",
+        "datatype": "string",
+        "values": [
+          "/bin",
+          "/sbin",
+          "/usr/bin",
+          "/usr/sbin",
+          "/usr/libexec",
+          "/usr/local/bin",
+          "/usr/local/sbin"
+        ]
+      },
+      {
+        "id": "selected-symlink-paths-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "object_component": {
+            "collection": "selected-symlinks-collection",
+            "item_field": "filepath"
+          }
+        }
+      },
+      {
+        "id": "resolved-target-paths-variable",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "object_component": {
+            "collection": "selected-symlink-targets-collection",
+            "item_field": "canonical_path"
+          }
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "children": [
+        {
+          "operator": "OR",
+          "children": [
+            {
+              "check": "no-selected-symlinks-check"
+            },
+            {
+              "check": "resolve-selected-symlinks-check"
+            }
+          ]
+        },
+        {
+          "check": "no-owner-violations-check"
+        }
+      ]
+    }
+  }
+}
