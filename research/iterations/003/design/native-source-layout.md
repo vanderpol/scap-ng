@@ -200,3 +200,103 @@ If yes, SCAP-NG SHOULD preserve the concept in native form.
 
 Legacy XML namespaces, opaque identifiers, component hrefs, wrapper structures,
 and cross-language stovepipes remain out of native NG source.
+
+
+## Explicit Benchmark surface
+
+The same explicit-field rule used for Rule Policy applies to `benchmark.yaml`.
+
+The Benchmark is the complete native policy-publication record. A reader SHALL
+NOT need knowledge of the historical source schema to discover which
+Benchmark-level properties SCAP-NG supports.
+
+For iteration 003, the supported Benchmark surface is:
+
+    benchmark:
+      id:
+      title:
+      description:
+      language:
+      status:
+      version:
+      metadata:
+      notices:
+      front_matter:
+      rear_matter:
+      references:
+      text_blocks:
+      platform:
+      scoring:
+      parameters:
+      groups:
+      profiles:
+      rules:
+
+Supported fields SHOULD remain visible even when their value is `null`, `[]`,
+or `{}`.
+
+### Benchmark-level conversion intent
+
+The converter SHALL preserve the information content of useful source
+Benchmark-level properties in native form, including:
+
+- status and status dates;
+- title and description;
+- natural-language identity;
+- legal/advisory notices;
+- document-generation front matter and rear matter;
+- references;
+- reusable human-readable text blocks when still referenced after conversion;
+- Benchmark platform applicability;
+- version, version time, and update location;
+- authorship/publisher/support/discovery metadata;
+- suggested scoring models and parameters when retained by NG;
+- Parameters;
+- Groups;
+- Profiles;
+- Rules.
+
+Multiple source values such as multilingual titles/descriptions SHALL NOT be
+collapsed when doing so would lose information. The native form SHOULD use
+structured entries containing language where needed.
+
+### Benchmark-level source properties intentionally relocated or removed
+
+Some historical Benchmark children/attributes do not belong in native
+`benchmark.yaml` even when they appeared at the source Benchmark level:
+
+- historical assessment results belong under the NG result model, not policy
+  source;
+- XML digital signatures are replaced by NG package/signature provenance rather
+  than embedded XML signature structure;
+- XML signature helper IDs are not native content;
+- source-resolution state is compiler provenance, not authored policy;
+- authoring `style` / stylesheet URLs are not retained unless a concrete NG
+  interoperability requirement is demonstrated;
+- XML namespaces and XML base/URI processing state are never native NG policy.
+
+These omissions are intentional model decisions, not accidental conversion
+loss.
+
+### Metadata
+
+Known metadata SHOULD be normalized into native fields rather than preserved as
+arbitrary XML.
+
+The Benchmark `metadata` mapping MAY carry useful publication metadata that
+does not already have a first-class Benchmark property, for example creator,
+publisher, contributor, subject, rights, source, and support/contact data.
+
+Raw XML metadata elements and namespace-qualified keys SHALL NOT appear in
+native source.
+
+If arbitrary source metadata cannot be normalized without information loss, the
+converter SHALL report it for design review rather than embedding an XML-shaped
+blob.
+
+### Regeneration goal
+
+The lossless-conversion target is sufficient native information to regenerate
+the same meaningful Benchmark publication data and policy semantics.
+
+It is not byte-for-byte reproduction of the original XML serialization.
