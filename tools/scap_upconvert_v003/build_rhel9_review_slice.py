@@ -505,24 +505,29 @@ def fully_lowerable(rec, oroot):
     return lowerability_reason(rec, oroot) is None
 
 def functional_group(rec):
-    haystack = " ".join(filter(None, [
-        rec.get("title"),
-        text(rec["element"].find("x:description", NS)),
-        text(rec["element"].find("x:fixtext", NS)),
-    ])).lower()
+    title = (rec.get("title") or "").lower()
+    discussion = (text(rec["element"].find("x:description", NS)) or "").lower()
+    remediation = (text(rec["element"].find("x:fixtext", NS)) or "").lower()
+    haystack = " ".join((title, discussion, remediation))
+
+    # Prefer specific, recognizable policy domains.  Avoid broad substring
+    # matches such as "user" or "log" that create misleading groups.
     topics = [
-        ("ssh", "SSH", ("ssh", "sshd", "secure shell")),
-        ("password-policy", "Password Policy", ("password", "pam", "pwquality", "login.defs")),
-        ("auditing", "Auditing", ("audit", "audisp", "journald", "log")),
-        ("account-management", "Account Management", ("account", "user", "group", "uid", "gid")),
-        ("services", "Services", ("service", "systemd", "daemon", "target")),
-        ("filesystem", "Filesystem and Permissions", ("file", "directory", "permission", "owner", "mount")),
-        ("networking", "Networking", ("network", "firewall", "ipv4", "ipv6", "tcp", "udp")),
-        ("cryptography", "Cryptography", ("crypto", "fips", "cipher", "certificate", "key")),
+        ("ssh", "SSH", (r"\bssh\b", r"\bsshd\b", r"secure shell")),
+        ("password-policy", "Password Policy", (r"password", r"pwquality", r"login\.defs", r"pam_")),
+        ("auditing", "Auditing", (r"\baudit", r"auditd", r"audisp")),
+        ("logging", "Logging", (r"journald", r"rsyslog", r"syslog", r"log file")),
+        ("graphical-environment", "Graphical Environment", (r"graphical", r"gnome", r"display manager", r"gdm")),
+        ("system-lifecycle", "System Lifecycle and Support", (r"vendor-supported", r"supported release", r"end of life")),
+        ("account-management", "Account Management", (r"user account", r"account management", r"inactive account", r"root account")),
+        ("services", "Services", (r"\bservice\b", r"\bdaemon\b", r"systemd")),
+        ("filesystem", "Filesystem and Permissions", (r"file permission", r"directory permission", r"file owner", r"mount point")),
+        ("networking", "Networking", (r"firewall", r"ipv4", r"ipv6", r"tcp", r"udp", r"network interface")),
+        ("cryptography", "Cryptography", (r"\bfips\b", r"cipher", r"certificate", r"cryptograph", r"private key")),
     ]
-    for gid, title, needles in topics:
-        if any(n in haystack for n in needles):
-            return gid, title
+    for gid, group_title, patterns in topics:
+        if any(re.search(pattern, haystack) for pattern in patterns):
+            return gid, group_title
     return "needs-grouping", "Needs Grouping"
 
 def build_groups(selected):
@@ -579,6 +584,33 @@ def main():
         files = [p for p in (td / "pkg").rglob("*") if p.is_file()]
         xr, oroot, xsrc, osrc = load_source_components(files)
         rs = records(xr)
+
+        applicability_candidates = [
+            {
+                "rule": r["id"],
+                "title": r["title"],
+                "platform_refs": r["platforms"],
+                "default_check_mode": (
+                    check_kind(next(
+                        (c for c in r["checks"] if not (c.get("selector") or "").strip()),
+                        r["checks"][0] if r["checks"] else None,
+                    ))
+                    if r["checks"] else None
+                ),
+            }
+            for r in rs if r["platforms"]
+        ]
+        manual_default_candidates = [
+            {
+                "rule": r["id"],
+                "title": r["title"],
+            }
+            for r in rs
+            if r["checks"] and check_kind(next(
+                (c for c in r["checks"] if not (c.get("selector") or "").strip()),
+                r["checks"][0],
+            )) == "manual"
+        ]
 
         # First accepted slice: three Rules for which this checkpoint can
         # preserve every check-selection and automated-assessment semantic it emits.
@@ -767,6 +799,8 @@ def main():
         })
         write_json(EVIDENCE / "rule-mapping.json", {"rules": evidence})
         write_json(EVIDENCE / "grouping.json", {"groups": grouping_evidence})
+        write_json(EVIDENCE / "applicability-candidates.json", {"rules": applicability_candidates})
+        write_json(EVIDENCE / "manual-default-candidates.json", {"rules": manual_default_candidates})
         write_json(EVIDENCE / "diagnostics.json", {"diagnostics": diagnostics})
         print("accepted native rules:", ", ".join(selected_ids))
 
