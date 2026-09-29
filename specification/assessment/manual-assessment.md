@@ -170,3 +170,20 @@ interaction language before their existing manual content can be used.
 **Specification navigation:** [← Previous: Assessment Method](assessment-method.md) · [Contents](../README.md) · [Next: Source, Compilation, Packaging, and Integrity →](../package/package-and-integrity.md)
 
 <!-- spec-nav:end -->
+
+
+## Manual Assessment versioning
+
+A native Manual Assessment SHOULD carry an explicit version/revision.
+
+When a Manual Assessment is created natively and has no inherited executable
+definition version, its initial version SHOULD be `1` unless the publisher
+uses another documented versioning policy.
+
+The Manual Assessment version SHALL remain independent of the governing Rule
+version. A Rule revision does not automatically imply a Manual Assessment
+revision, and a Manual Assessment revision does not automatically imply a Rule
+revision.
+
+Migration tooling SHALL preserve any authoritative source version when one
+exists rather than replacing it with the native initial value.
