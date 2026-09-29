@@ -137,7 +137,30 @@ A processor MAY deduplicate equivalent inventory facts emitted by multiple
 Platform Assessments, provided provenance sufficient to explain the reported
 inventory is retained.
 
-## 8. Reuse
+## 8. Descriptive titles
+
+Automated Assessment nodes MAY carry concise human-readable descriptive titles
+that explain what is being collected or evaluated.
+
+When present, the preferred native field names are:
+
+- `definition_title` for a named Assessment/definition-level description;
+- `test_title` for a test/evaluation description;
+- `object_title` for a collection/object description;
+- `state_title` for an expected-state/predicate description;
+- `variable_title` for a variable/derived-input description.
+
+These titles are descriptive metadata. Changing only a title SHALL NOT change
+Assessment truth or technical semantic identity.
+
+Migration tooling SHOULD preserve useful OVAL Test/Object/State/Variable
+`comment` attributes by mapping them to the corresponding typed title fields.
+
+OVAL `criteria` and `criterion` comments SHALL NOT be promoted into native
+SCAP-NG Boolean-expression titles merely because they exist in legacy content.
+They MAY be retained in migration provenance for source traceability.
+
+## 9. Reuse
 
 Reusable Assessments SHOULD use semantic identities describing the fact they
 establish rather than the first Rule or Benchmark that used them.
@@ -147,7 +170,7 @@ demonstrated.
 
 Reuse SHALL be promoted only when semantic equivalence has been established.
 
-## 9. Source references and compiled identity
+## 10. Source references and compiled identity
 
 Authoring paths MAY be used to reference Assessment source files.
 
@@ -158,7 +181,7 @@ Assessment identities.
 
 Moving or renaming a source file SHALL NOT change Assessment identity.
 
-## 10. Historical provenance
+## 11. Historical provenance
 
 Legacy XCCDF/OVAL/OCIL lineage SHOULD be retained as authoring comments or in
 separate conversion reports when useful for migration and review.
