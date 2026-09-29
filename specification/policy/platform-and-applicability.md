@@ -461,3 +461,11 @@ Platform identities sharing the same Rule policy set:
     research/iterations/002/examples/source/rhel9/assessments/automated/platforms/
 
 These examples are design-review source and do not freeze final serialization.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Benchmark, Rule, and Group Model](benchmark.md) · [Contents](../README.md) · [Next: Profiles and Tailoring →](profiles-and-tailoring.md)
+
+<!-- spec-nav:end -->
