@@ -132,10 +132,15 @@ class Model:
         self.memo[key]=out; return out
 
     def setexpr(self,e):
+        nested=e.findall(f"{{{OD}}}set")
+        if nested:
+            return ("set",e.attrib.get("set_operator","UNION"),
+                    ("nested",tuple(self.setexpr(c) for c in nested)))
         return ("set",e.attrib.get("set_operator","UNION"),
-                tuple(self.obj(c.text.strip()) for c in e.findall(f"{{{OD}}}object_reference")),
-                tuple((f.attrib.get("action","exclude"),self.state(f.text.strip()))
-                      for f in e.findall(f"{{{OD}}}filter")))
+                ("leaf",
+                 tuple(self.obj(c.text.strip()) for c in e.findall(f"{{{OD}}}object_reference")),
+                 tuple((f.attrib.get("action","exclude"),self.state(f.text.strip()))
+                       for f in e.findall(f"{{{OD}}}filter"))))
 
     def obj(self,oid):
         key=("obj",oid)
