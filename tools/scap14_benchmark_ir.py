@@ -845,10 +845,18 @@ def main() -> int:
             raise FileNotFoundError(f"missing applicability OVAL IR: {app_path}")
         applicability_ir=json.loads(app_path.read_text(encoding="utf-8"))
     applicability_definition_ids=set(applicability_diag.get("definition_ids",[]))
-    cpe_inventory_refs=[
-        row for row in applicability_diag.get("references",[])
-        if row.get("source_kind")=="cpe_dictionary"
-    ]
+
+    cpe_inventory_refs=[]
+    platform_inventory=[]
+    for row in manifest.get("cpe_inventory",[]):
+        copied=json.loads(json.dumps(row))
+        if row.get("status")=="split_valid":
+            inv_path=args.split_root/Path(row["path"]).parent/"oval-ir.json"
+            if not inv_path.exists():
+                raise FileNotFoundError(f"missing CPE inventory OVAL IR: {inv_path}")
+            copied["oval_ir"]=json.loads(inv_path.read_text(encoding="utf-8"))
+        cpe_inventory_refs.append(copied)
+        platform_inventory.append(copied)
 
     component_id, benchmark = benchmarks[0]
     benchmark_platform_refs=platforms(benchmark)
@@ -968,6 +976,7 @@ def main() -> int:
             "source_tree": split.xccdf_node(benchmark),
         },
         "platform_definitions":platform_definitions,
+        "platform_inventory":platform_inventory,
         "applicability":{
             "diagnostic":applicability_diag,
             "oval_ir":applicability_ir,
@@ -985,6 +994,9 @@ def main() -> int:
             "applicability_oval_definitions":len(applicability_definition_ids),
             "applicability_ir_present":applicability_ir is not None,
             "cpe_inventory_bindings":len(cpe_inventory_refs),
+            "cpe_inventory_split_valid":sum(
+                1 for x in platform_inventory if x.get("status")=="split_valid"
+            ),
             "traversal_items":len(traversal),
             "local_platform_refs":sum(
                 1 for ref in benchmark_platform_refs if ref.startswith("#")
