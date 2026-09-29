@@ -258,18 +258,10 @@ def main() -> int:
             (x.get("selector") if x.get("selector") not in (None,"") else "default")
             for x in source_checks
         }
-        if len(source_selector_names)>1:
-            if not (
-                migration.get("status")=="unsupported"
-                and migration.get("reason")=="selectable_check_alternatives_not_lowered"
-            ):
-                failures.append(
-                    f"{rid}: multiple source check selectors were not rejected losslessly"
-                )
 
         combined_policy={
             k:v for k,v in combined.items()
-            if k not in {"assessment","migration"}
+            if k not in {"assessment","assessments","migration"}
         }
         split_policy_clean={
             k:v for k,v in split_policy.items()
@@ -294,56 +286,100 @@ def main() -> int:
                 failures.append(f"{rid}: unsupported rule unexpectedly has binding")
             continue
 
+        canonical_assessments=entry.get("assessments")
+        if canonical_assessments is None:
+            canonical_assessments=[
+                entry.get("assessment")
+            ] if entry.get("assessment") is not None else []
+        canonical_assessment_ids={
+            x.get("id") for x in canonical_assessments if x and x.get("id")
+        }
+
         if source_checks:
             policy_checks=policy.get("checks") or []
-            if len(policy_checks)!=1:
-                failures.append(f"{rid}: supported rule does not expose exactly one lowered check")
-            else:
-                lowered=policy_checks[0]
-                expected_selector=next(iter(source_selector_names))
-                if lowered.get("selector")!=expected_selector:
-                    failures.append(f"{rid}: lowered check selector differs from source")
-                if policy.get("default_check")!=expected_selector:
-                    failures.append(f"{rid}: default check does not match lowered selector")
-                if lowered.get("assessment")!=entry.get("assessment",{}).get("id"):
-                    failures.append(f"{rid}: policy check does not resolve to canonical assessment")
+            lowered_selectors={x.get("selector") for x in policy_checks}
+            if lowered_selectors!=source_selector_names:
+                failures.append(
+                    f"{rid}: lowered selector set differs from source "
+                    f"{sorted(source_selector_names)} != {sorted(lowered_selectors)}"
+                )
+            for lowered in policy_checks:
+                if lowered.get("assessment") not in canonical_assessment_ids:
+                    failures.append(
+                        f"{rid}: selector {lowered.get('selector')} references "
+                        "an assessment absent from canonical rule assessments"
+                    )
+            source_has_default=any(
+                x.get("selector") in (None,"") for x in source_checks
+            )
+            if source_has_default:
+                if policy.get("default_check")!="default":
+                    failures.append(f"{rid}: source default check was not preserved")
+            elif policy.get("default_check") is not None:
+                failures.append(f"{rid}: converter invented a default check")
 
         binding=bindings.get(rid)
         if not binding:
             failures.append(f"{rid}: missing split assessment binding")
             continue
+        if binding.get("checks",[])!=policy.get("checks",[]):
+            failures.append(f"{rid}: split binding check alternatives differ from policy")
         if policy.get("default_check") is not None:
+            if binding.get("default_check")!=policy.get("default_check"):
+                failures.append(f"{rid}: binding default differs from policy default check")
             if binding.get("check_selector")!=policy.get("default_check"):
                 failures.append(f"{rid}: binding selector differs from policy default check")
-        aid=binding["assessment"]
-        apath=root/"split-policy-assessment-binding"/"automation"/"assessments"/(
-            "".join(c if c.isalnum() or c in "._-" else "_" for c in aid).strip("_")+".yaml"
-        )
-        if not apath.exists():
-            failures.append(f"{rid}: missing split assessment file {aid}")
-            continue
-        split_assessment=load_yaml(apath)["assessment"]
+
         if combined.get("assessment")!=entry.get("assessment"):
-            failures.append(f"{rid}: combined assessment differs from canonical")
-        if split_assessment!=entry.get("assessment"):
-            failures.append(f"{rid}: split assessment differs from canonical")
+            failures.append(f"{rid}: combined primary assessment differs from canonical")
+        if combined.get("assessments",[])!=canonical_assessments:
+            failures.append(f"{rid}: combined assessment alternatives differ from canonical")
+
+        for expected_assessment in canonical_assessments:
+            aid=expected_assessment["id"]
+            apath=root/"split-policy-assessment-binding"/"automation"/"assessments"/(
+                "".join(c if c.isalnum() or c in "._-" else "_" for c in aid).strip("_")+".yaml"
+            )
+            if not apath.exists():
+                failures.append(f"{rid}: missing split assessment file {aid}")
+                continue
+            split_assessment=load_yaml(apath)["assessment"]
+            if split_assessment!=expected_assessment:
+                failures.append(f"{rid}: split assessment differs from canonical: {aid}")
 
         if ansible_root is not None:
             abinding=ansible_bindings.get(rid)
             if not abinding:
                 failures.append(f"{rid}: missing ansible-inspired assessment binding")
             else:
-                ansible_aid=abinding["assessment"]
-                aansible=ansible_root/"automation"/"assessments"/(
-                    "".join(c if c.isalnum() or c in "._-" else "_" for c in ansible_aid).strip("_")+".yaml"
-                )
-                if not aansible.exists():
-                    failures.append(f"{rid}: missing ansible-inspired assessment file {ansible_aid}")
-                else:
+                if abinding.get("checks",[])!=policy.get("checks",[]):
+                    failures.append(
+                        f"{rid}: ansible-inspired binding alternatives differ from policy"
+                    )
+                if abinding.get("default_check")!=policy.get("default_check"):
+                    failures.append(
+                        f"{rid}: ansible-inspired default check differs from policy"
+                    )
+                for expected_assessment in canonical_assessments:
+                    ansible_aid=expected_assessment["id"]
+                    aansible=ansible_root/"automation"/"assessments"/(
+                        "".join(
+                            c if c.isalnum() or c in "._-" else "_"
+                            for c in ansible_aid
+                        ).strip("_")+".yaml"
+                    )
+                    if not aansible.exists():
+                        failures.append(
+                            f"{rid}: missing ansible-inspired assessment file {ansible_aid}"
+                        )
+                        continue
                     rendered=load_yaml(aansible).get("assessment",{})
                     recovered=canonicalize_ansible_assessment(rendered)
-                    if recovered!=entry.get("assessment"):
-                        failures.append(f"{rid}: ansible-inspired assessment differs from canonical")
+                    if recovered!=expected_assessment:
+                        failures.append(
+                            f"{rid}: ansible-inspired assessment differs from canonical: "
+                            f"{ansible_aid}"
+                        )
         checked+=1
 
     if len(bindings)!=summary["bindings"]:
