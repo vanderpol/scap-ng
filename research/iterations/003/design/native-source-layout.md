@@ -80,6 +80,7 @@ surface for iteration 003 is:
 
     rule:
       id:
+      version:
       title:
       severity:
       role:
