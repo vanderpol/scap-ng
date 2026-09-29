@@ -146,6 +146,53 @@ def emit_expression(parent, expr, ids):
         value=expr["split"]
         el = ET.SubElement(parent, q(OVAL_DEF, "split"), {"delimiter": value["delimiter"]})
         emit_component(el, value["component"], ids)
+    elif "begin" in expr:
+        value=expr["begin"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"begin"),{"character":value["character"]})
+        emit_component(el,value["component"],ids)
+    elif "end" in expr:
+        value=expr["end"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"end"),{"character":value["character"]})
+        emit_component(el,value["component"],ids)
+    elif "escape_regex" in expr:
+        el=ET.SubElement(parent,q(OVAL_DEF,"escape_regex"))
+        emit_component(el,expr["escape_regex"],ids)
+    elif "substring" in expr:
+        value=expr["substring"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"substring"),{
+            "substring_start":str(value["start"]),
+            "substring_length":str(value["length"]),
+        })
+        emit_component(el,value["component"],ids)
+    elif "time_difference" in expr:
+        value=expr["time_difference"]
+        attrs={}
+        if value.get("format_1") is not None: attrs["format_1"]=value["format_1"]
+        if value.get("format_2") is not None: attrs["format_2"]=value["format_2"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"time_difference"),attrs)
+        for comp in value["components"]:
+            emit_component(el,comp,ids)
+    elif "regex_capture" in expr:
+        value=expr["regex_capture"]
+        attrs={}
+        if value.get("pattern") is not None: attrs["pattern"]=value["pattern"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"regex_capture"),attrs)
+        emit_component(el,value["component"],ids)
+    elif "merge" in expr:
+        value=expr["merge"]
+        attrs={}
+        for k in ("delimiter","sort","order"):
+            if value.get(k) is not None: attrs[k]=str(value[k])
+        el=ET.SubElement(parent,q(OVAL_DEF,"merge"),attrs)
+        for comp in value["components"]:
+            emit_component(el,comp,ids)
+    elif "glob_to_regex" in expr:
+        value=expr["glob_to_regex"]
+        attrs={}
+        if value.get("glob_noescape") is not None:
+            attrs["glob_noescape"]=str(bool(value["glob_noescape"])).lower()
+        el=ET.SubElement(parent,q(OVAL_DEF,"glob_to_regex"),attrs)
+        emit_component(el,value["component"],ids)
     else:
         die(f"unsupported expression: {expr}")
 
