@@ -29,10 +29,11 @@ jobs:
           ref: v5.12.3
           path: oval-language
 
-      - name: Install XML validator
+      - name: Install XML validators
         run: |
           sudo apt-get update
           sudo apt-get install -y libxml2-utils
+          python -m pip install lxml
 
       - name: Reverse-generate OVAL stress fixtures
         run: |
@@ -53,6 +54,13 @@ jobs:
             echo "Validating $xml"
             xmllint --noout --schema "$schema" "$xml"
           done
+
+      - name: Validate regenerated OVAL against embedded Schematron
+        run: |
+          set -euo pipefail
+          python scap-ng/tools/scap_ng_roundtrip_v003/validate_embedded_schematron.py \
+            --schemas oval-language/oval-schemas \
+            out/*.xml
 
       - name: Upload regenerated OVAL
         uses: actions/upload-artifact@v4
