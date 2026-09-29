@@ -1,0 +1,48 @@
+name: Check selector conversion conformance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/check-selector-conformance.yml"
+      - "tools/scap14_rule_splitter.py"
+      - "tools/scap14_benchmark_ir.py"
+      - "tools/scap14_to_scapng.py"
+      - "tools/verify_scap14_to_scapng_conversion.py"
+      - "tools/test_xccdf_check_selector_conversion.py"
+      - "tools/test_xccdf_profile_resolution.py"
+  pull_request:
+    paths:
+      - ".github/workflows/check-selector-conformance.yml"
+      - "tools/scap14_rule_splitter.py"
+      - "tools/scap14_benchmark_ir.py"
+      - "tools/scap14_to_scapng.py"
+      - "tools/verify_scap14_to_scapng_conversion.py"
+      - "tools/test_xccdf_check_selector_conversion.py"
+      - "tools/test_xccdf_profile_resolution.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  selector-conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML lxml
+      - name: Syntax check migration tools
+        run: |
+          python -m py_compile \
+            tools/scap14_rule_splitter.py \
+            tools/scap14_benchmark_ir.py \
+            tools/scap14_to_scapng.py \
+            tools/verify_scap14_to_scapng_conversion.py
+      - name: Check XCCDF profile semantics
+        run: python tools/test_xccdf_profile_resolution.py
+      - name: Check selector conversion semantics
+        run: python tools/test_xccdf_check_selector_conversion.py
