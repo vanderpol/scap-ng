@@ -243,3 +243,11 @@ Historical lineage SHALL NOT be required in scanner-facing Assessment semantics.
 
 Runtime provenance needed to identify what actually executed is a separate
 result/package concern.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Parameters and Organizational Input](../policy/parameters-and-organizational-input.md) · [Contents](../README.md) · [Next: Manual Assessment →](manual-assessment.md)
+
+<!-- spec-nav:end -->
