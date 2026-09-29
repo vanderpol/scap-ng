@@ -183,3 +183,11 @@ If the source CPE identifier cannot be mapped unambiguously to the migrated
 inventory Assessment, the converter SHOULD preserve the original relationship
 as migration provenance and report it for review rather than invent a product
 identifier.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Results and Evidence](../results/results.md) · [Contents](../README.md) · [Next: OVAL 5.12.3 to SCAP-NG Migration →](oval-5.12.3-to-ng.md)
+
+<!-- spec-nav:end -->
