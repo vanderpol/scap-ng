@@ -60,3 +60,37 @@ The OVAL Board should explicitly choose among these directions:
 
 Any choice that differs from historical SCAP behavior SHALL be documented in
 the SCAP 1.4 compatibility crosswalk and migration guidance.
+
+
+## Historical authoring experience
+
+Prior OVAL Board discussions provide an important operational data point: a
+content author seeking a clean OVAL `not applicable` result for a policy-level
+applicability condition was directed toward or made aware of
+`applicability_check`, but the mechanism did not provide the desired
+policy-level NOT APPLICABLE behavior.
+
+This is consistent with the language definition of OVAL `not applicable`,
+which is primarily about a test or definition not being valid on the target
+platform (for example, an RPM test on a platform where RPM collection is not
+applicable), rather than a general policy statement that a security
+requirement is out of scope.
+
+It is also consistent with implementation evidence showing that
+`applicability_check` may be preserved as metadata without changing normal
+criteria evaluation.
+
+### Implication
+
+SCAP-NG SHALL NOT assume that OVAL `applicability_check` provided a complete
+or interoperable policy-applicability result model.
+
+Board review should explicitly distinguish:
+
+- platform/collector-level NOT APPLICABLE;
+- policy/rule applicability;
+- applicability predicates used to decide whether a Rule should be evaluated;
+- inventory predicates historically reused for applicability in SCAP content.
+
+These concepts MAY require different native semantics even though historical
+SCAP/OVAL content often blurred them.
