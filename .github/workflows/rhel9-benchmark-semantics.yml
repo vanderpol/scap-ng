@@ -79,8 +79,36 @@ jobs:
               print(' ',v.get('id'),v.get('type'),v.get('interactive'),len(v.get('values',[])),len(v.get('choices',[])))
           PY
 
+      - name: Audit current NG benchmark fidelity
+        id: fidelity
+        continue-on-error: true
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/audit_rhel9_ng_fidelity.py \
+            work/rhel9-benchmark-ir.json \
+            scap-ng/research/iterations/003/source/split-rule-assessment/rhel9-full \
+            --output work/rhel9-ng-fidelity.json
+
+      - name: Show fidelity issues
+        if: always()
+        run: |
+          if [ -f work/rhel9-ng-fidelity.json ]; then
+            python - <<'PY'
+          import json
+          d=json.load(open('work/rhel9-ng-fidelity.json'))
+          print(json.dumps({
+              'pass':d['pass'],
+              'issue_count':d['issue_count'],
+              'stats':d['stats'],
+          },indent=2))
+          for row in d['issues'][:200]:
+              print(json.dumps(row,sort_keys=True))
+          PY
+          fi
+
       - name: Upload benchmark semantic IR
         uses: actions/upload-artifact@v4
         with:
           name: rhel9-benchmark-semantic-ir
-          path: work/rhel9-benchmark-ir.json
+          path: |
+            work/rhel9-benchmark-ir.json
+            work/rhel9-ng-fidelity.json
