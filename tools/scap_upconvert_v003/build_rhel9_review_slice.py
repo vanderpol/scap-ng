@@ -37,6 +37,7 @@ def semantic_id(value, fallback):
 def node_title(node):
     return ((node.get("comment") or "").strip() or None) if node is not None else None
 
+# Preserve the OVAL Definition metadata title as optional Assessment descriptive metadata.
 def oval_definition_title(definition):
     if definition is None:
         return None
