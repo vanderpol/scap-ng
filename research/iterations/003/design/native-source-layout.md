@@ -227,6 +227,7 @@ For iteration 003, the supported Benchmark surface is:
       references:
       text_blocks:
       platform:
+      applicability_catalog:
       scoring:
       parameters:
       groups:
@@ -415,3 +416,17 @@ publisher-specific extension, for example:
 
 Their inclusion in a future core SCAP-NG vocabulary is an open standards
 question and requires affirmative governance review.
+
+
+## Benchmark applicability catalog reference
+
+When the Benchmark uses named Rule applicability conditions, the Benchmark
+source SHALL expose an explicit `applicability_catalog` field.
+
+For the iteration-003 split-rule-assessment layout:
+
+    applicability_catalog: applicability.yaml
+
+This field is a source reference, not a naming convention. A processor SHALL
+NOT infer the applicability catalog from the presence, filename, or directory
+location of `applicability.yaml`.
