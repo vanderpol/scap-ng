@@ -44,6 +44,18 @@ CPE and other external platform identifiers MAY be retained as aliases or
 references, but executable Platform truth comes from the bound Assessment
 Method.
 
+## 3. Inventory identity versus applicability identity
+
+SCAP-NG target results MAY report standardized product identifiers, including
+CPE identifiers, for the observed operating system and applications.
+
+This inventory-reporting use case is independent of whether CPE participates in
+Benchmark Platform or Rule applicability evaluation.
+
+A product identifier reported in target inventory SHALL NOT automatically make
+content applicable, and a content Platform identifier SHALL NOT automatically
+be emitted as observed target inventory without supporting collection evidence.
+
 ## 3. External platform identifiers
 
 A Platform MAY declare one or more external product/platform identifiers in
