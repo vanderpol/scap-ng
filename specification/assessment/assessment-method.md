@@ -251,3 +251,37 @@ result/package concern.
 **Specification navigation:** [← Previous: Parameters and Organizational Input](../policy/parameters-and-organizational-input.md) · [Contents](../README.md) · [Next: Manual Assessment →](manual-assessment.md)
 
 <!-- spec-nav:end -->
+
+
+## Assessment versioning
+
+An Assessment Method SHALL have a stable logical identity and SHOULD carry an
+explicit version/revision.
+
+Assessment identity and Assessment version SHALL be distinct concepts. A
+semantic revision of an Assessment SHOULD retain the same logical Assessment
+identity and increment or otherwise change its version according to the
+applicable versioning policy.
+
+For migrated OVAL Definitions, migration tooling SHOULD preserve the source
+OVAL Definition version as the initial Assessment version when that mapping is
+semantically faithful.
+
+Independent versioning of nested Assessment nodes corresponding conceptually
+to OVAL Tests, Objects, States, and Variables remains an open standards
+question. SCAP-NG SHALL NOT require such lower-level versions until the
+reuse/change-tracking benefit and authoring cost have been reviewed.
+
+## Generator/build provenance
+
+SCAP-NG SHALL NOT silently discard useful source generator metadata during
+migration.
+
+Whether generator identity, generator version, schema/specification version,
+and generation timestamp belong in native Assessment source, Benchmark
+publication metadata, package/build provenance, or migration evidence remains
+an open standards question.
+
+Until resolved, migration tooling SHOULD preserve source generator metadata in
+conversion evidence/provenance even when it is not emitted into native
+Assessment semantics.
