@@ -352,11 +352,14 @@ def build(data):
         for state in states:
             family, name = split_type(state["type"])
             ns = NS[family]
-            se = ET.SubElement(sts, q(ns, name + "_state"), {
+            sattrs={
                 "id": ids.get("ste", state["id"]),
                 "version": "1",
                 "comment": state["id"],
-            })
+            }
+            if state.get("operator") is not None:
+                sattrs["operator"]=state["operator"]
+            se = ET.SubElement(sts, q(ns, name + "_state"), sattrs)
             for field, spec in state.get("predicates", {}).items():
                 add_entity(se, ns, field, spec, ids)
 
