@@ -209,7 +209,12 @@ class Model:
             cneg=child.attrib.get("negate","false")=="true"
             capp=child.attrib.get("applicability_check","false")=="true"
             if local=="criteria":
+                # self.criteria() consumes the nested criteria element's own
+                # negate/applicability_check attributes. Do not apply them a
+                # second time from the parent traversal.
                 node=self.criteria(child)
+                cneg=False
+                capp=False
             elif local=="criterion":
                 node=("test",self.test(child.attrib["test_ref"]))
             elif local=="extend_definition":
