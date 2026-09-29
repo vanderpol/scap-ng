@@ -37,6 +37,14 @@ testing.
   - existence-only tests;
   - behavior preservation.
 
+- `rhel-aide-variable-chain.json`
+  - real RHEL-family OVAL graph;
+  - nested OR/AND criteria and extend-definition flattening;
+  - Test -> State dependency;
+  - recursive file discovery behaviors;
+  - multiple Object -> Variable -> Object chains;
+  - concat over independently collected object components.
+
 - `cartesian-variable-chain.json`
   - synthetic schema-derived language stress case;
   - variable -> variable chain;
