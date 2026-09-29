@@ -23,19 +23,19 @@ def typed(el,suffix):
     return fam+"."+local[:-len(suffix)]
 def sval(v):
     return "" if v is None else v
-def attrs(el, names, defaults=None):
-    defaults=defaults or {}
-    return tuple((n,el.attrib.get(n,defaults.get(n))) for n in names)
+
 class Model:
     def __init__(self,path):
         self.root=ET.parse(path).getroot()
+        self.definitions={e.attrib["id"]:e for sec in self.root.findall(f"{{{OD}}}definitions") for e in sec}
         self.tests={e.attrib["id"]:e for sec in self.root.findall(f"{{{OD}}}tests") for e in sec}
         self.objects={e.attrib["id"]:e for sec in self.root.findall(f"{{{OD}}}objects") for e in sec}
         self.states={e.attrib["id"]:e for sec in self.root.findall(f"{{{OD}}}states") for e in sec}
         self.vars={e.attrib["id"]:e for sec in self.root.findall(f"{{{OD}}}variables") for e in sec}
         self.memo={}
+
     def entity(self,e):
-        ns,local=split(e.tag)
+        _,local=split(e.tag)
         base=("entity",local,
               e.attrib.get("datatype","string"),
               e.attrib.get("operation","equals"),
@@ -44,6 +44,7 @@ class Model:
         vr=e.attrib.get("var_ref")
         if vr: return base+("var",self.variable(vr))
         return base+("value",sval(e.text))
+
     def component(self,e):
         ns,local=split(e.tag)
         if ns!=OD: raise ValueError(f"unsupported component ns {ns}")
@@ -60,6 +61,7 @@ class Model:
         if local=="count":
             return ("count",tuple(self.component(c) for c in e))
         raise ValueError(f"unsupported component {local}")
+
     def variable(self,vid):
         key=("var",vid)
         if key in self.memo:return self.memo[key]
@@ -74,61 +76,124 @@ class Model:
             out=head+(self.component(kids[0]),)
         else: raise ValueError(f"unsupported variable {local}")
         self.memo[key]=out; return out
+
     def state(self,sid):
         key=("state",sid)
         if key in self.memo:return self.memo[key]
         e=self.states[sid]
-        self.memo[key]=("recursion",sid)
+        self.memo[key]=("recursion-state",sid)
         out=("state",typed(e,"_state"),e.attrib.get("operator","AND"),
              tuple(self.entity(c) for c in e))
         self.memo[key]=out; return out
+
     def setexpr(self,e):
         return ("set",e.attrib.get("set_operator","UNION"),
                 tuple(self.obj(c.text.strip()) for c in e.findall(f"{{{OD}}}object_reference")),
                 tuple((f.attrib.get("action","exclude"),self.state(f.text.strip()))
                       for f in e.findall(f"{{{OD}}}filter")))
+
     def obj(self,oid):
         key=("obj",oid)
         if key in self.memo:return self.memo[key]
         e=self.objects[oid]
-        self.memo[key]=("recursion",oid)
+        self.memo[key]=("recursion-object",oid)
         body=[]
         for c in e:
             ns,local=split(c.tag)
-            if ns==OD and local=="set": body.append(self.setexpr(c))
-            elif ns==OD and local=="filter": body.append(("filter",c.attrib.get("action","exclude"),self.state(c.text.strip())))
-            elif local=="behaviors": body.append(("behaviors",tuple(sorted(c.attrib.items()))))
-            else: body.append(self.entity(c))
+            if ns==OD and local=="set":
+                body.append(self.setexpr(c))
+            elif ns==OD and local=="filter":
+                body.append(("filter",c.attrib.get("action","exclude"),self.state(c.text.strip())))
+            elif local=="behaviors":
+                body.append(("behaviors",tuple(sorted(c.attrib.items()))))
+            else:
+                body.append(self.entity(c))
         out=("object",typed(e,"_object"),tuple(body))
         self.memo[key]=out; return out
+
     def test(self,tid):
         e=self.tests[tid]
         body=[]
-        ns,_=split(e.tag)
         for c in e:
-            cns,local=split(c.tag)
-            if local=="object": body.append(("object",self.obj(c.attrib["object_ref"])))
-            elif local=="state": body.append(("state",self.state(c.attrib["state_ref"])))
-            else: raise ValueError(f"unsupported test child {local}")
+            _,local=split(c.tag)
+            if local=="object":
+                body.append(("object",self.obj(c.attrib["object_ref"])))
+            elif local=="state":
+                body.append(("state",self.state(c.attrib["state_ref"])))
+            else:
+                raise ValueError(f"unsupported test child {local}")
         return ("test",typed(e,"_test"),
                 e.attrib.get("check_existence","at_least_one_exists"),
                 e.attrib["check"],e.attrib.get("state_operator","AND"),tuple(body))
+
+    def criteria(self,e):
+        op=e.attrib.get("operator","AND")
+        neg=e.attrib.get("negate","false")=="true"
+        app=e.attrib.get("applicability_check","false")=="true"
+        kids=[]
+        for child in e:
+            _,local=split(child.tag)
+            cneg=child.attrib.get("negate","false")=="true"
+            capp=child.attrib.get("applicability_check","false")=="true"
+            if local=="criteria":
+                node=self.criteria(child)
+            elif local=="criterion":
+                node=("test",self.test(child.attrib["test_ref"]))
+            elif local=="extend_definition":
+                node=("definition",self.definition(child.attrib["definition_ref"]))
+            else:
+                raise ValueError(f"unsupported criteria child {local}")
+            if cneg or capp:
+                node=("edge",cneg,capp,node)
+            kids.append(node)
+        # Common source wrappers containing one child do not change truth semantics.
+        if op=="AND" and not neg and not app and len(kids)==1:
+            node=kids[0]
+            if isinstance(node,tuple) and node and node[0]=="definition":
+                return node[1]
+            return node
+        return ("criteria",op,neg,app,tuple(sorted(kids,key=repr)))
+
+    def definition(self,did):
+        key=("definition",did)
+        if key in self.memo:return self.memo[key]
+        e=self.definitions[did]
+        self.memo[key]=("recursion-definition",did)
+        crit=e.find(f"{{{OD}}}criteria")
+        if crit is None: raise ValueError(f"{did}: definition has no criteria")
+        out=self.criteria(crit)
+        self.memo[key]=out; return out
+
     def test_multiset(self):
         return collections.Counter(repr(self.test(t)) for t in self.tests)
 
-def compare(a,b):
+def compare(a,b,source_root=None,regenerated_root=None):
     am=Model(a); bm=Model(b)
     A=am.test_multiset(); B=bm.test_multiset()
     only_a=list((A-B).elements()); only_b=list((B-A).elements())
-    return {"equal":not only_a and not only_b,"only_source":only_a,"only_regenerated":only_b,
-            "source_test_count":sum(A.values()),"regenerated_test_count":sum(B.values())}
+    result={"equal":not only_a and not only_b,
+            "only_source":only_a,"only_regenerated":only_b,
+            "source_test_count":sum(A.values()),
+            "regenerated_test_count":sum(B.values())}
+    if source_root:
+        if not regenerated_root:
+            if len(bm.definitions)!=1:
+                raise ValueError("regenerated root must be supplied when output contains != 1 definition")
+            regenerated_root=next(iter(bm.definitions))
+        sd=am.definition(source_root); rd=bm.definition(regenerated_root)
+        result["definition_equal"]=sd==rd
+        result["source_definition"]=repr(sd)
+        result["regenerated_definition"]=repr(rd)
+        result["equal"]=result["equal"] and result["definition_equal"]
+    return result
 
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("source",type=Path); ap.add_argument("regenerated",type=Path)
+    ap.add_argument("--source-root"); ap.add_argument("--regenerated-root")
     ap.add_argument("--json",action="store_true")
     a=ap.parse_args()
-    r=compare(a.source,a.regenerated)
+    r=compare(a.source,a.regenerated,a.source_root,a.regenerated_root)
     print(json.dumps(r,indent=2) if a.json else ("EQUAL" if r["equal"] else json.dumps(r,indent=2)))
     raise SystemExit(0 if r["equal"] else 1)
 if __name__=="__main__": main()
