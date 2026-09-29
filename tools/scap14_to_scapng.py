@@ -447,6 +447,77 @@ def dump_json(path: Path, value) -> None:
     )
 
 
+def cpe_inventory_output(cpe_name: str | None) -> dict | None:
+    if not cpe_name:
+        return None
+    part=None
+    binding=None
+    if cpe_name.startswith("cpe:/"):
+        fields=cpe_name[5:].split(":")
+        part=fields[0] if fields else None
+        binding="uri"
+    elif cpe_name.startswith("cpe:2.3:"):
+        fields=cpe_name.split(":")
+        part=fields[2] if len(fields)>2 else None
+        binding="formatted_string"
+    product_kind={
+        "o":"operating_system",
+        "a":"application",
+        "h":"hardware",
+    }.get(part)
+    return {
+        "emit_when":"platform_true",
+        "role":"descriptive_target_inventory",
+        "product_kind":product_kind,
+        "identifiers":[{
+            "scheme":"cpe",
+            "binding":binding,
+            "value":cpe_name,
+        }],
+    }
+
+
+def compile_platform_inventory(source: dict, catalog: dict[str, dict]) -> list[dict]:
+    out=[]
+    for row in source.get("platform_inventory",[]):
+        cpe_name=row.get("cpe_name")
+        entry={
+            "cpe_name":cpe_name,
+            "definition_id":row.get("definition_id"),
+            "source_status":row.get("status"),
+            "source_path":row.get("path"),
+            "source_component":row.get("oval_component"),
+            "inventory_output":cpe_inventory_output(cpe_name),
+        }
+        if row.get("status")!="split_valid" or row.get("oval_ir") is None:
+            entry["assessment"]=None
+            entry["migration"]={
+                "status":"unsupported",
+                "reason":"cpe_inventory_source_not_split_valid",
+                "source_status":row.get("status"),
+                "message":"CPE product inventory source could not be compiled.",
+            }
+            out.append(entry)
+            continue
+
+        assessment,migration=compile_oval_assessment(
+            {
+                "id":f"platform.inventory.{cpe_name}",
+                "title":f"Product inventory for {cpe_name}",
+                "check_model":{"kind":"cpe_product_inventory"},
+            },
+            row["oval_ir"],
+            catalog,
+        )
+        if assessment is not None:
+            assessment["purpose"]="platform_inventory"
+            assessment["inventory_output"]=cpe_inventory_output(cpe_name)
+        entry["assessment"]=assessment
+        entry["migration"]=migration
+        out.append(entry)
+    return out
+
+
 def render_benchmark_doc(ir: dict, model: str) -> dict:
     benchmark = ir["benchmark"]
     return {
@@ -493,6 +564,8 @@ def main() -> int:
     manual = []
     automated = []
 
+    platform_inventory_assessments=compile_platform_inventory(source,catalog)
+
     applicability_source=source.get("applicability",{})
     applicability_assessment=None
     applicability_migration=None
@@ -532,6 +605,7 @@ def main() -> int:
         "scap_ng": SPEC,
         "prototype": True,
         "platform_definitions": source.get("platform_definitions", []),
+        "inventory_assessments": copy.deepcopy(platform_inventory_assessments),
         "applicability_assessment": (
             applicability_assessment.get("id")
             if applicability_assessment is not None else None
@@ -559,6 +633,7 @@ def main() -> int:
         "scap_ng": SPEC,
         "prototype": True,
         "platform_definitions": source.get("platform_definitions", []),
+        "inventory_assessments": copy.deepcopy(platform_inventory_assessments),
         "applicability_assessment": (
             applicability_assessment.get("id")
             if applicability_assessment is not None else None
@@ -757,6 +832,7 @@ def main() -> int:
         },
         "processing_plan": source.get("processing_plan"),
         "platform_definitions": source.get("platform_definitions", []),
+        "platform_inventory_assessments": platform_inventory_assessments,
         "profiles": source.get("profiles", []),
         "resolved_profiles": source.get("resolved_profiles", []),
         "profile_check_selectors": native_profile_check_selectors(source),
@@ -778,6 +854,15 @@ def main() -> int:
         ),
         "traversal_items":len((source.get("processing_plan") or {}).get("traversal",[])),
         "platform_definitions":len(source.get("platform_definitions",[])),
+        "platform_inventory_assessments":len(platform_inventory_assessments),
+        "platform_inventory_supported":sum(
+            1 for x in platform_inventory_assessments
+            if (x.get("migration") or {}).get("status")!="unsupported"
+        ),
+        "platform_inventory_blocked":sum(
+            1 for x in platform_inventory_assessments
+            if (x.get("migration") or {}).get("status")=="unsupported"
+        ),
         "source_groups":len(source.get("groups",[])),
         "source_profiles":len(source.get("profiles",[])),
         "resolved_profiles":len(source.get("resolved_profiles",[])),
