@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Build the first clean SCAP-NG 003 RHEL 9 review slice from authoritative SCAP 1.4.
+"""Generate a small, clean, semantically exact SCAP-NG 003 RHEL 9 review slice.
 
-This script consumes the published ZIP directly, emits only semantics that can
-be normalized cleanly, and records legacy lineage separately under evidence/.
+Only source paths fully understood by this checkpoint are emitted. Legacy
+lineage is written separately under evidence/.
 """
 
 from __future__ import annotations
-import hashlib, json, re, tempfile, urllib.request, zipfile
+import hashlib, json, re, shutil, tempfile, urllib.request, zipfile
+from copy import deepcopy
 from pathlib import Path
 import xml.etree.ElementTree as ET
 import yaml
@@ -21,235 +22,251 @@ EVIDENCE = ROOT / "research/iterations/003/evidence/rhel9-review-slice"
 XCCDF = "http://checklists.nist.gov/xccdf/1.2"
 NS = {"x": XCCDF}
 
-def local(tag): return tag.rsplit("}",1)[-1]
+def local(tag): return tag.rsplit("}", 1)[-1]
 def text(node):
     if node is None: return None
-    s=" ".join("".join(node.itertext()).split())
+    s = " ".join("".join(node.itertext()).split())
     return s or None
-def safe_id(s):
-    return re.sub(r"[^A-Za-z0-9_.-]+","-",s.strip()).strip("-")
+def safe_id(s): return re.sub(r"[^A-Za-z0-9_.-]+", "-", s.strip()).strip("-")
 def sha256(data): return hashlib.sha256(data).hexdigest()
-def write_yaml(path,obj):
-    path.parent.mkdir(parents=True,exist_ok=True)
-    path.write_text(yaml.safe_dump(obj,sort_keys=False,allow_unicode=True,width=100),encoding="utf-8")
-def write_json(path,obj):
-    path.parent.mkdir(parents=True,exist_ok=True)
-    path.write_text(json.dumps(obj,indent=2,sort_keys=True)+"\n",encoding="utf-8")
-def load_source_components(files):
-    """Return embedded Benchmark and OVAL definition roots from the source package."""
-    benchmark = None
-    oval = None
-    benchmark_source = None
-    oval_source = None
+def write_yaml(path, obj):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    class Dumper(yaml.SafeDumper):
+        def ignore_aliases(self, data): return True
+    path.write_text(yaml.dump(obj, Dumper=Dumper, sort_keys=False, allow_unicode=True, width=100), encoding="utf-8")
+def write_json(path, obj):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(obj, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
-    # Prefer explicit component files when a package provides them.
+def load_source_components(files):
+    benchmark = oval = None
+    benchmark_source = oval_source = None
+    parsed = []
     for p in files:
-        if p.suffix.lower() != ".xml":
-            continue
-        try:
-            root = ET.parse(p).getroot()
-        except ET.ParseError:
-            continue
+        if p.suffix.lower() != ".xml": continue
+        try: root = ET.parse(p).getroot()
+        except ET.ParseError: continue
+        parsed.append((p, root))
         if local(root.tag) == "Benchmark" and benchmark is None:
             benchmark, benchmark_source = root, p.name
         if local(root.tag) == "oval_definitions" and oval is None:
             oval, oval_source = root, p.name
-
-    # Signed SCAP packages commonly carry the components inside one datastream.
     if benchmark is None or oval is None:
-        for p in files:
-            if p.suffix.lower() != ".xml":
-                continue
-            try:
-                root = ET.parse(p).getroot()
-            except ET.ParseError:
-                continue
+        for p, root in parsed:
             for node in root.iter():
-                lname = local(node.tag)
-                if benchmark is None and lname == "Benchmark":
+                n = local(node.tag)
+                if benchmark is None and n == "Benchmark":
                     benchmark, benchmark_source = node, f"{p.name}#Benchmark"
-                elif oval is None and lname == "oval_definitions":
+                elif oval is None and n == "oval_definitions":
                     oval, oval_source = node, f"{p.name}#oval_definitions"
-                if benchmark is not None and oval is not None:
-                    break
-            if benchmark is not None and oval is not None:
-                break
-
-    if benchmark is None:
-        raise RuntimeError("No XCCDF Benchmark component found in source package")
-    if oval is None:
-        raise RuntimeError("No OVAL definitions component found in source package")
+                if benchmark is not None and oval is not None: break
+            if benchmark is not None and oval is not None: break
+    if benchmark is None or oval is None:
+        raise RuntimeError("Required Benchmark/OVAL component not found")
     return benchmark, oval, benchmark_source, oval_source
+
 def native_rule_id(rule):
-    version=text(rule.find("x:version",NS))
-    if version: return safe_id(version)
-    return safe_id((text(rule.find("x:title",NS)) or "rule").lower())[:80]
+    version = text(rule.find("x:version", NS))
+    return safe_id(version) if version else safe_id(text(rule.find("x:title", NS)) or "rule")
+
 def check_kind(check):
-    selector=(check.get("selector") or "").strip().lower()
-    system=(check.get("system") or "").lower()
-    inline=text(check.find("x:check-content",NS))
-    if selector=="manual" or "ocil" in system or inline: return "manual"
+    selector = (check.get("selector") or "").strip().lower()
+    system = (check.get("system") or "").lower()
+    if selector == "manual" or "ocil" in system or text(check.find("x:check-content", NS)):
+        return "manual"
     return "automated"
 
 def records(root):
-    out=[]
-    for group in root.findall(".//x:Group",NS):
-        for rule in group.findall("x:Rule",NS):
-            checks=rule.findall("x:check",NS)
+    out = []
+    for group in root.findall(".//x:Group", NS):
+        for rule in group.findall("x:Rule", NS):
+            checks = rule.findall("x:check", NS)
             out.append({
-                "element":rule,
-                "source_rule_id":rule.get("id"),
-                "id":native_rule_id(rule),
-                "title":text(rule.find("x:title",NS)),
-                "severity":rule.get("severity"),
-                "role":rule.get("role"),
-                "weight":rule.get("weight"),
-                "checks":checks,
-                "has_automated":any(check_kind(c)=="automated" for c in checks),
-                "has_manual":any(check_kind(c)=="manual" for c in checks),
-                "has_rule_platform":bool(rule.findall("x:platform",NS)),
-                "has_requires":bool(rule.findall("x:requires",NS)),
-                "has_conflicts":bool(rule.findall("x:conflicts",NS)),
+                "element": rule, "source_rule_id": rule.get("id"), "id": native_rule_id(rule),
+                "title": text(rule.find("x:title", NS)), "severity": rule.get("severity"),
+                "role": rule.get("role"), "weight": rule.get("weight"), "checks": checks,
+                "platforms": [p.get("idref") for p in rule.findall("x:platform", NS) if p.get("idref")],
+                "requires": [x.get("idref") for x in rule.findall("x:requires", NS) if x.get("idref")],
+                "conflicts": [x.get("idref") for x in rule.findall("x:conflicts", NS) if x.get("idref")],
             })
     return out
 
-def choose(rs):
-    chosen=[]
-    def add(r,why):
-        if r and r["source_rule_id"] not in {x[0]["source_rule_id"] for x in chosen}: chosen.append((r,why))
-    add(next((r for r in rs if r["has_automated"] and r["has_manual"]),None),"selectable automated/manual checks")
-    add(next((r for r in rs if r["has_rule_platform"] and r["has_automated"]),None),"rule applicability")
-    add(next((r for r in rs if r["has_automated"] and not r["has_manual"] and not r["has_rule_platform"]),None),"simple automated rule")
-    add(next((r for r in rs if r["has_requires"] or r["has_conflicts"]),None),"rule dependency semantics")
-    return chosen[:5]
+def find_by_id(root, item_id, suffix):
+    if not item_id: return None
+    return next((n for n in root.iter() if n.get("id") == item_id and local(n.tag).endswith(suffix)), None)
 
-def find_by_id(root,item_id,suffix):
-    for n in root.iter():
-        if n.get("id")==item_id and local(n.tag).endswith(suffix): return n
-    return None
-
-def simple_oval_assessment(oroot,definition_id,assessment_id):
-    definition=find_by_id(oroot,definition_id,"definition")
-    if definition is None:
-        for n in oroot.iter():
-            if local(n.tag)=="definition" and n.get("id")==definition_id: definition=n; break
-    if definition is None: return None,"referenced automated definition was not found"
-    criteria=next((c for c in definition if local(c.tag)=="criteria"),None)
-    if criteria is None: return None,"definition has no criteria"
-    children=[c for c in criteria if local(c.tag) in ("criterion","criteria","extend_definition")]
-    if len(children)!=1 or local(children[0].tag)!="criterion": return None,"first implementation supports exactly one criterion"
-    test_ref=children[0].get("test_ref")
-    test=next((n for n in oroot.iter() if n.get("id")==test_ref and local(n.tag).endswith("_test")),None)
-    if test is None: return None,"criterion test was not found"
-    test_name=local(test.tag)
-    ns_uri=test.tag.split("}",1)[0].strip("{")
-    family=ns_uri.split("#")[-1].split("/")[-1]
-    capability=f"{family}.{test_name[:-5] if test_name.endswith('_test') else test_name}"
-    obj_ref=None; state_refs=[]
+def lower_simple_definition(oroot, definition_id, assessment_id):
+    definition = next((n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id), None)
+    if definition is None: return None, "definition_not_found"
+    criteria = next((c for c in definition if local(c.tag) == "criteria"), None)
+    if criteria is None: return None, "missing_criteria"
+    children = [c for c in criteria if local(c.tag) in ("criterion", "criteria", "extend_definition")]
+    if len(children) != 1 or local(children[0].tag) != "criterion":
+        return None, "complex_criteria"
+    if (criteria.get("negate") or "false").lower() == "true" or (children[0].get("negate") or "false").lower() == "true":
+        return None, "negated_criteria"
+    test_ref = children[0].get("test_ref")
+    test = next((n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")), None)
+    if test is None: return None, "test_not_found"
+    test_name = local(test.tag)
+    ns_uri = test.tag.split("}", 1)[0].strip("{")
+    family = ns_uri.split("#")[-1].split("/")[-1]
+    capability = f"{family}.{test_name[:-5] if test_name.endswith('_test') else test_name}"
+    obj_ref = None; state_refs = []
     for child in test:
-        if local(child.tag)=="object": obj_ref=child.get("object_ref")
-        elif local(child.tag)=="state" and child.get("state_ref"): state_refs.append(child.get("state_ref"))
-    obj=find_by_id(oroot,obj_ref,"_object") if obj_ref else None
-    if obj is None: return None,"object was not found"
-    query={}
+        if local(child.tag) == "object": obj_ref = child.get("object_ref")
+        elif local(child.tag) == "state" and child.get("state_ref"): state_refs.append(child.get("state_ref"))
+    obj = find_by_id(oroot, obj_ref, "_object")
+    if obj is None: return None, "object_not_found"
+    query = {}
     for child in obj:
-        name=local(child.tag)
-        if name in ("behaviors","set","filter"): return None,f"object uses unsupported {name} semantics"
-        if child.get("var_ref"): return None,"object uses a variable reference"
-        value=text(child)
+        name = local(child.tag)
+        if name in ("behaviors", "set", "filter"): return None, f"object_{name}_not_yet_lowered"
+        if child.get("var_ref"): return None, "object_variable_not_yet_lowered"
+        value = text(child)
         if value is not None:
-            query[name]={"value":value,"operation":child.get("operation")} if child.get("operation") else value
-    expected=[]
+            query[name] = ({ "operation": child.get("operation"), "value": value }
+                           if child.get("operation") else value)
+    expected = []
     for ref in state_refs:
-        state=find_by_id(oroot,ref,"_state")
-        if state is None: return None,"state was not found"
+        state = find_by_id(oroot, ref, "_state")
+        if state is None: return None, "state_not_found"
         for child in state:
-            if child.get("var_ref"): return None,"state uses a variable reference"
-            item={"field":local(child.tag),"operation":child.get("operation") or "equals","value":text(child)}
-            if child.get("entity_check"): item["entity_check"]=child.get("entity_check")
+            if child.get("var_ref"): return None, "state_variable_not_yet_lowered"
+            item = {"field": local(child.tag), "operation": child.get("operation") or "equals", "value": text(child)}
+            if child.get("entity_check"): item["entity_check"] = child.get("entity_check")
+            if child.get("datatype"): item["datatype"] = child.get("datatype")
             expected.append(item)
-    return {"assessment":{
-        "id":assessment_id,"mode":"automated",
-        "collect":{"capability":capability,"query":query},
-        "evaluate":{"existence":test.get("check_existence") or "at_least_one_exists","check":test.get("check") or "all","expected":expected}
-    }},None
+    return {"assessment": {
+        "id": assessment_id,
+        "mode": "automated",
+        "collect": {"capability": capability, "select": query},
+        "assert": {
+            "existence": test.get("check_existence") or "at_least_one_exists",
+            "check": test.get("check") or "all",
+            **({"state": expected} if expected else {}),
+        },
+    }}, None
+
+def automated_refs(rec):
+    refs = []
+    for c in rec["checks"]:
+        if check_kind(c) != "automated": continue
+        ref = c.find("x:check-content-ref", NS)
+        if ref is None or not ref.get("name"): return None
+        refs.append(((c.get("selector") or "").strip() or "default", ref.get("name")))
+    return refs
+
+def fully_lowerable(rec, oroot):
+    if rec["platforms"] or rec["requires"] or rec["conflicts"]: return False
+    refs = automated_refs(rec)
+    if not refs: return False
+    for _, definition_id in {x for x in refs}:
+        assessment, _ = lower_simple_definition(oroot, definition_id, "probe")
+        if assessment is None: return False
+    return True
 
 def main():
-    OUT.mkdir(parents=True,exist_ok=True); EVIDENCE.mkdir(parents=True,exist_ok=True)
-    with tempfile.TemporaryDirectory() as t:
-        td=Path(t); zp=td/"source.zip"; urllib.request.urlretrieve(SOURCE_URL,zp); data=zp.read_bytes()
-        with zipfile.ZipFile(zp) as zf: zf.extractall(td/"pkg")
-        files=[p for p in (td/"pkg").rglob("*") if p.is_file()]
-        xr,oroot,xp_name,op_name=load_source_components(files)
-        rs=records(xr); selected=choose(rs)
-        source_to_native={r["source_rule_id"]:r["id"] for r in rs}
-        profiles=[]
-        for p in xr.findall("x:Profile",NS):
-            disabled=[]
-            for s in p.findall("x:select",NS):
-                if (s.get("selected") or "true").lower()=="false":
-                    rid=source_to_native.get(s.get("idref"))
-                    if rid: disabled.append(rid)
-            obj={"id":safe_id((p.get("id") or "profile").split("_profile_")[-1]),"title":text(p.find("x:title",NS))}
-            if disabled: obj["disabled_rules"]=sorted(disabled)
-            profiles.append(obj)
-        ids=[r["id"] for r,_ in selected]
-        write_yaml(OUT/"benchmark.yaml",{"benchmark":{
-            "id":"rhel9-stig-review-slice",
-            "title":"Red Hat Enterprise Linux 9 STIG — SCAP-NG 003 review slice",
-            "version":text(xr.find("x:version",NS)),
-            "platform":"rhel.9",
-            "scope":{"kind":"conversion-review-slice","rules":ids},
-            "profiles":profiles,"rules":ids
-        }})
-        apps=[]; ev=[]; diags=[]
-        for rec,why in selected:
-            rule=rec["element"]; rid=rec["id"]
-            policy={"policy":{"id":rid,"title":rec["title"],"severity":rec["severity"]}}
-            if rec["role"]: policy["policy"]["role"]=rec["role"]
-            if rec["weight"]: policy["policy"]["weight"]=float(rec["weight"])
-            checks={}
-            manuals=[c for c in rec["checks"] if check_kind(c)=="manual"]
-            autos=[c for c in rec["checks"] if check_kind(c)=="automated"]
-            if manuals:
-                proc=text(manuals[0].find("x:check-content",NS))
-                aid=f"{rid}.manual"
-                write_yaml(OUT/"assessments/manual"/f"{rid}.manual.assessment.yaml",{"assessment":{"id":aid,"mode":"manual","procedure":proc}})
-                checks["manual"]=aid
-            for i,c in enumerate(autos):
-                ref=c.find("x:check-content-ref",NS); did=ref.get("name") if ref is not None else None
-                selector=(c.get("selector") or "default").strip() or "default"
-                aid=f"{rid}.automated" if i==0 else f"{rid}.automated-{i+1}"
-                assessment,error=simple_oval_assessment(oroot,did,aid) if did else (None,"automated check has no content reference")
-                if assessment:
-                    write_yaml(OUT/"assessments/automated"/f"{aid}.assessment.yaml",assessment)
-                    checks[selector]=aid
-                    if selector=="default": checks.setdefault("automated",aid)
-                else:
-                    diags.append({"rule":rid,"area":"automated-assessment","status":"requires_review","reason":error})
-            policy["policy"]["checks"]=checks
-            for preferred in ("default","automated","manual"):
-                if preferred in checks: policy["policy"]["default_check"]=preferred; break
-            platforms=[p.get("idref") for p in rule.findall("x:platform",NS) if p.get("idref")]
-            if platforms:
-                app_id=f"{rid}.applicable"
-                policy["policy"]["applicability"]=[app_id]
-                apps.append({"id":app_id,"assessment":f"{app_id}.assessment"})
-                diags.append({"rule":rid,"area":"applicability-assessment","status":"requires_review","reason":"source platform predicate requires semantic lowering before native assessment emission"})
-            write_yaml(OUT/"policy"/f"{rid}.policy.yaml",policy)
-            ev.append({"native_rule_id":rid,"selection_reason":why,"source_rule_id":rec["source_rule_id"],
-                "source_check_refs":[{
-                    "selector":c.get("selector"),"system":c.get("system"),
-                    "href":(c.find("x:check-content-ref",NS).get("href") if c.find("x:check-content-ref",NS) is not None else None),
-                    "name":(c.find("x:check-content-ref",NS).get("name") if c.find("x:check-content-ref",NS) is not None else None)
-                } for c in rec["checks"]],"source_platform_refs":platforms})
-        if apps: write_yaml(OUT/"applicability.yaml",{"applicability":apps})
-        write_json(EVIDENCE/"source-package.json",{"source_url":SOURCE_URL,"zip_sha256":sha256(data),
-            "archive_files":sorted(str(p.relative_to(td/"pkg")) for p in files),
-            "selected_xccdf_component":xp_name,"selected_oval_component":op_name})
-        write_json(EVIDENCE/"rule-mapping.json",{"rules":ev})
-        write_json(EVIDENCE/"diagnostics.json",{"diagnostics":diags})
-        print(f"emitted {len(selected)} representative policies; diagnostics: {len(diags)}")
+    shutil.rmtree(OUT, ignore_errors=True)
+    shutil.rmtree(EVIDENCE, ignore_errors=True)
+    OUT.mkdir(parents=True); EVIDENCE.mkdir(parents=True)
 
-if __name__=="__main__":
+    with tempfile.TemporaryDirectory() as t:
+        td = Path(t); zp = td / "source.zip"
+        urllib.request.urlretrieve(SOURCE_URL, zp); package_bytes = zp.read_bytes()
+        with zipfile.ZipFile(zp) as zf: zf.extractall(td / "pkg")
+        files = [p for p in (td / "pkg").rglob("*") if p.is_file()]
+        xr, oroot, xsrc, osrc = load_source_components(files)
+        rs = records(xr)
+
+        # First accepted slice: three Rules for which this checkpoint can
+        # preserve every check-selection and automated-assessment semantic it emits.
+        selected = [r for r in rs if fully_lowerable(r, oroot)][:3]
+        if len(selected) < 3:
+            raise RuntimeError(f"Only {len(selected)} fully lowerable Rules found; refusing partial review slice")
+
+        selected_ids = [r["id"] for r in selected]
+        source_to_native = {r["source_rule_id"]: r["id"] for r in rs}
+
+        profiles = []
+        for p in xr.findall("x:Profile", NS):
+            disabled = []
+            for s in p.findall("x:select", NS):
+                if (s.get("selected") or "true").lower() == "false":
+                    rid = source_to_native.get(s.get("idref"))
+                    if rid in selected_ids: disabled.append(rid)
+            profile = {"id": safe_id((p.get("id") or "profile").split("_profile_")[-1]),
+                       "title": text(p.find("x:title", NS))}
+            if disabled: profile["disabled_rules"] = sorted(disabled)
+            profiles.append(profile)
+
+        write_yaml(OUT / "benchmark.yaml", {"benchmark": {
+            "id": "rhel9-stig-review-slice",
+            "title": "Red Hat Enterprise Linux 9 STIG — SCAP-NG 003 review slice",
+            "version": text(xr.find("x:version", NS)),
+            "platform": "rhel.9",
+            "profiles": profiles,
+            "rules": deepcopy(selected_ids),
+        }})
+
+        evidence = []; diagnostics = []
+        for rec in selected:
+            rid = rec["id"]; rule = rec["element"]
+            policy = {"policy": {"id": rid, "title": rec["title"], "severity": rec["severity"]}}
+            if rec["role"]: policy["policy"]["role"] = rec["role"]
+            if rec["weight"]: policy["policy"]["weight"] = float(rec["weight"])
+
+            checks = {}
+            definition_to_assessment = {}
+            for c in rec["checks"]:
+                selector = (c.get("selector") or "").strip() or "default"
+                if check_kind(c) == "manual":
+                    aid = f"{rid}.manual"
+                    procedure = text(c.find("x:check-content", NS))
+                    write_yaml(OUT / "assessments/manual" / f"{rid}.manual.assessment.yaml",
+                               {"assessment": {"id": aid, "mode": "manual", "procedure": procedure}})
+                    checks[selector] = aid
+                    continue
+
+                ref = c.find("x:check-content-ref", NS)
+                definition_id = ref.get("name")
+                aid = definition_to_assessment.get(definition_id)
+                if aid is None:
+                    aid = f"{rid}.automated"
+                    assessment, error = lower_simple_definition(oroot, definition_id, aid)
+                    if assessment is None:
+                        raise RuntimeError(f"{rid}: automated lowering regressed: {error}")
+                    write_yaml(OUT / "assessments/automated" / f"{rid}.automated.assessment.yaml", assessment)
+                    definition_to_assessment[definition_id] = aid
+                checks[selector] = aid
+
+            policy["policy"]["checks"] = checks
+            if "default" in checks: policy["policy"]["default_check"] = "default"
+            elif len(checks) == 1: policy["policy"]["default_check"] = next(iter(checks))
+            else: raise RuntimeError(f"{rid}: no source default check could be preserved")
+            write_yaml(OUT / "policy" / f"{rid}.policy.yaml", policy)
+
+            evidence.append({
+                "native_rule_id": rid,
+                "source_rule_id": rec["source_rule_id"],
+                "source_checks": [{
+                    "selector": c.get("selector"),
+                    "system": c.get("system"),
+                    "reference": (c.find("x:check-content-ref", NS).get("name")
+                                  if c.find("x:check-content-ref", NS) is not None else None),
+                    "href": (c.find("x:check-content-ref", NS).get("href")
+                             if c.find("x:check-content-ref", NS) is not None else None),
+                } for c in rec["checks"]],
+            })
+
+        write_json(EVIDENCE / "source-package.json", {
+            "source_url": SOURCE_URL, "zip_sha256": sha256(package_bytes),
+            "archive_files": sorted(str(p.relative_to(td / "pkg")) for p in files),
+            "benchmark_component": xsrc, "assessment_component": osrc,
+        })
+        write_json(EVIDENCE / "rule-mapping.json", {"rules": evidence})
+        write_json(EVIDENCE / "diagnostics.json", {"diagnostics": diagnostics})
+        print("accepted native rules:", ", ".join(selected_ids))
+
+if __name__ == "__main__":
     main()
