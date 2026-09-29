@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <generator>
+    <oval:product_name>RHEL 10 STIG SCAP content assembly</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-09-23T15:13:16Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <!--
+OVAL provenance
+Origin: Direct copy from RHEL 9 benchmark
+Source benchmark: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+Source IDs: oval:mil.disa.stig.defs:def:230294
+Basis: Definition and dependencies match the reference; labels and identifiers are excluded from comparison.
+Last reviewed: 2026-09-24
+Assessment SHA-256: 02629fde9b6abee1e169db31eea485cdc2772cfc96ede7cffcfb363dced8b533
+-->
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:28093600002" version="1" class="compliance">
+      <metadata>
+        <title>RHEL 10 must use a separate file system for the system audit data path.</title>
+        <description/>
+      </metadata>
+      <criteria>
+        <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28093600004" comment="There is a separate file system for audit data directory."/>
+        <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28093600003" comment="There is a separate file system configured for audit data directory."/>
+      </criteria>
+    </definition>
+    <!--
+OVAL provenance
+Origin: Direct copy from RHEL 9 benchmark
+Source benchmark: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+Source IDs: oval:mil.disa.stig.rhel9os:def:257847
+Basis: Complete assessment graph matches the recorded source definition as published in V2R9. Historical lineage names U_RHEL_9_V2R6_STIG_SCAP_1-3_Benchmark.xml.
+Last reviewed: 2026-09-24
+Assessment SHA-256: e9eac26cab8e57e3d113342634ff279d8e340ffd3f948869f1ca4ae4a3c7f938
+-->
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:28093600001" version="1" class="compliance">
+      <metadata>
+        <title>RHEL-09-231030 - RHEL 10 must use a separate file system for the system audit data path.</title>
+        <affected family="unix">
+          <platform>Red Hat Enterprise Linux 10</platform>
+        </affected>
+        <description>Placing "/var/log/audit" in its own partition enables better separation between audit files and other system files, and helps ensure that auditing cannot be halted due to the partition running out of space.
+Satisfies: SRG-OS-000341-GPOS-00132, SRG-OS-000480-GPOS-00227</description>
+      </metadata>
+      <criteria>
+        <extend_definition definition_ref="oval:navy.navwar.niwcatlantic.scc:def:28093600002"/>
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <ind:textfilecontent54_test xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:tst:28093600003" version="1" check_existence="all_exist" check="all" comment="There is a separate file system configured for audit data directory.">
+      <ind:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28093600005"/>
+    </ind:textfilecontent54_test>
+    <linux:partition_test xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:tst:28093600004" version="1" check_existence="all_exist" check="all" comment="There is a separate file system for audit data directory.">
+      <linux:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28093600007"/>
+    </linux:partition_test>
+  </tests>
+  <objects>
+    <ind:textfilecontent54_object xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:obj:28093600005" version="1" comment="Reads text from '/etc/fstab'; selects content using pattern match values derived from '^[^# \\t]+\\s+'; subexpression from an object that reads text from '/etc/audit/auditd.conf'; selects content using pattern match '^\\s*log_file\\s*=\\s*(\\S+)/\\S+\\s*$'; '\\s+' using concat.">
+      <ind:filepath>/etc/fstab</ind:filepath>
+      <ind:pattern datatype="string" operation="pattern match" var_ref="oval:navy.navwar.niwcatlantic.scc:var:28093600009" var_check="at least one"/>
+      <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
+    </ind:textfilecontent54_object>
+    <ind:textfilecontent54_object xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:obj:28093600006" version="2" comment="Reads text from '/etc/audit/auditd.conf'; selects content using pattern match '^\\s*log_file\\s*=\\s*(\\S+)/\\S+\\s*$'.">
+      <ind:behaviors ignore_case="true"/>
+      <ind:filepath>/etc/audit/auditd.conf</ind:filepath>
+      <ind:pattern datatype="string" operation="pattern match">^\s*log_file\s*=\s*(\S+)/\S+\s*$</ind:pattern>
+      <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
+    </ind:textfilecontent54_object>
+    <linux:partition_object xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:obj:28093600007" version="1" comment="Collects filesystem partition metadata for mount point values derived from subexpression from an object that reads text from '/etc/audit/auditd.conf'; selects content using pattern match '^\\s*log_file\\s*=\\s*(\\S+)/\\S+\\s*$'.">
+      <linux:mount_point datatype="string" var_ref="oval:navy.navwar.niwcatlantic.scc:var:28093600008" var_check="at least one"/>
+    </linux:partition_object>
+  </objects>
+  <variables>
+    <local_variable id="oval:navy.navwar.niwcatlantic.scc:var:28093600008" version="1" datatype="string" comment="audit data directory from /etc/audit/auditd.conf">
+      <object_component object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28093600006" item_field="subexpression"/>
+    </local_variable>
+    <local_variable id="oval:navy.navwar.niwcatlantic.scc:var:28093600009" version="1" datatype="string" comment="regex to find audit data partition in /etc/fstab">
+      <concat>
+        <literal_component>^[^# \t]+\s+</literal_component>
+        <object_component object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28093600006" item_field="subexpression"/>
+        <literal_component>\s+</literal_component>
+      </concat>
+    </local_variable>
+  </variables>
+</oval_definitions>
