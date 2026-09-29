@@ -81,6 +81,14 @@ def main():
         E.SubElement(relem,q("title")).text=r.get("title")
         if r.get("discussion"):
             E.SubElement(relem,q("description")).text=r["discussion"]
+
+        # itemType/reference precedes selectableItemType/rationale and the
+        # rule-specific ident/fix/check sequence in XCCDF 1.2.
+        for ref in r.get("references",[]) or []:
+            parts=[str(ref.get(k) or "") for k in ("title","publisher","type","subject","identifier")]
+            value=" ".join(x for x in parts if x)
+            if value:
+                E.SubElement(relem,q("reference")).text=value
         if r.get("rationale"):
             E.SubElement(relem,q("rationale")).text=r["rationale"]
         for cid in r.get("applicability") or []:
@@ -90,15 +98,6 @@ def main():
             if ident.get("scheme")=="cci":
                 ie=E.SubElement(relem,q("ident"),system="http://cyber.mil/cci")
                 ie.text=str(ident["value"])
-
-        # Preserve rule references in a schema-valid flattened representation.
-        # The source-to-NG fidelity audit separately verifies the structured
-        # reference fields, so this exporter is not the provenance authority.
-        for ref in r.get("references",[]) or []:
-            parts=[str(ref.get(k) or "") for k in ("title","publisher","type","subject","identifier")]
-            value=" ".join(x for x in parts if x)
-            if value:
-                E.SubElement(relem,q("reference")).text=value
 
         guidance=(r.get("remediation") or {}).get("guidance")
         if guidance:
