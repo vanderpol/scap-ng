@@ -11,6 +11,7 @@ FAMS={
  "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent":"independent",
  "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux":"linux",
  "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix":"unix",
+ "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows":"windows",
 }
 def split(tag):
     if tag.startswith("{"):
