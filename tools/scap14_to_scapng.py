@@ -799,7 +799,9 @@ def main() -> int:
         "blocked_rules": len(blocked),
         "combined_rule_files": len(canonical_rules),
         "split_policy_rule_files": len(canonical_rules),
-        "split_assessment_files": len(bindings),
+        "split_assessment_files": sum(
+            len(x.get("assessments", [])) for x in canonical_rules
+        ),
         "bindings": len(bindings),
         "migration_status": {},
     }
