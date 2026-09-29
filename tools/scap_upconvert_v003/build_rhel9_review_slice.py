@@ -880,15 +880,20 @@ def main():
                 "references": benchmark_references(xr),
                 "text_blocks": benchmark_text_blocks(xr),
                 "platform": {
-                    "id": "rhel.9",
-                    "title": "Red Hat Enterprise Linux 9",
+                    "id": "enterprise-linux.9",
+                    "title": "Enterprise Linux 9 family",
                     "identifiers": [
                         {
                             "scheme": "cpe",
                             "version": "2.3",
-                            "value": "cpe:2.3:o:redhat:enterprise_linux:9:*:*:*:*:*:*:*",
+                            "value": value,
                         }
+                        for value in benchmark_platform_refs
                     ],
+                    "applicability": {
+                        "mechanism": "cpe-name-match",
+                        "operator": "any",
+                    },
                     "assessment": None,
                 },
                 "scoring": benchmark_scoring(xr),
