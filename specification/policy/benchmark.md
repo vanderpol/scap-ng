@@ -443,3 +443,11 @@ evaluation.
 Whether a future SCAP-NG Benchmark publication may contain more than one
 Benchmark remains an open governance question. The current v1 design direction
 is one executable Benchmark per SCAP-NG Benchmark publication.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Conformance](../core/conformance.md) · [Contents](../README.md) · [Next: Platform and Applicability →](platform-and-applicability.md)
+
+<!-- spec-nav:end -->
