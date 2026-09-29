@@ -778,7 +778,7 @@ def oval_semantic_inventory(oroot):
             variable_kinds[name] = variable_kinds.get(name, 0) + 1
         if name in (
             "arithmetic", "begin", "concat", "count", "end", "escape_regex",
-            "literal_component", "object_component", "regex_capture",
+            "literal_component", "merge", "object_component", "regex_capture",
             "split", "substring", "time_difference", "unique",
             "variable_component",
         ):
@@ -803,7 +803,7 @@ def unsupported_definition_features(oroot, definition_id):
 
     supported_components = {
         "arithmetic", "begin", "concat", "count", "end", "escape_regex",
-        "literal_component", "object_component", "regex_capture",
+        "literal_component", "merge", "object_component", "regex_capture",
         "split", "substring", "time_difference", "unique",
         "variable_component",
     }
@@ -1058,6 +1058,14 @@ def lower_definition(oroot, definition_id, assessment_id):
             return {"concat": lowered}, None
         if name == "count":
             return {"count": lowered[0] if len(lowered) == 1 else lowered}, None
+        if name == "merge":
+            return {
+                "merge": {
+                    "values": lowered[0] if len(lowered) == 1 else lowered,
+                    "delimiter": node.get("delimiter") if node.get("delimiter") is not None else "",
+                    "sort": (node.get("sort") or "document").lower(),
+                }
+            }, None
         if name == "unique":
             return {"unique": lowered[0] if len(lowered) == 1 else lowered}, None
         if name == "split":
