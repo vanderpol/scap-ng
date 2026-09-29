@@ -153,6 +153,14 @@ jobs:
             work/rhel9-regenerated-xccdf.xml \
             --out-dir work/rhel9-xccdf-diff
 
+      - name: Audit raw XCCDF XML surface
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/audit_xccdf_xml_surface.py \
+            work/rhel9-source-xccdf.xml \
+            --rule-mapping scap-ng/research/iterations/003/evidence/rhel9-full/rule-mapping.json \
+            --platform-inventory scap-ng/research/iterations/003/evidence/rhel9-full/source-platform-inventory.json \
+            --output work/rhel9-xccdf-surface-audit.json
+
       - name: Upload benchmark semantic IR
         uses: actions/upload-artifact@v4
         with:
@@ -162,5 +170,6 @@ jobs:
             work/rhel9-ng-fidelity.json
             work/rhel9-regenerated-xccdf.xml
             work/rhel9-xccdf-roundtrip.json
+            work/rhel9-xccdf-surface-audit.json
             work/rhel9-source-xccdf.xml
             work/rhel9-xccdf-diff/**
