@@ -43,10 +43,12 @@ jobs:
             python scap-ng/tools/scap_ng_roundtrip_v003/ng_to_oval.py "$fixture" -o "out/$base.xml"
           done
 
-      - name: Validate regenerated OVAL against SCAP 1.4 omni schema
+      - name: Validate regenerated OVAL against OVAL 5.12.3 schemas
         run: |
           set -euo pipefail
-          schema="oval-language/oval-schemas/oval-definitions-schema.xsd"
+          cp scap-ng/tools/scap_ng_roundtrip_v003/oval-definitions-omni.xsd \
+             oval-language/oval-schemas/roundtrip-omni.xsd
+          schema="oval-language/oval-schemas/roundtrip-omni.xsd"
           for xml in out/*.xml; do
             echo "Validating $xml"
             xmllint --noout --schema "$schema" "$xml"
