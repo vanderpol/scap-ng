@@ -60,6 +60,10 @@ class Model:
             return ("arithmetic",e.attrib["arithmetic_operation"],tuple(self.component(c) for c in e))
         if local=="count":
             return ("count",tuple(self.component(c) for c in e))
+        if local=="unique":
+            return ("unique",tuple(self.component(c) for c in e))
+        if local=="split":
+            return ("split",e.attrib["delimiter"],tuple(self.component(c) for c in e))
         raise ValueError(f"unsupported component {local}")
 
     def variable(self,vid):
