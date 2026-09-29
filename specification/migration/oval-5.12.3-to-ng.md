@@ -388,3 +388,11 @@ minimum:
 
 This report is migration evidence. It is not required scanner-facing Assessment
 semantics.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: SCAP 1.4 Migration](scap-1.4-migration.md) · [Contents](../README.md) · [Next: OVAL 5.12.3 Capability Crosswalk →](oval-5.12.3-capability-crosswalk.md)
+
+<!-- spec-nav:end -->
