@@ -1,0 +1,129 @@
+{
+  "fixture_version": 1,
+  "id": "rhel-rsyslog-set-filter",
+  "source": {
+    "repository": "vanderpol/scap-content",
+    "path": "projects/linux/rhel10/oval/U_RHEL_10_SV-280986-oval.xml",
+    "note": "Real production-derived OVAL exercising Set UNION and Filter -> State."
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "no-remote-log-config-check",
+        "type": "independent.textfilecontent54",
+        "check_existence": "none_exist",
+        "check": "all",
+        "collection": "remote-log-config-union-collection"
+      },
+      {
+        "id": "no-rsyslog-listener-check",
+        "type": "linux.inetlisteningservers",
+        "check_existence": "none_exist",
+        "check": "all",
+        "collection": "rsyslog-listeners-collection"
+      }
+    ],
+    "collections": [
+      {
+        "id": "rsyslog-main-config-collection",
+        "type": "independent.textfilecontent54",
+        "behaviors": {
+          "ignore_case": true
+        },
+        "selectors": {
+          "filepath": "/etc/rsyslog.conf",
+          "pattern": {
+            "operation": "pattern match",
+            "value": "(?im)REMOTE_LISTENER_PATTERN"
+          },
+          "instance": {
+            "datatype": "int",
+            "operation": "greater than or equal",
+            "value": "1"
+          }
+        }
+      },
+      {
+        "id": "rsyslog-dropin-config-collection",
+        "type": "independent.textfilecontent54",
+        "behaviors": {
+          "ignore_case": true
+        },
+        "selectors": {
+          "path": "/etc/rsyslog.d",
+          "filename": {
+            "operation": "pattern match",
+            "value": "^.*$"
+          },
+          "pattern": {
+            "operation": "pattern match",
+            "value": "(?im)REMOTE_LISTENER_PATTERN"
+          },
+          "instance": {
+            "datatype": "int",
+            "operation": "greater than or equal",
+            "value": "1"
+          }
+        }
+      },
+      {
+        "id": "remote-log-config-union-collection",
+        "type": "independent.textfilecontent54",
+        "set": {
+          "operator": "UNION",
+          "collections": [
+            "rsyslog-main-config-collection",
+            "rsyslog-dropin-config-collection"
+          ]
+        }
+      },
+      {
+        "id": "rsyslog-listeners-collection",
+        "type": "linux.inetlisteningservers",
+        "selectors": {
+          "protocol": {
+            "operation": "pattern match",
+            "value": "^(?:tcp|udp)$"
+          },
+          "local_address": {
+            "operation": "pattern match",
+            "value": ".*"
+          },
+          "local_port": {
+            "datatype": "int",
+            "operation": "greater than or equal",
+            "value": "0"
+          }
+        },
+        "filters": [
+          {
+            "action": "include",
+            "state": "rsyslog-program-state"
+          }
+        ]
+      }
+    ],
+    "states": [
+      {
+        "id": "rsyslog-program-state",
+        "type": "linux.inetlisteningservers",
+        "predicates": {
+          "program_name": {
+            "operation": "pattern match",
+            "value": "^rsyslogd?$"
+          }
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "checks": [
+        "no-remote-log-config-check",
+        "no-rsyslog-listener-check"
+      ]
+    }
+  },
+  "fixture_substitutions": {
+    "REMOTE_LISTENER_PATTERN": "The original long regular expression is retained in source OVAL; the fixture token keeps this review fixture readable. Reverse-generation tests substitute the exact source expression before semantic comparison."
+  }
+}
