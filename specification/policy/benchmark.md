@@ -266,7 +266,7 @@ For a requested Benchmark execution, the processor SHALL conceptually:
 8. freeze the effective Rule-selection state;
 9. evaluate the Benchmark Platform expression;
 10. evaluate Rule applicability only for effectively selected Rules;
-11. execute compliance Assessment Methods only for applicable Rules; and
+11. execute the selected Assessment Methods for applicable Rules, preserving each Assessment's declared class and purpose; and
 12. produce results that identify the exact effective policy used.
 
 A build/compiler MAY perform source resolution and normalization before run
@@ -396,3 +396,20 @@ Benchmark-scoped applicability catalog.
 These examples are non-normative syntax demonstrations. Where example syntax
 and normative requirements diverge during pre-alpha development, the
 specification requirement controls.
+
+
+## 22. Assessment class neutrality
+
+A Benchmark MAY contain Rules whose selected Assessment Methods use different
+standardized Assessment classes.
+
+The Benchmark processing model SHALL NOT assume that every Rule is a
+`compliance` Assessment merely because compliance is a primary SCAP-NG use
+case.
+
+Rule outcome interpretation SHALL use the selected Assessment Method's declared
+class as defined in `../assessment/assessment-method.md`.
+
+Publisher-specific Rule metadata that is not part of the standardized SCAP-NG
+Policy vocabulary SHALL use the constrained extension mechanism rather than
+being promoted implicitly into core Rule fields.
