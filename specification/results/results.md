@@ -258,3 +258,11 @@ actual class.
 
 `information` is reserved as a candidate future class and SHALL NOT be
 treated as normative until approved through OVAL Board / SCAP-NG governance.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Source, Compilation, Packaging, and Integrity](../package/package-and-integrity.md) · [Contents](../README.md) · [Next: SCAP 1.4 Migration →](../migration/scap-1.4-migration.md)
+
+<!-- spec-nav:end -->
