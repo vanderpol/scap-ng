@@ -179,3 +179,11 @@ as generic names for normative SCAP-NG object types.
 Such terms MAY appear in examples, source metadata, identifiers, provenance, or
 publisher-specific extensions when they accurately describe the source
 publication.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [Contents](README.md) · [Next: SCAP-NG Requirements Index →](requirements-index.md)
+
+<!-- spec-nav:end -->
