@@ -1,0 +1,37 @@
+assessment:
+  id: SV-258025.automated
+  version: 13
+  assessment_title: RHEL 9 must initiate a session lock for graphical user interfaces when the screensaver
+    is activated.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    verify-os-initiates-session-lock-graphical-user-interfaces-when-screensaver:
+      test_title: Verify the OS initiates a session lock for graphical user interfaces when the screensaver
+        is activated.
+      collect:
+        object_title: Retrieve the gnome screensaver lock-delay setting.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: gsettings get org.gnome.desktop.screensaver lock-delay
+          pattern:
+            operation: pattern match
+            value: uint32\s(\d+)$
+      assert:
+        state_title: Confirm value is set to 5 or greater.
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: exit_status
+            operation: equals
+            value: '0'
+            datatype: int
+          - field: subexpression
+            operation: less than or equal
+            value: '5'
+            datatype: int
+  evaluate:
+    check: verify-os-initiates-session-lock-graphical-user-interfaces-when-screensaver

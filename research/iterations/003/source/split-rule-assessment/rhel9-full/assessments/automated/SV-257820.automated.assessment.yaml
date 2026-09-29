@@ -1,0 +1,33 @@
+assessment:
+  id: SV-257820.automated
+  version: 1
+  assessment_title: RHEL-09-214015 - RHEL 9 must check the GPG signature of software packages originating
+    from external software repositories before installation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-dnf-dnf-conf-gpgcheck-1:
+      test_title: /etc/dnf/dnf.conf gpgcheck=1
+      collect:
+        object_title: /etc/dnf/dnf.conf gpgcheck
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/dnf/dnf.conf
+          pattern:
+            operation: pattern match
+            value: ^gpgcheck=(.*)$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: /etc/dnf/dnf.conf gpgcheck=1
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '1'
+          datatype: string
+  evaluate:
+    check: etc-dnf-dnf-conf-gpgcheck-1

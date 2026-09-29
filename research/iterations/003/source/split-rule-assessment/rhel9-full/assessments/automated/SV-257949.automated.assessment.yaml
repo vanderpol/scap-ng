@@ -1,0 +1,65 @@
+assessment:
+  id: SV-257949.automated
+  version: 1
+  assessment_title: RHEL-09-252040 - RHEL 9 must configure a DNS processing mode set be Network Manager.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    dns-setting-exists-in-networkmanager-conf-default-none-or-systemd:
+      test_title: DNS setting exists in NetworkManager.conf and is default, none or systemd-resolved
+      collect:
+        object_title: NetworkManager.conf dns setting
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/NetworkManager/NetworkManager.conf
+          pattern:
+            operation: pattern match
+            value: ^dns=(\S*)\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          any:
+          - field: subexpression
+            operation: equals
+            value: none
+            datatype: string
+          - field: subexpression
+            operation: equals
+            value: default
+            datatype: string
+          - field: subexpression
+            operation: equals
+            value: systemd-resolved
+            datatype: string
+    dns-setting-exists-in-networkmanager-conf-main-section:
+      test_title: DNS setting exists in NetworkManager.conf main section
+      collect:
+        object_title: NetworkManager.conf main section
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/NetworkManager/NetworkManager.conf
+          pattern:
+            operation: pattern match
+            value: ^\[main\]((?:\r?\n(?:[^[\r\n].*)?)*)
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: \ndns=
+          datatype: string
+  evaluate:
+    all:
+    - check: dns-setting-exists-in-networkmanager-conf-default-none-or-systemd
+    - check: dns-setting-exists-in-networkmanager-conf-main-section

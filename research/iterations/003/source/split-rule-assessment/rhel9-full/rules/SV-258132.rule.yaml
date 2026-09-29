@@ -1,0 +1,46 @@
+rule:
+  id: SV-258132
+  version: r1134929
+  title: RHEL 9 must map the authenticated identity to the user or group account for PKI-based authentication.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: Without mapping the certificate used to authenticate to the user account, the ability to
+    determine the identity of the individual user or group will not be available for forensic analysis.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000187
+  - scheme: disa-stig-id
+    value: RHEL-09-631015
+  - scheme: disa-vulnerability-id
+    value: V-258132
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to map the authenticated identity to the user or group account by adding
+      or modifying the certmap section of the "/etc/sssd/sssd.conf" file based on the following example:
+      [certmap/testing.test/rule_name] matchrule = .*EDIPI@mil maprule = (userCertificate;binary={cert!bin})
+      domains = testing.test The "sssd" service must be restarted for the changes to take effect. To restart
+      the "sssd" service, run the following command: $ sudo systemctl restart sssd.service'
+  checks:
+    default: SV-258132.manual
+    manual: SV-258132.manual
+  default_check: default

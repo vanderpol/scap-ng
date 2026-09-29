@@ -1,0 +1,57 @@
+assessment:
+  id: SV-257792.automated
+  version: 1
+  assessment_title: RHEL-09-212035 - RHEL 9 must disable virtual system calls.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    bls-options-contain-vsyscall-none:
+      test_title: BLS options contain vsyscall=none
+      collect:
+        object_title: BLS options
+        capability: independent.textfilecontent54
+        select:
+          path: /boot/loader/entries
+          filename:
+            operation: pattern match
+            value: ^.*\.conf$
+          pattern:
+            operation: pattern match
+            value: ^options\s+(.*)$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)vsyscall=none(\s|$)
+    grub-cmdline-linux-arguments-in-etc-default-grub-contain-vsyscall:
+      test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain vsyscall=none
+      collect:
+        object_title: /etc/default/grub GRUB_CMDLINE_LINUX
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/default/grub
+          pattern:
+            operation: pattern match
+            value: ^GRUB_CMDLINE_LINUX="(.*)"
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)vsyscall=none(\s|$)
+  evaluate:
+    all:
+    - check: bls-options-contain-vsyscall-none
+    - check: grub-cmdline-linux-arguments-in-etc-default-grub-contain-vsyscall

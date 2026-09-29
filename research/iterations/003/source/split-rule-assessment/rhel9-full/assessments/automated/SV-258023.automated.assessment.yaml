@@ -1,0 +1,45 @@
+assessment:
+  id: SV-258023.automated
+  version: 13
+  assessment_title: RHEL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    gnome-idle-delay-not-set-0-or-greater-than-600:
+      test_title: Gnome idle-delay must not be set to 0 or greater than 600
+      collect:
+        object_title: Gather gsettings get org.gnome.desktop.session idle-delay
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: gsettings get org.gnome.desktop.session idle-delay
+          pattern:
+            operation: pattern match
+            value: uint32\s+(\d+)
+      assert:
+        state_title: idle-delay must not be equal to zero / idle-delay must be less than or equal to 600
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - all:
+            - field: exit_status
+              operation: equals
+              value: '0'
+              datatype: int
+            - field: subexpression
+              operation: not equal
+              value: '0'
+              datatype: int
+          - all:
+            - field: exit_status
+              operation: equals
+              value: '0'
+              datatype: int
+            - field: subexpression
+              operation: less than or equal
+              value: '600'
+              datatype: int
+  evaluate:
+    check: gnome-idle-delay-not-set-0-or-greater-than-600

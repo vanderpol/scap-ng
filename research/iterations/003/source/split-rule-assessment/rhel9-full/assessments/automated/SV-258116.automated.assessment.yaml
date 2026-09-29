@@ -1,0 +1,57 @@
+assessment:
+  id: SV-258116.automated
+  version: 1
+  assessment_title: RHEL-09-611135 - RHEL 9 must be configured so that user and group account administration
+    utilities are configured to store only encrypted representations of passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    libuser-conf-defaults-crypt-style-exists:
+      test_title: libuser.conf, defaults/crypt_style exists
+      collect:
+        object_title: /etc/libuser.conf defaults section with crypt_style
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/libuser.conf
+          pattern:
+            operation: pattern match
+            value: ^\[defaults]((?:\r?\n(?:[^[\r\n].*)?)*)
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: defaults/crypt_style
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: pattern match
+          value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
+          datatype: string
+    libuser-conf-crypt-style-sha512:
+      test_title: libuser.conf, crypt_style = sha512
+      collect:
+        object_title: /etc/libuser.conf defaults section with crypt_style
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/libuser.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*crypt_style\s*=\s*(\S+)\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: sha512
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: sha512
+          datatype: string
+  evaluate:
+    all:
+    - check: libuser-conf-defaults-crypt-style-exists
+    - check: libuser-conf-crypt-style-sha512

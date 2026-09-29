@@ -1,0 +1,32 @@
+assessment:
+  id: SV-258018.automated
+  version: 1
+  assessment_title: RHEL-09-271040 - RHEL 9 must not allow unattended or automatic logon via the graphical
+    user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    automaticloginenable-set-false-in-etc-gdm-custom-conf:
+      test_title: AutomaticLoginEnable is set to false in /etc/gdm/custom.conf.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/gdm/custom.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*\[daemon\]\s+[#\s\w=]*^\s*AutomaticLoginEnable=(\w+)\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: 'false'
+  evaluate:
+    check: automaticloginenable-set-false-in-etc-gdm-custom-conf

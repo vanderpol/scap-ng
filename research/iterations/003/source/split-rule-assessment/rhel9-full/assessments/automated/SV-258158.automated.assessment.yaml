@@ -1,0 +1,33 @@
+assessment:
+  id: SV-258158.automated
+  version: 1
+  assessment_title: RHEL-09-653045 - RHEL 9 must take action when allocated audit record storage volume
+    reaches 95 percent of the audit record storage capacity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-admin-space-left-5:
+      test_title: '/etc/audit/auditd.conf: admin_space_left = 5%'
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*admin_space_left\s*=\s*(\S+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: 5%
+          datatype: string
+  evaluate:
+    check: etc-audit-auditd-conf-admin-space-left-5

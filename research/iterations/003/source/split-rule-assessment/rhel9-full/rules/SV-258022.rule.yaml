@@ -1,0 +1,61 @@
+rule:
+  id: SV-258022
+  version: r1045097
+  title: RHEL 9 must prevent a user from overriding the screensaver lock-enabled setting for the graphical
+    user interface.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'A session time-out lock is a temporary action taken when a user stops work and moves away
+    from the immediate physical vicinity of the information system but does not log out because of the
+    temporary nature of the absence. Rather than relying on the user to manually lock their operating
+    system session prior to vacating the vicinity, operating systems need to be able to identify when
+    a user''s session has idled and take action to initiate the session lock. The session lock is implemented
+    at the point where session activity can be determined and/or controlled. Implementing session settings
+    will have little value if a user is able to manipulate these settings from the defaults prescribed
+    in the other requirements of this implementation guide. Satisfies: SRG-OS-000028-GPOS-00009, SRG-OS-000030-GPOS-00011'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000056
+  - scheme: cci
+    value: CCI-000057
+  - scheme: cci
+    value: CCI-000058
+  - scheme: disa-stig-id
+    value: RHEL-09-271060
+  - scheme: disa-vulnerability-id
+    value: V-258022
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - linux.gnome-installed
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to prevent a user from overriding settings for graphical user interfaces.
+      Create a database to contain the systemwide screensaver settings (if it does not already exist)
+      with the following command: Note: The example below is using the database "local" for the system.
+      If the system is using another database in "/etc/dconf/profile/user", the file should be created
+      under the appropriate subdirectory. $ sudo touch /etc/dconf/db/local.d/locks/session Add the following
+      setting to prevent nonprivileged users from modifying it: /org/gnome/desktop/screensaver/lock-enabled
+      Run the following command to update the database: $ sudo dconf update'
+  checks:
+    default: SV-258022.automated
+    automated: SV-258022.automated
+    manual: SV-258022.manual
+  default_check: default

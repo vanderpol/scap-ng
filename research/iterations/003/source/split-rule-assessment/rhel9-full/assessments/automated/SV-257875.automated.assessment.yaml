@@ -1,0 +1,47 @@
+assessment:
+  id: SV-257875.automated
+  version: 1
+  assessment_title: RHEL-09-231170 - RHEL 9 must mount /var/log/audit with the nosuid option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    var-log-audit-mounted-nosuid-option:
+      test_title: /var/log/audit is mounted with the nosuid option.
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /var/log/audit
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: nosuid
+          entity_check: at least one
+    var-log-audit-configured-in-etc-fstab-nosuid-option:
+      test_title: /var/log/audit is configured in /etc/fstab with the nosuid option.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+  evaluate:
+    all:
+    - check: var-log-audit-mounted-nosuid-option
+    - check: var-log-audit-configured-in-etc-fstab-nosuid-option

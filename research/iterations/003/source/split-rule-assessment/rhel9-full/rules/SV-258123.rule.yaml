@@ -1,0 +1,59 @@
+rule:
+  id: SV-258123
+  version: r1134923
+  title: RHEL 9 must implement certificate status checking for multifactor authentication.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'Using an authentication device, such as a DOD common access card (CAC) or token that is
+    separate from the information system, ensures that even if the information system is compromised,
+    credentials stored on the authentication device will not be affected. Multifactor solutions that require
+    devices separate from information systems gaining access include, for example, hardware tokens providing
+    time-based or challenge-response authenticators and smart cards such as the U.S. Government Personal
+    Identity Verification (PIV) card and the DOD CAC. RHEL 9 includes multiple options for configuring
+    certificate status checking, but for this requirement focuses on the System Security Services Daemon
+    (SSSD). By default, SSSD performs Online Certificate Status Protocol (OCSP) checking and certificate
+    verification using a sha256 digest function. Satisfies: SRG-OS-000375-GPOS-00160, SRG-OS-000377-GPOS-00162'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-004046
+  - scheme: cci
+    value: CCI-001954
+  - scheme: cci
+    value: CCI-001948
+  - scheme: disa-stig-id
+    value: RHEL-09-611170
+  - scheme: disa-vulnerability-id
+    value: V-258123
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to implement certificate status checking for multifactor authentication.
+      Review the "/etc/sssd/conf.d/certificate_verification.conf" file to determine if the system is configured
+      to prevent OCSP or certificate verification. Add the following line to the "/etc/sssd/conf.d/certificate_verification.conf"
+      file: certificate_verification = ocsp_dgst=sha512 Set the correct ownership and permissions on the
+      "/etc/sssd/conf.d/certificate_verification.conf" file by running these commands: $ sudo chown root:root
+      "/etc/sssd/conf.d/certificate_verification.conf" $ sudo chmod 600 "/etc/sssd/conf.d/certificate_verification.conf"
+      The "sssd" service must be restarted for the changes to take effect. To restart the "sssd" service,
+      run the following command: $ sudo systemctl restart sssd.service'
+  checks:
+    manual: SV-258123.manual
+  default_check: manual

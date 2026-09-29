@@ -1,0 +1,54 @@
+rule:
+  id: SV-257962
+  version: r1155733
+  title: RHEL 9 must use reverse path filtering on all IPv4 interfaces.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: Enabling reverse path filtering drops packets with source addresses that should not have
+    been able to be received on the interface on which they were received. It must not be used on systems
+    that are routers for complicated networks, but is helpful for end hosts and routers serving small
+    networks. The sysctl --system command will load settings from all system configuration files. All
+    configuration files are sorted by their filename in lexicographical order, regardless of the directories
+    in which they reside. If multiple files specify the same option, the entry in the file with the lexicographically
+    latest name will take precedence. Files are read from directories in the following list from top to
+    bottom. Once a file of a given filename is loaded, any file of the same name in subsequent directories
+    is ignored. /etc/sysctl.d/*.conf /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf
+    /lib/sysctl.d/*.conf /etc/sysctl.conf
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-253035
+  - scheme: disa-vulnerability-id
+    value: V-257962
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to use reverse path filtering on all IPv4 interfaces. Create a configuration
+      file if it does not already exist: $ sudo vi /etc/sysctl.d/99-ipv4_rp_filter.conf Add the following
+      line to the file: net.ipv4.conf.all.rp_filter = 1 Reload settings from all system configuration
+      files with the following command: $ sudo sysctl --system'
+  checks:
+    default: SV-257962.automated
+    automated: SV-257962.automated
+    manual: SV-257962.manual
+  default_check: default

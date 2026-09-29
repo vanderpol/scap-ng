@@ -1,0 +1,48 @@
+rule:
+  id: SV-279936
+  version: r1210929
+  title: RHEL 9 must audit any script or executable called by cron as root or by any privileged user.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: Any script or executable called by cron as root or by any privileged user must be owned
+    by that user. It must also have the permissions 755 or more restrictive and should have no extended
+    rights that allow any nonprivileged user to modify the script or executable.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000172
+  - scheme: disa-stig-id
+    value: RHEL-09-654097
+  - scheme: disa-vulnerability-id
+    value: V-279936
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to audit the execution of any system call made by cron as root or by any
+      privileged user. Add or update the following file system rules to "/etc/audit/rules.d/audit.rules":
+      -a always,exit -F arch=b64 -S execve -F subj_type=crond_t -F euid=0 -k cron_exec -a always,exit
+      -F arch=b32 -S execve -F subj_type=crond_t -F euid=0 -k cron_exec -a always,exit -F arch=b64 -S
+      execve -F subj_type=crond_t -F auid>=1000 -F auid!=unset -k cron_exec -a always,exit -F arch=b32
+      -S execve -F subj_type=crond_t -F auid>=1000 -F auid!=unset -k cron_exec To load the rules to the
+      kernel immediately, use the following command: $ sudo augenrules --load'
+  checks:
+    manual: SV-279936.manual
+  default_check: manual

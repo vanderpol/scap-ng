@@ -1,0 +1,33 @@
+assessment:
+  id: SV-258099.automated
+  version: 1
+  assessment_title: RHEL-09-611050 - RHEL 9 password-auth must be configured to use a sufficient number
+    of hashing rounds.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    pam-unix-module-included-in-password-auth-configured-100000-or:
+      test_title: The pam_unix module is included in password-auth and configured for 100000 or more rounds.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/pam.d/password-auth
+          pattern:
+            operation: pattern match
+            value: ^\s*password\s+sufficient\s+pam_unix\.so\s+[^#\n]*\brounds=(\d+)\b
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: greater than or equal
+          value: '100000'
+          datatype: int
+  evaluate:
+    check: pam-unix-module-included-in-password-auth-configured-100000-or

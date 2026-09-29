@@ -1,0 +1,26 @@
+assessment:
+  id: SV-270176.automated
+  version: 1
+  assessment_title: RHEL-09-232104 - RHEL 9 "/etc/audit/" must be group-owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-audit-directory-owned-by-root:
+      test_title: /etc/audit directory is owned by root
+      collect:
+        object_title: /etc/audit directory
+        capability: unix.file
+        select:
+          path: /etc/audit
+      assert:
+        state_title: group-owned by root
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: group_id
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    check: etc-audit-directory-owned-by-root

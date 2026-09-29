@@ -1,0 +1,44 @@
+rule:
+  id: SV-257881
+  version: r1184299
+  title: RHEL 9 must prevent special devices on non-root local partitions.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: The "nodev" mount option causes the system to not interpret character or block special devices.
+    Executing character or block special devices from untrusted file systems increases the opportunity
+    for nonprivileged users to attain unauthorized administrative access. The only legitimate location
+    for device files is the "/dev" directory located on the root partition, with the exception of chroot
+    jails if implemented.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-231200
+  - scheme: disa-vulnerability-id
+    value: V-257881
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: Configure the "/etc/fstab" to use the "nodev" option on all non-root local partitions.
+  checks:
+    manual: SV-257881.manual
+  default_check: manual

@@ -1,0 +1,28 @@
+assessment:
+  id: SV-258120.automated
+  version: 1
+  assessment_title: RHEL-09-611155 - RHEL 9 must not have accounts configured with blank or null passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    there-no-accounts-in-etc-shadow-that-have-blank-password:
+      test_title: There are no accounts in /etc/shadow that have blank password fields.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/shadow
+          pattern:
+            operation: pattern match
+            value: '^[^:]+::[^:]*:[^:]*:'
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    check: there-no-accounts-in-etc-shadow-that-have-blank-password

@@ -1,0 +1,46 @@
+rule:
+  id: SV-257920
+  version: r1101926
+  title: RHEL 9 library files must be owned by root.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: If RHEL 9 allowed any user to make changes to software libraries, then those changes might
+    be implemented without undergoing the appropriate testing and approvals that are part of a robust
+    change management process. This requirement applies to RHEL 9 with software libraries that are accessible
+    and configurable, as in the case of interpreted languages. Software libraries also include privileged
+    programs that execute with escalated privileges.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-001499
+  - scheme: disa-stig-id
+    value: RHEL-09-232200
+  - scheme: disa-vulnerability-id
+    value: V-257920
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the systemwide shared library files contained in the directories "/lib", "/lib64",
+      "/usr/lib", and "/usr/lib64" to be owned by root with the following command: $ sudo find /lib /lib64
+      /usr/lib /usr/lib64 -type f -name ''*.so*'' ! -user root -exec chown root {} +'
+  checks:
+    manual: SV-257920.manual
+  default_check: manual

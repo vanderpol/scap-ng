@@ -1,0 +1,29 @@
+assessment:
+  id: SV-258227.automated
+  version: 1
+  assessment_title: RHEL-09-654265 - RHEL 9 must take appropriate action when a critical audit processing
+    failure occurs.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-audit-audit-rules-f-2-option-present:
+      test_title: '/etc/audit/audit.rules: -f 2 option is present'
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            value: ^[ \t]*-f[ \t]+2\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    check: etc-audit-audit-rules-f-2-option-present

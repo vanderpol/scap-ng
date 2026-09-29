@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257979.automated
+  version: 2
+  assessment_title: RHEL-09-255015 - All RHEL 9 networked systems must have and implement SSH to protect
+    the confidentiality and integrity of transmitted and received information, as well as information
+    during preparation for transmission.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    check-if-ssh-in-active-state:
+      test_title: Check if SSH is in 'active' state
+      collect:
+        object_title: sshd.service ActiveState
+        capability: linux.systemdunitproperty
+        select:
+          unit: sshd.service
+          property: ActiveState
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: active
+  evaluate:
+    check: check-if-ssh-in-active-state

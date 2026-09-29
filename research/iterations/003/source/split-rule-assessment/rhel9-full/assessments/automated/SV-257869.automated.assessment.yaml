@@ -1,0 +1,50 @@
+assessment:
+  id: SV-257869.automated
+  version: 1
+  assessment_title: RHEL-09-231140 - RHEL 9 must mount /var with the nodev option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    var-mounted-nodev-option:
+      test_title: /var is mounted with the nodev option.
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /var
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: nodev
+          entity_check: at least one
+    var-configured-in-etc-fstab-nodev-option:
+      test_title: /var is configured in /etc/fstab with the nodev option.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s]+\s+/var\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: nodev option
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|,)nodev(,|$)
+          datatype: string
+  evaluate:
+    all:
+    - check: var-mounted-nodev-option
+    - check: var-configured-in-etc-fstab-nodev-option

@@ -1,0 +1,32 @@
+assessment:
+  id: SV-257805.automated
+  version: 2
+  assessment_title: RHEL-09-213050 - RHEL 9 must be configured to disable the Controller Area Network
+    kernel module.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-modprobe-d-contains-file-that-contains-blacklist-can:
+      test_title: /etc/modprobe.d contains a file that contains 'blacklist can'
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/modprobe.d
+          filename:
+            operation: pattern match
+            value: .*
+          pattern:
+            operation: pattern match
+            value: ^[ \t]*blacklist[ \t]+can[ \t]*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    check: etc-modprobe-d-contains-file-that-contains-blacklist-can

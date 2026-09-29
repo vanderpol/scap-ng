@@ -1,0 +1,56 @@
+assessment:
+  id: SV-257787.automated
+  version: 1
+  assessment_title: RHEL-09-212010 - RHEL 9 must require a boot loader superuser password.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-grub2-cfg-superusers-exists-has-name:
+      test_title: /etc/grub2.cfg:superusers exists and has a name.
+      collect:
+        object_title: /etc/grub2.cfg:superusers
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/grub2.cfg
+          pattern:
+            operation: pattern match
+            value: ^\s*set\s+superusers\s*=\s*"(\S+)"\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: GRUB superuser name
+        existence: all_exist
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^\S+$
+          datatype: string
+    boot-grub2-user-cfg-grub2-password-exists-has-pbkdf2-sha512:
+      test_title: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
+      collect:
+        object_title: /boot/grub2/grubenv:kernelopts
+        capability: independent.textfilecontent54
+        select:
+          filepath: /boot/grub2/user.cfg
+          pattern:
+            operation: pattern match
+            value: ^\s*GRUB2_PASSWORD=(\S+)\b
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: GRUB superuser password
+        existence: all_exist
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^grub\.pbkdf2\.sha512\.
+          datatype: string
+  evaluate:
+    all:
+    - check: etc-grub2-cfg-superusers-exists-has-name
+    - check: boot-grub2-user-cfg-grub2-password-exists-has-pbkdf2-sha512

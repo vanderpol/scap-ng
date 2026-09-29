@@ -1,0 +1,32 @@
+assessment:
+  id: SV-258077.automated
+  version: 3
+  assessment_title: RHEL-09-412080 - RHEL 9 must terminate idle user sessions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    system-terminates-idle-user-sessions:
+      test_title: The system terminates idle user sessions.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/systemd/logind.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*StopIdleSessionSec\s*=\s*(-?\d*)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '600'
+          datatype: int
+  evaluate:
+    check: system-terminates-idle-user-sessions

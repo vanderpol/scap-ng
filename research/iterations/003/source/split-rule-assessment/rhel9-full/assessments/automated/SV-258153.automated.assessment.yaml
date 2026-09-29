@@ -1,0 +1,39 @@
+assessment:
+  id: SV-258153.automated
+  version: 1
+  assessment_title: RHEL-09-653020 - RHEL 9 audit system must take appropriate action when an error writing
+    to the audit storage volume occurs.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-disk-error-action-syslog-single-or:
+      test_title: '/etc/audit/auditd.conf: disk_error_action = SYSLOG, SINGLE, or HALT'
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*disk_error_action\s*=\s*(\w+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          any:
+          - field: subexpression
+            operation: pattern match
+            value: (?i)^syslog$
+          - field: subexpression
+            operation: pattern match
+            value: (?i)^single$
+          - field: subexpression
+            operation: pattern match
+            value: (?i)^halt$
+  evaluate:
+    check: etc-audit-auditd-conf-disk-error-action-syslog-single-or

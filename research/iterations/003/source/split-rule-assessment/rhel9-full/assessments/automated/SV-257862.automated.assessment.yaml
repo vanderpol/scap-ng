@@ -1,0 +1,48 @@
+assessment:
+  id: SV-257862.automated
+  version: 1
+  assessment_title: RHEL-09-231105 - RHEL 9 must prevent files with the setuid and setgid bit set from
+    being executed on the /boot/efi directory.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    if-boot-efi-mounted-it-mounted-nosuid-option:
+      test_title: If /boot/efi is mounted, it is mounted with the nosuid option
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /boot/efi
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: nosuid
+          entity_check: at least one
+    if-boot-efi-configured-in-etc-fstab-it-configured-nosuid:
+      test_title: If /boot/efi is configured in /etc/fstab, it is configured with the nosuid option
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s]+\s+/boot/efi\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+  evaluate:
+    all:
+    - check: if-boot-efi-mounted-it-mounted-nosuid-option
+    - check: if-boot-efi-configured-in-etc-fstab-it-configured-nosuid

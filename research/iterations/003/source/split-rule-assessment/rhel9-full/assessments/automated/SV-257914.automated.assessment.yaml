@@ -1,0 +1,26 @@
+assessment:
+  id: SV-257914.automated
+  version: 1
+  assessment_title: RHEL-09-232170 - RHEL 9 /var/log directory must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    var-log-directory-owned-by-root:
+      test_title: /var/log directory is owned by root
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          path: /var/log
+      assert:
+        state_title: owned by root
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: user_id
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    check: var-log-directory-owned-by-root

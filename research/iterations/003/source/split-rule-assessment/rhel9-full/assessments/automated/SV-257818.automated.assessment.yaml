@@ -1,0 +1,61 @@
+assessment:
+  id: SV-257818.automated
+  version: 1
+  assessment_title: RHEL-09-213115 - The kdump service on RHEL 9 must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    kdump-service-loadstate-masked-if-it-exists:
+      test_title: kdump.service LoadState is masked if it exists.
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: kdump.service
+          property: LoadState
+      assert:
+        state_title: null
+        existence: any_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: masked
+    kdump-service-unitfilestate-masked-if-it-exists:
+      test_title: kdump.service UnitFileState is masked if it exists.
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: kdump.service
+          property: UnitFileState
+      assert:
+        state_title: null
+        existence: any_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: masked
+    kdump-service-activestate-inactive-if-it-exists:
+      test_title: kdump.service ActiveState is inactive if it exists.
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: kdump.service
+          property: ActiveState
+      assert:
+        state_title: null
+        existence: any_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: inactive
+  evaluate:
+    all:
+    - check: kdump-service-loadstate-masked-if-it-exists
+    - check: kdump-service-unitfilestate-masked-if-it-exists
+    - check: kdump-service-activestate-inactive-if-it-exists

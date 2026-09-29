@@ -1,0 +1,34 @@
+assessment:
+  id: SV-258033.automated
+  version: 2
+  assessment_title: RHEL-09-271115 - RHEL 9 must disable the user list at logon for graphical user interfaces.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    system-disables-gui-user-list-feature:
+      test_title: The system disables the GUI user list feature.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/dconf/db/local.d
+          filename:
+            operation: pattern match
+            value: .+
+          pattern:
+            operation: pattern match
+            value: ^\s*\[org\/gnome\/login-screen]\s*\n+[^\[]*disable-user-list\s*=\s*(\w+)$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: 'true'
+  evaluate:
+    check: system-disables-gui-user-list-feature

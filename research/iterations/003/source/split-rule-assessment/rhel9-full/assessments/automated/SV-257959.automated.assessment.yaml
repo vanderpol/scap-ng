@@ -1,0 +1,27 @@
+assessment:
+  id: SV-257959.automated
+  version: 3
+  assessment_title: RHEL-09-253020 - RHEL 9 must not forward Internet Protocol version 4 (IPv4) source-routed
+    packets.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    net-ipv4-conf-all-accept-source-routesetting-in-kernel-set:
+      test_title: net.ipv4.conf.all.accept_source_routesetting in kernel is set to 0
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: net.ipv4.conf.all.accept_source_route
+      assert:
+        state_title: null
+        existence: all_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    check: net-ipv4-conf-all-accept-source-routesetting-in-kernel-set

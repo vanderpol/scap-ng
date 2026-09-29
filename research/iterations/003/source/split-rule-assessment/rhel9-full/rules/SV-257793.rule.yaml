@@ -1,0 +1,47 @@
+rule:
+  id: SV-257793
+  version: r1044843
+  title: RHEL 9 must clear the page allocator to prevent use-after-free attacks.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'Poisoning writes an arbitrary value to freed pages, so any modification or reference to
+    that page after being freed or before being initialized will be detected and prevented. This prevents
+    many types of use-after-free vulnerabilities at little performance cost. Also prevents leak of data
+    and detection of corrupted memory. Satisfies: SRG-OS-000480-GPOS-00227, SRG-OS-000134-GPOS-00068'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-001084
+  - scheme: disa-stig-id
+    value: RHEL-09-212040
+  - scheme: disa-vulnerability-id
+    value: V-257793
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to enable page poisoning with the following commands: $ sudo grubby --update-kernel=ALL
+      --args="page_poison=1" Add or modify the following line in "/etc/default/grub" to ensure the configuration
+      survives kernel updates: GRUB_CMDLINE_LINUX="page_poison=1"'
+  checks:
+    default: SV-257793.automated
+    automated: SV-257793.automated
+    manual: SV-257793.manual
+  default_check: default

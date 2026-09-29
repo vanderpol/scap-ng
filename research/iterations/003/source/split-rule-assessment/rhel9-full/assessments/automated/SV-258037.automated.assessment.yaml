@@ -1,0 +1,31 @@
+assessment:
+  id: SV-258037.automated
+  version: 1
+  assessment_title: RHEL-09-291025 - RHEL 9 must enable Linux audit logging for the USBGuard daemon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    firewallbackend-set-nftables-in-etc-usbguard-usbguard-daemon-conf:
+      test_title: FirewallBackend is set to nftables in /etc/usbguard/usbguard-daemon.conf.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/usbguard/usbguard-daemon.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*AuditBackend\s*=\s*(\w+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: LinuxAudit
+  evaluate:
+    check: firewallbackend-set-nftables-in-etc-usbguard-usbguard-daemon-conf

@@ -1,0 +1,31 @@
+assessment:
+  id: SV-258060.automated
+  version: 2
+  assessment_title: RHEL-09-411105 - RHEL 9 must ensure account lockouts persist.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-security-faillock-conf-dir-var-log-faillock:
+      test_title: '/etc/security/faillock.conf: dir = var/log/faillock'
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/security/faillock.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*dir\s*=\s*(\S+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: /var/log/faillock
+  evaluate:
+    check: etc-security-faillock-conf-dir-var-log-faillock

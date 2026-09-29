@@ -1,0 +1,176 @@
+assessment:
+  id: SV-258171.automated
+  version: 1
+  assessment_title: RHEL-09-653110 - RHEL 9 must allow only the information system security manager (ISSM)
+    (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-has-mode-0600-or-less-permissive:
+      test_title: /etc/audit/auditd.conf has mode 0600 or less permissive
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          filepath: /etc/audit/auditd.conf
+      assert:
+        state_title: Mode 0600 or less permissive
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: suid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sgid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sticky
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: uexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+    rules-files-in-etc-audit-rules-d-have-mode-0600:
+      test_title: .rules files in /etc/audit/rules.d have mode 0600 or less permissive
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          path: /etc/audit/rules.d
+          filename:
+            operation: pattern match
+            value: .rules$
+      assert:
+        state_title: Mode 0600 or less permissive
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: suid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sgid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sticky
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: uexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+    etc-audit-audit-rules-has-mode-0600-or-less-permissive:
+      test_title: /etc/audit/audit.rules has mode 0600 or less permissive
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          filepath: /etc/audit/audit.rules
+      assert:
+        state_title: Mode 0600 or less permissive
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: suid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sgid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sticky
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: uexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+  evaluate:
+    all:
+    - check: etc-audit-auditd-conf-has-mode-0600-or-less-permissive
+    - check: rules-files-in-etc-audit-rules-d-have-mode-0600
+    - check: etc-audit-audit-rules-has-mode-0600-or-less-permissive

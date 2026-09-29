@@ -1,0 +1,37 @@
+assessment:
+  id: SV-257991.automated
+  version: 1
+  assessment_title: RHEL-09-255075 - RHEL 9 SSH server must be configured to use only Message Authentication
+    Codes (MACs) employing FIPS 140-3 validated cryptographic hash algorithms.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-crypto-policies-back-ends-openssh-config-macs-use-fips:
+      test_title: '/etc/crypto-policies/back-ends/openssh.config: MACs use FIPS 140-3 validated cryptographic
+        hash algorithms'
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/crypto-policies/back-ends/opensshserver.config
+          pattern:
+            operation: pattern match
+            value: ^\s*MACs\s+(\S+)\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          any:
+          - field: subexpression
+            operation: equals
+            value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+          - field: subexpression
+            operation: equals
+            value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
+  evaluate:
+    check: etc-crypto-policies-back-ends-openssh-config-macs-use-fips

@@ -1,0 +1,46 @@
+rule:
+  id: SV-258011
+  version: r1045079
+  title: RHEL 9 SSH daemon must prevent remote hosts from connecting to the proxy display.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: When X11 forwarding is enabled, there may be additional exposure to the server and client
+    displays if the sshd proxy display is configured to listen on the wildcard address. By default, sshd
+    binds the forwarding server to the loopback address and sets the hostname part of the "DISPLAY" environment
+    variable to localhost. This prevents remote hosts from connecting to the proxy display.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-255175
+  - scheme: disa-vulnerability-id
+    value: V-258011
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the SSH daemon to prevent remote hosts from connecting to the proxy display.
+      Add the following line to "/etc/ssh/sshd_config" or to a file in "/etc/ssh/sshd_config.d", or uncomment
+      the line and set the value to "yes": X11UseLocalhost yes The SSH service must be restarted for changes
+      to take effect: $ sudo systemctl restart sshd.service'
+  checks:
+    manual: SV-258011.manual
+  default_check: manual

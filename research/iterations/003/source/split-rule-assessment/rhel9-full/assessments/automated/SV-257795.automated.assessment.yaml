@@ -1,0 +1,57 @@
+assessment:
+  id: SV-257795.automated
+  version: 1
+  assessment_title: RHEL-09-212050 - RHEL 9 must enable mitigations against processor-based vulnerabilities.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    bls-options-contain-pti-on:
+      test_title: BLS options contain pti=on
+      collect:
+        object_title: BLS options
+        capability: independent.textfilecontent54
+        select:
+          path: /boot/loader/entries
+          filename:
+            operation: pattern match
+            value: ^.*\.conf$
+          pattern:
+            operation: pattern match
+            value: ^options\s+(.*)$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)pti=on(\s|$)
+    grub-cmdline-linux-arguments-in-etc-default-grub-contain-pti:
+      test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain pti=on
+      collect:
+        object_title: /etc/default/grub GRUB_CMDLINE_LINUX
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/default/grub
+          pattern:
+            operation: pattern match
+            value: ^GRUB_CMDLINE_LINUX="(.*)"
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)pti=on(\s|$)
+  evaluate:
+    all:
+    - check: bls-options-contain-pti-on
+    - check: grub-cmdline-linux-arguments-in-etc-default-grub-contain-pti

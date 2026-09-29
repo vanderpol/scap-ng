@@ -1,0 +1,27 @@
+assessment:
+  id: SV-257975.automated
+  version: 2
+  assessment_title: RHEL-09-254030 - RHEL 9 must not accept router advertisements on all IPv6 interfaces
+    by default.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    net-ipv6-conf-default-accept-ra-setting-in-kernel-set:
+      test_title: net.ipv6.conf.default.accept_ra setting in kernel is set to 0
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: net.ipv6.conf.default.accept_ra
+      assert:
+        state_title: null
+        existence: all_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    check: net-ipv6-conf-default-accept-ra-setting-in-kernel-set

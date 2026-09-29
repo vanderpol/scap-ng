@@ -1,0 +1,47 @@
+assessment:
+  id: SV-257878.automated
+  version: 1
+  assessment_title: RHEL-09-231185 - RHEL 9 must mount /var/tmp with the nosuid option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    if-var-tmp-mounted-it-mounted-nosuid-option:
+      test_title: If /var/tmp is mounted, it is mounted with the nosuid option
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /var/tmp
+      assert:
+        state_title: null
+        existence: any_exist
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: nosuid
+          entity_check: at least one
+    if-var-tmp-configured-in-etc-fstab-it-configured-nosuid:
+      test_title: If /var/tmp is configured in /etc/fstab, it is configured with the nosuid option
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s]+\s+/var/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance: '1'
+      assert:
+        state_title: null
+        existence: any_exist
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+  evaluate:
+    all:
+    - check: if-var-tmp-mounted-it-mounted-nosuid-option
+    - check: if-var-tmp-configured-in-etc-fstab-it-configured-nosuid

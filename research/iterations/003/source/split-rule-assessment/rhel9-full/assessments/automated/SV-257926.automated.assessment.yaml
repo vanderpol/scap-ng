@@ -1,0 +1,49 @@
+assessment:
+  id: SV-257926.automated
+  version: 1
+  assessment_title: RHEL-09-232230 - RHEL 9 cron configuration files directory must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-cron-files-owned-by-root:
+      test_title: /etc/cron* files owned by root
+      collect:
+        object_title: /etc/cron* files
+        capability: unix.file
+        select:
+          path: /etc
+          filename:
+            operation: pattern match
+            value: ^cron.*$
+      assert:
+        state_title: owned by root
+        existence: any_exist
+        check: all
+        state:
+          field: user_id
+          operation: equals
+          value: '0'
+          datatype: int
+    etc-cron-directories-owned-by-root:
+      test_title: /etc/cron* directories owned by root
+      collect:
+        object_title: /etc/cron* directories
+        capability: unix.file
+        select:
+          path:
+            operation: pattern match
+            value: ^/etc/cron.*$
+      assert:
+        state_title: owned by root
+        existence: any_exist
+        check: all
+        state:
+          field: user_id
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    all:
+    - check: etc-cron-files-owned-by-root
+    - check: etc-cron-directories-owned-by-root

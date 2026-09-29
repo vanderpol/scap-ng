@@ -1,0 +1,54 @@
+rule:
+  id: SV-258035
+  version: r1045125
+  title: RHEL 9 must have the USBGuard package installed.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: The USBguard-daemon is the main component of the USBGuard software framework. It runs as
+    a service in the background and enforces the USB device authorization policy for all USB devices.
+    The policy is defined by a set of rules using a rule language described in the usbguard-rules.conf
+    file. The policy and the authorization state of USB devices can be modified during runtime using the
+    usbguard tool. The system administrator (SA) must work with the site information system security officer
+    (ISSO) to determine a list of authorized peripherals and establish rules within the USBGuard software
+    framework to allow only authorized devices.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-001958
+  - scheme: cci
+    value: CCI-003959
+  - scheme: disa-stig-id
+    value: RHEL-09-291015
+  - scheme: disa-vulnerability-id
+    value: V-258035
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Install the usbguard package with the following command: $ sudo dnf install usbguard Enable
+      the service to start on boot and then start it with the following commands: $ sudo systemctl enable
+      usbguard $ sudo systemctl start usbguard Verify the status of the service with the following command:
+      $ sudo systemctl status usbguard Note: usbguard will need to be configured to allow authorized devices
+      once it is enabled on RHEL 9.'
+  checks:
+    default: SV-258035.automated
+    automated: SV-258035.automated
+    manual: SV-258035.manual
+  default_check: default

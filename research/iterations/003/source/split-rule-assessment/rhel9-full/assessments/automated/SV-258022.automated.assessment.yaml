@@ -1,0 +1,52 @@
+assessment:
+  id: SV-258022.automated
+  version: 1
+  assessment_title: RHEL-09-271060 - RHEL 9 must prevent a user from overriding the screensaver lock-enabled
+    setting for the graphical user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    check-that-etc-dconf-profile-user-system-db-at-minimum:
+      test_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+      collect:
+        object_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/dconf/profile/user
+          pattern:
+            operation: pattern match
+            value: ^\s*system-db\s*:\s*local\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+    org-gnome-desktop-screensaver-lock-enabled-in-etc-dconf-db:
+      test_title: /org/gnome/desktop/screensaver/lock-enabled in /etc/dconf/db/local.d/locks/*
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/dconf/db/local.d/locks
+          filename:
+            operation: pattern match
+            value: .*
+          pattern:
+            operation: pattern match
+            value: ^/org/gnome/desktop/screensaver/lock-enabled$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: check-that-etc-dconf-profile-user-system-db-at-minimum
+    - check: org-gnome-desktop-screensaver-lock-enabled-in-etc-dconf-db

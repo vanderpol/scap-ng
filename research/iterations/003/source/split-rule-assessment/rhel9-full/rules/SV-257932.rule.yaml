@@ -1,0 +1,51 @@
+rule:
+  id: SV-257932
+  version: r1014838
+  title: RHEL 9 must be configured so that all system device files are correctly labeled to prevent unauthorized
+    modification.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: If an unauthorized or modified device is allowed to exist on the system, there is the possibility
+    the system may perform unintended or unauthorized operations.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-232260
+  - scheme: disa-vulnerability-id
+    value: V-257932
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Restore the SELinux policy for the affected device file from the system policy database
+      using the following command: $ sudo restorecon -v <device_path> Substitute "<device_path>" with
+      the path to the affected device file (from the output of the previous commands). An example device
+      file path would be "/dev/ttyUSB0". If the output of the above command does not indicate that the
+      device was relabeled to a more specific SELinux type label, then the SELinux policy of the system
+      must be updated with more specific policy for the device class specified. If a package was used
+      to install support for a device class, that package could be reinstalled using the following command:
+      $ sudo dnf reinstall <package_name> If a package was not used to install the SELinux policy for
+      a given device class, then it must be generated manually and provide specific type labels.'
+  checks:
+    default: SV-257932.manual
+    manual: SV-257932.manual
+  default_check: default

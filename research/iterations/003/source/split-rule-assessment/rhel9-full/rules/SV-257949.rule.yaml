@@ -1,0 +1,50 @@
+rule:
+  id: SV-257949
+  version: r1134947
+  title: RHEL 9 must configure a DNS processing mode in Network Manager.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'To ensure that DNS resolver settings are respected, a DNS mode in Network Manager must
+    be configured. The following are common DNS values in NetworkManager.conf [main]: - default: NetworkManager
+    will update /etc/resolv.conf to reflect the nameservers provided by currently active connections.
+    - none: NetworkManager will not modify /etc/resolv.conf. Used when DNS is managed manually or by another
+    service. - systemd-resolved: Uses systemd-resolved to manage DNS. - dnsmasq: Enables the internal
+    dnsmasq plugin.'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-252040
+  - scheme: disa-vulnerability-id
+    value: V-257949
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure NetworkManager in RHEL 9 to use a DNS mode. In "/etc/NetworkManager/NetworkManager.conf",
+      add the following line in the "[main]" section: dns = <dns processing mode> Where <dns processing
+      mode> is default, none, or systemd-resolved. NetworkManager must be reloaded for the change to take
+      effect. $ sudo systemctl reload NetworkManager'
+  checks:
+    default: SV-257949.automated
+    automated: SV-257949.automated
+    manual: SV-257949.manual
+  default_check: default

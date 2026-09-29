@@ -1,0 +1,55 @@
+rule:
+  id: SV-257976
+  version: r1155769
+  title: RHEL 9 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being
+    accepted.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: ICMP redirect messages are used by routers to inform hosts that a more direct route exists
+    for a particular destination. These messages modify the host's route table and are unauthenticated.
+    An illicit ICMP redirect message could result in a man-in-the-middle attack. The sysctl --system command
+    will load settings from all system configuration files. All configuration files are sorted by their
+    filename in lexicographical order, regardless of the directories in which they reside. If multiple
+    files specify the same option, the entry in the file with the lexicographically latest name will take
+    precedence. Files are read from directories in the following list from top to bottom. Once a file
+    of a given filename is loaded, any file of the same name in subsequent directories is ignored. /etc/sysctl.d/*.conf
+    /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf
+    /etc/sysctl.conf
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-254035
+  - scheme: disa-vulnerability-id
+    value: V-257976
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to prevent IPv6 ICMP redirect messages from being accepted. Create a configuration
+      file if it does not already exist: $ sudo vi /etc/sysctl.d/ipv6_accept_redirects.conf Add the following
+      line to the file: net.ipv6.conf.default.accept_redirects = 0 Reload settings from all system configuration
+      files with the following command: $ sudo sysctl --system'
+  checks:
+    default: SV-257976.automated
+    automated: SV-257976.automated
+    manual: SV-257976.manual
+  default_check: default

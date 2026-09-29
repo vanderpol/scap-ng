@@ -1,0 +1,66 @@
+assessment:
+  id: SV-258000.automated
+  version: 2
+  assessment_title: RHEL-09-255120 - RHEL 9 SSH private host key files must have mode 0600 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    ssh-private-key-files-mode-600-or-less-permissive:
+      test_title: SSH private key files mode 600 or less permissive
+      collect:
+        object_title: SSH private key files
+        capability: unix.file
+        select:
+          path: /etc/ssh
+          filename:
+            operation: pattern match
+            value: ^ssh_host_.*_key$
+      assert:
+        state_title: Mode 0600 or less permissive
+        existence: all_exist
+        check: all
+        state:
+          all:
+          - field: suid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sgid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sticky
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: uexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+  evaluate:
+    check: ssh-private-key-files-mode-600-or-less-permissive

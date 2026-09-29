@@ -1,0 +1,49 @@
+assessment:
+  id: SV-258225.automated
+  version: 2
+  assessment_title: RHEL-09-654255 - RHEL 9 must generate audit records for all account creations, modifications,
+    disabling, and termination events that affect /var/log/lastlog.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    audit-32-bit-invocations-var-log-lastlog:
+      test_title: Audit 32-bit invocations of /var/log/lastlog
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-F\s+path=\/var\/log\/lastlog\s+-F\s+perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\s+-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-var-log-lastlog:
+      test_title: Audit 64-bit invocations of /var/log/lastlog
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-F\s+path=\/var\/log\/lastlog\s+-F\s+perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)\s+-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: all_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: audit-32-bit-invocations-var-log-lastlog
+    - check: audit-64-bit-invocations-var-log-lastlog

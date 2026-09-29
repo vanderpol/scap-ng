@@ -1,0 +1,29 @@
+assessment:
+  id: SV-257823.automated
+  version: 13
+  assessment_title: RHEL 9 must be configured so that the cryptographic hashes of system files match vendor
+    values.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    verify-that-rhel-9-configured-so-that-cryptographic-hashes-system:
+      test_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match
+        vendor values.
+      collect:
+        object_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files
+          match vendor values.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
+      assert:
+        state_title: Confirm no files are identified.
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: stdout_line
+          operation: equals
+          value: null
+  evaluate:
+    check: verify-that-rhel-9-configured-so-that-cryptographic-hashes-system

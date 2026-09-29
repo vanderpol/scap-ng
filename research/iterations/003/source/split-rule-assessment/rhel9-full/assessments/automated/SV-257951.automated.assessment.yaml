@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257951.automated
+  version: 1
+  assessment_title: RHEL-09-252050 - RHEL 9 must be configured to prevent unrestricted mail relaying.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-postfix-main-cf-smtpd-client-restrictions-permit-mynetworks-reject:
+      test_title: '/etc/postfix/main.cf: smtpd_client_restrictions = permit_mynetworks,reject'
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/postfix/main.cf
+          pattern:
+            operation: pattern match
+            value: ^smtpd_client_restrictions[ \t]*=[ \t]*permit_mynetworks[, \t]+reject[ \t]*$
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    check: etc-postfix-main-cf-smtpd-client-restrictions-permit-mynetworks-reject

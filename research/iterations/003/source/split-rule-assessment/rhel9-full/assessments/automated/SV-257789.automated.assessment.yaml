@@ -1,0 +1,33 @@
+assessment:
+  id: SV-257789.automated
+  version: 13
+  assessment_title: RHEL 9 must require a unique superusers name upon booting into single-user and maintenance
+    modes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    verify-boot-loader-password-not-set-root-admin-or-adminstrator:
+      test_title: Verify the boot loader password is not set to root, admin, or adminstrator.
+      collect:
+        object_title: Retrieve any configuration lines containing root, admin, or administrator.
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/grub2.cfg
+          pattern:
+            operation: pattern match
+            value: ^\n*[\s#]*set\s+superusers="(root|admin|administrator)"
+          instance:
+            operation: greater than or equal
+            value: '1'
+      assert:
+        state_title: Include filter to capture non-compliant configuration lines containing root, admin,
+          or administrator.
+        existence: none_exist
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^(root|admin|administrator)$
+  evaluate:
+    check: verify-boot-loader-password-not-set-root-admin-or-adminstrator
