@@ -126,8 +126,7 @@ purpose is either:
 
 ## Question 4: Assessment title
 
-Should SCAP-NG retain an optional `assessment_title` field, or remove it from
-the native model?
+Should SCAP-NG retain `assessment_title` as a standard nullable Assessment field, or remove it from the native model entirely?
 
 ### OVAL precedent
 
@@ -144,7 +143,7 @@ title.
 
 ### Current project recommendation
 
-Retain `assessment_title` as OPTIONAL for now.
+Retain `assessment_title` as a standard nullable field for now.
 
 Migration tooling SHOULD preserve an OVAL Definition
 `metadata/title` when present.
@@ -152,7 +151,7 @@ Migration tooling SHOULD preserve an OVAL Definition
 Native authoring SHOULD NOT synthesize an Assessment title merely by copying
 the governing Rule title.
 
-An absent source title SHOULD remain absent/null.
+An absent source title SHOULD be represented explicitly as `assessment_title: null`.
 
 The OVAL Board should advise whether the field provides enough value for
 standalone Assessment reuse, diagnostics, repositories, or interoperability to
