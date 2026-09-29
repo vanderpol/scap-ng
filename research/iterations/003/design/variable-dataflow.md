@@ -15,7 +15,7 @@ define the language surface.
 
 SCAP-NG SHALL treat chained variables as a normal case rather than an edge case.
 
-A native Assessment SHALL support an arbitrary acyclic dependency graph in which
+A native Assessment SHALL support arbitrarily deep dependency chains in which
 named value-producing nodes can depend on:
 
 - literals;
@@ -28,7 +28,9 @@ A variable MAY feed another variable, which MAY feed another variable, and so
 on. Implementations SHALL resolve dependencies by reference and SHALL NOT depend
 on source-file order.
 
-Dependency cycles SHALL be rejected as content errors.
+Direct Variable self-reference remains prohibited as in OVAL. Whether SCAP-NG
+SHALL reject every indirect cross-node dependency cycle is a working proposal
+pending OVAL Board review; see `../board-review/dependency-ordering-and-cycles.md`.
 
 ## OVAL variable categories that must be preserved
 
@@ -196,7 +198,9 @@ A valid dependency path may conceptually resemble:
       -> variable F
       -> state G
 
-provided that the complete graph is acyclic and schema-valid.
+provided that the dependency relationships are schema-valid. The proposed NG
+rule that the complete executable dependency graph also be acyclic is pending
+OVAL Board review.
 
 ## Execution model
 
@@ -204,7 +208,7 @@ The native execution model SHOULD be expressed as dependency-driven dataflow:
 
     resolve references
         -> validate types/cardinality
-        -> detect cycles
+        -> detect prohibited/unresolvable dependency recursion
         -> collect target data
         -> derive dependent values
         -> apply collection/set/filter transformations
@@ -239,7 +243,6 @@ the source OVAL graph used a separate Object or Variable if doing so:
 - duplicates meaningful computation;
 - obscures dependency relationships;
 - changes evaluation/error propagation;
-- changes collection reuse;
 - changes cardinality semantics; or
 - makes a complex daisy-chained graph materially harder to review.
 
