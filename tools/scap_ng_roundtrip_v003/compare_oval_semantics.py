@@ -222,8 +222,13 @@ class Model:
             if cneg or capp:
                 node=("edge",cneg,capp,node)
             kids.append(node)
-        # Common source wrappers containing one child do not change truth semantics.
-        if op=="AND" and not neg and not app and len(kids)==1:
+        # A one-child AND wrapper has the child's truth value. Preserve any
+        # negate/applicability flags as edge semantics so an OVAL
+        # extend_definition edge and its NG-dereferenced wrapper canonicalize
+        # identically.
+        if op=="AND" and len(kids)==1:
+            if neg or app:
+                return ("edge",neg,app,kids[0])
             return kids[0]
         return ("criteria",op,neg,app,tuple(sorted(kids,key=repr)))
 
