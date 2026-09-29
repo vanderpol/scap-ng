@@ -76,6 +76,8 @@ def attrs_for_entity(spec, ids):
             attrs["datatype"] = str(spec["datatype"])
         if "operation" in spec:
             attrs["operation"] = str(spec["operation"])
+        if "entity_check" in spec:
+            attrs["entity_check"] = str(spec["entity_check"])
         if "variable" in spec:
             attrs["var_ref"] = ids.get("var", spec["variable"])
             if "var_check" in spec:
