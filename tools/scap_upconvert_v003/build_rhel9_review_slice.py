@@ -510,6 +510,8 @@ def records(root):
                 "element": rule,
                 "source_rule_id": rule.get("id"),
                 "source_group_id": group.get("id"),
+                "source_group_title": text(group.find("x:title", NS)),
+                "source_group_description": text(group.find("x:description", NS)),
                 "id": identity["rule_id"],
                 "version": identity["rule_version"],
                 "stig_id": identity["stig_id"],
@@ -1874,6 +1876,9 @@ def main():
                 rule_identifiers.append({"scheme": "disa-stig-id", "value": rec["stig_id"]})
             if rec.get("vulnerability_id"):
                 rule_identifiers.append({"scheme": "disa-vulnerability-id", "value": rec["vulnerability_id"]})
+            group_title = rec.get("source_group_title")
+            if group_title and re.fullmatch(r"SRG-[A-Za-z0-9-]+", group_title):
+                rule_identifiers.append({"scheme": "disa-srg-id", "value": group_title})
 
             normalized_remediation, remediation_error = normalized_fixes(rule)
             if FULL_MODE and remediation_error:
