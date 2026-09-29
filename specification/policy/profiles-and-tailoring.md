@@ -426,3 +426,11 @@ instead of an automated check.
 
 The effective policy recorded for a run SHALL include any non-default check
 selection needed to reconstruct which Assessment Method was executed.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Platform and Applicability](platform-and-applicability.md) · [Contents](../README.md) · [Next: Policy Resolution →](policy-resolution.md)
+
+<!-- spec-nav:end -->
