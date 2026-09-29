@@ -113,3 +113,30 @@ When defining a native NG capability:
 4. Simplify the author-facing syntax.
 5. Change or merge the capability only when there is concrete evidence that
    the NG model remains semantically complete and portable.
+
+
+## Lossless migration and loud failure
+
+SCAP 1.4 migration is a semantic conversion problem, not merely a serialization
+problem.
+
+For supported source semantics, Stage-1 conversion SHALL preserve the meaning
+that can affect applicability, assessment selection, evaluation, or result.
+This includes XCCDF profile/tailoring behavior, selectable checks, OVAL
+existence/cardinality semantics, variable flow, Boolean composition, and
+result-relevant evidence.
+
+When the current NG model or converter cannot represent a source construct
+semantically, conversion SHALL fail explicitly for the affected path. It SHALL
+NOT silently approximate the source, drop a construct, weaken or strengthen an
+assertion, substitute a different check selector, fall back to a default after
+an explicit selector request, or turn an unsupported automated check into a
+manual one.
+
+The four reference STIGs are a standing migration/conformance corpus. New
+constructs discovered while converting them SHOULD become permanent regression
+tests so later syntax or tooling changes cannot reintroduce semantic loss.
+
+A generated artifact passing schema or syntax validation is necessary but not
+sufficient; semantic-equivalence checks are part of acceptance.
+
