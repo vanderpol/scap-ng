@@ -1,0 +1,96 @@
+assessment:
+  id: SV-257948.automated
+  version: 1
+  assessment_title: RHEL-09-252035 - RHEL 9 systems using Domain Name Servers (DNS) resolution must have
+    at least two name servers configured.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    system-using-dns:
+      test_title: The system is using DNS
+      collect:
+        object_title: /etc/nsswitch.conf hosts entry
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/nsswitch.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*hosts:\s*(.*)$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        state_title: hosts entry contains dns
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)dns(\s|$)
+    etc-resolv-conf-contains-at-least-one-nameserver-entry:
+      test_title: /etc/resolv.conf contains at least one nameserver entry
+      collect:
+        object_title: /etc/resolv.conf nameserver entries
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/resolv.conf
+          pattern:
+            operation: pattern match
+            value: ^nameserver\s+(.*)$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+    etc-resolv-conf-configured-at-least-two-name-servers:
+      test_title: /etc/resolv.conf is configured with at least two name servers
+      collect:
+        object_title: count of unique name servers
+        capability: independent.variable
+        select:
+          var_ref:
+            variable: count-unique-name-servers
+      assert:
+        state_title: /etc/resolv.conf is configured with at least two name servers
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: greater than or equal
+          value: '2'
+          datatype: int
+  evaluate:
+    any:
+    - not:
+        check: system-using-dns
+    - all:
+      - check: system-using-dns
+      - check: etc-resolv-conf-contains-at-least-one-nameserver-entry
+      - check: etc-resolv-conf-configured-at-least-two-name-servers
+  variables:
+    count-unique-name-servers:
+      title: count of unique name servers
+      datatype: int
+      expression:
+        count:
+          unique:
+            object_values:
+              collect:
+                object_title: /etc/resolv.conf nameserver entries
+                capability: independent.textfilecontent54
+                select:
+                  filepath: /etc/resolv.conf
+                  pattern:
+                    operation: pattern match
+                    value: ^nameserver\s+(.*)$
+                  instance:
+                    operation: greater than or equal
+                    datatype: int
+                    value: '1'
+              field: subexpression

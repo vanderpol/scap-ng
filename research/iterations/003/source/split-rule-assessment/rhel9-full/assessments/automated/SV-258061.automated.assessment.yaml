@@ -1,0 +1,68 @@
+assessment:
+  id: SV-258061.automated
+  version: 1
+  assessment_title: RHEL-09-411110 - RHEL 9 groups must have unique Group ID (GID).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    gids-unique:
+      test_title: GIDs are unique
+      collect:
+        object_title: count of group entries
+        capability: independent.variable
+        select:
+          var_ref:
+            variable: count-group-entries
+      assert:
+        state_title: count of unique GIDs
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value:
+            variable: count-unique-gids
+          datatype: int
+  evaluate:
+    check: gids-unique
+  variables:
+    count-group-entries:
+      title: count of group entries
+      datatype: int
+      expression:
+        count:
+          object_values:
+            collect:
+              object_title: /etc/group GIDs
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/group
+                pattern:
+                  operation: pattern match
+                  value: '^[^:]*:[^:]*:([^:]+):'
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+            field: subexpression
+    count-unique-gids:
+      title: count of unique GIDs
+      datatype: int
+      expression:
+        count:
+          unique:
+            object_values:
+              collect:
+                object_title: /etc/group GIDs
+                capability: independent.textfilecontent54
+                select:
+                  filepath: /etc/group
+                  pattern:
+                    operation: pattern match
+                    value: '^[^:]*:[^:]*:([^:]+):'
+                  instance:
+                    operation: greater than or equal
+                    datatype: int
+                    value: '1'
+              field: subexpression
