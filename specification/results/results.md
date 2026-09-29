@@ -233,3 +233,28 @@ use structured reason/applicability data rather than pretending to be
 compliance failures.
 
 The final exact explanation serialization remains under design.
+
+
+## 14. Assessment class and result interpretation
+
+Results SHALL retain the effective Assessment class when it is needed to
+interpret Boolean truth correctly.
+
+A Boolean true result SHALL NOT be universally translated to `pass`.
+
+At minimum:
+
+- `compliance: true` represents satisfaction of the compliance condition;
+- `vulnerability: true` represents presence of the vulnerability condition;
+- `inventory: true` represents presence of the represented inventory
+  condition;
+- `patch` truth SHALL be interpreted according to the standardized patch
+  class semantics;
+- `miscellaneous` SHALL carry sufficient context to interpret its truth.
+
+Applicability is invocation context, not an Assessment class. An applicability
+decision SHOULD retain both `purpose: applicability` and the Assessment's
+actual class.
+
+`information` is reserved as a candidate future class and SHALL NOT be
+treated as normative until approved through OVAL Board / SCAP-NG governance.
