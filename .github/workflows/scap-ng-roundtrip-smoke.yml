@@ -1,0 +1,53 @@
+name: SCAP-NG OVAL round-trip smoke test
+
+on:
+  push:
+    paths:
+      - 'research/iterations/003/examples/oval-ng-roundtrip-stress/**'
+      - 'tools/scap_ng_roundtrip_v003/**'
+      - '.github/workflows/scap-ng-roundtrip-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  reverse-generate-and-xsd-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out authoritative SCAP/OVAL schemas
+        uses: actions/checkout@v4
+        with:
+          repository: vanderpol/scap-content
+          path: scap-content
+
+      - name: Install XML validator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+
+      - name: Reverse-generate OVAL stress fixtures
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for fixture in scap-ng/research/iterations/003/examples/oval-ng-roundtrip-stress/*.json; do
+            base="$(basename "$fixture" .json)"
+            python scap-ng/tools/scap_ng_roundtrip_v003/ng_to_oval.py "$fixture" -o "out/$base.xml"
+          done
+
+      - name: Validate regenerated OVAL against SCAP 1.4 omni schema
+        run: |
+          set -euo pipefail
+          schema="scap-content/schemas/scap-1.4-oval-5.12.3/omni-schema.xsd"
+          for xml in out/*.xml; do
+            echo "Validating $xml"
+            xmllint --noout --schema "$schema" "$xml"
+          done
+
+      - name: Upload regenerated OVAL
+        uses: actions/upload-artifact@v4
+        with:
+          name: regenerated-oval
+          path: out/*.xml
