@@ -98,6 +98,89 @@ def records(root):
             })
     return out
 
+def localized_texts(parent, child_name):
+    values = []
+    for node in parent.findall(f"x:{child_name}", NS):
+        values.append({
+            "text": text(node),
+            "language": node.get("{http://www.w3.org/XML/1998/namespace}lang"),
+        })
+    return values
+
+def benchmark_status(root):
+    values = []
+    for node in root.findall("x:status", NS):
+        values.append({
+            "value": text(node),
+            "date": node.get("date"),
+        })
+    return values
+
+def benchmark_references(root):
+    values = []
+    for ref in root.findall("x:reference", NS):
+        values.append({
+            "text": text(ref),
+            "url": ref.get("href"),
+        })
+    return values
+
+def benchmark_notices(root):
+    values = []
+    for node in root.findall("x:notice", NS):
+        values.append({
+            "id": safe_id(node.get("id") or "notice"),
+            "text": text(node),
+            "language": node.get("{http://www.w3.org/XML/1998/namespace}lang"),
+        })
+    return values
+
+def benchmark_text_blocks(root):
+    values = []
+    for node in root.findall("x:plain-text", NS):
+        values.append({
+            "id": safe_id(node.get("id") or "text"),
+            "text": text(node),
+        })
+    return values
+
+def benchmark_metadata(root):
+    """Normalize common publication metadata without preserving XML namespaces."""
+    allowed = {
+        "title", "creator", "subject", "description", "publisher",
+        "contributor", "date", "type", "format", "identifier",
+        "source", "language", "relation", "coverage", "rights",
+    }
+    values = {}
+    unsupported = []
+    for metadata in root.findall("x:metadata", NS):
+        for child in list(metadata):
+            key = local(child.tag)
+            value = text(child)
+            if key in allowed:
+                values.setdefault(key, []).append(value)
+            else:
+                unsupported.append({
+                    "name": key,
+                    "value": value,
+                })
+    return values, unsupported
+
+def benchmark_scoring(root):
+    models = []
+    for node in root.findall("x:model", NS):
+        item = {
+            "system": text(node),
+            "parameters": {},
+        }
+        for child in list(node):
+            if local(child.tag) == "param":
+                name = child.get("name")
+                if name:
+                    item["parameters"][name] = child.get("value") or text(child)
+        models.append(item)
+    return models
+
 def normalized_fixes(rule):
     system_map = {
         "urn:xccdf:fix:script:sh": "shell",
@@ -547,29 +630,57 @@ def main():
             profiles.append(profile)
 
         groups, grouping_evidence = build_groups(selected)
-        write_yaml(OUT / "benchmark.yaml", {"benchmark": {
-            "id": "rhel9-stig-review-slice",
-            "title": "Red Hat Enterprise Linux 9 STIG — SCAP-NG 003 review slice",
-            "version": text(xr.find("x:version", NS)),
-            "platform": {
-                "id": "rhel.9",
-                "title": "Red Hat Enterprise Linux 9",
-                "identifiers": [
-                    {
-                        "scheme": "cpe",
-                        "version": "2.3",
-                        "value": "cpe:2.3:o:redhat:enterprise_linux:9:*:*:*:*:*:*:*",
-                    }
-                ],
-                "assessment": None,
-            },
-            "parameters": [],
-            "groups": groups,
-            "profiles": profiles,
-            "rules": deepcopy(selected_ids),
-        }})
+        metadata, unsupported_metadata = benchmark_metadata(xr)
+        version_node = xr.find("x:version", NS)
+        benchmark_doc = {
+            "benchmark": {
+                "id": "rhel9-stig-review-slice",
+                "title": localized_texts(xr, "title"),
+                "description": localized_texts(xr, "description"),
+                "language": xr.get("{http://www.w3.org/XML/1998/namespace}lang"),
+                "status": benchmark_status(xr),
+                "version": {
+                    "value": text(version_node),
+                    "time": version_node.get("time") if version_node is not None else None,
+                    "update": version_node.get("update") if version_node is not None else None,
+                },
+                "metadata": metadata,
+                "notices": benchmark_notices(xr),
+                "front_matter": localized_texts(xr, "front-matter"),
+                "rear_matter": localized_texts(xr, "rear-matter"),
+                "references": benchmark_references(xr),
+                "text_blocks": benchmark_text_blocks(xr),
+                "platform": {
+                    "id": "rhel.9",
+                    "title": "Red Hat Enterprise Linux 9",
+                    "identifiers": [
+                        {
+                            "scheme": "cpe",
+                            "version": "2.3",
+                            "value": "cpe:2.3:o:redhat:enterprise_linux:9:*:*:*:*:*:*:*",
+                        }
+                    ],
+                    "assessment": None,
+                },
+                "scoring": benchmark_scoring(xr),
+                "parameters": [],
+                "groups": groups,
+                "profiles": profiles,
+                "rules": deepcopy(selected_ids),
+            }
+        }
+        write_yaml(OUT / "benchmark.yaml", benchmark_doc)
 
-        evidence = []; diagnostics = []
+        evidence = []
+        diagnostics = [
+            {
+                "area": "benchmark.metadata",
+                "status": "requires_review",
+                "reason": "benchmark metadata element is not yet normalized",
+                "detail": item,
+            }
+            for item in unsupported_metadata
+        ]
         for rec in selected:
             rid = rec["id"]; rule = rec["element"]
             content_fields = policy_content(rule)
