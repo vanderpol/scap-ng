@@ -1191,7 +1191,7 @@ def main():
                                {"assessment": {
                                    "id": aid,
                                    "version": 1,
-                                   "assessment_title": f"Manual assessment for {rid}",
+                                   "assessment_title": None,
                                    "mode": "manual",
                                    "class": "compliance",
                                    "purpose": "assessment",
