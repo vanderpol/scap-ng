@@ -32,7 +32,7 @@ jobs:
           import yaml
           sys.path.insert(0, "tools")
           from scap_upconvert_v003.cleanliness import assert_native_clean
-          root = Path("research/iterations/003/source/split-policy-assessment/rhel9-review-slice")
+          root = Path("research/iterations/003/source/split-rule-assessment/rhel9-review-slice")
           for path in sorted(root.rglob("*.yaml")):
               doc = yaml.safe_load(path.read_text())
               assert_native_clean(doc)
@@ -40,13 +40,13 @@ jobs:
           PY
       - name: Commit generated review slice
         run: |
-          if [ -z "$(git status --porcelain -- research/iterations/003/source/split-policy-assessment/rhel9-review-slice research/iterations/003/evidence/rhel9-review-slice)" ]; then
+          if [ -z "$(git status --porcelain -- research/iterations/003/source/split-rule-assessment/rhel9-review-slice research/iterations/003/evidence/rhel9-review-slice)" ]; then
             echo "No generated changes"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add research/iterations/003/source/split-policy-assessment/rhel9-review-slice
+          git add -A research/iterations/003/source
           git add research/iterations/003/evidence/rhel9-review-slice
           git commit -m "Generate first clean 003 RHEL9 review slice"
           git fetch origin main
