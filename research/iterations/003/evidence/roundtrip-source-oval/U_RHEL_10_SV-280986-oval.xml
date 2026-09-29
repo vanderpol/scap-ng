@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <generator>
+    <oval:product_name>RHEL 10 STIG SCAP content assembly</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-09-23T15:13:16Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <!--
+OVAL provenance
+Origin: Derived from RHEL 9 benchmark
+Source benchmark: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+Source IDs: oval:mil.disa.stig.rhel9os:def:258143
+Adaptations: Retained native main/drop-in no-listener configuration checks; added native listening-socket evidence for the target runtime check. Patterns identify input modules/directives rather than outgoing action ports. Authorized aggregation and approved alternate tools remain external exceptions.
+Author: Codex with user review
+Last reviewed: 2026-09-25
+Assessment SHA-256: 476b556b289124637932f23a69b3b9605b03c59361778630b802061b85d639ec
+Change summary: Retained native main/drop-in no-listener configuration checks; added native listening-socket evidence for the target runtime check. Patterns identify input modules/directives rather than outgoing action ports. Authorized aggregation and approved alternate tools remain external exceptions.
+-->
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:28098600001" version="1" class="compliance">
+      <metadata>
+        <title>RHEL 10 must be configured so that the rsyslog daemon does not accept log messages from other servers unless the server is being used for log aggregation.</title>
+        <affected family="unix">
+          <platform>Red Hat Enterprise Linux 10</platform>
+        </affected>
+        <reference source="DISA STIG" ref_id="SV-280986"/>
+        <description>RHEL 10 check-text evaluation. Production comparison: RHEL-09-652025. Fresh implementation based on RHEL-09-652025; see the recorded source comparison and adaptations.</description>
+      </metadata>
+      <criteria operator="AND" comment="All listed conditions must be satisfied">
+        <extend_definition definition_ref="oval:navy.navwar.niwcatlantic.scc:def:28098600003" comment="Evaluate the referenced requirement"/>
+        <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28098600005" comment="rsyslog must not have a TCP or UDP listening socket"/>
+      </criteria>
+    </definition>
+    <!--
+OVAL provenance
+Origin: Derived from RHEL 9 benchmark
+Source benchmark: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+Source IDs: oval:mil.disa.stig.rhel9os:def:258143
+Adaptations: Retained native main/drop-in no-listener configuration checks; added native listening-socket evidence for the target runtime check. Patterns identify input modules/directives rather than outgoing action ports. Authorized aggregation and approved alternate tools remain external exceptions.
+Author: Codex with user review
+Last reviewed: 2026-09-25
+Assessment SHA-256: 3b3addc5487c3b010f424bf6467594c07ccebb426ba795fd5273d546411a7038
+Change summary: Retained native main/drop-in no-listener configuration checks; added native listening-socket evidence for the target runtime check. Patterns identify input modules/directives rather than outgoing action ports. Authorized aggregation and approved alternate tools remain external exceptions.
+-->
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:28098600002" version="1" class="compliance">
+      <metadata>
+        <title>The operating system must be configured so that the rsyslog daemon does not accept log messages from other servers unless the server is being used for log aggregation.</title>
+        <description/>
+      </metadata>
+      <criteria>
+        <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:28098600004" comment="no remote log acceptance"/>
+      </criteria>
+    </definition>
+    <!--
+OVAL provenance
+Origin: Derived from RHEL 9 benchmark
+Source benchmark: U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml
+Source IDs: oval:mil.disa.stig.rhel9os:def:258143
+Adaptations: Retained native main/drop-in no-listener configuration checks; added native listening-socket evidence for the target runtime check. Patterns identify input modules/directives rather than outgoing action ports. Authorized aggregation and approved alternate tools remain external exceptions.
+Author: Codex with user review
+Last reviewed: 2026-09-25
+Assessment SHA-256: d3b41ec899bd8bfedf105486cc2a8faa8687acef2d7c080cd59565b085b83765
+Change summary: Retained native main/drop-in no-listener configuration checks; added native listening-socket evidence for the target runtime check. Patterns identify input modules/directives rather than outgoing action ports. Authorized aggregation and approved alternate tools remain external exceptions.
+-->
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:28098600003" version="2" class="compliance">
+      <metadata>
+        <title>RHEL-09-652025 - RHEL 10 must be configured so that the rsyslog daemon does not accept log messages from other servers unless the server is being used for log aggregation.</title>
+        <affected family="unix">
+          <platform>Red Hat Enterprise Linux 10</platform>
+        </affected>
+        <description>Unintentionally running a rsyslog server accepting remote messages puts the system at increased risk. Malicious rsyslog messages sent to the server could exploit vulnerabilities in the server software itself, could introduce misleading information into the system's logs, or could fill the system's storage leading to a denial of service.
+
+If the system is intended to be a log aggregation server, its use must be documented with the information system security officer (ISSO).</description>
+      </metadata>
+      <criteria>
+        <extend_definition definition_ref="oval:navy.navwar.niwcatlantic.scc:def:28098600002"/>
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <ind:textfilecontent54_test xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:tst:28098600004" version="1" check_existence="none_exist" check="all" comment="no remote log acceptance">
+      <ind:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28098600006"/>
+    </ind:textfilecontent54_test>
+    <linux:inetlisteningservers_test xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:tst:28098600005" version="1" comment="rsyslog must not have a TCP or UDP listening socket" check_existence="none_exist" check="all">
+      <linux:object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:28098600009"/>
+    </linux:inetlisteningservers_test>
+  </tests>
+  <objects>
+    <ind:textfilecontent54_object xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:obj:28098600006" version="1" comment="remote log acceptance config">
+      <set set_operator="UNION">
+        <object_reference>oval:navy.navwar.niwcatlantic.scc:obj:28098600007</object_reference>
+        <object_reference>oval:navy.navwar.niwcatlantic.scc:obj:28098600008</object_reference>
+      </set>
+    </ind:textfilecontent54_object>
+    <ind:textfilecontent54_object xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:obj:28098600007" version="1" comment="rsyslog.conf: remote log acceptance config">
+      <ind:behaviors ignore_case="true"/>
+      <ind:filepath datatype="string">/etc/rsyslog.conf</ind:filepath>
+      <ind:pattern operation="pattern match">(?im)^[ \t]*(?:\$(?:InputTCPServerRun|UDPServerRun|InputRELPServerRun|RELPServerRun)[ \t]+\S+|input[ \t]*\([^)]*\btype[ \t]*=[ \t]*[\"\x27]?(?:imtcp|imudp|imrelp)\b|module[ \t]*\((?=[^)]*\bload[ \t]*=[ \t]*[\"\x27]?(?:imtcp|imudp|imrelp)\b)(?=[^)]*\bport[ \t]*=))[^\r\n]*$</ind:pattern>
+      <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
+    </ind:textfilecontent54_object>
+    <ind:textfilecontent54_object xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:navy.navwar.niwcatlantic.scc:obj:28098600008" version="1" comment="rsyslog.d/*.conf: remote log acceptance config">
+      <ind:behaviors ignore_case="true"/>
+      <ind:path>/etc/rsyslog.d</ind:path>
+      <ind:filename operation="pattern match">^.*$</ind:filename>
+      <ind:pattern operation="pattern match">(?im)^[ \t]*(?:\$(?:InputTCPServerRun|UDPServerRun|InputRELPServerRun|RELPServerRun)[ \t]+\S+|input[ \t]*\([^)]*\btype[ \t]*=[ \t]*[\"\x27]?(?:imtcp|imudp|imrelp)\b|module[ \t]*\((?=[^)]*\bload[ \t]*=[ \t]*[\"\x27]?(?:imtcp|imudp|imrelp)\b)(?=[^)]*\bport[ \t]*=))[^\r\n]*$</ind:pattern>
+      <ind:instance datatype="int" operation="greater than or equal">1</ind:instance>
+    </ind:textfilecontent54_object>
+    <linux:inetlisteningservers_object xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:obj:28098600009" version="1" comment="Collect TCP/UDP listening sockets owned by rsyslog">
+      <linux:protocol operation="pattern match">^(?:tcp|udp)$</linux:protocol>
+      <linux:local_address operation="pattern match">.*</linux:local_address>
+      <linux:local_port datatype="int" operation="greater than or equal">0</linux:local_port>
+      <filter action="include">oval:navy.navwar.niwcatlantic.scc:ste:28098600010</filter>
+    </linux:inetlisteningservers_object>
+  </objects>
+  <states>
+    <linux:inetlisteningservers_state xmlns:linux="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux" id="oval:navy.navwar.niwcatlantic.scc:ste:28098600010" version="1" comment="Select sockets owned by the rsyslog daemon">
+      <linux:program_name operation="pattern match">^rsyslogd?$</linux:program_name>
+    </linux:inetlisteningservers_state>
+  </states>
+</oval_definitions>
