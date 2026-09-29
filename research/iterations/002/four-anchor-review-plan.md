@@ -1,7 +1,7 @@
 # Iteration 002 Four-Anchor Source Review Plan
 
 **Status:** active  
-**Scope:** complete benchmark-layer conversion; assessment conversion deferred
+**Scope:** complete benchmark/policy conversion plus lossless assessment-migration proof
 
 Iteration 002 keeps four real STIG anchors:
 
@@ -11,9 +11,10 @@ Iteration 002 keeps four real STIG anchors:
 - Windows Server 2025
 
 The anchors are used to design and review native SCAP-NG source. The complete
-XCCDF benchmark/policy layer for each anchor is now in scope. Complete
-Assessment Method conversion, final packaging, and signing remain out of scope
-for this checkpoint.
+XCCDF benchmark/policy layer for each anchor is in scope, and the current
+checkpoint also exercises Assessment Method migration far enough to prove that
+source semantics are either represented faithfully or rejected explicitly.
+Final packaging and signing remain out of scope for this checkpoint.
 
 ## Why keep all four
 
@@ -54,11 +55,40 @@ The benchmark conversion SHOULD include, as applicable:
 7. source platform/applicability distinctions necessary to avoid changing
    effective policy.
 
-Executable compliance Assessment Methods are not required at this checkpoint.
+Executable compliance Assessment Methods SHALL be migrated for the reference
+cases exercised by this checkpoint when the current NG model can represent them
+losslessly.
 
-Source constructs that cannot yet be represented without deciding
-assessment-language semantics SHALL be identified for later conversion rather
-than silently guessed.
+A source construct that cannot yet be represented losslessly SHALL stop that
+conversion path with an explicit blocker. It SHALL NOT be silently guessed,
+weakened, strengthened, dropped, or converted from automated to manual merely
+because the converter lacks support.
+
+
+## Current acceptance gates
+
+The four-anchor exercise is also the regression corpus for design decisions
+made during iteration 002. Before this checkpoint is considered complete:
+
+1. Benchmark and policy semantics SHALL survive conversion.
+2. XCCDF selectable-check semantics SHALL survive as
+   `Benchmark Rule -> Policy -> selected check -> Assessment`.
+3. XCCDF `refine-rule/@selector` semantics SHALL be represented in native
+   Profile/Tailoring selector data.
+4. A source Rule exposing multiple selectable checks SHALL NOT be collapsed to
+   one Assessment. Until every alternative is lowered, conversion SHALL fail
+   explicitly.
+5. OVAL object/state/test/variable semantics, including existence and
+   non-existence conditions, SHALL be preserved or explicitly blocked.
+6. Manual Check Text and remediation context needed by content authors SHALL
+   remain available through the rule-centric authoring view.
+7. Result examples SHALL include deterministic human-readable outcome messages,
+   structured failure reasons, and bounded concrete evidence where applicable.
+8. Every newly discovered unsupported source construct SHOULD become a
+   permanent migration/conformance regression test.
+
+Generated output that merely validates syntactically does not satisfy these
+gates if it reflects an older design assumption.
 
 ## Profile rule-selection rule
 
