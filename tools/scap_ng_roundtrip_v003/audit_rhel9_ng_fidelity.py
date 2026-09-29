@@ -254,6 +254,7 @@ def main():
         issue("benchmark_scoring_mismatch",source=source_models,ng=bench.get("scoring",[]))
 
     # Rule identity + core policy surface.
+    source_groups={g["id"]:g for g in src["groups"]}
     expected_rules={}
     for r in src["rules"]:
         rid,rev=rule_identity(r["id"])
@@ -312,6 +313,22 @@ def main():
         if source_vuln is not None and ng_vulns!=[source_vuln]:
             issue("rule_vulnerability_id_mismatch",rule=rid,source=source_vuln,ng=ng_vulns)
 
+        source_srg=None
+        if group_path:
+            group=source_groups.get(group_path[-1])
+            if group:
+                title=norm_text(group.get("title"))
+                if title and re.fullmatch(r"SRG-[A-Za-z0-9-]+",title):
+                    source_srg=title
+        ng_srgs=[i.get("value") for i in ng.get("identifiers",[])
+                 if i.get("scheme")=="disa-srg-id"]
+        if source_srg is not None and ng_srgs!=[source_srg]:
+            issue("rule_srg_id_mismatch",rule=rid,source=source_srg,ng=ng_srgs)
+
+        source_fix_nodes=[x for x in sr.get("fixes",[]) if x.get("kind")=="fix"]
+        for fx in source_fix_nodes:
+            if norm_text(fx.get("text")) or fx.get("system") or fx.get("platform"):
+                issue("nonempty_source_fix_not_preserved",rule=rid,source=fx)
         fixtexts=[x.get("text") for x in sr.get("fixes",[]) if x.get("kind")=="fixtext"]
         expected_guidance=norm_text(fixtexts[0]) if fixtexts else None
         actual_guidance=norm_text((ng.get("remediation") or {}).get("guidance"))
@@ -406,6 +423,12 @@ def main():
     non_inert=[]
     for g in src["groups"]:
         members=g.get("members",{})
+        group_title=norm_text(g.get("title"))
+        group_desc=norm_text(g.get("description"))
+        title_normalized=(
+            group_title is None or bool(re.fullmatch(r"SRG-[A-Za-z0-9-]+",group_title))
+        )
+        description_normalized=group_desc in (None,"<GroupDescription></GroupDescription>")
         inert=(
             len(members.get("rules",[]))==1 and
             not members.get("groups") and not members.get("values") and
@@ -413,7 +436,8 @@ def main():
             not g.get("requires") and not g.get("conflicts") and
             not g.get("platforms") and not g.get("extends") and
             not g.get("abstract") and not g.get("hidden") and
-            not g.get("prohibit_changes") and g.get("weight") is None
+            not g.get("prohibit_changes") and g.get("weight") is None and
+            title_normalized and description_normalized
         )
         if not inert:
             non_inert.append(g["id"])
@@ -433,6 +457,11 @@ def main():
     for pid,sp in resolved.items():
         np=ng_profiles.get(pid)
         if not np: continue
+        if norm_text(np.get("title"))!=norm_text(sp.get("title")):
+            issue("profile_title_mismatch",profile=pid,source=sp.get("title"),ng=np.get("title"))
+        profile_desc=norm_text(sp.get("description"))
+        if profile_desc not in (None,"<ProfileDescription></ProfileDescription>"):
+            issue("profile_description_not_preserved",profile=pid,source=profile_desc)
         expected_disabled=expected_profile_disabled(src,sp)
         actual_disabled=sorted(np.get("disabled_rules") or [])
         if expected_disabled!=actual_disabled:
