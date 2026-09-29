@@ -140,7 +140,7 @@ class Model:
             elif local=="criterion":
                 node=("test",self.test(child.attrib["test_ref"]))
             elif local=="extend_definition":
-                node=("definition",self.definition(child.attrib["definition_ref"]))
+                node=self.definition(child.attrib["definition_ref"])
             else:
                 raise ValueError(f"unsupported criteria child {local}")
             if cneg or capp:
@@ -148,10 +148,7 @@ class Model:
             kids.append(node)
         # Common source wrappers containing one child do not change truth semantics.
         if op=="AND" and not neg and not app and len(kids)==1:
-            node=kids[0]
-            if isinstance(node,tuple) and node and node[0]=="definition":
-                return node[1]
-            return node
+            return kids[0]
         return ("criteria",op,neg,app,tuple(sorted(kids,key=repr)))
 
     def definition(self,did):
