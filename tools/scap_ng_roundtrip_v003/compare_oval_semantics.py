@@ -74,6 +74,23 @@ class Model:
         self.memo[key]=("recursion",vid)
         if local=="constant_variable":
             out=head+(tuple(sval(x.text) for x in e.findall(f"{{{OD}}}value")),)
+        elif local=="external_variable":
+            possible_values=tuple(
+                (x.attrib["hint"],sval(x.text))
+                for x in e.findall(f"{{{OD}}}possible_value")
+            )
+            possible_restrictions=[]
+            for pr in e.findall(f"{{{OD}}}possible_restriction"):
+                restrictions=tuple(
+                    (rr.attrib["operation"],sval(rr.text))
+                    for rr in pr.findall(f"{{{OD}}}restriction")
+                )
+                possible_restrictions.append((
+                    pr.attrib["hint"],
+                    pr.attrib.get("operator","AND"),
+                    restrictions,
+                ))
+            out=head+(possible_values,tuple(possible_restrictions))
         elif local=="local_variable":
             kids=list(e)
             if len(kids)!=1: raise ValueError(f"{vid}: expected one expression")
