@@ -147,3 +147,11 @@ default check or another available check.
 
 Results SHALL identify the effective check selector and Assessment Method used
 when check alternatives exist.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Profiles and Tailoring](profiles-and-tailoring.md) · [Contents](../README.md) · [Next: Parameters and Organizational Input →](parameters-and-organizational-input.md)
+
+<!-- spec-nav:end -->
