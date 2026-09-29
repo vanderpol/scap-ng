@@ -86,7 +86,7 @@ surface for iteration 003 is:
       weight:
       discussion:
       rationale:
-      documentable:
+      extensions:
       warnings:
       identifiers:
       references:
@@ -385,3 +385,32 @@ The review question for each such field is:
 
 This prevents SCAP-NG from standardizing accidental publisher conventions while
 still preserving information losslessly during migration.
+
+
+### DISA STIG publisher metadata in the 003 review slice
+
+The following values found inside DISA STIG Rule description payloads are not
+first-class XCCDF Rule properties and are therefore not core SCAP-NG Policy
+fields in iteration 003:
+
+- `documentable`;
+- `false_positives`;
+- `false_negatives`;
+- `mitigations`;
+- `potential_impacts`;
+- `responsibility`.
+
+When preserved in native review source they SHALL appear under an explicitly
+publisher-specific extension, for example:
+
+    extensions:
+      disa_stig:
+        documentable: false
+        false_positives: null
+        false_negatives: null
+        mitigations: null
+        potential_impacts: null
+        responsibility: null
+
+Their inclusion in a future core SCAP-NG vocabulary is an open standards
+question and requires affirmative governance review.
