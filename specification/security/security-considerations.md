@@ -57,3 +57,11 @@ SCAP-NG can standardize how policy and assessments are expressed and executed.
 
 Conformance to the SCAP-NG format SHALL NOT be interpreted as an assertion that
 the underlying security policy is effective, appropriate, or complete.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: OVAL 5.12.3 Capability Crosswalk](../migration/oval-5.12.3-capability-crosswalk.md) · [Contents](../README.md) · [Next: SCAP 1.4 to SCAP-NG Concept Crosswalk →](../crosswalk/scap-1.4-concept-crosswalk.md)
+
+<!-- spec-nav:end -->
