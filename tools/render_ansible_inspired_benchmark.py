@@ -162,6 +162,13 @@ def main() -> int:
         "authoring_style": "ansible-inspired",
         "runtime_dependency": "none",
         "platform_definitions": canonical.get("platform_definitions", []),
+        "inventory_assessments": [
+            {
+                **copy.deepcopy(row),
+                "assessment": transform_assessment(row.get("assessment")),
+            }
+            for row in canonical.get("platform_inventory_assessments", [])
+        ],
         "applicability_assessment": (
             transform_assessment(
                 (canonical.get("applicability") or {}).get("assessment")
