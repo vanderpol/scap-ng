@@ -1,0 +1,50 @@
+name: Build SCAP-NG 003 RHEL9 review slice
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "tools/scap_upconvert_v003/**"
+      - ".github/workflows/v003-rhel9-review-slice.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build-review-slice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pyyaml
+      - name: Generate clean review slice
+        run: python tools/scap_upconvert_v003/build_rhel9_review_slice.py
+      - name: Reject legacy residue in native source
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          import yaml
+          sys.path.insert(0, "tools")
+          from scap_upconvert_v003.cleanliness import assert_native_clean
+          root = Path("research/iterations/003/source/split-policy-assessment/rhel9-review-slice")
+          for path in sorted(root.rglob("*.yaml")):
+              doc = yaml.safe_load(path.read_text())
+              assert_native_clean(doc)
+              print("clean:", path)
+          PY
+      - name: Commit generated review slice
+        run: |
+          if git diff --quiet -- research/iterations/003/source/split-policy-assessment/rhel9-review-slice research/iterations/003/evidence/rhel9-review-slice; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/iterations/003/source/split-policy-assessment/rhel9-review-slice
+          git add research/iterations/003/evidence/rhel9-review-slice
+          git commit -m "Generate first clean 003 RHEL9 review slice"
+          git push
