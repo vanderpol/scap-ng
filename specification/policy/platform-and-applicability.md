@@ -168,6 +168,31 @@ Example:
 A Rule SHALL reference the stable condition identifier, not the Assessment file
 path.
 
+In human-authored source, an applicability catalog entry SHALL explicitly
+reference the Assessment source object it binds. The preferred authoring form
+is an explicit relative source path, for example:
+
+    applicability:
+      - id: linux.gnome-installed
+        assessment: assessments/applicability/linux.gnome-installed.assessment.yaml
+
+A compiler SHALL resolve that authoring reference, verify that the referenced
+Assessment's declared logical identity matches the resolved object, and replace
+the source-path relationship with the stable Assessment logical identity in
+compiled scanner-facing content.
+
+Processors SHALL NOT discover an applicability Assessment merely by scanning
+directories for a matching `assessment.id`. Physical co-location or filename
+similarity is not a semantic binding.
+
+Thus the two identities serve different purposes:
+
+- applicability `id` is the stable condition identifier referenced by Rules;
+- source `assessment` is the explicit authoring reference used to locate the
+  bound Assessment before compilation;
+- compiled content uses the resolved Assessment logical identity rather than a
+  source filesystem path.
+
 A processor SHALL resolve the identifier through the containing Benchmark's
 catalog.
 
