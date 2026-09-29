@@ -123,6 +123,16 @@ def native_rules(root: Path):
         out[doc["id"]]=doc
     return out
 
+def native_manual_assessments(root: Path):
+    out={}
+    manual_dir=root/"assessments"/"manual"
+    if not manual_dir.exists():
+        return out
+    for p in sorted(manual_dir.glob("*.yaml")):
+        doc=load_yaml(p)["assessment"]
+        out[doc["id"]]=doc
+    return out
+
 def expected_profile_disabled(source: dict, resolved_profile: dict):
     rules=source["rules"]
     selected={rule_identity(r["id"])[0]: bool(r.get("selected_default",True)) for r in rules}
@@ -153,6 +163,7 @@ def main():
     src=json.loads(a.source_ir.read_text(encoding="utf-8"))
     bench=load_yaml(a.ng_root/"benchmark.yaml")["benchmark"]
     nr=native_rules(a.ng_root)
+    manual_assessments=native_manual_assessments(a.ng_root)
     app=load_yaml(a.ng_root/"applicability.yaml").get("applicability",[])
     app_ids={x["id"] for x in app}
 
@@ -318,6 +329,32 @@ def main():
         if src_refs!=sorted(ng_refs):
             issue("rule_reference_mismatch",rule=rid,source=src_refs,ng=sorted(ng_refs))
 
+        # Manual procedure fidelity. RHEL9 embeds the NIWC manual procedure
+        # directly in the selector="manual" XCCDF check-content, so compare
+        # that source text to the native manual Assessment rather than relying
+        # on the legacy OCIL serialization.
+        source_manual=[
+            chk for chk in sr.get("checks",[])
+            if (chk.get("selector") or "")=="manual"
+        ]
+        if len(source_manual)!=1:
+            issue("manual_check_count_mismatch",rule=rid,count=len(source_manual))
+        else:
+            expected_procedure=norm_text(source_manual[0].get("inline_content"))
+            manual_id=(ng.get("checks") or {}).get("manual")
+            ma=manual_assessments.get(manual_id)
+            if ma is None:
+                issue("missing_manual_assessment",rule=rid,assessment=manual_id)
+            else:
+                actual_procedure=norm_text(ma.get("procedure"))
+                if expected_procedure!=actual_procedure:
+                    issue("manual_procedure_mismatch",rule=rid,
+                          source=expected_procedure,ng=actual_procedure)
+                if ma.get("mode")!="manual":
+                    issue("manual_assessment_mode_mismatch",rule=rid,ng=ma.get("mode"))
+                if ma.get("class")!="compliance":
+                    issue("manual_assessment_class_mismatch",rule=rid,ng=ma.get("class"))
+
         # This source has no requires/conflicts, but compare generically.
         if sr.get("requires") != ng.get("requires",[]):
             issue("rule_requires_mismatch",rule=rid,source=sr.get("requires"),ng=ng.get("requires"))
@@ -363,6 +400,7 @@ def main():
             issue("unexpected_rule_applicability",rule=rid,ng=ng.get("applicability"))
 
     stats["source_rules_with_explicit_platform"]=platform_rule_count
+    stats["native_manual_assessments"]=len(manual_assessments)
 
     # Source Groups are intentionally normalized away only if semantically inert.
     non_inert=[]
