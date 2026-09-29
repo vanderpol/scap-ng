@@ -178,6 +178,7 @@ def main() -> int:
         "runtime_dependency": "none",
         "profiles": canonical.get("profiles", []),
         "resolved_profiles": canonical.get("resolved_profiles", []),
+        "check_selectors": canonical.get("profile_check_selectors", []),
     })
     dump_yaml(out / "groups.yaml", {
         "scap_ng": SPEC,
@@ -206,7 +207,9 @@ def main() -> int:
     for row in canonical.get("rules", []):
         policy = copy.deepcopy(row.get("policy"))
         migration = copy.deepcopy(row.get("migration"))
-        assessment = row.get("assessment")
+        assessments = row.get("assessments")
+        if assessments is None:
+            assessments = [row.get("assessment")] if row.get("assessment") else []
         rid = policy["id"]
 
         dump_yaml(
@@ -225,27 +228,43 @@ def main() -> int:
             summary["blocked_rules"] += 1
             continue
 
-        rendered = transform_assessment(assessment)
-        if rendered is None:
-            continue
-        aid = rendered["id"]
-        dump_yaml(
-            out / "automation" / "assessments" / f"{safe_id(aid)}.yaml",
-            {
-                "scap_ng": SPEC,
-                "prototype": True,
-                "authoring_style": "ansible-inspired",
-                "runtime_dependency": "none",
-                "assessment": rendered,
-            },
-        )
-        bindings.append({
+        rendered_by_id = {}
+        for assessment in assessments:
+            rendered = transform_assessment(assessment)
+            if rendered is None:
+                continue
+            aid = rendered["id"]
+            rendered_by_id[aid] = rendered
+            dump_yaml(
+                out / "automation" / "assessments" / f"{safe_id(aid)}.yaml",
+                {
+                    "scap_ng": SPEC,
+                    "prototype": True,
+                    "authoring_style": "ansible-inspired",
+                    "runtime_dependency": "none",
+                    "assessment": rendered,
+                },
+            )
+            summary["assessments"] += 1
+
+        binding = {
             "rule": rid,
-            "assessment": aid,
-            "assessment_version": rendered.get("version", 1),
+            "checks": copy.deepcopy(policy.get("checks", [])),
             "migration_status": migration.get("status") if migration else None,
-        })
-        summary["assessments"] += 1
+        }
+        if policy.get("default_check") is not None:
+            binding["default_check"] = policy["default_check"]
+            default_row = next(
+                x for x in policy.get("checks", [])
+                if x.get("selector") == policy["default_check"]
+            )
+            binding["assessment"] = default_row["assessment"]
+            binding["assessment_version"] = default_row.get("assessment_version", 1)
+            binding["check_selector"] = policy["default_check"]
+        elif row.get("assessment") is not None:
+            binding["assessment"] = row["assessment"]["id"]
+            binding["assessment_version"] = row["assessment"].get("version", 1)
+        bindings.append(binding)
 
     dump_yaml(
         out / "automation" / "bindings.yaml",
