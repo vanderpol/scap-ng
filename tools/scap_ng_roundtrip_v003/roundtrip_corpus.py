@@ -121,7 +121,12 @@ def main():
         "rows":rows,
     }
     (a.out/"summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+chr(10),encoding="utf-8")
-    print(json.dumps({"source_file_count":len(files),"counts":summary["counts"],"all_pass":summary["all_pass"]},indent=2))
+    print(json.dumps({
+        "source_file_count":len(files),
+        "counts":summary["counts"],
+        "all_pass":summary["all_pass"],
+        "xml_diff_summary":summary["xml_diff_summary"],
+    },indent=2))
     if a.strict and not summary["all_pass"]:
         raise SystemExit(1)
 
