@@ -414,8 +414,9 @@ def native_applicability_id(platform_node):
     title = (text(next((n for n in platform_node if local(n.tag) == "title"), None)) or "").lower()
     mapping = [
         ("gnome", "linux.gnome-installed"),
-        ("nfs mounts configured", "linux.nfs-mounted"),
+        # Match the more-specific negative form before the positive substring.
         ("no nfs mounts", "linux.nfs-not-mounted"),
+        ("nfs mounts configured", "linux.nfs-mounted"),
         ("ipv6 enabled", "linux.ipv6-enabled"),
         ("bios boot", "linux.bios-boot"),
         ("uefi boot", "linux.uefi-boot"),
