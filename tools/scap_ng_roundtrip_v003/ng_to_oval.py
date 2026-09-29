@@ -272,43 +272,57 @@ def build(data):
     states = sem.get("states", [])
     variables = sem.get("variables", [])
 
-    if checks:
+    def emit_criteria(parent, node):
+        attrs={"operator": node.get("operator","AND")}
+        if node.get("negate") is not None:
+            attrs["negate"]=str(bool(node["negate"])).lower()
+        if node.get("applicability_check") is not None:
+            attrs["applicability_check"]=str(bool(node["applicability_check"])).lower()
+        ce=ET.SubElement(parent, q(OVAL_DEF, "criteria"), attrs)
+        children=node.get("children")
+        if children is None:
+            children=[{"check":cid} for cid in node.get("checks",[c["id"] for c in checks])]
+        for child in children:
+            if "check" in child:
+                cid=child["check"]
+                ca={"test_ref":ids.get("tst",cid),"comment":cid}
+                if child.get("negate") is not None:
+                    ca["negate"]=str(bool(child["negate"])).lower()
+                if child.get("applicability_check") is not None:
+                    ca["applicability_check"]=str(bool(child["applicability_check"])).lower()
+                ET.SubElement(ce,q(OVAL_DEF,"criterion"),ca)
+            elif "operator" in child or "children" in child or "checks" in child:
+                emit_criteria(ce,child)
+            else:
+                die(f"unsupported root criteria node: {child}")
+        return ce
+
+    roots=sem.get("roots")
+    if checks or roots:
         defs = ET.SubElement(root, q(OVAL_DEF, "definitions"))
-        d = ET.SubElement(defs, q(OVAL_DEF, "definition"), {
-            "id": ids.get("def", data["id"]),
-            "version": "1",
-            "class": sem.get("definition_class","compliance"),
-        })
-        md = ET.SubElement(d, q(OVAL_DEF, "metadata"))
-        ET.SubElement(md, q(OVAL_DEF, "title")).text = f"Round-trip fixture {data['id']}"
-        ET.SubElement(md, q(OVAL_DEF, "description")).text = "Generated from SCAP-NG semantic stress fixture."
-        def emit_criteria(parent, node):
-            attrs={"operator": node.get("operator","AND")}
-            if node.get("negate") is not None:
-                attrs["negate"]=str(bool(node["negate"])).lower()
-            if node.get("applicability_check") is not None:
-                attrs["applicability_check"]=str(bool(node["applicability_check"])).lower()
-            ce=ET.SubElement(parent, q(OVAL_DEF, "criteria"), attrs)
-            children=node.get("children")
-            if children is None:
-                children=[{"check":cid} for cid in node.get("checks",[c["id"] for c in checks])]
-            for child in children:
-                if "check" in child:
-                    cid=child["check"]
-                    ca={"test_ref":ids.get("tst",cid),"comment":cid}
-                    if child.get("negate") is not None:
-                        ca["negate"]=str(bool(child["negate"])).lower()
-                    if child.get("applicability_check") is not None:
-                        ca["applicability_check"]=str(bool(child["applicability_check"])).lower()
-                    ET.SubElement(ce,q(OVAL_DEF,"criterion"),ca)
-                elif "operator" in child or "children" in child or "checks" in child:
-                    emit_criteria(ce,child)
-                else:
-                    die(f"unsupported root criteria node: {child}")
-            return ce
+        if roots:
+            for root_spec in roots:
+                d = ET.SubElement(defs, q(OVAL_DEF, "definition"), {
+                    "id": ids.get("def", root_spec["id"]),
+                    "version": "1",
+                    "class": root_spec.get("definition_class","compliance"),
+                })
+                md = ET.SubElement(d, q(OVAL_DEF, "metadata"))
+                ET.SubElement(md, q(OVAL_DEF, "title")).text = f"Round-trip root {root_spec['id']}"
+                ET.SubElement(md, q(OVAL_DEF, "description")).text = "Generated from SCAP-NG semantic stress fixture."
+                emit_criteria(d,root_spec.get("root",{}))
+        else:
+            d = ET.SubElement(defs, q(OVAL_DEF, "definition"), {
+                "id": ids.get("def", data["id"]),
+                "version": "1",
+                "class": sem.get("definition_class","compliance"),
+            })
+            md = ET.SubElement(d, q(OVAL_DEF, "metadata"))
+            ET.SubElement(md, q(OVAL_DEF, "title")).text = f"Round-trip fixture {data['id']}"
+            ET.SubElement(md, q(OVAL_DEF, "description")).text = "Generated from SCAP-NG semantic stress fixture."
+            emit_criteria(d,sem.get("root",{}))
 
-        emit_criteria(d,sem.get("root",{}))
-
+    if checks:
         tests = ET.SubElement(root, q(OVAL_DEF, "tests"))
         for chk in checks:
             family, name = split_type(chk["type"])
