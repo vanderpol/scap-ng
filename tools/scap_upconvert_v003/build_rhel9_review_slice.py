@@ -286,6 +286,15 @@ def native_applicability_id(platform_node):
             return native
     return "applicability." + semantic_id(title, "condition")
 
+def source_platform_definition_id(platform_node):
+    logical = next((n for n in platform_node if local(n.tag) == "logical-test"), None)
+    if logical is None:
+        return None
+    children = [n for n in logical if local(n.tag) in ("check-fact-ref", "fact-ref", "logical-test")]
+    if len(children) != 1 or local(children[0].tag) != "check-fact-ref":
+        return None
+    return children[0].get("id-ref")
+
 def lower_source_platform(platform_node, oval_bundle):
     logical = next((n for n in platform_node if local(n.tag) == "logical-test"), None)
     if logical is None:
@@ -1283,6 +1292,15 @@ def main():
                 app_id, app_assessment, app_error = lower_source_platform(platform_node, oval_bundle)
                 if app_error:
                     raise RuntimeError(f"{rid}: applicability lowering failed: {app_error}")
+                app_definition_id = source_platform_definition_id(platform_node)
+                if app_definition_id:
+                    oval_descriptive_metadata_diagnostics(
+                        oval_bundle,
+                        app_definition_id,
+                        rid,
+                        app_assessment["assessment"]["id"],
+                        diagnostics,
+                    )
                 rule_doc["rule"]["applicability"] = [app_id]
                 app_assessment_id = app_assessment["assessment"]["id"]
                 applicability_registry[app_id] = app_assessment_id
