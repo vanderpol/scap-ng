@@ -1035,6 +1035,14 @@ def main():
         for rec in selected:
             rid = rec["id"]; rule = rec["element"]
             content_fields = policy_content(rule)
+            publisher_extension = {
+                "documentable": content_fields.get("documentable"),
+                "false_positives": content_fields.get("false_positives"),
+                "false_negatives": content_fields.get("false_negatives"),
+                "mitigations": content_fields.get("mitigations"),
+                "potential_impacts": content_fields.get("potential_impacts"),
+                "responsibility": content_fields.get("responsibility"),
+            }
             policy = {"policy": {
                 "id": rid,
                 "title": rec["title"],
@@ -1043,12 +1051,9 @@ def main():
                 "weight": float(rec["weight"]) if rec["weight"] is not None else None,
                 "discussion": content_fields.get("discussion"),
                 "rationale": content_fields.get("rationale"),
-                "documentable": content_fields.get("documentable"),
-                "false_positives": content_fields.get("false_positives"),
-                "false_negatives": content_fields.get("false_negatives"),
-                "mitigations": content_fields.get("mitigations"),
-                "potential_impacts": content_fields.get("potential_impacts"),
-                "responsibility": content_fields.get("responsibility"),
+                "extensions": {
+                    "disa_stig": publisher_extension,
+                },
                 "warnings": content_fields.get("warnings", []),
                 "identifiers": content_fields.get("identifiers", []),
                 "references": content_fields.get("references", []),
@@ -1121,6 +1126,9 @@ def main():
             write_yaml(OUT / "policy" / f"{rid}.policy.yaml", policy)
 
             evidence.append({
+                "publisher_extension": {
+                    "disa_stig": publisher_extension,
+                },
                 "native_rule_id": rid,
                 "source_rule_id": rec["source_rule_id"],
                 "source_checks": [{
