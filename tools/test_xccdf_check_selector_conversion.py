@@ -37,7 +37,7 @@ single_named = {
 }
 plan, error = mod.check_selection_plan(single_named, {"automated": assessment("assessment.auto"), "manual": None})
 assert error is None, error
-assert plan["default_check"] == "automated", plan
+assert "default_check" not in plan, plan
 assert plan["checks"][0]["source_selector"] == "automated", plan
 assert plan["checks"][0]["assessment"] == "assessment.auto", plan
 
@@ -77,18 +77,22 @@ assert plan is None, plan
 assert error["status"] == "unsupported", error
 assert error["reason"] == "check_selector_without_assessment", error
 
-# Multiple checking-system candidates under the same selector remain one
-# selector alternative; the source check logic retains system ordering.
+# Multiple non-equivalent candidates under the same selector are a loud
+# blocker until checking-system fallback is modeled explicitly.
 same_selector = {
     "id": "rule-system-fallback",
     "checks": [
-        {"selector": "automated", "system": "system-a"},
-        {"selector": "automated", "system": "system-b"},
+        {"selector": "automated", "system": "oval", "content_refs": [{"name": "def:a"}]},
+        {"selector": "automated", "system": "oval", "content_refs": [{"name": "def:b"}]},
     ],
 }
-plan, error = mod.check_selection_plan(same_selector, {"automated": assessment(), "manual": None})
-assert error is None, error
-assert plan["default_check"] == "automated", plan
+plan, error = mod.check_selection_plan(
+    same_selector,
+    {"automated": assessment(), "manual": None},
+)
+assert plan is None, plan
+assert error["status"] == "unsupported", error
+assert error["reason"] == "same_selector_alternatives_not_lowered", error
 
 source = {
     "resolved_profiles": [{
