@@ -66,7 +66,7 @@ The Benchmark object SHALL own Benchmark-wide policy structure, including:
 - Profile catalog/references;
 - Benchmark-scoped Parameter definitions or references.
 
-A Rule policy object SHALL own Rule-specific policy semantics, including as
+A Rule object SHALL own Rule-specific semantics, including as
 applicable:
 
 - stable Rule identity;
@@ -319,9 +319,9 @@ Illustrative source:
       applicability: applicability.yaml
 
       rules:
-        - policy/WN11-00-000020.policy.yaml
-        - policy/WN11-00-000050.policy.yaml
-        - policy/WN11-CC-000005.policy.yaml
+        - rules/WN11-00-000020.rule.yaml
+        - rules/WN11-00-000050.rule.yaml
+        - rules/WN11-CC-000005.rule.yaml
 
       profiles:
         - profiles/cat-i-only.profile.yaml
@@ -337,8 +337,8 @@ A typical source tree is:
 
     benchmark.yaml
     applicability.yaml
-    policy/
-      <rule>.policy.yaml
+    rules/
+      <rule>.rule.yaml
     profiles/
       <profile>.profile.yaml
     assessments/
@@ -413,3 +413,33 @@ class as defined in `../assessment/assessment-method.md`.
 Publisher-specific Rule metadata that is not part of the standardized SCAP-NG
 Policy vocabulary SHALL use the constrained extension mechanism rather than
 being promoted implicitly into core Rule fields.
+
+
+## 23. Benchmark use case
+
+A Benchmark SHALL declare a high-level `use_case` describing the primary
+SCAP-NG use case of that Benchmark.
+
+The initial inherited use-case model is derived from the SCAP 1.4 source
+data-stream use-case distinction. The current candidate native vocabulary is:
+
+- `compliance`;
+- `vulnerability`;
+- `inventory`;
+- `other`.
+
+The final naming of `compliance` versus the SCAP 1.4 term
+`CONFIGURATION` remains subject to standards review.
+
+Benchmark `use_case` SHALL remain distinct from Assessment `class`.
+A compliance Benchmark MAY contain inventory-class Assessments used for
+Platform or Rule applicability, and MAY contain patch-class Assessments where
+appropriate.
+
+Iteration 003 uses `use_case: compliance` for the RHEL 9 STIG conversion
+because the Benchmark's primary purpose is security-configuration compliance
+evaluation.
+
+Whether a future SCAP-NG Benchmark publication may contain more than one
+Benchmark remains an open governance question. The current v1 design direction
+is one executable Benchmark per SCAP-NG Benchmark publication.
