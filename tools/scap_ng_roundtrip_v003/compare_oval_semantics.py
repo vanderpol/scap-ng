@@ -64,6 +64,30 @@ class Model:
             return ("unique",tuple(self.component(c) for c in e))
         if local=="split":
             return ("split",e.attrib["delimiter"],tuple(self.component(c) for c in e))
+        if local=="begin":
+            return ("begin",e.attrib["character"],tuple(self.component(c) for c in e))
+        if local=="end":
+            return ("end",e.attrib["character"],tuple(self.component(c) for c in e))
+        if local=="escape_regex":
+            return ("escape_regex",tuple(self.component(c) for c in e))
+        if local=="substring":
+            return ("substring",e.attrib["substring_start"],e.attrib["substring_length"],
+                    tuple(self.component(c) for c in e))
+        if local=="time_difference":
+            return ("time_difference",e.attrib.get("format_1","year_month_day"),
+                    e.attrib.get("format_2","year_month_day"),
+                    tuple(self.component(c) for c in e))
+        if local=="regex_capture":
+            return ("regex_capture",e.attrib.get("pattern"),
+                    tuple(self.component(c) for c in e))
+        if local=="merge":
+            return ("merge",e.attrib.get("delimiter",""),
+                    e.attrib.get("sort","document"),
+                    e.attrib.get("order","ascending"),
+                    tuple(self.component(c) for c in e))
+        if local=="glob_to_regex":
+            return ("glob_to_regex",e.attrib.get("glob_noescape","false"),
+                    tuple(self.component(c) for c in e))
         raise ValueError(f"unsupported component {local}")
 
     def variable(self,vid):
