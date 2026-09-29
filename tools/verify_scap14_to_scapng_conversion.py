@@ -17,7 +17,7 @@ def load_yaml(path: Path):
 def canonicalize_ansible_assessment(rendered: dict) -> dict:
     """Recover canonical assessment semantics from the Ansible-inspired view."""
     out={}
-    for key in ("id","version","description","semantic_model"):
+    for key in ("id","version","description","semantic_model","purpose","inventory_output"):
         if key in rendered:
             out[key]=rendered[key]
 
