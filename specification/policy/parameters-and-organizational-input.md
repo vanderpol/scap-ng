@@ -90,3 +90,11 @@ distinguish at least:
 - interactive run-time input;
 - API/integration supplied input;
 - declared default.
+
+<!-- spec-nav:start -->
+
+---
+
+**Specification navigation:** [← Previous: Policy Resolution](policy-resolution.md) · [Contents](../README.md) · [Next: Assessment Method →](../assessment/assessment-method.md)
+
+<!-- spec-nav:end -->
