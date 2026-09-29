@@ -84,3 +84,31 @@ normative requirements.
   Definition/Test/Object/State/Variable semantics into SCAP-NG.
 - `migration/oval-5.12.3-capability-crosswalk.md` — OVAL 5.12.3 Test-type to
   provisional SCAP-NG Capability inventory.
+
+
+## Evolutionary design principle
+
+SCAP-NG is an evolutionary successor to SCAP 1.4, not a terminology reset.
+
+Before introducing a new normative term, object type, processing concept, or
+semantic distinction, specification work SHOULD first review the corresponding
+NIST SCAP, XCCDF, OVAL, CPE, ARF, and related standards terminology.
+
+When an existing standards term remains semantically accurate and useful,
+SCAP-NG SHOULD retain or deliberately adapt that term rather than inventing a
+synonym.
+
+A new term SHOULD be introduced only when:
+
+- existing SCAP/NIST terminology is materially inaccurate for the NG concept;
+- retaining the legacy term would preserve obsolete architecture or create
+  ambiguity; or
+- SCAP-NG introduces a genuinely new semantic concept with no suitable
+  predecessor.
+
+When SCAP-NG intentionally renames, replaces, or removes an established SCAP
+1.4 concept, the specification crosswalk SHOULD record that decision and its
+rationale.
+
+Publisher-specific vocabulary SHALL NOT be promoted into generic SCAP-NG
+terminology merely because it is common in one content ecosystem.
