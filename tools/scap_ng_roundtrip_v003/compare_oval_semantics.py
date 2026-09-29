@@ -213,7 +213,10 @@ class Model:
             elif local=="criterion":
                 node=("test",self.test(child.attrib["test_ref"]))
             elif local=="extend_definition":
-                node=self.definition(child.attrib["definition_ref"])
+                # extend_definition contributes the referenced Definition's
+                # result in the current logical context. Definition identity,
+                # metadata, and class are not an extra Boolean node.
+                node=self.definition_result(child.attrib["definition_ref"])
             else:
                 raise ValueError(f"unsupported criteria child {local}")
             if cneg or capp:
@@ -224,15 +227,20 @@ class Model:
             return kids[0]
         return ("criteria",op,neg,app,tuple(sorted(kids,key=repr)))
 
-    def definition(self,did):
-        key=("definition",did)
+    def definition_result(self,did):
+        key=("definition-result",did)
         if key in self.memo:return self.memo[key]
         e=self.definitions[did]
         self.memo[key]=("recursion-definition",did)
         crit=e.find(f"{{{OD}}}criteria")
         if crit is None: raise ValueError(f"{did}: definition has no criteria")
-        out=("definition",e.attrib.get("class"),self.criteria(crit))
-        self.memo[key]=out; return out
+        out=self.criteria(crit)
+        self.memo[key]=out
+        return out
+
+    def definition(self,did):
+        e=self.definitions[did]
+        return ("definition",e.attrib.get("class"),self.definition_result(did))
 
     def test_multiset(self):
         return collections.Counter(repr(self.test(t)) for t in self.tests)
