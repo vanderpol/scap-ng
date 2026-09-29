@@ -104,6 +104,24 @@ jobs:
           PY
           fi
 
+      - name: Regenerate full XCCDF policy from NG
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/ng_to_xccdf_rhel9.py \
+            scap-ng/research/iterations/003/source/split-rule-assessment/rhel9-full \
+            -o work/rhel9-regenerated-xccdf.xml
+
+      - name: Validate regenerated XCCDF 1.2
+        run: |
+          xmllint --noout --schema scap-ng/third_party/scap-1.4-schemas/xccdf_1.2.xsd \
+            work/rhel9-regenerated-xccdf.xml
+
+      - name: Compare regenerated XCCDF policy semantics
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/compare_xccdf_policy_semantics.py \
+            work/rhel9-benchmark-ir.json \
+            work/rhel9-regenerated-xccdf.xml \
+            --output work/rhel9-xccdf-roundtrip.json
+
       - name: Upload benchmark semantic IR
         uses: actions/upload-artifact@v4
         with:
@@ -111,3 +129,5 @@ jobs:
           path: |
             work/rhel9-benchmark-ir.json
             work/rhel9-ng-fidelity.json
+            work/rhel9-regenerated-xccdf.xml
+            work/rhel9-xccdf-roundtrip.json
