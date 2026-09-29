@@ -56,6 +56,118 @@ def write_json(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
+DIAGNOSTIC_LEVELS = ("info", "warn", "error", "fatal")
+
+def add_diagnostic(diagnostics, severity, code, message, **context):
+    if severity not in DIAGNOSTIC_LEVELS:
+        raise ValueError(f"invalid diagnostic severity: {severity}")
+    item = {
+        "severity": severity,
+        "code": code,
+        "message": message,
+    }
+    item.update({k: v for k, v in context.items() if v is not None})
+    diagnostics.append(item)
+
+def diagnostic_summary(diagnostics):
+    counts = {level: 0 for level in DIAGNOSTIC_LEVELS}
+    for item in diagnostics:
+        counts[item["severity"]] += 1
+    return {
+        "counts": counts,
+        "total": sum(counts.values()),
+        "highest_severity": next(
+            (level for level in reversed(DIAGNOSTIC_LEVELS) if counts[level]),
+            None,
+        ),
+    }
+
+def oval_descriptive_metadata_diagnostics(oroot, definition_id, rule_id, assessment_id, diagnostics):
+    definition = next(
+        (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id),
+        None,
+    )
+    if definition is None:
+        return
+
+    seen_tests = set()
+    seen_objects = set()
+    seen_states = set()
+    seen_variables = set()
+
+    def warn_missing(kind, node, field, code):
+        if node is not None and not node_title(node):
+            add_diagnostic(
+                diagnostics,
+                "warn",
+                code,
+                f"OVAL {kind} comment is absent; {field} is emitted as null.",
+                rule_id=rule_id,
+                assessment_id=assessment_id,
+                source_id=node.get("id"),
+                field=field,
+            )
+
+    def visit_criteria(node):
+        for child in node:
+            kind = local(child.tag)
+            if kind == "criterion":
+                test_ref = child.get("test_ref")
+                if not test_ref or test_ref in seen_tests:
+                    continue
+                seen_tests.add(test_ref)
+                test = find_by_id(oroot, test_ref, "_test")
+                warn_missing("Test", test, "test_title", "OVAL_TEST_COMMENT_MISSING")
+                if test is None:
+                    continue
+                for part in test:
+                    part_kind = local(part.tag)
+                    if part_kind == "object":
+                        obj_ref = part.get("object_ref")
+                        if obj_ref and obj_ref not in seen_objects:
+                            seen_objects.add(obj_ref)
+                            obj = find_by_id(oroot, obj_ref, "_object")
+                            warn_missing("Object", obj, "object_title", "OVAL_OBJECT_COMMENT_MISSING")
+                    elif part_kind == "state":
+                        state_ref = part.get("state_ref")
+                        if state_ref and state_ref not in seen_states:
+                            seen_states.add(state_ref)
+                            state = find_by_id(oroot, state_ref, "_state")
+                            warn_missing("State", state, "state_title", "OVAL_STATE_COMMENT_MISSING")
+            elif kind == "criteria":
+                visit_criteria(child)
+            elif kind == "extend_definition":
+                ref = child.get("definition_ref")
+                target = next(
+                    (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == ref),
+                    None,
+                )
+                if target is not None:
+                    nested = next((n for n in target if local(n.tag) == "criteria"), None)
+                    if nested is not None:
+                        visit_criteria(nested)
+
+    criteria = next((n for n in definition if local(n.tag) == "criteria"), None)
+    if criteria is not None:
+        visit_criteria(criteria)
+
+    # Variables can be referenced by object/state entities. Flag only variables
+    # actually referenced by the converted definition closure.
+    referenced_ids = seen_objects | seen_states
+    for source_id in list(referenced_ids):
+        node = next((n for n in oroot.iter() if n.get("id") == source_id), None)
+        if node is None:
+            continue
+        for descendant in node.iter():
+            var_ref = descendant.get("var_ref")
+            if var_ref and var_ref not in seen_variables:
+                seen_variables.add(var_ref)
+                variable = next(
+                    (n for n in oroot.iter() if n.get("id") == var_ref and local(n.tag).endswith("_variable")),
+                    None,
+                )
+                warn_missing("Variable", variable, "variable_title", "OVAL_VARIABLE_COMMENT_MISSING")
+
 def evidence_tree(node):
     return {
         "element": local(node.tag),
@@ -1110,15 +1222,16 @@ def main():
             applicability_assessments_written.add(assessment["assessment"]["id"])
 
         evidence = []
-        diagnostics = [
-            {
-                "area": "benchmark.metadata",
-                "status": "requires_review",
-                "reason": "benchmark metadata element is not yet normalized",
-                "detail": item,
-            }
-            for item in unsupported_metadata
-        ]
+        diagnostics = []
+        for item in unsupported_metadata:
+            add_diagnostic(
+                diagnostics,
+                "warn",
+                "BENCHMARK_METADATA_NOT_NORMALIZED",
+                "Benchmark metadata element is preserved in evidence but is not yet normalized into native SCAP-NG fields.",
+                area="benchmark.metadata",
+                detail=item,
+            )
         for rec in selected:
             rid = rec["id"]; rule = rec["element"]
             content_fields = rule_content(rule)
@@ -1210,6 +1323,9 @@ def main():
                     assessment, error = lower_definition(oval_bundle, definition_id, aid)
                     if assessment is None:
                         raise RuntimeError(f"{rid}: automated lowering regressed: {error}")
+                    oval_descriptive_metadata_diagnostics(
+                        oval_bundle, definition_id, rid, aid, diagnostics
+                    )
                     write_yaml(OUT / "assessments/automated" / f"{rid}.automated.assessment.yaml", assessment)
                     definition_to_assessment[definition_id] = aid
                 checks[selector] = aid
@@ -1288,8 +1404,16 @@ def main():
         write_json(EVIDENCE / "source-platform-inventory.json", {"platforms": source_platform_inventory})
         write_json(EVIDENCE / "benchmark-platform-source.json", {"platform_refs": benchmark_platform_refs})
         write_json(EVIDENCE / "manual-default-candidates.json", {"rules": manual_default_candidates})
-        write_json(EVIDENCE / "diagnostics.json", {"diagnostics": diagnostics})
+        summary = diagnostic_summary(diagnostics)
+        write_json(EVIDENCE / "diagnostics.json", {
+            "summary": summary,
+            "diagnostics": diagnostics,
+        })
         print("accepted native rules:", ", ".join(selected_ids))
+        print(
+            "diagnostics:",
+            " ".join(f"{level.upper()}={summary['counts'][level]}" for level in DIAGNOSTIC_LEVELS),
+        )
 
 if __name__ == "__main__":
     main()
