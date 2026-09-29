@@ -19,6 +19,7 @@ NS = {
     "independent": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
     "linux": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
     "unix": "http://oval.mitre.org/XMLSchema/oval-definitions-5#unix",
+    "windows": "http://oval.mitre.org/XMLSchema/oval-definitions-5#windows",
 }
 ET.register_namespace("", OVAL_DEF)
 ET.register_namespace("oval", OVAL_COMMON)
@@ -26,6 +27,7 @@ ET.register_namespace("xsi", XSI)
 ET.register_namespace("ind", NS["independent"])
 ET.register_namespace("linux", NS["linux"])
 ET.register_namespace("unix", NS["unix"])
+ET.register_namespace("windows", NS["windows"])
 
 def q(ns, local):
     return f"{{{ns}}}{local}"
