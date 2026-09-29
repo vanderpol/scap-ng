@@ -170,15 +170,19 @@ Changes include:
 
 - `tools/scap14_rule_splitter.py` now preserves XCCDF check selector, negate,
   and multi-check attributes in split provenance;
-- `tools/scap14_to_scapng.py` now emits explicit policy check/default bindings
-  for a faithfully lowered selector and blocks multiple selector alternatives
-  instead of collapsing them;
+- `tools/scap14_to_scapng.py` now emits explicit policy check/default bindings,
+  lowers the common default/automated/manual XCCDF selector pattern to distinct
+  Assessment alternatives, and blocks unsupported fallback patterns rather than
+  collapsing them;
 - resolved XCCDF `refine-rule/@selector` actions are projected into native
   Profile check-selector data;
 - `tools/verify_scap14_to_scapng_conversion.py` checks selector preservation
   and rejects silent collapse;
 - `tools/test_xccdf_check_selector_conversion.py` provides permanent focused
-  regression cases;
+  selector regression cases;
+- `research/iterations/002/examples/conformance/existence-state-cases.yaml`
+  and `tools/test_ng_existence_semantics.py` provide the base expected-state
+  existence truth table and OVAL `check_existence` preservation cases;
 - `.github/workflows/check-selector-conformance.yml` runs syntax and selector
   regression checks;
 - `.github/workflows/four-anchor-reuse-analysis.yml` now runs automatically
