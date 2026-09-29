@@ -122,3 +122,39 @@ purpose is either:
 
 - preserved elsewhere in NG; or
 - no longer needed.
+
+
+## Question 4: Assessment title
+
+Should SCAP-NG retain an optional `assessment_title` field, or remove it from
+the native model?
+
+### OVAL precedent
+
+OVAL Definitions may carry a human-readable title under
+`definition/metadata/title`.
+
+In many compliance content sets, that title is identical or nearly identical
+to the governing Rule title, which can make it redundant in a Rule/Assessment
+architecture.
+
+However, an Assessment may also be reusable across multiple Rules or may have
+a standalone technical description that differs meaningfully from the Rule
+title.
+
+### Current project recommendation
+
+Retain `assessment_title` as OPTIONAL for now.
+
+Migration tooling SHOULD preserve an OVAL Definition
+`metadata/title` when present.
+
+Native authoring SHOULD NOT synthesize an Assessment title merely by copying
+the governing Rule title.
+
+An absent source title SHOULD remain absent/null.
+
+The OVAL Board should advise whether the field provides enough value for
+standalone Assessment reuse, diagnostics, repositories, or interoperability to
+justify keeping it in the normative NG model. If not, NG can remove the field
+and preserve legacy Definition titles only in conversion provenance.
