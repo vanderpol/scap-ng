@@ -6,6 +6,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 OD="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+XSI="http://www.w3.org/2001/XMLSchema-instance"
 FAMS={
  "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent":"independent",
  "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux":"linux",
@@ -52,6 +53,7 @@ class Model:
         base=("entity",local,
               e.attrib.get("datatype","string"),
               e.attrib.get("operation","equals"),
+              e.attrib.get(f"{{{XSI}}}nil","false"),
               e.attrib.get("mask","false"),
               (e.attrib.get("var_check","all") if vr else None),
               (e.attrib.get("entity_check","all") if state_context else e.attrib.get("entity_check")),
