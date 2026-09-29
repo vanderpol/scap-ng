@@ -231,7 +231,7 @@ class Model:
         self.memo[key]=("recursion-definition",did)
         crit=e.find(f"{{{OD}}}criteria")
         if crit is None: raise ValueError(f"{did}: definition has no criteria")
-        out=self.criteria(crit)
+        out=("definition",e.attrib.get("class"),self.criteria(crit))
         self.memo[key]=out; return out
 
     def test_multiset(self):
