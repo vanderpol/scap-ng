@@ -315,7 +315,32 @@ The anomaly SHOULD be recorded in authoring comments and/or a conversion report.
 
 Correction is a separate reviewed content-maintenance action.
 
-## 16. Stage-2 native refactoring
+## 16. OVAL descriptive comments
+
+OVAL Test, Object, State, and Variable `comment` attributes SHOULD be
+preserved during migration when present because they provide useful
+human-readable context about what is collected or tested.
+
+Native SCAP-NG SHOULD expose those values using typed descriptive fields:
+
+- Test `comment` -> `test_title`;
+- Object `comment` -> `object_title`;
+- State `comment` -> `state_title`;
+- Variable `comment` -> `variable_title`.
+
+Definition metadata titles SHOULD map to `definition_title` when the mapping
+is unambiguous.
+
+These fields are descriptive metadata and SHALL NOT affect evaluation truth,
+result semantics, or exact technical reuse fingerprints.
+
+OVAL `criteria` and `criterion` comments MAY be retained in Stage-1
+migration provenance for source traceability but SHOULD NOT be emitted as
+native SCAP-NG Boolean-expression titles. Their omission from native
+scanner-facing semantics is intentional and SHALL NOT be treated as semantic
+loss.
+
+## 17. Stage-2 native refactoring
 
 Once Stage-1 equivalence is established, Stage 2 MAY:
 
@@ -329,7 +354,7 @@ Once Stage-1 equivalence is established, Stage 2 MAY:
 
 Stage-2 refactoring SHALL NOT be described as lossless if behavior changes.
 
-## 17. Example migration chain
+## 18. Example migration chain
 
 The recommended review chain is:
 
@@ -346,7 +371,7 @@ The recommended review chain is:
 Reviewers can therefore distinguish migration correctness from language
 elegance.
 
-## 18. Conversion report
+## 19. Conversion report
 
 A converter SHOULD emit a machine-readable conversion report containing, at
 minimum:
