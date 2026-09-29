@@ -136,6 +136,11 @@ Effective resolution is therefore:
 Check selection SHALL be resolved and frozen with the effective policy before
 applicability and compliance execution.
 
+Different selector identifiers MAY resolve to the same Assessment Method when
+the policy intentionally exposes multiple selector names for equivalent
+technical behavior. Shared implementation SHALL NOT erase selector identity;
+results SHALL still record the effective selector.
+
 If an explicitly requested selector does not exist for the Rule's applicable
 policy, resolution SHALL fail. A processor SHALL NOT silently substitute the
 default check or another available check.
