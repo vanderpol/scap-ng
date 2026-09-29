@@ -146,3 +146,36 @@ The context in which an Assessment Method is invoked.
 The initial purpose vocabulary is `assessment` and `applicability`.
 
 Purpose SHALL NOT be used as a substitute for Assessment class.
+
+
+## Checklist
+
+A human-consumable collection of security configuration guidance, Rules,
+procedures, or related policy content for a particular kind of system or
+platform.
+
+`Checklist` is the generic SCAP-NG/NIST-aligned term. Publisher-specific names
+such as Security Technical Implementation Guide (STIG), hardening guide, or
+security guide are not SCAP-NG normative object types.
+
+## SCAP-NG Benchmark
+
+A self-contained executable SCAP-NG publication centered on exactly one
+Benchmark and containing the Rules, Assessments, applicability definitions,
+metadata, and other artifacts required to process that Benchmark.
+
+The term `SCAP-NG Benchmark` refers to the distributable executable
+publication. The contained `Benchmark` remains the logical Benchmark object
+defined by the policy model.
+
+Whether a future SCAP-NG version permits more than one Benchmark in a single
+SCAP-NG Benchmark publication is an open governance question.
+
+## Publisher-specific terminology
+
+SCAP-NG specifications SHALL NOT use publisher-specific terms such as `STIG`
+as generic names for normative SCAP-NG object types.
+
+Such terms MAY appear in examples, source metadata, identifiers, provenance, or
+publisher-specific extensions when they accurately describe the source
+publication.
