@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
+  xmlns:unix="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+  <generator>
+    <oval:product_name>SCAP-NG round-trip schema-derived source</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-09-29T00:00:00Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <definition id="oval:scap-ng.roundtrip.source:def:4" version="1" class="compliance">
+      <metadata><title>Recursive Set stress case</title><description>Nested OVAL sets.</description></metadata>
+      <criteria><criterion test_ref="oval:scap-ng.roundtrip.source:tst:4" comment="nested set test"/></criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <unix:file_test id="oval:scap-ng.roundtrip.source:tst:4" version="1"
+      check_existence="at_least_one_exists" check="all" comment="nested set test">
+      <unix:object object_ref="oval:scap-ng.roundtrip.source:obj:40"/>
+    </unix:file_test>
+  </tests>
+  <objects>
+    <unix:file_object id="oval:scap-ng.roundtrip.source:obj:40" version="1" comment="nested set parent">
+      <set set_operator="INTERSECTION">
+        <set set_operator="UNION">
+          <object_reference>oval:scap-ng.roundtrip.source:obj:41</object_reference>
+          <object_reference>oval:scap-ng.roundtrip.source:obj:42</object_reference>
+        </set>
+        <set set_operator="UNION">
+          <object_reference>oval:scap-ng.roundtrip.source:obj:43</object_reference>
+        </set>
+      </set>
+    </unix:file_object>
+    <unix:file_object id="oval:scap-ng.roundtrip.source:obj:41" version="1" comment="tmp files">
+      <unix:path>/tmp</unix:path><unix:filename operation="pattern match">^.*$</unix:filename>
+    </unix:file_object>
+    <unix:file_object id="oval:scap-ng.roundtrip.source:obj:42" version="1" comment="var tmp files">
+      <unix:path>/var/tmp</unix:path><unix:filename operation="pattern match">^.*$</unix:filename>
+    </unix:file_object>
+    <unix:file_object id="oval:scap-ng.roundtrip.source:obj:43" version="1" comment="conf files">
+      <unix:path operation="pattern match">^/(?:tmp|var/tmp)$</unix:path>
+      <unix:filename operation="pattern match">^.*\.conf$</unix:filename>
+    </unix:file_object>
+  </objects>
+</oval_definitions>

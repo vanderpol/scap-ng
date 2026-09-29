@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 
 OVAL_DEF = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 OVAL_COMMON = "http://oval.mitre.org/XMLSchema/oval-common-5"
+XSI = "http://www.w3.org/2001/XMLSchema-instance"
 NS = {
     "independent": "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent",
     "linux": "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux",
@@ -21,6 +22,7 @@ NS = {
 }
 ET.register_namespace("", OVAL_DEF)
 ET.register_namespace("oval", OVAL_COMMON)
+ET.register_namespace("xsi", XSI)
 ET.register_namespace("ind", NS["independent"])
 ET.register_namespace("linux", NS["linux"])
 ET.register_namespace("unix", NS["unix"])
@@ -76,6 +78,12 @@ def attrs_for_entity(spec, ids):
             attrs["datatype"] = str(spec["datatype"])
         if "operation" in spec:
             attrs["operation"] = str(spec["operation"])
+        if "entity_check" in spec:
+            attrs["entity_check"] = str(spec["entity_check"])
+        if "check_existence" in spec:
+            attrs["check_existence"] = str(spec["check_existence"])
+        if "mask" in spec:
+            attrs["mask"] = str(bool(spec["mask"])).lower()
         if "variable" in spec:
             attrs["var_ref"] = ids.get("var", spec["variable"])
             if "var_check" in spec:
@@ -84,8 +92,28 @@ def attrs_for_entity(spec, ids):
 
 def add_entity(parent, ns, name, spec, ids):
     if isinstance(spec, dict):
-        el = ET.SubElement(parent, q(ns, name), attrs_for_entity(spec, ids))
-        if "variable" in spec:
+        eattrs=attrs_for_entity(spec, ids)
+        if spec.get("nil") is True:
+            eattrs[q(XSI,"nil")]="true"
+        el = ET.SubElement(parent, q(ns, name), eattrs)
+        if spec.get("nil") is True:
+            if "fields" in spec or "variable" in spec or "value" in spec:
+                die(f"{name}: nil entity cannot also contain fields/variable/value")
+        elif "fields" in spec:
+            if "variable" in spec or "value" in spec:
+                die(f"{name}: record fields cannot be combined with variable/value")
+            for field in spec["fields"]:
+                fattrs=attrs_for_entity(field,ids)
+                fattrs["name"]=field["name"]
+                fe=ET.SubElement(el,q(OVAL_DEF,"field"),fattrs)
+                if "variable" in field:
+                    if "value" in field:
+                        die(f"{name}.{field['name']}: variable and value both supplied")
+                elif "value" in field:
+                    fe.text=str(field["value"])
+                else:
+                    die(f"{name}.{field['name']}: field missing value or variable")
+        elif "variable" in spec:
             if "value" in spec:
                 die(f"{name}: variable and value both supplied")
         elif "value" in spec:
@@ -98,7 +126,10 @@ def add_entity(parent, ns, name, spec, ids):
 
 def emit_component(parent, comp, ids):
     if "literal" in comp:
-        el = ET.SubElement(parent, q(OVAL_DEF, "literal_component"))
+        attrs={}
+        if comp.get("datatype") is not None:
+            attrs["datatype"]=str(comp["datatype"])
+        el = ET.SubElement(parent, q(OVAL_DEF, "literal_component"), attrs)
         el.text = str(comp["literal"])
     elif "variable" in comp:
         ET.SubElement(parent, q(OVAL_DEF, "variable_component"),
@@ -144,8 +175,78 @@ def emit_expression(parent, expr, ids):
         value=expr["split"]
         el = ET.SubElement(parent, q(OVAL_DEF, "split"), {"delimiter": value["delimiter"]})
         emit_component(el, value["component"], ids)
+    elif "begin" in expr:
+        value=expr["begin"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"begin"),{"character":value["character"]})
+        emit_component(el,value["component"],ids)
+    elif "end" in expr:
+        value=expr["end"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"end"),{"character":value["character"]})
+        emit_component(el,value["component"],ids)
+    elif "escape_regex" in expr:
+        el=ET.SubElement(parent,q(OVAL_DEF,"escape_regex"))
+        emit_component(el,expr["escape_regex"],ids)
+    elif "substring" in expr:
+        value=expr["substring"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"substring"),{
+            "substring_start":str(value["start"]),
+            "substring_length":str(value["length"]),
+        })
+        emit_component(el,value["component"],ids)
+    elif "time_difference" in expr:
+        value=expr["time_difference"]
+        attrs={}
+        if value.get("format_1") is not None: attrs["format_1"]=value["format_1"]
+        if value.get("format_2") is not None: attrs["format_2"]=value["format_2"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"time_difference"),attrs)
+        for comp in value["components"]:
+            emit_component(el,comp,ids)
+    elif "regex_capture" in expr:
+        value=expr["regex_capture"]
+        attrs={}
+        if value.get("pattern") is not None: attrs["pattern"]=value["pattern"]
+        el=ET.SubElement(parent,q(OVAL_DEF,"regex_capture"),attrs)
+        emit_component(el,value["component"],ids)
+    elif "merge" in expr:
+        value=expr["merge"]
+        attrs={}
+        for k in ("delimiter","sort","order"):
+            if value.get(k) is not None: attrs[k]=str(value[k])
+        el=ET.SubElement(parent,q(OVAL_DEF,"merge"),attrs)
+        for comp in value["components"]:
+            emit_component(el,comp,ids)
+    elif "glob_to_regex" in expr:
+        value=expr["glob_to_regex"]
+        attrs={}
+        if value.get("glob_noescape") is not None:
+            attrs["glob_noescape"]=str(bool(value["glob_noescape"])).lower()
+        el=ET.SubElement(parent,q(OVAL_DEF,"glob_to_regex"),attrs)
+        emit_component(el,value["component"],ids)
     else:
         die(f"unsupported expression: {expr}")
+
+def emit_set(parent, spec, ids):
+    attrs={"set_operator": spec.get("operator","UNION")}
+    se=ET.SubElement(parent,q(OVAL_DEF,"set"),attrs)
+    nested=spec.get("sets")
+    collections=spec.get("collections")
+    if nested is not None:
+        if collections or spec.get("filters"):
+            die("nested set form cannot also contain collections/filters")
+        if not (1 <= len(nested) <= 2):
+            die("nested set form requires one or two child sets")
+        for child in nested:
+            emit_set(se,child,ids)
+    else:
+        if not collections or not (1 <= len(collections) <= 2):
+            die("leaf set form requires one or two collection references")
+        for ref in collections:
+            e=ET.SubElement(se,q(OVAL_DEF,"object_reference"))
+            e.text=ids.get("obj",ref)
+        for f in spec.get("filters",[]):
+            fe=ET.SubElement(se,q(OVAL_DEF,"filter"),{"action":f.get("action","exclude")})
+            fe.text=ids.get("ste",f["state"])
+    return se
 
 def build(data):
     sem = copy.deepcopy(data["ng_semantics"])
@@ -181,6 +282,8 @@ def build(data):
             attrs={"operator": node.get("operator","AND")}
             if node.get("negate") is not None:
                 attrs["negate"]=str(bool(node["negate"])).lower()
+            if node.get("applicability_check") is not None:
+                attrs["applicability_check"]=str(bool(node["applicability_check"])).lower()
             ce=ET.SubElement(parent, q(OVAL_DEF, "criteria"), attrs)
             children=node.get("children")
             if children is None:
@@ -191,6 +294,8 @@ def build(data):
                     ca={"test_ref":ids.get("tst",cid),"comment":cid}
                     if child.get("negate") is not None:
                         ca["negate"]=str(bool(child["negate"])).lower()
+                    if child.get("applicability_check") is not None:
+                        ca["applicability_check"]=str(bool(child["applicability_check"])).lower()
                     ET.SubElement(ce,q(OVAL_DEF,"criterion"),ca)
                 elif "operator" in child or "children" in child or "checks" in child:
                     emit_criteria(ce,child)
@@ -211,6 +316,8 @@ def build(data):
                 "check": chk["check"],
                 "comment": chk["id"],
             }
+            if chk.get("state_operator") is not None:
+                attrs["state_operator"] = chk["state_operator"]
             t = ET.SubElement(tests, q(ns, name + "_test"), attrs)
             ET.SubElement(t, q(ns, "object"), {
                 "object_ref": ids.get("obj", chk["collection"])
@@ -231,14 +338,7 @@ def build(data):
                 "comment": col["id"],
             })
             if "set" in col:
-                s = col["set"]
-                se = ET.SubElement(o, q(OVAL_DEF, "set"), {"set_operator": s["operator"]})
-                for ref in s["collections"]:
-                    e = ET.SubElement(se, q(OVAL_DEF, "object_reference"))
-                    e.text = ids.get("obj", ref)
-                for f in s.get("filters", []):
-                    fe = ET.SubElement(se, q(OVAL_DEF, "filter"), {"action": f.get("action", "exclude")})
-                    fe.text = ids.get("ste", f["state"])
+                emit_set(o,col["set"],ids)
             else:
                 if "behaviors" in col:
                     ET.SubElement(o, q(ns, "behaviors"),
@@ -255,11 +355,14 @@ def build(data):
         for state in states:
             family, name = split_type(state["type"])
             ns = NS[family]
-            se = ET.SubElement(sts, q(ns, name + "_state"), {
+            sattrs={
                 "id": ids.get("ste", state["id"]),
                 "version": "1",
                 "comment": state["id"],
-            })
+            }
+            if state.get("operator") is not None:
+                sattrs["operator"]=state["operator"]
+            se = ET.SubElement(sts, q(ns, name + "_state"), sattrs)
             for field, spec in state.get("predicates", {}).items():
                 add_entity(se, ns, field, spec, ids)
 
@@ -277,6 +380,21 @@ def build(data):
                 ve = ET.SubElement(vs, q(OVAL_DEF, "constant_variable"), attrs)
                 for value in var["values"]:
                     ET.SubElement(ve, q(OVAL_DEF, "value")).text = str(value)
+            elif kind == "external":
+                ve = ET.SubElement(vs, q(OVAL_DEF, "external_variable"), attrs)
+                for pv in var.get("possible_values", []):
+                    pe = ET.SubElement(ve, q(OVAL_DEF, "possible_value"), {"hint": pv["hint"]})
+                    pe.text = str(pv["value"])
+                for pr in var.get("possible_restrictions", []):
+                    pre = ET.SubElement(ve, q(OVAL_DEF, "possible_restriction"), {
+                        "hint": pr["hint"],
+                        "operator": pr.get("operator", "AND"),
+                    })
+                    for rr in pr["restrictions"]:
+                        re = ET.SubElement(pre, q(OVAL_DEF, "restriction"), {
+                            "operation": rr["operation"]
+                        })
+                        re.text = str(rr["value"])
             elif kind == "local":
                 ve = ET.SubElement(vs, q(OVAL_DEF, "local_variable"), attrs)
                 emit_expression(ve, var["expression"], ids)

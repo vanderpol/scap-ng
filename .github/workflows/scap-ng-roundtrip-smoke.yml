@@ -62,13 +62,35 @@ jobs:
             --schemas oval-language/oval-schemas \
             out/*.xml
 
-      - name: Upload regenerated OVAL
+      - name: Generate XML round-trip diffs
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p roundtrip-diffs
+          for fixture in scap-ng/research/iterations/003/examples/oval-ng-roundtrip-stress/*.json; do
+            local_path="$(python - "$fixture" <<'PY'
+import json,sys
+d=json.load(open(sys.argv[1]))
+print(d.get("source",{}).get("local_path",""))
+PY
+)"
+            [ -n "$local_path" ] || continue
+            base="$(basename "$fixture" .json)"
+            mkdir -p "roundtrip-diffs/$base"
+            python scap-ng/tools/scap_ng_roundtrip_v003/diff_oval_roundtrip.py               "scap-ng/$local_path" "out/$base.xml"               --out-dir "roundtrip-diffs/$base"
+          done
+
+      - name: Upload regenerated OVAL and diffs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: regenerated-oval
-          path: out/*.xml
+          name: regenerated-oval-and-diffs
+          path: |
+            out/*.xml
+            roundtrip-diffs/**
 
       - name: Compare original and regenerated OVAL semantics
+        if: always()
         run: |
           set -euo pipefail
           python scap-ng/tools/scap_ng_roundtrip_v003/run_roundtrip.py \

@@ -21,7 +21,7 @@ Status values:
 | OVAL semantic area | Required semantics | Current v003 status | Required next proof |
 |---|---|---|---|
 | constant_variable | one or more typed literal values | prototype | multi-value constants, datatype validation |
-| external_variable | externally supplied typed value set plus optional allowed values/restrictions | design | possible_value / possible_restriction mapping |
+| external_variable | externally supplied typed value set plus optional allowed values/restrictions | prototype | round-trip case covers possible_value and possible_restriction; execution binding still needed |
 | local_variable | one ComponentGroup member producing zero/one/many values | prototype | full recursive component coverage |
 | variable_component | variable -> variable dependency | prototype | deep chains, shared dependencies, cycle rejection |
 | object_component | object -> item field -> variable values, optional record_field | prototype | 0/1/many items and repeated item entities; record_field |
@@ -37,10 +37,10 @@ Status values:
 | regex_capture | one string component; capture semantics | prototype | no-match and collection behavior |
 | unique | de-duplicate collection values | prototype | datatype equality rules |
 | count | collection -> integer count | prototype | zero/DNE/error inputs |
-| glob_to_regex | glob conversion semantics | design | exact OVAL conversion rules |
-| merge | merge record-valued/component data | design | exact MergeFunctionType structure/semantics |
+| glob_to_regex | glob conversion semantics | prototype | round-trip representation covered; exact execution conversion rules still need interpreter tests |
+| merge | merge one or more component value sets with delimiter/sort/order semantics | prototype | round-trip representation covered; execution ordering semantics still need interpreter tests |
 | var_ref in object entities | variable supplies selector values | prototype | all operations, multi-valued var_check |
-| var_ref in state entities | variable supplies expected values | prototype | many-to-many var_check + entity_check |
+| var_ref in state entities | variable supplies expected values | prototype | round-trip many-to-many var_check + entity_check covered; truth-table execution still needed |
 | var_ref datatype matching | referenced variable datatype must match consuming entity rules | design | validator generated from schema constraints |
 | var_ref on record entity | prohibited | design | static rejection |
 | empty variable consumed by Object | Object considered not to exist | design | execution/result conformance |
@@ -48,9 +48,9 @@ Status values:
 | variable evaluation error propagation | error propagates to consuming entity | design | result-state tests |
 | var_check default | effective `all` when var_ref exists and var_check omitted | design | parser normalization |
 | var_check aggregation | all / at least one / only one / none satisfy etc. per CheckEnumeration | design | evaluation truth tables |
-| entity_check + var_check | two-level many-to-many state evaluation | design | exhaustive truth-table tests |
-| nested functions | arbitrary recursive FunctionGroup composition | prototype | depth and mixed-function tests |
-| dependency graph | arbitrary acyclic variable/object/state dependencies | design | DAG planner + cycle diagnostics |
+| entity_check + var_check | two-level many-to-many state evaluation | prototype | structural/semantic round-trip covered; exhaustive execution truth-table tests remain |
+| nested functions | arbitrary recursive FunctionGroup composition | prototype | broad FunctionGroup round-trip coverage exists; deeper mixed nesting and runtime flag semantics remain |
+| dependency graph | reference-driven variable/object/state dependencies | design | planner/order proof; indirect-cycle rejection is pending OVAL Board review |
 | object set recursion | nested sets with schema-constrained arity | prototype | recursive set evaluation |
 | set object references | 1..2 refs; referenced objects same type as parent | design | Schematron compatibility validation |
 | set filters | zero..many state references applied before set operator | prototype | ordering/composition tests |
@@ -109,7 +109,7 @@ until:
 2. Object and State variable references preserve var_check behavior;
 3. object/state empty-variable behavior and error propagation are tested;
 4. nested variable/object/set/filter dependency graphs are supported;
-5. dependency cycles are rejected deterministically;
+5. direct self-reference is rejected, and the Board resolves the proposed rule for indirect dependency cycles;
 6. datatype and operation constraints derived from XSD/Schematron are enforced;
 7. Self-Assertion tests cover language primitives; and
 8. production RHEL 9 / Windows 11 examples cover realistic deep combinations.

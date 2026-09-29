@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
+  xmlns:ind="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent">
+  <generator>
+    <oval:product_name>SCAP-NG round-trip schema-derived source</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-09-29T00:00:00Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <definition id="oval:scap-ng.roundtrip.source:def:70" version="1" class="compliance">
+      <metadata><title>Record state entity stress case</title><description>sql512 record fields.</description></metadata>
+      <criteria><criterion test_ref="oval:scap-ng.roundtrip.source:tst:70" comment="record state test"/></criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <ind:sql512_test id="oval:scap-ng.roundtrip.source:tst:70" version="1"
+      check_existence="at_least_one_exists" check="all" comment="record state test">
+      <ind:object object_ref="oval:scap-ng.roundtrip.source:obj:70"/>
+      <ind:state state_ref="oval:scap-ng.roundtrip.source:ste:70"/>
+    </ind:sql512_test>
+  </tests>
+  <objects>
+    <ind:sql512_object id="oval:scap-ng.roundtrip.source:obj:70" version="1" comment="record-producing SQL object">
+      <ind:engine>mysql</ind:engine>
+      <ind:version operation="pattern match">^8\..*$</ind:version>
+      <ind:instance operation="pattern match">^.*$</ind:instance>
+      <ind:database>security</ind:database>
+      <ind:sql>SELECT name, value FROM settings</ind:sql>
+    </ind:sql512_object>
+  </objects>
+  <states>
+    <ind:sql512_state id="oval:scap-ng.roundtrip.source:ste:70" version="1" comment="record result expectation">
+      <ind:result datatype="record" operation="equals" entity_check="all" check_existence="at_least_one_exists" mask="true">
+        <field name="name" datatype="string" operation="equals">password_policy</field>
+        <field name="value" datatype="string" operation="pattern match" entity_check="at least one" mask="true">^enabled$</field>
+      </ind:result>
+    </ind:sql512_state>
+  </states>
+</oval_definitions>

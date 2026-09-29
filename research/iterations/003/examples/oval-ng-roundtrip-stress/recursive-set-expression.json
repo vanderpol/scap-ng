@@ -1,0 +1,86 @@
+{
+  "fixture_version": 1,
+  "id": "recursive-set-expression",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:4",
+    "note": "Schema-derived OVAL case exercising direct recursive Set nesting.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/recursive-set-expression.xml"
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "recursive-set-check",
+        "type": "unix.file",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "recursive-set-collection"
+      }
+    ],
+    "collections": [
+      {
+        "id": "recursive-set-collection",
+        "type": "unix.file",
+        "set": {
+          "operator": "INTERSECTION",
+          "sets": [
+            {
+              "operator": "UNION",
+              "collections": [
+                "tmp-files-collection",
+                "var-tmp-files-collection"
+              ]
+            },
+            {
+              "operator": "UNION",
+              "collections": [
+                "conf-files-collection"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "tmp-files-collection",
+        "type": "unix.file",
+        "selectors": {
+          "path": "/tmp",
+          "filename": {
+            "operation": "pattern match",
+            "value": "^.*$"
+          }
+        }
+      },
+      {
+        "id": "var-tmp-files-collection",
+        "type": "unix.file",
+        "selectors": {
+          "path": "/var/tmp",
+          "filename": {
+            "operation": "pattern match",
+            "value": "^.*$"
+          }
+        }
+      },
+      {
+        "id": "conf-files-collection",
+        "type": "unix.file",
+        "selectors": {
+          "path": {
+            "operation": "pattern match",
+            "value": "^/(?:tmp|var/tmp)$"
+          },
+          "filename": {
+            "operation": "pattern match",
+            "value": "^.*\\.conf$"
+          }
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "checks": [
+        "recursive-set-check"
+      ]
+    }
+  }
+}

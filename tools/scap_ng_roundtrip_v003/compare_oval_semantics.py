@@ -6,6 +6,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 OD="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+XSI="http://www.w3.org/2001/XMLSchema-instance"
 FAMS={
  "http://oval.mitre.org/XMLSchema/oval-definitions-5#independent":"independent",
  "http://oval.mitre.org/XMLSchema/oval-definitions-5#linux":"linux",
@@ -34,14 +35,32 @@ class Model:
         self.vars={e.attrib["id"]:e for sec in self.root.findall(f"{{{OD}}}variables") for e in sec}
         self.memo={}
 
-    def entity(self,e):
+    def field(self,e):
+        vr=e.attrib.get("var_ref")
+        base=("field",e.attrib["name"],
+              e.attrib.get("datatype","string"),
+              e.attrib.get("operation","equals"),
+              e.attrib.get("mask","false"),
+              (e.attrib.get("var_check","all") if vr else None),
+              e.attrib.get("entity_check","all"))
+        if vr:
+            return base+("var",self.variable(vr))
+        return base+("value",sval(e.text))
+
+    def entity(self,e,state_context=False):
         _,local=split(e.tag)
+        vr=e.attrib.get("var_ref")
         base=("entity",local,
               e.attrib.get("datatype","string"),
               e.attrib.get("operation","equals"),
-              e.attrib.get("var_check","all"),
-              e.attrib.get("entity_check","all"))
-        vr=e.attrib.get("var_ref")
+              e.attrib.get(f"{{{XSI}}}nil","false"),
+              e.attrib.get("mask","false"),
+              (e.attrib.get("var_check","all") if vr else None),
+              (e.attrib.get("entity_check","all") if state_context else e.attrib.get("entity_check")),
+              (e.attrib.get("check_existence","at_least_one_exists") if state_context else e.attrib.get("check_existence")))
+        fields=[c for c in e if split(c.tag)[1]=="field"]
+        if fields:
+            return base+("fields",tuple(self.field(f) for f in fields))
         if vr: return base+("var",self.variable(vr))
         return base+("value",sval(e.text))
 
@@ -64,6 +83,30 @@ class Model:
             return ("unique",tuple(self.component(c) for c in e))
         if local=="split":
             return ("split",e.attrib["delimiter"],tuple(self.component(c) for c in e))
+        if local=="begin":
+            return ("begin",e.attrib["character"],tuple(self.component(c) for c in e))
+        if local=="end":
+            return ("end",e.attrib["character"],tuple(self.component(c) for c in e))
+        if local=="escape_regex":
+            return ("escape_regex",tuple(self.component(c) for c in e))
+        if local=="substring":
+            return ("substring",e.attrib["substring_start"],e.attrib["substring_length"],
+                    tuple(self.component(c) for c in e))
+        if local=="time_difference":
+            return ("time_difference",e.attrib.get("format_1","year_month_day"),
+                    e.attrib.get("format_2","year_month_day"),
+                    tuple(self.component(c) for c in e))
+        if local=="regex_capture":
+            return ("regex_capture",e.attrib.get("pattern"),
+                    tuple(self.component(c) for c in e))
+        if local=="merge":
+            return ("merge",e.attrib.get("delimiter",""),
+                    e.attrib.get("sort","document"),
+                    e.attrib.get("order","ascending"),
+                    tuple(self.component(c) for c in e))
+        if local=="glob_to_regex":
+            return ("glob_to_regex",e.attrib.get("glob_noescape","false"),
+                    tuple(self.component(c) for c in e))
         raise ValueError(f"unsupported component {local}")
 
     def variable(self,vid):
@@ -74,6 +117,23 @@ class Model:
         self.memo[key]=("recursion",vid)
         if local=="constant_variable":
             out=head+(tuple(sval(x.text) for x in e.findall(f"{{{OD}}}value")),)
+        elif local=="external_variable":
+            possible_values=tuple(
+                (x.attrib["hint"],sval(x.text))
+                for x in e.findall(f"{{{OD}}}possible_value")
+            )
+            possible_restrictions=[]
+            for pr in e.findall(f"{{{OD}}}possible_restriction"):
+                restrictions=tuple(
+                    (rr.attrib["operation"],sval(rr.text))
+                    for rr in pr.findall(f"{{{OD}}}restriction")
+                )
+                possible_restrictions.append((
+                    pr.attrib["hint"],
+                    pr.attrib.get("operator","AND"),
+                    restrictions,
+                ))
+            out=head+(possible_values,tuple(possible_restrictions))
         elif local=="local_variable":
             kids=list(e)
             if len(kids)!=1: raise ValueError(f"{vid}: expected one expression")
@@ -87,14 +147,19 @@ class Model:
         e=self.states[sid]
         self.memo[key]=("recursion-state",sid)
         out=("state",typed(e,"_state"),e.attrib.get("operator","AND"),
-             tuple(self.entity(c) for c in e))
+             tuple(self.entity(c,True) for c in e))
         self.memo[key]=out; return out
 
     def setexpr(self,e):
+        nested=e.findall(f"{{{OD}}}set")
+        if nested:
+            return ("set",e.attrib.get("set_operator","UNION"),
+                    ("nested",tuple(self.setexpr(c) for c in nested)))
         return ("set",e.attrib.get("set_operator","UNION"),
-                tuple(self.obj(c.text.strip()) for c in e.findall(f"{{{OD}}}object_reference")),
-                tuple((f.attrib.get("action","exclude"),self.state(f.text.strip()))
-                      for f in e.findall(f"{{{OD}}}filter")))
+                ("leaf",
+                 tuple(self.obj(c.text.strip()) for c in e.findall(f"{{{OD}}}object_reference")),
+                 tuple((f.attrib.get("action","exclude"),self.state(f.text.strip()))
+                       for f in e.findall(f"{{{OD}}}filter"))))
 
     def obj(self,oid):
         key=("obj",oid)

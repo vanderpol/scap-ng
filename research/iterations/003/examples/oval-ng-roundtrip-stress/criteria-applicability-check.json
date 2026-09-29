@@ -1,0 +1,55 @@
+{
+  "fixture_version": 1,
+  "id": "criteria-applicability-check",
+  "source": {
+    "root_definition": "oval:scap-ng.roundtrip.source:def:90",
+    "note": "Schema-derived OVAL case proving applicability_check flag preservation in criteria.",
+    "local_path": "research/iterations/003/evidence/roundtrip-source-oval/criteria-applicability-check.xml"
+  },
+  "ng_semantics": {
+    "checks": [
+      {
+        "id": "platform-prerequisite-check",
+        "type": "unix.file",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "platform-marker-collection"
+      },
+      {
+        "id": "configuration-check",
+        "type": "unix.file",
+        "check_existence": "at_least_one_exists",
+        "check": "all",
+        "collection": "configuration-marker-collection"
+      }
+    ],
+    "collections": [
+      {
+        "id": "platform-marker-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": "/etc/os-release"
+        }
+      },
+      {
+        "id": "configuration-marker-collection",
+        "type": "unix.file",
+        "selectors": {
+          "filepath": "/etc/example.conf"
+        }
+      }
+    ],
+    "root": {
+      "operator": "AND",
+      "children": [
+        {
+          "check": "platform-prerequisite-check",
+          "applicability_check": true
+        },
+        {
+          "check": "configuration-check"
+        }
+      ]
+    }
+  }
+}
