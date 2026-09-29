@@ -156,10 +156,15 @@ def main() -> int:
     combined_platforms=load_yaml(root/"combined-rule"/"platforms.yaml")
     split_platforms=load_yaml(root/"split-policy-assessment-binding"/"platforms.yaml")
     expected_platform_definitions=canonical.get("platform_definitions",[])
+    expected_inventory=canonical.get("platform_inventory_assessments",[])
     if combined_platforms.get("platform_definitions")!=expected_platform_definitions:
         failures.append("combined platform definitions differ from canonical")
     if split_platforms.get("platform_definitions")!=expected_platform_definitions:
         failures.append("split platform definitions differ from canonical")
+    if combined_platforms.get("inventory_assessments",[])!=expected_inventory:
+        failures.append("combined platform inventory assessments differ from canonical")
+    if split_platforms.get("inventory_assessments",[])!=expected_inventory:
+        failures.append("split platform inventory assessments differ from canonical")
 
     combined_profiles=load_yaml(root/"combined-rule"/"profiles.yaml")
     split_profiles=load_yaml(root/"split-policy-assessment-binding"/"profiles.yaml")
@@ -205,6 +210,20 @@ def main() -> int:
         ansible_platforms=load_yaml(ansible_root/"platforms.yaml")
         if ansible_platforms.get("platform_definitions")!=expected_platform_definitions:
             failures.append("ansible-inspired platform definitions differ from canonical")
+        rendered_inventory=ansible_platforms.get("inventory_assessments",[])
+        if len(rendered_inventory)!=len(expected_inventory):
+            failures.append("ansible-inspired platform inventory count differs from canonical")
+        else:
+            for rendered,expected in zip(rendered_inventory,expected_inventory):
+                recovered=copy.deepcopy(rendered)
+                recovered["assessment"]=canonicalize_ansible_assessment(
+                    rendered.get("assessment") or {}
+                ) if rendered.get("assessment") is not None else None
+                if recovered!=expected:
+                    failures.append(
+                        "ansible-inspired platform inventory assessment differs from canonical"
+                    )
+                    break
         expected_app_assessment=(canonical.get("applicability") or {}).get("assessment")
         rendered_app=ansible_platforms.get("applicability_assessment")
         if expected_app_assessment is not None:
