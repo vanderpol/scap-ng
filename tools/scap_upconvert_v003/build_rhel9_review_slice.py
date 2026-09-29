@@ -1384,18 +1384,6 @@ def main():
 
         evidence = []
         diagnostics = []
-        if FULL_MODE:
-            for rec in selected:
-                reason = lowerability_reason(rec, oval_bundle)
-                if reason:
-                    add_diagnostic(
-                        diagnostics,
-                        "error",
-                        "RULE_NOT_FULLY_LOWERABLE",
-                        "Rule contains source semantics that the current v003 native lowerer cannot yet represent faithfully.",
-                        rule_id=rec["id"],
-                        detail=reason,
-                    )
         for item in unsupported_metadata:
             add_diagnostic(
                 diagnostics,
@@ -1422,6 +1410,14 @@ def main():
             if rec.get("vulnerability_id"):
                 rule_identifiers.append({"scheme": "disa-vulnerability-id", "value": rec["vulnerability_id"]})
 
+            normalized_remediation, remediation_error = normalized_fixes(rule)
+            if FULL_MODE and remediation_error:
+                add_diagnostic(
+                    diagnostics, "error", "RULE_REMEDIATION_NOT_LOWERABLE",
+                    "Source remediation could not be represented faithfully; remediation was not emitted.",
+                    rule_id=rid, detail=remediation_error,
+                )
+
             rule_doc = {"rule": {
                 "id": rid,
                 "version": rec.get("version"),
@@ -1437,14 +1433,44 @@ def main():
                 "warnings": content_fields.get("warnings", []),
                 "identifiers": rule_identifiers,
                 "references": content_fields.get("references", []),
-                "requires": [],
-                "conflicts": [],
+                "requires": [
+                    source_to_native.get(value, value)
+                    for value in rec["requires"]
+                ],
+                "conflicts": [
+                    source_to_native.get(value, value)
+                    for value in rec["conflicts"]
+                ],
                 "applicability": [],
                 "parameters": {},
-                "remediation": content_fields.get("remediation"),
+                "remediation": (
+                    None if (FULL_MODE and remediation_error)
+                    else content_fields.get("remediation")
+                ),
                 "checks": {},
                 "default_check": None,
             }}
+
+            unresolved_requires = [
+                value for value in rule_doc["rule"]["requires"]
+                if value not in selected_ids
+            ]
+            unresolved_conflicts = [
+                value for value in rule_doc["rule"]["conflicts"]
+                if value not in selected_ids
+            ]
+            if FULL_MODE and unresolved_requires:
+                add_diagnostic(
+                    diagnostics, "error", "RULE_REQUIRES_TARGET_UNRESOLVED",
+                    "One or more Rule dependency targets could not be resolved to Benchmark Rule identities.",
+                    rule_id=rid, detail=unresolved_requires,
+                )
+            if FULL_MODE and unresolved_conflicts:
+                add_diagnostic(
+                    diagnostics, "error", "RULE_CONFLICT_TARGET_UNRESOLVED",
+                    "One or more Rule conflict targets could not be resolved to Benchmark Rule identities.",
+                    rule_id=rid, detail=unresolved_conflicts,
+                )
 
             if rec["platforms"]:
                 if len(rec["platforms"]) != 1:
