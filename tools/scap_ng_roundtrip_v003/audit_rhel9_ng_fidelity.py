@@ -63,6 +63,59 @@ def disa_tag(description, tag):
     m=re.search(rf"<{re.escape(tag)}>(.*?)</{re.escape(tag)}>",description,re.S|re.I)
     return norm_text(m.group(1)) if m else None
 
+def tree_children(node,name):
+    return [x for x in node.get("children",[]) if x.get("name")==name]
+
+def tree_text(node):
+    if node is None:
+        return None
+    parts=[]
+    if node.get("text"):
+        parts.append(node["text"])
+    for child in node.get("children",[]):
+        v=tree_text(child)
+        if v: parts.append(v)
+    return norm_text(" ".join(parts))
+
+def tree_localized(node,name):
+    out=[]
+    for x in tree_children(node,name):
+        out.append({
+            "text":tree_text(x),
+            "language":(x.get("attributes") or {}).get("lang"),
+        })
+    return out
+
+def source_benchmark_metadata(tree):
+    out={}
+    for md in tree_children(tree,"metadata"):
+        for x in md.get("children",[]):
+            key=x.get("name")
+            value=tree_text(x)
+            if value is not None:
+                out.setdefault(key,[]).append(value)
+    return out
+
+def normalize_front(items):
+    out=[]
+    for item in items:
+        value=item.get("text")
+        if value:
+            value=re.sub(r"enhanced with OCIL manual questions",
+                         "enhanced with manual assessment procedures",value,flags=re.I)
+        out.append({"text":value,"language":item.get("language")})
+    return out
+
+def normalize_rear(items):
+    out=[]
+    for item in items:
+        value=item.get("text")
+        if value:
+            value=re.sub(r"\s*filename:--:[^\s]+-xccdf\.xml","",value,flags=re.I)
+            value=norm_text(value)
+        out.append({"text":value,"language":item.get("language")})
+    return out
+
 def native_rules(root: Path):
     out={}
     for p in sorted((root/"rules").glob("*.yaml")):
@@ -108,6 +161,86 @@ def main():
 
     def issue(kind, **kw):
         issues.append({"kind":kind,**kw})
+
+    # Benchmark descriptive/publication metadata. These fields do not change
+    # assessment truth, but they are part of the benchmark information contract.
+    sb=src["benchmark"]
+    stree=sb.get("source_tree") or {}
+    if bench.get("title") != tree_localized(stree,"title"):
+        issue("benchmark_title_mismatch",source=tree_localized(stree,"title"),ng=bench.get("title"))
+    if bench.get("description") != tree_localized(stree,"description"):
+        issue("benchmark_description_mismatch",source=tree_localized(stree,"description"),ng=bench.get("description"))
+    source_lang=(stree.get("attributes") or {}).get("lang")
+    if bench.get("language") != source_lang:
+        issue("benchmark_language_mismatch",source=source_lang,ng=bench.get("language"))
+
+    source_status=[]
+    for x in tree_children(stree,"status"):
+        source_status.append({"value":tree_text(x),"date":(x.get("attributes") or {}).get("date")})
+    if bench.get("status") != source_status:
+        issue("benchmark_status_mismatch",source=source_status,ng=bench.get("status"))
+
+    source_version_nodes=tree_children(stree,"version")
+    if source_version_nodes:
+        sv=source_version_nodes[0]
+        expected_version={
+            "value":tree_text(sv),
+            "time":(sv.get("attributes") or {}).get("time"),
+            "update":(sv.get("attributes") or {}).get("update"),
+        }
+        if bench.get("version") != expected_version:
+            issue("benchmark_version_mismatch",source=expected_version,ng=bench.get("version"))
+
+    source_refs=[]
+    for x in tree_children(stree,"reference"):
+        source_refs.append({"text":tree_text(x),"url":(x.get("attributes") or {}).get("href")})
+    if bench.get("references") != source_refs:
+        issue("benchmark_reference_mismatch",source=source_refs,ng=bench.get("references"))
+
+    source_notices=[]
+    for x in tree_children(stree,"notice"):
+        attrs=x.get("attributes") or {}
+        source_notices.append({
+            "id":re.sub(r"[^A-Za-z0-9_.-]+","-",attrs.get("id") or "notice").strip("-"),
+            "text":tree_text(x),
+            "language":attrs.get("lang"),
+        })
+    if bench.get("notices") != source_notices:
+        issue("benchmark_notice_mismatch",source=source_notices,ng=bench.get("notices"))
+
+    expected_front=normalize_front(tree_localized(stree,"front-matter"))
+    if bench.get("front_matter") != expected_front:
+        issue("benchmark_front_matter_mismatch",source_normalized=expected_front,ng=bench.get("front_matter"))
+
+    expected_rear=normalize_rear(tree_localized(stree,"rear-matter"))
+    if bench.get("rear_matter") != expected_rear:
+        issue("benchmark_rear_matter_mismatch",source_normalized=expected_rear,ng=bench.get("rear_matter"))
+
+    source_blocks=[]
+    for x in tree_children(stree,"plain-text"):
+        attrs=x.get("attributes") or {}
+        source_blocks.append({
+            "id":re.sub(r"[^A-Za-z0-9_.-]+","-",attrs.get("id") or "text").strip("-"),
+            "text":tree_text(x),
+        })
+    if bench.get("text_blocks") != source_blocks:
+        issue("benchmark_text_blocks_mismatch",source=source_blocks,ng=bench.get("text_blocks"))
+
+    expected_metadata=source_benchmark_metadata(stree)
+    # Empty namespace-specific metadata is ignored exactly as the converter does.
+    if bench.get("metadata") != expected_metadata:
+        issue("benchmark_metadata_mismatch",source=expected_metadata,ng=bench.get("metadata"))
+
+    source_models=[]
+    for x in tree_children(stree,"model"):
+        params={}
+        for pnode in tree_children(x,"param"):
+            attrs=pnode.get("attributes") or {}
+            if attrs.get("name"):
+                params[attrs["name"]]=attrs.get("value") or tree_text(pnode)
+        source_models.append({"system":tree_text(x),"parameters":params})
+    if bench.get("scoring",[]) != source_models:
+        issue("benchmark_scoring_mismatch",source=source_models,ng=bench.get("scoring",[]))
 
     # Rule identity + core policy surface.
     expected_rules={}
