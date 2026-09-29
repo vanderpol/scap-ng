@@ -1,0 +1,43 @@
+assessment:
+  id: SV-257924.automated
+  version: 1
+  assessment_title: RHEL-09-232220 - RHEL 9 audit tools must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    audit-tools-owned-by-root:
+      test_title: audit tools are owned by root
+      collect:
+        object_title: audit tools
+        capability: unix.file
+        select:
+          filepath:
+            variable_check: at least one
+            datatype: string
+            value:
+              variable: audit-tools
+      assert:
+        state_title: owned by root
+        existence: all_exist
+        check: all
+        state:
+          field: user_id
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    check: audit-tools-owned-by-root
+  variables:
+    audit-tools:
+      title: audit tools
+      datatype: string
+      expression:
+        literal:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/rsyslogd
+        - /sbin/augenrules

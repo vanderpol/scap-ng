@@ -1,0 +1,50 @@
+assessment:
+  id: SV-258166.automated
+  version: 1
+  assessment_title: RHEL-09-653085 - RHEL 9 audit log directory must be owned by root to prevent unauthorized
+    read access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    audit-log-directories-owned-by-root:
+      test_title: audit log directories are owned by root
+      collect:
+        object_title: Audit log directory
+        capability: unix.file
+        select:
+          path:
+            variable: audit-data-directory-from-etc-audit-auditd-conf
+      assert:
+        state_title: owned by root
+        existence: all_exist
+        check: all
+        state:
+          field: user_id
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    check: audit-log-directories-owned-by-root
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf:
+      title: audit data directory from /etc/audit/auditd.conf
+      datatype: string
+      expression:
+        object_values:
+          collect:
+            object_title: null
+            capability: independent.textfilecontent54
+            select:
+              filepath: /etc/audit/auditd.conf
+              pattern:
+                operation: pattern match
+                datatype: string
+                value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+              instance:
+                operation: greater than or equal
+                datatype: int
+                value: '1'
+            behaviors:
+              ignore_case: 'true'
+          field: subexpression

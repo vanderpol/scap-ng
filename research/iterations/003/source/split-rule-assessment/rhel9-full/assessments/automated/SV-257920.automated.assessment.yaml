@@ -1,0 +1,59 @@
+assessment:
+  id: SV-257920.automated
+  version: 13
+  assessment_title: RHEL 9 library files must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    system-library-files-owned-by-root:
+      test_title: System Library files are owned by root
+      collect:
+        object_title: All system-library files not owned by root
+        capability: unix.file
+        select:
+          path:
+            variable_check: only one
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            operation: pattern match
+            value: \.so(\.\d+)*$
+        filters:
+        - action: exclude
+          match:
+            field: user_id
+            operation: equals
+            value: '0'
+            datatype: int
+          state_title: owned by root
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: symbolic link
+          state_title: symbolic links
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: directory
+        behaviors:
+          recurse_direction: down
+      assert:
+        state_title: null
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    check: system-library-files-owned-by-root
+  variables:
+    system-wide-shared-library-files-directories:
+      title: system-wide shared library files directories
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64

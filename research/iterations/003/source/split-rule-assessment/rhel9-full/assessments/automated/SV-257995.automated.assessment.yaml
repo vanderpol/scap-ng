@@ -1,0 +1,55 @@
+assessment:
+  id: SV-257995.automated
+  version: 2
+  assessment_title: RHEL-09-255095 - RHEL 9 must be configured so that all network connections associated
+    with SSH traffic terminate after becoming unresponsive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-ssh-sshd-config-clientalivecountmax-1:
+      test_title: /etc/ssh/sshd_config:ClientAliveCountMax = 1
+      collect:
+        object_title: all sshd_config and sshd_config.d/* files
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/ssh/sshd_config
+                pattern:
+                  operation: pattern match
+                  value: ^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/ssh/sshd_config.d
+                filename:
+                  operation: pattern match
+                  value: .+
+                pattern:
+                  operation: pattern match
+                  value: ^\s*(?i)ClientAliveCountMax(?-i)\s+"?(\d+)"?\s*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '1'
+          datatype: int
+  evaluate:
+    check: etc-ssh-sshd-config-clientalivecountmax-1

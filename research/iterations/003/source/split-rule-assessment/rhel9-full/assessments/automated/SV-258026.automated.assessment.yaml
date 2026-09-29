@@ -1,0 +1,79 @@
+assessment:
+  id: SV-258026.automated
+  version: 2
+  assessment_title: RHEL-09-271080 - RHEL 9 must prevent a user from overriding the session lock-delay
+    setting for the graphical user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    dconf-user-database-s-exist:
+      test_title: dconf user database(s) exist
+      collect:
+        object_title: dconf user databases
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/dconf/profile/user
+          pattern:
+            operation: pattern match
+            value: ^system-db:(\S+)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+    org-gnome-desktop-screensaver-lock-delay-in-dconf-user-database:
+      test_title: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories exists
+      collect:
+        object_title: /org/gnome/desktop/screensaver/lock-delay in dconf user database locks directories
+        capability: independent.textfilecontent54
+        select:
+          path:
+            variable_check: at least one
+            value:
+              variable: dconf-user-database-locks-directories
+          filename:
+            operation: pattern match
+            value: .*
+          pattern:
+            operation: pattern match
+            value: ^/org/gnome/desktop/screensaver/lock-delay$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: dconf-user-database-s-exist
+    - check: org-gnome-desktop-screensaver-lock-delay-in-dconf-user-database
+  variables:
+    dconf-user-database-locks-directories:
+      title: dconf user database locks directories
+      datatype: string
+      expression:
+        concat:
+        - literal: /etc/dconf/db/
+        - object_values:
+            collect:
+              object_title: dconf user databases
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/dconf/profile/user
+                pattern:
+                  operation: pattern match
+                  value: ^system-db:(\S+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+            field: subexpression
+        - literal: .d/locks

@@ -1,0 +1,81 @@
+assessment:
+  id: SV-258051.automated
+  version: 2
+  assessment_title: RHEL-09-411060 - All RHEL 9 local interactive users must have a home directory assigned
+    in the /etc/passwd file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    check-users-without-home-directory-not-defined:
+      test_title: check for users without a home directory not defined
+      collect:
+        object_title: only non-system users (uid>999) home-dirs
+        capability: unix.password
+        set:
+          operator: complement
+          members:
+          - collect:
+              object_title: Users with an username
+              capability: unix.password
+              select:
+                username:
+                  operation: pattern match
+                  datatype: string
+                  value: '[\w]+'
+          filters:
+          - action: exclude
+            match:
+              field: user_id
+              operation: less than
+              value: '1000'
+              entity_check: all
+              datatype: int
+            state_title: only uids < 1000
+      assert:
+        state_title: only users with the home directory defined
+        existence: all_exist
+        check: all
+        state:
+          field: home_dir
+          operation: pattern match
+          value: .+
+          datatype: string
+    check-if-root-s-home-directory-not-defined:
+      test_title: check if root's home directory is not defined
+      collect:
+        object_title: only root users (uid=0) home-dirs
+        capability: unix.password
+        set:
+          operator: complement
+          members:
+          - collect:
+              object_title: Users with an username
+              capability: unix.password
+              select:
+                username:
+                  operation: pattern match
+                  datatype: string
+                  value: '[\w]+'
+          filters:
+          - action: exclude
+            match:
+              field: user_id
+              operation: greater than
+              value: '0'
+              entity_check: all
+              datatype: int
+            state_title: only uids > 0
+      assert:
+        state_title: only users with the home directory defined
+        existence: all_exist
+        check: all
+        state:
+          field: home_dir
+          operation: pattern match
+          value: .+
+          datatype: string
+  evaluate:
+    all:
+    - check: check-users-without-home-directory-not-defined
+    - check: check-if-root-s-home-directory-not-defined

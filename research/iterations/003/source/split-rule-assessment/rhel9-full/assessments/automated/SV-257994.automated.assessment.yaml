@@ -1,0 +1,95 @@
+assessment:
+  id: SV-257994.automated
+  version: 1
+  assessment_title: RHEL-09-255090 - RHEL 9 must force a frequent session key renegotiation for SSH connections
+    to the server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-ssh-sshd-config-rekeylimit-max-data-time-greater-than:
+      test_title: /etc/ssh/sshd_config:RekeyLimit max data and time are greater than zero.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/ssh/sshd_config
+          pattern:
+            operation: pattern match
+            value: ^\s*RekeyLimit\s+\d+[kmg]?\s+\d+[smdhw]?\s*
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        state_title: null
+        existence: all_exist
+        check: all
+        state:
+          field: text
+          operation: pattern match
+          value: ^(?i)\s*RekeyLimit\s+[1-9][0-9]*[kmg]?\s+([1-9][0-9]*[smhdw]?)+\s*$
+          datatype: string
+    sshd-config-includes-sshd-config-d:
+      test_title: sshd_config includes sshd_config.d
+      collect:
+        object_title: sshd_config includes
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            datatype: string
+            value: /etc/ssh/sshd_config
+          pattern:
+            operation: pattern match
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: equals
+          value: /etc/ssh/sshd_config.d/*.conf
+          datatype: string
+    etc-ssh-sshd-config-d-rekeylimit-max-data-time-greater:
+      test_title: /etc/ssh/sshd_config.d:RekeyLimit max data and time are greater than zero.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/ssh/sshd_config.d
+          filename:
+            operation: pattern match
+            value: ^.+\.conf$
+          pattern:
+            operation: pattern match
+            value: ^\s*RekeyLimit\s+\d+[kmg]?\s+\d+[smdhw]?\s*
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        state_title: null
+        existence: all_exist
+        check: all
+        state:
+          field: text
+          operation: pattern match
+          value: ^(?i)\s*RekeyLimit\s+[1-9][0-9]*[kmg]?\s+([1-9][0-9]*[smhdw]?)+\s*$
+          datatype: string
+  evaluate:
+    any:
+    - check: etc-ssh-sshd-config-rekeylimit-max-data-time-greater-than
+    - all:
+      - check: sshd-config-includes-sshd-config-d
+      - check: etc-ssh-sshd-config-d-rekeylimit-max-data-time-greater

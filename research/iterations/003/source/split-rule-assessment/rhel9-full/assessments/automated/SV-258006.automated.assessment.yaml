@@ -1,0 +1,91 @@
+assessment:
+  id: SV-258006.automated
+  version: 2
+  assessment_title: RHEL-09-255150 - RHEL 9 SSH daemon must not allow known hosts authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-ssh-sshd-config-ignoreuserknownhosts-yes:
+      test_title: /etc/ssh/sshd_config:IgnoreUserKnownHosts == yes
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/ssh/sshd_config
+          pattern:
+            operation: pattern match
+            value: ^\s*(?i)IgnoreUserKnownHosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^(yes|"yes")$
+          datatype: string
+    sshd-config-includes-sshd-config-d:
+      test_title: sshd_config includes sshd_config.d
+      collect:
+        object_title: sshd_config includes
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            datatype: string
+            value: /etc/ssh/sshd_config
+          pattern:
+            operation: pattern match
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: equals
+          value: /etc/ssh/sshd_config.d/*.conf
+          datatype: string
+    etc-ssh-sshd-config-d-ignoreuserknownhosts-yes:
+      test_title: /etc/ssh/sshd_config.d:IgnoreUserKnownHosts == yes
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/ssh/sshd_config.d
+          filename:
+            operation: pattern match
+            datatype: string
+            value: ^.+\.conf$
+          pattern:
+            operation: pattern match
+            value: ^\s*(?i)IgnoreUserKnownHosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^(yes|"yes")$
+          datatype: string
+  evaluate:
+    any:
+    - check: etc-ssh-sshd-config-ignoreuserknownhosts-yes
+    - all:
+      - check: sshd-config-includes-sshd-config-d
+      - check: etc-ssh-sshd-config-d-ignoreuserknownhosts-yes

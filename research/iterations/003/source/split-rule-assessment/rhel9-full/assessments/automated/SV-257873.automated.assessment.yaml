@@ -1,0 +1,85 @@
+assessment:
+  id: SV-257873.automated
+  version: 1
+  assessment_title: RHEL-09-231160 - RHEL 9 must mount /var/log/audit with the nodev option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    var-log-audit-mounted-nodev-option:
+      test_title: /var/log/audit is mounted with the nodev option
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /var/log/audit
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: nodev
+          entity_check: at least one
+    var-log-audit-configured-nodev-option-in-etc-fstab:
+      test_title: /var/log/audit is configured with the nodev option in /etc/fstab
+      collect:
+        object_title: null
+        capability: independent.variable
+        select:
+          var_ref:
+            variable: mount-options-var-log-audit-in-etc-fstab
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: nodev
+          entity_check: at least one
+    var-log-audit-configured-in-etc-fstab:
+      test_title: /var/log/audit is configured in /etc/fstab
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance:
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: var-log-audit-mounted-nodev-option
+    - check: var-log-audit-configured-nodev-option-in-etc-fstab
+    - check: var-log-audit-configured-in-etc-fstab
+  variables:
+    mount-options-var-log-audit-in-etc-fstab:
+      title: Mount options for /var/log/audit in /etc/fstab
+      datatype: string
+      expression:
+        split:
+          value:
+            object_values:
+              collect:
+                object_title: null
+                capability: independent.textfilecontent54
+                select:
+                  filepath: /etc/fstab
+                  pattern:
+                    operation: pattern match
+                    value: ^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+                  instance:
+                    datatype: int
+                    value: '1'
+              field: subexpression
+          delimiter: ','

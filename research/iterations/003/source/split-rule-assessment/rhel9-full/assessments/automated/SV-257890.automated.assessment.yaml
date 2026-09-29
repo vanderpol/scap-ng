@@ -1,0 +1,90 @@
+assessment:
+  id: SV-257890.automated
+  version: 2
+  assessment_title: RHEL-09-232050 - All RHEL 9 local interactive user home directories must have mode
+    0750 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    all-local-interactive-user-home-directories-0750-or-less:
+      test_title: All local interactive user home directories are 0750 or less
+      collect:
+        object_title: home directories of local interactive users without nologin
+        capability: unix.file
+        select:
+          path:
+            variable_check: at least one
+            value:
+              variable: home-directories-local-interactive-users-without-nologin
+      assert:
+        state_title: mode 0750 or less permissive
+        existence: any_exist
+        check: all
+        state:
+          all:
+          - field: suid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sgid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sticky
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+  evaluate:
+    check: all-local-interactive-user-home-directories-0750-or-less
+  variables:
+    home-directories-local-interactive-users-without-nologin:
+      title: home directories of local interactive users without nologin
+      datatype: string
+      expression:
+        object_values:
+          collect:
+            object_title: Local interactive users without nologin
+            capability: unix.password
+            select:
+              username:
+                operation: pattern match
+                value: .*
+            filters:
+            - action: exclude
+              match:
+                field: login_shell
+                operation: pattern match
+                value: ^.*nologin.*$
+              state_title: nologin shell
+            - action: exclude
+              match:
+                field: user_id
+                operation: less than
+                value: '1000'
+                datatype: int
+              state_title: uid < 1000
+            - action: exclude
+              match:
+                field: user_id
+                operation: equals
+                value: '65534'
+                datatype: int
+              state_title: uid = 65534 (nobody)
+          field: home_dir

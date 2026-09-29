@@ -1,0 +1,51 @@
+assessment:
+  id: SV-258174.automated
+  version: 13
+  assessment_title: RHEL 9 must have mail aliases to notify the information system security officer (ISSO)
+    and system administrator (SA) (at a minimum) in the event of an audit processing failure.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    confirm-postfix-configured-notify-in-event-audit-processing-failure:
+      test_title: Confirm postfix is configured to notify in the event of an audit processing failure.
+      collect:
+        object_title: Confirm postfix alias map(s) exist.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command:
+            variable: retrieve-location-alias-map-construct-postmap-query
+      assert:
+        state_title: Confirm an alias is returned by the postconf query.
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: exit_status
+            operation: equals
+            value: '0'
+            datatype: int
+          - field: stdout_line
+            operation: pattern match
+            value: \w+
+  evaluate:
+    check: confirm-postfix-configured-notify-in-event-audit-processing-failure
+  variables:
+    retrieve-location-alias-map-construct-postmap-query:
+      title: Retrieve location of alias map and construct postmap query.
+      datatype: string
+      expression:
+        concat:
+        - literal: postmap -q root
+        - object_values:
+            collect:
+              object_title: Retrive location of alias maps.
+              capability: independent.shellcommand
+              select:
+                shell: bash
+                command: postconf alias_maps
+                pattern:
+                  operation: pattern match
+                  value: ^\s*alias_maps\s+=\s+(hash:.*)$
+            field: subexpression

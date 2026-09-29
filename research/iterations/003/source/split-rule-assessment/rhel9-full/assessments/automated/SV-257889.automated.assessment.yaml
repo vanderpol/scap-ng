@@ -1,0 +1,206 @@
+assessment:
+  id: SV-257889.automated
+  version: 1
+  assessment_title: RHEL-09-232045 - All RHEL 9 local initialization files must have mode 0740 or less
+    permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    local-initialization-files-non-system-users-have-mode-0740-or:
+      test_title: Local initialization files for non-system users have mode 0740 or less permissive.
+      collect:
+        object_title: local initialization files of non-system users.
+        capability: unix.file
+        select:
+          path:
+            variable_check: at least one
+            value:
+              variable: home-directories-non-system-users
+          filename:
+            operation: pattern match
+            value: ^\.[^\s\.]+
+        filters:
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: directory
+        behaviors:
+          max_depth: '1'
+          recurse: symlinks
+          recurse_direction: down
+      assert:
+        state_title: mode 0740 or less permissive
+        existence: any_exist
+        check: all
+        state:
+          all:
+          - field: suid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sgid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sticky
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+    local-initialization-files-root-have-mode-0740-or-less-permissive:
+      test_title: Local initialization files for root have mode 0740 or less permissive.
+      collect:
+        object_title: local initialization files of root user.
+        capability: unix.file
+        select:
+          path:
+            variable_check: at least one
+            value:
+              variable: home-directory-root-user
+          filename:
+            operation: pattern match
+            value: ^\.[^\s\.]+
+        filters:
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: directory
+        behaviors:
+          max_depth: '1'
+          recurse: symlinks
+          recurse_direction: down
+      assert:
+        state_title: mode 0740 or less permissive
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: suid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sgid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sticky
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oread
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: oexec
+            operation: equals
+            value: 'false'
+            datatype: boolean
+  evaluate:
+    all:
+    - check: local-initialization-files-non-system-users-have-mode-0740-or
+    - check: local-initialization-files-root-have-mode-0740-or-less-permissive
+  variables:
+    home-directories-non-system-users:
+      title: The home directories of non-system users.
+      datatype: string
+      expression:
+        object_values:
+          collect:
+            object_title: only non-system users (uid>999) home-dirs excluding root directory
+            capability: unix.password
+            set:
+              operator: complement
+              members:
+              - collect:
+                  object_title: Users with an username
+                  capability: unix.password
+                  select:
+                    username:
+                      operation: pattern match
+                      datatype: string
+                      value: '[\w]+'
+              filters:
+              - action: exclude
+                match:
+                  field: user_id
+                  operation: less than
+                  value: '1000'
+                  entity_check: all
+                  datatype: int
+                state_title: only uids < 1000
+              - action: exclude
+                match:
+                  field: home_dir
+                  operation: equals
+                  value: /
+                state_title: root directory
+          field: home_dir
+    home-directory-root-user:
+      title: The home directory of the root user.
+      datatype: string
+      expression:
+        object_values:
+          collect:
+            object_title: only root users (uid=0) home-dirs excluding root directory
+            capability: unix.password
+            set:
+              operator: complement
+              members:
+              - collect:
+                  object_title: Users with an username
+                  capability: unix.password
+                  select:
+                    username:
+                      operation: pattern match
+                      datatype: string
+                      value: '[\w]+'
+              filters:
+              - action: exclude
+                match:
+                  field: user_id
+                  operation: greater than
+                  value: '0'
+                  entity_check: all
+                  datatype: int
+                state_title: only uids > 0
+              - action: exclude
+                match:
+                  field: home_dir
+                  operation: equals
+                  value: /
+                state_title: root directory
+          field: home_dir

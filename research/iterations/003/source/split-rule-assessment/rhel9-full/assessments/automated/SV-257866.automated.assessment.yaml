@@ -1,0 +1,85 @@
+assessment:
+  id: SV-257866.automated
+  version: 1
+  assessment_title: RHEL-09-231125 - RHEL 9 must mount /tmp with the nodev option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    tmp-mounted-nodev-option:
+      test_title: /tmp is mounted with the nodev option
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /tmp
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: nodev
+          entity_check: at least one
+    tmp-configured-nodev-option-in-etc-fstab:
+      test_title: /tmp is configured with the nodev option in /etc/fstab
+      collect:
+        object_title: null
+        capability: independent.variable
+        select:
+          var_ref:
+            variable: mount-options-tmp-in-etc-fstab
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: nodev
+          entity_check: at least one
+    tmp-configured-in-etc-fstab:
+      test_title: /tmp is configured in /etc/fstab
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s]+\s+/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance:
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: tmp-mounted-nodev-option
+    - check: tmp-configured-nodev-option-in-etc-fstab
+    - check: tmp-configured-in-etc-fstab
+  variables:
+    mount-options-tmp-in-etc-fstab:
+      title: Mount options for /tmp in /etc/fstab
+      datatype: string
+      expression:
+        split:
+          value:
+            object_values:
+              collect:
+                object_title: null
+                capability: independent.textfilecontent54
+                select:
+                  filepath: /etc/fstab
+                  pattern:
+                    operation: pattern match
+                    value: ^\s*[^#\s]+\s+/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+                  instance:
+                    datatype: int
+                    value: '1'
+              field: subexpression
+          delimiter: ','

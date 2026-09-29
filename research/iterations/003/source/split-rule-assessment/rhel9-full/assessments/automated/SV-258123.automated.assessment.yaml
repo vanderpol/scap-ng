@@ -1,0 +1,60 @@
+assessment:
+  id: SV-258123.automated
+  version: 2
+  assessment_title: RHEL-09-611170 - RHEL 9 must implement certificate status checking for multifactor
+    authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    sssd-config-certificate-verification-ocsp-dgst-sha512:
+      test_title: 'sssd config: certificate_verification: ocsp_dgst=sha512'
+      collect:
+        object_title: 'sssd config: certificate_verification'
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: 'sssd.conf: certificate_verification'
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  datatype: string
+                  value: /etc/sssd/sssd.conf
+                pattern:
+                  operation: pattern match
+                  value: ^\s*certificate_verification\s*=\s*(.*)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: '/etc/sssd/conf.d/*.conf: certificate_verification'
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  datatype: string
+                  value: /etc/sssd/conf.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  value: ^[^.].*\.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^\s*certificate_verification\s*=\s*(.*)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (?i)(^|,)ocsp_dgst=sha512(,|$)
+          datatype: string
+  evaluate:
+    check: sssd-config-certificate-verification-ocsp-dgst-sha512

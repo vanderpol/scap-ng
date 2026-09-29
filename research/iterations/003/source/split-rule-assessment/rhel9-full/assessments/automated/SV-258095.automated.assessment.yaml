@@ -1,0 +1,49 @@
+assessment:
+  id: SV-258095.automated
+  version: 13
+  assessment_title: RHEL 9 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth
+    file.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    verify-pam-faillock-so-module-present-in-etc-pam-d:
+      test_title: Verify the pam_faillock.so module is present in the '/etc/pam.d/system-auth' file.
+      collect:
+        object_title: 'Retrieve configuration from file: /etc/pam.d/system-auth.'
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/pam.d/system-auth
+          pattern:
+            operation: pattern match
+            value: .+
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'false'
+          multiline: 'true'
+          singleline: 'true'
+      assert:
+        state_title: Check that auth required pam_faillock.so preath line exists. / Check that auth required
+          pam_faillock.so authfail line exists. / Check that account required pam_faillock.so line exists.
+          / Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: text
+            operation: pattern match
+            value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth\b
+          - field: text
+            operation: pattern match
+            value: \n\s*auth\s+required\s+pam_faillock.so\s+authfail\b
+          - field: text
+            operation: pattern match
+            value: \n\s*account\s+required\s+pam_faillock.so\b
+          - field: text
+            operation: pattern match
+            value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
+  evaluate:
+    check: verify-pam-faillock-so-module-present-in-etc-pam-d

@@ -1,0 +1,100 @@
+assessment:
+  id: SV-257884.automated
+  version: 13
+  assessment_title: RHEL 9 library files must have mode 755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    system-library-files-have-mode-755-or-less-permissive-gwrite:
+      test_title: System Library files have mode 755 or less permissive (gwrite should be = false)
+      collect:
+        object_title: All files in system Library with mode 755 (gwrite should be = false)
+        capability: unix.file
+        select:
+          path:
+            variable_check: only one
+            datatype: string
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            operation: pattern match
+            datatype: string
+            value: .*
+        filters:
+        - action: exclude
+          match:
+            field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          state_title: Mode 755 or less permissive (gwrite should be = false)
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: symbolic link
+          state_title: symbolic links
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: directory
+      assert:
+        state_title: null
+        existence: none_exist
+        check: all
+        state: null
+    system-library-files-have-mode-755-or-less-permissive-owrite:
+      test_title: System Library files have mode 755 or less permissive (owrite should be = false)
+      collect:
+        object_title: All files in system Library with mode 755 (owrite should be = false)
+        capability: unix.file
+        select:
+          path:
+            variable_check: only one
+            datatype: string
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            operation: pattern match
+            datatype: string
+            value: .*
+        filters:
+        - action: exclude
+          match:
+            field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          state_title: Mode 755 or less permissive (owrite should be = false)
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: symbolic link
+          state_title: symbolic links
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: directory
+      assert:
+        state_title: null
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: system-library-files-have-mode-755-or-less-permissive-gwrite
+    - check: system-library-files-have-mode-755-or-less-permissive-owrite
+  variables:
+    system-wide-shared-library-files-directories:
+      title: system-wide shared library files directories
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64

@@ -1,0 +1,64 @@
+assessment:
+  id: SV-257918.automated
+  version: 13
+  assessment_title: RHEL 9 system commands must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    files-in-system-command-directories-owned-by-root:
+      test_title: Files in System command directories are owned by root
+      collect:
+        object_title: All system-command files not owned by root
+        capability: unix.file
+        select:
+          path:
+            variable_check: only one
+            datatype: string
+            value:
+              variable: system-command-directories
+          filename:
+            operation: pattern match
+            datatype: string
+            value: .*
+        filters:
+        - action: exclude
+          match:
+            field: user_id
+            operation: equals
+            value: '0'
+            datatype: int
+          state_title: owned by root
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: symbolic link
+          state_title: symbolic links
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: directory
+        behaviors:
+          recurse_direction: down
+      assert:
+        state_title: null
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    check: files-in-system-command-directories-owned-by-root
+  variables:
+    system-command-directories:
+      title: system command directories
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/libexec
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin

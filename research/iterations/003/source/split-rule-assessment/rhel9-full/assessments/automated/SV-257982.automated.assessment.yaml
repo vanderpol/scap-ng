@@ -1,0 +1,54 @@
+assessment:
+  id: SV-257982.automated
+  version: 1
+  assessment_title: RHEL-09-255030 - RHEL 9 must log SSH connection attempts and failures to the server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-ssh-sshd-config-loglevel-verbose:
+      test_title: /etc/ssh/sshd_config:LogLevel == VERBOSE
+      collect:
+        object_title: all sshd_config and sshd_config.d/* files
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: Pull value of /etc/ssh/sshd_config:LogLevel
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/ssh/sshd_config
+                pattern:
+                  operation: pattern match
+                  value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: Pull value of /etc/ssh/sshd_config.d:LogLevel
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/ssh/sshd_config.d
+                filename:
+                  operation: pattern match
+                  value: .+
+                pattern:
+                  operation: pattern match
+                  value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        state_title: LogLevel value is set to VERBOSE
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^VERBOSE$|^"VERBOSE"$
+          datatype: string
+  evaluate:
+    check: etc-ssh-sshd-config-loglevel-verbose

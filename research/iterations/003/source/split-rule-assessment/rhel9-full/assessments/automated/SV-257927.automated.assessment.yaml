@@ -1,0 +1,33 @@
+assessment:
+  id: SV-257927.automated
+  version: 1
+  assessment_title: RHEL-09-232235 - RHEL 9 cron configuration files directory must be group-owned by
+    root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    cron-configuration-files-group-owned-by-root:
+      test_title: cron configuration files are group-owned by root
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          path: /etc
+          filename:
+            operation: pattern match
+            value: ^cron.*
+        behaviors:
+          max_depth: '-1'
+          recurse_direction: down
+      assert:
+        state_title: group-owned by root
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: group_id
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    check: cron-configuration-files-group-owned-by-root

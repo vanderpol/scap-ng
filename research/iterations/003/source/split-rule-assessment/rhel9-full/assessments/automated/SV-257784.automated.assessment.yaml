@@ -1,0 +1,59 @@
+assessment:
+  id: SV-257784.automated
+  version: 2
+  assessment_title: RHEL-09-211045 - The systemd Ctrl-Alt-Delete burst key sequence in RHEL 9 must be
+    disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-systemd-system-conf-ctrlaltdelburstaction-set-none:
+      test_title: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
+      collect:
+        object_title: CtrlAltDelBurstAction in /etc/systemd/system.conf and /etc/systemd/system.conf.d/*
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  datatype: string
+                  value: /etc/systemd/system.conf
+                pattern:
+                  operation: pattern match
+                  value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  datatype: string
+                  value: /etc/systemd/system.conf.d
+                filename:
+                  operation: pattern match
+                  value: ^.+\.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: none
+          datatype: string
+  evaluate:
+    check: etc-systemd-system-conf-ctrlaltdelburstaction-set-none

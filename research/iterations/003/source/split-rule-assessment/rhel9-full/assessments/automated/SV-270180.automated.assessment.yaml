@@ -1,0 +1,60 @@
+assessment:
+  id: SV-270180.automated
+  version: 1
+  assessment_title: RHEL-09-433016 - The RHEL 9 fapolicy module must be configured to employ a deny-all,
+    permit-by-exception policy to allow the execution of authorized software programs.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-fapolicyd-fapolicyd-conf-permissive-0:
+      test_title: '/etc/fapolicyd/fapolicyd.conf: permissive = 0'
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fapolicyd/fapolicyd.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*permissive\s*=\s*(\d+)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '0'
+          datatype: int
+    etc-fapolicyd-compiled-rules-deny-all:
+      test_title: '/etc/fapolicyd/compiled.rules: deny all'
+      collect:
+        object_title: The last non-whitespace line of /etc/fapolicyd/compiled.rules
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fapolicyd/compiled.rules
+          pattern:
+            operation: pattern match
+            value: (.*\S.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          multiline: 'false'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (?:^|\n)(?:deny|deny_log|deny_audit)[ \t]+perm=any[ \t]+all[ \t]+:[ \t]+all(?:$|\n)
+  evaluate:
+    all:
+    - check: etc-fapolicyd-fapolicyd-conf-permissive-0
+    - check: etc-fapolicyd-compiled-rules-deny-all

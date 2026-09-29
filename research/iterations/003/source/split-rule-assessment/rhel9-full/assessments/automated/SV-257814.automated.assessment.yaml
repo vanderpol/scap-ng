@@ -1,0 +1,100 @@
+assessment:
+  id: SV-257814.automated
+  version: 3
+  assessment_title: RHEL-09-213095 - RHEL 9 must disable core dumps for all users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    global-domain-core-set-0:
+      test_title: For the global domain, core is set to 0.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/security/limits.conf
+                pattern:
+                  operation: pattern match
+                  value: ^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/security/limits.d
+                filename:
+                  operation: pattern match
+                  value: \.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        state_title: null
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '0'
+          datatype: int
+    if-core-set-any-specific-domains-it-set-0:
+      test_title: If core is set for any specific domains, it is set to 0.
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/security/limits.conf
+                pattern:
+                  operation: pattern match
+                  value: ^[ \t]*[^#*\s]+[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/security/limits.d
+                filename:
+                  operation: pattern match
+                  value: \.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^[ \t]*[^#*\s]+[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        state_title: null
+        existence: any_exist
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '0'
+          datatype: int
+  evaluate:
+    all:
+    - check: global-domain-core-set-0
+    - check: if-core-set-any-specific-domains-it-set-0
