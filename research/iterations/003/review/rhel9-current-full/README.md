@@ -26,7 +26,7 @@ The [profile audit](profile-selection-audit.json) computes source Benchmark/Grou
 
 [Validation](validation.json) checks package-boundary-safe relative references, referenced document types, identity uniqueness, defaults, group membership, applicability bindings, current vocabulary and native cleanliness. Collection → Variable → Test → evaluation presentation order is checked across the full review. Generated identity listings are evidence, not an author-maintained lookup index.
 
-Executed focused regressions: 13 named/private Collection tests, 16 retained Variable/filter/set depth tests, 8 shared manual-binding/Profile-contract regressions and 3 profile-selection regressions passed locally. The full original-package build, comparative audits and reverse omni-schema validation passed on both Windows and Linux in [CI run 36780705541](https://github.com/vanderpol/scap-ng/actions/runs/36780705541), using converter commit `71a5689822518626665b7f6459cfba522ca4037a`. This includes the subtractive-Profile and source-description correction. See [ci-verification.json](ci-verification.json).
+Executed focused regressions: 13 named/private Collection tests, 16 retained Variable/filter/set depth tests, 8 shared manual-binding/Profile-contract regressions and 3 profile-selection regressions passed locally. The full original-package build, comparative audits and reverse omni-schema validation passed on both Windows and Linux in [CI run 36782749388](https://github.com/vanderpol/scap-ng/actions/runs/36782749388), using converter commit `112a2e1956b0d9d1ff03944f999b52f40b8b171a`. This includes the subtractive-Profile, visible empty disabled_rules, and source-description corrections. See [ci-verification.json](ci-verification.json).
 
 ## Useful review entry points
 

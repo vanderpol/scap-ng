@@ -1,0 +1,237 @@
+{
+  "benchmark": {
+    "id": "example.tailoring-options",
+    "version": "0.1"
+  },
+  "profile": "site-baseline",
+  "publisher_selection": {
+    "demo-password-length": true,
+    "demo-password-history": false,
+    "demo-log-retention": false,
+    "demo-session-timeout": true,
+    "demo-time-sources": true
+  },
+  "effective_selection": {
+    "demo-password-length": true,
+    "demo-password-history": true,
+    "demo-log-retention": true,
+    "demo-session-timeout": false,
+    "demo-time-sources": false
+  },
+  "selection_source": {
+    "demo-password-length": "tailoring:example.site-tailoring",
+    "demo-password-history": "tailoring:example.site-tailoring",
+    "demo-log-retention": "tailoring:example.site-tailoring",
+    "demo-session-timeout": "tailoring:example.site-tailoring",
+    "demo-time-sources": "tailoring:example.site-tailoring"
+  },
+  "parameters": {
+    "password_minimum_length": 18,
+    "password_history_count": 24,
+    "log_retention_days": 90,
+    "retain_audit_logs": true,
+    "banner_text": "Authorized users only. Activity is monitored.",
+    "allowed_logging_formats": [
+      "json",
+      "text"
+    ],
+    "compliance_owner": {
+      "name": "Example Security Operations",
+      "contact": "security@example.test"
+    }
+  },
+  "parameter_source": {
+    "password_minimum_length": "tailoring:example.site-tailoring",
+    "password_history_count": "tailoring:example.site-tailoring",
+    "log_retention_days": "tailoring:example.site-tailoring",
+    "retain_audit_logs": "tailoring:example.site-tailoring",
+    "banner_text": "tailoring:example.site-tailoring",
+    "allowed_logging_formats": "tailoring:example.site-tailoring",
+    "compliance_owner": "tailoring:example.site-tailoring"
+  },
+  "assessment_selections": {
+    "demo-password-length": {
+      "selector": "manual",
+      "assessment_id": "demo-password-length.manual",
+      "will_be_selected": true,
+      "selector_source": "tailoring:example.site-tailoring"
+    },
+    "demo-password-history": {
+      "selector": "default",
+      "assessment_id": "demo-password-history.manual",
+      "will_be_selected": true,
+      "selector_source": "benchmark"
+    },
+    "demo-log-retention": {
+      "selector": "document-review",
+      "assessment_id": "demo-log-retention.document-review",
+      "will_be_selected": true,
+      "selector_source": "tailoring:example.site-tailoring"
+    },
+    "demo-session-timeout": {
+      "selector": "default",
+      "assessment_id": "demo-session-timeout.manual",
+      "will_be_selected": false,
+      "selector_source": "benchmark"
+    },
+    "demo-time-sources": {
+      "selector": "default",
+      "assessment_id": "demo-time-sources.manual",
+      "will_be_selected": false,
+      "selector_source": "benchmark"
+    }
+  },
+  "tailoring_layers": [
+    {
+      "id": "example.organization-baseline",
+      "version": 1,
+      "selection": {
+        "demo-password-length": false,
+        "demo-password-history": false,
+        "demo-log-retention": false,
+        "demo-session-timeout": true,
+        "demo-time-sources": true
+      },
+      "parameter_values": {
+        "password_minimum_length": 16,
+        "password_history_count": 5,
+        "log_retention_days": 30,
+        "retain_audit_logs": false,
+        "banner_text": "Authorized use only.",
+        "allowed_logging_formats": [
+          "text"
+        ],
+        "compliance_owner": {
+          "name": "Example Publisher",
+          "contact": "publisher@example.test"
+        }
+      },
+      "check_selectors": {
+        "demo-password-length": "default",
+        "demo-password-history": "default",
+        "demo-log-retention": "default",
+        "demo-session-timeout": "default",
+        "demo-time-sources": "default"
+      },
+      "provenance": {
+        "author": {
+          "name": "Example Organization Author"
+        },
+        "organization": {
+          "name": "Example Organization"
+        },
+        "created_at": "2026-09-30T17:00:00-04:00",
+        "modified_at": "2026-09-30T17:00:00-04:00",
+        "approval": {
+          "authority": "Example Change Board",
+          "reference": "EXAMPLE-BASELINE-10",
+          "status": "illustrative-only"
+        }
+      },
+      "selection_justifications": {
+        "disabled_rules": {
+          "demo-password-length": "Fictional parent-layer exception, subsequently reversed by the site."
+        }
+      },
+      "parameter_justifications": {
+        "password_minimum_length": "Organization baseline above the publisher Profile's 14."
+      }
+    },
+    {
+      "id": "example.site-tailoring",
+      "version": 2,
+      "selection": {
+        "demo-password-length": true,
+        "demo-password-history": true,
+        "demo-log-retention": true,
+        "demo-session-timeout": false,
+        "demo-time-sources": false
+      },
+      "parameter_values": {
+        "password_minimum_length": 18,
+        "password_history_count": 24,
+        "log_retention_days": 90,
+        "retain_audit_logs": true,
+        "banner_text": "Authorized users only. Activity is monitored.",
+        "allowed_logging_formats": [
+          "json",
+          "text"
+        ],
+        "compliance_owner": {
+          "name": "Example Security Operations",
+          "contact": "security@example.test"
+        }
+      },
+      "check_selectors": {
+        "demo-password-length": "manual",
+        "demo-password-history": "default",
+        "demo-log-retention": "document-review",
+        "demo-session-timeout": "default",
+        "demo-time-sources": "default"
+      },
+      "provenance": {
+        "author": {
+          "name": "Example Policy Author",
+          "contact": "author@example.test"
+        },
+        "organization": {
+          "name": "Example Organization"
+        },
+        "created_at": "2026-09-30T17:55:00-04:00",
+        "modified_at": "2026-09-30T18:00:00-04:00",
+        "approval": {
+          "authority": "Example Change Board",
+          "reference": "EXAMPLE-CHANGE-100",
+          "status": "illustrative-only"
+        },
+        "ticket": "EXAMPLE-CHANGE-100",
+        "exception": "EXAMPLE-EXCEPTION-200",
+        "effective_date": "2026-10-01",
+        "expiration_date": "2027-09-30",
+        "justification": "Fictional worked example; these metadata fields do not alter evaluation."
+      },
+      "selection_justifications": {
+        "enabled_rules": {
+          "demo-log-retention": "Restore audit review disabled by the publisher Profile."
+        },
+        "disabled_rules": {
+          "demo-time-sources": "Demonstrate a local exclusion; this is not an applicability change."
+        },
+        "enabled_groups": {
+          "authentication": "Restore publisher-disabled history and parent-Tailoring-disabled length Rules."
+        },
+        "disabled_groups": {
+          "sessions": "Demonstrate a Group exclusion expanded to individual Rules."
+        }
+      },
+      "parameter_justifications": {
+        "password_minimum_length": "Override the organization's 16-character value with 18.",
+        "password_history_count": "Increase the published history requirement.",
+        "log_retention_days": "Use the site's approved retention period.",
+        "retain_audit_logs": "Require persistent logs as expected policy data.",
+        "banner_text": "Supply the approved expected notice text.",
+        "allowed_logging_formats": "Permit both published formats as expected-state data.",
+        "compliance_owner": "Identify the expected organizational record."
+      }
+    }
+  ],
+  "organizational_input": {
+    "approved_time_sources": {
+      "value": [
+        "ntp1.example.test",
+        "ntp2.example.test"
+      ],
+      "source": "example.site-input",
+      "provenance": {
+        "author": "Example Operations",
+        "organization": "Example Organization",
+        "supplied_at": "2026-09-30T18:00:00-04:00"
+      }
+    }
+  },
+  "limits": [
+    "Worked policy-source resolver only; no target execution, finalized schema or full NG conformance.",
+    "Fixture source spellings for Group operations, provenance and parent bindings are review proposals.",
+    "This resolver does not implement rebase mapping or Assessment Request execution."
+  ]
+}

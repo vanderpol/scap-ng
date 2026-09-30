@@ -405,13 +405,16 @@ SHOULD add worked source examples covering at least:
 - rebasing Tailoring to a newer Benchmark version;
 - result provenance showing publisher policy versus local modifications.
 
-These examples SHOULD use the same `research/iterations/002/examples/source/` organization as the
-current RHEL 9 and Windows 11 Benchmark examples.
+Current worked examples are in
+[`research/iterations/003/examples/tailoring-all-options/`](../../research/iterations/003/examples/tailoring-all-options/README.md),
+including a comprehensive demonstration and a Tailoring bound to the current
+full RHEL9 review. Example source grammar proposals SHALL NOT be mistaken for
+finalized serialization or assessor runtime conformance.
 
 
 ## 23. Check selection
 
-A policy MAY expose multiple named check alternatives for a Rule. A Tailoring
+A Rule MAY expose multiple named Assessment alternatives. A Tailoring
 artifact MAY select among those published alternatives by **check selector**.
 
 Illustrative source:
@@ -424,8 +427,8 @@ Illustrative source:
       check_selectors:
         EXAMPLE-01-000001: manual
 
-The selector identifies a choice already exposed by the Rule's governing
-policy. Tailoring SHALL NOT use check selection to introduce, replace, or
+The selector identifies a choice already exposed by the Rule.
+Tailoring SHALL NOT use check selection to introduce, replace, or
 modify an Assessment implementation.
 
 Selector names are extensible and SHALL NOT be restricted to `automated` and

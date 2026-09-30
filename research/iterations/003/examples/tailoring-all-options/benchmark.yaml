@@ -1,0 +1,133 @@
+benchmark:
+  id: example.tailoring-options
+  ng_schema_version: null
+  use_case: compliance
+  title: Tailoring options demonstration
+  description: Fictional policy-resolution fixture; no target execution is claimed.
+  version:
+    value: '0.1'
+    time: null
+    update: null
+  default_selection: true
+  platform: null
+  applicability_catalog: null
+  parameters:
+  - id: password_minimum_length
+    type: integer
+    description: Expected policy data for password minimum length.
+    source: publisher
+    value: 12
+    tailorable: true
+    required: false
+    constraints:
+      minimum: 8
+      maximum: 128
+  - id: password_history_count
+    type: integer
+    description: Expected policy data for password history count.
+    source: publisher
+    value: 5
+    tailorable: true
+    required: false
+    constraints:
+      minimum: 0
+      maximum: 100
+  - id: log_retention_days
+    type: integer
+    description: Expected policy data for log retention days.
+    source: publisher
+    value: 30
+    tailorable: true
+    required: false
+    constraints:
+      minimum: 1
+      maximum: 3650
+  - id: retain_audit_logs
+    type: boolean
+    description: Expected policy data for retain audit logs.
+    source: publisher
+    value: false
+    tailorable: true
+    required: false
+    constraints: {}
+  - id: banner_text
+    type: string
+    description: Expected policy data for banner text.
+    source: publisher
+    value: Authorized use only.
+    tailorable: true
+    required: false
+    constraints:
+      max_length: 256
+  - id: allowed_logging_formats
+    type: list
+    description: Expected policy data for allowed logging formats.
+    source: publisher
+    value:
+    - text
+    tailorable: true
+    required: false
+    constraints:
+      items: string
+      allowed:
+      - json
+      - text
+  - id: compliance_owner
+    type: record
+    description: Expected policy data for compliance owner.
+    source: publisher
+    value:
+      name: Example Publisher
+      contact: publisher@example.test
+    tailorable: true
+    required: false
+    constraints:
+      fields:
+        name: string
+        contact: string
+  - id: approved_time_sources
+    type: list
+    description: Expected policy data for approved time sources.
+    source: organization
+    value: null
+    tailorable: false
+    required: true
+    constraints:
+      items: string
+  groups:
+  - id: authentication
+    title: Authentication
+    rules:
+    - demo-password-length
+    - demo-password-history
+    groups: []
+  - id: audit
+    title: Audit
+    rules:
+    - demo-log-retention
+    groups: []
+  - id: sessions
+    title: Sessions
+    rules:
+    - demo-session-timeout
+    groups: []
+  - id: services
+    title: Services
+    rules:
+    - demo-time-sources
+    groups: []
+  profiles:
+  - id: site-baseline
+    title: Example publisher site Profile
+    description: Publisher variation; all remaining member Rules stay enabled.
+    disabled_rules:
+    - demo-password-history
+    - demo-log-retention
+    parameters:
+      password_minimum_length: 14
+  rules:
+  - demo-password-length
+  - demo-password-history
+  - demo-log-retention
+  - demo-session-timeout
+  - demo-time-sources

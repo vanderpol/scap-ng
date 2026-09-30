@@ -1,0 +1,72 @@
+# Comprehensive working-design example. All identities and approvals are fictional.
+# Exact new Group/provenance/parent-reference shapes are review proposals.
+tailoring:
+  id: example.site-tailoring
+  version: 2
+  title: Example site policy exercising the documented Tailoring options
+  description: Local differences applied after the publisher Profile and organization baseline.
+  benchmark:
+    id: example.tailoring-options
+    version: '0.1'
+  profile: site-baseline
+  extends:
+    id: example.organization-baseline
+    version: 1
+    source: organization-baseline.tailoring.yaml
+  enabled_rules:
+    - demo-log-retention
+  disabled_rules:
+    - demo-time-sources
+  enabled_groups:
+    - authentication
+  disabled_groups:
+    - sessions
+  parameters:
+    password_minimum_length: 18
+    password_history_count: 24
+    log_retention_days: 90
+    retain_audit_logs: true
+    banner_text: Authorized users only. Activity is monitored.
+    allowed_logging_formats:
+      - json
+      - text
+    compliance_owner:
+      name: Example Security Operations
+      contact: security@example.test
+  check_selectors:
+    demo-password-length: manual
+    demo-log-retention: document-review
+  selection_justifications:
+    enabled_rules:
+      demo-log-retention: Restore audit review disabled by the publisher Profile.
+    disabled_rules:
+      demo-time-sources: Demonstrate a local exclusion; this is not an applicability change.
+    enabled_groups:
+      authentication: Restore publisher-disabled history and parent-Tailoring-disabled length Rules.
+    disabled_groups:
+      sessions: Demonstrate a Group exclusion expanded to individual Rules.
+  parameter_justifications:
+    password_minimum_length: Override the organization's 16-character value with 18.
+    password_history_count: Increase the published history requirement.
+    log_retention_days: Use the site's approved retention period.
+    retain_audit_logs: Require persistent logs as expected policy data.
+    banner_text: Supply the approved expected notice text.
+    allowed_logging_formats: Permit both published formats as expected-state data.
+    compliance_owner: Identify the expected organizational record.
+  provenance:
+    author:
+      name: Example Policy Author
+      contact: author@example.test
+    organization:
+      name: Example Organization
+    created_at: '2026-09-30T17:55:00-04:00'
+    modified_at: '2026-09-30T18:00:00-04:00'
+    approval:
+      authority: Example Change Board
+      reference: EXAMPLE-CHANGE-100
+      status: illustrative-only
+    ticket: EXAMPLE-CHANGE-100
+    exception: EXAMPLE-EXCEPTION-200
+    effective_date: '2026-10-01'
+    expiration_date: '2027-09-30'
+    justification: Fictional worked example; these metadata fields do not alter evaluation.
