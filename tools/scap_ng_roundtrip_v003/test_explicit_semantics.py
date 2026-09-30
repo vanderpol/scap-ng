@@ -3,11 +3,17 @@
 import importlib.util
 from pathlib import Path
 import unittest
+import tempfile
 
 SCRIPT = Path(__file__).resolve().parent / "ng_to_oval.py"
 spec = importlib.util.spec_from_file_location("ng_to_oval", SCRIPT)
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
+
+COMPARE = Path(__file__).resolve().parent / "compare_oval_semantics.py"
+compare_spec = importlib.util.spec_from_file_location("compare_oval_semantics", COMPARE)
+comparator = importlib.util.module_from_spec(compare_spec)
+compare_spec.loader.exec_module(comparator)
 
 NS = module.NS["unix"]
 Q = lambda name: f"{{{NS}}}{name}"
@@ -75,6 +81,26 @@ class ExplicitSemanticsTests(unittest.TestCase):
                         }}}]}}
         with self.assertRaisesRegex(ValueError, "requires a variable"):
             module.build(fixture)
+
+    def test_comparator_resolves_state_existence_defaults(self):
+        ns = module.NS["unix"]
+        template = (
+            '<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" '
+            'xmlns:unix="' + ns + '">'
+            '<states><unix:file_state id="oval:example:ste:1" version="1">'
+            '<unix:path {attribute} >/tmp</unix:path>'
+            '</unix:file_state></states></oval_definitions>'
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            def semantic_state(attribute):
+                filename = Path(directory) / "state.xml"
+                filename.write_text(template.format(attribute=attribute), encoding="utf-8")
+                return comparator.Model(filename).state("oval:example:ste:1")
+            omitted = semantic_state("")
+            explicit_default = semantic_state('check_existence="at_least_one_exists"')
+            explicit_different = semantic_state('check_existence="none_exist"')
+            self.assertEqual(omitted, explicit_default)
+            self.assertNotEqual(omitted, explicit_different)
 
     def test_missing_required_existence_is_not_silently_guessed(self):
         fixture = {"id": "missing-001", "ng_semantics": {
