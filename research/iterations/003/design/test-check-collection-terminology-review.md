@@ -79,3 +79,54 @@ A clean semantic model need not expose OVAL XML's **Object** type as a top-level
 **Conformance tests needed before adopting as normative:** (1) capability mismatch must fail even if bare XML XSD accepts the references; (2) nested filters and sets must enforce compatible type constraints, potentially with typed collection ancestry beyond a single Test; (3) special no-Object Tests get explicit contracts; (4) reject legacy mismatched source graphs or report them as source defects instead of retagging. Until the tests pass, keep independent Test/Object/State types in Stage-1 conversion data and source provenance to avoid obscuring failures.
 
 The type-count inventory is empirical and *not* an OVAL Board vote. A clearly labeled non-voting Discussion can summarize it after the gap audit closes.
+
+
+## Candidate replacement for OVAL Test `check`: `state_match`
+
+OVAL 5.12.3 defines Test `check` as the quantifier over collected items
+(excluding items whose status is Does Not Exist) that determines how many
+items must satisfy the referenced State requirements. It is evaluated only
+after the Test `check_existence` requirement is satisfied. When a Test has no
+State references, OVAL says `check` has no evaluation meaning.
+
+That exact distinction should be visible in native NG rather than preserved
+under the vague word `check`.
+
+Candidate native form:
+
+```yaml
+assertion:
+  existence: at_least_one_exists
+  state_match: all
+  state:
+    ...
+```
+
+Candidate semantics:
+
+- `existence` answers **whether the Collection produced the required set of
+  existing observations**. It is evaluated before State matching for the
+  purpose of Test truth.
+- `state_match` answers **how many existing collected observations must
+  satisfy the Test's State requirement(s)**.
+- An observation representing a source item with status `does_not_exist`
+  SHALL NOT participate in `state_match`; it participates in the existence
+  semantics instead.
+- If a Test has multiple States, each existing collected observation is
+  compared against those States and their per-observation results are first
+  combined by `state_operator`. The resulting per-observation result is then
+  aggregated by `state_match`.
+- If no State is present, `state_match` has no semantic effect. Native NG
+  SHOULD avoid requiring a meaningless value in that shape rather than
+  copying OVAL's required-but-ignored `check` attribute.
+- `state_match` SHALL NOT be confused with State-entity
+  `entity_check`, variable `variable_check`, or Policy check selection.
+  Those are different quantification scopes.
+
+The exact value vocabulary must preserve OVAL `CheckEnumeration` behavior in
+lossless Stage-1 conversion. Friendly value names may be considered separately
+only if they map bijectively and retain error/unknown behavior.
+
+This candidate name is intentionally descriptive rather than a one-word
+replacement. It remains non-normative until negative/edge-case regressions are
+added and the Board accepts the native terminology.
