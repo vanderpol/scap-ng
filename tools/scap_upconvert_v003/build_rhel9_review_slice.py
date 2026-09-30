@@ -924,6 +924,10 @@ def unsupported_definition_features(oroot, definition_id):
         if kind not in ("constant_variable", "local_variable", "external_variable"):
             add("variable_kind", var_ref, kind)
             return
+        if kind == "external_variable":
+            # possible_value / possible_restriction are input-validation
+            # semantics, not OVAL ComponentGroup expressions.
+            return
         for descendant in variable.iter():
             name = local(descendant.tag)
             if descendant is variable or name == "value":
@@ -1131,10 +1135,42 @@ def lower_definition(oroot, definition_id, assessment_id):
             values = [oval_value_text(child) for child in variable if local(child.tag) == "value"]
             entry["expression"] = {"literal": values[0] if len(values) == 1 else values}
         elif kind == "external_variable":
-            entry["input"] = {
+            input_contract = {
                 "required": True,
                 "cardinality": "one_or_more",
             }
+            alternatives = []
+            for child in variable:
+                child_kind = local(child.tag)
+                if child_kind == "notes":
+                    continue
+                if child_kind == "possible_value":
+                    alternatives.append({
+                        "literal": oval_value_text(child),
+                        "hint": child.get("hint") or "",
+                    })
+                elif child_kind == "possible_restriction":
+                    conditions = []
+                    for restriction in child:
+                        if local(restriction.tag) != "restriction":
+                            continue
+                        conditions.append({
+                            "operation": restriction.get("operation"),
+                            "value": oval_value_text(restriction),
+                        })
+                    alternatives.append({
+                        "restriction_group": {
+                            "operator": (child.get("operator") or "AND").upper(),
+                            "hint": child.get("hint") or "",
+                            "conditions": conditions,
+                        }
+                    })
+                else:
+                    active_variables.remove(var_ref)
+                    return None, f"unsupported_external_variable_child:{child_kind}"
+            if alternatives:
+                input_contract["validation"] = {"alternatives": alternatives}
+            entry["input"] = input_contract
         elif kind == "local_variable":
             components = [child for child in variable if local(child.tag) not in ("notes",)]
             if len(components) != 1:
