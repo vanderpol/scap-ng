@@ -15,23 +15,31 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /proc/sys/crypto/fips_enabled
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^(\d+)$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: all_exist
         check: all
         state:
           field: subexpression
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     not:
