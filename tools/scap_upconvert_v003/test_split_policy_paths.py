@@ -47,6 +47,15 @@ class ExplicitAuthoringReferenceTests(unittest.TestCase):
                 resolve_source_ref(self.root, self.policy, reference,
                                    "assessment", "check")
 
+    def test_nonportable_and_null_source_paths_are_rejected(self):
+        for reference in ("C:/assessment.yaml", "nested" + chr(92) + "file.yaml",
+                          "path" + chr(0) + ".yaml"):
+            with self.subTest(reference=repr(reference)), self.assertRaisesRegex(
+                ValueError, "portable source path"
+            ):
+                resolve_source_ref(self.root, self.policy, reference,
+                                   "assessment", "check")
+
     def test_wrong_object_kind_fails(self):
         with self.assertRaisesRegex(ValueError, "document type"):
             resolve_source_ref(self.root, self.policy,
