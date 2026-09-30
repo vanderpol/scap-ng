@@ -9,9 +9,13 @@ provisional native SCAP-NG Capability mapping.
 Listing a Test type here does not freeze the final Capability name. It records
 the migration surface that the specification must account for.
 
-The current inventory contains 259 OVAL Test types. Project review classifies
-116 as native-capability candidates and 143 as effectively deprecated/excluded
-from the initial native surface.
+The earlier inventory contained 259 types, including the SCC/NIWC-only
+`independent.sqlext_test`. Removing that non-standard element yields a
+**provisional** inventory of 258 standard types, with 115 native-capability
+candidates and 143 effectively deprecated/excluded types. The entire inventory
+SHALL be regenerated against pinned **upstream** OVAL 5.12.3 schemas before
+these numbers are considered authoritative; a locally augmented schema is
+insufficient for defining the standard vocabulary.
 
 The converter SHALL still account for excluded Test types. Exclusion means
 "report source remediation/unsupported status", not "silently ignore".
@@ -44,7 +48,7 @@ that collapsing them would preserve semantics.
 | esx | 4 | 0 | 4 |
 | freebsd | 1 | 0 | 1 |
 | hpux | 6 | 0 | 6 |
-| independent | 18 | 11 | 7 |
+| independent | 17 | 10 | 7 |
 | ios | 17 | 12 | 5 |
 | iosxe | 14 | 11 | 3 |
 | junos | 4 | 1 | 3 |
@@ -57,7 +61,7 @@ that collapsing them would preserve semantics.
 | solaris | 16 | 5 | 11 |
 | unix | 18 | 9 | 9 |
 | windows | 50 | 19 | 31 |
-| **Total** | **259** | **116** | **143** |
+| **Provisional total** | **258** | **115** | **143** |
 
 ## Supported / in-scope candidates
 
@@ -108,7 +112,6 @@ use; the capability is not inherently Unix-specific. For example, selecting
 the capability itself remains platform-independent. SCAP-NG SHALL NOT rename
 this capability to `unix.command` merely because a common use invokes Bash.
 | `sql512_test` | `independent.sql512` | schema-only | candidate; name-review |
-| `sqlext_test` | `independent.sqlext` | schema-only | candidate |
 | `textfilecontent54_test` | `independent.textfilecontent54` | production:797, self-assertion:21 | candidate; name-review |
 | `unknown_test` | `independent.unknown` | self-assertion:1 | candidate |
 | `variable_test` | `independent.variable` | production:19, self-assertion:308 | candidate |
@@ -275,3 +278,18 @@ decisions stabilize.
 **Specification navigation:** [← Previous: OVAL 5.12.3 to SCAP-NG Migration](oval-5.12.3-to-ng.md) · [Contents](../README.md) · [Next: Security Considerations →](../security/security-considerations.md)
 
 <!-- spec-nav:end -->
+
+
+## Publisher extension exclusion: `sqlext`
+
+SCC/NIWC `sqlext_test`, `sqlext_object`, and `sqlext_state` appear
+in locally augmented OVAL schemas but are absent from pinned upstream OVAL
+5.12.3. They SHALL NOT be listed as standard OVAL-derived SCAP-NG capabilities.
+The generic converter SHALL diagnose these as out-of-scope publisher-extension
+constructs rather than silently emit schema-invalid standard OVAL.
+Migration of the source SQL content to standard `sql512` is a separate
+future content-maintenance effort; this specification does not claim that
+`sqlext` and `sql512` are behaviorally interchangeable.
+
+See
+[OVAL-derived specification lessons](../../research/iterations/003/design/oval-derived-specification-lessons.md).
