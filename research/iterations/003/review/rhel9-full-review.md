@@ -1,5 +1,12 @@
 # RHEL 9 — complete native SCAP-NG iteration 003 review
 
+**Current authoring review:** [two-rule Test vocabulary and relative-path slice](test-vocabulary-slice/README.md).
+The slice proposes consistent Test names and searchable `test-` IDs before
+full regeneration. The complete split-policy variant below already uses explicit
+relative Policy-to-Assessment paths. Links under the older "Start here" section
+refer to the historical split-rule prototype; its ID-only selectors are not the
+accepted source-path model.
+
 **Status:** REVIEW CANDIDATE — source/package build validated; execution equivalence NOT established.  
 **Audience:** SCAP-NG model and authoring review before reference-scanner implementation.  
 **Generated from:** NIWC enhanced RHEL 9 STIG 002.009.013 / SCAP 1.4 ZIP, source archive SHA-256 `70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5`. Source archive provenance is in `../evidence/rhel9-full/source-package.json`.
