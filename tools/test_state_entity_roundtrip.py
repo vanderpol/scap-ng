@@ -102,6 +102,28 @@ class StateEntityRoundTripTests(unittest.TestCase):
         self.assertIsNone(rejected)
         self.assertEqual(error, "deprecated_oval_definition")
 
+    def test_mixed_test_object_capability_is_rejected(self):
+        source = ET.fromstring(SOURCE)
+        obj = source.find(f".//{{{UNIX}}}file_object")
+        obj.tag = f"{{{UNIX}}}process58_object"
+        native, error = lower_definition(source, "oval:example:def:1", "mixed-object")
+        self.assertIsNone(native)
+        self.assertEqual(
+            error,
+            "test_collection_capability_mismatch:unix.file!=unix.process58",
+        )
+
+    def test_mixed_test_state_capability_is_rejected(self):
+        source = ET.fromstring(SOURCE)
+        state = source.find(f".//{{{UNIX}}}file_state")
+        state.tag = f"{{{UNIX}}}process58_state"
+        native, error = lower_definition(source, "oval:example:def:1", "mixed-state")
+        self.assertIsNone(native)
+        self.assertEqual(
+            error,
+            "test_state_capability_mismatch:unix.file!=unix.process58",
+        )
+
     def test_required_test_check_is_not_invented(self):
         source = ET.fromstring(SOURCE.replace('check="all" ', ''))
         native, error = lower_definition(source, "oval:example:def:1", "invalid-check")
