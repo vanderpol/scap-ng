@@ -1603,14 +1603,26 @@ def lower_definition(oroot, definition_id, assessment_id):
         collection, error = lower_object(obj_ref)
         if error:
             return None, error
-        # Preserve Test, Object, and State capabilities independently. OVAL
-        # references can legally preserve distinct component families and a
-        # lossless converter must not retag the referenced Object.
+        # A native Test owns the capability contract. Direct Object and State
+        # references SHALL be the corresponding type. XML XSD keyrefs alone
+        # cannot enforce this; OVAL generally relies on per-Test Schematron.
+        # Fail closed here so a source authoring defect cannot become an NG
+        # assessment with mixed execution semantics.
+        if collection.get("capability") != capability:
+            return None, (
+                "test_collection_capability_mismatch:"
+                f"{capability}!={collection.get('capability')}"
+            )
         states = []
         for ref in state_refs:
             condition, title, state_capability, error = lower_state(ref)
             if error:
                 return None, error
+            if state_capability != capability:
+                return None, (
+                    "test_state_capability_mismatch:"
+                    f"{capability}!={state_capability}"
+                )
             if condition is not None:
                 states.append({
                     "state_title": title,
