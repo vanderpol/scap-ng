@@ -37,10 +37,11 @@ assessment:
       assert:
         existence: any_exist
         check: all
-        state: null
         state_operator: AND
         states:
-        - state:
+        - state_title: greater than zero
+          capability: unix.shadow
+          state:
             field: chg_req
             value: '0'
             operation: greater than
@@ -48,9 +49,9 @@ assessment:
             mask: false
             entity_check: all
             entity_existence: at_least_one_exists
-          state_title: greater than zero
+        - state_title: less than or equal to sixty
           capability: unix.shadow
-        - state:
+          state:
             field: chg_req
             value: '60'
             operation: less than or equal
@@ -58,8 +59,6 @@ assessment:
             mask: false
             entity_check: all
             entity_existence: at_least_one_exists
-          state_title: less than or equal to sixty
-          capability: unix.shadow
     root-password-in-etc-shadow-does-not-have-maximum-password:
       test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than
         60
@@ -76,10 +75,11 @@ assessment:
       assert:
         existence: all_exist
         check: all
-        state: null
         state_operator: AND
         states:
-        - state:
+        - state_title: greater than zero
+          capability: unix.shadow
+          state:
             field: chg_req
             value: '0'
             operation: greater than
@@ -87,9 +87,9 @@ assessment:
             mask: false
             entity_check: all
             entity_existence: at_least_one_exists
-          state_title: greater than zero
+        - state_title: less than or equal to sixty
           capability: unix.shadow
-        - state:
+          state:
             field: chg_req
             value: '60'
             operation: less than or equal
@@ -97,8 +97,6 @@ assessment:
             mask: false
             entity_check: all
             entity_existence: at_least_one_exists
-          state_title: less than or equal to sixty
-          capability: unix.shadow
   evaluate:
     all:
     - check: no-password-in-etc-shadow-has-maximum-password-age-0
@@ -106,8 +104,8 @@ assessment:
   variables:
     anonymous-uids:
       title: anonymous UIDs
-      datatype: int
       kind: constant
+      datatype: int
       expression:
         literal:
         - '65534'
@@ -116,8 +114,8 @@ assessment:
         - '4294967295'
     pattern-match-lines-starting-usernames-system-users:
       title: Pattern to match lines starting with usernames of system users
-      datatype: string
       kind: local
+      datatype: string
       expression:
         concat:
         - literal:
