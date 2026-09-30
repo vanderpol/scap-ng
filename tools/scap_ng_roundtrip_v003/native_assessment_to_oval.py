@@ -401,13 +401,28 @@ class Builder:
             "check": assertion.get("check") or "all",
             "comment": check.get("test_title") or check_id,
         }
-        state_operator, state_exprs = self.split_test_states(assertion.get("state"))
-        if len(state_exprs) > 1:
+
+        explicit_states = assertion.get("states")
+        if explicit_states:
+            state_operator = (assertion.get("state_operator") or "AND").upper()
             attrs["state_operator"] = state_operator
+            state_items = [
+                (item.get("state"), item.get("state_title"))
+                for item in explicit_states
+            ]
+        else:
+            state_operator, state_exprs = self.split_test_states(assertion.get("state"))
+            if len(state_exprs) > 1:
+                attrs["state_operator"] = state_operator
+            state_items = [
+                (expr, assertion.get("state_title"))
+                for expr in state_exprs
+            ]
+
         test = ET.SubElement(self.tests, q(ns, name + "_test"), attrs)
         ET.SubElement(test, q(ns, "object"), {"object_ref": self.emit_object(collection)})
-        for expr in state_exprs:
-            sid = self.emit_state(capability, expr, assertion.get("state_title"))
+        for expr, title in state_items:
+            sid = self.emit_state(capability, expr, title)
             ET.SubElement(test, q(ns, "state"), {"state_ref": sid})
         self.check_to_test[check_id] = tid
         return tid
