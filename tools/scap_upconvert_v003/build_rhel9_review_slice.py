@@ -2036,16 +2036,22 @@ def main():
         selected_ids = [r["id"] for r in selected]
         source_to_native = {r["source_rule_id"]: r["id"] for r in rs}
 
+        from audit_profile_selection import extract_selection, expected_selections
+        selection_rules, selection_groups, selection_ancestry, selection_profiles = extract_selection(zp)
+        selection_baseline, selection_expected = expected_selections(
+            selection_rules, selection_groups, selection_ancestry, selection_profiles)
+        selection_problems = [problem for row in selection_expected.values() for problem in row["problems"]]
+        if selection_problems:
+            raise ValueError(f"Unresolved profile selections: {selection_problems}")
         profiles = []
         for p in xr.findall("x:Profile", NS):
-            disabled = []
-            for s in p.findall("x:select", NS):
-                if (s.get("selected") or "true").lower() == "false":
-                    rid = source_to_native.get(s.get("idref"))
-                    if rid in selected_ids: disabled.append(rid)
-            profile = {"id": safe_id((p.get("id") or "profile").split("_profile_")[-1]),
-                       "title": text(p.find("x:title", NS))}
+            pid = (p.get("id") or "profile").split("_profile_")[-1]
+            effective = selection_expected[pid]["enabled"]
+            profile = {"id": safe_id(pid), "title": text(p.find("x:title", NS))}
+            disabled = [rid for rid in selected_ids if selection_baseline[rid] and not effective[rid]]
+            enabled = [rid for rid in selected_ids if not selection_baseline[rid] and effective[rid]]
             if disabled: profile["disabled_rules"] = sorted(disabled)
+            if enabled: profile["enabled_rules"] = sorted(enabled)
             selectors = {}
             for rr in p.findall("x:refine-rule", NS):
                 rid = source_to_native.get(rr.get("idref"))
@@ -2073,6 +2079,7 @@ def main():
             "benchmark": {
                 "id": "rhel9-stig-full" if FULL_MODE else "rhel9-stig-review-slice",
                 "use_case": "compliance",
+                "default_selection": True,
                 "title": localized_texts(xr, "title"),
                 "description": localized_texts(xr, "description"),
                 "language": xr.get("{http://www.w3.org/XML/1998/namespace}lang"),
@@ -2116,6 +2123,9 @@ def main():
                 "rules": deepcopy(selected_ids),
             }
         }
+        baseline_disabled = [rid for rid in selected_ids if not selection_baseline[rid]]
+        if baseline_disabled:
+            benchmark_doc["benchmark"]["disabled_rules"] = sorted(baseline_disabled)
         write_yaml(OUT / "benchmark.yaml", benchmark_doc)
 
         applicability_registry = {}

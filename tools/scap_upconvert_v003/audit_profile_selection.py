@@ -9,6 +9,8 @@ does NOT claim requires/conflicts, applicability, or runtime result parity.
 from __future__ import annotations
 
 import argparse
+import hashlib
+from collections import Counter
 import json
 import re
 import sys
@@ -43,6 +45,18 @@ def extract_selection(source_zip: Path):
     if len(xccdf) != 1:
         raise ValueError(f"Expected one XCCDF Benchmark, found {len(xccdf)}")
     root = xccdf[0]
+    # Benchmark is not an XCCDF selectable Item; selected there is invalid.
+    if root.get("selected") is not None:
+        raise ValueError("UNEXPRESSIBLE_BENCHMARK_SELECTED")
+    def selected_item(element):
+        raw = element.get("selected")
+        if raw is not None and raw not in ("true", "false", "1", "0"):
+            raise ValueError(f"INVALID_SELECTED: {element.get('id')}: {raw}")
+        if element.get("extends"):
+            raise ValueError(f"UNRESOLVED_ITEM_EXTENDS: {element.get('id')}")
+        return {"selected": raw in ("true", "1") if raw is not None else True,
+                "selected_provenance": "explicit" if raw is not None else "schema_default",
+                "selected_lexical": raw}
     rules = []
     groups = []
     group_ancestors = {}
@@ -56,13 +70,13 @@ def extract_selection(source_zip: Path):
                 if not id_:
                     raise ValueError("Unnamed XCCDF Group")
                 groups.append({"id": id_,
-                               "selected": ir.boolean_attribute(child.get("selected"), True),
+                               **selected_item(child),
                                "cluster_id": child.get("cluster-id")})
                 walk(child, ancestors + [id_])
             elif name == "Rule":
                 rid = native_rule_id(child.get("id"))
                 rules.append({"id": child.get("id"), "native": rid,
-                              "selected": ir.boolean_attribute(child.get("selected"), True),
+                              **selected_item(child),
                               "cluster_id": child.get("cluster-id")})
                 group_ancestors[rid] = list(ancestors)
     walk(root, [])
@@ -70,10 +84,16 @@ def extract_selection(source_zip: Path):
         raise ValueError("Duplicate source/native Rule identities")
     if len(groups) != len({g["id"] for g in groups}):
         raise ValueError("Duplicate Group identities")
+    if len({x["id"] for x in rules + groups}) != len(rules + groups):
+        raise ValueError("Duplicate Item identities across Rule/Group")
     profiles = [ir.profile_semantics(e) for e in root.iter()
                 if isinstance(e.tag, str) and split.local(e.tag) == "Profile"]
     if len(profiles) != len({p["id"] for p in profiles}):
         raise ValueError("Duplicate Profile identities")
+    if any(not p.get("id") for p in profiles):
+        raise ValueError("Unnamed Profile")
+    if len({native_profile_id(p["id"]) for p in profiles}) != len(profiles):
+        raise ValueError("Duplicate native Profile identities")
     resolved = ir.resolve_profiles(profiles, rules, groups, [])
     return rules, groups, group_ancestors, resolved
 
@@ -94,6 +114,8 @@ def expected_selections(rules, groups, ancestors, profiles):
         selection = dict(rule_defaults)
         group_selection = dict(group_defaults)
         problems = []
+        history = []
+        seen = {}
         for action in actions:
             if action["kind"] != "select":
                 continue
@@ -110,6 +132,16 @@ def expected_selections(rules, groups, ancestors, profiles):
             if not targets:
                 problems.append({"code": "EMPTY_SELECT_TARGET", "action": action})
             for target in targets:
+                key = (action.get("source_profile_id"), target["kind"], target["id"])
+                if key in seen:
+                    problems.append({"code": "DUPLICATE_SELECT" if seen[key] == enabled
+                                     else "CONFLICTING_SELECT", "profile": profile["id"],
+                                     "source_profile": key[0], "target": target["id"]})
+                seen[key] = enabled
+                history.append({"source_profile": action.get("source_profile_id"),
+                                "order": action.get("effective_order"),
+                                "idref": action["attributes"].get("idref"),
+                                "target": target, "selected": enabled})
                 kind = target["kind"]
                 if kind == "rule":
                     selection[target["id"]] = enabled
@@ -120,6 +152,7 @@ def expected_selections(rules, groups, ancestors, profiles):
         results[native_profile_id(profile["id"])] = {
             "enabled": effective(selection, group_selection),
             "problems": problems,
+            "explicit_selection_history": history,
             "source_profile_id": profile["id"],
             "inheritance_chain": profile.get("inheritance_chain"),
         }
@@ -143,6 +176,18 @@ def audit(source_zip: Path, native_benchmark: Path):
         issues.append({"code": "PROFILE_SET_MISMATCH",
                        "missing": sorted(set(resolved)-set(native_profiles)),
                        "extra": sorted(set(native_profiles)-set(resolved))})
+    for scope in native_profile_rows:
+        for field in ("extends", "select", "selected", "default_selection"):
+            if field in scope:
+                issues.append({"code": "UNEXPRESSIBLE_NATIVE_SELECTION", "profile": scope.get("id"),
+                               "field": field})
+    for scope in [benchmark] + native_profile_rows:
+        for field in ("disabled_rules", "enabled_rules"):
+            entries = scope.get(field) or []
+            duplicates = sorted(k for k, n in Counter(entries).items() if n > 1)
+            if duplicates:
+                issues.append({"code": "DUPLICATE_NATIVE_OVERRIDE", "profile": scope.get("id"),
+                               "field": field, "rules": duplicates})
     # The current renderer implies baseline Rule selected=true unless
     # benchmark explicitly supplies baseline/default selection metadata.
     native_default = benchmark.get("default_selection")
@@ -155,6 +200,16 @@ def audit(source_zip: Path, native_benchmark: Path):
     else:
         issues.append({"code": "UNSUPPORTED_NATIVE_DEFAULT_SELECTION", "value": native_default})
         native_baseline = {rid: True for rid in source_rule_ids}
+    baseline_enabled = set(benchmark.get("enabled_rules") or [])
+    baseline_disabled = set(benchmark.get("disabled_rules") or [])
+    for rid in sorted((baseline_enabled | baseline_disabled) - source_rule_ids):
+        issues.append({"code": "UNKNOWN_BASELINE_RULE", "rule": rid})
+    if baseline_enabled & baseline_disabled:
+        issues.append({"code": "CONFLICTING_BASELINE_OVERRIDE",
+                       "rules": sorted(baseline_enabled & baseline_disabled)})
+    for rid in source_rule_ids:
+        if rid in baseline_enabled: native_baseline[rid] = True
+        elif rid in baseline_disabled: native_baseline[rid] = False
     for rid in sorted(source_rule_ids):
         if native_baseline[rid] != baseline[rid]:
             issues.append({"code": "BASELINE_SELECTED_MISMATCH", "rule": rid,
@@ -184,8 +239,17 @@ def audit(source_zip: Path, native_benchmark: Path):
                            "profile": pid, "count": len(diff), "examples": diff[:20]})
         comparison.append({"profile": pid, "source_profile": expected["source_profile_id"],
                            "mismatch_count": len(diff), "source_enabled":
-                               sum(expected["enabled"].values())})
+                               sum(expected["enabled"].values()),
+                           "rules_compared": len(source_rule_ids),
+                           "inheritance_chain": expected["inheritance_chain"],
+                           "explicit_selection_history": expected["explicit_selection_history"],
+                           "effective_selection": expected["enabled"]})
     return {
+        "source_sha256": hashlib.sha256(source_zip.read_bytes()).hexdigest(),
+        "native_sha256": hashlib.sha256(native_benchmark.read_bytes()).hexdigest(),
+        "baseline_evidence": {"rules": rules, "groups": groups, "ancestors": ancestry,
+                              "effective_selection": baseline,
+                              "native_default_provenance": "explicit" if native_default is not None else "implicit"},
         "source_zip": str(source_zip), "native_benchmark": str(native_benchmark),
         "source_rules": len(rules), "source_groups": len(groups),
         "source_profiles": len(profiles), "native_rules": len(native_rules),
@@ -205,7 +269,10 @@ def main():
     parser.add_argument("--native", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
-    report = audit(args.source, args.native)
+    try:
+        report = audit(args.source, args.native)
+    except (ValueError, KeyError, TypeError) as exc:
+        report = {"issues": [{"code": "SELECTION_AUDIT_BLOCKER", "message": str(exc)}]}
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True)+"\n",
                            encoding="utf-8")
