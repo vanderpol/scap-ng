@@ -28,8 +28,11 @@ A Profile SHALL NOT:
 - introduce a Rule not contained in the Benchmark;
 - re-enable a Rule disabled by an ancestor Profile.
 
-A Profile that does not change Rule selection SHALL contain no Rule-selection
-state.
+A Profile SHALL expose `disabled_rules`, including an empty list when it
+disables no additional Rules. An empty list explicitly records no additional
+deselections; it SHALL NOT re-enable Rules disabled by an ancestor Profile.
+This preserves the visible supported-data-elements convention. `enabled_rules`
+is not a supported publisher Profile property and SHALL NOT appear there.
 
 Illustrative source:
 

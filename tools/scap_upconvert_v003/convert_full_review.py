@@ -60,7 +60,7 @@ def render_profiles(xr, resolved, baseline, expected):
              'description':profile_description(original.find('x:description',source.NS))}
         if parent_id: row['extends']=parent_id
         disabled=sorted(rid for rid,value in effective['enabled'].items() if not value and inherited[rid])
-        if disabled: row['disabled_rules']=disabled
+        row['disabled_rules']=disabled
         profiles.append(row)
     return profiles
 

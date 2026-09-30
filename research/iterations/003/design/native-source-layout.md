@@ -144,9 +144,10 @@ This is intentionally different from opaque legacy content models where authors
 and reviewers needed external schema knowledge to discover available
 properties.
 
-This explicit-field rule does not override Profile canonicalization decisions
-where omission itself is semantically meaningful (for example, omission of
-`disabled_rules` means the Profile does not alter Benchmark Rule selection).
+The explicit-field rule also applies to publisher Profiles: `disabled_rules`
+remains visible as `[]` when the Profile disables no additional Rules. It does
+not re-enable ancestor-disabled Rules. `enabled_rules` is unsupported in
+publisher Profiles and remains a separate Tailoring property.
 
 
 ## Hierarchical Group taxonomy

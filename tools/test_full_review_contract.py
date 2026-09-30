@@ -43,10 +43,10 @@ class ProfileRendering(unittest.TestCase):
         expected={pid:{'enabled':dict(baseline),'problems':[]} for pid in ('parent','child')}
         return root,resolved,baseline,expected
 
-    def test_unchanged_profile_has_no_selection_state_or_xml_wrapper(self):
+    def test_unchanged_profile_shows_empty_disables_and_no_xml_wrapper(self):
         root,resolved,baseline,expected=self.fixture()
         p=render_profiles(root,resolved,baseline,expected)[0]
-        self.assertNotIn('enabled_rules',p);self.assertNotIn('disabled_rules',p)
+        self.assertNotIn('enabled_rules',p);self.assertEqual(p['disabled_rules'],[])
         self.assertIsNone(p['description'])
 
     def test_subtractive_child_preserves_inheritance_and_only_additional_disables(self):

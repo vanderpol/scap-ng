@@ -25,8 +25,8 @@ def violations(document):
     for profile in document.get('benchmark',{}).get('profiles',[]):
         if 'enabled_rules' in profile:
             errors.append('benchmark.profiles: publisher Profiles are subtractive; enabled_rules belongs to Tailoring')
-        if 'disabled_rules' in profile and not profile['disabled_rules']:
-            errors.append('benchmark.profiles: omit empty Rule-selection state')
+        if 'disabled_rules' not in profile:
+            errors.append('benchmark.profiles: show disabled_rules explicitly, including an empty list')
         if '<ProfileDescription' in (profile.get('description') or ''):
             errors.append('benchmark.profiles: remove source XML description wrapper')
     sections=[key for key in a if key in ASSESSMENT_SECTION_ORDER]
