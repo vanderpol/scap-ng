@@ -62,27 +62,41 @@ jobs:
 
       - name: Validate every regenerated OVAL document with XSD
         run: |
-          set -euo pipefail
+          set -uo pipefail
+          : > xsd-validation.log
+          failed=0
           for xml in roundtrip-out/*.oval.xml; do
-            echo "XSD: $xml"
-            xmllint --noout \
+            echo "XSD: $xml" | tee -a xsd-validation.log
+            if ! xmllint --noout \
               --schema oval-language/oval-schemas/roundtrip-full-omni.xsd \
-              "$xml"
+              "$xml" 2>&1 | tee -a xsd-validation.log; then
+              failed=1
+            fi
           done
+          if [ "$failed" -ne 0 ]; then touch xsd-validation.failed; fi
 
       - name: Validate every regenerated OVAL document with embedded Schematron
         run: |
+          set +e
           python scap-ng/tools/scap_ng_roundtrip_v003/validate_embedded_schematron.py \
             --schemas oval-language/oval-schemas \
-            roundtrip-out/*.oval.xml
+            roundtrip-out/*.oval.xml 2>&1 | tee schematron-validation.log
+          rc=${PIPESTATUS[0]}
+          if [ "$rc" -ne 0 ]; then touch schematron-validation.failed; fi
+          exit 0
 
       - name: Upload full Self-Assertion reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: self-assertion-v003-reports
           path: |
             self-assertion-v003-report.json
             self-assertion-v003-roundtrip.json
+            xsd-validation.log
+            schematron-validation.log
+            xsd-validation.failed
+            schematron-validation.failed
 
       - name: Enforce zero unexplained v003 conversion failures
         run: |
@@ -94,3 +108,8 @@ jobs:
             --corpus self-assertion/SCAP_1.4/OVAL_Test_Content \
             --out roundtrip-out \
             --report self-assertion-v003-roundtrip.json
+
+      - name: Enforce OVAL XSD and Schematron validity
+        run: |
+          test ! -e xsd-validation.failed
+          test ! -e schematron-validation.failed
