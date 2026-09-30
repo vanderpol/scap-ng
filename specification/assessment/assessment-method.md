@@ -477,8 +477,35 @@ separate OVAL behavior for a System Characteristics document that omits the
 entire collected-objects section requires item matching against system data and
 remains a distinct evaluator conformance case.
 
-State/entity/variable result propagation, item comparison, omitted
-collected-objects-section behavior, early-termination completeness and
+### State entity and variable aggregation order
+
+When a State entity references multiple Variable values and a collected Item
+contains multiple corresponding entity instances, evaluation SHALL preserve
+the OVAL 5.12.3 many-to-many aggregation order:
+
+1. compare one system/item entity value against each Variable value;
+2. combine those comparison results with that State entity's `var_check`;
+3. repeat for each corresponding system/item entity instance;
+4. combine the per-instance results with that State entity's `entity_check`;
+5. combine distinct entity/predicate results inside the State using the
+   State's own Boolean operator;
+6. when a Test references multiple States, combine those State results for
+   each item using the Test's `state_operator`; and
+7. combine item results at the Test level using the Test's `check`.
+
+These scopes SHALL remain independent. A producer or evaluator SHALL NOT
+commute, merge or substitute `var_check`, `entity_check`, State operator,
+`state_operator`, or Test `check` merely because a particular two-valued
+example happens to produce the same result. Error/unknown/not-evaluated/not-
+applicable propagation occurs at each aggregation layer.
+
+The current independent fixture exercises non-commutative and error-precedence
+cases. Zero-row/zero-value edge cases that are not fully established by the
+authoritative text SHALL remain explicit conformance questions rather than
+being guessed.
+
+Item comparison operations themselves, omitted collected-objects-section
+behavior, remaining zero-cardinality cases, early-termination completeness and
 differential evaluator testing remain separate conformance work.
 
 ### Structural compatibility versus execution equivalence
