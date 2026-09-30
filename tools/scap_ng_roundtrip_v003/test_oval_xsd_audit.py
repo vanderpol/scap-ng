@@ -56,6 +56,16 @@ class SchemaAuditTests(unittest.TestCase):
             self.assertEqual(counts["resolved_global"], 2)
             self.assertEqual(counts["builtin_xsd"], 1)
             self.assertEqual(counts["unresolved_global"], 1)
+            transitive = json.loads((target / "transitive-type-defaults.json").read_text())
+            by_type = {row["type"]: row for row in transitive["types"]}
+            self.assertEqual(by_type["base"]["defaults"]["flag"]["value"], "yes")
+            self.assertEqual(by_type["derived"]["defaults"]["flag"]["value"], "yes")
+            self.assertEqual(by_type["derived"]["defaults"]["fixedFlag"]["value"], "set")
+            self.assertEqual(by_type["derived"]["status"], "resolved")
+            self.assertEqual(by_type["broken"]["status"], "incomplete")
+            self.assertTrue(any(b["reason"] == "not_found"
+                                for b in by_type["broken"]["blockers"]))
+            self.assertEqual(by_type["builtin"]["status"], "resolved")
             rows = json.loads((target / "named-reference-resolution.json").read_text())
             self.assertTrue(any(row["status"] == "unresolved_global"
                                 and row["reference"] == "t:missing" for row in rows))
