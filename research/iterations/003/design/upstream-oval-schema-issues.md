@@ -4,6 +4,32 @@
 **Status:** working defect/errata register; **no issue below has yet been submitted upstream**. The distinction between confirmed validation gaps and requests for clarification matters.  
 **Policy:** SCAP-NG conversion faithfully preserves the original OVAL semantics. Changing upstream OVAL is a separate, reviewed upstream-maintenance activity. Do not automatically rewrite existing content or modify upstream XSDs.
 
+## Complete upstream schema inventory result
+
+The full automated scan of the pinned upstream `OVAL-Community/OVAL@v5.12.3`
+schemas succeeded in GitHub Actions run
+[36709423605](https://github.com/vanderpol/scap-ng/actions/runs/36709423605).
+
+| Category | Inventory count | Interpretation |
+| --- | ---: | --- |
+| Schema files parsed | 54 | No XML parsing failures |
+| Explicit schema defaults | 280 | Not necessarily 280 distinct behaviors |
+| Type extension/restriction declarations | 1,642 | Must resolve inheritance for effective contracts |
+| Optional element declarations | 4,362 | Optionality alone does not establish omission semantics |
+| Semantic documentation passages | 1,357 | Search index requiring contextual interpretation |
+| Default/omission documentation candidates | 296 | **Not** 296 proven defects |
+| Embedded Schematron assertions/reports | 1,182 | Must integrate with semantic-validator analysis |
+
+Machine-readable inventories and original source line mappings were uploaded as
+the `upstream-oval-5.12.3-xsd-audit` artifact of that run. The scanner is
+`tools/scap_ng_roundtrip_v003/audit_oval_xsd_defaults.py`.
+
+**Next triage order:** (1) existence and quantifier semantics;
+(2) prose-only defaults such as `var_check`; (3) Object behavior
+inheritance and omitted parent semantics; (4) datatype/operation defaults;
+(5) existence/error status propagation; (6) publisher-versus-standard
+Schematron behavior.
+
 ## Triage definitions
 
 - **Confirmed validation gap:** concrete published source or synthetic fixture passes the current validation set while containing an independently established inconsistency.
