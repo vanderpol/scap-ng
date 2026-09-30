@@ -4,7 +4,6 @@ assessment:
   assessment_title: RHEL-09-211010 - RHEL 9 must be a vendor-supported release.
   mode: automated
   class: compliance
-  deprecated: false
   purpose: assessment
   evaluate:
     test: test-rhel-9-minor-version-supported
@@ -16,46 +15,68 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          path: /etc
-          filename: redhat-release
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc
+          filename:
+            operation: equals
+            datatype: string
+            mask: false
+            value: redhat-release
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*Red Hat Enterprise Linux release 9\.(\d+)
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
-        state: null
         state_operator: OR
         states:
-        - state:
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
             field: subexpression
-            operation: equals
             value: '7'
-            datatype: int
-          state_title: null
-          capability: independent.textfilecontent54
-        - state:
-            field: subexpression
             operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
             value: '8'
-            datatype: int
-          state_title: null
-          capability: independent.textfilecontent54
-        - state:
-            field: subexpression
             operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
             value: '9'
-            datatype: int
-          state_title: null
-          capability: independent.textfilecontent54
-        - state:
-            field: subexpression
             operation: equals
-            value: '10'
             datatype: int
-          state_title: null
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
           capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: '10'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
         item_quantifier: all

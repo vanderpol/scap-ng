@@ -176,3 +176,15 @@ and appropriately tested work directly to `main`. Do not create routine feature
 branches or pull requests unless the owner explicitly requests one. Record
 provenance, implementation limits and validation evidence as usual. Once the
 owner identifies a stable checkpoint, reassess the branch/review workflow.
+
+## Current Rule/Assessment architecture
+
+The owner reconfirmed on 2026-09-30 that separate Policy objects were replaced
+by Rules to support compliance and vulnerability use cases. The model is
+Benchmark → Rule → selected Assessment. Rules own named selections/defaults
+and explicit relative Assessment source paths. Do not restore Policy files from
+older split-policy experiments or interpret those trees as the current design.
+See `research/iterations/003/design/native-source-layout.md`.
+Native Assessments SHALL NOT contain a `deprecated` attribute. Effective
+deprecated source tests remain conversion blockers; historical deprecation
+metadata belongs in provenance, never a native runtime flag.

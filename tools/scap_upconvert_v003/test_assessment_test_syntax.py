@@ -44,5 +44,20 @@ class TestSyntax(unittest.TestCase):
                                   "question": "Review the documentation."}}
         self.assertEqual(assessment_test_syntax(original), original)
 
+    def test_stale_false_metadata_removed(self):
+        original = self.source()
+        original["assessment"]["deprecated"] = False
+        converted = assessment_test_syntax(original)
+        self.assertNotIn("deprecated", converted["assessment"])
+        self.assertIs(original["assessment"]["deprecated"], False)
+
+    def test_deprecated_or_ambiguous_status_rejected(self):
+        for value in (True, "false", None, 0):
+            with self.subTest(value=value):
+                original = self.source()
+                original["assessment"]["deprecated"] = value
+                with self.assertRaisesRegex(ValueError, "Deprecated Assessment"):
+                    assessment_test_syntax(original)
+
 if __name__ == "__main__":
     unittest.main()

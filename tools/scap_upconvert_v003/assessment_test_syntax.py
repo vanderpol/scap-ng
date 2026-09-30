@@ -5,6 +5,10 @@ def assessment_test_syntax(document):
     """Rename authoring vocabulary without changing evaluation semantics."""
     result = copy.deepcopy(document)
     assessment = result["assessment"]
+    if "deprecated" in assessment:
+        if assessment["deprecated"] is not False:
+            raise ValueError("Deprecated Assessment cannot become native executable source")
+        del assessment["deprecated"]
     if "checks" not in assessment:
         return result  # Manual assessments have no technical Tests.
     original = assessment.pop("checks")
@@ -35,4 +39,3 @@ def verify_assessment_test_syntax(original, converted):
     """Compare complete payloads, allowing only the declared vocabulary rename."""
     if converted != assessment_test_syntax(original):
         raise ValueError("Assessment changed beyond the declared Test vocabulary rename")
-

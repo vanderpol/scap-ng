@@ -1,40 +1,20 @@
 # RHEL 9 — complete native SCAP-NG iteration 003 review
 
 **Current authoring review:** [two-rule Test vocabulary and relative-path slice](test-vocabulary-slice/README.md).
-The slice proposes consistent Test names and searchable `test-` IDs before
-full regeneration. The complete split-policy variant below already uses explicit
-relative Policy-to-Assessment paths. Links under the older "Start here" section
-refer to the historical split-rule prototype; its ID-only selectors are not the
-accepted source-path model.
+The slice uses the current **Benchmark → Rule → Assessment** architecture:
+Rules directly own Assessment choices and relative paths. Separate Policy files
+are superseded. Full regeneration awaits owner review of the vocabulary slice.
 
 **Status:** REVIEW CANDIDATE — source/package build validated; execution equivalence NOT established.  
 **Audience:** SCAP-NG model and authoring review before reference-scanner implementation.  
 **Generated from:** NIWC enhanced RHEL 9 STIG 002.009.013 / SCAP 1.4 ZIP, source archive SHA-256 `70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5`. Source archive provenance is in `../evidence/rhel9-full/source-package.json`.
 
-## Complete split-policy review variant — now available
+## Superseded split-policy variant
 
-The **recommended architecture review** is the complete
-[split-Benchmark/Rule/Policy/Assessment source](../source/split-policy-assessment/rhel9-full/benchmark.yaml).
-
-- [Rule showing Policy reference](../source/split-policy-assessment/rhel9-full/rules/SV-257777.rule.yaml)
-- [Matching Policy with named checks/default](../source/split-policy-assessment/rhel9-full/policies/SV-257777.policy.yaml)
-- [Matching automated Assessment](../source/split-policy-assessment/rhel9-full/assessments/automated/SV-257777.automated.assessment.yaml)
-- [Manual-only Rule](../source/split-policy-assessment/rhel9-full/rules/SV-257778.rule.yaml)
-- [Manual-only Policy](../source/split-policy-assessment/rhel9-full/policies/SV-257778.policy.yaml)
-- [Review validation evidence](../evidence/rhel9-split-policy-review.json)
-- [Passing review-generation workflow](https://github.com/vanderpol/scap-ng/actions/workflows/v003-rhel9-split-policy-review.yml)
-
-The validator checked all 445 Rules and 445 Policies, including Group membership,
-11 Profiles, selector→Assessment resolution, applicability references and
-byte-for-byte preservation of **879** source Assessment files. There were zero
-reported reference issues. There are **418** Rules with both automated and
-manual check choices and **27** manual-only Rules; these are the review
-source's classification and do not alone establish executable compatibility.
-
-**Critical boundaries:** these Policy files are one per Rule for this first
-complete representation; cross-OS reuse has not been claimed. The split-policy
-content is source for architecture review, **not** a compiled scanner package,
-and passing structural validation is **not** runtime equivalence.
+The `source/split-policy-assessment/rhel9-full` tree and its structural validation
+are historical experiments. They reintroduced a separate Policy object and
+SHALL NOT serve as the current architecture or as input for new native examples.
+Current authoring review uses the Rule/Assessment slice linked above.
 
 ## Start here
 
@@ -61,7 +41,7 @@ Relative links above assume the review file is located at `research/iterations/0
 - Profile names/selection derive from SCAP source; check whether they are authoring-friendly and whether disabled Rules are easy to audit.
 - Stage-1 conversion is expected to preserve behavior and source defects. This is **not** a scan-tested or OVAL-runtime-equivalent release.
 
-**Important limitation:** The current generated package is a split **Rule/Assessment** authoring prototype, whereas the agreed long-term architecture is split **Benchmark/Policy/Assessment**, where Rule-to-Policy binding and Policy check selectors are separately defined. It should **not** be labeled a final split-policy implementation. We will use the review to determine exactly what should move from Rule into reusable Policy before treating the format as frozen.
+**Important limitation:** The full package remains a transitional Rule/Assessment prototype. The current architecture is Benchmark/Rule/Assessment, with Rule-owned selections and explicit relative Assessment source paths. The vocabulary slice must be reviewed before complete regeneration.
 
 ## Review prompts (structural rather than individual rule correctness)
 

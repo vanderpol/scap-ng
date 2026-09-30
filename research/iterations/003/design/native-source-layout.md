@@ -47,7 +47,6 @@ SHALL NOT contain migrated XCCDF/OVAL/CPE structures.
           benchmark.yaml
           applicability.yaml
           rules/
-          policies/
           assessments/
             automated/
             manual/
@@ -59,59 +58,42 @@ once exact reuse is demonstrated.
 Source and sample results SHALL remain in different top-level directories.
 
 
-## Rule, Policy, and Assessment file resolution (accepted design; implementation pending)
+## Rule and Assessment file resolution
 
-The generated `rhel9-full` currently stores shorthand Assessment IDs directly
-on Rules. That is a transitional converter output, **not** the approved
-authoring resolution model. See [issue #31](https://github.com/vanderpol/scap-ng/issues/31).
+The current model is **Benchmark → Rule → selected Assessment**. Rule replaces
+separate Policy objects so the same architecture supports compliance and
+vulnerability assertions. The Rule owns assertion metadata, applicability,
+parameters, remediation and named Assessment selections. Assessment owns the
+evaluation method. A separate Policy file SHALL NOT be introduced.
 
-For iteration 003 the agreed source contract is:
+Source Assessment references SHALL be explicit relative YAML paths resolved
+from the referring Rule file, independent of process working directory. Missing
+references, wrong document types and package-boundary escapes SHALL fail. Stable
+Assessment identities come from document contents rather than filename guesses.
+Compiled packages resolve logical identities through explicit manifest bindings.
+No author-maintained Assessment index is required for locating YAML sources.
 
-- `rules/<rule-id>.rule.yaml` has a `policy` field containing an **explicit
-  relative path** to a source Policy YAML file.
-- `policies/<policy-id>.policy.yaml` owns named `checks` and
-  `default_check`; each check's `assessment` field contains an **explicit
-  relative path** to an Assessment YAML file.
-- Source-path resolution is relative to the referring file, independent of
-  process working directory. Tools normalize and verify paths, reject missing
-  references and boundary escapes, and validate the referenced object's type.
-- Every referenced Policy/Assessment has its own stable logical `id`, which
-  SHALL NOT be derived from a basename. Selector names are also preserved.
-- The compiler emits an explicit ID/version → package member/integrity-digest
-  binding. Compiled assessors resolve only through that binding, not filename
-  guesses. Two selectors MAY point to one Assessment.
-- A separate author-maintained Assessment index SHALL NOT be required for
-  locating YAML sources. An ID-only source reference SHALL NOT be inferred
-  from filenames or directory layout.
-
-The existing Benchmark `applicability_catalog` field is an example of a
-path-based source reference; the applicability registry still names
-applicability IDs and their assessment bindings.
-
-Illustrative accepted authoring syntax (not yet generated): 
+The old full RHEL 9 Rule source still uses ID-only selection references and is
+transitional output. The current [two-rule authoring review slice](../review/test-vocabulary-slice/README.md)
+places relative paths directly on Rules. Its proposed field names are
+`assessment_choices` and `default_assessment_choice`; these vocabulary names
+remain subject to owner review, while named selector/default semantics are preserved.
 
 ```yaml
-# rules/SV-257777.rule.yaml
 rule:
   id: SV-257777
-  policy: ../policies/SV-257777.policy.yaml
-```
-
-```yaml
-# policies/SV-257777.policy.yaml
-policy:
-  id: SV-257777.policy
-  default_check: default
-  checks:
+  assessment_choices:
     default:
+      assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
+    automated:
       assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
     manual:
       assessment: ../assessments/manual/SV-257777.manual.assessment.yaml
+  default_assessment_choice: default
 ```
 
-The Rule's current `checks` and `default_check` fields SHALL be
-relocated into Policy after converter changes. Their presence in generated
-RHEL 9 source must not be mistaken for a final schema commitment.
+This section supersedes earlier Rule → Policy → Assessment guidance. The
+relative-path decision is retained without restoring the superseded Policy layer.
 
 ## Explicit native field visibility
 

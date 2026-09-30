@@ -5,7 +5,6 @@ assessment:
     approved.
   mode: automated
   class: compliance
-  deprecated: false
   purpose: assessment
   evaluate:
     test: test-default-target-symlinked-multi-user-target
@@ -17,12 +16,21 @@ assessment:
         object_title: null
         capability: unix.symlink
         select:
-          filepath: /etc/systemd/system/default.target
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/systemd/system/default.target
       assert:
         existence: all_exist
+        state_title: null
+        state_capability: unix.symlink
         state:
           field: canonical_path
-          operation: pattern match
           value: '[\S]*\/multi\-user\.target$'
-        state_capability: unix.symlink
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         item_quantifier: all
