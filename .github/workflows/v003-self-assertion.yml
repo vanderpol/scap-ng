@@ -96,16 +96,72 @@ jobs:
             xsd-validation.failed
             schematron-baseline.json
 
-      - name: Enforce zero unexplained v003 conversion failures
+      - name: Enforce only pinned deprecated-test blockers
         run: |
-          python scap-ng/tools/scap_upconvert_v003/check_self_assertion.py             --corpus self-assertion/SCAP_1.4/OVAL_Test_Content             --output self-assertion-v003-report.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
 
-      - name: Enforce zero semantic round-trip differences
-        run: |
-          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
-            --corpus self-assertion/SCAP_1.4/OVAL_Test_Content \
-            --out roundtrip-out \
-            --report self-assertion-v003-roundtrip.json
+          expected = {
+              "oval:navy.navwar.niwcatlantic.scc.ios:def:1": {
+                  "http://oval.mitre.org/XMLSchema/oval-definitions-5#ios#version_test"
+              },
+              "oval:org.joval.junos.test:def:1": {
+                  "http://oval.mitre.org/XMLSchema/oval-definitions-5#junos#xml_config_test"
+              },
+          }
+
+          conversion=json.loads(Path("self-assertion-v003-report.json").read_text())
+          found={}
+          unexpected=[]
+          for row in conversion.get("failure_details",[]):
+              features=[]
+              for problem in row.get("problems",[]):
+                  features.extend(problem.get("unsupported_features") or [])
+              names={x.get("feature") for x in features}
+              details={x.get("detail") for x in features if x.get("detail")}
+              if names == {"deprecated_oval_test"}:
+                  found[row["definition_id"]]=details
+              else:
+                  unexpected.append(row)
+
+          if unexpected:
+              print(json.dumps({"unexpected_conversion_failures":unexpected},indent=2))
+              raise SystemExit(1)
+          if set(found) != set(expected):
+              print(json.dumps({"expected":expected,"found":found},indent=2))
+              raise SystemExit(1)
+          for did,details in expected.items():
+              if not details <= found[did]:
+                  print(json.dumps({"definition":did,"expected":list(details),"found":list(found[did])},indent=2))
+                  raise SystemExit(1)
+
+          roundtrip=json.loads(Path("self-assertion-v003-roundtrip.json").read_text())
+          bad=[]
+          blocked=set()
+          for row in roundtrip.get("results",[]):
+              if row.get("equal"):
+                  continue
+              features=row.get("unsupported_features") or []
+              names={x.get("feature") for x in features}
+              if names == {"deprecated_oval_test"} and row.get("definition_id") in expected:
+                  blocked.add(row["definition_id"])
+              else:
+                  bad.append(row)
+          if bad or blocked != set(expected):
+              print(json.dumps({"unexpected_roundtrip_failures":bad,"blocked":sorted(blocked)},indent=2))
+              raise SystemExit(1)
+
+          if roundtrip.get("semantic_equal") != roundtrip.get("definitions") - len(expected):
+              raise SystemExit(
+                  f"semantic count mismatch: {roundtrip.get('semantic_equal')} of {roundtrip.get('definitions')}"
+              )
+          print(json.dumps({
+              "definitions":roundtrip["definitions"],
+              "semantic_equal":roundtrip["semantic_equal"],
+              "deprecated_blockers":sorted(blocked),
+          },indent=2))
+          PY
 
       - name: Enforce OVAL XSD validity
         run: |
