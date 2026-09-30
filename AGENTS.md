@@ -168,3 +168,11 @@ Iteration 003 restarts SCAP 1.4 up-conversion from the accepted native design.
 - A small `applicability.yaml` registry is retained only as semantic applicability-ID -> Assessment binding indirection; it SHALL NOT contain migrated OVAL/CPE/XCCDF structures.
 - Rules reference applicability IDs, not Assessment file paths.
 - The clean-room converter lives under `tools/scap_upconvert_v003/` and SHALL NOT import the iteration-001/002 whole-benchmark conversion pipeline.
+
+## Pre-alpha publication workflow
+
+Owner direction, 2026-09-30: during the current pre-alpha phase, commit completed
+and appropriately tested work directly to `main`. Do not create routine feature
+branches or pull requests unless the owner explicitly requests one. Record
+provenance, implementation limits and validation evidence as usual. Once the
+owner identifies a stable checkpoint, reassess the branch/review workflow.
