@@ -12,8 +12,12 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 import yaml
 
+# Share the source revision with pinned NIWC corpus regression workflows.
+# Never generate review artifacts from a moving 'main' archive.
+SOURCE_REVISION = "8c8e5dff860af6b1290ee9273a282db24278f8d5"
 SOURCE_URL = (
-    "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/"
+    "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/"
+    f"{SOURCE_REVISION}/Current/"
     "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip"
 )
 ROOT = Path(__file__).resolve().parents[2]
@@ -2414,7 +2418,8 @@ def main():
         )
 
         write_json(EVIDENCE / "source-package.json", {
-            "source_url": SOURCE_URL, "zip_sha256": sha256(package_bytes),
+            "source_url": SOURCE_URL, "source_revision": SOURCE_REVISION,
+            "zip_sha256": sha256(package_bytes),
             "archive_files": sorted(str(p.relative_to(td / "pkg")) for p in files),
             "benchmark_component": xsrc, "assessment_component": osrc,
         })
