@@ -7,6 +7,7 @@ Reads local XSD files only. Does not resolve remote imports; flags them for revi
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -23,7 +24,7 @@ def local(tag):
 
 def inventory(root: Path):
     files = sorted([root] if root.is_file() else root.rglob("*.xsd"))
-    output = {"files": [], "declarations": [], "imports": [], "errors": []}
+    output = {"files": [], "source_sha256": {}, "declarations": [], "imports": [], "inheritance_edges": [], "errors": []}
     for path in files:
         try:
             doc = ET.parse(path)
@@ -32,6 +33,7 @@ def inventory(root: Path):
             continue
         root_node = doc.getroot()
         output["files"].append(str(path))
+        output["source_sha256"][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
         target_ns = root_node.get("targetNamespace", "")
         def walk(node, ancestry):
             tag = local(node.tag)
@@ -40,6 +42,14 @@ def inventory(root: Path):
             if tag in ("import", "include", "redefine", "override"):
                 output["imports"].append({"file": str(path), "kind": tag,
                     "namespace": node.get("namespace"), "schemaLocation": node.get("schemaLocation")})
+            # These links require resolution across named types and attribute groups.
+            # Do not infer an effective default simply from an attribute name.
+            dependency = node.get("base") if tag in ("extension", "restriction") else (node.get("ref") if tag in ("attributeGroup", "group") else None)
+            if dependency:
+                output["inheritance_edges"].append({"file": str(path),
+                    "targetNamespace": target_ns, "path": "/".join(here),
+                    "kind": tag, "reference": dependency,
+                    "resolution": "unresolved"})
             if tag in ATTR_TAGS | STRUCTURAL:
                 name = node.get("name", node.get("ref", ""))
                 restrictions = []
@@ -69,6 +79,7 @@ def inventory(root: Path):
         "explicit_defaults": sum("default" in x["attributes"] for x in output["declarations"]),
         "fixed_values": sum("fixed" in x["attributes"] for x in output["declarations"]),
         "import_links": len(output["imports"]),
+        "unresolved_inheritance_edges": len(output["inheritance_edges"]),
         "errors": len(output["errors"])}
     return output
 
