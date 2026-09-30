@@ -803,8 +803,8 @@ def unsupported_definition_features(oroot, definition_id):
 
     supported_components = {
         "arithmetic", "begin", "concat", "count", "end", "escape_regex",
-        "literal_component", "merge", "object_component", "regex_capture",
-        "split", "substring", "time_difference", "unique",
+        "glob_to_regex", "literal_component", "merge", "object_component",
+        "regex_capture", "split", "substring", "time_difference", "unique",
         "variable_component",
     }
 
@@ -867,7 +867,7 @@ def unsupported_definition_features(oroot, definition_id):
 
     def visit_criteria(node):
         operator = (node.get("operator") or "AND").upper()
-        if operator not in ("AND", "OR"):
+        if operator not in ("AND", "OR", "ONE", "XOR"):
             add("criteria_operator", detail=operator)
         for child in node:
             kind = local(child.tag)
@@ -1092,6 +1092,13 @@ def lower_definition(oroot, definition_id, assessment_id):
             }, None
         if name == "escape_regex":
             return {"escape_regex": lowered[0] if len(lowered) == 1 else lowered}, None
+        if name == "glob_to_regex":
+            return {
+                "glob_to_regex": {
+                    "value": lowered[0] if len(lowered) == 1 else lowered,
+                    "noescape": (node.get("glob_noescape") or "false").lower() == "true",
+                }
+            }, None
         if name == "arithmetic":
             return {
                 "arithmetic": {
@@ -1389,6 +1396,10 @@ def lower_definition(oroot, definition_id, assessment_id):
             expr = {"all": terms}
         elif operator == "OR":
             expr = {"any": terms}
+        elif operator == "ONE":
+            expr = {"one": terms}
+        elif operator == "XOR":
+            expr = {"xor": terms}
         else:
             return None, f"unsupported_criteria_operator:{operator}"
 
