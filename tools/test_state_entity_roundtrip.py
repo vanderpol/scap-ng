@@ -57,6 +57,36 @@ class StateEntityRoundTripTests(unittest.TestCase):
         self.assertEqual(test.get("check_existence"), "at_least_one_exists")
         self.assertEqual(state_entity.get("check_existence"), "none_exist")
 
+    def test_state_identity_precedes_predicates_in_generated_source(self):
+        # Readability is a source-format contract. It MUST NOT alter semantics.
+        source = ET.fromstring(SOURCE)
+        native, error = lower_definition(source, "oval:example:def:1", "state-order")
+        self.assertIsNone(error, error)
+        check = next(iter(native["assessment"]["checks"].values()))
+        assertion = check["assert"]
+        self.assertLess(list(assertion).index("state_title"),
+                        list(assertion).index("state"))
+        self.assertLess(list(assertion).index("state_capability"),
+                        list(assertion).index("state"))
+        self.assertEqual(assertion["state_capability"], "unix.file")
+        self.assertEqual(assertion["state"]["field"], "filename")
+
+    def test_multiple_state_headers_precede_each_state(self):
+        source = ET.fromstring(SOURCE)
+        state_node = source.find(f".//{{{UNIX}}}file_state")
+        duplicate = ET.fromstring(ET.tostring(state_node, encoding="unicode"))
+        duplicate.set("id", "oval:example:ste:2")
+        source.find(f".//{{{OD}}}states").append(duplicate)
+        test_node = source.find(f".//{{{UNIX}}}file_test")
+        ET.SubElement(test_node, f"{{{UNIX}}}state",
+                      {"state_ref": "oval:example:ste:2"})
+        native, error = lower_definition(source, "oval:example:def:1", "states-order")
+        self.assertIsNone(error, error)
+        assertion = next(iter(native["assessment"]["checks"].values()))["assert"]
+        for item in assertion["states"]:
+            self.assertEqual(list(item)[:3],
+                             ["state_title", "capability", "state"])
+
     def test_required_test_check_is_not_invented(self):
         source = ET.fromstring(SOURCE.replace('check="all" ', ''))
         native, error = lower_definition(source, "oval:example:def:1", "invalid-check")
