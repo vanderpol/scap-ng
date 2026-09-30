@@ -797,6 +797,7 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
     """
     cache = {}
     resolving = set()
+    collecting_objects = set()
 
     def result(status, **kwargs):
         return {"status": status, **kwargs}
@@ -922,6 +923,16 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
         return {"status": "exact_static", "items": unique_items(items), "operation": "set"}
 
     def synthetic_object_items(object_ref):
+        if object_ref in collecting_objects:
+            return result("cycle", reason=f"object_cycle:{object_ref}",
+                          operation="object_component", object_ref=object_ref)
+        collecting_objects.add(object_ref)
+        try:
+            return synthetic_object_items_inner(object_ref)
+        finally:
+            collecting_objects.remove(object_ref)
+
+    def synthetic_object_items_inner(object_ref):
         element = by_id.get(object_ref)
         if element is None or kind_by_id.get(object_ref) != "object":
             return result(
@@ -1168,6 +1179,21 @@ def resolve_static_variables(by_id, kind_by_id, max_values: int = 4096):
             children = all_children_static(node, name, minimum=2)
             if children["status"] != "exact_static":
                 return children
+            # Check cardinality before allocating the product. Checking only
+            # afterwards could allocate millions of strings under a 4096-value
+            # limit. Keep the original AST; bounded means not evaluated here.
+            candidate_values = 1
+            for operand in children["values"]:
+                candidate_values *= len(operand)
+            if candidate_values > max_values:
+                return result(
+                    "bounded",
+                    reason=f"{name}_value_expansion_exceeds_{max_values}",
+                    operation=name,
+                    candidate_values=candidate_values,
+                )
+            if candidate_values == 0:
+                return bounded([], name)
             values = [""]
             for child_values in children["values"]:
                 values = [

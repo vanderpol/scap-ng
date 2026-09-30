@@ -28,6 +28,45 @@ def identity(node):
     return uri, stem.rsplit("_", 1)[0]
 
 
+def audit_set_references(root, component_id=None):
+    """Check the inherited same-Object-type constraint at every set depth.
+
+    Unlike the upstream oval-def_setobjref Schematron pattern, which enumerates
+    depths 1..3, this walk covers every nested set. It records source defects
+    without rewriting or coercing any Object capability.
+    """
+    sections = {split.local(n.tag): n for n in root if isinstance(n.tag, str)}
+    objects = {n.get("id"): n for n in sections.get("objects", [])
+               if isinstance(n.tag, str) and n.get("id")}
+    report = {"set_object_refs": 0, "mismatches": [], "missing_targets": []}
+    for owner in objects.values():
+        pending = [(n, 1) for n in owner if split.local(n.tag) == "set"]
+        while pending:
+            node, depth = pending.pop()
+            for child in node:
+                name = split.local(child.tag)
+                if name == "set":
+                    pending.append((child, depth + 1))
+                elif name == "object_reference":
+                    report["set_object_refs"] += 1
+                    ref = (child.text or "").strip()
+                    details = {"component": component_id, "object": owner.get("id"),
+                               "reference": ref, "kind": "set_object",
+                               "set_depth": depth}
+                    target = objects.get(ref)
+                    if target is None:
+                        report["missing_targets"].append(details)
+                    elif identity(target) != identity(owner):
+                        report["mismatches"].append({
+                            **details, "reason": "mismatched_type",
+                            "expected_family": identity(owner)[0],
+                            "expected_stem": identity(owner)[1],
+                            "target_type": ET.QName(target).localname,
+                            "target_family": ET.QName(target).namespace,
+                        })
+    return report
+
+
 def audit_source(zip_file):
     _member, _data, stream = split.find_datastream(zip_file)
     components, _refs = split.embedded_components(stream)
@@ -37,6 +76,7 @@ def audit_source(zip_file):
         "tests": 0,
         "object_refs": 0,
         "state_refs": 0,
+        "set_object_refs": 0,
         "tests_without_object": [],
         "mismatches": [],
         "duplicate_id_components": [],
@@ -58,6 +98,10 @@ def audit_source(zip_file):
                     result["duplicate_id_components"].append({
                         "component": component_id, "id": key})
                 index[key] = (kind, element)
+        set_audit = audit_set_references(root, component_id)
+        result["set_object_refs"] += set_audit["set_object_refs"]
+        result["mismatches"].extend(set_audit["mismatches"])
+        result["missing_targets"].extend(set_audit["missing_targets"])
         for test in sections.get("tests", []):
             if not isinstance(test.tag, str):
                 continue
@@ -158,14 +202,14 @@ def main():
         "sources": sources,
         "totals": {key: sum(row[key] for row in sources)
                    for key in ("oval_components", "tests",
-                               "object_refs", "state_refs")},
+                               "object_refs", "state_refs", "set_object_refs")},
         "issues": {
             "mismatched_type_references": sum(len(r["mismatches"]) for r in sources),
             "missing_targets": sum(len(r["missing_targets"]) for r in sources),
             "duplicate_ids": sum(len(r["duplicate_id_components"]) for r in sources),
             "tests_without_objects": sum(len(r["tests_without_object"]) for r in sources),
         },
-        "scope": "Direct Test Object/State references; filters, sets, extended expressions and runtime evaluation need separate conformance checks.",
+        "scope": "Direct Test Object/State references and same-type Object references at every nested set depth. Filter typing, extended expressions and runtime evaluation remain separate conformance work.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")

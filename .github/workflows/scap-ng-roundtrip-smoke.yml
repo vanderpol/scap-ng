@@ -14,6 +14,8 @@ on:
       - 'tools/test_oval_effective_attributes.py'
       - 'tools/test_state_entity_roundtrip.py'
       - 'tools/test_niwc_census_summary.py'
+      - 'tools/test_variable_filter_dependencies.py'
+      - 'tools/scap_ng_roundtrip_v003/audit_test_object_state_types.py'
       - 'tools/scap_upconvert_v003/build_rhel9_review_slice.py'
   pull_request:
     paths:
@@ -24,6 +26,10 @@ on:
       - 'tools/scap_ng_roundtrip_v003/compare_schematron_baseline.py'
       - 'tools/scap_ng_roundtrip_v003/build_full_oval_omni.py'
       - '.github/workflows/scap-ng-roundtrip-smoke.yml'
+      - 'tools/test_variable_filter_dependencies.py'
+      - 'tools/scap_upconvert_v003/build_rhel9_review_slice.py'
+      - 'tools/oval_semantic_ir.py'
+      - 'tools/scap_ng_roundtrip_v003/audit_test_object_state_types.py'
   workflow_dispatch:
 
 jobs:
@@ -46,13 +52,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libxml2-utils
-          python -m pip install lxml
+          python -m pip install lxml pyyaml cryptography
 
       - name: Regression tests for effective and explicit OVAL attributes
         run: |
           python scap-ng/tools/test_oval_effective_attributes.py
           python scap-ng/tools/test_state_entity_roundtrip.py
           python scap-ng/tools/test_niwc_census_summary.py
+          python scap-ng/tools/test_variable_filter_dependencies.py
           python scap-ng/tools/scap_ng_roundtrip_v003/test_explicit_semantics.py
 
       - name: Reverse-generate OVAL stress fixtures
