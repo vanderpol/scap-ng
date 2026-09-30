@@ -62,7 +62,7 @@ def validate_native_tree(root):
         kind=next(iter(doc)); identity=doc[kind].get('id')
         if identity:
             if identity in identities: raise ValueError('Duplicate native identity: '+identity)
-            identities[identity]=str(path.relative_to(root))
+            identities[identity]=path.relative_to(root).as_posix()
         documents[path.resolve()]=doc
     def resolve(owner, ref, kind):
         path=(owner.parent/ref).resolve()

@@ -45,7 +45,7 @@ def audit(package, output):
             if method['mode']!=expected_mode: issues.append(rid+': mode differs for '+selector)
             if not manual:
                 original=check.find('x:check-content-ref',NS)
-                path=str(target.relative_to(output.resolve()))
+                path=target.relative_to(output.resolve()).as_posix()
                 if assessment_definitions.get(path)!=original.get('name'):
                     issues.append(rid+': source definition binding differs for '+selector)
             else:
