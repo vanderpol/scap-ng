@@ -216,6 +216,22 @@ compliance evaluation.
 
 ## 12. Tailoring provenance
 
+A Tailoring artifact SHALL expose a human-readable `purpose` explaining why
+the Tailoring exists. Purpose and a clearly labeled `provenance` section SHOULD
+appear near the top, before policy changes, so reviewers can readily find them.
+
+The provenance section SHALL expose distinct fields for `created_by`,
+`created_at`, `modified_by`, `modified_at`, `authorized_by`, `authorized_at`,
+`authorization_reference`, and `authorization_status`. Creator, modifier and
+authorizer SHALL remain distinct roles even when the same person fills them.
+Person records SHOULD include name, organizational role and contact information
+when available. Organizational ownership SHOULD also be recorded.
+
+Unset or not-yet-authorized fields MAY be null and SHALL remain visible in
+draft examples. A null authorizer SHALL NOT be represented as approval by the
+creator. These metadata record purpose and authorization provenance; they SHALL
+NOT themselves alter Rule selection, Parameter values or Assessment execution.
+
 A Tailoring artifact SHOULD identify, where available:
 
 - Tailoring identity/version;

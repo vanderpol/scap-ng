@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import yaml
 
-ALLOWED={'id','version','title','description','benchmark','profile','extends','enabled_rules','disabled_rules',
+ALLOWED={'id','version','title','purpose','description','benchmark','profile','extends','enabled_rules','disabled_rules',
          'enabled_groups','disabled_groups','parameters','check_selectors','selection_justifications',
          'parameter_justifications','provenance'}
 
@@ -109,7 +109,8 @@ def resolve(benchmark_path, tailoring_path, input_path=None):
         for rid,selector in t.get('check_selectors',{}).items():
             if rid not in rules or selector not in rules[rid]['assessment_choices']: raise ValueError('Unknown Rule/Assessment selector')
             selectors[rid]=selector;selector_source[rid]=origin
-        history.append({'id':t['id'],'version':t['version'],'selection':dict(selections),
+        history.append({'id':t['id'],'version':t['version'],'purpose':t.get('purpose'),
+                        'selection':dict(selections),
                         'parameter_values':deepcopy(values),'check_selectors':dict(selectors),
                         'provenance':deepcopy(t.get('provenance',{})),
                         'selection_justifications':deepcopy(t.get('selection_justifications',{})),

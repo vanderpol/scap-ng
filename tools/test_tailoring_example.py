@@ -37,6 +37,25 @@ class TailoringExample(unittest.TestCase):
         self.assertFalse(r['effective_selection']['demo-session-timeout'])
         self.assertEqual(sum(r['effective_selection'].values()),4)
 
+    def test_purpose_and_distinct_creator_authorizer_are_preserved(self):
+        result=self.run_demo();layer=result['tailoring_layers'][-1]
+        self.assertTrue(layer['purpose'])
+        self.assertEqual(layer['provenance']['created_by']['name'],'Example Policy Author')
+        self.assertEqual(layer['provenance']['authorized_by']['name'],'Example Approver')
+        self.assertEqual(layer['provenance']['authorization_reference'],'EXAMPLE-CHANGE-100')
+
+    def test_draft_authorization_metadata_does_not_change_effective_policy(self):
+        original=self.run_demo()
+        def draft(doc):
+            doc['tailoring']['purpose']='Draft review of the same policy changes.'
+            p=doc['tailoring']['provenance']
+            p.update(authorized_by=None,authorized_at=None,authorization_reference=None,authorization_status='draft')
+        root=self.modified(draft);result=self.run_demo(root)
+        for key in ('effective_selection','parameters','assessment_selections'):
+            self.assertEqual(result[key],original[key])
+        self.assertIsNone(result['tailoring_layers'][-1]['provenance']['authorized_by'])
+        self.assertEqual(result['tailoring_layers'][-1]['provenance']['authorization_status'],'draft')
+
     def test_wrong_publication_is_rejected(self):
         root=self.modified(lambda d:d['tailoring']['benchmark'].update(version='0.2'))
         with self.assertRaisesRegex(ValueError,'binding mismatch'):self.run_demo(root)

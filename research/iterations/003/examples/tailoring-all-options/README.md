@@ -4,6 +4,21 @@ Start with [all-options.tailoring.yaml](tailoring/all-options.tailoring.yaml). I
 
 This is a worked policy-resolution example. It does not introduce a separate Policy object, change the RHEL9 publication, or claim finalized serialization/NG schema or target execution. The demonstration Benchmark uses manual Assessments; its non-default `document-review` selector shows that selector names are extensible. Parameter data and source bindings are exercised by the example resolver, not a production assessor's expected-state input evaluator.
 
+## Who, authorization and purpose
+
+Every example puts `purpose` and `provenance` immediately after identity/title.
+`created_by`, `modified_by` and `authorized_by` identify separate roles; the
+creator is never implicitly treated as the authorizer. Each has an obvious
+place for name, role and contact. Ownership, dates, authorization reference/status,
+ticket, exception, effective/expiration dates and justification remain visible.
+Unused values can be null. In a draft, `authorized_by`, `authorized_at` and
+`authorization_reference` can all be null with `authorization_status: draft`.
+
+These are author-supplied provenance records, not a change to evaluation logic.
+The resolver preserves them and the purpose for every Tailoring layer; changing
+them does not enable Rules, alter values or choose Assessments. All identities
+and approvals in these examples are fictional.
+
 ## Option coverage
 
 | Documented option | Where it is exercised |
@@ -20,7 +35,10 @@ This is a worked policy-resolution example. It does not introduce a separate Pol
 | Override a parent value | Password length progresses 12 → 14 → 16 → 18 |
 | Select existing named Assessment alternatives | `check_selectors`: `manual` and `document-review` |
 | Justify selection and value changes | `selection_justifications`, `parameter_justifications` |
-| Author, organization, creation/modification times | `provenance` |
+| Purpose: why the Tailoring exists | `purpose`, near the top |
+| Who created/modified it, and when | `provenance.created_by`, `created_at`, `modified_by`, `modified_at` |
+| Who authorized it, and when | `provenance.authorized_by`, `authorized_at`, `authorization_reference`, `authorization_status` |
+| Organizational ownership | `provenance.organization` |
 | Approval authority/reference, ticket and exception | `provenance` |
 | Effective/expiration dates and overall justification | `provenance`; metadata does not schedule or modify execution |
 | Tailoring with no Profile or parent | [no-profile.tailoring.yaml](tailoring/no-profile.tailoring.yaml) |
@@ -65,7 +83,7 @@ python tools/test_tailoring_example.py
 
 The small resolver validates the examples' bindings and policy boundaries and records per-layer provenance. It does not execute Assessment Requests, evaluate targets, enforce a finalized NG schema, or implement complete missing-input result semantics. Assessment identities come from document contents; Rule filenames do not establish identity. Parent source paths and Assessment paths are explicit and bounded.
 
-Eleven regressions cover the expected five-Rule outcome, no-Profile behavior, actual RHEL9 bindings, mismatched publication, same-layer conflicts, unknown selectors, invalid Parameter values, Organizational Input separation, prohibited execution mutations, parent identity/cycles and filename-independent Rule lookup. All passed locally and on Windows/Linux in [CI run 36783808173](https://github.com/vanderpol/scap-ng/actions/runs/36783808173). See [validation.json](validation.json).
+Thirteen regressions cover the expected five-Rule outcome, no-Profile behavior, actual RHEL9 bindings, mismatched publication, same-layer conflicts, unknown selectors, invalid Parameter values, Organizational Input separation, prohibited execution mutations, parent identity/cycles and filename-independent Rule lookup, preservation of purpose/creator/authorizer, and explicit null authorization in drafts. The original eleven passed on Windows/Linux in [CI run 36783808173](https://github.com/vanderpol/scap-ng/actions/runs/36783808173); all thirteen passed locally after the metadata update. See [validation.json](validation.json).
 
 ## Rebase is a workflow
 

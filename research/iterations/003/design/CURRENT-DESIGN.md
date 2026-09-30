@@ -55,6 +55,8 @@ rendering were outside this slice. Windows/Linux graph and local-ZIP regressions
 
 [Tailoring worked examples](../examples/tailoring-all-options/README.md) cover the documented mutation surface, parent layering, provenance, typed value overrides, named Assessment selections and separate Organizational Input. They include a real RHEL9 binding and resolved-policy snapshots. New detailed source field shapes remain proposals; the small resolver exercises the examples and is not a production assessor or finalized schema implementation.
 
+Owner direction, 2026-09-30: Tailoring SHALL have an obvious human-readable `purpose` and distinct provenance locations for creator, modifier and authorizer, with dates, organizational ownership and authorization reference/status. Keep these near the top of examples and retain unset draft fields explicitly as null. Preserve them in resolved policy provenance without treating metadata as execution-changing data.
+
 `review/test-vocabulary-slice` is **incomplete**, despite its passing narrow naming/path tests. It still contains older `collect`/`object_title`/capability duplication and has no Variable/Collection dependency example. It SHALL NOT be described as a completed current-design slice.
 
 `source/split-rule-assessment/rhel9-full` is historical generated baseline data, not current native syntax. `source/split-policy-assessment/rhel9-full` is a superseded architecture experiment. Neither tree is an automatic source of current authoring decisions.
