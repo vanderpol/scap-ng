@@ -47,6 +47,29 @@ class EffectiveAttributeTests(unittest.TestCase):
             different["check_existence"]["value"],
         )
 
+    def test_inherited_state_entity_attribute_group_defaults(self):
+        # EntityStateSimple/Complex inherit from EntityAttributeGroup.
+        omitted = ir.effective_attributes(element("<filename/>"), "state_entity")
+        for key, value in {
+            "datatype": "string",
+            "operation": "equals",
+            "mask": "false",
+        }.items():
+            with self.subTest(key=key):
+                self.assertEqual(
+                    omitted[key],
+                    {"value": value, "origin": "xsd_default"},
+                )
+        explicit = ir.effective_attributes(
+            element('<filename datatype="int" operation="greater than" mask="true"/>'),
+            "state_entity",
+        )
+        self.assertEqual(explicit["datatype"], {"value": "int", "origin": "explicit"})
+        self.assertEqual(
+            explicit["operation"], {"value": "greater than", "origin": "explicit"}
+        )
+        self.assertEqual(explicit["mask"], {"value": "true", "origin": "explicit"})
+
     def test_documented_variable_default_only_with_reference(self):
         no_variable = ir.effective_attributes(element("<path/>"), "state_entity")
         with_variable = ir.effective_attributes(
