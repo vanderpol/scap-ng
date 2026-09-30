@@ -203,13 +203,26 @@ def main(argv=None):
             app_oval=oval
         original_path=temp/'original-applicability.xml'; ET.ElementTree(app_oval).write(original_path,encoding='utf-8')
         predicates,dictionary=platform_sources(args.input)
+        split_platform_definitions={}
+        if args.split_root:
+            provenance_path=args.split_root/'applicability'/'provenance.json'
+            if provenance_path.exists():
+                provenance_doc=json.loads(provenance_path.read_text(encoding='utf-8'))
+                for row in provenance_doc.get('checks',[]):
+                    platform_id=(row.get('platform_id') or '').lstrip('#')
+                    definition_id=row.get('definition_id') or row.get('name')
+                    if platform_id and definition_id:
+                        prior=split_platform_definitions.get(platform_id)
+                        if prior and prior!=definition_id:
+                            raise ValueError('Conflicting split applicability binding: '+platform_id)
+                        split_platform_definitions[platform_id]=definition_id
         referenced={ref.lstrip('#') for r in rs for ref in r['platforms']}
         referenced.update(n.get('idref').lstrip('#') for n in xr.findall('x:platform',source.NS))
         app_ids={}; app_evidence=[]; registry={}; blocked_applicability={}
         for ref in sorted(referenced):
             negate=False
             if ref in predicates:
-                node=predicates[ref];did=source.source_platform_definition_id(node)
+                node=predicates[ref];did=split_platform_definitions.get(ref) or source.source_platform_definition_id(node)
                 logical=next(n for n in node if source.local(n.tag)=='logical-test')
                 negate=(logical.get('negate') or 'false') in ('true','1')
                 title=source.text(next((n for n in node if source.local(n.tag)=='title'),None))
