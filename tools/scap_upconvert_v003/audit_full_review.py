@@ -31,18 +31,29 @@ def audit(package, output):
             selector=(check.get('selector') or '').strip() or 'default'
             if selector in expected: issues.append(rid+': duplicate source selector')
             expected[selector]=check
-        if set(choices)!=set(expected): issues.append(rid+': selector set differs')
+        fallbacks={row['selector']:row for row in bindings[rid].get('manual_fallbacks',[])}
+        expected_native=set(expected)-{selector for selector in fallbacks if selector!='default'}
+        if set(choices)!=expected_native: issues.append(rid+': selector set differs')
         if 'default' not in expected or native['default_assessment_choice']!='default':
             issues.append(rid+': source default selection is not preserved')
         assessment_definitions={a['path']:a['source_graph_bindings']['source_definition']
-                                for a in bindings[rid]['assessments']}
+                                for a in bindings[rid]['assessments']
+                                if a.get('path') and a.get('source_graph_bindings')}
         for selector,check in expected.items():
+            if selector in fallbacks and selector!='default':
+                if selector in choices: issues.append(rid+': deprecated automated selector was not skipped: '+selector)
+                continue
             ref=choices[selector]['assessment']; target=(output/'rules'/ref).resolve()
             if not target.is_relative_to(output.resolve()): raise ValueError('Package escape')
             method=yaml.safe_load(target.read_text(encoding='utf-8'))['assessment']
             manual=check.get('system')=='http://scap.nist.gov/schema/ocil/2'
-            expected_mode='manual' if manual else 'automated'
+            expected_mode='manual' if manual or selector in fallbacks else 'automated'
             if method['mode']!=expected_mode: issues.append(rid+': mode differs for '+selector)
+            if selector in fallbacks:
+                # Intentional NG migration rule: deprecated automated OVAL is
+                # not converted. The source default may point to the verified
+                # source manual Assessment instead.
+                continue
             if not manual:
                 original=check.find('x:check-content-ref',NS)
                 path=target.relative_to(output.resolve()).as_posix()
@@ -66,7 +77,9 @@ def audit(package, output):
         if native['weight']!=float(element.get('weight') or '1'): issues.append(rid+': weight differs')
         source_title=' '.join(''.join(element.find('x:title',NS).itertext()).split())
         if native['title']!=source_title: issues.append(rid+': title differs')
-        comparisons.append({'rule':rid,'selectors':list(expected),'default':'default','matched':not any(x.startswith(rid+':') for x in issues)})
+        comparisons.append({'rule':rid,'selectors':list(expected),'native_selectors':list(choices),
+                            'manual_fallbacks':list(fallbacks),'default':'default',
+                            'matched':not any(x.startswith(rid+':') for x in issues)})
     return {'source_rules':len(source_rules),'native_rules':len(paths),'rule_comparisons':comparisons,
             'issues':issues,'limits':['Compares source bindings, manual inline procedures and selected Rule metadata; does not prove runtime equivalence or complete metadata conformance.']}
 
