@@ -1302,6 +1302,18 @@ def lower_definition(oroot, definition_id, assessment_id):
         capability = f"{family}.{test_name[:-5] if test_name.endswith('_test') else test_name}"
         test_title = node_title(test)
 
+        # OVAL independent:unknown_test intentionally has no Object and always
+        # evaluates to unknown. Preserve that result explicitly instead of
+        # inventing collection semantics.
+        if test_name == "unknown_test":
+            check_id = unique_check_id(test_title, capability)
+            test_to_check[test_ref] = check_id
+            checks[check_id] = {
+                "test_title": test_title,
+                "result": "unknown",
+            }
+            return {"check": check_id}, None
+
         obj_ref = None
         state_refs = []
         for child in test:
