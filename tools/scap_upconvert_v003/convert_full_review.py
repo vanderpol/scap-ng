@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Build the current RHEL9 full research review from a checksum-pinned local ZIP.
+"""Build a current full SCAP-NG research review from a pinned local SCAP ZIP.
 
 Uses source parsing/lowering helpers, never historical generator main functions.
+Deprecated OVAL Tests are rejected from automation; where verified source manual
+checks exist, affected Rules may be emitted as manual-only review content.
 Not a finalized language implementation or a target-runtime conformance claim.
 """
 import argparse
@@ -135,11 +137,15 @@ def validate_native_tree(root):
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--input', type=Path, required=True)
-    parser.add_argument('--sha256', required=True)
+    parser.add_argument('--sha256', required=True, help='Expected SHA256, or "auto" for a source already pinned by repository revision/path')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--benchmark-id', default='rhel9-stig-current-full')
+    parser.add_argument('--platform-id', default='enterprise-linux.9')
+    parser.add_argument('--platform-title', default='Enterprise Linux 9 family')
     parser.add_argument('--schema', type=Path, default=Path(__file__).resolve().parents[2]/'third_party/scap-1.4-schemas/omni-schema.xsd')
     args=parser.parse_args(argv)
-    if hashlib.sha256(args.input.read_bytes()).hexdigest()!=args.sha256:
+    actual_sha256=hashlib.sha256(args.input.read_bytes()).hexdigest()
+    if args.sha256!='auto' and actual_sha256!=args.sha256:
         raise ValueError('Source checksum mismatch')
     if args.output.exists() and any(args.output.iterdir()): raise ValueError('Output must be new or empty')
     xr,oval=review.source_components(args.input)
@@ -159,7 +165,7 @@ def main(argv=None):
     with tempfile.TemporaryDirectory() as temporary:
         temp=Path(temporary); rule_list=temp/'rules.json'
         write_json(rule_list,[r['id'] for r in rs])
-        status=review.main(['--input',str(args.input),'--sha256',args.sha256,'--output',str(args.output),
+        status=review.main(['--input',str(args.input),'--sha256',actual_sha256,'--output',str(args.output),
                             '--rules-file',str(rule_list),'--schema',str(args.schema)])
         if status: raise ValueError('Assessment conversion blocked; see evidence.json')
         evidence=json.loads((args.output/'evidence.json').read_text(encoding='utf-8'))
@@ -169,7 +175,7 @@ def main(argv=None):
         predicates,dictionary=platform_sources(args.input)
         referenced={ref.lstrip('#') for r in rs for ref in r['platforms']}
         referenced.update(n.get('idref').lstrip('#') for n in xr.findall('x:platform',source.NS))
-        app_ids={}; app_evidence=[]; registry={}
+        app_ids={}; app_evidence=[]; registry={}; blocked_applicability={}
         for ref in sorted(referenced):
             negate=False
             if ref in predicates:
@@ -186,7 +192,25 @@ def main(argv=None):
             else: raise ValueError('Unresolved applicability source: '+ref)
             if not did or app_id in registry: raise ValueError('Missing or colliding applicability identity: '+ref)
             unsupported=source.unsupported_definition_features(oval,did)
-            if unsupported: raise ValueError('Applicability source blocked: '+str(unsupported))
+            if unsupported:
+                deprecated_only=all(x.get('feature')=='deprecated_oval_test' for x in unsupported)
+                if deprecated_only:
+                    blocked_applicability[ref]={
+                        'native_condition':app_id,
+                        'source_definition':did,
+                        'unsupported':unsupported,
+                        'reason':'deprecated_oval_test',
+                    }
+                    app_ids[ref]=None
+                    app_evidence.append({
+                        'source_platform':ref,
+                        'native_condition':app_id,
+                        'source_definition':did,
+                        'status':'skipped_deprecated_oval_test_manual_fallback',
+                        'unsupported':unsupported,
+                    })
+                    continue
+                raise ValueError('Applicability source blocked: '+str(unsupported))
             provenance={};native,error=source.lower_definition(oval,did,app_id+'.assessment',collection_graph=True,provenance=provenance)
             if error: raise ValueError('Applicability: '+str(error))
             tree,new_id=build(native);schema.assertValid(etree.fromstring(ET.tostring(tree.getroot())))
@@ -207,6 +231,17 @@ def main(argv=None):
             choices={key:{'assessment':'../'+ref} for key,ref in result['selectors'].items()}
             source_selectors=[(c.get('selector') or '').strip() or 'default' for c in rec['checks']]
             if len(source_selectors)!=len(set(source_selectors)): raise ValueError('Duplicate Rule selector: '+rid)
+            blocked_refs=[x.lstrip('#') for x in rec['platforms'] if x.lstrip('#') in blocked_applicability]
+            if blocked_refs:
+                manual_ref=result['selectors'].get('manual') or result.get('manual_fallback_assessment')
+                if not manual_ref:
+                    raise ValueError('Deprecated applicability requires source manual fallback for '+rid)
+                choices={'default':{'assessment':'../'+manual_ref},'manual':{'assessment':'../'+manual_ref}}
+                result['applicability_manual_fallback']={
+                    'source_platforms':blocked_refs,
+                    'reason':'deprecated_oval_test',
+                    'manual_assessment':manual_ref,
+                }
             default='default' if 'default' in choices else next(iter(choices),None)
             if default is None: raise ValueError('Rule has no Assessment: '+rid)
             content=source.rule_content(element)
@@ -221,7 +256,7 @@ def main(argv=None):
                                  {'scheme':'vulnerability','value':rec['vulnerability_id']}]+content.get('identifiers',[]),
                   'references':content.get('references',[]),'requires':[by_source[x] for x in rec['requires']],
                   'conflicts':[by_source[x] for x in rec['conflicts']],
-                  'applicability':[app_ids[x.lstrip('#')] for x in rec['platforms']],
+                  'applicability':[app_ids[x.lstrip('#')] for x in rec['platforms'] if app_ids.get(x.lstrip('#'))],
                   'parameters':{},'remediation':content.get('remediation'),
                   'assessment_choices':choices,'default_assessment_choice':default}
             review.write_yaml(args.output/'rules'/f'{rid}.rule.yaml',{'rule':rule})
@@ -234,19 +269,19 @@ def main(argv=None):
         if unsupported: raise ValueError('Unsupported Benchmark metadata: '+str(unsupported))
         front,_=source.normalize_front_matter(xr);rear,_=source.normalize_rear_matter(xr)
         groups,grouping=source.build_groups(rs);version=xr.find('x:version',source.NS)
-        benchmark={'id':'rhel9-stig-current-full','ng_schema_version':None,'use_case':'compliance',
+        benchmark={'id':args.benchmark_id,'ng_schema_version':None,'use_case':'compliance',
                    'title':source.localized_texts(xr,'title'),'description':source.localized_texts(xr,'description'),
                    'language':xr.get('{http://www.w3.org/XML/1998/namespace}lang'),
                    'status':source.benchmark_status(xr),'version':{'value':source.text(version),'time':version.get('time'),'update':version.get('update')},
                    'metadata':metadata,'notices':source.benchmark_notices(xr),'front_matter':front,'rear_matter':rear,
                    'references':source.benchmark_references(xr),'text_blocks':source.benchmark_text_blocks(xr),
-                   'platform':{'id':'enterprise-linux.9','title':'Enterprise Linux 9 family',
-                               'applicability':{'operator':'any','conditions':[app_ids[n.get('idref').lstrip('#')] for n in xr.findall('x:platform',source.NS)]}},
+                   'platform':{'id':args.platform_id,'title':args.platform_title,
+                               'applicability':{'operator':'any','conditions':[app_ids[n.get('idref').lstrip('#')] for n in xr.findall('x:platform',source.NS) if app_ids.get(n.get('idref').lstrip('#'))]}},
                    'applicability_catalog':'applicability.yaml','scoring':source.benchmark_scoring(xr),
                    'parameters':[],'default_selection':next(iter(baseline.values())),
                    'groups':groups,'profiles':profiles,'rules':[r['id'] for r in rs]}
         review.write_yaml(args.output/'benchmark.yaml',{'benchmark':benchmark})
-        review.write_yaml(args.output/'applicability.yaml',{'applicability':{'id':'rhel9-applicability','conditions':registry}})
+        review.write_yaml(args.output/'applicability.yaml',{'applicability':{'id':args.benchmark_id+'.applicability','conditions':registry}})
         parity=audit(args.input,args.output/'benchmark.yaml')
         if parity['issues']: raise ValueError('Profile selection mismatch: '+str(parity['issues']))
         write_json(args.output/'profile-selection-audit.json',parity)
@@ -267,7 +302,9 @@ def main(argv=None):
                             'Platform execution evidence is recorded separately by CI.']
         evidence['profile_rule_comparisons']=len(rs)*len(profiles)
         evidence['applicability_conditions']=len(registry)
+        evidence['blocked_applicability']=list(blocked_applicability.values())
         evidence['source_revision']=source.SOURCE_REVISION
+        evidence['source_sha256']=actual_sha256
         write_json(args.output/'evidence.json',evidence)
     print(json.dumps({'status':evidence['status'],'rules':len(rs),'profiles':len(profiles),
                       'applicability':len(registry),'yaml_files':validation['yaml_files']},indent=2))
