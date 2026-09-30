@@ -1024,7 +1024,10 @@ def lower_definition(oroot, definition_id, assessment_id):
         name = local(node.tag)
 
         if name == "literal_component":
-            return {"literal": text(node)}, None
+            value = text(node)
+            if node.get("datatype"):
+                return {"literal": {"value": value, "datatype": node.get("datatype")}}, None
+            return {"literal": value}, None
 
         if name == "variable_component":
             var_ref = node.get("var_ref")
@@ -1039,12 +1042,15 @@ def lower_definition(oroot, definition_id, assessment_id):
             collection, error = lower_object(obj_ref)
             if error:
                 return None, error
-            return {
+            result = {
                 "object_values": {
                     "collect": collection,
                     "field": field,
                 }
-            }, None
+            }
+            if node.get("record_field"):
+                result["object_values"]["record_field"] = node.get("record_field")
+            return result, None
 
         children = [child for child in node if local(child.tag) not in ("notes",)]
         lowered = []
@@ -1064,6 +1070,7 @@ def lower_definition(oroot, definition_id, assessment_id):
                     "values": lowered[0] if len(lowered) == 1 else lowered,
                     "delimiter": node.get("delimiter") if node.get("delimiter") is not None else "",
                     "sort": (node.get("sort") or "document").lower(),
+                    "order": (node.get("order") or "ascending").lower(),
                 }
             }, None
         if name == "unique":
@@ -1275,6 +1282,8 @@ def lower_definition(oroot, definition_id, assessment_id):
                 attrs["entity_check"] = child.get("entity_check")
             if child.get("datatype"):
                 attrs["datatype"] = child.get("datatype")
+            if child.get("mask"):
+                attrs["mask"] = child.get("mask").lower() == "true"
             if attrs:
                 attrs["value"] = value
                 item = attrs
