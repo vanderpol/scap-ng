@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/audit-upstream-oval-xsd-defaults.yml"
       - "tools/scap_ng_roundtrip_v003/audit_oval_xsd_defaults.py"
+      - "tools/scap_ng_roundtrip_v003/test_oval_xsd_audit.py"
 
 jobs:
   xsd-audit:
@@ -25,6 +26,8 @@ jobs:
           python-version: "3.12"
       - name: Install parsing dependency
         run: python -m pip install lxml
+      - name: Verify audit reference-resolution logic on synthetic schemas
+        run: python scap-ng/tools/scap_ng_roundtrip_v003/test_oval_xsd_audit.py
       - name: Audit XSD defaults inheritance documentation and Schematron
         run: |
           python scap-ng/tools/scap_ng_roundtrip_v003/audit_oval_xsd_defaults.py \
