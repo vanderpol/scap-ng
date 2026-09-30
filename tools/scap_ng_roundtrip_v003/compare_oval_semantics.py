@@ -36,7 +36,7 @@ class Model:
         self.vars={e.attrib["id"]:e for sec in self.root.findall(f"{{{OD}}}variables") for e in sec}
         self.memo={}
 
-    def entity(self,e):
+    def entity(self,e, *, state_entity=False):
         _,local=split(e.tag)
         nil=any(split(k)[1]=="nil" and str(v).lower()=="true" for k,v in e.attrib.items())
         base=("entity",local,
@@ -44,6 +44,7 @@ class Model:
               e.attrib.get("operation","equals"),
               e.attrib.get("var_check","all"),
               e.attrib.get("entity_check","all"),
+              e.attrib.get("check_existence","at_least_one_exists") if state_entity else None,
               e.attrib.get("mask","false"),
               nil)
         fields=[c for c in e if split(c.tag)[1]=="field"]
@@ -175,7 +176,7 @@ class Model:
         if key in self.memo:return self.memo[key]
         e=self.states[sid]
         self.memo[key]=("recursion-state",sid)
-        terms=[self.entity(c) for c in e if split(c.tag)[1]!="notes"]
+        terms=[self.entity(c, state_entity=True) for c in e if split(c.tag)[1]!="notes"]
         expr=self._bool(e.attrib.get("operator","AND"),terms) if terms else ("empty-state",)
         out=("state",typed(e,"_state"),expr)
         self.memo[key]=out; return out
