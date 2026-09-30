@@ -1,0 +1,63 @@
+name: Publish SCAP-NG canonical JSON research discussion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "board/discussions/CANONICAL-JSON-AUTHORING-RESEARCH.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish non-voting research discussion
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const owner = context.repo.owner;
+            const name = context.repo.repo;
+            const title = '[RESEARCH][NON-VOTING] Canonical execution JSON and multiple authoring presentations';
+            const marker = 'scap-ng-discussion-id: CANONICAL-JSON-AUTHORING-RESEARCH';
+            const body = fs.readFileSync('board/discussions/CANONICAL-JSON-AUTHORING-RESEARCH.md', 'utf8');
+            const info = await github.graphql(`
+              query($owner: String!, $name: String!) {
+                repository(owner: $owner, name: $name) {
+                  id
+                  discussionCategories(first: 100) {
+                    nodes { id name isAnswerable }
+                  }
+                  discussions(first: 100) {
+                    nodes { id title url body }
+                  }
+                }
+              }`, {owner, name});
+            const repo = info.repository;
+            const existing = repo.discussions.nodes.find(d =>
+              d.body?.includes(marker) || d.title === title);
+            if (existing) {
+              core.info('Already published: ' + existing.url);
+              await core.summary.addRaw('Existing discussion: ' + existing.url).write();
+              return;
+            }
+            const categories = repo.discussionCategories.nodes;
+            const cat = categories.find(c => /^(ideas|general|proposals)$/i.test(c.name))
+              || categories.find(c => !/announcement|poll|voting/i.test(c.name))
+              || categories[0];
+            if (!cat) throw new Error('No discussion categories are configured.');
+            const created = await github.graphql(`
+              mutation($repositoryId: ID!, $categoryId: ID!, $title: String!, $body: String!) {
+                createDiscussion(input: {repositoryId: $repositoryId, categoryId: $categoryId, title: $title, body: $body}) {
+                  discussion { url id }
+                }
+              }`, {repositoryId: repo.id, categoryId: cat.id, title, body});
+            const url = created.createDiscussion.discussion.url;
+            core.info('Published: ' + url);
+            await core.summary.addRaw('Created discussion: ' + url).write();
