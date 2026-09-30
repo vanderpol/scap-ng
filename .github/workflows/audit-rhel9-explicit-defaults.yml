@@ -2,6 +2,10 @@ name: Audit native RHEL9 explicit variable and entity defaults
 
 on:
   workflow_dispatch:
+  # CI-generated commits do not fire ordinary push workflows.
+  workflow_run:
+    workflows: ["Build SCAP-NG 003 full RHEL9 benchmark"]
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -15,6 +19,7 @@ permissions:
 
 jobs:
   audit:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
