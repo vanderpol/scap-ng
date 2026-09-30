@@ -53,7 +53,22 @@ def write_yaml(path,doc):
     path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(yaml.safe_dump(doc,sort_keys=False,allow_unicode=True,width=110),encoding='utf-8')
 
-def main():
+def manual_procedure(rec, c):
+    source_ref=c.find('x:check-content-ref',NS)
+    binding=(c.get('system'),source_ref.get('href'),source_ref.get('name')) if source_ref is not None else None
+    procedure=text(c.find('x:check-content',NS))
+    candidates=[text(other.find('x:check-content',NS)) for other in rec['checks']
+                if binding is not None and other.get('system')==binding[0]
+                and other.find('x:check-content-ref',NS) is not None
+                and (other.find('x:check-content-ref',NS).get('href'),
+                     other.find('x:check-content-ref',NS).get('name'))==binding[1:]]
+    procedures={value for value in candidates if value}
+    if len(procedures)>1: raise ValueError(rec['id']+': conflicting procedures for shared manual source binding')
+    procedure=procedure or next(iter(procedures),None)
+    if not procedure: raise ValueError(rec['id']+': manual source has no verified inline procedure')
+    return binding, procedure
+
+def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--input',type=Path,required=True)
     p.add_argument('--sha256',required=True)
@@ -61,7 +76,7 @@ def main():
     p.add_argument('--rule',action='append',default=[])
     p.add_argument('--rules-file',type=Path)
     p.add_argument('--schema',type=Path,default=Path(__file__).resolve().parents[2]/'third_party/scap-1.4-schemas/omni-schema.xsd')
-    args=p.parse_args()
+    args=p.parse_args(argv)
     digest=hashlib.sha256(args.input.read_bytes()).hexdigest()
     if digest!=args.sha256:raise SystemExit('Source archive checksum mismatch')
     wanted=set(args.rule)
@@ -90,13 +105,23 @@ def main():
             rec=all_records[rid]
             result={'rule_id':rid,'title':rec['title'],'selectors':{},'assessments':[]}
             done={}
+            manual_done={}
             for c in rec['checks']:
                 selector=(c.get('selector') or '').strip() or 'default'
                 if check_kind(c)=='manual':
-                    aid=rid+'.manual';ref='assessments/manual/'+aid+'.assessment.yaml'
-                    write_yaml(args.output/ref,{'assessment':{'id':aid,'version':1,'mode':'manual',
-                        'purpose':'assessment','class':'compliance','procedure':text(c.find('x:check-content',NS)),
+                    binding,procedure=manual_procedure(rec,c)
+                    key=binding or ('inline',procedure)
+                    if key in manual_done:
+                        result['selectors'][selector]=manual_done[key]
+                        continue
+                    aid=rid+'.manual'+('' if not manual_done else '-'+str(len(manual_done)+1))
+                    ref='assessments/manual/'+aid+'.assessment.yaml'
+                    write_yaml(args.output/ref,{'assessment':{'id':aid,'version':1,'assessment_title':rec['title'],'mode':'manual',
+                        'purpose':'assessment','class':'compliance','procedure':procedure,
                         'inputs':[],'evidence':[]}})
+                    manual_done[key]=ref
+                    result.setdefault('manual_source_bindings',[]).append({'path':ref,'source_binding':binding,
+                        'procedure_origin':'matching shared source binding' if not text(c.find('x:check-content',NS)) else 'inline check text'})
                     result['selectors'][selector]=ref
                     continue
                 source_ref=c.find('x:check-content-ref',NS)
