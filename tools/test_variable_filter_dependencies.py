@@ -91,6 +91,22 @@ def set_source(depth, target_namespace=UNIX, target_name="file_object", missing=
 
 
 class DependencyTests(unittest.TestCase):
+    def test_collected_bundle_preserves_dependency_accounting_and_lowering(self):
+        root = source()
+        variable(root, 1, literal())
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "source.xml"
+            ET.ElementTree(root).write(path)
+            bundle = converter.collect_oval_bundle([path])
+        self.assertEqual(converter.unsupported_definition_features(bundle, DID), [])
+        native, error = converter.lower_definition(bundle, DID, "bundle-assessment")
+        self.assertIsNone(error, error)
+        self.assertIsNotNone(native)
+        add_filter(bundle[0], "oval:dependency:var:99")
+        findings = converter.unsupported_definition_features(bundle, DID)
+        self.assertIn({"feature": "variable_not_found",
+                       "source_id": "oval:dependency:var:99"}, findings)
+
     def roundtrip(self, root):
         self.assertEqual(converter.unsupported_definition_features(root, DID), [])
         native, error = converter.lower_definition(root, DID, "dependency-assessment")

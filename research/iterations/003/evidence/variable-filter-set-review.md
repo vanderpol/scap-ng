@@ -36,7 +36,7 @@ universal graph-depth support is claimed.
 
 ## Validation evidence
 
-`python tools/test_variable_filter_dependencies.py` passes 15 focused tests.
+`python tools/test_variable_filter_dependencies.py` passes 16 focused tests.
 Five targeted tests were also executed against the original converter/IR:
 all five exposed the pre-change defects (four failed assertions and one
 unbounded Object-set recursion). The other fixes have separate negative cases.
@@ -50,7 +50,14 @@ depth-4 coverage gap. This test isolates `oval-def_setobjref`; it does not asser
 that every third-party validator accepts the defect.
 
 The existing effective-attribute, State-entity, census-summary and explicit
-semantics suites add 31 passing tests (46 total).
+semantics suites add 31 passing tests (47 total).
+
+The initial main CI run exposed a bundled-input indexing regression: individual
+OVAL roots passed, but `collect_oval_bundle` wraps those roots in an
+`assessment-bundle`, causing the new feature index to miss their sections.
+The correction indexes nested sections and adds a regression using the actual
+bundle collector, covering successful native lowering and missing Variables
+reachable through Filters. This is a converter defect, not a source anomaly.
 
 Production evidence is separate from these synthetic language tests:
 

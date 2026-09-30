@@ -913,7 +913,9 @@ def unsupported_definition_features(oroot, definition_id):
     visited = set()
     index = {}
     duplicates = set()
-    for section in oroot:
+    # Whole-benchmark ingestion wraps OVAL documents in assessment-bundle;
+    # focused conversion also accepts a single oval_definitions root.
+    for section in oroot.iter():
         if local(section.tag) not in ("definitions", "tests", "objects", "states", "variables"):
             continue
         for node in section:
