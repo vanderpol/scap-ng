@@ -104,6 +104,21 @@ class EffectiveAttributeTests(unittest.TestCase):
             parsed["effective_attributes"]["state_operator"]["value"], "AND"
         )
 
+    def test_missing_required_check_is_not_defaulted(self):
+        # The upstream OVAL 5.12.3 TestType requires check; unlike
+        # check_existence, it has no XSD default.
+        invalid = element(
+            f'<unix:file_test xmlns:unix="{UNIX}" '
+            'id="oval:example:tst:1" version="1" comment="invalid"/>'
+        )
+        parsed = ir.parse_test(invalid)
+        self.assertIsNone(parsed["check"])
+        self.assertIn("check", parsed["missing_required_attributes"])
+        self.assertEqual(
+            parsed["effective_attributes"]["check_existence"]["value"],
+            "at_least_one_exists",
+        )
+
     def test_unknown_scope_fails_closed(self):
         with self.assertRaises(ValueError):
             ir.effective_attributes(element("<path/>"), "behavior")
