@@ -296,3 +296,69 @@ an open standards question.
 Until resolved, migration tooling SHOULD preserve source generator metadata in
 conversion evidence/provenance even when it is not emitted into native
 Assessment semantics.
+
+
+## Derived requirements from OVAL 5.12.3 round-trip evidence
+
+This section captures provisional assessor contracts supported by iterative
+semantic regression tests. Its terminology describes **native behavior**, not
+an obligation to reproduce the OVAL XML object model.
+
+### Typed components and compatible references
+
+An automated Assessment SHALL distinguish (a) Test/evaluation capability,
+(b) collected Object/Collection capability, and (c) expected State/predicate
+capability wherever all three concepts are present. A producer SHALL NOT
+silently change a referenced component's capability to match its caller.
+
+A semantic validator SHALL verify that a Test is compatible with the Object
+and State interfaces it references. An incompatible combination SHALL be
+reported with reference identities and source locations, even where the input
+is otherwise XSD-valid. Preserving a malformed published source for migration
+diagnostics is **not** an assertion that the configuration is executable or
+valid native SCAP-NG.
+
+### Typed dependency closure
+
+Assessment dependency resolution SHALL include every reachable Definition
+expression, Test, Collection/Object, State, set, filter, Variable, component,
+function operand, and nested reference required for evaluation. Validation,
+unsupported-feature detection, provenance accounting, and execution planning
+SHALL use equivalent graph-closure semantics and SHALL reject unresolved
+required references.
+
+The evaluator SHALL NOT assume that Variables can be substituted in a single
+pre-collection pass. Dataflow can depend recursively on collection results.
+Cycle handling and termination outcomes SHALL be deterministic; exact
+cycle/error propagation cases require an execution conformance suite.
+
+### State associations and quantifiers
+
+An automated Test MAY associate multiple individually defined States.
+Its **Test-level State combiner** SHALL remain distinct from the internal
+Boolean/entity operator of each State. Existence, item-check aggregation,
+entity-check aggregation, and variable-value aggregation SHALL each have
+explicitly specified scope; a producer SHALL NOT collapse these scopes merely
+because some Boolean-only cases evaluate equally.
+
+### External input constraints
+
+An externally supplied typed value MAY have enumerated allowed values or
+typed restrictions. Conforming input binding SHALL validate the supplied
+values against those constraints before Assessment execution; invalid inputs
+SHALL not silently broaden the permissible domain. The constraint model SHALL
+support multiple values where the source semantics permit them.
+
+The exact restriction-expression syntax, multiplicity truth tables, and error
+outcomes remain to be specified and independently execution-tested.
+
+### Structural compatibility versus execution equivalence
+
+Passing a source-to-native-to-source semantic graph comparison, XSD
+validation, and source-relative Schematron checks is **migration
+compatibility evidence**, not proof that two evaluators agree at runtime.
+Execution-equivalence claims SHALL require reference evaluation cases
+covering actual collection, typed comparison, cardinality and error states.
+
+Detailed rationale and staged extraction criteria are recorded in
+[OVAL-derived specification lessons](../../research/iterations/003/design/oval-derived-specification-lessons.md).
