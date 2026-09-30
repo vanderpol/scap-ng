@@ -44,6 +44,10 @@ def main():
             continue
         target=root.get("targetNamespace","")
         for node in root.iter():
+            # lxml includes comments and processing instructions in iter().
+            # They have non-string .tag values and are not XML schema nodes.
+            if not isinstance(node.tag, str):
+                continue
             tag=local(node)
             if tag in ("attribute","element") and node.get("default") is not None:
                 defaults.append({**location(path,node),"kind":tag,"name":node.get("name") or node.get("ref"),
