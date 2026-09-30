@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse, collections, csv, hashlib, json, re
 from pathlib import Path
 from lxml import etree as ET
+from xsd_effective_defaults import inventory as transitive_default_inventory
 
 XSD = "http://www.w3.org/2001/XMLSchema"
 SCH = "http://purl.oclc.org/dsdl/schematron"
@@ -124,6 +125,8 @@ def main():
     save("attribute-group-links.json",attribute_groups)
     save("source-sha256.json",source_hashes)
     save("named-reference-resolution.json",resolved_references)
+    transitive=transitive_default_inventory(args.schemas)
+    save("transitive-type-defaults.json",transitive)
     save("type-inheritance.json",inherited)
     save("optional-elements.json",optional)
     save("semantic-documentation.json",annotations)
@@ -134,6 +137,7 @@ def main():
        "attribute_group_references":sum(bool(x["ref"]) for x in attribute_groups),
        "attribute_group_declarations":sum(bool(x["name"]) for x in attribute_groups),
        "inheritance_relations":len(inherited),
+       "transitive_type_defaults":transitive["summary"],
        "named_reference_resolution":dict(sorted(collections.Counter(
            row["status"] for row in resolved_references).items())),
        "optional_elements":len(optional),"semantic_annotation_passages":len(annotations),
@@ -158,7 +162,10 @@ def main():
       "or referenced group composition has been resolved.",
       "The `named-reference-resolution.json` inventory distinguishes local",
       "global declarations, built-in XSD types, ambiguous and missing links.",
-      "It does not yet compute effective inherited defaults.",
+      "See `transitive-type-defaults.json` for conservative effective",
+      "attribute defaults on named complex types; each unresolved inheritance",
+      "or wildcard appears as a blocker, rather than a guessed value.",
+      "This remains a structural audit, not runtime collector semantics.",
       "", "## Implicit behavioral defaults and existence checks", "",
       "Review all entries in `semantic-documentation.json`, including the",
       "embedded ExistenceEnumeration evaluation tables and records whose prose",
@@ -183,7 +190,8 @@ def main():
       "10. Masks, item creation, result/status flags, and directives defaults",
       "    must be separated into runtime, results, provenance, and migration.",
       "","## Remaining required review","",
-      "- Resolve effective inherited attributes through complexTypes and attributeGroups.",
+      "- Resolve any incomplete inherited type cases, wildcard constraints and",
+      "  restrictions, then compare resolved type defaults to importer semantics.",
       "- Inspect every documentation passage and embedded evaluation table.",
       "- Build independent executable result truth tables and invalid fixtures.",
       "- Compare verified resolved defaults, not only explicit XML attributes.",
