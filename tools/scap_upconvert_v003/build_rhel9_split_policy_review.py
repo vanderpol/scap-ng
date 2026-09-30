@@ -28,7 +28,7 @@ def resolve_source_ref(package_root, source_file, reference, document_kind, expe
     """
     if not isinstance(reference, str) or not reference or Path(reference).is_absolute():
         raise ValueError(f"Invalid {document_kind} source path: {reference!r}")
-    if "\\\\" in reference or "\\x00" in reference:
+    if chr(92) in reference or chr(0) in reference or ":" in reference.split("/", 1)[0]:
         raise ValueError(f"Invalid portable source path: {reference!r}")
     root = package_root.resolve()
     target = (source_file.parent / reference).resolve()
