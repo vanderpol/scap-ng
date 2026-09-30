@@ -1413,6 +1413,8 @@ def lower_definition(oroot, definition_id, assessment_id):
                 return None, error
             if (child.get("negate") or "false").lower() == "true":
                 term = {"not": term}
+            if (child.get("applicability_check") or "false").lower() == "true":
+                term = {"applicability_check": term}
             terms.append(term)
 
         if not terms:
@@ -1432,6 +1434,8 @@ def lower_definition(oroot, definition_id, assessment_id):
 
         if (node.get("negate") or "false").lower() == "true":
             expr = {"not": expr}
+        if (node.get("applicability_check") or "false").lower() == "true":
+            expr = {"applicability_check": expr}
         return expr, None
 
     root_criteria = next((n for n in definition if local(n.tag) == "criteria"), None)
