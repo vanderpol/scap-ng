@@ -38,11 +38,34 @@ class Model:
 
     def entity(self,e):
         _,local=split(e.tag)
+        nil=any(split(k)[1]=="nil" and str(v).lower()=="true" for k,v in e.attrib.items())
         base=("entity",local,
               e.attrib.get("datatype","string"),
               e.attrib.get("operation","equals"),
               e.attrib.get("var_check","all"),
-              e.attrib.get("entity_check","all"))
+              e.attrib.get("entity_check","all"),
+              e.attrib.get("mask","false"),
+              nil)
+        fields=[c for c in e if split(c.tag)[1]=="field"]
+        if fields:
+            records=[]
+            for field in fields:
+                fbase=(
+                    field.attrib.get("name"),
+                    field.attrib.get("datatype","string"),
+                    field.attrib.get("operation","equals"),
+                    field.attrib.get("var_check","all"),
+                    field.attrib.get("entity_check","all"),
+                    field.attrib.get("mask","false"),
+                )
+                vr=field.attrib.get("var_ref")
+                if vr:
+                    records.append(fbase+("var",self.variable(vr)))
+                else:
+                    records.append(fbase+("value",sval(field.text)))
+            return base+("record",tuple(sorted(records,key=repr)))
+        if nil:
+            return base+("nil",)
         vr=e.attrib.get("var_ref")
         if vr: return base+("var",self.variable(vr))
         text=sval(e.text).strip()
