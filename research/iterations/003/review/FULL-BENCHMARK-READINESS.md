@@ -33,6 +33,12 @@ A full native benchmark becomes a candidate for project-owner review when:
 Review can proceed with *documented* nonblocking warnings; no blanket
 "100% lossless" claim is warranted without the relevant conformance proof.
 
+## Reviewer feedback 2026-09-30 — blocking issues
+
+- [#30 Profile selection and inherited defaults](https://github.com/vanderpol/scap-ng/issues/30): current generated Benchmark uses compact `disabled_rules` lists rather than enumerating enabled rules, but we have not yet verified inherited XCCDF Group/Rule `selected` values and Profile `extends` semantics. **Compact profiles are the intended approach**; validate actual effective selections before marking them correct.
+- [#31 Explicit Rule → Policy → Assessment linkage](https://github.com/vanderpol/scap-ng/issues/31): current native Rule's `checks` map stores assessment IDs; files with those IDs exist and follow a directory convention, but a separate Policy artifact and explicit stable reference resolution layer are still missing. Current `rhel9-full` does **not** yet satisfy the accepted split architecture. Fix the converter and regenerate rather than editing hundreds of output files.
+- [Source README](../source/split-rule-assessment/README.md) now labels what is current generated evidence versus the intended reviewed native representation. Passing schema, package or OVAL regression checks alone SHALL NOT override these review blockers.
+
 ## Snapshot: RHEL 9
 
 - Current native source path:
