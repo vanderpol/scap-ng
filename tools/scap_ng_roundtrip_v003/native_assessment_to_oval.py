@@ -15,9 +15,11 @@ import xml.etree.ElementTree as ET
 
 OD = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 OC = "http://oval.mitre.org/XMLSchema/oval-common-5"
+XSI = "http://www.w3.org/2001/XMLSchema-instance"
 
 ET.register_namespace("", OD)
 ET.register_namespace("oval", OC)
+ET.register_namespace("xsi", XSI)
 
 def q(ns, name):
     return f"{{{ns}}}{name}"
@@ -71,9 +73,37 @@ class Builder:
         self.emitted_variables = set()
         self.check_to_test = {}
 
+    def emit_record_fields(self, parent, fields):
+        for item in fields:
+            attrs = {"name": scalar(item["name"])}
+            for source, target in (
+                ("operation", "operation"),
+                ("datatype", "datatype"),
+                ("variable_check", "var_check"),
+                ("entity_check", "entity_check"),
+                ("mask", "mask"),
+            ):
+                if item.get(source) is not None:
+                    attrs[target] = scalar(item[source])
+            field = ET.SubElement(parent, q(OD, "field"), attrs)
+            value = item.get("value")
+            if isinstance(value, dict) and set(value) == {"variable"}:
+                field.set("var_ref", self.emit_variable(value["variable"]))
+            elif value is not None:
+                field.text = scalar(value)
+
+    def emit_entity_payload(self, el, value):
+        if isinstance(value, dict) and set(value) == {"record"}:
+            self.emit_record_fields(el, value["record"])
+        elif isinstance(value, dict) and set(value) == {"variable"}:
+            el.set("var_ref", self.emit_variable(value["variable"]))
+        elif value is not None:
+            el.text = scalar(value)
+
     def emit_value_entity(self, parent, ns, field, spec):
         attrs = {}
         value = spec
+        nil = False
         if isinstance(spec, dict) and "value" in spec:
             value = spec.get("value")
             if spec.get("operation") is not None:
@@ -86,15 +116,20 @@ class Builder:
                 attrs["datatype"] = scalar(spec["datatype"])
             if spec.get("mask") is not None:
                 attrs["mask"] = scalar(spec["mask"])
+            if spec.get("nil") is not None:
+                nil = bool(spec["nil"])
+                attrs[q(XSI, "nil")] = scalar(nil)
         el = ET.SubElement(parent, q(ns, field), attrs)
+        if nil:
+            return el
         if isinstance(value, dict) and set(value) == {"variable"}:
             variable_id = self.emit_variable(value["variable"])
             if field == "var_ref":
                 el.text = variable_id
             else:
                 el.set("var_ref", variable_id)
-        elif value is not None:
-            el.text = scalar(value)
+        else:
+            self.emit_entity_payload(el, value)
         return el
 
     def emit_state(self, capability, expr, title=None):
@@ -133,12 +168,12 @@ class Builder:
                 attrs["datatype"] = scalar(pred["datatype"])
             if pred.get("mask") is not None:
                 attrs["mask"] = scalar(pred["mask"])
+            nil = bool(pred.get("nil", False))
+            if pred.get("nil") is not None:
+                attrs[q(XSI, "nil")] = scalar(nil)
             el = ET.SubElement(state, q(ns, pred["field"]), attrs)
-            value = pred.get("value")
-            if isinstance(value, dict) and set(value) == {"variable"}:
-                el.set("var_ref", self.emit_variable(value["variable"]))
-            elif value is not None:
-                el.text = scalar(value)
+            if not nil:
+                self.emit_entity_payload(el, pred.get("value"))
         return sid
 
     def split_test_states(self, expr):
