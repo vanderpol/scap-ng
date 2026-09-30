@@ -23,6 +23,17 @@ from scap_ng_roundtrip_v003.compare_oval_semantics import compare, OD
 from check_current_authoring_contract import violations
 import yaml
 
+def source_benchmark(package):
+    benchmarks=[]
+    with zipfile.ZipFile(package) as z:
+        for name in sorted(z.namelist()):
+            if not name.lower().endswith('.xml'): continue
+            root=ET.fromstring(z.read(name))
+            for node in root.iter():
+                if local(node.tag)=='Benchmark': benchmarks.append(node)
+    if len(benchmarks)!=1: raise ValueError('Expected one source Benchmark')
+    return benchmarks[0]
+
 def source_components(package):
     benchmarks=[];oval=[]
     with zipfile.ZipFile(package) as z:
@@ -67,6 +78,73 @@ def manual_procedure(rec, c):
     procedure=procedure or next(iter(procedures),None)
     if not procedure: raise ValueError(rec['id']+': manual source has no verified inline procedure')
     return binding, procedure
+
+def convert_rule(rec, original, output, schema, temp_root):
+    from lxml import etree
+    rid=rec['id']
+    result={'rule_id':rid,'title':rec['title'],'selectors':{},'assessments':[]}
+    done={}; manual_done={}; deprecated_selector_fallbacks=[]
+    has_manual=any(check_kind(check)=='manual' for check in rec['checks'])
+    original_path=Path(temp_root)/(rid+'-source.xml')
+    ET.ElementTree(original).write(original_path,encoding='utf-8')
+    failed=False
+    for c in rec['checks']:
+        selector=(c.get('selector') or '').strip() or 'default'
+        if check_kind(c)=='manual':
+            binding,procedure=manual_procedure(rec,c)
+            key=binding or ('inline',procedure)
+            if key in manual_done:
+                result['selectors'][selector]=manual_done[key]; continue
+            aid=rid+'.manual'+('' if not manual_done else '-'+str(len(manual_done)+1))
+            ref='assessments/manual/'+aid+'.assessment.yaml'
+            write_yaml(output/ref,{'assessment':{'id':aid,'version':1,'assessment_title':rec['title'],'mode':'manual',
+                'purpose':'assessment','class':'compliance','procedure':procedure,'inputs':[],'evidence':[]}})
+            manual_done[key]=ref
+            result.setdefault('manual_source_bindings',[]).append({'path':ref,'source_binding':binding,
+                'procedure_origin':'matching shared source binding' if not text(c.find('x:check-content',NS)) else 'inline check text'})
+            result['selectors'][selector]=ref
+            continue
+        source_ref=c.find('x:check-content-ref',NS)
+        did=source_ref.get('name')
+        if did in done:
+            result['selectors'][selector]=done[did]; continue
+        aid=rid+'.automated'+('' if not done else '-'+str(len(done)+1))
+        provenance={}
+        unsupported=unsupported_definition_features(original,did)
+        if unsupported:
+            deprecated_only=all(x.get('feature')=='deprecated_oval_test' for x in unsupported)
+            if deprecated_only and has_manual:
+                deprecated_selector_fallbacks.append({'selector':selector,'source_definition':did,'unsupported':unsupported})
+                result['assessments'].append({'status':'skipped_deprecated_oval_test_manual_fallback',
+                                              'source_definition':did,'unsupported':unsupported})
+                continue
+            failed=True; result['assessments'].append({'status':'blocked','source_definition':did,'unsupported':unsupported}); continue
+        native,error=lower_definition(original,did,aid,collection_graph=True,provenance=provenance)
+        if error:
+            failed=True; result['assessments'].append({'status':'blocked','error':error}); continue
+        errors=violations(native)
+        if errors: raise ValueError('Current vocabulary guard: '+str(errors))
+        tree,new_id=build(native); schema.assertValid(etree.fromstring(ET.tostring(tree.getroot())))
+        regenerated=Path(temp_root)/(rid+'-'+aid.replace('.','-')+'.xml'); tree.write(regenerated,encoding='utf-8')
+        parity=compare(original_path,regenerated,did,new_id,root_only=True)
+        if not parity['equal']:
+            failed=True; result['assessments'].append({'status':'blocked','parity':parity}); continue
+        ref='assessments/automated/'+aid+'.assessment.yaml'
+        write_yaml(output/ref,native); done[did]=ref; result['selectors'][selector]=ref
+        result['assessments'].append({'status':'representation_comparator_equal','path':ref,
+            'source_graph_bindings':provenance,'tests':len(native['assessment']['tests']),
+            'collections':len(native['assessment']['collections']),
+            'variables':len(native['assessment'].get('variables',{})),'reverse_omni_schema_valid':True})
+    if deprecated_selector_fallbacks:
+        manual_ref=result['selectors'].get('manual') or (next(iter(manual_done.values())) if manual_done else None)
+        if manual_ref is None:
+            failed=True; result.setdefault('errors',[]).append('deprecated automated source has no usable manual fallback')
+        else:
+            for fallback in deprecated_selector_fallbacks:
+                if fallback['selector']=='default': result['selectors']['default']=manual_ref
+            result['manual_fallbacks']=deprecated_selector_fallbacks
+            result['manual_fallback_assessment']=manual_ref
+    return result, failed
 
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
