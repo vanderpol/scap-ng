@@ -9,6 +9,7 @@ assessment:
   checks:
     system-library-directories-group-by-root-group:
       test_title: System Library directories are group by root group.
+      capability: unix.file
       collect:
         object_title: All system-wide Library directories not owned by root-group
         capability: unix.file
@@ -28,17 +29,20 @@ assessment:
             value: '1000'
             datatype: int
           state_title: Group Owned by root or System group (gid less than 1000)
+          capability: unix.file
         - action: exclude
           match:
             field: type
             operation: equals
             value: file
+          capability: unix.file
         - action: exclude
           match:
             field: type
             operation: equals
             value: symbolic link
           state_title: symbolic links
+          capability: unix.file
         behaviors:
           recurse_direction: down
       assert:

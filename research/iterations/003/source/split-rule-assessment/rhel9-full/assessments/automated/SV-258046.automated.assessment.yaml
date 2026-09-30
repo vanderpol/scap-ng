@@ -9,6 +9,7 @@ assessment:
   checks:
     system-accounts-in-etc-passwd-use-sbin-nologin:
       test_title: The system accounts in /etc/passwd use /sbin/nologin.
+      capability: unix.password
       collect:
         object_title: only system accounts
         capability: unix.password
@@ -29,12 +30,14 @@ assessment:
               operation: greater than or equal
               value: '1000'
               datatype: int
+            capability: unix.password
           - action: exclude
             match:
               field: user_id
               operation: equals
               value: '0'
               datatype: int
+            capability: unix.password
       assert:
         existence: at_least_one_exists
         check: all
@@ -43,5 +46,6 @@ assessment:
           operation: pattern match
           value: /sbin/nologin|/usr/sbin/nologin
           datatype: string
+        state_capability: unix.password
   evaluate:
     check: system-accounts-in-etc-passwd-use-sbin-nologin

@@ -9,6 +9,7 @@ assessment:
   checks:
     files-in-system-command-directories-owned-by-root:
       test_title: Files in System command directories are owned by root
+      capability: unix.file
       collect:
         object_title: All system-command files not owned by root
         capability: unix.file
@@ -30,17 +31,20 @@ assessment:
             value: '0'
             datatype: int
           state_title: owned by root
+          capability: unix.file
         - action: exclude
           match:
             field: type
             operation: equals
             value: symbolic link
           state_title: symbolic links
+          capability: unix.file
         - action: exclude
           match:
             field: type
             operation: equals
             value: directory
+          capability: unix.file
         behaviors:
           recurse_direction: down
       assert:

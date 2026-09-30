@@ -10,6 +10,7 @@ assessment:
   checks:
     verify-pam-faillock-so-module-present-in-etc-pam-d:
       test_title: Verify the pam_faillock.so module is present in the '/etc/pam.d/system-auth' file.
+      capability: independent.textfilecontent54
       collect:
         object_title: 'Retrieve configuration from file: /etc/pam.d/system-auth.'
         capability: independent.textfilecontent54
@@ -37,20 +38,24 @@ assessment:
             operation: pattern match
             value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth\b
           state_title: Check that auth required pam_faillock.so preath line exists.
+          capability: independent.textfilecontent54
         - state:
             field: text
             operation: pattern match
             value: \n\s*auth\s+required\s+pam_faillock.so\s+authfail\b
           state_title: Check that auth required pam_faillock.so authfail line exists.
+          capability: independent.textfilecontent54
         - state:
             field: text
             operation: pattern match
             value: \n\s*account\s+required\s+pam_faillock.so\b
           state_title: Check that account required pam_faillock.so line exists.
+          capability: independent.textfilecontent54
         - state:
             field: text
             operation: pattern match
             value: \n\s*auth\s+required\s+pam_faillock.so\s+preauth(.*\n)*auth\s+(required|sufficient|requisite)\s+pam_unix.so
           state_title: Check that auth required pam_faillock.so preath line preceeds the pam_unix.so line.
+          capability: independent.textfilecontent54
   evaluate:
     check: verify-pam-faillock-so-module-present-in-etc-pam-d

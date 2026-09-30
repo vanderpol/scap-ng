@@ -10,6 +10,7 @@ assessment:
   checks:
     selinux-active:
       test_title: selinux is active
+      capability: linux.partition
       collect:
         object_title: /sys/fs/selinux
         capability: linux.partition
@@ -22,8 +23,10 @@ assessment:
           field: fs_type
           operation: equals
           value: selinuxfs
+        state_capability: linux.partition
     selinux-enforcing:
       test_title: selinux is enforcing
+      capability: independent.textfilecontent54
       collect:
         object_title: /sys/fs/selinux/enforce value
         capability: independent.textfilecontent54
@@ -45,8 +48,10 @@ assessment:
           value: '0'
           datatype: int
         state_title: /sys/fs/selinux/enforce != 0
+        state_capability: independent.textfilecontent54
     etc-selinux-config-selinux-enforcing:
       test_title: /etc/selinux/config:SELINUX=enforcing
+      capability: independent.textfilecontent54
       collect:
         object_title: /etc/selinux/config:SELINUX value
         capability: independent.textfilecontent54
@@ -68,6 +73,7 @@ assessment:
           value: enforcing
           datatype: string
         state_title: /etc/selinux/config:SELINUX=enforcing
+        state_capability: independent.textfilecontent54
   evaluate:
     all:
     - check: selinux-active

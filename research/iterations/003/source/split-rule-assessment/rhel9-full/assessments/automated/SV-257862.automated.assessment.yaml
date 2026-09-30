@@ -10,6 +10,7 @@ assessment:
   checks:
     if-boot-efi-mounted-it-mounted-nosuid-option:
       test_title: If /boot/efi is mounted, it is mounted with the nosuid option
+      capability: linux.partition
       collect:
         object_title: null
         capability: linux.partition
@@ -23,8 +24,10 @@ assessment:
           operation: equals
           value: nosuid
           entity_check: at least one
+        state_capability: linux.partition
     if-boot-efi-configured-in-etc-fstab-it-configured-nosuid:
       test_title: If /boot/efi is configured in /etc/fstab, it is configured with the nosuid option
+      capability: independent.textfilecontent54
       collect:
         object_title: null
         capability: independent.textfilecontent54
@@ -43,6 +46,7 @@ assessment:
           field: subexpression
           operation: pattern match
           value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+        state_capability: independent.textfilecontent54
   evaluate:
     all:
     - check: if-boot-efi-mounted-it-mounted-nosuid-option

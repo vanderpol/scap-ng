@@ -10,6 +10,7 @@ assessment:
   checks:
     no-password-in-etc-shadow-has-maximum-password-age-0:
       test_title: No password in /etc/shadow has a maximum password age of 0 or greater than 60
+      capability: unix.shadow
       collect:
         object_title: /etc/shadow max password ages for non-system users
         capability: unix.shadow
@@ -28,6 +29,7 @@ assessment:
             variable_check: at least one
             datatype: string
           state_title: Lines starting with usernames of system users
+          capability: unix.shadow
       assert:
         existence: any_exist
         check: all
@@ -40,15 +42,18 @@ assessment:
             value: '0'
             datatype: int
           state_title: greater than zero
+          capability: unix.shadow
         - state:
             field: chg_req
             operation: less than or equal
             value: '60'
             datatype: int
           state_title: less than or equal to sixty
+          capability: unix.shadow
     root-password-in-etc-shadow-does-not-have-maximum-password:
       test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than
         60
+      capability: unix.shadow
       collect:
         object_title: /etc/shadow max password age for root
         capability: unix.shadow
@@ -68,12 +73,14 @@ assessment:
             value: '0'
             datatype: int
           state_title: greater than zero
+          capability: unix.shadow
         - state:
             field: chg_req
             operation: less than or equal
             value: '60'
             datatype: int
           state_title: less than or equal to sixty
+          capability: unix.shadow
   evaluate:
     all:
     - check: no-password-in-etc-shadow-has-maximum-password-age-0
@@ -114,6 +121,7 @@ assessment:
                   operation: greater than or equal
                   value: '1000'
                   datatype: int
+                capability: unix.password
               - action: include
                 match:
                   field: user_id
@@ -123,6 +131,7 @@ assessment:
                   variable_check: all
                   datatype: int
                 state_title: anonymous users
+                capability: unix.password
             field: username
         - literal:
             value: $

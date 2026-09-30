@@ -10,6 +10,7 @@ assessment:
   checks:
     check-users-without-home-directory-not-defined:
       test_title: check for users without a home directory not defined
+      capability: unix.password
       collect:
         object_title: only non-system users (uid>999) home-dirs
         capability: unix.password
@@ -33,6 +34,7 @@ assessment:
               entity_check: all
               datatype: int
             state_title: only uids < 1000
+            capability: unix.password
       assert:
         existence: all_exist
         check: all
@@ -42,8 +44,10 @@ assessment:
           value: .+
           datatype: string
         state_title: only users with the home directory defined
+        state_capability: unix.password
     check-if-root-s-home-directory-not-defined:
       test_title: check if root's home directory is not defined
+      capability: unix.password
       collect:
         object_title: only root users (uid=0) home-dirs
         capability: unix.password
@@ -67,6 +71,7 @@ assessment:
               entity_check: all
               datatype: int
             state_title: only uids > 0
+            capability: unix.password
       assert:
         existence: all_exist
         check: all
@@ -76,6 +81,7 @@ assessment:
           value: .+
           datatype: string
         state_title: only users with the home directory defined
+        state_capability: unix.password
   evaluate:
     all:
     - check: check-users-without-home-directory-not-defined

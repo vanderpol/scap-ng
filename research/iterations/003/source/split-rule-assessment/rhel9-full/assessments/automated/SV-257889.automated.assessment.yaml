@@ -10,6 +10,7 @@ assessment:
   checks:
     local-initialization-files-non-system-users-have-mode-0740-or:
       test_title: Local initialization files for non-system users have mode 0740 or less permissive.
+      capability: unix.file
       collect:
         object_title: local initialization files of non-system users.
         capability: unix.file
@@ -27,6 +28,7 @@ assessment:
             field: type
             operation: equals
             value: directory
+          capability: unix.file
         behaviors:
           max_depth: '1'
           recurse: symlinks
@@ -69,8 +71,10 @@ assessment:
             value: 'false'
             datatype: boolean
         state_title: mode 0740 or less permissive
+        state_capability: unix.file
     local-initialization-files-root-have-mode-0740-or-less-permissive:
       test_title: Local initialization files for root have mode 0740 or less permissive.
+      capability: unix.file
       collect:
         object_title: local initialization files of root user.
         capability: unix.file
@@ -88,6 +92,7 @@ assessment:
             field: type
             operation: equals
             value: directory
+          capability: unix.file
         behaviors:
           max_depth: '1'
           recurse: symlinks
@@ -130,6 +135,7 @@ assessment:
             value: 'false'
             datatype: boolean
         state_title: mode 0740 or less permissive
+        state_capability: unix.file
   evaluate:
     all:
     - check: local-initialization-files-non-system-users-have-mode-0740-or
@@ -164,12 +170,14 @@ assessment:
                   entity_check: all
                   datatype: int
                 state_title: only uids < 1000
+                capability: unix.password
               - action: exclude
                 match:
                   field: home_dir
                   operation: equals
                   value: /
                 state_title: root directory
+                capability: unix.password
           field: home_dir
     home-directory-root-user:
       title: The home directory of the root user.
@@ -200,10 +208,12 @@ assessment:
                   entity_check: all
                   datatype: int
                 state_title: only uids > 0
+                capability: unix.password
               - action: exclude
                 match:
                   field: home_dir
                   operation: equals
                   value: /
                 state_title: root directory
+                capability: unix.password
           field: home_dir

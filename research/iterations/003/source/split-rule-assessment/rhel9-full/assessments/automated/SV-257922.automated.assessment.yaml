@@ -9,6 +9,7 @@ assessment:
   checks:
     system-library-directories-owned-by-root:
       test_title: System Library directories are owned by root.
+      capability: unix.file
       collect:
         object_title: All system-wide Library directories not owned by root
         capability: unix.file
@@ -27,6 +28,7 @@ assessment:
             operation: equals
             value: symbolic link
           state_title: symbolic links
+          capability: unix.file
         - action: exclude
           match:
             field: user_id
@@ -34,11 +36,13 @@ assessment:
             value: '0'
             datatype: int
           state_title: owned by root
+          capability: unix.file
         - action: exclude
           match:
             field: type
             operation: equals
             value: file
+          capability: unix.file
         behaviors:
           recurse_direction: down
       assert:

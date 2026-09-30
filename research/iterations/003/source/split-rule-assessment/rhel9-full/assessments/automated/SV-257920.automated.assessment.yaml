@@ -9,6 +9,7 @@ assessment:
   checks:
     system-library-files-owned-by-root:
       test_title: System Library files are owned by root
+      capability: unix.file
       collect:
         object_title: All system-library files not owned by root
         capability: unix.file
@@ -28,17 +29,20 @@ assessment:
             value: '0'
             datatype: int
           state_title: owned by root
+          capability: unix.file
         - action: exclude
           match:
             field: type
             operation: equals
             value: symbolic link
           state_title: symbolic links
+          capability: unix.file
         - action: exclude
           match:
             field: type
             operation: equals
             value: directory
+          capability: unix.file
         behaviors:
           recurse_direction: down
       assert:

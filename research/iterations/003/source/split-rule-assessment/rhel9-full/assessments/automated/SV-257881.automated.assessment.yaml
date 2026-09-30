@@ -9,6 +9,7 @@ assessment:
   checks:
     device-files-mounted-nodev-option-mounts-on-ignored:
       test_title: Device files are mounted with the nodev option.  Mounts on '/' are ignored.
+      capability: linux.partition
       collect:
         object_title: null
         capability: linux.partition
@@ -22,6 +23,7 @@ assessment:
             field: device
             operation: pattern match
             value: ^/dev\S*$
+          capability: linux.partition
       assert:
         existence: any_exist
         check: all
@@ -30,9 +32,11 @@ assessment:
           operation: equals
           value: nodev
           entity_check: at least one
+        state_capability: linux.partition
     device-files-configured-in-etc-fstab-use-nodev-option-mounts:
       test_title: Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are
         ignored.
+      capability: independent.textfilecontent54
       collect:
         object_title: null
         capability: independent.textfilecontent54
@@ -52,6 +56,7 @@ assessment:
           field: subexpression
           operation: pattern match
           value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
+        state_capability: independent.textfilecontent54
   evaluate:
     all:
     - check: device-files-mounted-nodev-option-mounts-on-ignored
