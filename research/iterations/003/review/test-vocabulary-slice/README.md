@@ -1,6 +1,6 @@
 # Test vocabulary and relative-path review slice
 
-Status: **AUTHORING REVIEW CANDIDATE**. Architecture: **Benchmark → Rule → Assessment**; no separate Policy object or file. Two real RHEL 9 rules; no full benchmark regeneration, scanner execution, or runtime-equivalence claim.
+Status: **INCOMPLETE — AUTHORING READINESS BLOCKED**. See [current design](../../design/CURRENT-DESIGN.md) and [preflight findings](readiness.json). Narrow tests passed, but Collection/Variable coverage and complete native vocabulary migration are missing. Architecture: **Benchmark → Rule → Assessment**; no separate Policy object or file. Two real RHEL 9 rules; no full benchmark regeneration, scanner execution, or runtime-equivalence claim.
 
 Review these in order:
 

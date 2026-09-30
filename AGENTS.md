@@ -1,3 +1,14 @@
+## Mandatory current-design preflight
+
+Before selecting or running authoring generation tools, read
+`research/iterations/003/design/CURRENT-DESIGN.md`. It separates latest owner
+decisions, implementation gaps and pending Board ratification. Older generated
+trees are evidence, not architecture authority. Do not interpret a pending Board
+vote as permission to drop owner-agreed working features. Variables support both
+existing named Collections and private embedded Collections. Before describing
+review output as ready, run `tools/check_current_authoring_contract.py` and
+feature-specific regressions. A vocabulary pass is not semantic equivalence.
+
 # AGENTS.md
 
 ## SCAP-NG research evidence rules

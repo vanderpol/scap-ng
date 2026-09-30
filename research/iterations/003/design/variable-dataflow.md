@@ -341,11 +341,11 @@ that no interoperability or diagnostics requirement justifies forcing every
 intermediate expression to become a separately named Variable.
 
 
-## Native authoring option: inline local Collections inside Variables
+## Working decision: named and embedded Collections inside Variables
 
-**Status:** native-NG authoring idea; does not change lossless SCAP 1.4 conversion behavior.
+**Status:** owner-agreed working design, reconfirmed 2026-09-30; formal Board review is separate. Both forms SHALL be supported. This does not authorize erasing source sharing during lossless conversion.
 
-SCAP-NG SHOULD permit a Variable expression to obtain values either from:
+SCAP-NG SHALL permit a Variable expression to obtain values either from:
 
 1. a named reusable Collection; or
 2. an inline local Collection defined inside that Variable when the collection
@@ -402,7 +402,7 @@ structure.
 
 ### Board review point
 
-The OVAL Board should review whether SCAP-NG should support both:
+The OVAL Board should formally review the working design supporting both:
 
 - named reusable Collections; and
 - anonymous/local Collections scoped to a single Variable expression.
