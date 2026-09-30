@@ -477,7 +477,7 @@ class Builder:
         did = self.ids.get("def", a.get("id") or "assessment")
         attrs = {
             "id": did,
-            "version": scalar(a.get("version") or 1),
+            "version": scalar(a.get("version") if a.get("version") is not None else 1),
             "class": a.get("class") or "miscellaneous",
         }
         if a.get("deprecated"):
