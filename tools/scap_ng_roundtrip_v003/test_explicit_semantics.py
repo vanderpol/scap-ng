@@ -30,7 +30,8 @@ class ExplicitSemanticsTests(unittest.TestCase):
                 "states": [{
                     "id": "s1", "type": "unix.file", "operator": "OR",
                     "predicates": {
-                        "path": {"value": "/tmp", "entity_check": "at least one"},
+                        "path": {"value": "/tmp", "entity_check": "at least one",
+                                 "check_existence": "none_exist"},
                         "filename": {"variable": "v1", "var_check": "all",
                                      "entity_check": "all"}
                     }
@@ -53,8 +54,27 @@ class ExplicitSemanticsTests(unittest.TestCase):
         path = state.find(Q("path"))
         filename = state.find(Q("filename"))
         self.assertEqual(path.get("entity_check"), "at least one")
+        self.assertEqual(path.get("check_existence"), "none_exist")
         self.assertEqual(filename.get("var_check"), "all")
         self.assertEqual(filename.get("entity_check"), "all")
+
+    def test_entity_assertions_are_not_allowed_on_object_selectors(self):
+        fixture = {"id": "invalid-object", "ng_semantics": {
+            "collections": [{"id": "o1", "type": "unix.file",
+                             "selectors": {"path": {
+                                 "value": "/tmp", "check_existence": "none_exist"
+                             }}}]}}
+        with self.assertRaisesRegex(ValueError, "State entity assertion"):
+            module.build(fixture)
+
+    def test_var_check_requires_variable_reference(self):
+        fixture = {"id": "invalid-state", "ng_semantics": {
+            "states": [{"id": "s1", "type": "unix.file",
+                        "predicates": {"path": {
+                            "value": "/tmp", "var_check": "all"
+                        }}}]}}
+        with self.assertRaisesRegex(ValueError, "requires a variable"):
+            module.build(fixture)
 
     def test_missing_required_existence_is_not_silently_guessed(self):
         fixture = {"id": "missing-001", "ng_semantics": {
