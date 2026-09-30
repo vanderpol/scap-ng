@@ -81,7 +81,6 @@ def extract_selection(source_zip: Path):
 def expected_selections(rules, groups, ancestors, profiles):
     rule_defaults = {r["id"]: r["selected"] for r in rules}
     group_defaults = {g["id"]: g["selected"] for g in groups}
-    source_to_native = {r["id"]: r["native"] for r in rules}
 
     def effective(rule_values, group_values):
         return {r["native"]: bool(rule_values[r["id"]])
@@ -98,7 +97,7 @@ def expected_selections(rules, groups, ancestors, profiles):
         for action in actions:
             if action["kind"] != "select":
                 continue
-            if action.get("resolution_status") not in (None, "resolved"):
+            if action.get("target_resolution") != "resolved":
                 problems.append({"code": "UNRESOLVED_SELECT",
                                  "profile": profile["id"], "action": action})
                 continue
