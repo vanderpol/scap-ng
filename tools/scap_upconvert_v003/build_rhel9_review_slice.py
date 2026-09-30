@@ -1401,35 +1401,38 @@ def lower_definition(oroot, definition_id, assessment_id):
         collection["capability"] = capability
 
         states = []
-        state_titles = []
         for ref in state_refs:
             condition, title, error = lower_state(ref)
             if error:
                 return None, error
-            if title:
-                state_titles.append(title)
             if condition is not None:
-                states.append(condition)
+                states.append({
+                    "state": condition,
+                    "state_title": title,
+                })
 
         check_id = unique_check_id(test_title, capability)
         test_to_check[test_ref] = check_id
 
         assertion = {
-            "state_title": " / ".join(state_titles) if state_titles else None,
             "existence": test.get("check_existence") or "at_least_one_exists",
             "check": test.get("check") or "all",
             "state": None,
         }
         if states:
             state_operator = (test.get("state_operator") or "AND").upper()
-            if len(states) == 1:
-                assertion["state"] = states[0]
-            elif state_operator == "AND":
-                assertion["state"] = {"all": states}
-            elif state_operator == "OR":
-                assertion["state"] = {"any": states}
-            else:
+            if state_operator not in ("AND", "OR"):
                 return None, f"unsupported_state_operator:{state_operator}"
+            if len(states) == 1:
+                assertion["state"] = states[0]["state"]
+                if states[0].get("state_title"):
+                    assertion["state_title"] = states[0]["state_title"]
+            else:
+                # Preserve Test-level state boundaries separately from the
+                # boolean operator inside each State. These are distinct OVAL
+                # semantics and cannot be reconstructed from a flattened AST.
+                assertion["state_operator"] = state_operator
+                assertion["states"] = states
 
         checks[check_id] = {
             "test_title": test_title,
