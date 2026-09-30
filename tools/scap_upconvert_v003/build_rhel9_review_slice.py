@@ -1208,6 +1208,12 @@ def lower_definition(oroot, definition_id, assessment_id):
                 item["datatype"] = child.get("datatype")
             if child.get("mask"):
                 item["mask"] = child.get("mask").lower() == "true"
+            nil_value = next(
+                (value for key, value in child.attrib.items() if local(key) == "nil"),
+                None,
+            )
+            if nil_value is not None:
+                item["nil"] = nil_value.lower() == "true"
             conditions.append(item)
         if not conditions:
             condition = None
