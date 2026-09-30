@@ -142,13 +142,17 @@ def main(argv=None):
     parser.add_argument('--benchmark-id', default='rhel9-stig-current-full')
     parser.add_argument('--platform-id', default='enterprise-linux.9')
     parser.add_argument('--platform-title', default='Enterprise Linux 9 family')
+    parser.add_argument('--split-root', type=Path, help='Optional component-resolved rule-split corpus from scap14_rule_splitter.py')
     parser.add_argument('--schema', type=Path, default=Path(__file__).resolve().parents[2]/'third_party/scap-1.4-schemas/omni-schema.xsd')
     args=parser.parse_args(argv)
     actual_sha256=hashlib.sha256(args.input.read_bytes()).hexdigest()
     if args.sha256!='auto' and actual_sha256!=args.sha256:
         raise ValueError('Source checksum mismatch')
     if args.output.exists() and any(args.output.iterdir()): raise ValueError('Output must be new or empty')
-    xr,oval=review.source_components(args.input)
+    if args.split_root:
+        xr=review.source_benchmark(args.input); oval=None
+    else:
+        xr,oval=review.source_components(args.input)
     rs=source.records(xr); by_source={r['source_rule_id']:r['id'] for r in rs}
     if len(rs)!=len(by_source) or len(rs)!=len({r['id'] for r in rs}): raise ValueError('Duplicate Rules')
     # Reject unsupported policy forms rather than flattening them silently.
@@ -163,15 +167,41 @@ def main(argv=None):
         selection_evidence.append({'profile':pid, 'source':deepcopy(profile),
                                    'effective_selection':effective['enabled']})
     with tempfile.TemporaryDirectory() as temporary:
-        temp=Path(temporary); rule_list=temp/'rules.json'
-        write_json(rule_list,[r['id'] for r in rs])
-        status=review.main(['--input',str(args.input),'--sha256',actual_sha256,'--output',str(args.output),
-                            '--rules-file',str(rule_list),'--schema',str(args.schema)])
-        if status: raise ValueError('Assessment conversion blocked; see evidence.json')
-        evidence=json.loads((args.output/'evidence.json').read_text(encoding='utf-8'))
-        results={r['rule_id']:r for r in evidence['rules']}
+        temp=Path(temporary)
         schema=etree.XMLSchema(etree.parse(str(args.schema)))
-        original_path=temp/'original.xml'; ET.ElementTree(oval).write(original_path,encoding='utf-8')
+        if args.split_root:
+            evidence={'status':'prototype_collection_graph_review','source_sha256':actual_sha256,'rules':[],
+                      'limits':['Component-resolved per-Rule conversion evidence; not target-runtime equivalence.',
+                                'Deprecated OVAL Tests are skipped only when a verified source manual fallback exists.',
+                                'Manual procedures copied from inline source Check Text; full OCIL logic not assessed.']}
+            blocked=False
+            for rec in rs:
+                split_path=args.split_root/'rules'/rec['source_rule_id']/'oval.xml'
+                if split_path.exists():
+                    original=ET.parse(split_path).getroot()
+                else:
+                    original=ET.Element('{'+review.OD+'}oval_definitions')
+                    for name in ('definitions','tests','objects','states','variables'):
+                        ET.SubElement(original,'{'+review.OD+'}'+name)
+                result,failed_rule=review.convert_rule(rec,original,args.output,schema,temp)
+                evidence['rules'].append(result); blocked=blocked or failed_rule
+            evidence['status']='blocked' if blocked else 'prototype_dataflow_and_roundtrip_checks_passed'
+            write_json(args.output/'evidence.json',evidence)
+            if blocked: raise ValueError('Assessment conversion blocked; see evidence.json')
+        else:
+            rule_list=temp/'rules.json'
+            write_json(rule_list,[r['id'] for r in rs])
+            status=review.main(['--input',str(args.input),'--sha256',actual_sha256,'--output',str(args.output),
+                                '--rules-file',str(rule_list),'--schema',str(args.schema)])
+            if status: raise ValueError('Assessment conversion blocked; see evidence.json')
+            evidence=json.loads((args.output/'evidence.json').read_text(encoding='utf-8'))
+        results={r['rule_id']:r for r in evidence['rules']}
+        if args.split_root:
+            app_split=args.split_root/'applicability'/'oval.xml'
+            app_oval=ET.parse(app_split).getroot() if app_split.exists() else ET.Element('{'+review.OD+'}oval_definitions')
+        else:
+            app_oval=oval
+        original_path=temp/'original-applicability.xml'; ET.ElementTree(app_oval).write(original_path,encoding='utf-8')
         predicates,dictionary=platform_sources(args.input)
         referenced={ref.lstrip('#') for r in rs for ref in r['platforms']}
         referenced.update(n.get('idref').lstrip('#') for n in xr.findall('x:platform',source.NS))
@@ -191,7 +221,7 @@ def main(argv=None):
                 app_id='platform.'+source.semantic_id(title,'platform')
             else: raise ValueError('Unresolved applicability source: '+ref)
             if not did or app_id in registry: raise ValueError('Missing or colliding applicability identity: '+ref)
-            unsupported=source.unsupported_definition_features(oval,did)
+            unsupported=source.unsupported_definition_features(app_oval,did)
             if unsupported:
                 deprecated_only=all(x.get('feature')=='deprecated_oval_test' for x in unsupported)
                 if deprecated_only:
@@ -211,7 +241,7 @@ def main(argv=None):
                     })
                     continue
                 raise ValueError('Applicability source blocked: '+str(unsupported))
-            provenance={};native,error=source.lower_definition(oval,did,app_id+'.assessment',collection_graph=True,provenance=provenance)
+            provenance={};native,error=source.lower_definition(app_oval,did,app_id+'.assessment',collection_graph=True,provenance=provenance)
             if error: raise ValueError('Applicability: '+str(error))
             tree,new_id=build(native);schema.assertValid(etree.fromstring(ET.tostring(tree.getroot())))
             reverse=temp/'reverse.xml';tree.write(reverse,encoding='utf-8')
