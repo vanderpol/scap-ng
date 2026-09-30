@@ -242,6 +242,18 @@ def main(argv=None):
                     'reason':'deprecated_oval_test',
                     'manual_assessment':manual_ref,
                 }
+                existing={row['selector'] for row in result.get('manual_fallbacks',[])}
+                for selector in source_selectors:
+                    if selector!='manual' and selector not in existing:
+                        result.setdefault('manual_fallbacks',[]).append({
+                            'selector':selector,
+                            'source_definition':None,
+                            'unsupported':[{
+                                'feature':'deprecated_oval_test',
+                                'detail':'Rule applicability uses a deprecated OVAL Test',
+                            }],
+                            'reason':'deprecated_applicability',
+                        })
             default='default' if 'default' in choices else next(iter(choices),None)
             if default is None: raise ValueError('Rule has no Assessment: '+rid)
             content=source.rule_content(element)
