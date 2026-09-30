@@ -255,32 +255,30 @@ Reuse SHALL be promoted only when semantic equivalence has been established.
 ## 11. Source references and compiled identity
 
 Human-readable native authoring files SHOULD use **explicit relative
-source-file paths** for file-backed Rule → Policy and Policy → Assessment
-references. Relative paths SHALL resolve against the directory containing
-the referring file, SHALL be normalized and confined to the declared source
-boundary, and SHALL be validated before compilation. The authoring tool
-SHALL NOT infer a path from a logical identity, matching basename, or an
-arbitrary directory search.
+source-file paths** for each Rule-owned Assessment selection. Relative paths
+SHALL resolve against the directory containing the referring Rule file, SHALL
+be normalized and confined to the declared source boundary, and SHALL be
+validated before compilation. The authoring tool SHALL NOT infer a path from
+a logical identity, matching basename, or arbitrary directory search.
 
-Logical Policy and Assessment identities SHALL be read from the referenced
-objects and remain distinct from file paths. Moving or renaming a source
-file SHALL NOT by itself change its semantic identity; referring source files
-may need their paths updated. Different check selectors MAY resolve to the
-same Assessment, but selector identity SHALL remain visible.
+Assessment identities SHALL be read from the referenced Assessment objects and
+remain distinct from file paths. Moving or renaming an Assessment source file
+SHALL NOT by itself change its semantic identity; referring Rules may need
+their paths updated. Different named Rule selections MAY deliberately resolve
+to the same Assessment, but selector identity SHALL remain visible.
 
-During compilation, source references SHALL resolve to logical IDs and
-versions and to explicit packaged members with integrity digests in the
-package's object index or manifest. Runtime scanners SHALL resolve through
-this published index, not relative authoring paths or assumed file layout.
-Resolution errors, duplicate conflicting identities, wrong object types,
-missing file members, and escaping the source/package boundary SHALL fail
-validation, not trigger fallback lookup.
+During compilation, Rule Assessment references SHALL resolve to logical IDs
+and versions and to explicit packaged members with integrity digests in the
+package manifest. Runtime scanners SHALL resolve through this published
+manifest, not relative authoring paths or assumed file layout. Resolution
+errors, duplicate conflicting identities, wrong object types, missing package
+members, and escaping the source/package boundary SHALL fail validation, not
+trigger fallback lookup.
 
-ID-only authoring references MAY be introduced only with a defined,
-unambiguous registry and conformance tests; an opaque ID alone is not a
-complete portable source-file link.
-
-Moving or renaming a source file SHALL NOT change Assessment identity.
+A separate Policy object or author-maintained Assessment index SHALL NOT be
+required for this linkage. ID-only authoring references MAY be introduced only
+with a defined, unambiguous registry and conformance tests; an opaque ID alone
+is not a complete portable source-file link.
 
 ## 12. Historical provenance
 
