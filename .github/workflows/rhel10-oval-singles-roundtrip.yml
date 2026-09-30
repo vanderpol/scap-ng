@@ -1,0 +1,103 @@
+name: RHEL 10 OVAL singles native round-trip
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/rhel10-oval-singles-roundtrip.yml"
+      - "tools/scap_upconvert_v003/**"
+      - "tools/scap_ng_roundtrip_v003/**"
+
+jobs:
+  rhel10-singles:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out RHEL 10 OVAL singles
+        uses: actions/checkout@v4
+        with:
+          repository: vanderpol/scap-content
+          ref: main
+          path: scap-content
+
+      - name: Check out authoritative OVAL 5.12.3 schemas
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+          python -m pip install pyyaml lxml
+
+      - name: Round-trip all RHEL 10 OVAL singles
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
+            --corpus scap-content/projects/linux/rhel10/oval \
+            --include 'U_RHEL_10_SV-*-oval.xml' \
+            --out rhel10-roundtrip-out \
+            --report rhel10-singles-roundtrip.json \
+            --inventory-only
+
+      - name: Build aggregate OVAL validation schema
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/build_full_oval_omni.py \
+            --schemas oval-language/oval-schemas \
+            --output oval-language/oval-schemas/roundtrip-full-omni.xsd
+
+      - name: Validate regenerated RHEL 10 OVAL with XSD
+        shell: bash
+        run: |
+          set -uo pipefail
+          : > rhel10-xsd-validation.log
+          failed=0
+          for xml in rhel10-roundtrip-out/*.oval.xml; do
+            if ! xmllint --noout \
+              --schema oval-language/oval-schemas/roundtrip-full-omni.xsd \
+              "$xml" 2>&1 | tee -a rhel10-xsd-validation.log; then
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then touch rhel10-xsd-validation.failed; fi
+
+      - name: Compare Schematron findings to RHEL 10 source
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/compare_schematron_baseline.py \
+            --schemas oval-language/oval-schemas \
+            --corpus scap-content/projects/linux/rhel10/oval \
+            --report rhel10-singles-roundtrip.json \
+            --output rhel10-schematron-baseline.json
+
+      - name: Upload RHEL 10 round-trip evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rhel10-oval-singles-roundtrip
+          path: |
+            rhel10-singles-roundtrip.json
+            rhel10-xsd-validation.log
+            rhel10-xsd-validation.failed
+            rhel10-schematron-baseline.json
+
+      - name: Enforce zero semantic differences
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
+            --corpus scap-content/projects/linux/rhel10/oval \
+            --include 'U_RHEL_10_SV-*-oval.xml' \
+            --out rhel10-roundtrip-out \
+            --report rhel10-singles-roundtrip.json
+
+      - name: Enforce XSD validity
+        run: test ! -e rhel10-xsd-validation.failed
