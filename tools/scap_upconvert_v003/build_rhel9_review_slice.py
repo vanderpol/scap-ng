@@ -1135,8 +1135,8 @@ def lower_definition(oroot, definition_id, assessment_id):
         kind = local(variable.tag)
         entry = {
             "title": node_title(variable),
-            "datatype": variable.get("datatype"),
             "kind": kind.replace("_variable", ""),
+            "datatype": variable.get("datatype"),
         }
 
         if kind == "constant_variable":
@@ -1589,9 +1589,9 @@ def lower_definition(oroot, definition_id, assessment_id):
                 return None, error
             if condition is not None:
                 states.append({
-                    "state": condition,
                     "state_title": title,
                     "capability": state_capability,
+                    "state": condition,
                 })
 
         check_id = unique_check_id(test_title, capability)
@@ -1600,24 +1600,26 @@ def lower_definition(oroot, definition_id, assessment_id):
         assertion = {
             "existence": test.get("check_existence") or "at_least_one_exists",
             "check": test.get("check"),
-            "state": None,
         }
         if states:
             state_operator = (test.get("state_operator") or "AND").upper()
             if state_operator not in ("AND", "OR"):
                 return None, f"unsupported_state_operator:{state_operator}"
             if len(states) == 1:
+                # Identify the State before exposing its predicates, including
+                # when its title is genuinely absent in source content.
+                assertion["state_title"] = states[0]["state_title"]
+                assertion["state_capability"] = states[0]["capability"]
                 assertion["state"] = states[0]["state"]
-                if states[0].get("state_title"):
-                    assertion["state_title"] = states[0]["state_title"]
-                if states[0].get("capability"):
-                    assertion["state_capability"] = states[0]["capability"]
             else:
                 # Preserve Test-level state boundaries separately from the
                 # boolean operator inside each State. These are distinct OVAL
                 # semantics and cannot be reconstructed from a flattened AST.
                 assertion["state_operator"] = state_operator
                 assertion["states"] = states
+
+        if not states:
+            assertion["state"] = None
 
         checks[check_id] = {
             "test_title": test_title,
