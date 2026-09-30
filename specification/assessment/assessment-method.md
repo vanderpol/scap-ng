@@ -420,6 +420,34 @@ support multiple values where the source semantics permit them.
 The exact restriction-expression syntax, multiplicity truth tables, and error
 outcomes remain to be specified and independently execution-tested.
 
+### Inherited result aggregation semantics
+
+For OVAL-compatible migrated assessments, generic Boolean/result aggregation
+SHALL preserve the OVAL 5.12.3 evaluation tables for `CheckEnumeration`,
+`OperatorEnumeration`, and `ExistenceEnumeration`, including the precedence
+and propagation of `true`, `false`, `error`, `unknown`, `not evaluated`,
+and `not applicable`.
+
+A conforming migration implementation SHALL NOT replace these multi-valued
+semantics with ordinary two-valued Boolean logic. In particular, a decisive
+`false` for an ALL/AND aggregation and a decisive `true` for an
+AT-LEAST-ONE/OR aggregation may determine the result even when other inputs
+are `error` or `unknown`, exactly as specified by the authoritative OVAL
+tables.
+
+Test/object existence aggregation SHALL remain a separate evaluation stage
+from item-to-State satisfaction aggregation. `any_exist` is not synonymous
+with `at_least_one_exists`; the inherited OVAL table intentionally permits
+`any_exist` to evaluate true when zero matching objects exist and no
+collection error prevents that conclusion.
+
+The project's reference truth-table fixture is
+`tools/oval_result_truth_tables.py` with conformance tests in
+`tools/test_oval_result_truth_tables.py`. This helper is test evidence, not
+the reference scanner itself. Full collected-object flag handling,
+State/entity/variable result propagation, and evaluator differential testing
+remain separate conformance work.
+
 ### Structural compatibility versus execution equivalence
 
 Passing a source-to-native-to-source semantic graph comparison, XSD
