@@ -22,6 +22,7 @@ SCOPES = {
     "state": ("StateType",),
     "variable": ("VariableType",),
     "state_entity": ("EntityStateSimpleBaseType", "EntityStateComplexBaseType"),
+    "object_entity": ("EntitySimpleBaseType", "EntityComplexBaseType"),
 }
 
 
