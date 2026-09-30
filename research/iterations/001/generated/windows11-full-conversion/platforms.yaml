@@ -255,14 +255,6 @@ inventory_assessments:
     description: Product inventory for cpe:/o:microsoft:windows_11
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
-      oval:mil.disa.stig.ind:obj:10000000:
-        capability: scapng.collect.independent.family
-        source_object_id: oval:mil.disa.stig.ind:obj:10000000
-        source_type: family_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        version: '1'
-        object_title: OS family
-        query: []
       oval:mil.disa.stig.win:obj:10000001:
         capability: scapng.collect.windows.registry
         source_object_id: oval:mil.disa.stig.win:obj:10000001
@@ -303,8 +295,34 @@ inventory_assessments:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ProductName
+      oval:mil.disa.stig.ind:obj:10000000:
+        capability: scapng.collect.independent.family
+        source_object_id: oval:mil.disa.stig.ind:obj:10000000
+        source_type: family_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        version: '1'
+        object_title: OS family
+        query: []
     derive: {}
     predicates:
+      oval:mil.disa.stig.ind:ste:10000000:
+        source_state_id: oval:mil.disa.stig.ind:ste:10000000
+        source_type: family_state
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+        operator: AND
+        entities:
+        - effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            entity_check:
+              origin: xsd_default
+              value: all
+          kind: element
+          name: family
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
+          value: windows
+        state_title: Microsoft Windows family
       oval:mil.disa.stig.win:ste:10000001:
         source_state_id: oval:mil.disa.stig.win:ste:10000001
         source_type: registry_state
@@ -314,6 +332,13 @@ inventory_assessments:
         - attributes:
             datatype: int
             operation: greater than or equal
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            entity_check:
+              origin: xsd_default
+              value: all
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
@@ -327,37 +352,20 @@ inventory_assessments:
         entities:
         - attributes:
             operation: pattern match
+          effective_attributes:
+            check_existence:
+              origin: xsd_default
+              value: at_least_one_exists
+            entity_check:
+              origin: xsd_default
+              value: all
           kind: element
           name: value
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
           value: ^[Ww][Ii][Nn][Dd][Oo][Ww][Ss] 1[01].*$
         state_title: Windows 10 or Windows 11
-      oval:mil.disa.stig.ind:ste:10000000:
-        source_state_id: oval:mil.disa.stig.ind:ste:10000000
-        source_type: family_state
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-        operator: AND
-        entities:
-        - kind: element
-          name: family
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#independent
-          value: windows
-        state_title: Microsoft Windows family
     evaluate:
       tests:
-        oval:mil.disa.stig.win:tst:10000000:
-          source_test_id: oval:mil.disa.stig.win:tst:10000000
-          source_type: registry_test
-          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
-          test_title: The installed operating system is Windows 10 or 11
-          check: all
-          check_existence: at_least_one_exists
-          state_operator: AND
-          collections:
-          - oval:mil.disa.stig.win:obj:10000000
-          predicates:
-          - oval:mil.disa.stig.win:ste:10000000
-          source_other: []
         oval:mil.disa.stig.ind:tst:10000000:
           source_test_id: oval:mil.disa.stig.ind:tst:10000000
           source_type: family_test
@@ -383,6 +391,19 @@ inventory_assessments:
           - oval:mil.disa.stig.win:obj:10000001
           predicates:
           - oval:mil.disa.stig.win:ste:10000001
+          source_other: []
+        oval:mil.disa.stig.win:tst:10000000:
+          source_test_id: oval:mil.disa.stig.win:tst:10000000
+          source_type: registry_test
+          source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#windows
+          test_title: The installed operating system is Windows 10 or 11
+          check: all
+          check_existence: at_least_one_exists
+          state_operator: AND
+          collections:
+          - oval:mil.disa.stig.win:obj:10000000
+          predicates:
+          - oval:mil.disa.stig.win:ste:10000000
           source_other: []
       definitions:
         oval:mil.disa.stig.windows11:def:1:
@@ -454,9 +475,9 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:microsoft:windows_11
-      semantic_ir_sha256: cadb161cf061ee11078cf4a81b5c3ca603465752c06b0d785e27399dbe938fa0
+      semantic_ir_sha256: 45fc94b4283855b6a4280f3340ef09bd9abe91ba933c4e7eb705f3fe381e5abc
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
-    semantic_fingerprint_sha256: 137512c5a290320dbe59bc5a77fc6708afa97768cd0ac0618798e8ce213504b3
+    semantic_fingerprint_sha256: 31418a1f27e4c4026d96e206e2559ee7a2c6da39e60dd8fbe79ef0e3f41e70af
     purpose: platform_inventory
     inventory_output:
       emit_when: platform_true
