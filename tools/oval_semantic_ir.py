@@ -530,6 +530,11 @@ KNOWN_ATTRIBUTE_DEFAULTS = {
         "deprecated": ("false", "xsd_default"),
     },
     "variable": {"deprecated": ("false", "xsd_default")},
+    "object_entity": {
+        "datatype": ("string", "xsd_default"),
+        "operation": ("equals", "xsd_default"),
+        "mask": ("false", "xsd_default"),
+    },
     "state_entity": {
         "check_existence": ("at_least_one_exists", "xsd_default"),
         "entity_check": ("all", "xsd_default"),
@@ -553,7 +558,7 @@ def effective_attributes(e, scope):
     if scope not in KNOWN_ATTRIBUTE_DEFAULTS:
         raise ValueError(f"unknown default resolution scope: {scope}")
     defaults = dict(KNOWN_ATTRIBUTE_DEFAULTS[scope])
-    if scope == "state_entity" and e.get("var_ref") is not None:
+    if scope in ("state_entity", "object_entity") and e.get("var_ref") is not None:
         defaults["var_check"] = ("all", "documented_implicit")
     result = {}
     for name, (default_value, provenance) in defaults.items():
@@ -578,8 +583,8 @@ def semantic_child(e, *, context=None):
     attrs = {etree.QName(k).localname: v for k, v in e.attrib.items()}
     if attrs:
         out["attributes"] = attrs
-    if context == "state_entity" and n != "notes":
-        out["effective_attributes"] = effective_attributes(e, "state_entity")
+    if context in ("state_entity", "object_entity") and n != "notes":
+        out["effective_attributes"] = effective_attributes(e, context)
     val = text_value(e)
     if val is not None:
         out["value"] = val
@@ -650,7 +655,8 @@ def parse_test(e):
 
 
 def parse_object(e):
-    children = [semantic_child(c) for c in e if isinstance(c.tag, str)]
+    children = [semantic_child(c, context="object_entity" if local(c.tag) != "notes" else None)
+                for c in e if isinstance(c.tag, str)]
     return {
         "id": e.get("id"),
         "type": local(e.tag),
