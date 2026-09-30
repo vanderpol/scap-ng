@@ -1,0 +1,64 @@
+name: Build complete RHEL9 split-policy review
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/v003-rhel9-split-policy-review.yml"
+      - "tools/scap_upconvert_v003/build_rhel9_split_policy_review.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v003-rhel9-split-policy-review
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pyyaml
+
+      - name: Build complete split-policy review source and validate all references
+        run: |
+          python tools/scap_upconvert_v003/build_rhel9_split_policy_review.py
+
+      - name: Verify no Assessment payload changed
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          before=Path("research/iterations/003/source/split-rule-assessment/rhel9-full/assessments")
+          after=Path("research/iterations/003/source/split-policy-assessment/rhel9-full/assessments")
+          original={p.relative_to(before).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in before.rglob("*.yaml")}
+          converted={p.relative_to(after).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in after.rglob("*.yaml")}
+          if original!=converted: raise SystemExit("Assessment payload unexpectedly changed")
+          print("Assessment YAML files preserved byte-for-byte:",len(original))
+          PY
+
+      - name: Commit review artifact and coverage evidence
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A research/iterations/003/source/split-policy-assessment/rhel9-full
+          git add -A research/iterations/003/evidence/rhel9-split-policy-review.json
+          if git diff --cached --quiet; then
+            echo "Existing split-policy review artifact matches."
+          else
+            git commit -m "Generate complete RHEL9 split-policy review content"
+            git fetch origin main
+            git rebase origin/main
+            git push
+          fi
+
+      - name: Show final coverage
+        run: cat research/iterations/003/evidence/rhel9-split-policy-review.json
