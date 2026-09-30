@@ -11,6 +11,8 @@ Repository for researching the future of SCAP.
 
 The current work is preliminary research rather than a published specification. Current clean-native development is in `research/iterations/003/`; iterations 001 and 002 preserve research history.
 
+Current review: [full RHEL9 source-generated Benchmark, Rules and Assessments](research/iterations/003/review/rhel9-current-full/README.md), including all 445 Rules, comparative evidence and the local Windows conversion command. Start with the [current design contract](research/iterations/003/design/CURRENT-DESIGN.md); historical generated trees are not current authoring guidance.
+
 ## Development tracking
 
 - [Detailed roadmap and proposed milestones](ROADMAP.md) — work remaining, completed issue history, dependencies, and beta/1.0 gates.

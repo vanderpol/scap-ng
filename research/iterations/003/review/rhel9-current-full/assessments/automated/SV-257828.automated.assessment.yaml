@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257828.automated
+  version: 1
+  assessment_title: RHEL-09-215025 - RHEL 9 must not have the nfs-utils package installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: nfs-utils
+  tests:
+    test-nfs-utils-package-installed:
+      test_title: nfs-utils package is installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    not:
+      test: test-nfs-utils-package-installed

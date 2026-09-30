@@ -3,6 +3,8 @@
 **Status:** active clean-room conversion redesign  
 **Audience:** project contributors, external reviewers, and potential OVAL Board review
 
+Current review entry point: [full RHEL9 current-design review](review/rhel9-current-full/README.md). It is generated from the pinned original package using `tools/scap_upconvert_v003/convert_full_review.py`; older `source/` trees remain historical baselines. Read [CURRENT-DESIGN.md](design/CURRENT-DESIGN.md) before selecting a generator.
+
 Iteration 003 is organized so a reviewer can understand it without knowing
 iteration 001 or 002.
 

@@ -1,0 +1,40 @@
+assessment:
+  id: SV-258125.automated
+  version: 1
+  assessment_title: RHEL-09-611180 - The pcscd service on RHEL 9 must be active.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-systemdunitproperty-collection:
+      collection_title: null
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          mask: false
+          value: pcscd.socket
+        property:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ActiveState
+  tests:
+    test-pcscd-socket-active:
+      test_title: The pcscd socket is active.
+      capability: linux.systemdunitproperty
+      collection: linux-systemdunitproperty-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: active
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-pcscd-socket-active

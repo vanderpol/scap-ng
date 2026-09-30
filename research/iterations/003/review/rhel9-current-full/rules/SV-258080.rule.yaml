@@ -1,0 +1,53 @@
+rule:
+  id: SV-258080
+  version: r1045162
+  title: RHEL 9 must configure SELinux context type to allow the use of a nondefault faillock tally directory.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Not having the correct SELinux context on the faillock directory may lead to unauthorized access to
+    the directory.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-431020
+  - scheme: vulnerability
+    value: V-258080
+  - scheme: cci
+    value: CCI-000044
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to allow the use of a nondefault faillock tally directory while SELinux enforces
+      a targeted policy. First enable the feature using the following command: $ sudo authselect enable-feature
+      with-faillock Create a nondefault faillock tally directory (if it does not already exist) with the following
+      example: $ sudo mkdir /var/log/faillock Then add/modify the "/etc/security/faillock.conf" file to match the
+      following line: dir = /var/log/faillock Update the /etc/selinux/targeted/contexts/files/file_contexts.local
+      with "faillog_t" context type for the nondefault faillock tally directory with the following command: $ sudo
+      semanage fcontext -a -t faillog_t "/var/log/faillock(/.*)?" Next, update the context type of the nondefault
+      faillock directory/subdirectories and files with the following command: $ sudo restorecon -R -v /var/log/faillock'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258080.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258080.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258080.manual.assessment.yaml
+  default_assessment_choice: default

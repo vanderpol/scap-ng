@@ -1,0 +1,37 @@
+assessment:
+  id: SV-258208.automated
+  version: 1
+  assessment_title: RHEL-09-654170 - RHEL 9 must audit all uses of the userhelper command.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/sbin/userhelper\s+(-F\s+perm=([rwa]*x[rwa]*)\s+)?-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-audit-invocations-usr-sbin-userhelper:
+      test_title: Audit invocations of /usr/sbin/userhelper
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-audit-invocations-usr-sbin-userhelper

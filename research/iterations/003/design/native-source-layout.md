@@ -74,8 +74,8 @@ Compiled packages resolve logical identities through explicit manifest bindings.
 No author-maintained Assessment index is required for locating YAML sources.
 
 The old full RHEL 9 Rule source still uses ID-only selection references and is
-transitional output. The current [two-rule authoring review slice](../review/test-vocabulary-slice/README.md)
-places relative paths directly on Rules. Its proposed field names are
+historical output. The current [full RHEL9 review](../review/rhel9-current-full/README.md)
+places relative paths directly on all 445 Rules. Its proposed field names are
 `assessment_choices` and `default_assessment_choice`; these vocabulary names
 remain subject to owner review, while named selector/default semantics are preserved.
 

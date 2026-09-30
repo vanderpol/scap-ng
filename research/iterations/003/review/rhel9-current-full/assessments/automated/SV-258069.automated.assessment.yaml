@@ -1,0 +1,142 @@
+assessment:
+  id: SV-258069.automated
+  version: 1
+  assessment_title: RHEL-09-412040 - RHEL 9 must limit the number of concurrent sessions to ten for all accounts
+    and/or account types.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    default-maxlogins-in-etc-security-limits-conf-collection:
+      collection_title: default maxlogins in /etc/security/limits.conf
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/limits.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    default-maxlogins-in-etc-security-limits-d-conf-collection:
+      collection_title: default maxlogins in /etc/security/limits.d/*.conf
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/limits.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    all-default-maxlogins-settings-in-etc-security-limits-conf-etc-collection:
+      collection_title: all default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf
+      set:
+        operator: union
+        members:
+        - collection: default-maxlogins-in-etc-security-limits-conf-collection
+        - collection: default-maxlogins-in-etc-security-limits-d-conf-collection
+    non-default-maxlogins-in-etc-security-limits-conf-collection:
+      collection_title: non-default maxlogins in /etc/security/limits.conf
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/limits.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    non-default-maxlogins-in-etc-security-limits-d-conf-collection:
+      collection_title: non-default maxlogins in /etc/security/limits.d/*.conf
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/limits.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    all-non-default-maxlogins-settings-in-etc-security-limits-conf-collection:
+      collection_title: all non-default maxlogins settings in /etc/security/limits.conf and /etc/security/limits.d/*.conf
+      set:
+        operator: union
+        members:
+        - collection: non-default-maxlogins-in-etc-security-limits-conf-collection
+        - collection: non-default-maxlogins-in-etc-security-limits-d-conf-collection
+  tests:
+    test-limits-conf-limits-d-conf-maxlogins-set-10-or-less:
+      test_title: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less by default
+      capability: independent.textfilecontent54
+      collection: all-default-maxlogins-settings-in-etc-security-limits-conf-etc-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: '10'
+          operation: less than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-limits-conf-limits-d-conf-maxlogins-set-10-or-less-2:
+      test_title: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains
+      capability: independent.textfilecontent54
+      collection: all-non-default-maxlogins-settings-in-etc-security-limits-conf-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: '10'
+          operation: less than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-limits-conf-limits-d-conf-maxlogins-set-10-or-less
+    - test: test-limits-conf-limits-d-conf-maxlogins-set-10-or-less-2

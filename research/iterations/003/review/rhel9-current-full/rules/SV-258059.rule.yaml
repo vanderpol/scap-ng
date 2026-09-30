@@ -1,0 +1,50 @@
+rule:
+  id: SV-258059
+  version: r991589
+  title: The root account must be the only account having unrestricted access to RHEL 9 system.
+  severity: high
+  role: full
+  weight: 10.0
+  discussion: An account has root authority if it has a user identifier (UID) of "0". Multiple accounts with a UID
+    of "0" afford more opportunity for potential intruders to guess a password for a privileged account. Proper
+    configuration of sudo is recommended to afford multiple system administrators access to root privileges in an
+    accountable manner.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-411100
+  - scheme: vulnerability
+    value: V-258059
+  - scheme: cci
+    value: CCI-000366
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: Change the UID of any account on the system, other than root, that has a UID of "0". If the account
+      is associated with system commands or applications, the UID should be changed to one greater than "0" but
+      less than "1000". Otherwise, assign a UID of greater than "1000" that has not already been assigned.
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258059.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258059.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258059.manual.assessment.yaml
+  default_assessment_choice: default

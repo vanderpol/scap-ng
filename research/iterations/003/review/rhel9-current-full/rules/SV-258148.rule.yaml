@@ -1,0 +1,52 @@
+rule:
+  id: SV-258148
+  version: r1045292
+  title: RHEL 9 must encrypt via the gtls driver the transfer of audit records offloaded onto a different system
+    or media from the system being audited via rsyslog.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: 'Information stored in one location is vulnerable to accidental or incidental deletion or alteration.
+    Offloading is a common process in information systems with limited audit storage capacity. RHEL 9 installation
+    media provides "rsyslogd", a system utility providing support for message logging. Support for both internet
+    and Unix domain sockets enables this utility to support both local and remote logging. Coupling this utility
+    with "gnutls" (a secure communications library implementing the SSL, TLS and DTLS protocols) creates a method
+    to securely encrypt and offload auditing. Satisfies: SRG-OS-000342-GPOS-00133, SRG-OS-000479-GPOS-00224'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-652050
+  - scheme: vulnerability
+    value: V-258148
+  - scheme: cci
+    value: CCI-001851
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to use the gtls driver to encrypt offloaded audit records by setting the following
+      options in "/etc/rsyslog.conf" or "/etc/rsyslog.d/[customfile].conf": $DefaultNetstreamDriver gtls'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258148.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258148.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258148.manual.assessment.yaml
+  default_assessment_choice: default

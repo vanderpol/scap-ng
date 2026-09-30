@@ -1,0 +1,78 @@
+assessment:
+  id: SV-258091.automated
+  version: 2
+  assessment_title: RHEL-09-611010 - RHEL 9 must ensure the password complexity module in the system-auth file is
+    configured for three retries or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    in-etc-security-pwquality-conf-check-pam-pwquality-so-retry-collection:
+      collection_title: in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/pwquality.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*retry\s*=\s*(-?\d*)\s*(?:#.*)?$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    in-etc-security-pwquality-conf-check-pam-pwquality-so-retry-collection-2:
+      collection_title: in /etc/security/pwquality.conf check for pam_pwquality.so retry equals value
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/pwquality.conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*retry\s*=\s*(-?\d*)\s*(?:#.*)?$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        recurse_direction: down
+    independent-textfilecontent54-collection:
+      collection_title: null
+      set:
+        operator: union
+        members:
+        - collection: in-etc-security-pwquality-conf-check-pam-pwquality-so-retry-collection
+        - collection: in-etc-security-pwquality-conf-check-pam-pwquality-so-retry-collection-2
+  tests:
+    test-etc-security-pwquality-conf-retry-not-greater-than-3-not:
+      test_title: /etc/security/pwquality.conf:retry not greater than 3 and not 0
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: ^[123]$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-security-pwquality-conf-retry-not-greater-than-3-not

@@ -1,0 +1,75 @@
+assessment:
+  id: SV-257784.automated
+  version: 2
+  assessment_title: RHEL-09-211045 - The systemd Ctrl-Alt-Delete burst key sequence in RHEL 9 must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/systemd/system.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/systemd/system.conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.+\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    ctrlaltdelburstaction-in-etc-systemd-system-conf-etc-systemd-system-conf-collection:
+      collection_title: CtrlAltDelBurstAction in /etc/systemd/system.conf and /etc/systemd/system.conf.d/*
+      set:
+        operator: union
+        members:
+        - collection: independent-textfilecontent54-collection
+        - collection: independent-textfilecontent54-collection-2
+  tests:
+    test-etc-systemd-system-conf-ctrlaltdelburstaction-set-none:
+      test_title: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
+      capability: independent.textfilecontent54
+      collection: ctrlaltdelburstaction-in-etc-systemd-system-conf-etc-systemd-system-conf-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: none
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-systemd-system-conf-ctrlaltdelburstaction-set-none

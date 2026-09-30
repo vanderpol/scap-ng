@@ -1,0 +1,65 @@
+assessment:
+  id: SV-258231.automated
+  version: 1
+  assessment_title: RHEL-09-671015 - RHEL 9 must employ FIPS 140-3 approved cryptographic hashing algorithms for
+    all stored passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    extract-password-hashes-from-etc-shadow-collection:
+      collection_title: Extract password hashes from /etc/shadow.
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/shadow
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '^[^:]+:([^:]*):'
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    filter-out-acceptable-shadow-password-entries-collection:
+      collection_title: Filter out acceptable shadow password entries.
+      set:
+        operator: union
+        members:
+        - collection: extract-password-hashes-from-etc-shadow-collection
+        filters:
+        - action: exclude
+          match:
+            field: subexpression
+            value: ^[!*]
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Exclude inactive/locked hashes (with leading '!' or '*').
+        - action: exclude
+          match:
+            field: subexpression
+            value: ^[$][6][$]
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Exclude hashes with leading '$6$'.
+  tests:
+    test-no-active-password-hash-in-etc-shadow-has-prefix-other:
+      test_title: No active password hash in /etc/shadow has a prefix other than '$6$'.
+      capability: independent.textfilecontent54
+      collection: filter-out-acceptable-shadow-password-entries-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-no-active-password-hash-in-etc-shadow-has-prefix-other

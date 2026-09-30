@@ -1,0 +1,37 @@
+assessment:
+  id: condition.linux-nfs-mounts-configured.assessment
+  version: 2
+  assessment_title: Linux with NFS mounts configured
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    etc-fstab-uncommented-nfs-capturing-options-collection:
+      collection_title: /etc/fstab, uncommented, nfs, capturing options
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-nfs-mounts-present:
+      test_title: NFS mounts are present
+      capability: independent.textfilecontent54
+      collection: etc-fstab-uncommented-nfs-capturing-options-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-nfs-mounts-present

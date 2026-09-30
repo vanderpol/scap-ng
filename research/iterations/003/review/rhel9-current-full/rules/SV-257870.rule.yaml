@@ -1,0 +1,48 @@
+rule:
+  id: SV-257870
+  version: r958804
+  title: RHEL 9 must mount /var/log with the nodev option.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: The "nodev" mount option causes the system to not interpret character or block special devices. Executing
+    character or block special devices from untrusted file systems increases the opportunity for nonprivileged users
+    to attain unauthorized administrative access. The only legitimate location for device files is the "/dev" directory
+    located on the root partition, with the exception of chroot jails if implemented.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-231145
+  - scheme: vulnerability
+    value: V-257870
+  - scheme: cci
+    value: CCI-001764
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: Modify "/etc/fstab" to use the "nodev" option on the "/var/log" directory.
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-257870.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-257870.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-257870.manual.assessment.yaml
+  default_assessment_choice: default

@@ -1,0 +1,33 @@
+assessment:
+  id: condition.linux-bios-boot.assessment
+  version: 6
+  assessment_title: Linux BIOS Boot
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    unix-file-collection:
+      collection_title: null
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /sys/firmware/efi
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+  tests:
+    test-sys-firmware-efi-does-not-exist:
+      test_title: /sys/firmware/efi does not exist
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-sys-firmware-efi-does-not-exist

@@ -1,0 +1,48 @@
+rule:
+  id: SV-258232
+  version: r1184335
+  title: RHEL 9 IP tunnels must use FIPS 140-3 approved cryptographic algorithms.
+  severity: high
+  role: full
+  weight: 10.0
+  discussion: Overriding the system crypto policy makes the behavior of the Libreswan service violate expectations,
+    and makes system configuration more fragmented.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-671020
+  - scheme: vulnerability
+    value: V-258232
+  - scheme: cci
+    value: CCI-000068
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - condition.linux-libreswan-installed
+  parameters: {}
+  remediation:
+    guidance: 'Configure Libreswan to use the system cryptographic policy. Add the following line to "/etc/ipsec.conf":
+      include /etc/crypto-policies/back-ends/libreswan.config'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258232.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258232.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258232.manual.assessment.yaml
+  default_assessment_choice: default

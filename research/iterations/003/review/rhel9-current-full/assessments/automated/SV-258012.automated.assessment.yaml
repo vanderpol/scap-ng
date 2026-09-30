@@ -1,0 +1,51 @@
+assessment:
+  id: SV-258012.automated
+  version: 1
+  assessment_title: RHEL-09-271010 - RHEL 9 must display the Standard Mandatory DOD Notice and Consent Banner before
+    granting local or remote access to the system via a graphical user logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/dconf/db/local.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*banner-message-enable\s*=\s*(\w+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-dconf-db-local-d-banner-message-enable-set-true:
+      test_title: /etc/dconf/db/local.d/*/banner-message-enable is set to true
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: 'true'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-dconf-db-local-d-banner-message-enable-set-true

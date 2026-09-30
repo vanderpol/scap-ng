@@ -1,0 +1,49 @@
+rule:
+  id: SV-258077
+  version: r1155659
+  title: RHEL 9 must terminate idle user sessions.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Terminating an idle session within a short time period reduces the window of opportunity for unauthorized
+    personnel to take control of a management session enabled on the console or console port that has been left
+    unattended.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-412080
+  - scheme: vulnerability
+    value: V-258077
+  - scheme: cci
+    value: CCI-001133
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to log out idle sessions. Create the directory if necessary: $ mkdir -p /etc/systemd/logind.conf.d/
+      Create a *.conf file in /etc/systemd/logind.conf.d/ with the following content: [Login] StopIdleSessionSec=600
+      KillUserProcesses=no Restart systemd-logind: $ systemctl restart systemd-logind'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258077.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258077.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258077.manual.assessment.yaml
+  default_assessment_choice: default

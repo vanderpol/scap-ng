@@ -1,0 +1,45 @@
+assessment:
+  id: condition.gnome-shell-package.assessment
+  version: 2
+  assessment_title: Gnome-shell Package
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gnome-shell
+    linux-dpkginfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gnome-shell
+  tests:
+    test-gnome-installed:
+      test_title: Gnome is installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-gnome-installed-2:
+      test_title: Gnome is installed
+      capability: linux.dpkginfo
+      collection: linux-dpkginfo-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - test: test-gnome-installed
+    - test: test-gnome-installed-2

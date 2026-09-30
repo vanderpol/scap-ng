@@ -1,0 +1,50 @@
+rule:
+  id: SV-258004
+  version: r1045067
+  title: RHEL 9 SSH daemon must not allow Kerberos authentication.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: 'Kerberos authentication for SSH is often implemented using Generic Security Service Application Program
+    Interface (GSSAPI). If Kerberos is enabled through SSH, the SSH daemon provides a means of access to the system''s
+    Kerberos implementation. Vulnerabilities in the system''s Kerberos implementations may be subject to exploitation.
+    Satisfies: SRG-OS-000364-GPOS-00151, SRG-OS-000480-GPOS-00227'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-255140
+  - scheme: vulnerability
+    value: V-258004
+  - scheme: cci
+    value: CCI-001813
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the SSH daemon to not allow Kerberos authentication. Add the following line in "/etc/ssh/sshd_config"
+      or to a file in "/etc/ssh/sshd_config.d", or uncomment the line and set the value to "no": KerberosAuthentication
+      no The SSH service must be restarted for changes to take effect: $ sudo systemctl restart sshd.service'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258004.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258004.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258004.manual.assessment.yaml
+  default_assessment_choice: default

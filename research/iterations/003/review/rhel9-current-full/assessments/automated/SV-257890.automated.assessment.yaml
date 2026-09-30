@@ -1,0 +1,137 @@
+assessment:
+  id: SV-257890.automated
+  version: 2
+  assessment_title: RHEL-09-232050 - All RHEL 9 local interactive user home directories must have mode 0750 or less
+    permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    local-interactive-users-without-nologin-collection:
+      collection_title: Local interactive users without nologin
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        match:
+          field: login_shell
+          value: ^.*nologin.*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: nologin shell
+      - action: exclude
+        match:
+          field: user_id
+          value: '1000'
+          operation: less than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: uid < 1000
+      - action: exclude
+        match:
+          field: user_id
+          value: '65534'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: uid = 65534 (nobody)
+    home-directories-local-interactive-users-without-nologin-collection:
+      collection_title: home directories of local interactive users without nologin
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directories-local-interactive-users-without-nologin-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+  variables:
+    home-directories-local-interactive-users-without-nologin-variable:
+      title: home directories of local interactive users without nologin
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: local-interactive-users-without-nologin-collection
+          field: home_dir
+      collection_capabilities:
+        local-interactive-users-without-nologin-collection: unix.password
+  tests:
+    test-all-local-interactive-user-home-directories-0750-or-less:
+      test_title: All local interactive user home directories are 0750 or less
+      capability: unix.file
+      collection: home-directories-local-interactive-users-without-nologin-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: mode 0750 or less permissive
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-all-local-interactive-user-home-directories-0750-or-less

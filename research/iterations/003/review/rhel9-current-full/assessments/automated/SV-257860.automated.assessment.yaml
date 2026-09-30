@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257860.automated
+  version: 1
+  assessment_title: RHEL-09-231095 - RHEL 9 must mount /boot with the nodev option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    boot-collection:
+      collection_title: /boot
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /boot
+  tests:
+    test-boot-has-nodev-option:
+      test_title: /boot has nodev option
+      capability: linux.partition
+      collection: boot-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: mount_options
+          value: nodev
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-boot-has-nodev-option

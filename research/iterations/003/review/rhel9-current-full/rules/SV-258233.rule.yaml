@@ -1,0 +1,55 @@
+rule:
+  id: SV-258233
+  version: r1015136
+  title: RHEL 9 pam_unix.so module must be configured in the password-auth file to use a FIPS 140-3 approved cryptographic
+    hashing algorithm for system authentication.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Unapproved mechanisms that are used for authentication to the cryptographic module are not verified
+    and; therefore, cannot be relied upon to provide confidentiality or integrity, and DOD data may be compromised.
+    RHEL 9 systems utilizing encryption are required to use FIPS-compliant mechanisms for authenticating to cryptographic
+    modules. FIPS 140-3 is the current standard for validating that mechanisms used to access cryptographic modules
+    utilize authentication that meets DOD requirements. This allows for Security Levels 1, 2, 3, or 4 for use on
+    a general-purpose computing system.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-671025
+  - scheme: vulnerability
+    value: V-258233
+  - scheme: cci
+    value: CCI-004062
+  - scheme: cci
+    value: CCI-000196
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to use a FIPS 140-3 approved cryptographic hashing algorithm for system authentication.
+      Edit/modify the following line in the "/etc/pam.d/password-auth" file to include the sha512 option for pam_unix.so:
+      password sufficient pam_unix.so sha512'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258233.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258233.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258233.manual.assessment.yaml
+  default_assessment_choice: default

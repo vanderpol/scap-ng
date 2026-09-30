@@ -1,0 +1,45 @@
+assessment:
+  id: SV-258073.automated
+  version: 1
+  assessment_title: RHEL-09-412060 - RHEL 9 must define default permissions for the c shell.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/csh.cshrc
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)umask\s*(\d+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-umask-set-only-077-in-etc-csh-cshrc:
+      test_title: UMASK is set to only 077 in /etc/csh.cshrc
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: '077'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-umask-set-only-077-in-etc-csh-cshrc

@@ -1,0 +1,52 @@
+rule:
+  id: SV-257985
+  version: r1069364
+  title: RHEL 9 must not permit direct logons to the root account using remote access via SSH.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: 'Even though the communications channel may be encrypted, an additional layer of security is gained
+    by extending the policy of not logging directly on as root. In addition, logging in with a user-specific account
+    provides individual accountability of actions performed on the system and also helps to minimize direct attack
+    attempts on root''s password. Satisfies: SRG-OS-000109-GPOS-00056, SRG-OS-000480-GPOS-00227'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-255045
+  - scheme: vulnerability
+    value: V-257985
+  - scheme: cci
+    value: CCI-004045
+  - scheme: cci
+    value: CCI-000770
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'To configure the system to prevent SSH users from logging on directly as root add or modify the following
+      line in "/etc/ssh/sshd_config" or in a file in "/etc/ssh/sshd_config.d". PermitRootLogin no Restart the SSH
+      daemon for the settings to take effect: $ sudo systemctl restart sshd.service'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-257985.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-257985.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-257985.manual.assessment.yaml
+  default_assessment_choice: default

@@ -1,0 +1,241 @@
+assessment:
+  id: SV-258085.automated
+  version: 1
+  assessment_title: RHEL-09-432020 - RHEL 9 must use the invoking user's password for privilege escalation when
+    using "sudo".
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-sudoers-defaults-targetpw-collection:
+      collection_title: /etc/sudoers Defaults !targetpw
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Defaults\s+!targetpw\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-sudoers-defaults-rootpw-collection:
+      collection_title: /etc/sudoers Defaults !rootpw
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Defaults\s+!rootpw\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-sudoers-defaults-runaspw-collection:
+      collection_title: /etc/sudoers Defaults !runaspw
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Defaults\s+!runaspw\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-sudoers-includedir-collection:
+      collection_title: /etc/sudoers includedir
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[#@]includedir\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-sudoers-d-config-files-excluding-files-ending-or-containing-collection:
+      collection_title: /etc/sudoers.d config files, excluding files ending with ~ or containing .
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/sudoers.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^.]*[^.~]$
+    etc-sudoers-d-defaults-targetpw-collection:
+      collection_title: /etc/sudoers.d Defaults !targetpw
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: sudoers-d-config-files-variable
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Defaults\s+!targetpw\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-sudoers-d-defaults-rootpw-collection:
+      collection_title: /etc/sudoers.d Defaults !rootpw
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: sudoers-d-config-files-variable
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Defaults\s+!rootpw\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-sudoers-d-defaults-runaspw-collection:
+      collection_title: /etc/sudoers.d Defaults !runaspw
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: sudoers-d-config-files-variable
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Defaults\s+!runaspw\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  variables:
+    sudoers-d-config-files-variable:
+      title: sudoers.d config files
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: etc-sudoers-d-config-files-excluding-files-ending-or-containing-collection
+          field: filepath
+      collection_capabilities:
+        etc-sudoers-d-config-files-excluding-files-ending-or-containing-collection: unix.file
+  tests:
+    test-defaults-targetpw-in-etc-sudoers:
+      test_title: Defaults !targetpw in /etc/sudoers
+      capability: independent.textfilecontent54
+      collection: etc-sudoers-defaults-targetpw-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-defaults-rootpw-in-etc-sudoers:
+      test_title: Defaults !rootpw in /etc/sudoers
+      capability: independent.textfilecontent54
+      collection: etc-sudoers-defaults-rootpw-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-defaults-runaspw-in-etc-sudoers:
+      test_title: Defaults !runaspw in /etc/sudoers
+      capability: independent.textfilecontent54
+      collection: etc-sudoers-defaults-runaspw-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-etc-sudoers-d-included-in-etc-sudoers:
+      test_title: /etc/sudoers.d included in /etc/sudoers
+      capability: independent.textfilecontent54
+      collection: etc-sudoers-includedir-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state:
+          field: subexpression
+          value: /etc/sudoers.d
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-defaults-targetpw-in-etc-sudoers-d:
+      test_title: Defaults !targetpw in /etc/sudoers.d
+      capability: independent.textfilecontent54
+      collection: etc-sudoers-d-defaults-targetpw-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-defaults-rootpw-in-etc-sudoers-d:
+      test_title: Defaults !rootpw in /etc/sudoers.d
+      capability: independent.textfilecontent54
+      collection: etc-sudoers-d-defaults-rootpw-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-defaults-runaspw-in-etc-sudoers-d:
+      test_title: Defaults !runaspw in /etc/sudoers.d
+      capability: independent.textfilecontent54
+      collection: etc-sudoers-d-defaults-runaspw-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - all:
+      - test: test-defaults-targetpw-in-etc-sudoers
+      - test: test-defaults-rootpw-in-etc-sudoers
+      - test: test-defaults-runaspw-in-etc-sudoers
+    - all:
+      - test: test-etc-sudoers-d-included-in-etc-sudoers
+      - test: test-defaults-targetpw-in-etc-sudoers-d
+      - test: test-defaults-rootpw-in-etc-sudoers-d
+      - test: test-defaults-runaspw-in-etc-sudoers-d

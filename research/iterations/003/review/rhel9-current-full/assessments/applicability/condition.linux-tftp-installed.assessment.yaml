@@ -1,0 +1,27 @@
+assessment:
+  id: condition.linux-tftp-installed.assessment
+  version: 1
+  assessment_title: Linux with TFTP installed
+  mode: automated
+  class: compliance
+  purpose: applicability
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: tftp-server
+  tests:
+    test-tftp-server-package-iinstalled:
+      test_title: The tftp-server package is iinstalled.
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-tftp-server-package-iinstalled

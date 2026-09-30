@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257957.automated
+  version: 3
+  assessment_title: RHEL-09-253010 - RHEL 9 must be configured to use TCP syncookies.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv4.tcp_syncookies
+  tests:
+    test-net-ipv4-tcp-syncookies-setting-in-kernel-set-1:
+      test_title: net.ipv4.tcp_syncookies setting in kernel is set to 1
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-net-ipv4-tcp-syncookies-setting-in-kernel-set-1

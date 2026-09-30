@@ -240,7 +240,7 @@ def main(argv=None):
                             'Representation equality and schema validation do not prove target runtime equivalence.',
                             'Manual procedures copied from inline source Check Text; full OCIL logic not assessed.',
                             'ng_schema_version remains null until an NG schema is assigned.',
-                            'Full original package execution on Windows not yet performed.']
+                            'Platform execution evidence is recorded separately by CI.']
         evidence['profile_rule_comparisons']=len(rs)*len(profiles)
         evidence['applicability_conditions']=len(registry)
         evidence['source_revision']=source.SOURCE_REVISION

@@ -14,7 +14,7 @@ Owner reconfirmation: 2026-09-30. Read this file before selecting a generator, p
 - Variables can consume Collection fields or other Variables. Named intermediates and the complete graph through sets/filter States/functions must survive conversion. Source identity must remain in provenance so distinct source nodes are not merged merely because payloads match.
 - Native Assessments have no `deprecated` attribute. Effectively deprecated source Tests are blockers; they do not become native runtime flags.
 - Capability is declared at Test level for its directly used Collection/State contract; mismatches fail. Do not silently mix types. For a Collection used only by Variables, the owner selected capability declaration on the Variable as the working prototype direction (2026-09-30). Exact grammar and formal Board ratification remain pending; do not treat this as an approved standard or infer type from filenames/IDs.
-- Pre-alpha: publish completed, appropriately tested work directly to `main` without routine permission requests. Full benchmark regeneration remains held while the authoring slice is being reviewed.
+- Pre-alpha: publish completed, appropriately tested work directly to `main` without routine permission requests. The owner authorized current-design full RHEL9 review generation on 2026-09-30. Historical publishing workflows remain held; use the new source-driven full review entry point.
 
 ## Converter delivery and stability requirement
 
@@ -31,7 +31,7 @@ output from pinned original SCAP input. See
 
 - Exact Rule choice field names (`assessment_choices`, `default_assessment_choice`) are review proposals.
 - Complete `collection`/`collection_title` and `assertion` vocabulary migration, including the final item/state quantifier syntax, is unfinished.
-- Named Collection graph conversion and reverse consumption now have a tested prototype (`collection_graph=True`), including source identity and Variable references. Full compiler integration is unfinished. Variable-side capability declaration is the selected prototype direction; `collection_capabilities` is prototype grammar, with Board approval pending.
+- Named Collection graph conversion and reverse consumption now have a tested prototype (`collection_graph=True`), including source identity and Variable references. It is integrated into the complete pinned RHEL9 Rule/Benchmark research renderer; compiled package/signature and broader consumer integration remain unfinished. Variable-side capability declaration is the selected prototype direction; `collection_capabilities` is prototype grammar, with Board approval pending.
 - Formal Board review of embedded Collections and colocated Filters remains pending. Both named-reference and embedded-Collection Variable forms are required in the working design, not optional pending implementation choices.
 - Full runtime equivalence is unproven. Round-trip and source-reference checks alone do not establish evaluator equivalence.
 
@@ -44,7 +44,11 @@ Source graph sharing, Variable chains and private embedded native-authoring
 Collections have regression coverage. All 42 Variable-bearing RHEL 9 cases
 compare equal through the new graph/reverse path; 23 sample automated outputs
 also regenerate omni-schema-valid OVAL. Runtime conformance, complete Rule/Profile
-rendering and Windows execution are not established.
+rendering were outside this slice. Windows/Linux graph and local-ZIP regressions subsequently passed; full-source review evidence is tracked separately below.
+
+## Full RHEL9 checkpoint
+
+[Current full review](../review/rhel9-current-full/README.md) uses the pinned original package, not old rendered YAML: 445 Rules, 11 Profiles, 418 automated and 445 manual Assessments, 18 source-driven applicability conditions. All 4,895 Rule/Profile selection comparisons match. Automated/applicability definition round trips and pinned omni-schema checks pass. Relative Rule paths, source selectors/defaults, shared manual questionnaire aliases, grouping and native presentation/cleanliness are checked. The exact research CLI is `tools/scap_upconvert_v003/convert_full_review.py`; Windows/Linux full-package CI evidence is recorded with the review. This is not finalized grammar, compiled packaging or runtime conformance.
 
 ## Current artifact status
 

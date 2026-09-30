@@ -1,0 +1,104 @@
+assessment:
+  id: SV-258000.automated
+  version: 2
+  assessment_title: RHEL-09-255120 - RHEL 9 SSH private host key files must have mode 0600 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    ssh-private-key-files-collection:
+      collection_title: SSH private key files
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^ssh_host_.*_key$
+  tests:
+    test-ssh-private-key-files-mode-600-or-less-permissive:
+      test_title: SSH private key files mode 600 or less permissive
+      capability: unix.file
+      collection: ssh-private-key-files-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: Mode 0600 or less permissive
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: uexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-ssh-private-key-files-mode-600-or-less-permissive

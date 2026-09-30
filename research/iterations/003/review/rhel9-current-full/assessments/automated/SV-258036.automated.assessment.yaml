@@ -1,0 +1,40 @@
+assessment:
+  id: SV-258036.automated
+  version: 1
+  assessment_title: RHEL-09-291020 - RHEL 9 must have the USBGuard package enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    usbguard-service-activestate-collection:
+      collection_title: usbguard.service ActiveState
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          mask: false
+          value: usbguard.service
+        property:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ActiveState
+  tests:
+    test-usbguard-service-active:
+      test_title: usbguard.service is active
+      capability: linux.systemdunitproperty
+      collection: usbguard-service-activestate-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: usbguard.service active
+        state:
+          field: value
+          value: active
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-usbguard-service-active

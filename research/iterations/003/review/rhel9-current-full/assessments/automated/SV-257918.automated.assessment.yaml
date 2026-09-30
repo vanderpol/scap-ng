@@ -1,0 +1,80 @@
+assessment:
+  id: SV-257918.automated
+  version: 13
+  assessment_title: RHEL 9 system commands must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-system-command-files-not-owned-by-root-collection:
+      collection_title: All system-command files not owned by root
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-command-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: exclude
+        match:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: owned by root
+      - action: exclude
+        match:
+          field: type
+          value: symbolic link
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: symbolic links
+      - action: exclude
+        match:
+          field: type
+          value: directory
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+      behaviors:
+        recurse_direction: down
+  variables:
+    system-command-directories-variable:
+      title: system command directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /bin
+        - /sbin
+        - /usr/bin
+        - /usr/libexec
+        - /usr/sbin
+        - /usr/local/bin
+        - /usr/local/sbin
+  tests:
+    test-files-in-system-command-directories-owned-by-root:
+      test_title: Files in System command directories are owned by root
+      capability: unix.file
+      collection: all-system-command-files-not-owned-by-root-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-files-in-system-command-directories-owned-by-root

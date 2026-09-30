@@ -1,0 +1,57 @@
+rule:
+  id: SV-257975
+  version: r1155766
+  title: RHEL 9 must not accept router advertisements on all IPv6 interfaces by default.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Routing protocol daemons are typically used on routers to exchange network topology information with
+    other routers. If this software is used when not required, system network information may be unnecessarily transmitted
+    across the network. An illicit router advertisement message could result in a man-in-the-middle attack. The
+    sysctl --system command will load settings from all system configuration files. All configuration files are
+    sorted by their filename in lexicographical order, regardless of the directories in which they reside. If multiple
+    files specify the same option, the entry in the file with the lexicographically latest name will take precedence.
+    Files are read from directories in the following list from top to bottom. Once a file of a given filename is
+    loaded, any file of the same name in subsequent directories is ignored. /etc/sysctl.d/*.conf /run/sysctl.d/*.conf
+    /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-254030
+  - scheme: vulnerability
+    value: V-257975
+  - scheme: cci
+    value: CCI-000366
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - condition.linux-ipv6-enabled
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to not accept router advertisements on all IPv6 interfaces by default unless the
+      system is a router. Create a configuration file if it does not already exist: $ sudo vi /etc/sysctl.d/ipv6_accept_ra.conf
+      Add the following line to the file: net.ipv6.conf.default.accept_ra = 0 Reload settings from all system configuration
+      files with the following command: $ sudo sysctl --system'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-257975.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-257975.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-257975.manual.assessment.yaml
+  default_assessment_choice: default

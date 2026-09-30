@@ -1,0 +1,142 @@
+assessment:
+  id: SV-258134.automated
+  version: 13
+  assessment_title: RHEL 9 must have the AIDE package installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    confirm-aide-file-integrity-tool-package-installed-collection:
+      collection_title: Confirm the aide file integrity tool package is installed.
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: aide
+    find-aide-conf-file-collection:
+      collection_title: Find the aide.conf file.
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: aide.conf
+      behaviors:
+        recurse_direction: down
+        recurse: directories
+        max_depth: '-1'
+        recurse_file_system: local
+    retrieve-path-working-db-file-collection:
+      collection_title: Retrieve path to the working DB file.
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: retrieve-location-aide-conf-file-variable
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\@\@define\s+DBDIR\s+(\S+)
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    retrieve-filename-working-db-file-collection:
+      collection_title: Retrieve filename of the working DB file.
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: retrieve-location-aide-conf-file-variable
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^database=file:\@\@\{DBDIR\}/(\S+)
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    retrieve-details-working-db-file-collection:
+      collection_title: Retrieve details of the working DB file.
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: retrieve-location-working-aide-database-file-variable
+  variables:
+    retrieve-location-aide-conf-file-variable:
+      title: Retrieve location of the aide.conf file.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: find-aide-conf-file-collection
+          field: filepath
+      collection_capabilities:
+        find-aide-conf-file-collection: unix.file
+    retrieve-location-working-aide-database-file-variable:
+      title: Retrieve location of the working aide database file.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            collection: retrieve-path-working-db-file-collection
+            field: subexpression
+        - literal:
+            value: /
+            datatype: string
+        - values:
+            collection: retrieve-filename-working-db-file-collection
+            field: subexpression
+      collection_capabilities:
+        retrieve-path-working-db-file-collection: independent.textfilecontent54
+        retrieve-filename-working-db-file-collection: independent.textfilecontent54
+  tests:
+    test-confirm-aide-file-integrity-tool-package-installed:
+      test_title: Confirm the aide file integrity tool package is installed.
+      capability: linux.rpminfo
+      collection: confirm-aide-file-integrity-tool-package-installed-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-verify-working-db-file-configured-in-aide-conf-file-exists:
+      test_title: Verify the working DB file configured in the 'aide.conf file' exists.
+      capability: unix.file
+      collection: retrieve-details-working-db-file-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Confirm existence of DB file.
+        state:
+          field: filepath
+          value: .*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-confirm-aide-file-integrity-tool-package-installed
+    - test: test-verify-working-db-file-configured-in-aide-conf-file-exists

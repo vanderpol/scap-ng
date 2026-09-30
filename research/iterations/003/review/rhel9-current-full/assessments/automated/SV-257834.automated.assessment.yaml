@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257834.automated
+  version: 1
+  assessment_title: RHEL-09-215055 - RHEL 9 must not have the tuned package installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: tuned
+  tests:
+    test-tuned-package-installed:
+      test_title: tuned package is installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    not:
+      test: test-tuned-package-installed

@@ -1,0 +1,78 @@
+assessment:
+  id: SV-257923.automated
+  version: 13
+  assessment_title: RHEL 9 library directories must be group-owned by root or a system account.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    all-system-wide-library-directories-not-owned-by-root-group-collection:
+      collection_title: All system-wide Library directories not owned by root-group
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: only one
+          value:
+            variable: system-wide-shared-library-files-directories-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+      filters:
+      - action: exclude
+        match:
+          field: group_id
+          value: '1000'
+          operation: less than
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Group Owned by root or System group (gid less than 1000)
+      - action: exclude
+        match:
+          field: type
+          value: file
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+      - action: exclude
+        match:
+          field: type
+          value: symbolic link
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: symbolic links
+      behaviors:
+        recurse_direction: down
+  variables:
+    system-wide-shared-library-files-directories-variable:
+      title: system-wide shared library files directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64
+  tests:
+    test-system-library-directories-group-by-root-group:
+      test_title: System Library directories are group by root group.
+      capability: unix.file
+      collection: all-system-wide-library-directories-not-owned-by-root-group-collection
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-system-library-directories-group-by-root-group

@@ -24,4 +24,6 @@ The converter SHALL NOT be called stable merely because a full generated tree or
 
 No final CLI command is invented here. Current tools are research components; an exact tested Windows command will be supplied with the stabilized entry point. README examples, fixtures, source grammar and implementation changes SHALL be reviewed together. Formal specification text will continue to record semantics that successful conversion alone cannot prove.
 
+The current full RHEL9 research entry point is now `tools/scap_upconvert_v003/convert_full_review.py`. Its [review README](../review/rhel9-current-full/README.md) gives the exact PowerShell command, pinned dependencies/input checksum and Windows/Linux full-package CI evidence. It renders all Rules and Assessments for the pinned package and checks source/profile parity. This is an executable research checkpoint, not the final stable handoff; finalized grammar, runtime conformance and Windows11 integration remain future gates.
+
 Provenance: **Evidence/Audit** of the owner's direct requirement; implementation acceptance criteria translate that requirement into verifiable delivery conditions.

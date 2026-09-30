@@ -1,0 +1,81 @@
+assessment:
+  id: SV-257787.automated
+  version: 1
+  assessment_title: RHEL-09-212010 - RHEL 9 must require a boot loader superuser password.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-grub2-cfg-superusers-collection:
+      collection_title: /etc/grub2.cfg:superusers
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/grub2.cfg
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*set\s+superusers\s*=\s*"(\S+)"\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    boot-grub2-grubenv-kernelopts-collection:
+      collection_title: /boot/grub2/grubenv:kernelopts
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /boot/grub2/user.cfg
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*GRUB2_PASSWORD=(\S+)\b
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-etc-grub2-cfg-superusers-exists-has-name:
+      test_title: /etc/grub2.cfg:superusers exists and has a name.
+      capability: independent.textfilecontent54
+      collection: etc-grub2-cfg-superusers-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: GRUB superuser name
+        state:
+          field: subexpression
+          value: ^\S+$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-boot-grub2-user-cfg-grub2-password-exists-has-pbkdf2-sha512:
+      test_title: /boot/grub2/user.cfg:GRUB2_PASSWORD exists and has a PBKDF2/SHA512 password assigned.
+      capability: independent.textfilecontent54
+      collection: boot-grub2-grubenv-kernelopts-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: GRUB superuser password
+        state:
+          field: subexpression
+          value: ^grub\.pbkdf2\.sha512\.
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-etc-grub2-cfg-superusers-exists-has-name
+    - test: test-boot-grub2-user-cfg-grub2-password-exists-has-pbkdf2-sha512

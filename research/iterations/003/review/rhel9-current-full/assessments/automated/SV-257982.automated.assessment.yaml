@@ -1,0 +1,75 @@
+assessment:
+  id: SV-257982.automated
+  version: 1
+  assessment_title: RHEL-09-255030 - RHEL 9 must log SSH connection attempts and failures to the server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    pull-value-etc-ssh-sshd-config-loglevel-collection:
+      collection_title: Pull value of /etc/ssh/sshd_config:LogLevel
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    pull-value-etc-ssh-sshd-config-d-loglevel-collection:
+      collection_title: Pull value of /etc/ssh/sshd_config.d:LogLevel
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .+
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)LogLevel(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    all-sshd-config-sshd-config-d-files-collection:
+      collection_title: all sshd_config and sshd_config.d/* files
+      set:
+        operator: union
+        members:
+        - collection: pull-value-etc-ssh-sshd-config-loglevel-collection
+        - collection: pull-value-etc-ssh-sshd-config-d-loglevel-collection
+  tests:
+    test-etc-ssh-sshd-config-loglevel-verbose:
+      test_title: /etc/ssh/sshd_config:LogLevel == VERBOSE
+      capability: independent.textfilecontent54
+      collection: all-sshd-config-sshd-config-d-files-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: LogLevel value is set to VERBOSE
+        state:
+          field: subexpression
+          value: ^VERBOSE$|^"VERBOSE"$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-ssh-sshd-config-loglevel-verbose

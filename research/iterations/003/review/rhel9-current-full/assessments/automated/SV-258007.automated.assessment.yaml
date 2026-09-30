@@ -1,0 +1,75 @@
+assessment:
+  id: SV-258007.automated
+  version: 1
+  assessment_title: RHEL-09-255155 - RHEL 9 SSH daemon must disable remote X connections for interactive users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)X11Forwarding[ \t]+([^\s#]*)[ \t]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .+
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)X11Forwarding[ \t]+([^\s#]*)[ \t]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    x11forwarding-in-etc-ssh-sshd-config-etc-ssh-sshd-config-collection:
+      collection_title: X11Forwarding in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*
+      set:
+        operator: union
+        members:
+        - collection: independent-textfilecontent54-collection
+        - collection: independent-textfilecontent54-collection-2
+  tests:
+    test-etc-ssh-sshd-config-or-etc-ssh-sshd-config-d:
+      test_title: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:X11Forwarding == no
+      capability: independent.textfilecontent54
+      collection: x11forwarding-in-etc-ssh-sshd-config-etc-ssh-sshd-config-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: ^(no|"no")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-ssh-sshd-config-or-etc-ssh-sshd-config-d

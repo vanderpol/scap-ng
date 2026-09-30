@@ -1,0 +1,40 @@
+assessment:
+  id: SV-258090.automated
+  version: 1
+  assessment_title: RHEL-09-433015 - RHEL 9 fapolicy module must be enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    fapolicyd-service-activestate-collection:
+      collection_title: fapolicyd.service ActiveState
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          mask: false
+          value: fapolicyd.service
+        property:
+          operation: equals
+          datatype: string
+          mask: false
+          value: ActiveState
+  tests:
+    test-fapolicyd-service-active:
+      test_title: fapolicyd.service is active
+      capability: linux.systemdunitproperty
+      collection: fapolicyd-service-activestate-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: active
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-fapolicyd-service-active

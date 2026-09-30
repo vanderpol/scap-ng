@@ -1,0 +1,27 @@
+assessment:
+  id: SV-257846.automated
+  version: 2
+  assessment_title: RHEL-09-231025 - RHEL 9 must use a separate file system for /var/log.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-partition-collection:
+      collection_title: null
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var/log
+  tests:
+    test-there-separate-file-system-var-log:
+      test_title: There is a separate file system for /var/log.
+      capability: linux.partition
+      collection: linux-partition-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-there-separate-file-system-var-log

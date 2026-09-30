@@ -1,0 +1,93 @@
+assessment:
+  id: SV-258001.automated
+  version: 1
+  assessment_title: RHEL-09-255125 - RHEL 9 SSH public host key files must have mode 0644 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-file-collection:
+      collection_title: null
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.pub$
+      behaviors:
+        max_depth: '-1'
+        recurse_direction: down
+  tests:
+    test-ssh-daemon-public-host-key-files-have-mode-0644-or:
+      test_title: The SSH daemon public host key files have mode 0644 or less permissive
+      capability: unix.file
+      collection: unix-file-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: File permissions is 644 or more restrictive
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: uexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-ssh-daemon-public-host-key-files-have-mode-0644-or

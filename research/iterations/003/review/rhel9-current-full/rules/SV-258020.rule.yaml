@@ -1,0 +1,57 @@
+rule:
+  id: SV-258020
+  version: r1045094
+  title: RHEL 9 must prevent a user from overriding the disabling of the graphical user smart card removal action.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: 'A session lock is a temporary action taken when a user stops work and moves away from the immediate
+    physical vicinity of the information system but does not want to log out because of the temporary nature of
+    the absence. The session lock is implemented at the point where session activity can be determined. Rather than
+    be forced to wait for a period of time to expire before the user session can be locked, RHEL 9 needs to provide
+    users with the ability to manually invoke a session lock so users can secure their session if it is necessary
+    to temporarily vacate the immediate physical vicinity. Satisfies: SRG-OS-000028-GPOS-00009, SRG-OS-000030-GPOS-00011'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-271050
+  - scheme: vulnerability
+    value: V-258020
+  - scheme: cci
+    value: CCI-000056
+  - scheme: cci
+    value: CCI-000057
+  - scheme: cci
+    value: CCI-000058
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - condition.gnome-shell-package
+  parameters: {}
+  remediation:
+    guidance: 'Add the following line to "/etc/dconf/db/local.d/locks/00-security-settings-lock" to prevent user
+      override of the smart card removal action: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+      Then update the dconf system databases: $ sudo dconf update'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258020.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258020.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258020.manual.assessment.yaml
+  default_assessment_choice: default

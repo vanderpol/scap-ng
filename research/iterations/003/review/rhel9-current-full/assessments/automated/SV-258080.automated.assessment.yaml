@@ -1,0 +1,81 @@
+assessment:
+  id: SV-258080.automated
+  version: 1
+  assessment_title: RHEL-09-431020 - RHEL 9 must configure SELinux context type to allow the use of a nondefault
+    faillock tally directory.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-security-faillock-conf-dir-collection:
+      collection_title: /etc/security/faillock.conf dir
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/faillock.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*dir\s*=\s*(.*)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    configured-faillock-directory-selinux-context-collection:
+      collection_title: configured faillock directory selinux context
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: faillock-directory-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+  variables:
+    faillock-directory-variable:
+      title: faillock directory
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: etc-security-faillock-conf-dir-collection
+          field: subexpression
+  tests:
+    test-configured-faillock-directory-has-correct-selinux-context:
+      test_title: configured faillock directory has correct selinux context
+      capability: linux.selinuxsecuritycontext
+      collection: configured-faillock-directory-selinux-context-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: configured faillock directory selinux context correct
+        state:
+          field: type
+          value: faillog_t
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-etc-security-faillock-conf-dir-option-exists:
+      test_title: /etc/security/faillock.conf dir option exists
+      capability: independent.textfilecontent54
+      collection: etc-security-faillock-conf-dir-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-configured-faillock-directory-has-correct-selinux-context
+    - test: test-etc-security-faillock-conf-dir-option-exists

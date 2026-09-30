@@ -1,0 +1,81 @@
+assessment:
+  id: SV-258045.automated
+  version: 2
+  assessment_title: RHEL-09-411030 - RHEL 9 duplicate User IDs (UIDs) must not exist for interactive users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    interactive-users-collection:
+      collection_title: Interactive Users
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+      filters:
+      - action: include
+        match:
+          field: user_id
+          value: '1000'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+        state_title: Interactive Users
+    count-passwd-entries-collection:
+      collection_title: count of passwd entries
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: count-passwd-entries-variable
+  variables:
+    count-passwd-entries-variable:
+      title: count of passwd entries
+      kind: local
+      datatype: int
+      expression:
+        count:
+          values:
+            collection: interactive-users-collection
+            field: user_id
+      collection_capabilities:
+        interactive-users-collection: unix.password
+    count-unique-uids-variable:
+      title: count of unique UIDs
+      kind: local
+      datatype: int
+      expression:
+        count:
+          unique:
+            values:
+              collection: interactive-users-collection
+              field: user_id
+      collection_capabilities:
+        interactive-users-collection: unix.password
+  tests:
+    test-uids-unique:
+      test_title: UIDs are unique
+      capability: independent.variable
+      collection: count-passwd-entries-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: count of passwd UIDs
+        state:
+          field: value
+          value:
+            variable: count-unique-uids-variable
+          operation: equals
+          datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-uids-unique

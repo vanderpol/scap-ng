@@ -1,0 +1,52 @@
+rule:
+  id: SV-258033
+  version: r1045120
+  title: RHEL 9 must disable the user list at logon for graphical user interfaces.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Leaving the user list enabled is a security risk since it allows anyone with physical access to the
+    system to enumerate known user accounts without authenticated access to the system.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-271115
+  - scheme: vulnerability
+    value: V-258033
+  - scheme: cci
+    value: CCI-000366
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - condition.gnome-shell-package
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to disable the user list at logon for graphical user interfaces. Create a database
+      to contain the systemwide screensaver settings (if it does not already exist) with the following command:
+      Note: The example below is using the database "local" for the system. If the system is using another database
+      in "/etc/dconf/profile/user", the file should be created under the appropriate subdirectory. $ sudo touch
+      /etc/dconf/db/local.d/02-login-screen [org/gnome/login-screen] disable-user-list=true Update the system databases:
+      $ sudo dconf update'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258033.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258033.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258033.manual.assessment.yaml
+  default_assessment_choice: default

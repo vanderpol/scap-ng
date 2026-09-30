@@ -1,0 +1,70 @@
+assessment:
+  id: platform.red-hat-enterprise-linux-9.assessment
+  version: 13
+  assessment_title: Red Hat Enterprise Linux 9
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: redhat-release
+    linux-rpminfo-collection-2:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: toss-release
+    linux-rpminfo-collection-3:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: oraclelinux-release
+  tests:
+    test-redhat-release-package-version-9:
+      test_title: The redhat-release package is version 9.
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: version
+          value: ^9\.\d+$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-toss-package-not-installed:
+      test_title: The TOSS Package is not Installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection-2
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+    test-oracle-linux-package-not-installed:
+      test_title: The Oracle Linux Package is not Installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection-3
+      assertion:
+        existence: none_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-redhat-release-package-version-9
+    - test: test-toss-package-not-installed
+    - test: test-oracle-linux-package-not-installed

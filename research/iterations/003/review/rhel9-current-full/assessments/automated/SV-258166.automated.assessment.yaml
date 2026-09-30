@@ -1,0 +1,75 @@
+assessment:
+  id: SV-258166.automated
+  version: 1
+  assessment_title: RHEL-09-653085 - RHEL 9 audit log directory must be owned by root to prevent unauthorized read
+    access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/auditd.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    audit-log-directory-collection:
+      collection_title: Audit log directory
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: audit-data-directory-from-etc-audit-auditd-conf-variable
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          nil: true
+          value: ''
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf-variable:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: independent-textfilecontent54-collection
+          field: subexpression
+      collection_capabilities:
+        independent-textfilecontent54-collection: independent.textfilecontent54
+  tests:
+    test-audit-log-directories-owned-by-root:
+      test_title: audit log directories are owned by root
+      capability: unix.file
+      collection: audit-log-directory-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: owned by root
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-audit-log-directories-owned-by-root

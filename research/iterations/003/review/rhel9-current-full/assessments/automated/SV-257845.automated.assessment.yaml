@@ -1,0 +1,55 @@
+assessment:
+  id: SV-257845.automated
+  version: 1
+  assessment_title: RHEL-09-231020 - RHEL 9 must use a separate file system for /var.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-partition-collection:
+      collection_title: null
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /var
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^[^# \t]+\s+/var\s+
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-there-separate-file-system-var:
+      test_title: There is a separate file system for /var.
+      capability: linux.partition
+      collection: linux-partition-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-there-separate-file-system-configured-var:
+      test_title: There is a separate file system configured for /var.
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-there-separate-file-system-var
+    - test: test-there-separate-file-system-configured-var

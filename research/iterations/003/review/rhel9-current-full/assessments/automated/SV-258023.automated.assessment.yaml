@@ -1,0 +1,72 @@
+assessment:
+  id: SV-258023.automated
+  version: 13
+  assessment_title: RHEL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    gather-gsettings-get-org-gnome-desktop-session-idle-delay-collection:
+      collection_title: Gather gsettings get org.gnome.desktop.session idle-delay
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gsettings get org.gnome.desktop.session idle-delay
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: uint32\s+(\d+)
+  tests:
+    test-gnome-idle-delay-not-set-0-or-greater-than-600:
+      test_title: Gnome idle-delay must not be set to 0 or greater than 600
+      capability: independent.shellcommand
+      collection: gather-gsettings-get-org-gnome-desktop-session-idle-delay-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_operator: AND
+        states:
+        - state_title: idle-delay must not be equal to zero
+          state:
+            all:
+            - field: exit_status
+              value: '0'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: subexpression
+              value: '0'
+              operation: not equal
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+        - state_title: idle-delay must be less than or equal to 600
+          state:
+            all:
+            - field: exit_status
+              value: '0'
+              operation: equals
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            - field: subexpression
+              value: '600'
+              operation: less than or equal
+              datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+  evaluate:
+    test: test-gnome-idle-delay-not-set-0-or-greater-than-600

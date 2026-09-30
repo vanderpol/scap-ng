@@ -1,0 +1,84 @@
+assessment:
+  id: SV-258174.automated
+  version: 13
+  assessment_title: RHEL 9 must have mail aliases to notify the information system security officer (ISSO) and system
+    administrator (SA) (at a minimum) in the event of an audit processing failure.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrive-location-alias-maps-collection:
+      collection_title: Retrive location of alias maps.
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: postconf alias_maps
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*alias_maps\s+=\s+(hash:.*)$
+    confirm-postfix-alias-map-s-exist-collection:
+      collection_title: Confirm postfix alias map(s) exist.
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: all
+          value:
+            variable: retrieve-location-alias-map-construct-postmap-query-variable
+  variables:
+    retrieve-location-alias-map-construct-postmap-query-variable:
+      title: Retrieve location of alias map and construct postmap query.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: 'postmap -q root '
+            datatype: string
+        - values:
+            collection: retrive-location-alias-maps-collection
+            field: subexpression
+      collection_capabilities:
+        retrive-location-alias-maps-collection: independent.shellcommand
+  tests:
+    test-confirm-postfix-configured-notify-in-event-audit-processing-failure:
+      test_title: Confirm postfix is configured to notify in the event of an audit processing failure.
+      capability: independent.shellcommand
+      collection: confirm-postfix-alias-map-s-exist-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Confirm an alias is returned by the postconf query.
+        state:
+          all:
+          - field: exit_status
+            value: '0'
+            operation: equals
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: stdout_line
+            value: \w+
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    test: test-confirm-postfix-configured-notify-in-event-audit-processing-failure

@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257843.automated
+  version: 1
+  assessment_title: RHEL-09-231010 - A separate RHEL 9 file system must be used for user home directories (such
+    as /home or an equivalent).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-partition-collection:
+      collection_title: null
+      select:
+        mount_point:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*\/home
+  tests:
+    test-separate-operating-system-filesystem-used-user-home-directories:
+      test_title: A separate operating system filesystem is used for user home directories
+      capability: linux.partition
+      collection: linux-partition-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-separate-operating-system-filesystem-used-user-home-directories

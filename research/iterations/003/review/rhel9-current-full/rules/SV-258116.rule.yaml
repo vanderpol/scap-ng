@@ -1,0 +1,54 @@
+rule:
+  id: SV-258116
+  version: r1045240
+  title: RHEL 9 must be configured so that user and group account administration utilities are configured to store
+    only encrypted representations of passwords.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Passwords need to be protected at all times, and encryption is the standard method for protecting
+    passwords. If passwords are not encrypted, they can be plainly read (i.e., clear text) and easily compromised.
+    Passwords that are encrypted with a weak algorithm are no more protected than if they are kept in plain text.
+    This setting ensures user and group account administration utilities are configured to store only encrypted
+    representations of passwords. Additionally, the "crypt_style" configuration option ensures the use of a strong
+    hashing algorithm that makes password cracking attacks more difficult.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-611135
+  - scheme: vulnerability
+    value: V-258116
+  - scheme: cci
+    value: CCI-004062
+  - scheme: cci
+    value: CCI-000196
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to use the SHA-512 algorithm for password hashing. Add or change the following line
+      in the "[defaults]" section of "/etc/libuser.conf" file: crypt_style = sha512'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258116.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258116.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258116.manual.assessment.yaml
+  default_assessment_choice: default

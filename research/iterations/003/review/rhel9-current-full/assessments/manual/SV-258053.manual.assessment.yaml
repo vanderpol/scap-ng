@@ -1,0 +1,19 @@
+assessment:
+  id: SV-258053.manual
+  version: 1
+  assessment_title: All RHEL 9 local interactive user home directories must be group-owned by the home directory
+    owner's primary group.
+  mode: manual
+  purpose: assessment
+  class: compliance
+  procedure: 'Verify the assigned home directory of all local interactive users is group-owned by that user''s primary
+    GID with the following command: Note: This may miss local interactive users that have been assigned a privileged
+    user identifier (UID). Evidence of interactive use may be obtained from a number of log files containing system
+    logon information. The returned directory "/home/disauser" is used as an example. $ getent passwd | awk -F:
+    ''($3>=1000 && $7!~/(nologin|false)$/){printf "User: %-15s Primary GID: %-5s Home: %s\n", $1, $4, $6}'' User:
+    disauser Primary GID: 1002 Home: /home/disauser Check the user''s primary group with the following command:
+    $ stat -c "Directory: %n --> Actual GID: %g (%G)" /home/disauser Directory: /home/disauser --> Actual GID: 1002
+    (disauser) If the user home directory referenced in "/etc/passwd" is not group-owned by that user''s primary
+    GID, this is a finding.'
+  inputs: []
+  evidence: []

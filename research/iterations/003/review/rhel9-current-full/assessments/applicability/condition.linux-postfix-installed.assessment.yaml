@@ -1,0 +1,27 @@
+assessment:
+  id: condition.linux-postfix-installed.assessment
+  version: 1
+  assessment_title: Linux with postfix installed
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: postfix
+  tests:
+    test-postfix-package-installed:
+      test_title: The postfix package is installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-postfix-package-installed

@@ -1,0 +1,81 @@
+assessment:
+  id: SV-257881.automated
+  version: 1
+  assessment_title: RHEL-09-231200 - RHEL 9 must prevent special devices on non-root local partitions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-partition-collection:
+      collection_title: null
+      select:
+        mount_point:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/\S+$
+      filters:
+      - action: include
+        match:
+          field: device
+          value: ^/dev\S*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*/dev\S*\s+/\S+\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-device-files-mounted-nodev-option-mounts-on-ignored:
+      test_title: Device files are mounted with the nodev option.  Mounts on '/' are ignored.
+      capability: linux.partition
+      collection: linux-partition-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: mount_options
+          value: nodev
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+    test-device-files-configured-in-etc-fstab-use-nodev-option-mounts:
+      test_title: Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are ignored.
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-device-files-mounted-nodev-option-mounts-on-ignored
+    - test: test-device-files-configured-in-etc-fstab-use-nodev-option-mounts

@@ -1,0 +1,119 @@
+assessment:
+  id: SV-258176.automated
+  version: 1
+  assessment_title: RHEL-09-654010 - RHEL 9 must audit uses of the "execve" system call.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    32-bit-execve-syscall-uid-comparison-collection:
+      collection_title: 32-bit execve syscall uid comparison
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-S\s+execve\s+-C\s+uid!=euid\s+-F\s+euid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    64-bit-execve-syscall-uid-comparison-collection:
+      collection_title: 64-bit execve syscall uid comparison
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+uid!=euid\s+-F\s+euid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    32-bit-execve-syscall-gid-comparison-collection:
+      collection_title: 32-bit execve syscall gid comparison
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    64-bit-execve-syscall-gid-comparison-collection:
+      collection_title: 64-bit execve syscall gid comparison
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/audit/audit.rules
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+-S\s+execve\s+-C\s+gid!=egid\s+-F\s+egid=0\s*((\s+-k\s+|-F\s+key=)\S+\s*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-audit-32-bit-invocations-execve-syscall-comparing-uids:
+      test_title: Audit 32-bit invocations of execve syscall comparing uids
+      capability: independent.textfilecontent54
+      collection: 32-bit-execve-syscall-uid-comparison-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-audit-64-bit-invocations-execve-syscall-comparing-uids:
+      test_title: Audit 64-bit invocations of execve syscall comparing uids
+      capability: independent.textfilecontent54
+      collection: 64-bit-execve-syscall-uid-comparison-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-audit-32-bit-invocations-execve-syscall-comparing-gids:
+      test_title: Audit 32-bit invocations of execve syscall comparing gids
+      capability: independent.textfilecontent54
+      collection: 32-bit-execve-syscall-gid-comparison-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-audit-64-bit-invocations-execve-syscall-comparing-gids:
+      test_title: Audit 64-bit invocations of execve syscall comparing gids
+      capability: independent.textfilecontent54
+      collection: 64-bit-execve-syscall-gid-comparison-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-audit-32-bit-invocations-execve-syscall-comparing-uids
+    - test: test-audit-64-bit-invocations-execve-syscall-comparing-uids
+    - test: test-audit-32-bit-invocations-execve-syscall-comparing-gids
+    - test: test-audit-64-bit-invocations-execve-syscall-comparing-gids

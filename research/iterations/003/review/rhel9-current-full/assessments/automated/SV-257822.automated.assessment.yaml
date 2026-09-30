@@ -1,0 +1,68 @@
+assessment:
+  id: SV-257822.automated
+  version: 1
+  assessment_title: RHEL-09-214025 - RHEL 9 must have GPG signature verification enabled for all software repositories.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/yum.repos.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \.repo$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*\[[^]]+\]\s*\n(?:[^[]*\n)*
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-every-etc-yum-repos-d-repo-reponame-has-gpgcheck-set:
+      test_title: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 1.
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: text
+          value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-no-etc-yum-repos-d-repo-reponame-has-gpgcheck-set:
+      test_title: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 0.
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: none satisfy
+        state_title: null
+        state:
+          field: text
+          value: \n\s*gpgcheck\s*=\s*(False|0|no)\s*(\n|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-every-etc-yum-repos-d-repo-reponame-has-gpgcheck-set
+    - test: test-no-etc-yum-repos-d-repo-reponame-has-gpgcheck-set

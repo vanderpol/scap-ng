@@ -1,0 +1,75 @@
+assessment:
+  id: SV-258110.automated
+  version: 1
+  assessment_title: RHEL-09-611105 - RHEL 9 must prevent the use of dictionary words for passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/pwquality.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*dictcheck\s*=\s*([-\d]+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    independent-textfilecontent54-collection-2:
+      collection_title: null
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/security/pwquality.conf.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: \.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*dictcheck\s*=\s*([-\d]+)\s*(?:#.*)?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    all-pwquality-configuration-files-collection:
+      collection_title: all pwquality configuration files
+      set:
+        operator: union
+        members:
+        - collection: independent-textfilecontent54-collection
+        - collection: independent-textfilecontent54-collection-2
+  tests:
+    test-passwords-not-dictionary-words:
+      test_title: passwords must not be dictionary words
+      capability: independent.textfilecontent54
+      collection: all-pwquality-configuration-files-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: '0'
+          operation: not equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-passwords-not-dictionary-words

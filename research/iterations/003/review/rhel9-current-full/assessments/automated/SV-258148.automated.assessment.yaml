@@ -1,0 +1,231 @@
+assessment:
+  id: SV-258148.automated
+  version: 1
+  assessment_title: RHEL-09-652050 - RHEL 9 must encrypt via the gtls driver the transfer of audit records offloaded
+    onto a different system or media from the system being audited via rsyslog.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    rsyslog-conf-defaultnetstreamdriver-collection:
+      collection_title: 'rsyslog.conf: DefaultNetstreamDriver'
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\$DefaultNetstreamDriver\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-d-conf-defaultnetstreamdriver-collection:
+      collection_title: 'rsyslog.d/*.conf: DefaultNetstreamDriver'
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\$DefaultNetstreamDriver\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    defaultnetstreamdriver-collection:
+      collection_title: DefaultNetstreamDriver
+      set:
+        operator: union
+        members:
+        - collection: rsyslog-conf-defaultnetstreamdriver-collection
+        - collection: rsyslog-d-conf-defaultnetstreamdriver-collection
+    rsyslog-conf-action-all-messages-collection:
+      collection_title: 'rsyslog.conf: action for all messages'
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-d-conf-action-all-messages-collection:
+      collection_title: 'rsyslog.d/*.conf: action for all messages'
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-action-all-messages-collection:
+      collection_title: 'rsyslog: action for all messages'
+      set:
+        operator: union
+        members:
+        - collection: rsyslog-conf-action-all-messages-collection
+        - collection: rsyslog-d-conf-action-all-messages-collection
+    rsyslog-conf-module-blocks-collection:
+      collection_title: 'rsyslog.conf: module blocks'
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-d-conf-module-blocks-collection:
+      collection_title: 'rsyslog.d/*.conf: module blocks'
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-module-blocks-collection:
+      collection_title: 'rsyslog: module blocks'
+      set:
+        operator: union
+        members:
+        - collection: rsyslog-conf-module-blocks-collection
+        - collection: rsyslog-d-conf-module-blocks-collection
+  tests:
+    test-defaultnetstreamdriver-gtls:
+      test_title: DefaultNetstreamDriver == gtls
+      capability: independent.textfilecontent54
+      collection: defaultnetstreamdriver-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: gtls
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-streamdriver-gtls-advanced-syntax:
+      test_title: StreamDriver == gtls (advanced syntax)
+      capability: independent.textfilecontent54
+      collection: rsyslog-action-all-messages-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_operator: AND
+        states:
+        - state_title: null
+          state:
+            field: subexpression
+            value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: subexpression
+            value: (?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\s*=\s*"gtls"
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-streamdriver-not-set-in-module-block-advanced-syntax:
+      test_title: StreamDriver is not set in a module block (advanced syntax)
+      capability: independent.textfilecontent54
+      collection: rsyslog-module-blocks-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: none satisfy
+        state_title: null
+        state:
+          field: subexpression
+          value: (?i)(?:^|\n)[^#]*\bStreamDriver(?:\.Name)?\b
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - any:
+      - test: test-defaultnetstreamdriver-gtls
+      - test: test-streamdriver-gtls-advanced-syntax
+    - test: test-streamdriver-not-set-in-module-block-advanced-syntax

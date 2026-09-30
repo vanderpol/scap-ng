@@ -1,0 +1,46 @@
+assessment:
+  id: SV-257855.automated
+  version: 1
+  assessment_title: RHEL-09-231070 - RHEL 9 must prevent code from being executed on file systems that are imported
+    via Network File System (NFS).
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)
+        instance:
+          operation: not equal
+          datatype: int
+          mask: false
+          value: '0'
+  tests:
+    test-all-nfs-entries-in-etc-fstab-have-noexec:
+      test_title: all nfs entries in /etc/fstab have noexec
+      capability: independent.textfilecontent54
+      collection: independent-textfilecontent54-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: (^|,)noexec(,|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-all-nfs-entries-in-etc-fstab-have-noexec

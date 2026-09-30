@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257964.automated
+  version: 2
+  assessment_title: RHEL-09-253045 - RHEL 9 must not forward IPv4 source-routed packets by default.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv4.conf.default.accept_source_route
+  tests:
+    test-net-ipv4-conf-default-accept-source-route-setting-in-kernel:
+      test_title: net.ipv4.conf.default.accept_source_route setting in kernel is set to 0
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-net-ipv4-conf-default-accept-source-route-setting-in-kernel

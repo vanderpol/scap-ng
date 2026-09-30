@@ -1,0 +1,89 @@
+assessment:
+  id: SV-258013.automated
+  version: 1
+  assessment_title: RHEL-09-271015 - RHEL 9 must prevent a user from overriding the banner-message-enable setting
+    for the graphical user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    dconf-user-databases-collection:
+      collection_title: dconf user databases
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/dconf/profile/user
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^system-db:(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    org-gnome-login-screen-banner-message-enable-in-dconf-user-collection:
+      collection_title: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: dconf-user-database-locks-directories-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/org/gnome/login-screen/banner-message-enable$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  variables:
+    dconf-user-database-locks-directories-variable:
+      title: dconf user database locks directories
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: /etc/dconf/db/
+            datatype: string
+        - values:
+            collection: dconf-user-databases-collection
+            field: subexpression
+        - literal:
+            value: .d/locks
+            datatype: string
+  tests:
+    test-dconf-user-database-s-exist:
+      test_title: dconf user database(s) exist
+      capability: independent.textfilecontent54
+      collection: dconf-user-databases-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-org-gnome-login-screen-banner-message-enable-in-dconf-user:
+      test_title: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
+      capability: independent.textfilecontent54
+      collection: org-gnome-login-screen-banner-message-enable-in-dconf-user-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-dconf-user-database-s-exist
+    - test: test-org-gnome-login-screen-banner-message-enable-in-dconf-user

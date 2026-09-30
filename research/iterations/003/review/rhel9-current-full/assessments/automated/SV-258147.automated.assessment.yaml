@@ -1,0 +1,231 @@
+assessment:
+  id: SV-258147.automated
+  version: 1
+  assessment_title: RHEL-09-652045 - RHEL 9 must encrypt the transfer of audit records offloaded onto a different
+    system or media from the system being audited via rsyslog.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    rsyslog-conf-actionsendstreamdrivermode-collection:
+      collection_title: 'rsyslog.conf: ActionSendStreamDriverMode'
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\$ActionSendStreamDriverMode\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-d-conf-actionsendstreamdrivermode-collection:
+      collection_title: 'rsyslog.d/*.conf: ActionSendStreamDriverMode'
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\$ActionSendStreamDriverMode\s+(\S+)\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    actionsendstreamdrivermode-collection:
+      collection_title: ActionSendStreamDriverMode
+      set:
+        operator: union
+        members:
+        - collection: rsyslog-conf-actionsendstreamdrivermode-collection
+        - collection: rsyslog-d-conf-actionsendstreamdrivermode-collection
+    rsyslog-conf-action-all-messages-collection:
+      collection_title: 'rsyslog.conf: action for all messages'
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-d-conf-action-all-messages-collection:
+      collection_title: 'rsyslog.d/*.conf: action for all messages'
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-action-all-messages-collection:
+      collection_title: 'rsyslog: action for all messages'
+      set:
+        operator: union
+        members:
+        - collection: rsyslog-conf-action-all-messages-collection
+        - collection: rsyslog-d-conf-action-all-messages-collection
+    rsyslog-conf-module-blocks-collection:
+      collection_title: 'rsyslog.conf: module blocks'
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-d-conf-module-blocks-collection:
+      collection_title: 'rsyslog.d/*.conf: module blocks'
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/rsyslog.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+      behaviors:
+        ignore_case: 'true'
+    rsyslog-module-blocks-collection:
+      collection_title: 'rsyslog: module blocks'
+      set:
+        operator: union
+        members:
+        - collection: rsyslog-conf-module-blocks-collection
+        - collection: rsyslog-d-conf-module-blocks-collection
+  tests:
+    test-actionsendstreamdrivermode-1:
+      test_title: ActionSendStreamDriverMode == 1
+      capability: independent.textfilecontent54
+      collection: actionsendstreamdrivermode-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-streamdrivermode-1-advanced-syntax:
+      test_title: StreamDriverMode == 1 (advanced syntax)
+      capability: independent.textfilecontent54
+      collection: rsyslog-action-all-messages-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_operator: AND
+        states:
+        - state_title: null
+          state:
+            field: subexpression
+            value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          state:
+            field: subexpression
+            value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?Mode\s*=\s*"1"
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-streamdrivermode-not-set-in-module-block-advanced-syntax:
+      test_title: StreamDriverMode is not set in a module block (advanced syntax)
+      capability: independent.textfilecontent54
+      collection: rsyslog-module-blocks-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: none satisfy
+        state_title: null
+        state:
+          field: subexpression
+          value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?Mode\b
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - any:
+      - test: test-actionsendstreamdrivermode-1
+      - test: test-streamdrivermode-1-advanced-syntax
+    - test: test-streamdrivermode-not-set-in-module-block-advanced-syntax

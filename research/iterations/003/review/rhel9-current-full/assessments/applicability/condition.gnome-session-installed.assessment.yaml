@@ -1,0 +1,45 @@
+assessment:
+  id: condition.gnome-session-installed.assessment
+  version: 13
+  assessment_title: Gnome Session is installed
+  mode: automated
+  class: inventory
+  purpose: applicability
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gnome-session
+    linux-dpkginfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gnome-shell
+  tests:
+    test-gnome-session-package-installed-rpm:
+      test_title: The gnome-session package is installed. (RPM).
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-gnome-session-package-installed-deb:
+      test_title: The gnome-session package is installed. (DEB)
+      capability: linux.dpkginfo
+      collection: linux-dpkginfo-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+  evaluate:
+    any:
+    - test: test-gnome-session-package-installed-rpm
+    - test: test-gnome-session-package-installed-deb

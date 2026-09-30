@@ -1,0 +1,51 @@
+rule:
+  id: SV-257837
+  version: r1044910
+  title: A graphical display manager must not be installed on RHEL 9 unless approved.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Unnecessary service packages must not be installed to decrease the attack surface of the system. Graphical
+    display managers have a long history of security vulnerabilities and must not be used, unless approved and documented.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-215070
+  - scheme: vulnerability
+    value: V-257837
+  - scheme: cci
+    value: CCI-000366
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Document the requirement for a graphical user interface with the ISSO or remove all xorg packages
+      with the following command: Warning: If you are accessing the system through the graphical user interface,
+      change to the multi-user.target with the following command: $ sudo systemctl isolate multi-user.target Warning:
+      Removal of the graphical user interface will immediately render it useless. The following commands must not
+      be run from a virtual terminal emulator in the graphical interface. $ sudo dnf remove "xorg*" $ sudo systemctl
+      set-default multi-user.target'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-257837.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-257837.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-257837.manual.assessment.yaml
+  default_assessment_choice: default

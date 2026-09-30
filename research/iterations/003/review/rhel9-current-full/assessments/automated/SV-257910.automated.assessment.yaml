@@ -1,0 +1,40 @@
+assessment:
+  id: SV-257910.automated
+  version: 1
+  assessment_title: RHEL-09-232150 - RHEL 9 /etc/shadow file must be owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    etc-shadow-file-collection:
+      collection_title: /etc/shadow file
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: shadow
+  tests:
+    test-etc-shadow-file-owned-by-root:
+      test_title: /etc/shadow file is owned by root.
+      capability: unix.file
+      collection: etc-shadow-file-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: owned by root
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-shadow-file-owned-by-root

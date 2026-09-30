@@ -1,0 +1,45 @@
+assessment:
+  id: SV-258242.automated
+  version: 1
+  assessment_title: RHEL-09-672050 - RHEL 9 must implement DOD-approved encryption in the bind package.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    named-conf-includes-collection:
+      collection_title: named.conf includes
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/named.conf
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*include\s+"(.*)"\s*;\s*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-named-conf-includes-crypto-policy:
+      test_title: named.conf includes crypto-policy
+      capability: independent.textfilecontent54
+      collection: named-conf-includes-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: at least one
+        state_title: null
+        state:
+          field: subexpression
+          value: /etc/crypto-policies/back-ends/bind.config
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-named-conf-includes-crypto-policy

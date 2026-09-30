@@ -1,0 +1,46 @@
+assessment:
+  id: condition.rhel9-not-fips.assessment
+  version: 4
+  assessment_title: RHEL9 and Not FIPS
+  mode: automated
+  class: compliance
+  purpose: applicability
+  collections:
+    proc-sys-crypto-fips-enabled-collection:
+      collection_title: /proc/sys/crypto/fips_enabled
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /proc/sys/crypto/fips_enabled
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^(\d+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-fips-enabled-1:
+      test_title: fips_enabled == 1
+      capability: independent.textfilecontent54
+      collection: proc-sys-crypto-fips-enabled-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    not:
+      test: test-fips-enabled-1

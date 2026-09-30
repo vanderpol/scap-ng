@@ -1,0 +1,51 @@
+rule:
+  id: SV-258106
+  version: r1102061
+  title: RHEL 9 must require users to provide a password for privilege escalation.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: 'Without reauthentication, users may access resources or perform tasks for which they do not have
+    authorization. When operating systems provide the capability to escalate a functional capability, it is critical
+    that the user reauthenticate. Satisfies: SRG-OS-000373-GPOS-00156, SRG-OS-000373-GPOS-00157, SRG-OS-000373-GPOS-00158'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-611085
+  - scheme: vulnerability
+    value: V-258106
+  - scheme: cci
+    value: CCI-004895
+  - scheme: cci
+    value: CCI-002038
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: Configure RHEL 9 to not allow users to execute privileged actions without authenticating with a password.
+      Remove any occurrence of "NOPASSWD" found in "/etc/sudoers" file or files in the "/etc/sudoers.d" directory.
+      $ sudo find /etc/sudoers /etc/sudoers.d -type f -exec sed -i '/NOPASSWD/ s/^/# /g' {} \;
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258106.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258106.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258106.manual.assessment.yaml
+  default_assessment_choice: default

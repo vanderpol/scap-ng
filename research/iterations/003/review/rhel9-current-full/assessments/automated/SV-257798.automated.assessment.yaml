@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257798.automated
+  version: 2
+  assessment_title: RHEL-09-213015 - RHEL 9 must prevent kernel profiling by nonprivileged users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: kernel.perf_event_paranoid
+  tests:
+    test-kernel-perf-event-paranoid-setting-in-kernel-set-2:
+      test_title: kernel.perf_event_paranoid setting in kernel is set to 2
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-kernel-perf-event-paranoid-setting-in-kernel-set-2

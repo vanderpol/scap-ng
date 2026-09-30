@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257970.automated
+  version: 3
+  assessment_title: RHEL-09-253075 - RHEL 9 must not enable IPv4 packet forwarding unless the system is a router.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    unix-sysctl-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: net.ipv4.conf.all.forwarding
+  tests:
+    test-net-ipv4-conf-all-forwarding-setting-in-kernel-set-0:
+      test_title: net.ipv4.conf.all.forwarding setting in kernel is set to 0
+      capability: unix.sysctl
+      collection: unix-sysctl-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-net-ipv4-conf-all-forwarding-setting-in-kernel-set-0

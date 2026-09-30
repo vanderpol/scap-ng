@@ -1,0 +1,50 @@
+rule:
+  id: SV-258016
+  version: r958804
+  title: RHEL 9 must disable the graphical user interface autorun function unless required.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Allowing autorun commands to execute may introduce malicious code to a system. Configuring this setting
+    prevents autorun commands from executing.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-271030
+  - scheme: vulnerability
+    value: V-258016
+  - scheme: cci
+    value: CCI-001764
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - condition.gnome-session-installed
+  parameters: {}
+  remediation:
+    guidance: 'Configure the GNOME desktop to disable the autorun function on removable media. The dconf settings
+      can be edited in the /etc/dconf/db/* location. Update the [org/gnome/desktop/media-handling] section of the
+      "/etc/dconf/db/local.d/00-security-settings" database file and add or update the following lines: [org/gnome/desktop/media-handling]
+      autorun-never=true Then update the dconf system databases: $ sudo dconf update'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258016.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258016.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258016.manual.assessment.yaml
+  default_assessment_choice: default

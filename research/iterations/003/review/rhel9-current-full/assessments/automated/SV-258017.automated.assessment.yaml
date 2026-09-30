@@ -1,0 +1,46 @@
+assessment:
+  id: SV-258017.automated
+  version: 13
+  assessment_title: RHEL 9 must prevent a user from overriding the disabling of the graphical user interface autorun
+    function.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    retrieve-gsettings-writable-org-gnome-desktop-media-handling-autorun-never-collection:
+      collection_title: Retrieve gsettings writable org.gnome.desktop.media-handling autorun-never
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: gsettings writable org.gnome.desktop.media-handling autorun-never
+        pattern:
+          operation: equals
+          datatype: string
+          mask: false
+          value: .+
+  tests:
+    test-verify-gsettings-writable-org-gnome-desktop-media-handling-autorun-never:
+      test_title: Verify gsettings writable org.gnome.desktop.media-handling autorun-never returns false
+      capability: independent.shellcommand
+      collection: retrieve-gsettings-writable-org-gnome-desktop-media-handling-autorun-never-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: Verify command returns false
+        state:
+          field: stdout_line
+          value: 'false'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-verify-gsettings-writable-org-gnome-desktop-media-handling-autorun-never

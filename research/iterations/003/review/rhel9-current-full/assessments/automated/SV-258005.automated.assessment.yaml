@@ -1,0 +1,75 @@
+assessment:
+  id: SV-258005.automated
+  version: 2
+  assessment_title: RHEL-09-255145 - RHEL 9 SSH daemon must not allow rhosts authentication.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    pull-value-etc-ssh-sshd-config-ignorerhosts-collection:
+      collection_title: Pull value of /etc/ssh/sshd_config:IgnoreRhosts
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)IgnoreRhosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    pull-value-etc-ssh-sshd-config-d-ignorerhosts-collection:
+      collection_title: Pull value of /etc/ssh/sshd_config.d:IgnoreRhosts
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/ssh/sshd_config.d
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*(?i)IgnoreRhosts(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    ignore-rhosts-set-yes-in-both-etc-ssh-sshd-config-collection:
+      collection_title: Ignore Rhosts is set to 'yes' in both /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*
+      set:
+        operator: union
+        members:
+        - collection: pull-value-etc-ssh-sshd-config-ignorerhosts-collection
+        - collection: pull-value-etc-ssh-sshd-config-d-ignorerhosts-collection
+  tests:
+    test-etc-ssh-sshd-config-ignorerhosts-yes:
+      test_title: /etc/ssh/sshd_config:IgnoreRhosts == yes
+      capability: independent.textfilecontent54
+      collection: ignore-rhosts-set-yes-in-both-etc-ssh-sshd-config-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: ^(yes|"yes")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    test: test-etc-ssh-sshd-config-ignorerhosts-yes

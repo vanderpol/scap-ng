@@ -1,0 +1,86 @@
+assessment:
+  id: SV-257796.automated
+  version: 1
+  assessment_title: RHEL-09-212055 - RHEL 9 must enable auditing of processes that start prior to the audit daemon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    bls-options-collection:
+      collection_title: BLS options
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /boot/loader/entries
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^.*\.conf$
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^options\s+(.*)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    etc-default-grub-grub-cmdline-linux-collection:
+      collection_title: /etc/default/grub GRUB_CMDLINE_LINUX
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/default/grub
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^GRUB_CMDLINE_LINUX="(.*)"
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-bls-options-contain-audit-1:
+      test_title: BLS options contain audit=1
+      capability: independent.textfilecontent54
+      collection: bls-options-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: (^|\s)audit=1(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-grub-cmdline-linux-arguments-in-etc-default-grub-contain-audit:
+      test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain audit=1
+      capability: independent.textfilecontent54
+      collection: etc-default-grub-grub-cmdline-linux-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: null
+        state:
+          field: subexpression
+          value: (^|\s)audit=1(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-bls-options-contain-audit-1
+    - test: test-grub-cmdline-linux-arguments-in-etc-default-grub-contain-audit

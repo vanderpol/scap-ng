@@ -1,0 +1,43 @@
+assessment:
+  id: SV-258032.automated
+  version: 1
+  assessment_title: RHEL-09-271110 - RHEL 9 must prevent a user from overriding the Ctrl-Alt-Del sequence settings
+    for the graphical user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    org-gnome-settings-daemon-plugins-media-keys-logout-in-etc-collection:
+      collection_title: /org/gnome/settings-daemon/plugins/media-keys/logout in /etc/dconf/db/local.d/locks/*
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/dconf/db/local.d/locks
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: .*
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^/org/gnome/settings-daemon/plugins/media-keys/logout$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  tests:
+    test-org-gnome-settings-daemon-plugins-media-keys-logout-locked-in:
+      test_title: /org/gnome/settings-daemon/plugins/media-keys/logout is locked in /etc/dconf/db/local.d/locks/*
+      capability: independent.textfilecontent54
+      collection: org-gnome-settings-daemon-plugins-media-keys-logout-in-etc-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-org-gnome-settings-daemon-plugins-media-keys-logout-locked-in

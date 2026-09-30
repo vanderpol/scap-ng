@@ -1,0 +1,50 @@
+rule:
+  id: SV-258027
+  version: r1045106
+  title: RHEL 9 must conceal, via the session lock, information previously visible on the display with a publicly
+    viewable image.
+  severity: medium
+  role: full
+  weight: 10.0
+  discussion: Setting the screensaver mode to blank-only conceals the contents of the display from passersby.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: stig
+    value: RHEL-09-271085
+  - scheme: vulnerability
+    value: V-258027
+  - scheme: cci
+    value: CCI-000060
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - condition.gnome-session-installed
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to prevent a user from overriding the picture-uri setting for graphical user interfaces.
+      In the file "/etc/dconf/db/local.d/00-security-settings", add or update the following lines: [org/gnome/desktop/screensaver]
+      picture-uri='''' Prevent user modification by adding the following line to "/etc/dconf/db/local.d/locks/00-security-settings-lock":
+      /org/gnome/desktop/screensaver/picture-uri Update the dconf system databases: $ sudo dconf update'
+  assessment_choices:
+    default:
+      assessment: ../assessments/automated/SV-258027.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-258027.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-258027.manual.assessment.yaml
+  default_assessment_choice: default

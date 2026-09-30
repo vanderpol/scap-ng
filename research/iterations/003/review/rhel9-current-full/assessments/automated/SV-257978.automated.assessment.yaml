@@ -1,0 +1,27 @@
+assessment:
+  id: SV-257978.automated
+  version: 1
+  assessment_title: RHEL-09-255010 - All RHEL 9 networked systems must have SSH installed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  collections:
+    linux-rpminfo-collection:
+      collection_title: null
+      select:
+        name:
+          operation: equals
+          datatype: string
+          mask: false
+          value: openssh-server
+  tests:
+    test-openssh-server-package-installed:
+      test_title: openssh-server package is installed
+      capability: linux.rpminfo
+      collection: linux-rpminfo-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    test: test-openssh-server-package-installed
