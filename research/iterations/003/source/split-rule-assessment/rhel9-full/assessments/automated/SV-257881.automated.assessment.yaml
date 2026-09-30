@@ -1,0 +1,84 @@
+assessment:
+  id: SV-257881.automated
+  version: 1
+  assessment_title: RHEL-09-231200 - RHEL 9 must prevent special devices on non-root local partitions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    device-files-mounted-nodev-option-mounts-on-ignored:
+      test_title: Device files are mounted with the nodev option.  Mounts on '/' are ignored.
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^/\S+$
+        filters:
+        - action: include
+          match:
+            field: device
+            value: ^/dev\S*$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          capability: linux.partition
+      assert:
+        existence: any_exist
+        check: all
+        state_title: null
+        state_capability: linux.partition
+        state:
+          field: mount_options
+          value: nodev
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+    device-files-configured-in-etc-fstab-use-nodev-option-mounts:
+      test_title: Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are
+        ignored.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*/dev\S*\s+/\S+\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: any_exist
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - check: device-files-mounted-nodev-option-mounts-on-ignored
+    - check: device-files-configured-in-etc-fstab-use-nodev-option-mounts

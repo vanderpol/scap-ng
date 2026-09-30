@@ -1,0 +1,76 @@
+assessment:
+  id: SV-257784.automated
+  version: 2
+  assessment_title: RHEL-09-211045 - The systemd Ctrl-Alt-Delete burst key sequence in RHEL 9 must be
+    disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-systemd-system-conf-ctrlaltdelburstaction-set-none:
+      test_title: /etc/systemd/system.conf:CtrlAltDelBurstAction is set to none.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: CtrlAltDelBurstAction in /etc/systemd/system.conf and /etc/systemd/system.conf.d/*
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/systemd/system.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/systemd/system.conf.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.+\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: none
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: etc-systemd-system-conf-ctrlaltdelburstaction-set-none

@@ -1,0 +1,125 @@
+assessment:
+  id: SV-258232.automated
+  version: 1
+  assessment_title: RHEL-09-671020 - RHEL 9 IP tunnels must use FIPS 140-2/140-3 approved cryptographic
+    algorithms.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    ipsec-conf-includes-crypto-policy:
+      test_title: ipsec.conf includes crypto-policy
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/ipsec.conf includes
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ipsec.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: /etc/crypto-policies/back-ends/libreswan.config
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    ipsec-conf-includes-etc-ipsec-d-conf:
+      test_title: ipsec.conf includes /etc/ipsec.d/*.conf
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/ipsec.conf includes
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ipsec.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: /etc/ipsec.d/*.conf
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    etc-ipsec-d-conf-includes-crypto-policy:
+      test_title: /etc/ipsec.d/*.conf includes crypto-policy
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/ipsec.d/*.conf includes
+        capability: independent.textfilecontent54
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ipsec.d
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^.*\.conf$
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: /etc/crypto-policies/back-ends/libreswan.config
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - check: ipsec-conf-includes-crypto-policy
+    - all:
+      - check: ipsec-conf-includes-etc-ipsec-d-conf
+      - check: etc-ipsec-d-conf-includes-crypto-policy

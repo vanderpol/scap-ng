@@ -1,0 +1,91 @@
+assessment:
+  id: SV-258019.automated
+  version: 1
+  assessment_title: RHEL-09-271045 - RHEL 9 must be able to initiate directly a session lock for all connection
+    types using smart card when the smart card is removed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    dconf-smartcard-removal-action-lock-screen:
+      test_title: dconf smartcard removal-action lock-screen
+      capability: independent.textfilecontent54
+      collect:
+        object_title: dconf org/gnome/settings-daemon/peripherals/smartcard sections
+        capability: independent.textfilecontent54
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: at least one
+            value:
+              variable: dconf-database-directories
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\[org/gnome/settings-daemon/peripherals/smartcard](?:\r?\n(?:[^[\r\n].*)?)*
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: text
+          value: \nremoval-action='lock-screen'\s*(\n|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: dconf-smartcard-removal-action-lock-screen
+  variables:
+    dconf-database-directories:
+      title: dconf database directories
+      kind: local
+      datatype: string
+      expression:
+        object_values:
+          collect:
+            object_title: dconf database directories
+            capability: unix.file
+            select:
+              path:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/dconf/db
+              filename:
+                operation: equals
+                datatype: string
+                mask: false
+                nil: true
+                value: ''
+            filters:
+            - action: include
+              match:
+                field: path
+                value: ^/etc/dconf/db/.*\.d$
+                operation: pattern match
+                datatype: string
+                mask: false
+                entity_check: all
+                entity_existence: at_least_one_exists
+              state_title: dconf database directories
+              capability: unix.file
+            behaviors:
+              max_depth: '1'
+              recurse_direction: down
+          field: path

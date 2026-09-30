@@ -1,0 +1,79 @@
+assessment:
+  id: SV-258068.automated
+  version: 2
+  assessment_title: RHEL-09-412035 - RHEL 9 must automatically exit interactive command shell user sessions
+    after 10 minutes of inactivity.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    tmout-option-set-600-or-less-in-etc-profile-etc:
+      test_title: TMOUT option is set to 600 or less in /etc/profile and /etc/profile.d/*.sh.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/profile
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^[^#]*\s*TMOUT=(\d+)\s*$
+                instance:
+                  operation: equals
+                  datatype: int
+                  mask: false
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/profile.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.+\.sh$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^[^#]*\s*TMOUT=(\d+)\s*$
+                instance:
+                  operation: equals
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                max_depth: '-1'
+                recurse_direction: down
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '600'
+          operation: less than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: tmout-option-set-600-or-less-in-etc-profile-etc

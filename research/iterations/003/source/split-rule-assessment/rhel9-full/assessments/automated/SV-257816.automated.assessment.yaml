@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257816.automated
+  version: 2
+  assessment_title: RHEL-09-213105 - RHEL 9 must disable the use of user namespaces.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    user-max-user-namespaces-set-0-in-kernel:
+      test_title: user.max_user_namespaces is set to 0 in kernel
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: user.max_user_namespaces
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: user-max-user-namespaces-set-0-in-kernel

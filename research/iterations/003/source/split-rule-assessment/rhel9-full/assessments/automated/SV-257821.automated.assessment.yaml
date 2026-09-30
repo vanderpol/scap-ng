@@ -1,0 +1,46 @@
+assessment:
+  id: SV-257821.automated
+  version: 1
+  assessment_title: RHEL-09-214020 - RHEL 9 must check the GPG signature of locally installed software
+    packages before installation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-dnf-dnf-conf-localpkg-gpgcheck-set-true-1-or:
+      test_title: '/etc/dnf/dnf.conf: localpkg_gpgcheck is set to True, 1, or yes.'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/dnf/dnf.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*localpkg_gpgcheck\s*=\s*(\w+)\b\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^(True|1|yes)$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: etc-dnf-dnf-conf-localpkg-gpgcheck-set-true-1-or

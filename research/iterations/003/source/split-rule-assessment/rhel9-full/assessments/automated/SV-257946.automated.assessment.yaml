@@ -1,0 +1,45 @@
+assessment:
+  id: SV-257946.automated
+  version: 1
+  assessment_title: RHEL-09-252025 - RHEL 9 must disable the chrony daemon from acting as a server.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    chrony-daemon-disabled-from-acting-as-server:
+      test_title: The chrony daemon is disabled from acting as a server.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/chrony.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^[ \t]*port[ \t]+(\d+)[ \t]*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: chrony-daemon-disabled-from-acting-as-server

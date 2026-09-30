@@ -1,0 +1,36 @@
+assessment:
+  id: SV-257942.automated
+  version: 2
+  assessment_title: RHEL-09-251045 - RHEL 9 must enable hardening for the Berkeley Packet Filter just-in-time
+    compiler.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    net-core-bpf-jit-harden-set-2-in-kernel:
+      test_title: net.core.bpf_jit_harden is set to 2 in kernel
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: net.core.bpf_jit_harden
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '2'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: net-core-bpf-jit-harden-set-2-in-kernel

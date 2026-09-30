@@ -1,0 +1,65 @@
+assessment:
+  id: SV-258217.automated
+  version: 2
+  assessment_title: RHEL-09-654215 - RHEL 9 must generate audit records for all account creations, modifications,
+    disabling, and termination events that affect /etc/sudoers.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    audit-32-bit-invocations-etc-sudoers:
+      test_title: Audit 32-bit invocations of /etc/sudoers
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32?\s+-F\s+path=/etc/sudoers\s+-F\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-etc-sudoers:
+      test_title: Audit 64-bit invocations of /etc/sudoers
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64?\s+-F\s+path=/etc/sudoers\s+-F\s*perm=([rx]*w[rx]*a[rx]*|[rx]*a[rx]*w[rx]*)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: audit-32-bit-invocations-etc-sudoers
+    - check: audit-64-bit-invocations-etc-sudoers

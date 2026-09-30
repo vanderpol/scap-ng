@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257867.automated
+  version: 2
+  assessment_title: RHEL-09-231130 - RHEL 9 must mount /tmp with the noexec option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    tmp-mounted-noexec-option:
+      test_title: /tmp is mounted with the noexec option
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /tmp
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: linux.partition
+        state:
+          field: mount_options
+          value: noexec
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: tmp-mounted-noexec-option

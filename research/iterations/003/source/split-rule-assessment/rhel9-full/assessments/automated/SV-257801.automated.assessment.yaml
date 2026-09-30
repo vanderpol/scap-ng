@@ -1,0 +1,36 @@
+assessment:
+  id: SV-257801.automated
+  version: 2
+  assessment_title: RHEL-09-213030 - RHEL 9 must enable kernel parameters to enforce discretionary access
+    control on hardlinks.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    fs-protected-hardlinks-setting-in-kernel-set-1:
+      test_title: fs.protected_hardlinks setting in kernel is set to 1
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: fs.protected_hardlinks
+      assert:
+        existence: all_exist
+        check: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: fs-protected-hardlinks-setting-in-kernel-set-1

@@ -1,0 +1,72 @@
+assessment:
+  id: SV-257874.automated
+  version: 1
+  assessment_title: RHEL-09-231165 - RHEL 9 must mount /var/log/audit with the noexec option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    var-log-audit-mounted-noexec-option:
+      test_title: /var/log/audit is mounted with the noexec option
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /var/log/audit
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: linux.partition
+        state:
+          field: mount_options
+          value: noexec
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+    var-log-audit-configured-noexec-option-in-etc-fstab:
+      test_title: /var/log/audit is configured with the noexec option in /etc/fstab
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance:
+            operation: equals
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^.*noexec.*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - check: var-log-audit-mounted-noexec-option
+    - check: var-log-audit-configured-noexec-option-in-etc-fstab

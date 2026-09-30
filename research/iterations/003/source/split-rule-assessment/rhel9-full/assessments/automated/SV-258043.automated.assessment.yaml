@@ -1,0 +1,46 @@
+assessment:
+  id: SV-258043.automated
+  version: 1
+  assessment_title: RHEL-09-411020 - All RHEL 9 local interactive user accounts must be assigned a home
+    directory upon creation.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    all-local-interactive-user-accounts-assigned-home-directory-upon-creation:
+      test_title: All local interactive user accounts are assigned a home directory upon creation
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/login.defs
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*CREATE_HOME\s+([^#\s]+)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^(yes|"yes")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: all-local-interactive-user-accounts-assigned-home-directory-upon-creation

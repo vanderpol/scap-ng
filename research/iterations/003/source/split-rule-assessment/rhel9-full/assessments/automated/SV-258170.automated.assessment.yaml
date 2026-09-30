@@ -1,0 +1,45 @@
+assessment:
+  id: SV-258170.automated
+  version: 1
+  assessment_title: RHEL-09-653105 - RHEL 9 must write audit records to disk.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-write-logs-yes:
+      test_title: '/etc/audit/auditd.conf: write_logs = yes'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: (?i)^\s*write_logs\s*=\s*(\w+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (?i)^yes$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: etc-audit-auditd-conf-write-logs-yes

@@ -1,0 +1,120 @@
+assessment:
+  id: SV-258155.automated
+  version: 2
+  assessment_title: RHEL-09-653030 - RHEL 9 must allocate audit record storage capacity to store at least
+    one week's worth of audit records.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    there-separate-file-system-audit-data-directory:
+      test_title: There is a separate file system for audit data directory.
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: at least one
+            value:
+              variable: audit-data-directory-from-etc-audit-auditd-conf
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-file-system-total-space-10gib:
+      test_title: Audit file system total space >= 10GiB
+      capability: independent.variable
+      collect:
+        object_title: null
+        capability: independent.variable
+        select:
+          var_ref:
+            operation: equals
+            datatype: string
+            mask: false
+            value:
+              variable: audit-partition-total-size-in-bytes
+      assert:
+        existence: all_exist
+        check: all
+        state_title: 10GiB
+        state_capability: independent.variable
+        state:
+          field: value
+          value: '10737418240'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - check: there-separate-file-system-audit-data-directory
+    - check: audit-file-system-total-space-10gib
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        object_values:
+          collect:
+            object_title: null
+            capability: independent.textfilecontent54
+            select:
+              filepath:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/audit/auditd.conf
+              pattern:
+                operation: pattern match
+                datatype: string
+                mask: false
+                value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+              instance:
+                operation: greater than or equal
+                datatype: int
+                mask: false
+                value: '1'
+            behaviors:
+              ignore_case: 'true'
+          field: subexpression
+    audit-partition-total-size-in-bytes:
+      title: audit partition total size in bytes
+      kind: local
+      datatype: string
+      expression:
+        arithmetic:
+          operation: multiply
+          operands:
+          - object_values:
+              collect:
+                object_title: null
+                capability: linux.partition
+                select:
+                  mount_point:
+                    operation: equals
+                    datatype: string
+                    mask: false
+                    variable_check: at least one
+                    value:
+                      variable: audit-data-directory-from-etc-audit-auditd-conf
+              field: block_size
+          - object_values:
+              collect:
+                object_title: null
+                capability: linux.partition
+                select:
+                  mount_point:
+                    operation: equals
+                    datatype: string
+                    mask: false
+                    variable_check: at least one
+                    value:
+                      variable: audit-data-directory-from-etc-audit-auditd-conf
+              field: total_space

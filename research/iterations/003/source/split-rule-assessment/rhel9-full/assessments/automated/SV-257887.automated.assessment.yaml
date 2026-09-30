@@ -1,0 +1,80 @@
+assessment:
+  id: SV-257887.automated
+  version: 1
+  assessment_title: RHEL-09-232035 - RHEL 9 audit tools must have a mode of 0755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    audit-tools-have-mode-0755-or-less-permissive:
+      test_title: audit tools have a mode of 0755 or less permissive.
+      capability: unix.file
+      collect:
+        object_title: audit tools
+        capability: unix.file
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: at least one
+            value:
+              variable: audit-tools
+      assert:
+        existence: all_exist
+        check: all
+        state_title: mode 0755 or less permissive
+        state_capability: unix.file
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    check: audit-tools-have-mode-0755-or-less-permissive
+  variables:
+    audit-tools:
+      title: audit tools
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /sbin/auditctl
+        - /sbin/aureport
+        - /sbin/ausearch
+        - /sbin/autrace
+        - /sbin/auditd
+        - /sbin/rsyslogd
+        - /sbin/augenrules

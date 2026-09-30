@@ -1,0 +1,105 @@
+assessment:
+  id: SV-257997.automated
+  version: 1
+  assessment_title: RHEL-09-255105 - RHEL 9 SSH server configuration file must be group-owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-ssh-sshd-config-file-group-owned-by-root:
+      test_title: The /etc/ssh/sshd_config file is group-owned by root.
+      capability: unix.file
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ssh/sshd_config
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: group-owned by root
+        state_capability: unix.file
+        state:
+          field: group_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    etc-ssh-sshd-config-d-directory-sub-directories-group-owned:
+      test_title: The /etc/ssh/sshd_config.d directory and sub-directories are group-owned by root.
+      capability: unix.file
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ssh/sshd_config.d
+          filename:
+            operation: equals
+            datatype: string
+            mask: false
+            nil: true
+            value: ''
+        behaviors:
+          recurse: directories
+          recurse_direction: down
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: group-owned by root
+        state_capability: unix.file
+        state:
+          field: group_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    etc-ssh-sshd-config-d-files-group-owned-by-root:
+      test_title: The /etc/ssh/sshd_config.d files are group-owned by root.
+      capability: unix.file
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ssh/sshd_config.d
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*
+        behaviors:
+          recurse: directories
+          recurse_direction: down
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: group-owned by root
+        state_capability: unix.file
+        state:
+          field: group_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - check: etc-ssh-sshd-config-file-group-owned-by-root
+    - check: etc-ssh-sshd-config-d-directory-sub-directories-group-owned
+    - check: etc-ssh-sshd-config-d-files-group-owned-by-root

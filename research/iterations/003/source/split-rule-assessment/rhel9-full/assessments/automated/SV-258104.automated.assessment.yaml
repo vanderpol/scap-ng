@@ -1,0 +1,46 @@
+assessment:
+  id: SV-258104.automated
+  version: 1
+  assessment_title: RHEL-09-611075 - RHEL 9 passwords for new users or password changes must have a 24
+    hours minimum password lifetime restriction in /etc/login.defs.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-login-defs-pass-min-days-1:
+      test_title: /etc/login.defs:PASS_MIN_DAYS >= 1
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/login.defs
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*PASS_MIN_DAYS\s+(\d*)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '1'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: etc-login-defs-pass-min-days-1

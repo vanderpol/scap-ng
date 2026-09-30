@@ -1,0 +1,47 @@
+assessment:
+  id: SV-258157.automated
+  version: 1
+  assessment_title: RHEL-09-653040 - RHEL 9 must notify the system administrator (SA) and information
+    system security officer (ISSO) (at a minimum) when allocated audit record storage volume 75 percent
+    utilization.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-space-left-action-email:
+      test_title: '/etc/audit/auditd.conf: space_left_action = email'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: (?i)^\s*space_left_action\s*=\s*(\w+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (?i)^email$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: etc-audit-auditd-conf-space-left-action-email

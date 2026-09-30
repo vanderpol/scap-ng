@@ -1,0 +1,66 @@
+assessment:
+  id: SV-258231.automated
+  version: 1
+  assessment_title: RHEL-09-671015 - RHEL 9 must employ FIPS 140-3 approved cryptographic hashing algorithms
+    for all stored passwords.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    no-active-password-hash-in-etc-shadow-has-prefix-other:
+      test_title: No active password hash in /etc/shadow has a prefix other than '$6$'.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: Filter out acceptable shadow password entries.
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: Extract password hashes from /etc/shadow.
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/shadow
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: '^[^:]+:([^:]*):'
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+          filters:
+          - action: exclude
+            match:
+              field: subexpression
+              value: ^[!*]
+              operation: pattern match
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            state_title: Exclude inactive/locked hashes (with leading '!' or '*').
+            capability: independent.textfilecontent54
+          - action: exclude
+            match:
+              field: subexpression
+              value: ^[$][6][$]
+              operation: pattern match
+              datatype: string
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
+            state_title: Exclude hashes with leading '$6$'.
+            capability: independent.textfilecontent54
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    check: no-active-password-hash-in-etc-shadow-has-prefix-other

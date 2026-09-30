@@ -1,0 +1,234 @@
+assessment:
+  id: SV-258146.automated
+  version: 2
+  assessment_title: RHEL-09-652040 - RHEL 9 must authenticate the remote logging server for offloading
+    audit logs via rsyslog.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    actionsendstreamdriverauthmode-x509-name:
+      test_title: ActionSendStreamDriverAuthMode == x509/name
+      capability: independent.textfilecontent54
+      collect:
+        object_title: ActionSendStreamDriverAuthMode
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: 'rsyslog.conf: ActionSendStreamDriverAuthMode'
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+          - collect:
+              object_title: 'rsyslog.d/*.conf: ActionSendStreamDriverAuthMode'
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.*\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\$ActionSendStreamDriverAuthMode\s+(\S+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: x509/name
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    streamdriverauthmode-set-x509-name-advanced-syntax:
+      test_title: StreamDriverAuthMode is set to x509/name (advanced syntax)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 'rsyslog: action for all messages'
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: 'rsyslog.conf: action for all messages'
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+          - collect:
+              object_title: 'rsyslog.d/*.conf: action for all messages'
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.*\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state_operator: AND
+        states:
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\s*=\s*"x509/name"
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    streamdriverauthmode-not-set-in-module-block-advanced-syntax:
+      test_title: StreamDriverAuthMode is not set in a module block (advanced syntax)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 'rsyslog: module blocks'
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: 'rsyslog.conf: module blocks'
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+          - collect:
+              object_title: 'rsyslog.d/*.conf: module blocks'
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.*\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*module\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+      assert:
+        existence: any_exist
+        check: none satisfy
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?AuthMode\b
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - any:
+      - check: actionsendstreamdriverauthmode-x509-name
+      - check: streamdriverauthmode-set-x509-name-advanced-syntax
+    - check: streamdriverauthmode-not-set-in-module-block-advanced-syntax

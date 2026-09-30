@@ -1,0 +1,36 @@
+assessment:
+  id: SV-257850.automated
+  version: 1
+  assessment_title: RHEL-09-231045 - RHEL 9 must prevent device files from being interpreted on file systems
+    that contain user home directories.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    home-mounted-noexec-option:
+      test_title: /home is mounted with the noexec option
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*\/home
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: linux.partition
+        state:
+          field: mount_options
+          value: nodev
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: home-mounted-noexec-option

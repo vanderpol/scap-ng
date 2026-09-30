@@ -1,0 +1,51 @@
+assessment:
+  id: SV-258173.automated
+  version: 2
+  assessment_title: RHEL-09-653120 - RHEL 9 must allocate an audit_backlog_limit of sufficient size to
+    capture processes that start prior to the audit daemon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    boot-loader-specification-options-have-audit-backlog-limit-set-8192:
+      test_title: The Boot Loader Specification options have audit_backlog_limit set to 8192 or greater.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /boot/loader/entries
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^.*\.conf$
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^options\s+.*\baudit_backlog_limit=(\d+)\b
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '8192'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: boot-loader-specification-options-have-audit-backlog-limit-set-8192

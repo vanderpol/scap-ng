@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257903.automated
+  version: 1
+  assessment_title: RHEL-09-232115 - RHEL 9 /etc/gshadow file must be group-owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-gshadow-file-owned-by-root:
+      test_title: /etc/gshadow file is owned by root
+      capability: unix.file
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/gshadow
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: etc-gshadow-file-owned-by-root

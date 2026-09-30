@@ -1,0 +1,90 @@
+assessment:
+  id: SV-258114.automated
+  version: 1
+  assessment_title: RHEL-09-611125 - RHEL 9 must require the maximum number of repeating characters be
+    limited to three when passwords are changed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    maximum-number-repeating-characters-limited-three-when-passwords-changed:
+      test_title: The maximum number of repeating characters is limited to three when passwords are changed.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/pwquality.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*maxrepeat\s*=\s*(-?\d*)\s*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/pwquality.conf.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: \.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*maxrepeat\s*=\s*(-?\d*)\s*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                recurse_direction: down
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_operator: AND
+        states:
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: '3'
+            operation: less than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: null
+          capability: independent.textfilecontent54
+          state:
+            field: subexpression
+            value: '0'
+            operation: greater than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    check: maximum-number-repeating-characters-limited-three-when-passwords-changed

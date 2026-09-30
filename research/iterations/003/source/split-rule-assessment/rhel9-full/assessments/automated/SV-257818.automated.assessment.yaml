@@ -1,0 +1,103 @@
+assessment:
+  id: SV-257818.automated
+  version: 1
+  assessment_title: RHEL-09-213115 - The kdump service on RHEL 9 must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    kdump-service-loadstate-masked-if-it-exists:
+      test_title: kdump.service LoadState is masked if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kdump.service
+          property:
+            operation: equals
+            datatype: string
+            mask: false
+            value: LoadState
+      assert:
+        existence: any_exist
+        check: all
+        state_title: null
+        state_capability: linux.systemdunitproperty
+        state:
+          field: value
+          value: masked
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    kdump-service-unitfilestate-masked-if-it-exists:
+      test_title: kdump.service UnitFileState is masked if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kdump.service
+          property:
+            operation: equals
+            datatype: string
+            mask: false
+            value: UnitFileState
+      assert:
+        existence: any_exist
+        check: all
+        state_title: null
+        state_capability: linux.systemdunitproperty
+        state:
+          field: value
+          value: masked
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    kdump-service-activestate-inactive-if-it-exists:
+      test_title: kdump.service ActiveState is inactive if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kdump.service
+          property:
+            operation: equals
+            datatype: string
+            mask: false
+            value: ActiveState
+      assert:
+        existence: any_exist
+        check: all
+        state_title: null
+        state_capability: linux.systemdunitproperty
+        state:
+          field: value
+          value: inactive
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - check: kdump-service-loadstate-masked-if-it-exists
+    - check: kdump-service-unitfilestate-masked-if-it-exists
+    - check: kdump-service-activestate-inactive-if-it-exists

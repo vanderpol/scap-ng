@@ -1,0 +1,47 @@
+assessment:
+  id: SV-257930.automated
+  version: 13
+  assessment_title: All RHEL 9 local files and directories must have a valid group owner.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    verify-all-local-files-directories-on-rhel-8-have-valid:
+      test_title: Verify all local files and directories on RHEL 8 have a valid group.
+      capability: independent.shellcommand
+      collect:
+        object_title: Verify all local files and directories on RHEL 8 have a valid group.  Limit results
+          to the first 100 failures found.
+        capability: independent.shellcommand
+        select:
+          shell:
+            operation: equals
+            datatype: string
+            mask: false
+            value: bash
+          command:
+            operation: equals
+            datatype: string
+            mask: false
+            value: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup
+              -print | head -n 100
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: Confirm no files or directories with invalid group are found.
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: none_exist
+  evaluate:
+    check: verify-all-local-files-directories-on-rhel-8-have-valid

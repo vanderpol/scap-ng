@@ -1,0 +1,46 @@
+assessment:
+  id: SV-258031.automated
+  version: 13
+  assessment_title: RHEL 9 must disable the ability of a user to accidentally press Ctrl-Alt-Del and cause
+    a system to shut down or reboot.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    verify-rhel-9-configured-ignore-ctrl-alt-del-sequence-in:
+      test_title: Verify RHEL 9 is configured to ignore the Ctrl-Alt-Del sequence in the GNOME desktop.
+      capability: independent.shellcommand
+      collect:
+        object_title: Retrieve GNOME desktop logout setting.
+        capability: independent.shellcommand
+        select:
+          shell:
+            operation: equals
+            datatype: string
+            mask: false
+            value: bash
+          command:
+            operation: equals
+            datatype: string
+            mask: false
+            value: gsettings get org.gnome.settings-daemon.plugins.media-keys logout
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: Confirm GNOME desktop logout setting is [''].
+        state_capability: independent.shellcommand
+        state:
+          field: stdout_line
+          value: '['''']'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: verify-rhel-9-configured-ignore-ctrl-alt-del-sequence-in

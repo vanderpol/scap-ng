@@ -1,0 +1,37 @@
+assessment:
+  id: SV-258070.automated
+  version: 1
+  assessment_title: RHEL-09-412045 - RHEL 9 must log username information when unsuccessful logon attempts
+    occur.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    check-etc-security-faillock-conf-audit-setting:
+      test_title: check /etc/security/faillock.conf for the audit setting
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/security/faillock.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*audit\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+  evaluate:
+    check: check-etc-security-faillock-conf-audit-setting

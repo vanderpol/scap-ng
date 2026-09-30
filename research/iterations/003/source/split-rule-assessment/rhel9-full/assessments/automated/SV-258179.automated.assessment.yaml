@@ -1,0 +1,871 @@
+assessment:
+  id: SV-258179.automated
+  version: 1
+  assessment_title: RHEL-09-654025 - RHEL 9 must audit all uses of the setxattr, fsetxattr, lsetxattr,
+    removexattr, fremovexattr, and lremovexattr system calls.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    audit-32-bit-invocations-fsetxattr-syscall-auid-1000:
+      test_title: Audit 32-bit invocations of fsetxattr syscall (auid>=1000)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 32-bit fsetxattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fsetxattr\s+|(\s+|,)fsetxattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-fsetxattr-syscall-auid-1000:
+      test_title: Audit 64-bit invocations of fsetxattr syscall (auid>=1000)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 64-bit fsetxattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fsetxattr\s+|(\s+|,)fsetxattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-32-bit-invocations-fsetxattr-syscall-auid-0:
+      test_title: Audit 32-bit invocations of fsetxattr syscall (auid=0)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 32-bit fsetxattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fsetxattr\s+|(\s+|,)fsetxattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-fsetxattr-syscall-auid-0:
+      test_title: Audit 64-bit invocations of fsetxattr syscall (auid=0)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 64-bit fsetxattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fsetxattr\s+|(\s+|,)fsetxattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-32-bit-invocations-lsetxattr-system-call:
+      test_title: Audit 32-bit invocations of the lsetxattr system call.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: pattern-audit-rule-32-bit-invocations-lsetxattr-system-call
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    audit-64-bit-invocations-lsetxattr-system-call:
+      test_title: Audit 64-bit invocations of the lsetxattr system call.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: pattern-audit-rule-64-bit-invocations-lsetxattr-system-call
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    audit-32-bit-invocations-lsetxattr-system-call-by-root-user:
+      test_title: Audit 32-bit invocations of the lsetxattr system call by root user.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: pattern-audit-rule-32-bit-invocations-lsetxattr-system-call-by
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    audit-64-bit-invocations-lsetxattr-system-call-by-root-user:
+      test_title: Audit 64-bit invocations of the lsetxattr system call by root user.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: pattern-audit-rule-32-bit-invocations-lsetxattr-system-call-by-2
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    audit-32-bit-invocations-fremovexattr-syscall:
+      test_title: Audit 32-bit invocations of fremovexattr syscall
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fremovexattr\s+|(\s+|,)fremovexattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-fremovexattr-syscall:
+      test_title: Audit 64-bit invocations of fremovexattr syscall
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fremovexattr\s+|(\s+|,)fremovexattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-32-bit-invocations-fremovexattr-syscall-by-root:
+      test_title: Audit 32-bit invocations of fremovexattr syscall by root
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+fremovexattr\s+|(\s+|,)fremovexattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-fremovexattr-syscall-by-root:
+      test_title: Audit 64-bit invocations of fremovexattr syscall by root
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+fremovexattr\s+|(\s+|,)fremovexattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-32-bit-invocations-lremovexattr-syscall:
+      test_title: Audit 32-bit invocations of lremovexattr syscall
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 32-bit lremovexattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+lremovexattr\s+|(\s+|,)lremovexattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-lremovexattr-syscall:
+      test_title: Audit 64-bit invocations of lremovexattr syscall
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 64-bit lremovexattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+lremovexattr\s+|(\s+|,)lremovexattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-32-bit-invocations-lremovexattr-syscall-by-root:
+      test_title: Audit 32-bit invocations of lremovexattr syscall by root
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 32-bit lremovexattr syscall (invoked by root)
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+lremovexattr\s+|(\s+|,)lremovexattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-lremovexattr-syscall-by-root:
+      test_title: Audit 64-bit invocations of lremovexattr syscall by root
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 64-bit lremovexattr syscall (invoked by root)
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+lremovexattr\s+|(\s+|,)lremovexattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-32-bit-invocations-removexattr-system-call:
+      test_title: Audit 32-bit invocations of the removexattr system call.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: pattern-audit-rule-32-bit-invocations-removexattr-system-call
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    audit-64-bit-invocations-removexattr-system-call:
+      test_title: Audit 64-bit invocations of the removexattr system call.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: pattern-audit-rule-64-bit-invocations-removexattr-system-call
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    audit-32-bit-invocations-removexattr-system-call-by-root-user:
+      test_title: Audit 32-bit invocations of the removexattr system call by root user.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: pattern-audit-rule-32-bit-invocations-removexattr-system-call-by
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    audit-64-bit-invocations-removexattr-system-call-by-root-user:
+      test_title: Audit 64-bit invocations of the removexattr system call by root user.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: pattern-audit-rule-32-bit-invocations-removexattr-system-call-by-2
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    audit-32-bit-invocations-setxattr-syscall-auid-1000:
+      test_title: Audit 32-bit invocations of setxattr syscall (auid>=1000)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 32-bit setxattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+setxattr\s+|(\s+|,)setxattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-setxattr-syscall-auid-1000:
+      test_title: Audit 64-bit invocations of setxattr syscall (auid>=1000)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 64-bit setxattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+setxattr\s+|(\s+|,)setxattr(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-32-bit-invocations-setxattr-syscall-auid-0:
+      test_title: Audit 32-bit invocations of setxattr syscall (auid=0)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 32-bit setxattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+setxattr\s+|(\s+|,)setxattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    audit-64-bit-invocations-setxattr-syscall-auid-0:
+      test_title: Audit 64-bit invocations of setxattr syscall (auid=0)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 64-bit setxattr syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b64\s+(?:.*(-S\s+setxattr\s+|(\s+|,)setxattr(\s+|,))).*-F\s+auid=0(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - all:
+      - check: audit-32-bit-invocations-fsetxattr-syscall-auid-1000
+      - check: audit-64-bit-invocations-fsetxattr-syscall-auid-1000
+      - check: audit-32-bit-invocations-fsetxattr-syscall-auid-0
+      - check: audit-64-bit-invocations-fsetxattr-syscall-auid-0
+    - all:
+      - check: audit-32-bit-invocations-lsetxattr-system-call
+      - check: audit-64-bit-invocations-lsetxattr-system-call
+      - check: audit-32-bit-invocations-lsetxattr-system-call-by-root-user
+      - check: audit-64-bit-invocations-lsetxattr-system-call-by-root-user
+    - all:
+      - check: audit-32-bit-invocations-fremovexattr-syscall
+      - check: audit-64-bit-invocations-fremovexattr-syscall
+      - check: audit-32-bit-invocations-fremovexattr-syscall-by-root
+      - check: audit-64-bit-invocations-fremovexattr-syscall-by-root
+    - all:
+      - check: audit-32-bit-invocations-lremovexattr-syscall
+      - check: audit-64-bit-invocations-lremovexattr-syscall
+      - check: audit-32-bit-invocations-lremovexattr-syscall-by-root
+      - check: audit-64-bit-invocations-lremovexattr-syscall-by-root
+    - all:
+      - check: audit-32-bit-invocations-removexattr-system-call
+      - check: audit-64-bit-invocations-removexattr-system-call
+      - check: audit-32-bit-invocations-removexattr-system-call-by-root-user
+      - check: audit-64-bit-invocations-removexattr-system-call-by-root-user
+    - check: audit-32-bit-invocations-setxattr-syscall-auid-1000
+    - check: audit-64-bit-invocations-setxattr-syscall-auid-1000
+    - check: audit-32-bit-invocations-setxattr-syscall-auid-0
+    - check: audit-64-bit-invocations-setxattr-syscall-auid-0
+  variables:
+    append-audit-rule:
+      title: Append an audit rule
+      kind: constant
+      datatype: string
+      expression:
+        literal: ^\s*-a\s+(?:always,exit|exit,always)
+    audit-32-bit-architecture:
+      title: Audit 32-bit architecture
+      kind: constant
+      datatype: string
+      expression:
+        literal: \s+-F\s+arch=b32
+    allow-multiple-s-fields:
+      title: Allow for multiple -S fields
+      kind: constant
+      datatype: string
+      expression:
+        literal: \s+(?:-S\s+[,\w]+\s+)*
+    allow-leading-syscalls:
+      title: Allow for leading syscalls
+      kind: constant
+      datatype: string
+      expression:
+        literal: -S\s+[,\w]*\b
+    allow-trailing-syscalls:
+      title: Allow for trailing syscalls
+      kind: constant
+      datatype: string
+      expression:
+        literal: \b[,\w]*
+    filter-out-system-uids:
+      title: Filter out system UIDs
+      kind: constant
+      datatype: string
+      expression:
+        literal: -F\s+auid>=1000\s+-F\s+auid!=(?:4294967295|-1|unset)
+    key-field:
+      title: Key field
+      kind: constant
+      datatype: string
+      expression:
+        literal: (?:\s+(?:-k\s+|-F\s+key=)[-\w]+)*\s*$
+    pattern-audit-rule-32-bit-invocations-lsetxattr-system-call:
+      title: Pattern for audit rule for 32-bit invocations of lsetxattr system call.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: append-audit-rule
+        - variable: audit-32-bit-architecture
+        - variable: allow-multiple-s-fields
+        - variable: allow-leading-syscalls
+        - literal:
+            value: lsetxattr
+            datatype: string
+        - variable: allow-trailing-syscalls
+        - variable: allow-multiple-s-fields
+        - variable: filter-out-system-uids
+        - variable: key-field
+    audit-64-bit-architecture:
+      title: Audit 64-bit architecture
+      kind: constant
+      datatype: string
+      expression:
+        literal: \s+-F\s+arch=b64
+    pattern-audit-rule-64-bit-invocations-lsetxattr-system-call:
+      title: Pattern for audit rule for 64-bit invocations of lsetxattr system call.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: append-audit-rule
+        - variable: audit-64-bit-architecture
+        - variable: allow-multiple-s-fields
+        - variable: allow-leading-syscalls
+        - literal:
+            value: lsetxattr
+            datatype: string
+        - variable: allow-trailing-syscalls
+        - variable: allow-multiple-s-fields
+        - variable: filter-out-system-uids
+        - variable: key-field
+    filter-out-non-root-uids:
+      title: Filter out non-root UIDs.
+      kind: constant
+      datatype: string
+      expression:
+        literal: -F\s+auid=0
+    pattern-audit-rule-32-bit-invocations-lsetxattr-system-call-by:
+      title: Pattern for audit rule for 32-bit invocations of lsetxattr system call by root user.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: append-audit-rule
+        - variable: audit-32-bit-architecture
+        - variable: allow-multiple-s-fields
+        - variable: allow-leading-syscalls
+        - literal:
+            value: lsetxattr
+            datatype: string
+        - variable: allow-trailing-syscalls
+        - variable: allow-multiple-s-fields
+        - variable: filter-out-non-root-uids
+        - variable: key-field
+    pattern-audit-rule-32-bit-invocations-lsetxattr-system-call-by-2:
+      title: Pattern for audit rule for 32-bit invocations of lsetxattr system call by root user.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: append-audit-rule
+        - variable: audit-32-bit-architecture
+        - variable: allow-multiple-s-fields
+        - variable: allow-leading-syscalls
+        - literal:
+            value: lsetxattr
+            datatype: string
+        - variable: allow-trailing-syscalls
+        - variable: allow-multiple-s-fields
+        - variable: filter-out-non-root-uids
+        - variable: key-field
+    pattern-audit-rule-32-bit-invocations-removexattr-system-call:
+      title: Pattern for audit rule for 32-bit invocations of removexattr system call.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: append-audit-rule
+        - variable: audit-32-bit-architecture
+        - variable: allow-multiple-s-fields
+        - variable: allow-leading-syscalls
+        - literal:
+            value: removexattr
+            datatype: string
+        - variable: allow-trailing-syscalls
+        - variable: allow-multiple-s-fields
+        - variable: filter-out-system-uids
+        - variable: key-field
+    pattern-audit-rule-64-bit-invocations-removexattr-system-call:
+      title: Pattern for audit rule for 64-bit invocations of removexattr system call.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: append-audit-rule
+        - variable: audit-64-bit-architecture
+        - variable: allow-multiple-s-fields
+        - variable: allow-leading-syscalls
+        - literal:
+            value: removexattr
+            datatype: string
+        - variable: allow-trailing-syscalls
+        - variable: allow-multiple-s-fields
+        - variable: filter-out-system-uids
+        - variable: key-field
+    pattern-audit-rule-32-bit-invocations-removexattr-system-call-by:
+      title: Pattern for audit rule for 32-bit invocations of removexattr system call by root user.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: append-audit-rule
+        - variable: audit-32-bit-architecture
+        - variable: allow-multiple-s-fields
+        - variable: allow-leading-syscalls
+        - literal:
+            value: removexattr
+            datatype: string
+        - variable: allow-trailing-syscalls
+        - variable: allow-multiple-s-fields
+        - variable: filter-out-non-root-uids
+        - variable: key-field
+    pattern-audit-rule-32-bit-invocations-removexattr-system-call-by-2:
+      title: Pattern for audit rule for 32-bit invocations of removexattr system call by root user.
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: append-audit-rule
+        - variable: audit-32-bit-architecture
+        - variable: allow-multiple-s-fields
+        - variable: allow-leading-syscalls
+        - literal:
+            value: removexattr
+            datatype: string
+        - variable: allow-trailing-syscalls
+        - variable: allow-multiple-s-fields
+        - variable: filter-out-non-root-uids
+        - variable: key-field

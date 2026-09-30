@@ -1,0 +1,87 @@
+assessment:
+  id: SV-257793.automated
+  version: 1
+  assessment_title: RHEL-09-212040 - RHEL 9 must clear the page allocator to prevent use-after-free attacks.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    bls-options-contain-page-poison-1:
+      test_title: BLS options contain page_poison=1
+      capability: independent.textfilecontent54
+      collect:
+        object_title: BLS options
+        capability: independent.textfilecontent54
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /boot/loader/entries
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^.*\.conf$
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^options\s+(.*)$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (^|\s)page_poison=1(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    etc-default-grub-page-poison-1:
+      test_title: /etc/default/grub page_poison=1
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/default/grub GRUB_CMDLINE_LINUX
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/default/grub
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^GRUB_CMDLINE_LINUX="(.*)"
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (^|\s)page_poison=1(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - check: bls-options-contain-page-poison-1
+    - check: etc-default-grub-page-poison-1

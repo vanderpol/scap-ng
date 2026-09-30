@@ -1,0 +1,73 @@
+assessment:
+  id: SV-258166.automated
+  version: 1
+  assessment_title: RHEL-09-653085 - RHEL 9 audit log directory must be owned by root to prevent unauthorized
+    read access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    audit-log-directories-owned-by-root:
+      test_title: audit log directories are owned by root
+      capability: unix.file
+      collect:
+        object_title: Audit log directory
+        capability: unix.file
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: audit-data-directory-from-etc-audit-auditd-conf
+          filename:
+            operation: equals
+            datatype: string
+            mask: false
+            nil: true
+            value: ''
+      assert:
+        existence: all_exist
+        check: all
+        state_title: owned by root
+        state_capability: unix.file
+        state:
+          field: user_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: audit-log-directories-owned-by-root
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        object_values:
+          collect:
+            object_title: null
+            capability: independent.textfilecontent54
+            select:
+              filepath:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/audit/auditd.conf
+              pattern:
+                operation: pattern match
+                datatype: string
+                mask: false
+                value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+              instance:
+                operation: greater than or equal
+                datatype: int
+                mask: false
+                value: '1'
+            behaviors:
+              ignore_case: 'true'
+          field: subexpression

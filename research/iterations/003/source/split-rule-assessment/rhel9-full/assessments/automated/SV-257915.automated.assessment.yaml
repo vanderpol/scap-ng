@@ -1,0 +1,41 @@
+assessment:
+  id: SV-257915.automated
+  version: 1
+  assessment_title: RHEL-09-232175 - RHEL 9 /var/log directory must be group-owned by root.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    var-log-directory-group-owned-by-root:
+      test_title: /var/log directory is group-owned by root.
+      capability: unix.file
+      collect:
+        object_title: /var/log directory
+        capability: unix.file
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /var/log
+          filename:
+            operation: equals
+            datatype: string
+            mask: false
+            nil: true
+            value: ''
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: group-owned by root
+        state_capability: unix.file
+        state:
+          field: group_id
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: var-log-directory-group-owned-by-root

@@ -1,0 +1,142 @@
+assessment:
+  id: SV-258133.automated
+  version: 1
+  assessment_title: RHEL-09-631020 - RHEL 9 must prohibit the use of cached authenticators after one day.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-sssd-sssd-conf-cache-credentials-false:
+      test_title: /etc/sssd/sssd.conf:cache_credentials = false
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sssd/sssd.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*cache_credentials\s*=\s*true\b$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sssd/conf.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.+\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*cache_credentials\s*=\s*true\b$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+                max_depth: '-1'
+                recurse_direction: down
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+    etc-sssd-sssd-conf-offline-credentials-expiration-1:
+      test_title: /etc/sssd/sssd.conf:offline_credentials_expiration = 1
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sssd/sssd.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sssd/conf.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.+\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                max_depth: '-1'
+                recurse_direction: down
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    any:
+    - check: etc-sssd-sssd-conf-cache-credentials-false
+    - check: etc-sssd-sssd-conf-offline-credentials-expiration-1

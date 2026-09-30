@@ -1,0 +1,130 @@
+assessment:
+  id: SV-257806.automated
+  version: 2
+  assessment_title: RHEL-09-213055 - RHEL 9 must be configured to disable the FireWire kernel module.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-modprobe-d-contains-file-that-contains-install-firewire-core:
+      test_title: /etc/modprobe.d contains a file that contains 'install firewire-core /bin/false'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/modprobe.d
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^[ \t]*install[ \t]+firewire-core[ \t]+/bin/false[ \t]*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    etc-modprobe-d-contains-file-that-contains-blacklist-firewire-core:
+      test_title: /etc/modprobe.d contains a file that contains 'blacklist firewire-core'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/modprobe.d
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^[ \t]*blacklist[ \t]+firewire-core[ \t]*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    etc-modprobe-conf-contains-install-firewire-core-bin-false:
+      test_title: /etc/modprobe.conf contains 'install firewire-core /bin/false'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/modprobe.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^[ \t]*install[ \t]+firewire-core[ \t]+/bin/false[ \t]*$
+          instance:
+            operation: equals
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    etc-modprobe-conf-contains-blacklist-firewire-core:
+      test_title: /etc/modprobe.conf contains 'blacklist firewire-core'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/modprobe.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^[ \t]*blacklist[ \t]+firewire-core[ \t]*$
+          instance:
+            operation: equals
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    any:
+    - all:
+      - check: etc-modprobe-d-contains-file-that-contains-install-firewire-core
+      - check: etc-modprobe-d-contains-file-that-contains-blacklist-firewire-core
+    - all:
+      - check: etc-modprobe-conf-contains-install-firewire-core-bin-false
+      - check: etc-modprobe-conf-contains-blacklist-firewire-core

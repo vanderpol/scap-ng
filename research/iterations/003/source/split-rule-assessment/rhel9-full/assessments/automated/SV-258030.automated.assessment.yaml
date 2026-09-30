@@ -1,0 +1,71 @@
+assessment:
+  id: SV-258030.automated
+  version: 1
+  assessment_title: RHEL-09-271100 - RHEL 9 must prevent a user from overriding the disable-restart-buttons
+    setting for the graphical user interface.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    check-that-etc-dconf-profile-user-system-db-at-minimum:
+      test_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+      capability: independent.textfilecontent54
+      collect:
+        object_title: check that /etc/dconf/profile/user:system-db is at minimum set to local
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/dconf/profile/user
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*system-db\s*:\s*local\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    check-that-disable-restart-button-setting-locked-from-nonprivileged-user:
+      test_title: Check that the disable-restart-button setting is locked from nonprivileged user modification
+      capability: independent.textfilecontent54
+      collect:
+        object_title: Check that the disable-restart-button setting is locked from nonprivileged user
+          modification
+        capability: independent.textfilecontent54
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/dconf/db/local.d/locks
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^.*$
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*\/org\/gnome\/login-screen\/disable-restart-buttons$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: check-that-etc-dconf-profile-user-system-db-at-minimum
+    - check: check-that-disable-restart-button-setting-locked-from-nonprivileged-user

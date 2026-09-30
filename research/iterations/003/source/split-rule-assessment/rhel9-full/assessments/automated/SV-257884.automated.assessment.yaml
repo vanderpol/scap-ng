@@ -1,0 +1,135 @@
+assessment:
+  id: SV-257884.automated
+  version: 13
+  assessment_title: RHEL 9 library files must have mode 755 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    system-library-files-have-mode-755-or-less-permissive-gwrite:
+      test_title: System Library files have mode 755 or less permissive (gwrite should be = false)
+      capability: unix.file
+      collect:
+        object_title: All files in system Library with mode 755 (gwrite should be = false)
+        capability: unix.file
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: only one
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*
+        filters:
+        - action: exclude
+          match:
+            field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Mode 755 or less permissive (gwrite should be = false)
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            value: symbolic link
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: symbolic links
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            value: directory
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          capability: unix.file
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+    system-library-files-have-mode-755-or-less-permissive-owrite:
+      test_title: System Library files have mode 755 or less permissive (owrite should be = false)
+      capability: unix.file
+      collect:
+        object_title: All files in system Library with mode 755 (owrite should be = false)
+        capability: unix.file
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: only one
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: .*
+        filters:
+        - action: exclude
+          match:
+            field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Mode 755 or less permissive (owrite should be = false)
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            value: symbolic link
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: symbolic links
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            value: directory
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          capability: unix.file
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: system-library-files-have-mode-755-or-less-permissive-gwrite
+    - check: system-library-files-have-mode-755-or-less-permissive-owrite
+  variables:
+    system-wide-shared-library-files-directories:
+      title: system-wide shared library files directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64

@@ -1,0 +1,123 @@
+assessment:
+  id: SV-257847.automated
+  version: 1
+  assessment_title: RHEL-09-231030 - RHEL 9 must use a separate file system for the system audit data
+    path.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    there-separate-file-system-audit-data-directory:
+      test_title: There is a separate file system for audit data directory.
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: at least one
+            value:
+              variable: audit-data-directory-from-etc-audit-auditd-conf
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+    there-separate-file-system-configured-audit-data-directory:
+      test_title: There is a separate file system configured for audit data directory.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            variable_check: at least one
+            value:
+              variable: regex-find-audit-data-partition-in-etc-fstab
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: there-separate-file-system-audit-data-directory
+    - check: there-separate-file-system-configured-audit-data-directory
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        object_values:
+          collect:
+            object_title: null
+            capability: independent.textfilecontent54
+            select:
+              filepath:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/audit/auditd.conf
+              pattern:
+                operation: pattern match
+                datatype: string
+                mask: false
+                value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+              instance:
+                operation: greater than or equal
+                datatype: int
+                mask: false
+                value: '1'
+            behaviors:
+              ignore_case: 'true'
+          field: subexpression
+    regex-find-audit-data-partition-in-etc-fstab:
+      title: regex to find audit data partition in /etc/fstab
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: ^[^# \t]+\s+
+            datatype: string
+        - object_values:
+            collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/audit/auditd.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+            field: subexpression
+        - literal:
+            value: \s+
+            datatype: string

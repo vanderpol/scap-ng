@@ -1,0 +1,76 @@
+assessment:
+  id: SV-258007.automated
+  version: 1
+  assessment_title: RHEL-09-255155 - RHEL 9 SSH daemon must disable remote X connections for interactive
+    users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    etc-ssh-sshd-config-or-etc-ssh-sshd-config-d:
+      test_title: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:X11Forwarding == no
+      capability: independent.textfilecontent54
+      collect:
+        object_title: X11Forwarding in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/ssh/sshd_config
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*(?i)X11Forwarding[ \t]+([^\s#]*)[ \t]*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/ssh/sshd_config.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: .+
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^\s*(?i)X11Forwarding[ \t]+([^\s#]*)[ \t]*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: ^(no|"no")$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: etc-ssh-sshd-config-or-etc-ssh-sshd-config-d

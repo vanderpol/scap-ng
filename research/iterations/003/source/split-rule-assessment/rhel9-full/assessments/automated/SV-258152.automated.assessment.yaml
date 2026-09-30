@@ -1,0 +1,72 @@
+assessment:
+  id: SV-258152.automated
+  version: 2
+  assessment_title: RHEL-09-653015 - RHEL 9 audit service must be enabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    auditd-service-active:
+      test_title: auditd.service is active
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit:
+            operation: equals
+            datatype: string
+            mask: false
+            value: auditd.service
+          property:
+            operation: equals
+            datatype: string
+            mask: false
+            value: ActiveState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: linux.systemdunitproperty
+        state:
+          field: value
+          value: active
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    auditd-service-running:
+      test_title: auditd.service is running
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit:
+            operation: equals
+            datatype: string
+            mask: false
+            value: auditd.service
+          property:
+            operation: equals
+            datatype: string
+            mask: false
+            value: SubState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: linux.systemdunitproperty
+        state:
+          field: value
+          value: running
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - check: auditd-service-active
+    - check: auditd-service-running

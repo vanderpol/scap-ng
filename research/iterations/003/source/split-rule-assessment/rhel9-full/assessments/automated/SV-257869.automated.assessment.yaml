@@ -1,0 +1,72 @@
+assessment:
+  id: SV-257869.automated
+  version: 1
+  assessment_title: RHEL-09-231140 - RHEL 9 must mount /var with the nodev option.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    var-mounted-nodev-option:
+      test_title: /var is mounted with the nodev option.
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /var
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: null
+        state_capability: linux.partition
+        state:
+          field: mount_options
+          value: nodev
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: at least one
+          entity_existence: at_least_one_exists
+    var-configured-in-etc-fstab-nodev-option:
+      test_title: /var is configured in /etc/fstab with the nodev option.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^\s*[^#\s]+\s+/var\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state_title: nodev option
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: (^|,)nodev(,|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - check: var-mounted-nodev-option
+    - check: var-configured-in-etc-fstab-nodev-option

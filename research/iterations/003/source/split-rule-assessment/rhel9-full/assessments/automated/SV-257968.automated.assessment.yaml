@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257968.automated
+  version: 2
+  assessment_title: RHEL-09-253065 - RHEL 9 must not send Internet Control Message Protocol (ICMP) redirects.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    net-ipv4-conf-all-send-redirects-setting-in-kernel-set:
+      test_title: net.ipv4.conf.all.send_redirects setting in kernel is set to 0
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: net.ipv4.conf.all.send_redirects
+      assert:
+        existence: all_exist
+        check: all
+        state_title: null
+        state_capability: unix.sysctl
+        state:
+          field: value
+          value: '0'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: net-ipv4-conf-all-send-redirects-setting-in-kernel-set

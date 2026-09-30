@@ -1,0 +1,45 @@
+assessment:
+  id: SV-258230.automated
+  version: 3
+  assessment_title: RHEL-09-671010 - RHEL 9 must enable FIPS mode.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    fips-enabled-1:
+      test_title: fips_enabled == 1
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /proc/sys/crypto/fips_enabled
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /proc/sys/crypto/fips_enabled
+          pattern:
+            operation: pattern match
+            datatype: string
+            mask: false
+            value: ^(\d+)$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            mask: false
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state_title: null
+        state_capability: independent.textfilecontent54
+        state:
+          field: subexpression
+          value: '1'
+          operation: equals
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: fips-enabled-1

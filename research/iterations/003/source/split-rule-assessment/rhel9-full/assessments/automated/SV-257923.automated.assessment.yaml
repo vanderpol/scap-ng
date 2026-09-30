@@ -1,0 +1,80 @@
+assessment:
+  id: SV-257923.automated
+  version: 13
+  assessment_title: RHEL 9 library directories must be group-owned by root or a system account.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    system-library-directories-group-by-root-group:
+      test_title: System Library directories are group by root group.
+      capability: unix.file
+      collect:
+        object_title: All system-wide Library directories not owned by root-group
+        capability: unix.file
+        select:
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: only one
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            operation: equals
+            datatype: string
+            mask: false
+            nil: true
+            value: ''
+        filters:
+        - action: exclude
+          match:
+            field: group_id
+            value: '1000'
+            operation: less than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: Group Owned by root or System group (gid less than 1000)
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            value: file
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            value: symbolic link
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: symbolic links
+          capability: unix.file
+        behaviors:
+          recurse_direction: down
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    check: system-library-directories-group-by-root-group
+  variables:
+    system-wide-shared-library-files-directories:
+      title: system-wide shared library files directories
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64

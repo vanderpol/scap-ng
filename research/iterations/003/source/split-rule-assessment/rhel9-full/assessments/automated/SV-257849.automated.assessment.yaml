@@ -1,0 +1,40 @@
+assessment:
+  id: SV-257849.automated
+  version: 1
+  assessment_title: RHEL-09-231040 - RHEL 9 file system automount function must be disabled unless required.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    autofs-service-activestate-inactive-if-it-exists:
+      test_title: autofs.service ActiveState is inactive if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit:
+            operation: equals
+            datatype: string
+            mask: false
+            value: autofs.service
+          property:
+            operation: equals
+            datatype: string
+            mask: false
+            value: ActiveState
+      assert:
+        existence: any_exist
+        check: all
+        state_title: null
+        state_capability: linux.systemdunitproperty
+        state:
+          field: value
+          value: inactive
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    check: autofs-service-activestate-inactive-if-it-exists

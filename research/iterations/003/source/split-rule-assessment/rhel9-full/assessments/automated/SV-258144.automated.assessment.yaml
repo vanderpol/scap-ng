@@ -1,0 +1,183 @@
+assessment:
+  id: SV-258144.automated
+  version: 2
+  assessment_title: RHEL-09-652030 - All RHEL 9 remote access methods must be monitored.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  checks:
+    rsyslog-auth-configured-logged:
+      test_title: 'rsyslog: auth.* is configured to be logged'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^[ \t]*(?:\S+;auth\.\*|auth\.\*;\S+|auth\.\*|\S+;auth\.\*;\S+)[ \t]+\S+\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.*\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^[ \t]*(?:\S+;auth\.\*|auth\.\*;\S+|auth\.\*|\S+;auth\.\*;\S+)[ \t]+\S+\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    rsyslog-authpriv-configured-logged:
+      test_title: 'rsyslog: authpriv.* is configured to be logged'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^[ \t]*(?:\S+;authpriv\.\*|authpriv\.\*;\S+|authpriv\.\*|\S+;authpriv\.\*;\S+)[
+                    \t]+\S+\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.*\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^[ \t]*(?:\S+;authpriv\.\*|authpriv\.\*;\S+|authpriv\.\*|\S+;authpriv\.\*;\S+)[
+                    \t]+\S+\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    rsyslog-daemon-configured-logged:
+      test_title: 'rsyslog: daemon.* is configured to be logged'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.conf
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^[ \t]*(?:\S+;daemon\.\*|daemon\.\*;\S+|daemon\.\*|\S+;daemon\.\*;\S+)[ \t]+\S+\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.d
+                filename:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^.*\.conf$
+                pattern:
+                  operation: pattern match
+                  datatype: string
+                  mask: false
+                  value: ^[ \t]*(?:\S+;daemon\.\*|daemon\.\*;\S+|daemon\.\*|\S+;daemon\.\*;\S+)[ \t]+\S+\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  mask: false
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: rsyslog-auth-configured-logged
+    - check: rsyslog-authpriv-configured-logged
+    - check: rsyslog-daemon-configured-logged
