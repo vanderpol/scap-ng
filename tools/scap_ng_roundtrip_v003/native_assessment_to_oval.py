@@ -88,7 +88,11 @@ class Builder:
                 attrs["mask"] = scalar(spec["mask"])
         el = ET.SubElement(parent, q(ns, field), attrs)
         if isinstance(value, dict) and set(value) == {"variable"}:
-            el.set("var_ref", self.emit_variable(value["variable"]))
+            variable_id = self.emit_variable(value["variable"])
+            if field == "var_ref":
+                el.text = variable_id
+            else:
+                el.set("var_ref", variable_id)
         elif value is not None:
             el.text = scalar(value)
         return el
