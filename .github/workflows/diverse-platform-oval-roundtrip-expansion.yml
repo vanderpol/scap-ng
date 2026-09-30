@@ -79,6 +79,27 @@ jobs:
             --benchmark-key "${{ matrix.key }}" \
             --fail-on-unresolved
 
+      - name: Inspect SQL publisher extension source
+        if: matrix.key == 'sql2022-instance'
+        run: |
+          echo "=== sqlext source occurrences ==="
+          grep -R -n -B 12 -A 30 'sqlext' "work/${{ matrix.key }}-split" || true
+          echo "=== namespaces in affected closure ==="
+          python - <<'PY'
+          from pathlib import Path
+          from lxml import etree as E
+          root=Path("work/sql2022-instance-split")
+          for path in root.rglob("oval.xml"):
+              text=path.read_text(errors="replace")
+              if "sqlext" not in text:
+                  continue
+              tree=E.parse(str(path))
+              print(path)
+              for el in tree.getroot().iter():
+                  if isinstance(el.tag,str) and "sqlext" in E.QName(el).localname:
+                      print(" ",E.QName(el).localname,E.QName(el).namespace,dict(el.attrib))
+          PY
+
       - name: Round-trip every OVAL definition
         run: |
           python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
