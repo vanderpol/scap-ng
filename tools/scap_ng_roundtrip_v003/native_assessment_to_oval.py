@@ -187,7 +187,8 @@ class Builder:
         return "AND", [expr]
 
     def emit_filter(self, parent, capability, item):
-        sid = self.emit_state(capability, item.get("match"), item.get("state_title"))
+        state_capability = item.get("capability") or capability
+        sid = self.emit_state(state_capability, item.get("match"), item.get("state_title"))
         f = ET.SubElement(parent, q(OD, "filter"), {"action": item.get("action") or "exclude"})
         f.text = sid
 
@@ -389,7 +390,7 @@ class Builder:
             return tid
 
         collection = check["collect"]
-        capability = collection["capability"]
+        capability = check.get("capability") or collection["capability"]
         family, name = split_capability(capability)
         ns = family_ns(family)
         tid = self.ids.get("tst", check_id)
@@ -407,7 +408,11 @@ class Builder:
             state_operator = (assertion.get("state_operator") or "AND").upper()
             attrs["state_operator"] = state_operator
             state_items = [
-                (item.get("state"), item.get("state_title"))
+                (
+                    item.get("state"),
+                    item.get("state_title"),
+                    item.get("capability") or capability,
+                )
                 for item in explicit_states
             ]
         else:
@@ -415,14 +420,18 @@ class Builder:
             if len(state_exprs) > 1:
                 attrs["state_operator"] = state_operator
             state_items = [
-                (expr, assertion.get("state_title"))
+                (
+                    expr,
+                    assertion.get("state_title"),
+                    assertion.get("state_capability") or capability,
+                )
                 for expr in state_exprs
             ]
 
         test = ET.SubElement(self.tests, q(ns, name + "_test"), attrs)
         ET.SubElement(test, q(ns, "object"), {"object_ref": self.emit_object(collection)})
-        for expr, title in state_items:
-            sid = self.emit_state(capability, expr, title)
+        for expr, title, state_capability in state_items:
+            sid = self.emit_state(state_capability, expr, title)
             ET.SubElement(test, q(ns, "state"), {"state_ref": sid})
         self.check_to_test[check_id] = tid
         return tid
