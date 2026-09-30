@@ -475,11 +475,14 @@ class Builder:
     def build(self):
         a = self.assessment
         did = self.ids.get("def", a.get("id") or "assessment")
-        d = ET.SubElement(self.defs, q(OD, "definition"), {
+        attrs = {
             "id": did,
             "version": scalar(a.get("version") or 1),
             "class": a.get("class") or "miscellaneous",
-        })
+        }
+        if a.get("deprecated"):
+            attrs["deprecated"] = "true"
+        d = ET.SubElement(self.defs, q(OD, "definition"), attrs)
         md = ET.SubElement(d, q(OD, "metadata"))
         ET.SubElement(md, q(OD, "title")).text = a.get("assessment_title") or a.get("id") or "SCAP-NG assessment"
         ET.SubElement(md, q(OD, "description")).text = "Regenerated from native SCAP-NG assessment semantics."
