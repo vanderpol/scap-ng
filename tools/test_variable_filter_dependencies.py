@@ -244,8 +244,8 @@ class DependencyTests(unittest.TestCase):
         schema_dir = Path(__file__).resolve().parents[1] / "third_party/scap-1.4-schemas/oval_5.12.3"
         schema = etree.XMLSchema(etree.fromstring(f"""
           <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-            <xs:import namespace="{OD}" schemaLocation="{schema_dir}/oval-definitions-schema.xsd"/>
-            <xs:import namespace="{UNIX}" schemaLocation="{schema_dir}/unix-definitions-schema.xsd"/>
+            <xs:import namespace="{OD}" schemaLocation="{(schema_dir / 'oval-definitions-schema.xsd').as_uri()}"/>
+            <xs:import namespace="{UNIX}" schemaLocation="{(schema_dir / 'unix-definitions-schema.xsd').as_uri()}"/>
           </xs:schema>"""))
         root = source()
         for n in range(1, 32):
@@ -279,8 +279,8 @@ class DependencyTests(unittest.TestCase):
         schema_dir = Path(__file__).resolve().parents[1] / "third_party/scap-1.4-schemas/oval_5.12.3"
         xsd = etree.XMLSchema(etree.fromstring(f"""
           <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-            <xs:import namespace="{OD}" schemaLocation="{schema_dir}/oval-definitions-schema.xsd"/>
-            <xs:import namespace="{UNIX}" schemaLocation="{schema_dir}/unix-definitions-schema.xsd"/>
+            <xs:import namespace="{OD}" schemaLocation="{(schema_dir / 'oval-definitions-schema.xsd').as_uri()}"/>
+            <xs:import namespace="{UNIX}" schemaLocation="{(schema_dir / 'unix-definitions-schema.xsd').as_uri()}"/>
           </xs:schema>"""))
         sch = "http://purl.oclc.org/dsdl/schematron"
         definition_schema = etree.parse(str(schema_dir / "oval-definitions-schema.xsd"))
