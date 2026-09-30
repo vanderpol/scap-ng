@@ -9,6 +9,8 @@ import sys
 import tempfile
 import unittest
 
+from xsd_effective_defaults import inventory as resolve_type_defaults
+
 SCRIPT = Path(__file__).with_name("audit_oval_xsd_defaults.py")
 SCHEMA = """<?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -69,6 +71,29 @@ class SchemaAuditTests(unittest.TestCase):
             rows = json.loads((target / "named-reference-resolution.json").read_text())
             self.assertTrue(any(row["status"] == "unresolved_global"
                                 and row["reference"] == "t:missing" for row in rows))
+
+    def test_simple_content_base_can_be_a_named_simple_type(self):
+        schema = """<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:t="urn:example" targetNamespace="urn:example">
+          <xs:simpleType name="SchemaVersionPattern">
+            <xs:restriction base="xs:string"/>
+          </xs:simpleType>
+          <xs:complexType name="SchemaVersionType">
+            <xs:simpleContent>
+              <xs:extension base="t:SchemaVersionPattern">
+                <xs:attribute name="platform" type="xs:string" default="X"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:schema>"""
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            (folder / "one.xsd").write_text(schema, encoding="utf-8")
+            report = resolve_type_defaults(folder)
+            self.assertEqual(report["summary"]["incomplete_types"], 0)
+            self.assertEqual(report["summary"]["resolved_types"], 1)
+            self.assertEqual(report["types"][0]["defaults"]["platform"]["value"], "X")
+
 
 
 if __name__ == "__main__":
