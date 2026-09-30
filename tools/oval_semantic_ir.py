@@ -619,7 +619,12 @@ def parse_test(e):
         "namespace": ns(e.tag),
         "version": e.get("version"),
         "comment": e.get("comment"),
-        "check": e.get("check", "all"),
+        # TestType.check is required in OVAL 5.12.3; never synthesize "all".
+        "check": e.get("check"),
+        "missing_required_attributes": [
+            name for name in ("id", "version", "check", "comment")
+            if e.get(name) is None
+        ],
         "check_existence": e.get("check_existence", "at_least_one_exists"),
         "state_operator": e.get("state_operator", "AND"),
         "effective_attributes": effective_attributes(e, "test"),
