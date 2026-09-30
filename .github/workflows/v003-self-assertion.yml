@@ -25,11 +25,22 @@ jobs:
           ref: e3538595c5083b9c34d937a81d319234df9bbfaa
           path: self-assertion
 
+      - name: Check out authoritative OVAL 5.12.3 schemas
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - run: python -m pip install pyyaml
+      - name: Install validation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+          python -m pip install pyyaml lxml
 
       - name: Inventory every Self-Assertion definition through v003 lowering
         run: |
@@ -42,6 +53,28 @@ jobs:
             --out roundtrip-out \
             --report self-assertion-v003-roundtrip.json \
             --inventory-only
+
+      - name: Build aggregate OVAL 5.12.3 validation schema
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/build_full_oval_omni.py \
+            --schemas oval-language/oval-schemas \
+            --output oval-language/oval-schemas/roundtrip-full-omni.xsd
+
+      - name: Validate every regenerated OVAL document with XSD
+        run: |
+          set -euo pipefail
+          for xml in roundtrip-out/*.oval.xml; do
+            echo "XSD: $xml"
+            xmllint --noout \
+              --schema oval-language/oval-schemas/roundtrip-full-omni.xsd \
+              "$xml"
+          done
+
+      - name: Validate every regenerated OVAL document with embedded Schematron
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/validate_embedded_schematron.py \
+            --schemas oval-language/oval-schemas \
+            roundtrip-out/*.oval.xml
 
       - name: Upload full Self-Assertion reports
         uses: actions/upload-artifact@v4
