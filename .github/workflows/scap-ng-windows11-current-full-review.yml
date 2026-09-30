@@ -42,6 +42,9 @@ jobs:
       - run: python -m pip install PyYAML==6.0.3 lxml==6.1.1
       - name: Shared full-review regressions
         run: python scap-ng/tools/test_full_review_contract.py
+      - name: Build component-resolved Windows 11 rule splits
+        run: |
+          python scap-ng/tools/scap14_rule_splitter.py             niwc/Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip             --output-dir work/windows11-split             --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd             --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5             --source-repository-path Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip             --benchmark-key windows11             --fail-on-unresolved
       - name: Generate current Windows 11 review
         run: >-
           python scap-ng/tools/scap_upconvert_v003/convert_full_review.py
@@ -50,6 +53,7 @@ jobs:
           --benchmark-id windows11-stig-current-full
           --platform-id microsoft.windows-11
           --platform-title "Microsoft Windows 11"
+          --split-root work/windows11-split
           --output work/windows11-current-full
       - name: Enforce review accounting and deprecated-test fallback
         run: |
