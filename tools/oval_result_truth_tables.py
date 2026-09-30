@@ -205,3 +205,27 @@ def evaluate_collected_object_test(
 def evaluate_missing_collected_object_record():
     """OVAL Test result when collected_objects exists but matching object does not."""
     return UNKNOWN
+
+
+def aggregate_many_to_many(*, var_check, entity_check, comparison_rows):
+    """Aggregate one State entity's many-to-many value comparisons.
+
+    Each row represents one corresponding system/item entity compared against
+    all values of the referenced variable. OVAL first combines each row using
+    var_check, then combines row results using entity_check.
+    """
+    rows = [list(row) for row in comparison_rows]
+    if not rows or any(not row for row in rows):
+        raise ValueError("many-to-many aggregation requires non-empty rows")
+    per_entity = [aggregate_check(var_check, row) for row in rows]
+    return aggregate_check(entity_check, per_entity)
+
+
+def aggregate_state(operator, predicate_results):
+    """Combine entity/predicate results inside one OVAL State."""
+    return aggregate_operator(operator, predicate_results)
+
+
+def aggregate_item_states(state_operator, state_results):
+    """Combine multiple referenced State results for one collected item."""
+    return aggregate_operator(state_operator, state_results)
