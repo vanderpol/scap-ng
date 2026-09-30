@@ -73,3 +73,7 @@ Owner direction, 2026-09-30: Tailoring SHALL have an obvious human-readable `pur
 6. Before reviewer handoff, compare both generator output and consumer behavior against every settled decision above. Run a full round trip after the accepted source grammar is implemented end-to-end.
 
 Provenance: **Evidence/Audit** of owner decisions and observed regressions; no external redesign proposal supersedes the established model.
+
+## Complete current-design corpus regression
+
+[2026-09-30 checkpoint](../evidence/full-current-roundtrip-2026-09-30/README.md): all 65 pinned NIWC Current packages accounted for, 11,628 of 11,973 definition occurrences comparator-equal; 204 deprecated-Test, 132 publisher-extension and 9 confirmed source type-binding blockers. All regenerated package XSD and source-relative Schematron steps pass. Separate Self-Assertion has 165 of 167 equal with only 2 expected deprecated-Test blockers. Fresh full RHEL9 and current contract suites pass on Windows/Linux. The run fixed the historical-mode coverage gap, renamed Collection documentation guard, lexical QName diagnostic comparison and masked Schematron pipeline errors. This is conversion evidence, not target runtime equivalence; the complete census remains red for the explicitly documented source type errors.
