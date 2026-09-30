@@ -61,10 +61,11 @@ def main():
     names=[
         "oval-common-schema.xsd",
         "oval-definitions-schema.xsd",
-        "independent-definitions-schema.xsd",
-        "unix-definitions-schema.xsd",
-        "linux-definitions-schema.xsd",
     ]
+    names += sorted(
+        p.name for p in args.schemas.glob("*-definitions-schema.xsd")
+        if p.name != "oval-definitions-schema.xsd"
+    )
     paths=[args.schemas/n for n in names]
     schema=build_schema(paths)
     validator=isoschematron.Schematron(schema,store_report=True)
