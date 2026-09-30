@@ -65,7 +65,7 @@ python tools/test_tailoring_example.py
 
 The small resolver validates the examples' bindings and policy boundaries and records per-layer provenance. It does not execute Assessment Requests, evaluate targets, enforce a finalized NG schema, or implement complete missing-input result semantics. Assessment identities come from document contents; Rule filenames do not establish identity. Parent source paths and Assessment paths are explicit and bounded.
 
-Eleven regressions cover the expected five-Rule outcome, no-Profile behavior, actual RHEL9 bindings, mismatched publication, same-layer conflicts, unknown selectors, invalid Parameter values, Organizational Input separation, prohibited execution mutations, parent identity/cycles and filename-independent Rule lookup. All passed locally.
+Eleven regressions cover the expected five-Rule outcome, no-Profile behavior, actual RHEL9 bindings, mismatched publication, same-layer conflicts, unknown selectors, invalid Parameter values, Organizational Input separation, prohibited execution mutations, parent identity/cycles and filename-independent Rule lookup. All passed locally and on Windows/Linux in [CI run 36783808173](https://github.com/vanderpol/scap-ng/actions/runs/36783808173). See [validation.json](validation.json).
 
 ## Rebase is a workflow
 
