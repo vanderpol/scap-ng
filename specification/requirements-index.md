@@ -95,3 +95,31 @@ this index:
 **Specification navigation:** [← Previous: SCAP-NG Terminology](terminology.md) · [Contents](README.md) · [Next: Conformance →](core/conformance.md)
 
 <!-- spec-nav:end -->
+
+
+## OVAL schema-to-assessor specification program
+
+The OVAL 5.12.3 XSD/Schematron semantics extraction starts during iteration
+003. The project SHALL track each inherited semantic requirement to its
+upstream schema/constraint anchor and to an NG model location, implementation
+status, and conformance test. This does **not** mandate copying the XML schemas
+or all their annotations verbatim into the native NG specification.
+
+Priority order:
+
+1. graph, reference, criteria, class, and result semantics;
+2. Test/Object/State, existence, states, comparisons, quantifiers, sets,
+   filters, behaviors and schema defaults;
+3. variable kinds, allowed values/restrictions, functions and dataflow;
+4. per-family and per-capability entity typing and schema constraints;
+5. collector execution rules, complete error/unknown propagation and
+   target-evaluation conformance; and
+6. results, evidence and operational security rules.
+
+Generic assessor semantics supported by schema and comparative evidence
+SHOULD enter the draft now. Platform-specific execution details SHOULD remain
+provisional until reference-scanner behavior and differential fixtures
+support normative claims.
+
+The complete discovery ledger and staged proof gates are in
+[OVAL-derived specification lessons](../research/iterations/003/design/oval-derived-specification-lessons.md).
