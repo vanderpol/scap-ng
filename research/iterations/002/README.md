@@ -135,3 +135,7 @@ That checkpoint is the guard against treating iteration-001 or earlier
 iteration-002 generated behavior as authoritative when it conflicts with the
 current split policy/assessment architecture, lossless-conversion requirement,
 check-selector semantics, result/evidence model, or authoring decisions.
+
+## Medium-range backlog
+
+- [Content-authoring prototype](BACKLOG_CONTENT_AUTHORING_PROTOTYPE.md) — author workflow prototype, scheduled after effective-default auditing and substantial semantic round-trip verification; not part of the current validation milestone.
