@@ -48,6 +48,7 @@ _DOCUMENTATION_FIELDS = {
     "assessment_title",
     "test_title",
     "object_title",
+    "collection_title",
     "state_title",
     "title",
     "description",
