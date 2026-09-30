@@ -1,0 +1,55 @@
+name: Inspect corpus type-binding blockers
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/scap-ng-inspect-corpus-blockers.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 lxml==6.1.1
+      - name: Compare source type bindings and historical/current lowering
+        run: |
+          python - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, "tools")
+          from scap_upconvert_v003.convert_collection_review import source_components
+          from scap_upconvert_v003.build_rhel9_review_slice import lower_definition, local
+          from scap_ng_roundtrip_v003.audit_test_object_state_types import audit_source
+          for label in ("F5_NGINX", "MS_IIS_10-0_Site", "MS_IIS_8-5_Site"):
+              package = next(Path("niwc/Current").glob("U_"+label+"_*SCAP_1-4_Benchmark*.zip"))
+              _, root = source_components(package)
+              index = {n.get("id"): n for n in root.iter() if n.get("id")}
+              source_audit = audit_source(package)
+              filters = []
+              for obj in root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}objects"):
+                  for f in obj.iter():
+                      if local(f.tag) != "filter": continue
+                      state = index.get((f.text or "").strip())
+                      if state is not None:
+                          filters.append({"object":obj.get("id"),"object_type":obj.tag,
+                                          "state":state.get("id"),"state_type":state.tag,
+                                          "action":f.get("action","exclude")})
+              blocked = []
+              for definition in root.find("{http://oval.mitre.org/XMLSchema/oval-definitions-5}definitions"):
+                  did = definition.get("id")
+                  _, current = lower_definition(root, did, "diagnostic", collection_graph=True)
+                  if not current: continue
+                  _, historical = lower_definition(root, did, "diagnostic")
+                  blocked.append({"definition":did,"current_error":current,"historical_error":historical})
+              print(json.dumps({"package":package.name,"source_type_audit":source_audit,
+                                "source_filter_bindings":filters,"blocked":blocked},indent=2))
+          PY
