@@ -36,7 +36,7 @@ def catalog(folder):
             if not isinstance(node.tag, str):
                 continue
             kind = ET.QName(node).localname
-            if kind in {"complexType", "attributeGroup", "attribute"} and node.get("name"):
+            if kind in {"complexType", "simpleType", "attributeGroup", "attribute"} and node.get("name"):
                 definitions[(namespace, kind, node.get("name"))].append((path.name, node))
     return definitions
 
@@ -142,7 +142,16 @@ def effective_type_attributes(definitions, namespace, typename):
                     blockers.append({"reason": "unknown_base_namespace",
                                      "reference": base_name, "file": path})
                 else:
-                    inherited, failed = resolve("complexType", base)
+                    # XSD simpleContent may extend a named *simpleType*;
+                    # that base contributes no inherited attributes.
+                    # complexContent must still resolve a complexType.
+                    simple = definitions.get((base[0], "simpleType", base[1]), [])
+                    if (bases[0].tag == XS + "simpleContent"
+                            and len(simple) == 1
+                            and not definitions.get((base[0], "complexType", base[1]))):
+                        inherited, failed = {}, []
+                    else:
+                        inherited, failed = resolve("complexType", base)
                     attrs.update(inherited)
                     blockers.extend(failed)
 
