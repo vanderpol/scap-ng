@@ -123,7 +123,38 @@ class Model:
             if len(kids)!=1: raise ValueError(f"{vid}: expected one expression")
             out=head+(self.component(kids[0]),)
         elif local=="external_variable":
-            out=head
+            alternatives=[]
+            for child in e:
+                _,child_local=split(child.tag)
+                if child_local=="notes":
+                    continue
+                if child_local=="possible_value":
+                    alternatives.append((
+                        "possible_value",
+                        child.attrib.get("hint",""),
+                        sval(child.text),
+                    ))
+                elif child_local=="possible_restriction":
+                    restrictions=[]
+                    for item in child:
+                        _,item_local=split(item.tag)
+                        if item_local!="restriction":
+                            raise ValueError(
+                                f"{vid}: unsupported possible_restriction child {item_local}"
+                            )
+                        restrictions.append((
+                            item.attrib.get("operation"),
+                            sval(item.text),
+                        ))
+                    alternatives.append((
+                        "possible_restriction",
+                        child.attrib.get("operator","AND"),
+                        child.attrib.get("hint",""),
+                        tuple(sorted(restrictions,key=repr)),
+                    ))
+                else:
+                    raise ValueError(f"{vid}: unsupported external variable child {child_local}")
+            out=head+(tuple(sorted(alternatives,key=repr)),)
         else: raise ValueError(f"unsupported variable {local}")
         self.memo[key]=out; return out
 
