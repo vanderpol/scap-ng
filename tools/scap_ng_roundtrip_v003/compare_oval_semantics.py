@@ -45,6 +45,11 @@ class Model:
               e.attrib.get("entity_check","all"))
         vr=e.attrib.get("var_ref")
         if vr: return base+("var",self.variable(vr))
+        text=sval(e.text).strip()
+        # independent:variable_object uses <var_ref>VARIABLE_ID</var_ref>
+        # instead of the ordinary var_ref attribute form.
+        if local=="var_ref" and text in self.vars:
+            return base+("var",self.variable(text))
         return base+("value",sval(e.text))
 
     def component(self,e):
