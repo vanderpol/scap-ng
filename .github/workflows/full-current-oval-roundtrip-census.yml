@@ -6,15 +6,18 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/full-current-oval-roundtrip-census.yml"
-      # Run the published NIWC corpus after converter and semantic audit changes,
-      # not only after edits to this workflow itself.
+      # The 65-package matrix is expensive: trigger only for files that
+      # participate in the production round trip, not audit-only tooling or
+      # synthetic fixtures. Audit changes run the separate XSD audit workflow.
       - "tools/scap_upconvert_v003/**"
-      - "tools/scap_ng_roundtrip_v003/**"
+      - "tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py"
+      - "tools/scap_ng_roundtrip_v003/native_assessment_to_oval.py"
+      - "tools/scap_ng_roundtrip_v003/compare_oval_semantics.py"
+      - "tools/scap_ng_roundtrip_v003/compare_schematron_baseline.py"
+      - "tools/scap_ng_roundtrip_v003/build_full_oval_omni.py"
+      - "tools/scap_ng_roundtrip_v003/summarize_niwc_census.py"
       - "tools/scap14_rule_splitter.py"
       - "tools/oval_semantic_ir.py"
-      - "tools/oval_xsd_default_inventory.py"
-      - "tools/test_oval_effective_attributes.py"
-      - "tools/test_state_entity_roundtrip.py"
 
 # Only the newest revision needs the expensive complete NIWC matrix.
 concurrency:
