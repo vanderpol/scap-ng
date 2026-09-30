@@ -18,10 +18,12 @@ def q(ns, local):
 
 def build_schema(paths):
     schema=E.Element(q(SCH,"schema"),nsmap={"sch":SCH},queryBinding="xslt")
+    sources=[E.parse(str(path)) for path in paths]
     seen={}
-    index=0
-    for path in paths:
-        source=E.parse(str(path))
+    # ISO Schematron requires namespace declarations before pattern elements.
+    # Collect namespaces across every source XSD first; appending a later XSD's
+    # sch:ns after an earlier XSD's patterns produces an invalid schema.
+    for source in sources:
         for e in source.iter(q(SCH,"ns")):
             prefix=e.get("prefix"); uri=e.get("uri")
             if prefix in seen and seen[prefix]!=uri:
@@ -29,6 +31,8 @@ def build_schema(paths):
             if prefix not in seen:
                 n=E.SubElement(schema,q(SCH,"ns"))
                 n.set("prefix",prefix); n.set("uri",uri); seen[prefix]=uri
+    index=0
+    for source in sources:
         for e in source.iter(q(SCH,"pattern")):
             c=deepcopy(e)
             c.set("id",f"roundtrip-{index}-{c.get('id') or 'unnamed'}")
