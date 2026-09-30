@@ -298,6 +298,39 @@ conversion evidence/provenance even when it is not emitted into native
 Assessment semantics.
 
 
+## OVAL-derived collection behavior contracts
+
+**Status: compatibility requirement; schema-wide and execution conformance
+coverage is still open.**
+
+Each supported native Collection Capability SHALL define a typed, versioned
+behavior contract: its allowed settings, allowed values, effective defaults,
+validity conditions, collection/existence/error effects and supported
+combinations. SCAP-NG SHALL NOT make authors rely on undocumented
+collector-specific defaults.
+
+Stage-1 migration SHALL preserve all behavior settings explicitly provided by
+the source and SHALL materialize behavior defaults **only when their effective
+meaning is established for the relevant OVAL Object type**. Absence of the
+optional `behaviors` element SHALL NOT automatically be assumed equivalent to
+an empty element or a partially specified element without verifying the source
+language's omission semantics.
+
+Native Collection authoring SHOULD expose applicable effective behaviors with
+concrete values. Conversion provenance SHALL distinguish values explicitly
+authored in OVAL from values inferred through a documented default. If a
+behavior is unsupported or its effective semantics cannot be established,
+migration SHALL report the affected Definition instead of silently choosing a
+default.
+
+Conformance tests SHALL distinguish XML attribute preservation from actual
+collector behavior and SHALL cover conditional semantics (for example,
+`max_depth=-1` does not enable recursion when
+`recurse_direction=none`), inherited behavior types, error-flagging options,
+regular-expression modes and item-existence/creation behaviors.
+
+See [the OVAL Object behaviors audit](../../research/iterations/003/design/oval-object-behaviors-audit.md).
+
 ## Derived requirements from OVAL 5.12.3 round-trip evidence
 
 This section captures provisional assessor contracts supported by iterative
