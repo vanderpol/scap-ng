@@ -109,14 +109,57 @@ Pinned NIWC SCAP 1.4 corpus:
 
 ### Windows 11 published benchmark
 
-The Windows 11 platform expansion passes:
+- 477 definitions.
+- 475/477 are standard, nonblocked definitions and round-trip semantically.
+- 2 definitions are explicit deprecated-OVAL-test blockers.
+- Regenerated standard closures are XSD-valid.
+- New Schematron findings: 0.
+- Maximum observed dependency depth: 6.
 
-- published SCAP split into per-rule OVAL dependency closures;
-- all nonblocked definitions round-trip semantically;
-- regenerated closures are XSD-valid;
-- source-baselined Schematron comparison passes;
-- deprecated OVAL test types remain explicit conversion blockers rather than
-  being silently translated.
+### Windows Server 2025 published benchmark
+
+- 501 definitions.
+- 500/501 are standard, nonblocked definitions and round-trip semantically.
+- 1 definition is an explicit deprecated-OVAL-test blocker.
+- Regenerated standard closures are XSD-valid.
+- New Schematron findings: 0.
+- Maximum observed dependency depth: 6.
+
+### Diverse platform breadth gate
+
+The following additional pinned NIWC SCAP 1.4 benchmarks have passed native
+round-trip semantic comparison, authoritative XSD validation, and source-
+baselined Schematron comparison for every nonblocked standard OVAL Definition:
+
+- Apple macOS 15;
+- Ubuntu 24.04 LTS;
+- Solaris 11 x86;
+- Apache HTTP Server 2.4 UNIX Server;
+- Apache Tomcat 9;
+- Microsoft IIS 10;
+- Google Chrome;
+- Kubernetes; and
+- F5 nginx.
+
+The nginx corpus exposed and now regression-tests an important lossless-model
+requirement: OVAL Test, Object, and State capabilities SHALL be preserved
+independently. The converter SHALL NOT retag a referenced Object or State merely
+to match the Test family.
+
+### SQL Server 2022 publisher-extension boundary
+
+The SQL Server 2022 Instance corpus uses `sqlext_test`, `sqlext_object`, and
+`sqlext_state` in the Independent namespace. These elements exist in the
+SCC/NIWC-augmented bundled schema copy but are absent from the pinned
+authoritative upstream OVAL 5.12.3 Independent schema.
+
+Therefore they are not treated as standard OVAL 5.12.3 by the generic
+converter. The converter derives its standard Test/Object/State vocabulary from
+the pinned upstream schemas and SHALL report such elements as explicit
+`nonstandard_oval_element` publisher-extension blockers. A future SCC/NIWC
+publisher profile MAY map `sqlext` to an explicitly namespaced SCAP-NG SQL
+assessment capability once its extension semantics and reverse mapping are
+formally defined.
 
 ## Intentional semantic-preserving normalizations
 
