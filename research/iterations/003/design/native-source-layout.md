@@ -59,13 +59,13 @@ once exact reuse is demonstrated.
 Source and sample results SHALL remain in different top-level directories.
 
 
-## Rule, Policy, and Assessment file resolution (candidate for implementation)
+## Rule, Policy, and Assessment file resolution (accepted design; implementation pending)
 
 The generated `rhel9-full` currently stores shorthand Assessment IDs directly
 on Rules. That is a transitional converter output, **not** the approved
 authoring resolution model. See [issue #31](https://github.com/vanderpol/scap-ng/issues/31).
 
-For iteration 003 the proposed source contract is:
+For iteration 003 the agreed source contract is:
 
 - `rules/<rule-id>.rule.yaml` has a `policy` field containing an **explicit
   relative path** to a source Policy YAML file.
@@ -80,15 +80,15 @@ For iteration 003 the proposed source contract is:
 - The compiler emits an explicit ID/version → package member/integrity-digest
   binding. Compiled assessors resolve only through that binding, not filename
   guesses. Two selectors MAY point to one Assessment.
-- Alternate ID-only authoring requires a separate defined registry; until
-  such a registry exists an identifier by itself is not a resolvable source
-  reference.
+- A separate author-maintained Assessment index SHALL NOT be required for
+  locating YAML sources. An ID-only source reference SHALL NOT be inferred
+  from filenames or directory layout.
 
 The existing Benchmark `applicability_catalog` field is an example of a
 path-based source reference; the applicability registry still names
 applicability IDs and their assessment bindings.
 
-Illustrative proposed source: 
+Illustrative accepted authoring syntax (not yet generated): 
 
 ```yaml
 # rules/SV-257777.rule.yaml
