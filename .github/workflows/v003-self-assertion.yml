@@ -34,12 +34,29 @@ jobs:
         run: |
           python scap-ng/tools/scap_upconvert_v003/check_self_assertion.py             --corpus self-assertion/SCAP_1.4/OVAL_Test_Content             --output self-assertion-v003-report.json             --inventory-only
 
-      - name: Upload full Self-Assertion conversion report
+      - name: Round-trip every Self-Assertion definition through native v003
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
+            --corpus self-assertion/SCAP_1.4/OVAL_Test_Content \
+            --out roundtrip-out \
+            --report self-assertion-v003-roundtrip.json \
+            --inventory-only
+
+      - name: Upload full Self-Assertion reports
         uses: actions/upload-artifact@v4
         with:
-          name: self-assertion-v003-report
-          path: self-assertion-v003-report.json
+          name: self-assertion-v003-reports
+          path: |
+            self-assertion-v003-report.json
+            self-assertion-v003-roundtrip.json
 
       - name: Enforce zero unexplained v003 conversion failures
         run: |
           python scap-ng/tools/scap_upconvert_v003/check_self_assertion.py             --corpus self-assertion/SCAP_1.4/OVAL_Test_Content             --output self-assertion-v003-report.json
+
+      - name: Enforce zero semantic round-trip differences
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
+            --corpus self-assertion/SCAP_1.4/OVAL_Test_Content \
+            --out roundtrip-out \
+            --report self-assertion-v003-roundtrip.json
