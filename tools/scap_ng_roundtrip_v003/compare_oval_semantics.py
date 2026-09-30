@@ -94,6 +94,8 @@ class Model:
             kids=list(e)
             if len(kids)!=1: raise ValueError(f"{vid}: expected one expression")
             out=head+(self.component(kids[0]),)
+        elif local=="external_variable":
+            out=head
         else: raise ValueError(f"unsupported variable {local}")
         self.memo[key]=out; return out
 
@@ -107,8 +109,19 @@ class Model:
         self.memo[key]=out; return out
 
     def setexpr(self,e):
+        members=[]
+        for c in e:
+            ns,local=split(c.tag)
+            if ns==OD and local=="object_reference":
+                members.append(("object",self.obj(c.text.strip())))
+            elif ns==OD and local=="set":
+                members.append(("set",self.setexpr(c)))
+            elif ns==OD and local=="filter":
+                continue
+            else:
+                raise ValueError(f"unsupported set child {local}")
         return ("set",e.attrib.get("set_operator","UNION"),
-                tuple(self.obj(c.text.strip()) for c in e.findall(f"{{{OD}}}object_reference")),
+                tuple(members),
                 tuple((f.attrib.get("action","exclude"),self.state(f.text.strip()))
                       for f in e.findall(f"{{{OD}}}filter")))
 
