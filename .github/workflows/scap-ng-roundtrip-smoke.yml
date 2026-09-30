@@ -6,6 +6,8 @@ on:
       - 'research/iterations/003/examples/oval-ng-roundtrip-stress/**'
       - 'tools/scap_ng_roundtrip_v003/**'
       - '.github/workflows/scap-ng-roundtrip-smoke.yml'
+      - 'tools/oval_semantic_ir.py'
+      - 'tools/test_oval_effective_attributes.py'
   pull_request:
     paths:
       - 'research/iterations/003/examples/oval-ng-roundtrip-stress/**'
@@ -34,6 +36,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libxml2-utils
           python -m pip install lxml
+
+      - name: Regression tests for effective and explicit OVAL attributes
+        run: |
+          python scap-ng/tools/test_oval_effective_attributes.py
+          python scap-ng/tools/scap_ng_roundtrip_v003/test_explicit_semantics.py
 
       - name: Reverse-generate OVAL stress fixtures
         run: |
