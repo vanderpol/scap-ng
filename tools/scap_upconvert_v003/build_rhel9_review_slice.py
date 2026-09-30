@@ -1139,6 +1139,40 @@ def lower_definition(oroot, definition_id, assessment_id):
         return None, f"unsupported_variable_component:{name}"
 
     def lower_entity_value(node):
+        children = [child for child in node if local(child.tag) == "field"]
+        if children:
+            fields = []
+            for child in children:
+                var_ref = child.get("var_ref")
+                if var_ref:
+                    native_id, error = ensure_variable(var_ref)
+                    if error:
+                        return None, error
+                    value = {"variable": native_id}
+                else:
+                    raw = oval_value_text(child)
+                    value = "" if raw is None else raw
+                item = {
+                    "name": child.get("name"),
+                    "value": value,
+                }
+                for source, target in (
+                    ("operation", "operation"),
+                    ("datatype", "datatype"),
+                    ("var_check", "variable_check"),
+                    ("entity_check", "entity_check"),
+                    ("mask", "mask"),
+                ):
+                    if child.get(source) is not None:
+                        raw_attr = child.get(source)
+                        item[target] = (
+                            raw_attr.lower() == "true"
+                            if source == "mask"
+                            else raw_attr
+                        )
+                fields.append(item)
+            return {"record": fields}, None
+
         var_ref = node.get("var_ref")
         if not var_ref and local(node.tag) == "var_ref":
             var_ref = text(node)
@@ -1293,6 +1327,12 @@ def lower_definition(oroot, definition_id, assessment_id):
                 attrs["datatype"] = child.get("datatype")
             if child.get("mask"):
                 attrs["mask"] = child.get("mask").lower() == "true"
+            nil_value = next(
+                (value for key, value in child.attrib.items() if local(key) == "nil"),
+                None,
+            )
+            if nil_value is not None:
+                attrs["nil"] = nil_value.lower() == "true"
             if attrs:
                 attrs["value"] = value
                 item = attrs
