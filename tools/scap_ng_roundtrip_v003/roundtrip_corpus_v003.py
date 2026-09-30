@@ -41,6 +41,50 @@ def definition_nodes(root):
 def safe_name(value):
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", value)
 
+def dependency_depth(root, definition_id):
+    by_id = {
+        node.get("id"): node
+        for node in root.iter()
+        if node.get("id")
+    }
+    ids = set(by_id)
+
+    def refs(node):
+        out=set()
+        for item in node.iter():
+            for value in item.attrib.values():
+                if value in ids:
+                    out.add(value)
+            text=(item.text or "").strip()
+            if text in ids:
+                out.add(text)
+        return out
+
+    graph={
+        node_id: refs(node)-{node_id}
+        for node_id,node in by_id.items()
+    }
+    memo={}
+    visiting=set()
+
+    def walk(node_id):
+        if node_id in memo:
+            return memo[node_id]
+        if node_id in visiting:
+            return (0,[node_id,"<cycle>"])
+        visiting.add(node_id)
+        best=(0,[node_id])
+        for target in sorted(graph.get(node_id,())):
+            depth,path=walk(target)
+            cand=(1+depth,[node_id]+path)
+            if cand[0] > best[0]:
+                best=cand
+        visiting.remove(node_id)
+        memo[node_id]=best
+        return best
+
+    return walk(definition_id)
+
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--corpus",type=Path,required=True)
@@ -72,7 +116,13 @@ def main():
         for definition in definition_nodes(root):
             total+=1
             did=definition.get("id")
-            row={"file":rel,"definition_id":did}
+            depth,path=dependency_depth(root,did)
+            row={
+                "file":rel,
+                "definition_id":did,
+                "dependency_depth":depth,
+                "dependency_path":path,
+            }
             unsupported=unsupported_definition_features(root,did)
             if unsupported:
                 row["stage"]="lower"
@@ -142,10 +192,15 @@ def main():
     for row in failures:
         by_stage[row.get("stage","unknown")]=by_stage.get(row.get("stage","unknown"),0)+1
 
+    deepest=max(rows,key=lambda r:r.get("dependency_depth",0),default=None)
     report={
         "files":len(sources),
         "definitions":total,
         "semantic_equal":equal,
+        "max_dependency_depth":deepest.get("dependency_depth",0) if deepest else 0,
+        "deepest_dependency_file":deepest.get("file") if deepest else None,
+        "deepest_dependency_definition":deepest.get("definition_id") if deepest else None,
+        "deepest_dependency_path":deepest.get("dependency_path",[]) if deepest else [],
         "failures":len(failures),
         "failures_by_stage":dict(sorted(by_stage.items())),
         "parse_failures":parse_failures,
