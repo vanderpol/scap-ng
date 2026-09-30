@@ -20,6 +20,30 @@ def dump(path, doc):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump(doc, allow_unicode=True, sort_keys=False, width=110), encoding="utf-8")
 
+def resolve_source_ref(package_root, source_file, reference, document_kind, expected_id):
+    """Resolve explicit relative authoring path inside the source package.
+
+    Logical identity comes from document contents, never from filename.
+    Reject absolute/missing/escaping/ambiguous references rather than guessing.
+    """
+    if not isinstance(reference, str) or not reference or Path(reference).is_absolute():
+        raise ValueError(f"Invalid {document_kind} source path: {reference!r}")
+    if "\\\\" in reference or "\\x00" in reference:
+        raise ValueError(f"Invalid portable source path: {reference!r}")
+    root = package_root.resolve()
+    target = (source_file.parent / reference).resolve()
+    if not target.is_relative_to(root):
+        raise ValueError(f"Reference escapes benchmark package: {reference!r}")
+    if not target.is_file():
+        raise ValueError(f"Missing referenced source file: {target}")
+    doc = load(target)
+    if not isinstance(doc, dict) or not isinstance(doc.get(document_kind), dict):
+        raise ValueError(f"Wrong referenced document type: {target}")
+    if doc[document_kind].get("id") != expected_id:
+        raise ValueError(f"Referenced {document_kind} identity mismatch: {target}")
+    return target
+
+
 def rule_ids_in_groups(groups):
     ids = []
     def visit(item):
@@ -57,6 +81,7 @@ def main():
     source_rule_ids=set()
     policy_ids=set()
     selected_assessments=set()
+    validated_source_paths=0
     issues=[]
     variants={"automated":0,"manual_only":0,"both":0,"other":0}
     for path in rule_paths:
@@ -74,6 +99,7 @@ def main():
             raise ValueError(f"Unresolved default selector: {rid}: {default!r}")
         if default=="default" and checks.get("default") not in checks.values():
             raise ValueError(f"Missing default implementation: {rid}")
+        typed_checks={}
         for selector, target in checks.items():
             if not isinstance(target,str) or not target:
                 raise ValueError(f"Invalid check target: {rid} {selector}")
@@ -89,6 +115,10 @@ def main():
             if assessment["id"]!=target:
                 raise ValueError(f"Assessment identity mismatch: {rid}:{selector}")
             selected_assessments.add(target)
+            # Input is the old ID-only review source. Output authoring
+            # references must be explicit paths relative to Policy.
+            explicit="../"+assessment_file.relative_to(output).as_posix()
+            typed_checks[selector]={"assessment":explicit}
         variant=("both" if "automated" in checks and "manual" in checks
                  else "automated" if "automated" in checks
                  else "manual_only" if "manual" in checks else "other")
@@ -101,12 +131,20 @@ def main():
             "id": policy_id,
             "version":rule.get("version"),
             "title": rule.get("title"),
-            "checks":checks,
+            "checks":typed_checks,
             "default_check":default,
         }
-        dump(output/"policies"/(rid+".policy.yaml"),{"policy":policy})
-        rule["policy"] = "policies/"+rid+".policy.yaml"
-        dump(output/"rules"/path.name,document)
+        policy_file=output/"policies"/(rid+".policy.yaml")
+        rule_file=output/"rules"/path.name
+        dump(policy_file,{"policy":policy})
+        rule["policy"] = "../policies/"+rid+".policy.yaml"
+        dump(rule_file,document)
+        resolve_source_ref(output,rule_file,rule["policy"],"policy",policy_id)
+        validated_source_paths+=1
+        for selector, ref in typed_checks.items():
+            resolve_source_ref(output,policy_file,ref["assessment"],
+                               "assessment",checks[selector])
+            validated_source_paths+=1
 
     if len(source_rule_ids)!=445:
         raise ValueError(f"Expected 445 source Rules; observed {len(source_rule_ids)}")
@@ -139,6 +177,7 @@ def main():
         "output":str(output),
         "rule_count":len(source_rule_ids),
         "policy_count":len(policy_ids),
+        "validated_explicit_paths":validated_source_paths,
         "assessment_file_count":len(list((output/"assessments").rglob("*.assessment.yaml"))),
         "referenced_check_assessment_count":len(selected_assessments),
         "groups_membership_unique":len(set(group_ids)),
@@ -149,6 +188,7 @@ def main():
             "Policy files are one-per-Rule transitional ownership objects; no unproven cross-platform policy reuse.",
             "Assessments copied byte-for-byte from tested baseline; no independent runtime parity claim.",
             "No compiled split-policy package yet; benchmark/Rule/Policy/Assessment review source only.",
+            "All generated Rule-to-Policy and Policy-to-Assessment authoring paths are explicit and resolved.",
         ]
     }
     rp=Path(args.report);rp.parent.mkdir(parents=True,exist_ok=True)
