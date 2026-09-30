@@ -1363,6 +1363,11 @@ def lower_definition(oroot, definition_id, assessment_id):
             }
             if child.get("entity_check"):
                 item["entity_check"] = child.get("entity_check")
+            # State entity existence is independent of Test check_existence.
+            # Only preserve explicit source values; the semantic comparator
+            # resolves documented omission defaults independently.
+            if child.get("check_existence") is not None:
+                item["entity_existence"] = child.get("check_existence")
             if child.get("var_check"):
                 item["variable_check"] = child.get("var_check")
             if child.get("datatype"):
