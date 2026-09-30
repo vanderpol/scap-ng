@@ -1164,7 +1164,13 @@ def lower_definition(oroot, definition_id, assessment_id):
         elif len(conditions) == 1:
             condition = conditions[0]
         else:
-            condition = {"all": conditions}
+            state_operator = (state.get("operator") or "AND").upper()
+            if state_operator == "AND":
+                condition = {"all": conditions}
+            elif state_operator == "OR":
+                condition = {"any": conditions}
+            else:
+                return None, node_title(state), f"unsupported_state_operator:{state_operator}"
         return condition, node_title(state), None
 
     def lower_filter(filter_node):
