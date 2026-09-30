@@ -57,6 +57,12 @@ class StateEntityRoundTripTests(unittest.TestCase):
         self.assertEqual(test.get("check_existence"), "at_least_one_exists")
         self.assertEqual(state_entity.get("check_existence"), "none_exist")
 
+    def test_required_test_check_is_not_invented(self):
+        source = ET.fromstring(SOURCE.replace('check="all" ', ''))
+        native, error = lower_definition(source, "oval:example:def:1", "invalid-check")
+        self.assertIsNone(native)
+        self.assertEqual(error, "invalid_oval_missing_required_test_check")
+
     def test_default_absence_remains_unmaterialized_in_native(self):
         source = ET.fromstring(SOURCE.replace(' check_existence="none_exist"', ""))
         native, error = lower_definition(source, "oval:example:def:1", "default-cardinality")
