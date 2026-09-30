@@ -6,7 +6,7 @@ Usage:
    --schemas oval-language/oval-schemas --out work/oval-xsd-default-audit
 """
 from __future__ import annotations
-import argparse, collections, csv, json, re
+import argparse, collections, csv, hashlib, json, re
 from pathlib import Path
 from lxml import etree as ET
 
@@ -35,13 +35,15 @@ def main():
     args=ap.parse_args()
     paths=sorted(args.schemas.glob("*.xsd"))
     if len(paths)<45: raise SystemExit(f"Expected upstream complete OVAL 5.12.3 schema set, found {len(paths)}")
-    defaults=[]; inherited=[]; optional=[]; annotations=[]; rules=[]
+    defaults=[]; fixed=[]; inherited=[]; attribute_groups=[]; optional=[]; annotations=[]; rules=[]
+    source_hashes={}
     errors=[]
     for path in paths:
         try: root=ET.parse(str(path)).getroot()
         except ET.XMLSyntaxError as exc:
             errors.append({"file":path.name,"error":str(exc)})
             continue
+        source_hashes[path.name]=hashlib.sha256(path.read_bytes()).hexdigest()
         target=root.get("targetNamespace","")
         for node in root.iter():
             # lxml includes comments and processing instructions in iter().
@@ -52,6 +54,14 @@ def main():
             if tag in ("attribute","element") and node.get("default") is not None:
                 defaults.append({**location(path,node),"kind":tag,"name":node.get("name") or node.get("ref"),
                      "default":node.get("default"),"targetNamespace":target})
+            if tag in ("attribute","element") and node.get("fixed") is not None:
+                fixed.append({**location(path,node),"kind":tag,
+                    "name":node.get("name") or node.get("ref"),
+                    "fixed":node.get("fixed"),"targetNamespace":target})
+            if tag=="attributeGroup":
+                attribute_groups.append({**location(path,node),"name":node.get("name"),
+                    "ref":node.get("ref"),"targetNamespace":target,
+                    "status":"unresolved" if node.get("ref") else "declaration"})
             if tag in ("extension","restriction") and node.get("base"):
                 inherited.append({**location(path,node),"base":node.get("base")})
             if tag=="element" and node.get("minOccurs")=="0":
@@ -68,13 +78,19 @@ def main():
     def save(name, data):
         (args.out/name).write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     save("explicit-defaults.json",defaults)
+    save("fixed-values.json",fixed)
+    save("attribute-group-links.json",attribute_groups)
+    save("source-sha256.json",source_hashes)
     save("type-inheritance.json",inherited)
     save("optional-elements.json",optional)
     save("semantic-documentation.json",annotations)
     save("schematron-assertions.json",rules)
     save("parse-errors.json",errors)
     summary={"upstream_xsd_files":len(paths),"parse_errors":len(errors),
-       "explicit_defaults":len(defaults),"inheritance_relations":len(inherited),
+       "explicit_defaults":len(defaults),"fixed_values":len(fixed),
+       "attribute_group_references":sum(bool(x["ref"]) for x in attribute_groups),
+       "attribute_group_declarations":sum(bool(x["name"]) for x in attribute_groups),
+       "inheritance_relations":len(inherited),
        "optional_elements":len(optional),"semantic_annotation_passages":len(annotations),
        "implicit_or_default_documentation_passages":sum(x["default_language"] for x in annotations),
        "embedded_schematron_assertions":len(rules),
@@ -91,7 +107,11 @@ def main():
       "| Source | Line | Attribute/element | Default |","| --- | ---: | --- | --- |"]
     for x in defaults:
         lines.append("| `%s` | %d | `%s` | `%s` |"%(x["file"],x["line"],x["name"],str(x["default"]).replace("|","/")))
-    lines += ["","## Implicit behavioral defaults and existence checks", "",
+    lines += ["", "## Fixed-value declarations and attribute-group references", "",
+      "See `fixed-values.json` and `attribute-group-links.json` for source-anchored",
+      "details. These are inventory entries, NOT proof that type inheritance",
+      "or referenced group composition has been resolved.",
+      "", "## Implicit behavioral defaults and existence checks", "",
       "Review all entries in `semantic-documentation.json`, including the",
       "embedded ExistenceEnumeration evaluation tables and records whose prose",
       "spans several XML lines. Counting only XSD `default=` is not sufficient.",
