@@ -349,7 +349,39 @@ class Builder:
             attrs["comment"] = str(entry["title"])
         kind = entry.get("kind")
         if kind == "external":
-            ET.SubElement(self.variables, q(OD, "external_variable"), attrs)
+            ve = ET.SubElement(self.variables, q(OD, "external_variable"), attrs)
+            validation = (entry.get("input") or {}).get("validation") or {}
+            for alternative in validation.get("alternatives", []):
+                if "literal" in alternative:
+                    pv = ET.SubElement(
+                        ve,
+                        q(OD, "possible_value"),
+                        {"hint": str(alternative.get("hint") or "")},
+                    )
+                    if alternative.get("literal") is not None:
+                        pv.text = scalar(alternative.get("literal"))
+                elif "restriction_group" in alternative:
+                    group = alternative["restriction_group"]
+                    pr = ET.SubElement(
+                        ve,
+                        q(OD, "possible_restriction"),
+                        {
+                            "operator": str(group.get("operator") or "AND").upper(),
+                            "hint": str(group.get("hint") or ""),
+                        },
+                    )
+                    for condition in group.get("conditions", []):
+                        restriction = ET.SubElement(
+                            pr,
+                            q(OD, "restriction"),
+                            {"operation": str(condition.get("operation"))},
+                        )
+                        if condition.get("value") is not None:
+                            restriction.text = scalar(condition.get("value"))
+                else:
+                    raise ValueError(
+                        f"unsupported external-variable validation alternative: {alternative!r}"
+                    )
         elif kind == "constant":
             ve = ET.SubElement(self.variables, q(OD, "constant_variable"), attrs)
             expression = entry.get("expression", {})
