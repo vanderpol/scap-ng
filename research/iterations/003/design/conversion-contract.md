@@ -239,3 +239,29 @@ is native SCAP-NG.
 
 Native-authored SCAP-NG content MAY use a cleaner decomposition than converted
 content, provided both forms have the same defined semantics.
+
+
+### OVAL `extend_definition` normalization
+
+OVAL `extend_definition` is a reusable reference to another Definition's
+criteria graph. In native SCAP-NG assessment source, the converter SHALL
+dereference the referenced Definition and preserve its resulting truth
+semantics rather than reproducing a legacy Definition-reference graph.
+
+Accordingly:
+
+1. the converter SHALL recursively resolve the referenced Definition;
+2. `negate` and `applicability_check` attributes on the
+   `extend_definition` edge SHALL be applied to the dereferenced expression;
+3. cycles SHALL stop conversion with an explicit diagnostic rather than being
+   silently truncated;
+4. the referenced Definition's descriptive metadata SHALL be preserved in
+   provenance but SHALL NOT be required in native assessment truth semantics;
+5. reverse conversion to OVAL MAY serialize the flattened criteria directly and
+   is not required to reconstruct the original `extend_definition` edge; and
+6. semantic comparison SHALL treat the referenced and flattened forms as equal
+   when their truth semantics are identical.
+
+This normalization is `represented_normalized`, not a loss of assessment
+semantics. Structural XML comparison SHALL classify the removal of
+`extend_definition` separately from unexplained differences.
