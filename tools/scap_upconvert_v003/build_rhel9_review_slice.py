@@ -1467,10 +1467,13 @@ def lower_definition(oroot, definition_id, assessment_id):
                 continue
             if error:
                 return None, error
-            if (child.get("negate") or "false").lower() == "true":
-                term = {"not": term}
-            if (child.get("applicability_check") or "false").lower() == "true":
-                term = {"applicability_check": term}
+            # Nested criteria apply their own node attributes recursively.
+            # criterion and extend_definition carry edge attributes here.
+            if kind != "criteria":
+                if (child.get("negate") or "false").lower() == "true":
+                    term = {"not": term}
+                if (child.get("applicability_check") or "false").lower() == "true":
+                    term = {"applicability_check": term}
             terms.append(term)
 
         if not terms:
