@@ -28,6 +28,19 @@ A variable MAY feed another variable, which MAY feed another variable, and so
 on. Implementations SHALL resolve dependencies by reference and SHALL NOT depend
 on source-file order.
 
+“Arbitrarily deep” describes the language's recursive expressiveness, not
+unlimited implementation resources. It SHALL NOT be interpreted as a fixed
+three-layer language limit. Implementation resource exhaustion SHALL be
+reported separately from invalid source and SHALL NOT produce a partial
+Assessment presented as successfully converted. Computation limits are distinct
+from caps on reported evidence. Exact budgets and their configuration remain
+under review in [issue #38](https://github.com/vanderpol/scap-ng/issues/38).
+
+The current v003 feature-accounting pass is iterative. Native lowering still
+uses recursive calls; exceeding Python's available recursion returns
+`conversion_resource_limit:python_recursion` without an Assessment. This is an
+implementation limitation, not a claim that the input violates OVAL.
+
 Direct Variable self-reference remains prohibited as in OVAL. Whether SCAP-NG
 SHALL reject every indirect cross-node dependency cycle is a working proposal
 pending OVAL Board review; see `../board-review/dependency-ordering-and-cycles.md`.

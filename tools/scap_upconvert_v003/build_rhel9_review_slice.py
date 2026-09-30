@@ -901,17 +901,27 @@ def oval_semantic_inventory(oroot):
     }
 
 def unsupported_definition_features(oroot, definition_id):
-    """Return all structurally unsupported constructs reachable from a Definition.
+    """Account for the complete reachable source graph without recursive walks.
 
-    Generic variables, sets, filters, and behaviors are native v003 constructs
-    and therefore are not errors here. This pass is intentionally independent of
-    lowering so diagnostics can enumerate multiple problems instead of masking
-    everything behind the first failure.
+    Filters reference States, and those States can introduce further Variables
+    and Objects. Visited nodes terminate cyclic source graphs for diagnostics;
+    this pass does not decide the Board's general cycle policy or repair source.
+    Native lowering separately refuses cycles it cannot finitely represent.
     """
     findings = []
     seen = set()
-    visited_definitions = set()
-    visited_variables = set()
+    visited = set()
+    index = {}
+    duplicates = set()
+    for section in oroot:
+        if local(section.tag) not in ("definitions", "tests", "objects", "states", "variables"):
+            continue
+        for node in section:
+            source_id = node.get("id")
+            if source_id:
+                if source_id in index:
+                    duplicates.add(source_id)
+                index[source_id] = node
 
     supported_components = {
         "arithmetic", "begin", "concat", "count", "end", "escape_regex",
@@ -932,149 +942,98 @@ def unsupported_definition_features(oroot, definition_id):
             item["detail"] = detail
         findings.append(item)
 
-    def inspect_variable(var_ref):
-        if not var_ref or var_ref in visited_variables:
-            return
-        visited_variables.add(var_ref)
-        variable = next(
-            (n for n in oroot.iter() if n.get("id") == var_ref and local(n.tag).endswith("_variable")),
-            None,
+    pending = [("definition", definition_id)]
+    while pending:
+        kind, ref = pending.pop()
+        if (kind, ref) in visited:
+            continue
+        visited.add((kind, ref))
+        node = index.get(ref)
+        name = local(node.tag) if node is not None else None
+        expected = name == "definition" if kind == "definition" else bool(
+            name and name.endswith("_" + kind)
         )
-        if variable is None:
-            add("variable_not_found", var_ref)
-            return
-        kind = local(variable.tag)
-        if kind not in ("constant_variable", "local_variable", "external_variable"):
-            add("variable_kind", var_ref, kind)
-            return
-        if kind == "external_variable":
-            # possible_value / possible_restriction are input-validation
-            # semantics, not OVAL ComponentGroup expressions.
-            return
-        for descendant in variable.iter():
-            name = local(descendant.tag)
-            if descendant is variable or name == "value":
-                continue
-            if name.endswith("_variable"):
-                continue
-            if name not in supported_components:
-                add("variable_component", var_ref, name)
-            nested_ref = descendant.get("var_ref")
-            if nested_ref:
-                inspect_variable(nested_ref)
-            # Object-component dependencies are part of the variable graph.
-            # Follow them during feature accounting so a standard-looking
-            # Definition cannot hide a non-standard Object behind
-            # Object -> Variable -> Object chains.
-            if name == "object_component" and descendant.get("object_ref"):
-                inspect_object(descendant.get("object_ref"))
+        if not ref or node is None or not expected:
+            add(kind + "_not_found", ref)
+            continue
+        if ref in duplicates:
+            add("duplicate_oval_id", ref)
+            continue
 
-    def inspect_object(obj_ref):
-        obj = find_by_id(oroot, obj_ref, "_object")
-        if obj is None:
-            add("object_not_found", obj_ref)
-            return
-        obj_ns = obj.tag.split("}", 1)[0].strip("{") if "}" in obj.tag else ""
-        obj_name = local(obj.tag)
-        if (obj_ns, obj_name) not in oval_definition_elements():
-            add(
-                "nonstandard_oval_element",
-                obj_ref,
-                f"{obj_ns}#{obj_name}",
-            )
-        for descendant in obj.iter():
-            var_ref = descendant.get("var_ref")
-            if var_ref:
-                inspect_variable(var_ref)
-            if local(descendant.tag) == "var_ref" and text(descendant):
-                inspect_variable(text(descendant))
-            if local(descendant.tag) == "object_reference" and text(descendant):
-                inspect_object(text(descendant))
-            if local(descendant.tag) == "filter":
-                state_ref = descendant.get("state_ref") or text(descendant)
-                if not state_ref or find_by_id(oroot, state_ref, "_state") is None:
-                    add("filter_state_not_found", obj_ref, state_ref)
+        if kind in ("test", "object", "state"):
+            namespace = node.tag.split("}", 1)[0].strip("{") if "}" in node.tag else ""
+            if (namespace, name) not in oval_definition_elements():
+                add("nonstandard_oval_element", ref, f"{namespace}#{name}")
+            if kind == "test" and (namespace, name) in deprecated_test_types():
+                add("deprecated_oval_test", ref, f"{namespace}#{name}")
 
-    def visit_criteria(node):
-        operator = (node.get("operator") or "AND").upper()
-        if operator not in ("AND", "OR", "ONE", "XOR"):
-            add("criteria_operator", detail=operator)
-        for child in node:
-            kind = local(child.tag)
-            if kind == "criterion":
-                test_ref = child.get("test_ref")
-                test = next(
-                    (n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")),
-                    None,
-                )
-                if test is None:
-                    add("test_not_found", test_ref)
+        if kind == "definition":
+            criteria = next((n for n in node if local(n.tag) == "criteria"), None)
+            if criteria is None:
+                add("missing_criteria", ref)
+                continue
+            for descendant in criteria.iter():
+                child_kind = local(descendant.tag)
+                if child_kind == "criteria":
+                    operator = (descendant.get("operator") or "AND").upper()
+                    if operator not in ("AND", "OR", "ONE", "XOR"):
+                        add("criteria_operator", detail=operator)
+                elif child_kind == "criterion":
+                    pending.append(("test", descendant.get("test_ref")))
+                elif child_kind == "extend_definition":
+                    pending.append(("definition", descendant.get("definition_ref")))
+
+        elif kind == "test":
+            state_refs = []
+            for part in node:
+                part_kind = local(part.tag)
+                if part_kind == "object":
+                    pending.append(("object", part.get("object_ref")))
+                elif part_kind == "state":
+                    state_refs.append(part.get("state_ref"))
+                    pending.append(("state", part.get("state_ref")))
+            operator = (node.get("state_operator") or "AND").upper()
+            if len(state_refs) > 1 and operator not in ("AND", "OR"):
+                add("state_operator", ref, operator)
+
+        elif kind in ("object", "state"):
+            for descendant in node.iter():
+                var_ref = descendant.get("var_ref")
+                if var_ref:
+                    pending.append(("variable", var_ref))
+                child_kind = local(descendant.tag)
+                if kind == "object" and child_kind == "var_ref" and text(descendant):
+                    pending.append(("variable", text(descendant)))
+                elif kind == "object" and child_kind == "object_reference":
+                    pending.append(("object", text(descendant)))
+                elif kind == "object" and child_kind == "filter":
+                    state_ref = descendant.get("state_ref") or text(descendant)
+                    state = index.get(state_ref)
+                    if state is None or not local(state.tag).endswith("_state"):
+                        add("filter_state_not_found", ref, state_ref)
+                    else:
+                        pending.append(("state", state_ref))
+
+        elif kind == "variable":
+            if name not in ("constant_variable", "local_variable", "external_variable"):
+                add("variable_kind", ref, name)
+                continue
+            # External constraints are not ComponentGroup expressions.
+            if name == "external_variable":
+                continue
+            for component in node:
+                if local(component.tag) in ("notes", "Signature"):
                     continue
-                test_ns = test.tag.split("}", 1)[0].strip("{") if "}" in test.tag else ""
-                test_name = local(test.tag)
-                if (test_ns, test_name) not in oval_definition_elements():
-                    add(
-                        "nonstandard_oval_element",
-                        test_ref,
-                        f"{test_ns}#{test_name}",
-                    )
-                if (test_ns, test_name) in deprecated_test_types():
-                    add(
-                        "deprecated_oval_test",
-                        test_ref,
-                        f"{test_ns}#{test_name}",
-                    )
-                state_refs = []
-                for part in test:
-                    part_kind = local(part.tag)
-                    if part_kind == "object":
-                        inspect_object(part.get("object_ref"))
-                    elif part_kind == "state" and part.get("state_ref"):
-                        state_refs.append(part.get("state_ref"))
-                        state = find_by_id(oroot, part.get("state_ref"), "_state")
-                        if state is None:
-                            add("state_not_found", part.get("state_ref"))
-                        else:
-                            state_ns = state.tag.split("}", 1)[0].strip("{") if "}" in state.tag else ""
-                            state_name = local(state.tag)
-                            if (state_ns, state_name) not in oval_definition_elements():
-                                add(
-                                    "nonstandard_oval_element",
-                                    part.get("state_ref"),
-                                    f"{state_ns}#{state_name}",
-                                )
-                            for descendant in state.iter():
-                                var_ref = descendant.get("var_ref")
-                                if var_ref:
-                                    inspect_variable(var_ref)
-                state_operator = (test.get("state_operator") or "AND").upper()
-                if len(state_refs) > 1 and state_operator not in ("AND", "OR"):
-                    add("state_operator", test_ref, state_operator)
-            elif kind == "criteria":
-                visit_criteria(child)
-            elif kind == "extend_definition":
-                visit_definition(child.get("definition_ref"))
+                for descendant in component.iter():
+                    child_kind = local(descendant.tag)
+                    if child_kind != "value" and child_kind not in supported_components:
+                        add("variable_component", ref, child_kind)
+                    if descendant.get("var_ref"):
+                        pending.append(("variable", descendant.get("var_ref")))
+                    if child_kind == "object_component":
+                        pending.append(("object", descendant.get("object_ref")))
 
-    def visit_definition(ref):
-        if not ref or ref in visited_definitions:
-            return
-        visited_definitions.add(ref)
-        definition = next(
-            (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == ref),
-            None,
-        )
-        if definition is None:
-            add("definition_not_found", ref)
-            return
-        criteria = next((n for n in definition if local(n.tag) == "criteria"), None)
-        if criteria is None:
-            add("missing_criteria", ref)
-            return
-        visit_criteria(criteria)
-
-    visit_definition(definition_id)
     return findings
-
 def lower_definition(oroot, definition_id, assessment_id):
     """Lower one OVAL Definition to native SCAP-NG assessment semantics."""
     definition = next(
@@ -1138,6 +1097,11 @@ def lower_definition(oroot, definition_id, assessment_id):
         return f"{family}.{state_name}"
 
     def ensure_variable(var_ref):
+        # A name is reserved before its expression is lowered. It is reusable
+        # only after lowering completes; otherwise a back-edge would serialize
+        # an unresolved cycle as if it were a finished shared dependency.
+        if var_ref in active_variables:
+            return None, f"variable_cycle:{var_ref}"
         if var_ref in variable_names:
             return variable_names[var_ref], None
         variable = next(
@@ -1146,9 +1110,6 @@ def lower_definition(oroot, definition_id, assessment_id):
         )
         if variable is None:
             return None, f"variable_not_found:{var_ref}"
-        if var_ref in active_variables:
-            return None, f"variable_cycle:{var_ref}"
-
         # VariableType.datatype is REQUIRED by OVAL 5.12.3. There is
         # no default here (unlike entity datatypes).
         if variable.get("datatype") is None:
@@ -1729,7 +1690,12 @@ def lower_definition(oroot, definition_id, assessment_id):
         return None, "missing_criteria"
 
     active_definitions.add(definition_id)
-    expression, error = lower_criteria(root_criteria)
+    try:
+        expression, error = lower_criteria(root_criteria)
+    except RecursionError:
+        # A host implementation limit is not an OVAL language-depth restriction
+        # or proof that the source is invalid. Do not emit a partial Assessment.
+        return None, "conversion_resource_limit:python_recursion"
     active_definitions.remove(definition_id)
     if error:
         return None, error

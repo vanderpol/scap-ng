@@ -89,6 +89,36 @@ Schematron behavior.
 **Source:** SCC-augmented bundled `independent-definitions-schema.xsd` contains `sqlext_test`, `sqlext_object`, `sqlext_state`; upstream v5.12.3 lacks them.
 **Disposition:** `sqlext` is explicitly out of scope for SCAP-NG standard OVAL. Do not file this as a defect against upstream XSD. Future user-maintained SQL source may migrate to standard `sql512`. Generic converters should inspect pinned upstream schema vocabulary and independently classify publisher extensions.
 
+## OV-XSD-007 — Nested-set same-type assertion covers only depths 1 through 3
+
+**Classification:** Confirmed coverage gap in the specific embedded pattern,
+not a general OVAL variable/expression depth limit.
+**Source:** pinned OVAL 5.12.3 `oval-definitions-schema.xsd`, `set` annotation,
+Schematron pattern `oval-def_setobjref`.
+
+The set grammar is recursive, but this pattern spells out three XPath contexts
+for Object references at depths 1, 2 and 3. It does not cover depth 4 or deeper.
+The regression `test_deep_set_schematron_coverage_gap` constructs a
+`unix.file_object` referencing `unix.fileextendedattribute_object` through
+nested sets. The source is XSD-valid; the isolated upstream pattern detects the
+mismatch at depths 1 and 3, but accepts it at depths 4 and 32. Our independent
+source audit detects it at all four depths with qualified type identities.
+This is a claim about this pattern's coverage, not all possible validator tools.
+
+**Tracking:** [issue #37](https://github.com/vanderpol/scap-ng/issues/37), with
+#8 and #11. No upstream schema was changed and no upstream issue was submitted.
+The source audit reports defects without changing Object types.
+
+**Candidate upstream improvement:** derive the owner from ancestors and match
+all descendant set references rather than enumerating nesting levels. Review
+namespace-aware type comparison and portability of the replacement XPath before
+proposing an upstream patch.
+
+**Evidence:** `tools/test_variable_filter_dependencies.py`; valid/mismatching/
+missing references at depths 1, 3, 4 and 32; different namespaces with identical
+local names. Variable chains and function nesting at depth 32 are separately
+XSD/round-trip evidence, not scanner runtime proof.
+
 ## Rules for filing upstream tickets
 
 For any proposed upstream correction, record: exact original source tag/commit, file and line/element, reproducer valid under current XSD/Schematron, expected versus actual semantic result, impact, minimum fix, backward-compatibility assessment, and a regression test. Avoid proposing an XSD change on intuition alone: interpret annotations, constraint inheritance, formal OVAL documentation and any governing OVAL Board decision first.
