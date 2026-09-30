@@ -1,0 +1,102 @@
+name: Linux platform OVAL round-trip expansion
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/linux-platform-oval-roundtrip-expansion.yml"
+      - "tools/scap_upconvert_v003/**"
+      - "tools/scap_ng_roundtrip_v003/**"
+
+jobs:
+  roundtrip:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: rhel9
+            source: Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          - key: oracle-linux9
+            source: Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC SCAP 1.4 corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - name: Check out authoritative OVAL 5.12.3 schemas
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+          python -m pip install lxml pyyaml cryptography
+
+      - name: Split published SCAP into per-rule OVAL closures
+        run: |
+          python scap-ng/tools/scap14_rule_splitter.py \
+            "niwc/${{ matrix.source }}" \
+            --output-dir "work/${{ matrix.key }}-split" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+            --source-repository-path "${{ matrix.source }}" \
+            --benchmark-key "${{ matrix.key }}" \
+            --fail-on-unresolved
+
+      - name: Round-trip every automated OVAL closure
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
+            --corpus "work/${{ matrix.key }}-split" \
+            --include 'oval.xml' \
+            --out "work/${{ matrix.key }}-roundtrip" \
+            --report "work/${{ matrix.key }}-roundtrip.json"
+
+      - name: Build aggregate OVAL validation schema
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/build_full_oval_omni.py \
+            --schemas oval-language/oval-schemas \
+            --output oval-language/oval-schemas/roundtrip-full-omni.xsd
+
+      - name: Validate every regenerated closure with XSD
+        run: |
+          set -euo pipefail
+          for xml in "work/${{ matrix.key }}-roundtrip"/*.oval.xml; do
+            xmllint --noout \
+              --schema oval-language/oval-schemas/roundtrip-full-omni.xsd \
+              "$xml"
+          done
+
+      - name: Compare Schematron findings to each source closure
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/compare_schematron_baseline.py \
+            --schemas oval-language/oval-schemas \
+            --corpus "work/${{ matrix.key }}-split" \
+            --report "work/${{ matrix.key }}-roundtrip.json" \
+            --output "work/${{ matrix.key }}-schematron.json"
+
+      - name: Upload expansion evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.key }}-oval-roundtrip-expansion
+          path: |
+            work/${{ matrix.key }}-roundtrip.json
+            work/${{ matrix.key }}-schematron.json
