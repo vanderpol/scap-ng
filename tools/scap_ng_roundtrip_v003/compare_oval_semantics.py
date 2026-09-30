@@ -232,28 +232,38 @@ class Model:
         kids=[]
         for child in e:
             _,local=split(child.tag)
-            cneg=child.attrib.get("negate","false")=="true"
-            capp=child.attrib.get("applicability_check","false")=="true"
             if local=="criteria":
+                # The child criteria node owns its negate/applicability flags;
+                # recursion normalizes those flags into an expression edge.
                 node=self.criteria(child)
             elif local=="criterion":
                 node=("test",self.test(child.attrib["test_ref"]))
+                node=self.edge(
+                    node,
+                    child.attrib.get("negate","false")=="true",
+                    child.attrib.get("applicability_check","false")=="true",
+                )
             elif local=="extend_definition":
                 # SCAP-NG intentionally dereferences extended definitions.
-                # Compare the referenced criteria semantics, not nested
-                # definition metadata that does not survive flattening.
+                # Flags on the reference apply to the resulting expression.
                 node=self.definition(child.attrib["definition_ref"], include_metadata=False)
+                node=self.edge(
+                    node,
+                    child.attrib.get("negate","false")=="true",
+                    child.attrib.get("applicability_check","false")=="true",
+                )
             else:
                 raise ValueError(f"unsupported criteria child {local}")
-            node=self.edge(node,cneg,capp)
             kids.append(node)
         # A one-child criteria node has the same truth value for AND, OR,
-        # ONE, and XOR. Normalize its flags as an edge on that child so native
-        # lowering may collapse the transparent wrapper without creating a diff.
+        # ONE, and XOR. For all criteria nodes, normalize negate/applicability
+        # as an expression edge so a dereferenced extend_definition compares
+        # identically to the flattened replacement criteria.
         if len(kids)==1:
-            node=kids[0]
-            return self.edge(node,neg,app)
-        return ("criteria",op,neg,app,tuple(sorted(kids,key=repr)))
+            base=kids[0]
+        else:
+            base=("criteria",op,False,False,tuple(sorted(kids,key=repr)))
+        return self.edge(base,neg,app)
 
     def definition(self,did,include_metadata=True):
         key=("definition",did,include_metadata)
