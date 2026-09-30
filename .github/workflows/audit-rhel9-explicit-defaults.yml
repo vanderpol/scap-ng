@@ -1,0 +1,37 @@
+name: Audit native RHEL9 explicit variable and entity defaults
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/audit-rhel9-explicit-defaults.yml"
+      - "tools/audit_v003_explicit_defaults.py"
+      - "tools/test_native_default_explicitness.py"
+      - "research/iterations/003/source/split-rule-assessment/rhel9-full/assessments/**"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pyyaml
+      - name: Verify negative and positive explicit-default fixtures
+        run: python tools/test_native_default_explicitness.py
+      - name: Audit generated RHEL9 assessment entities
+        run: |
+          python tools/audit_v003_explicit_defaults.py \
+            --root research/iterations/003/source/split-rule-assessment/rhel9-full/assessments \
+            --report work/rhel9-explicit-defaults.json
+      - name: Preserve count and issue evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rhel9-explicit-defaults-report
+          path: work/rhel9-explicit-defaults.json
