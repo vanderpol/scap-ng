@@ -47,6 +47,7 @@ SHALL NOT contain migrated XCCDF/OVAL/CPE structures.
           benchmark.yaml
           applicability.yaml
           rules/
+          policies/
           assessments/
             automated/
             manual/
@@ -57,6 +58,60 @@ once exact reuse is demonstrated.
 
 Source and sample results SHALL remain in different top-level directories.
 
+
+## Rule, Policy, and Assessment file resolution (candidate for implementation)
+
+The generated `rhel9-full` currently stores shorthand Assessment IDs directly
+on Rules. That is a transitional converter output, **not** the approved
+authoring resolution model. See [issue #31](https://github.com/vanderpol/scap-ng/issues/31).
+
+For iteration 003 the proposed source contract is:
+
+- `rules/<rule-id>.rule.yaml` has a `policy` field containing an **explicit
+  relative path** to a source Policy YAML file.
+- `policies/<policy-id>.policy.yaml` owns named `checks` and
+  `default_check`; each check's `assessment` field contains an **explicit
+  relative path** to an Assessment YAML file.
+- Source-path resolution is relative to the referring file, independent of
+  process working directory. Tools normalize and verify paths, reject missing
+  references and boundary escapes, and validate the referenced object's type.
+- Every referenced Policy/Assessment has its own stable logical `id`, which
+  SHALL NOT be derived from a basename. Selector names are also preserved.
+- The compiler emits an explicit ID/version → package member/integrity-digest
+  binding. Compiled assessors resolve only through that binding, not filename
+  guesses. Two selectors MAY point to one Assessment.
+- Alternate ID-only authoring requires a separate defined registry; until
+  such a registry exists an identifier by itself is not a resolvable source
+  reference.
+
+The existing Benchmark `applicability_catalog` field is an example of a
+path-based source reference; the applicability registry still names
+applicability IDs and their assessment bindings.
+
+Illustrative proposed source: 
+
+```yaml
+# rules/SV-257777.rule.yaml
+rule:
+  id: SV-257777
+  policy: ../policies/SV-257777.policy.yaml
+```
+
+```yaml
+# policies/SV-257777.policy.yaml
+policy:
+  id: SV-257777.policy
+  default_check: default
+  checks:
+    default:
+      assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-257777.manual.assessment.yaml
+```
+
+The Rule's current `checks` and `default_check` fields SHALL be
+relocated into Policy after converter changes. Their presence in generated
+RHEL 9 source must not be mistaken for a final schema commitment.
 
 ## Explicit native field visibility
 
