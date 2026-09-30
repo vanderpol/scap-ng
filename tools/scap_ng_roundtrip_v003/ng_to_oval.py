@@ -69,24 +69,35 @@ def split_type(t):
         die(f"unsupported OVAL family: {family}")
     return family, name
 
-def attrs_for_entity(spec, ids):
+def attrs_for_entity(spec, ids, *, state_entity=False):
+    """Emit stated semantics without inferring unverified schema defaults.
+
+    State entity existence is distinct from Test.check_existence. Object
+    selectors SHALL NOT acquire state-only assertion attributes.
+    """
     attrs = {}
     if isinstance(spec, dict):
         if "datatype" in spec:
             attrs["datatype"] = str(spec["datatype"])
         if "operation" in spec:
             attrs["operation"] = str(spec["operation"])
-        if "entity_check" in spec:
-            attrs["entity_check"] = str(spec["entity_check"])
+        for key in ("entity_check", "check_existence"):
+            if key in spec:
+                if not state_entity:
+                    die(f"{key} is a State entity assertion, not an Object selector")
+                attrs[key] = str(spec[key])
+        if "var_check" in spec and "variable" not in spec:
+            die("var_check requires a variable reference")
         if "variable" in spec:
             attrs["var_ref"] = ids.get("var", spec["variable"])
             if "var_check" in spec:
                 attrs["var_check"] = str(spec["var_check"])
     return attrs
 
-def add_entity(parent, ns, name, spec, ids):
+def add_entity(parent, ns, name, spec, ids, *, state_entity=False):
     if isinstance(spec, dict):
-        el = ET.SubElement(parent, q(ns, name), attrs_for_entity(spec, ids))
+        el = ET.SubElement(parent, q(ns, name),
+                           attrs_for_entity(spec, ids, state_entity=state_entity))
         if "variable" in spec:
             if "value" in spec:
                 die(f"{name}: variable and value both supplied")
@@ -272,7 +283,7 @@ def build(data):
                 state_attrs["operator"] = str(state["operator"])
             se = ET.SubElement(sts, q(ns, name + "_state"), state_attrs)
             for field, spec in state.get("predicates", {}).items():
-                add_entity(se, ns, field, spec, ids)
+                add_entity(se, ns, field, spec, ids, state_entity=True)
 
     if variables:
         vs = ET.SubElement(root, q(OVAL_DEF, "variables"))
