@@ -17,6 +17,53 @@ SOURCE_URL = (
     "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip"
 )
 ROOT = Path(__file__).resolve().parents[2]
+
+_DEPRECATED_TEST_TYPES = None
+
+def deprecated_test_types():
+    """Return effective deprecated OVAL test QNames from bundled 5.12.3 schemas.
+
+    Explicit support overrides may reinstate schema-deprecated tests. Everything
+    else carrying oval:deprecated_info is rejected from native SCAP-NG.
+    """
+    global _DEPRECATED_TEST_TYPES
+    if _DEPRECATED_TEST_TYPES is not None:
+        return _DEPRECATED_TEST_TYPES
+
+    schema_root = ROOT / "third_party" / "scap-1.4-schemas" / "oval_5.12.3"
+    deprecated = set()
+    for path in sorted(schema_root.rglob("*.xsd")):
+        try:
+            xroot = ET.parse(path).getroot()
+        except Exception:
+            continue
+        target = xroot.get("targetNamespace") or ""
+        for child in list(xroot):
+            if local(child.tag) != "element" or not child.get("name"):
+                continue
+            name = child.get("name")
+            if not name.endswith("_test"):
+                continue
+            if any(local(node.tag) == "deprecated_info" for node in child.iter()):
+                deprecated.add((target, name))
+
+    override_path = ROOT / "research" / "iterations" / "001" / "oval-test-support-overrides.json"
+    if override_path.exists():
+        try:
+            doc = json.loads(override_path.read_text(encoding="utf-8"))
+            for row in doc.get("overrides", []):
+                if row.get("effective_status") != "supported_reinstated":
+                    continue
+                qualified = row.get("qualified_name") or ""
+                namespace, sep, name = qualified.rpartition("#")
+                if sep:
+                    deprecated.discard((namespace, name))
+        except Exception:
+            pass
+
+    _DEPRECATED_TEST_TYPES = frozenset(deprecated)
+    return _DEPRECATED_TEST_TYPES
+
 FULL_MODE = os.environ.get("SCAP_NG_V003_MODE", "slice").lower() == "full"
 BUILD_NAME = "rhel9-full" if FULL_MODE else "rhel9-review-slice"
 OUT = ROOT / "research/iterations/003/source/split-rule-assessment" / BUILD_NAME
@@ -887,6 +934,14 @@ def unsupported_definition_features(oroot, definition_id):
                 if test is None:
                     add("test_not_found", test_ref)
                     continue
+                test_ns = test.tag.split("}", 1)[0].strip("{") if "}" in test.tag else ""
+                test_name = local(test.tag)
+                if (test_ns, test_name) in deprecated_test_types():
+                    add(
+                        "deprecated_oval_test",
+                        test_ref,
+                        f"{test_ns}#{test_name}",
+                    )
                 state_refs = []
                 for part in test:
                     part_kind = local(part.tag)
