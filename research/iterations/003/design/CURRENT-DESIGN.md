@@ -12,7 +12,7 @@ Owner reconfirmation: 2026-09-30. Read this file before selecting a generator, p
 - Converted source SHALL preserve meaningful named Collection boundaries and Variable dependencies. Do not duplicate a shared source Object inline at every use. Embedded Collections are supported for native authoring; they SHALL NOT be used to erase shared source references during lossless conversion.
 - Variables can consume Collection fields or other Variables. Named intermediates and the complete graph through sets/filter States/functions must survive conversion. Source identity must remain in provenance so distinct source nodes are not merged merely because payloads match.
 - Native Assessments have no `deprecated` attribute. Effectively deprecated source Tests are blockers; they do not become native runtime flags.
-- Capability is declared at Test level for its directly used Collection/State contract; mismatches fail. Do not silently mix types. The type declaration for a Collection used only by a Variable remains an explicit design question, not scanner inference.
+- Capability is declared at Test level for its directly used Collection/State contract; mismatches fail. Do not silently mix types. For a Collection used only by Variables, the owner selected capability declaration on the Variable as the working prototype direction (2026-09-30). Exact grammar and formal Board ratification remain pending; do not treat this as an approved standard or infer type from filenames/IDs.
 - Pre-alpha: publish completed, appropriately tested work directly to `main` without routine permission requests. Full benchmark regeneration remains held while the authoring slice is being reviewed.
 
 ## Converter delivery and stability requirement
@@ -30,9 +30,20 @@ output from pinned original SCAP input. See
 
 - Exact Rule choice field names (`assessment_choices`, `default_assessment_choice`) are review proposals.
 - Complete `collection`/`collection_title` and `assertion` vocabulary migration, including the final item/state quantifier syntax, is unfinished.
-- Named Collection registry/reference implementation and variable-only Collection capability resolution are unfinished.
+- Named Collection graph conversion and reverse consumption now have a tested prototype (`collection_graph=True`), including source identity and Variable references. Full compiler integration is unfinished. Variable-side capability declaration is the selected prototype direction; `collection_capabilities` is prototype grammar, with Board approval pending.
 - Formal Board review of embedded Collections and colocated Filters remains pending. Both named-reference and embedded-Collection Variable forms are required in the working design, not optional pending implementation choices.
 - Full runtime equivalence is unproven. Round-trip and source-reference checks alone do not establish evaluator equivalence.
+
+## Collection/dataflow checkpoint
+
+[Source-generated sample](../review/collection-dataflow-source-sample/README.md):
+selected Assessment output from 25 RHEL 9 Rules, converted from the pinned
+original ZIP. This is a tested dataflow prototype, not a full Benchmark compiler.
+Source graph sharing, Variable chains and private embedded native-authoring
+Collections have regression coverage. All 42 Variable-bearing RHEL 9 cases
+compare equal through the new graph/reverse path; 23 sample automated outputs
+also regenerate omni-schema-valid OVAL. Runtime conformance, complete Rule/Profile
+rendering and Windows execution are not established.
 
 ## Current artifact status
 

@@ -1,0 +1,286 @@
+assessment:
+  id: SV-257889.automated
+  version: 1
+  assessment_title: RHEL-09-232045 - All RHEL 9 local initialization files must have mode 0740 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  tests:
+    test-local-initialization-files-non-system-users-have-mode-0740-or:
+      test_title: Local initialization files for non-system users have mode 0740 or less permissive.
+      capability: unix.file
+      collection: local-initialization-files-non-system-users-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: mode 0740 or less permissive
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-local-initialization-files-root-have-mode-0740-or-less-permissive:
+      test_title: Local initialization files for root have mode 0740 or less permissive.
+      capability: unix.file
+      collection: local-initialization-files-root-user-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state_title: mode 0740 or less permissive
+        state:
+          all:
+          - field: suid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sgid
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: sticky
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gwrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: gexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oread
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: owrite
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          - field: oexec
+            value: 'false'
+            operation: equals
+            datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-local-initialization-files-non-system-users-have-mode-0740-or
+    - test: test-local-initialization-files-root-have-mode-0740-or-less-permissive
+  variables:
+    home-directories-non-system-users-variable:
+      title: The home directories of non-system users.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: only-non-system-users-uid-999-home-dirs-excluding-root-collection
+          field: home_dir
+      collection_capabilities:
+        only-non-system-users-uid-999-home-dirs-excluding-root-collection: unix.password
+    home-directory-root-user-variable:
+      title: The home directory of the root user.
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: only-root-users-uid-0-home-dirs-excluding-root-directory-collection
+          field: home_dir
+      collection_capabilities:
+        only-root-users-uid-0-home-dirs-excluding-root-directory-collection: unix.password
+  collections:
+    users-username-collection:
+      collection_title: Users with an username
+      select:
+        username:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: '[\w]+'
+    only-non-system-users-uid-999-home-dirs-excluding-root-collection:
+      collection_title: only non-system users (uid>999) home-dirs excluding root directory
+      set:
+        operator: complement
+        members:
+        - collection: users-username-collection
+        filters:
+        - action: exclude
+          match:
+            field: user_id
+            value: '1000'
+            operation: less than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: only uids < 1000
+        - action: exclude
+          match:
+            field: home_dir
+            value: /
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: root directory
+    local-initialization-files-non-system-users-collection:
+      collection_title: local initialization files of non-system users.
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directories-non-system-users-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\.[^\s\.]+
+      filters:
+      - action: exclude
+        match:
+          field: type
+          value: directory
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+      behaviors:
+        max_depth: '1'
+        recurse: symlinks
+        recurse_direction: down
+    only-root-users-uid-0-home-dirs-excluding-root-directory-collection:
+      collection_title: only root users (uid=0) home-dirs excluding root directory
+      set:
+        operator: complement
+        members:
+        - collection: users-username-collection
+        filters:
+        - action: exclude
+          match:
+            field: user_id
+            value: '0'
+            operation: greater than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: only uids > 0
+        - action: exclude
+          match:
+            field: home_dir
+            value: /
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+          state_title: root directory
+    local-initialization-files-root-user-collection:
+      collection_title: local initialization files of root user.
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          variable_check: at least one
+          value:
+            variable: home-directory-root-user-variable
+        filename:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\.[^\s\.]+
+      filters:
+      - action: exclude
+        match:
+          field: type
+          value: directory
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+      behaviors:
+        max_depth: '1'
+        recurse: symlinks
+        recurse_direction: down

@@ -1036,7 +1036,7 @@ def unsupported_definition_features(oroot, definition_id):
                         pending.append(("object", descendant.get("object_ref")))
 
     return findings
-def lower_definition(oroot, definition_id, assessment_id):
+def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=False, provenance=None):
     """Lower one OVAL Definition to native SCAP-NG assessment semantics."""
     definition = next(
         (n for n in oroot.iter() if local(n.tag) == "definition" and n.get("id") == definition_id),
@@ -1053,6 +1053,9 @@ def lower_definition(oroot, definition_id, assessment_id):
     assessment_title = oval_definition_title(definition)
     assessment_class = definition.get("class") or "miscellaneous"
     checks = {}
+    collections = {}
+    collection_names = {}
+    used_collection_ids = set()
     variables = {}
     variable_names = {}
     active_variables = set()
@@ -1064,6 +1067,8 @@ def lower_definition(oroot, definition_id, assessment_id):
 
     def unique_check_id(title, capability):
         base = semantic_id(title, semantic_id(capability, "check"))
+        if collection_graph:
+            base = "test-" + base
         candidate = base
         suffix = 2
         while candidate in used_check_ids:
@@ -1076,6 +1081,8 @@ def lower_definition(oroot, definition_id, assessment_id):
         title = node_title(variable)
         kind = local(variable.tag).replace("_variable", "")
         base = semantic_id(title, f"{kind}-value")
+        if collection_graph:
+            base += "-variable"
         candidate = base
         suffix = 2
         while candidate in used_variable_ids:
@@ -1097,6 +1104,30 @@ def lower_definition(oroot, definition_id, assessment_id):
         family = ns_uri.split("#")[-1].split("/")[-1] if ns_uri else "generic"
         state_name = name[:-6] if name.endswith("_state") else name
         return f"{family}.{state_name}"
+
+    def ensure_collection(obj_ref):
+        # Source identity, not payload equality, defines sharing in conversion.
+        if obj_ref in active_objects:
+            return None, f"object_cycle:{obj_ref}"
+        if obj_ref in collection_names:
+            return collection_names[obj_ref], None
+        obj = find_by_id(oroot, obj_ref, "_object")
+        if obj is None:
+            return None, f"object_not_found:{obj_ref}"
+        base = semantic_id(node_title(obj), capability_for_object(obj).replace(".", "-")) + "-collection"
+        name = base
+        suffix = 2
+        while name in used_collection_ids:
+            name = f"{base}-{suffix}"
+            suffix += 1
+        used_collection_ids.add(name)
+        payload, error = lower_object(obj_ref)
+        if error:
+            return None, error
+        payload = {"collection_title": payload.pop("object_title"), **payload}
+        collections[name] = payload
+        collection_names[obj_ref] = name
+        return name, None
 
     def ensure_variable(var_ref):
         # A name is reserved before its expression is lowered. It is reusable
@@ -1205,17 +1236,13 @@ def lower_definition(oroot, definition_id, assessment_id):
         if name == "object_component":
             obj_ref = node.get("object_ref")
             field = node.get("item_field")
-            collection, error = lower_object(obj_ref)
+            collection, error = (ensure_collection(obj_ref) if collection_graph else lower_object(obj_ref))
             if error:
                 return None, error
-            result = {
-                "object_values": {
-                    "collect": collection,
-                    "field": field,
-                }
-            }
+            key = "values" if collection_graph else "object_values"
+            result = {key: {("collection" if collection_graph else "collect"): collection, "field": field}}
             if node.get("record_field"):
-                result["object_values"]["record_field"] = node.get("record_field")
+                result[key]["record_field"] = node.get("record_field")
             return result, None
 
         children = [child for child in node if local(child.tag) not in ("notes",)]
@@ -1419,10 +1446,10 @@ def lower_definition(oroot, definition_id, assessment_id):
         for child in set_node:
             name = local(child.tag)
             if name == "object_reference":
-                collection, error = lower_object(text(child))
+                collection, error = (ensure_collection(text(child)) if collection_graph else lower_object(text(child)))
                 if error:
                     return None, error
-                members.append({"collect": collection})
+                members.append({("collection" if collection_graph else "collect"): collection})
             elif name == "set":
                 nested, error = lower_set(child)
                 if error:
@@ -1523,7 +1550,7 @@ def lower_definition(oroot, definition_id, assessment_id):
 
     def lower_test(test_ref):
         if test_ref in test_to_check:
-            return {"check": test_to_check[test_ref]}, None
+            return {("test" if collection_graph else "check"): test_to_check[test_ref]}, None
 
         test = next(
             (n for n in oroot.iter() if n.get("id") == test_ref and local(n.tag).endswith("_test")),
@@ -1553,7 +1580,7 @@ def lower_definition(oroot, definition_id, assessment_id):
                 "capability": capability,
                 "result": "unknown",
             }
-            return {"check": check_id}, None
+            return {("test" if collection_graph else "check"): check_id}, None
 
         obj_ref = None
         state_refs = []
@@ -1563,7 +1590,7 @@ def lower_definition(oroot, definition_id, assessment_id):
             elif local(child.tag) == "state" and child.get("state_ref"):
                 state_refs.append(child.get("state_ref"))
 
-        collection, error = lower_object(obj_ref)
+        collection, error = (ensure_collection(obj_ref) if collection_graph else lower_object(obj_ref))
         if error:
             return None, error
         # A native Test owns the capability contract. Direct Object and State
@@ -1571,10 +1598,11 @@ def lower_definition(oroot, definition_id, assessment_id):
         # cannot enforce this; OVAL generally relies on per-Test Schematron.
         # Fail closed here so a source authoring defect cannot become an NG
         # assessment with mixed execution semantics.
-        if collection.get("capability") != capability:
+        collection_payload = collections[collection] if collection_graph else collection
+        if collection_payload.get("capability") != capability:
             return None, (
                 "test_collection_capability_mismatch:"
-                f"{capability}!={collection.get('capability')}"
+                f"{capability}!={collection_payload.get('capability')}"
             )
         states = []
         for ref in state_refs:
@@ -1598,7 +1626,7 @@ def lower_definition(oroot, definition_id, assessment_id):
 
         assertion = {
             "existence": test.get("check_existence") or "at_least_one_exists",
-            "check": test.get("check"),
+            ("item_quantifier" if collection_graph else "check"): test.get("check"),
         }
         if states:
             state_operator = (test.get("state_operator") or "AND").upper()
@@ -1623,10 +1651,10 @@ def lower_definition(oroot, definition_id, assessment_id):
         checks[check_id] = {
             "test_title": test_title,
             "capability": capability,
-            "collect": collection,
-            "assert": assertion,
+            ("collection" if collection_graph else "collect"): collection,
+            ("assertion" if collection_graph else "assert"): assertion,
         }
-        return {"check": check_id}, None
+        return {("test" if collection_graph else "check"): check_id}, None
 
     def lower_criteria(node):
         operator = (node.get("operator") or "AND").upper()
@@ -1709,11 +1737,25 @@ def lower_definition(oroot, definition_id, assessment_id):
         "mode": "automated",
         "class": assessment_class,
         "purpose": "assessment",
-        "checks": checks,
+        ("tests" if collection_graph else "checks"): checks,
         "evaluate": expression,
     }
     if variables:
         assessment["variables"] = variables
+    if collection_graph:
+        assessment["collections"] = collections
+        from scap_upconvert_v003.collection_graph import place_capabilities
+        try:
+            place_capabilities(assessment)
+        except RecursionError:
+            return None, "conversion_resource_limit:python_recursion"
+        except ValueError as exc:
+            return None, "collection_graph_type_binding:" + str(exc)
+    if provenance is not None:
+        provenance.update({"source_definition": definition_id,
+                           "source_collection_bindings": dict(collection_names),
+                           "source_variable_bindings": dict(variable_names),
+                           "source_test_bindings": dict(test_to_check)})
     return {"assessment": assessment}, None
 
 def automated_refs(rec):

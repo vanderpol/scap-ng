@@ -1,0 +1,71 @@
+assessment:
+  id: SV-257815.automated
+  version: 1
+  assessment_title: RHEL-09-213100 - RHEL 9 must disable acquiring, saving, and processing core dumps.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  tests:
+    test-systemd-coredump-socket-loadstate-masked-if-exists:
+      test_title: systemd-coredump.socket LoadState is masked if exists
+      capability: linux.systemdunitproperty
+      collection: systemd-coredump-socket-loadstate-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: masked
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+    test-systemd-coredump-socket-unitfilestate-masked-if-exists:
+      test_title: systemd-coredump.socket UnitFileState is masked if exists
+      capability: linux.systemdunitproperty
+      collection: systemd-coredump-socket-unitfilestate-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_title: null
+        state:
+          field: value
+          value: masked
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-systemd-coredump-socket-loadstate-masked-if-exists
+    - test: test-systemd-coredump-socket-unitfilestate-masked-if-exists
+  collections:
+    systemd-coredump-socket-loadstate-collection:
+      collection_title: systemd-coredump.socket LoadState
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          mask: false
+          value: systemd-coredump.socket
+        property:
+          operation: equals
+          datatype: string
+          mask: false
+          value: LoadState
+    systemd-coredump-socket-unitfilestate-collection:
+      collection_title: systemd-coredump.socket UnitFileState
+      select:
+        unit:
+          operation: equals
+          datatype: string
+          mask: false
+          value: systemd-coredump.socket
+        property:
+          operation: equals
+          datatype: string
+          mask: false
+          value: UnitFileState

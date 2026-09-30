@@ -57,6 +57,19 @@ class Builder:
     def __init__(self, document):
         self.doc = document
         self.assessment = document.get("assessment", document)
+        if "tests" in self.assessment and "checks" in self.assessment:
+            raise ValueError("Ambiguous mixed Test/check vocabulary")
+        self.native_graph = "tests" in self.assessment
+        if self.native_graph:
+            from scap_upconvert_v003.collection_graph import collection_types
+            self.collection_types = collection_types(self.assessment)
+        else:
+            self.collection_types = {}
+        self.test_nodes = self.assessment.get("tests", self.assessment.get("checks", {}))
+        self.active_objects = set()
+        self.active_variables = set()
+        self.variable_context = []
+        self.private_collection_number = 0
         self.ids = Ids()
         self.root = ET.Element(q(OD, "oval_definitions"))
         gen = ET.SubElement(self.root, q(OD, "generator"))
@@ -198,9 +211,9 @@ class Builder:
         attrs = {"set_operator": str(set_expr.get("operator") or "union").upper()}
         node = ET.SubElement(parent, q(OD, "set"), attrs)
         for member in set_expr.get("members", []):
-            if "collect" in member:
+            if "collection" in member or "collect" in member:
                 ref = ET.SubElement(node, q(OD, "object_reference"))
-                ref.text = self.emit_object(member["collect"])
+                ref.text = self.emit_object(member.get("collection", member.get("collect")))
             elif "set" in member:
                 self.emit_set(node, member["set"], capability)
             else:
@@ -208,17 +221,33 @@ class Builder:
         for item in set_expr.get("filters", []):
             self.emit_filter(node, capability, item)
 
-    def emit_object(self, collection):
-        oid = self.ids.get("obj", collection)
+    def emit_object(self, collection, *, private_identity=None, inherited_capability=None):
+        if isinstance(collection, str):
+            name = collection
+            if name not in self.assessment.get("collections", {}):
+                raise ValueError(f"Unknown Collection reference: {name}")
+            collection = dict(self.assessment["collections"][name])
+            collection["capability"] = self.collection_types[name]
+            identity = ["named_collection", name]
+        else:
+            identity = private_identity if private_identity is not None else collection
+            if inherited_capability is not None:
+                collection = dict(collection)
+                collection['capability'] = inherited_capability
+        oid = self.ids.get("obj", identity)
+        if oid in self.active_objects:
+            raise ValueError("Collection dependency cycle")
         if oid in self.emitted_objects:
             return oid
         self.emitted_objects.add(oid)
+        self.active_objects.add(oid)
         capability = collection.get("capability")
         family, name = split_capability(capability)
         ns = family_ns(family)
         attrs = {"id": oid, "version": "1"}
-        if collection.get("object_title"):
-            attrs["comment"] = str(collection["object_title"])
+        title = collection.get("collection_title", collection.get("object_title"))
+        if title:
+            attrs["comment"] = str(title)
         obj = ET.SubElement(self.objects, q(ns, name + "_object"), attrs)
 
         if collection.get("behaviors"):
@@ -233,6 +262,7 @@ class Builder:
                 self.emit_value_entity(obj, ns, field, spec)
             for item in collection.get("filters", []):
                 self.emit_filter(obj, capability, item)
+        self.active_objects.remove(oid)
         return oid
 
     def emit_component(self, parent, expr):
@@ -256,9 +286,20 @@ class Builder:
                 "var_ref": self.emit_variable(value)
             })
             return
-        if name == "object_values":
+        if name in ("values", "object_values"):
+            collection = value.get("collection", value.get("collect"))
+            if name == "values" and isinstance(collection, dict):
+                if not self.variable_context:
+                    raise ValueError("Embedded Collection is outside Variable scope")
+                native_id, entry = self.variable_context[-1]
+                self.private_collection_number += 1
+                object_id = self.emit_object(collection,
+                    private_identity=["private", native_id, self.private_collection_number],
+                    inherited_capability=entry.get("capability"))
+            else:
+                object_id = self.emit_object(collection)
             attrs = {
-                "object_ref": self.emit_object(value["collect"]),
+                "object_ref": object_id,
                 "item_field": value["field"],
             }
             if value.get("record_field"):
@@ -335,6 +376,8 @@ class Builder:
         raise ValueError(f"unsupported native expression {name}")
 
     def emit_variable(self, native_id):
+        if native_id in self.active_variables:
+            raise ValueError(f"Variable dependency cycle: {native_id}")
         vid = self.ids.get("var", native_id)
         if vid in self.emitted_variables:
             return vid
@@ -342,6 +385,8 @@ class Builder:
         if entry is None:
             raise ValueError(f"native variable not found: {native_id}")
         self.emitted_variables.add(vid)
+        self.active_variables.add(native_id)
+        self.variable_context.append((native_id, entry))
         attrs = {
             "id": vid,
             "version": "1",
@@ -402,12 +447,16 @@ class Builder:
             self.emit_component(ve, entry["expression"])
         else:
             raise ValueError(f"unsupported native variable kind {kind!r}: {native_id}")
+        self.variable_context.pop()
+        self.active_variables.remove(native_id)
         return vid
 
     def emit_check(self, check_id):
         if check_id in self.check_to_test:
             return self.check_to_test[check_id]
-        check = self.assessment["checks"][check_id]
+        if check_id not in self.test_nodes:
+            raise ValueError(f"Unknown Test reference: {check_id}")
+        check = self.test_nodes[check_id]
 
         if check.get("result") == "unknown":
             capability = check.get("capability") or "independent.unknown"
@@ -423,17 +472,19 @@ class Builder:
             self.check_to_test[check_id] = tid
             return tid
 
-        collection = check["collect"]
-        capability = check.get("capability") or collection["capability"]
+        collection = check.get("collection", check.get("collect"))
+        capability = check.get("capability")
+        if not capability and isinstance(collection, dict):
+            capability = collection.get("capability")
         family, name = split_capability(capability)
         ns = family_ns(family)
         tid = self.ids.get("tst", check_id)
-        assertion = check.get("assert", {})
+        assertion = check.get("assertion", check.get("assert", {}))
         attrs = {
             "id": tid,
             "version": "1",
             "check_existence": assertion.get("existence") or "at_least_one_exists",
-            "check": assertion.get("check") or "all",
+            "check": assertion.get("item_quantifier", assertion.get("check")) or "all",
             "comment": check.get("test_title") or check_id,
         }
 
@@ -487,10 +538,11 @@ class Builder:
 
     def emit_logic_node(self, parent, expr, force_criteria=False):
         expr, negate, applicability = self.unwrap_flags(expr)
-        if isinstance(expr, dict) and set(expr) == {"check"} and not force_criteria:
+        if isinstance(expr, dict) and set(expr) in ({"test"}, {"check"}) and not force_criteria:
+            ref = expr.get("test", expr.get("check"))
             attrs = {
-                "test_ref": self.emit_check(expr["check"]),
-                "comment": str(expr["check"]),
+                "test_ref": self.emit_check(ref),
+                "comment": str(ref),
             }
             if negate:
                 attrs["negate"] = "true"
