@@ -225,6 +225,30 @@ This includes defaults such as:
 Making a default explicit SHALL preserve the OVAL default value; it SHALL NOT
 be used as an opportunity to choose a more convenient native default.
 
+## 10A. Object behaviors and inherited defaults
+
+Stage-1 OVAL migration SHALL NOT equate copying an explicit
+`<behaviors>` attribute map with full behavior compatibility. For each
+standard Object's schema-declared behavior type, the converter SHALL
+resolve inherited attributes, enumerations, effective defaults, and
+conditional applicability. It SHALL distinguish an omitted `behaviors`
+element from an empty or partially populated element until their equivalence
+has been established by source documentation and conformance cases.
+
+Effective behavior settings that affect item collection, recursion, filters,
+existence, regex matching, collector error status or execution SHALL be
+explicit in SCAP-NG native Collections. Defaults may be recorded as
+`source_default` in the separate provenance ledger; they SHALL NOT be
+invisible scanner magic. Unsupported or ambiguous behavior settings SHALL
+result in exact per-Definition diagnostics.
+
+The semantic comparator SHALL eventually compare effective behavior
+signatures, not just raw source attribute spelling. Until that independent
+gate and execution tests exist, successful OVAL document round trips SHALL
+NOT be represented as proof of full Object-behavior support.
+
+See [behavior audit](../../research/iterations/003/design/oval-object-behaviors-audit.md).
+
 ## 11. Result semantics
 
 OVAL result propagation includes more than true/false.
