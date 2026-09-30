@@ -44,6 +44,87 @@ For a current **illustrative** trace, follow `SV-257777` from `benchmark.yaml` t
 
 The Benchmark owns its profiles, groups and parameters. Legacy XCCDF/OVAL/CPE XML IDs, input XML metadata, conversion diagnostics and provenance belong in evidence, not native source. No SCAP 1.4 serialization structure is permitted in native assessment logic.
 
+## Proposed authoring links — explicit relative paths (not yet generated)
+
+**Decision proposed for iteration-003 implementation:** Human-authored source SHALL use
+explicit relative paths for file-backed Rule → Policy and Policy → Assessment
+references. Logical IDs identify the objects *inside* those files; filenames
+do not define identity. This follows the existing
+[`specification/assessment/assessment-method.md`](../../../../specification/assessment/assessment-method.md)
+source-reference/compiled-identity distinction.
+
+Example directory-local authoring:
+
+```yaml
+# rules/SV-257777.rule.yaml
+rule:
+  id: SV-257777
+  policy: ../policies/SV-257777.policy.yaml
+```
+
+```yaml
+# policies/SV-257777.policy.yaml
+policy:
+  id: SV-257777.policy
+  default_check: default
+  checks:
+    default:
+      assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
+    automated:
+      assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-257777.manual.assessment.yaml
+```
+
+```yaml
+# assessments/automated/SV-257777.automated.assessment.yaml
+assessment:
+  id: SV-257777.automated
+  mode: automated
+  # Other source assessment fields follow ...
+```
+
+These are **illustrations of the proposed linkage fields**; the committed
+`rhel9-full` directory has not yet been regenerated with them.
+
+### How authors and tools resolve links
+
+1. A Rule path resolves **relative to the directory containing that Rule file**,
+   not relative to the working directory or repository root.
+2. The referenced Policy's Assessment paths resolve **relative to the Policy
+   file's directory**. Paths use forward slashes for portability.
+3. The loader normalizes `.` and `..`, validates the target is inside the
+   explicitly declared source/package boundary, and rejects missing targets,
+   symlink escapes, wrong object types, duplicate conflicting identities, and
+   cycles. Local source processing SHALL NOT silently fetch remote files.
+4. The compiler loads the target document and reads the contained `policy.id`
+   or `assessment.id`; **these IDs, not path basenames, are semantic identities**.
+   Multiple selectors MAY deliberately reference the same Assessment file.
+5. The compiler produces a reference index/package manifest mapping logical
+   IDs and versions to exact packaged members and hashes. The scanner consumes
+   **that explicit index**, validating integrity and resolution; it SHALL NOT
+   guess a path from the identifier or search directories for matching names.
+6. Moving an Assessment file requires updating source references (or an
+   authoring-tool refactor), but does not by itself change the Assessment
+   semantic ID or version. Changes to test semantics require proper versioning.
+7. Tailoring selects a published check selector, not an arbitrary source file
+   path; applicable evaluation uses the already-resolved immutable package.
+
+For example, a scanner seeing the *compiled* check selection
+`SV-257777.automated` consults the package object index, not a convention
+like `assessments/automated/<id>.assessment.yaml`. The index specifies the
+concrete package member and its digest.
+
+An **ID-only source reference** MAY eventually be supported when backed by
+an explicit versioned source-object registry with exactly one matching entry.
+Until that grammar is specified and validated, ID-only references are not
+interoperable, and no author/scanner SHALL infer filenames from them.
+
+The source compiler and package resolver will implement these rules as part
+of [issue #31](https://github.com/vanderpol/scap-ng/issues/31).
+The existing benchmark-level `applicability_catalog: applicability.yaml`
+already demonstrates an explicit relative source path.
+
 ## Reviewer status
 
 This iteration is still under active development. The incomplete Policy boundary and unproven inherited profile selection are **handoff blockers**, even where package ID resolution and OVAL regression tests pass. RHEL 9 and Windows 11 readiness must be evaluated independently.
