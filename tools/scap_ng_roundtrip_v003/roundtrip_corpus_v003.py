@@ -208,7 +208,21 @@ def main():
     }
     args.report.parent.mkdir(parents=True,exist_ok=True)
     args.report.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
-    print(json.dumps({k:v for k,v in report.items() if k!="results"},indent=2,sort_keys=True))
+    summary={k:v for k,v in report.items() if k!="results"}
+    if failures:
+        summary["failure_details"]=[
+            {
+                "file":row.get("file"),
+                "definition_id":row.get("definition_id"),
+                "stage":row.get("stage"),
+                "dependency_depth":row.get("dependency_depth"),
+                "error":row.get("error"),
+                "source_definition":row.get("source_definition"),
+                "regenerated_definition":row.get("regenerated_definition"),
+            }
+            for row in failures
+        ]
+    print(json.dumps(summary,indent=2,sort_keys=True))
 
     if args.inventory_only:
         return 0
