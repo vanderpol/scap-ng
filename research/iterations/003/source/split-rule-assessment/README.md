@@ -50,7 +50,7 @@ The Benchmark owns its profiles, groups and parameters. Legacy XCCDF/OVAL/CPE XM
 explicit relative paths for file-backed Rule → Policy and Policy → Assessment
 references. Logical IDs identify the objects *inside* those files; filenames
 do not define identity. This follows the existing
-[`specification/assessment/assessment-method.md`](../../../../specification/assessment/assessment-method.md)
+[`specification/assessment/assessment-method.md`](../../../../../specification/assessment/assessment-method.md)
 source-reference/compiled-identity distinction.
 
 Example directory-local authoring:
