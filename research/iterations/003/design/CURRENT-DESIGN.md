@@ -15,6 +15,17 @@ Owner reconfirmation: 2026-09-30. Read this file before selecting a generator, p
 - Capability is declared at Test level for its directly used Collection/State contract; mismatches fail. Do not silently mix types. The type declaration for a Collection used only by a Variable remains an explicit design question, not scanner inference.
 - Pre-alpha: publish completed, appropriately tested work directly to `main` without routine permission requests. Full benchmark regeneration remains held while the authoring slice is being reviewed.
 
+## Converter delivery and stability requirement
+
+Owner direction, 2026-09-30: once conversion reaches stability, provide the exact
+maintained converter and instructions for running it on the owner's Windows
+development computer. Windows portability is an implementation requirement now,
+not a late packaging task. The converter is the executable expression of the
+working NG design; source syntax, documented semantics and regression fixtures
+must evolve together. One documented entry point must reproduce the reviewed
+output from pinned original SCAP input. See
+[converter stability and Windows delivery](converter-stability-and-windows.md).
+
 ## Open or not yet implemented
 
 - Exact Rule choice field names (`assessment_choices`, `default_assessment_choice`) are review proposals.
