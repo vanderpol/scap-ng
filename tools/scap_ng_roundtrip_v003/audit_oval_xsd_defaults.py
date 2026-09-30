@@ -37,6 +37,9 @@ def main():
     if len(paths)<45: raise SystemExit(f"Expected upstream complete OVAL 5.12.3 schema set, found {len(paths)}")
     defaults=[]; fixed=[]; inherited=[]; attribute_groups=[]; optional=[]; annotations=[]; rules=[]
     source_hashes={}
+    # Resolve references to named global types/groups only; do not infer inherited defaults.
+    named_declarations=collections.defaultdict(list)
+    references=[]
     errors=[]
     for path in paths:
         try: root=ET.parse(str(path)).getroot()
@@ -45,6 +48,12 @@ def main():
             continue
         source_hashes[path.name]=hashlib.sha256(path.read_bytes()).hexdigest()
         target=root.get("targetNamespace","")
+        for child in root:
+            if not isinstance(child.tag,str):
+                continue
+            kind=local(child)
+            if kind in ("complexType","simpleType","attributeGroup","group") and child.get("name"):
+                named_declarations[(target,kind,child.get("name"))].append(location(path,child))
         for node in root.iter():
             # lxml includes comments and processing instructions in iter().
             # They have non-string .tag values and are not XML schema nodes.
@@ -58,6 +67,10 @@ def main():
                 fixed.append({**location(path,node),"kind":tag,
                     "name":node.get("name") or node.get("ref"),
                     "fixed":node.get("fixed"),"targetNamespace":target})
+            if tag in ("extension","restriction") and node.get("base"):
+                references.append((path,node,"type",node.get("base")))
+            if tag in ("attributeGroup","group") and node.get("ref"):
+                references.append((path,node,tag,node.get("ref")))
             if tag=="attributeGroup":
                 attribute_groups.append({**location(path,node),"name":node.get("name"),
                     "ref":node.get("ref"),"targetNamespace":target,
@@ -74,6 +87,35 @@ def main():
                         "default_language":bool(DEFAULT_TERMS.search(value))})
             if tag in ("assert","report") and node.tag.startswith("{"+SCH+"}"):
                 rules.append({**location(path,node),"kind":tag,"test":node.get("test"),"text":txt(node)[:1000]})
+    resolved_references=[]
+    for path,node,kind,qname in references:
+        if ":" in qname:
+            prefix,name=qname.split(":",1)
+            uri=node.nsmap.get(prefix)
+        else:
+            name=qname
+            uri=node.nsmap.get(None,"")
+        candidates=(
+            ("complexType","simpleType") if kind=="type" else (kind,)
+        )
+        matches=[(candidate,source) for candidate in candidates
+                 for source in named_declarations.get((uri,candidate,name),[])]
+        if uri==XSD and kind=="type":
+            status="builtin_xsd"
+        elif not uri:
+            status="unresolved_namespace"
+        elif len(matches)==1:
+            status="resolved_global"
+        elif len(matches)>1:
+            status="ambiguous_global"
+        else:
+            status="unresolved_global"
+        resolved_references.append({
+            **location(path,node),"kind":kind,"reference":qname,
+            "expanded_name":f"{{{uri}}}{name}" if uri else None,
+            "status":status,
+            "candidates":[{"kind":candidate,**source} for candidate,source in matches],
+        })
     args.out.mkdir(parents=True,exist_ok=True)
     def save(name, data):
         (args.out/name).write_text(json.dumps(data,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
@@ -81,6 +123,7 @@ def main():
     save("fixed-values.json",fixed)
     save("attribute-group-links.json",attribute_groups)
     save("source-sha256.json",source_hashes)
+    save("named-reference-resolution.json",resolved_references)
     save("type-inheritance.json",inherited)
     save("optional-elements.json",optional)
     save("semantic-documentation.json",annotations)
@@ -91,6 +134,8 @@ def main():
        "attribute_group_references":sum(bool(x["ref"]) for x in attribute_groups),
        "attribute_group_declarations":sum(bool(x["name"]) for x in attribute_groups),
        "inheritance_relations":len(inherited),
+       "named_reference_resolution":dict(sorted(collections.Counter(
+           row["status"] for row in resolved_references).items())),
        "optional_elements":len(optional),"semantic_annotation_passages":len(annotations),
        "implicit_or_default_documentation_passages":sum(x["default_language"] for x in annotations),
        "embedded_schematron_assertions":len(rules),
@@ -111,6 +156,9 @@ def main():
       "See `fixed-values.json` and `attribute-group-links.json` for source-anchored",
       "details. These are inventory entries, NOT proof that type inheritance",
       "or referenced group composition has been resolved.",
+      "The `named-reference-resolution.json` inventory distinguishes local",
+      "global declarations, built-in XSD types, ambiguous and missing links.",
+      "It does not yet compute effective inherited defaults.",
       "", "## Implicit behavioral defaults and existence checks", "",
       "Review all entries in `semantic-documentation.json`, including the",
       "embedded ExistenceEnumeration evaluation tables and records whose prose",
