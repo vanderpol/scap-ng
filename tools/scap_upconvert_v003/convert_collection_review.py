@@ -106,6 +106,8 @@ def main(argv=None):
             result={'rule_id':rid,'title':rec['title'],'selectors':{},'assessments':[]}
             done={}
             manual_done={}
+            deprecated_selector_fallbacks=[]
+            has_manual=any(check_kind(check)=='manual' for check in rec['checks'])
             for c in rec['checks']:
                 selector=(c.get('selector') or '').strip() or 'default'
                 if check_kind(c)=='manual':
@@ -133,6 +135,19 @@ def main(argv=None):
                 provenance={}
                 unsupported=unsupported_definition_features(original,did)
                 if unsupported:
+                    deprecated_only=all(x.get('feature')=='deprecated_oval_test' for x in unsupported)
+                    if deprecated_only and has_manual:
+                        deprecated_selector_fallbacks.append({
+                            'selector': selector,
+                            'source_definition': did,
+                            'unsupported': unsupported,
+                        })
+                        result['assessments'].append({
+                            'status':'skipped_deprecated_oval_test_manual_fallback',
+                            'source_definition':did,
+                            'unsupported':unsupported,
+                        })
+                        continue
                     failed=True;result['assessments'].append({'status':'blocked','source_definition':did,'unsupported':unsupported});continue
                 native,error=lower_definition(original,did,aid,collection_graph=True,provenance=provenance)
                 if error:
@@ -154,6 +169,19 @@ def main(argv=None):
                     'collections':len(native['assessment']['collections']),
                     'variables':len(native['assessment'].get('variables',{})),
                     'reverse_omni_schema_valid':True})
+            if deprecated_selector_fallbacks:
+                manual_ref=result['selectors'].get('manual')
+                if manual_ref is None and manual_done:
+                    manual_ref=next(iter(manual_done.values()))
+                if manual_ref is None:
+                    failed=True
+                    result.setdefault('errors',[]).append('deprecated automated source has no usable manual fallback')
+                else:
+                    for fallback in deprecated_selector_fallbacks:
+                        if fallback['selector']=='default':
+                            result['selectors']['default']=manual_ref
+                    result['manual_fallbacks']=deprecated_selector_fallbacks
+                    result['manual_fallback_assessment']=manual_ref
             evidence['rules'].append(result)
     evidence['status']='blocked' if failed else 'prototype_dataflow_and_roundtrip_checks_passed'
     (args.output/'evidence.json').write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')
