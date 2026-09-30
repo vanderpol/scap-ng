@@ -28,6 +28,7 @@ from scap_upconvert_v003.build_rhel9_review_slice import (
     semantic_id,
     unsupported_definition_features,
 )
+from check_current_authoring_contract import violations
 from scap_upconvert_v003.cleanliness import assert_native_clean
 from scap_ng_roundtrip_v003.native_assessment_to_oval import build as reverse_build
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
@@ -91,6 +92,8 @@ def main():
     ap.add_argument("--out",type=Path,required=True)
     ap.add_argument("--report",type=Path,required=True)
     ap.add_argument("--inventory-only",action="store_true")
+    ap.add_argument("--layout", choices=("current", "historical"), default="current",
+                    help="Current named Collection/Test graph, or explicit historical baseline.")
     ap.add_argument(
         "--include",
         default="*.xml",
@@ -130,7 +133,10 @@ def main():
                 rows.append(row)
                 continue
 
-            native,error=lower_definition(root,did,"roundtrip."+semantic_id(did,"definition"))
+            native,error=lower_definition(
+                root,did,"roundtrip."+semantic_id(did,"definition"),
+                collection_graph=args.layout == "current",
+            )
             if native is None:
                 row["stage"]="lower"
                 row["error"]=error
@@ -139,6 +145,10 @@ def main():
 
             try:
                 assert_native_clean(native)
+                if args.layout == "current":
+                    errors = violations(native)
+                    if errors:
+                        raise ValueError("Current authoring contract: " + str(errors))
             except Exception as exc:
                 row["stage"]="cleanliness"
                 row["error"]=str(exc)
@@ -148,7 +158,7 @@ def main():
             stem=safe_name(Path(rel).with_suffix("").as_posix()+"__"+did)
             native_path=args.out/(stem+".native.json")
             regen_path=args.out/(stem+".oval.xml")
-            native_path.write_text(json.dumps(native,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+            native_path.write_text(json.dumps(native,indent=2)+"\n",encoding="utf-8")
 
             try:
                 tree,regen_id=reverse_build(native)
@@ -194,6 +204,7 @@ def main():
 
     deepest=max(rows,key=lambda r:r.get("dependency_depth",0),default=None)
     report={
+        "native_layout":args.layout,
         "files":len(sources),
         "definitions":total,
         "semantic_equal":equal,

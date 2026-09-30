@@ -31,7 +31,7 @@ def summarize(folder: Path, expected_sources: list[str]) -> dict:
     unaccounted = []
     for row in by_source.values():
         for field in ("definitions", "semantic_equal", "deprecated_blockers",
-                      "publisher_extension_blockers", "unexpected_failures"):
+                      "publisher_extension_blockers", "unexpected_failures", "parse_failures"):
             totals[field] += int(row.get(field, 0))
         extensions.update(row.get("publisher_extension_elements") or [])
         classified = sum(int(row.get(k, 0)) for k in (
@@ -118,7 +118,8 @@ def main() -> int:
     print(render_markdown(report))
     if (report["missing_sources"] or report["duplicate_sources"]
             or report["unexpected_sources"] or report["unaccounted_packages"]
-            or report["totals"].get("unexpected_failures", 0)):
+            or report["totals"].get("unexpected_failures", 0)
+            or report["totals"].get("parse_failures", 0)):
         return 1
     return 0
 

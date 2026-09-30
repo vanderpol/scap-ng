@@ -1,0 +1,45 @@
+name: Current-design regression contracts
+on:
+  push:
+    branches: [main]
+    paths:
+      - tools/scap_upconvert_v003/**
+      - tools/scap_ng_roundtrip_v003/**
+      - tools/test_*.py
+      - tools/check_current_authoring_contract.py
+      - tools/resolve_tailoring_example.py
+      - .github/workflows/scap-ng-current-regression.yml
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: read
+jobs:
+  contracts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 lxml==6.1.1
+      - name: Current source graph and actual corpus CLI
+        run: |
+          python tools/test_named_collection_graph.py
+          python tools/test_current_corpus_cli.py
+      - name: Variables, defaults, State entities and explicit semantics
+        run: |
+          python tools/test_variable_filter_dependencies.py
+          python tools/test_oval_effective_attributes.py
+          python tools/test_state_entity_roundtrip.py
+          python tools/scap_ng_roundtrip_v003/test_explicit_semantics.py
+      - name: Authoring, Profiles, Tailoring and provenance
+        run: |
+          python tools/test_current_authoring_contract.py
+          python tools/test_full_review_contract.py
+          python tools/test_tailoring_example.py

@@ -16,6 +16,7 @@ on:
       - "tools/scap_ng_roundtrip_v003/compare_schematron_baseline.py"
       - "tools/scap_ng_roundtrip_v003/build_full_oval_omni.py"
       - "tools/scap_ng_roundtrip_v003/summarize_niwc_census.py"
+      - "tools/check_current_authoring_contract.py"
       - "tools/scap14_rule_splitter.py"
       - "tools/oval_semantic_ir.py"
 
@@ -107,7 +108,8 @@ jobs:
             --benchmark-key "current-${{ matrix.key }}" \
             --fail-on-unresolved
 
-      - name: Round-trip all standard definitions
+      - name: Round-trip all standard definitions using current Collection/Test graph
+        id: roundtrip
         run: |
           python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
             --corpus "work/${{ matrix.key }}-split" \
@@ -126,6 +128,8 @@ jobs:
           from pathlib import Path
           key=os.environ["KEY"]
           report=json.loads(Path(f"work/{key}-roundtrip.json").read_text())
+          if report.get("native_layout") != "current":
+              raise SystemExit("Historical output cannot establish current-design coverage")
           deprecated=[]
           extensions=[]
           bad=[]
@@ -152,6 +156,8 @@ jobs:
                   bad.append(row)
           summary={
               "source":os.environ["SOURCE"],
+              "native_layout":report["native_layout"],
+              "parse_failures":len(report.get("parse_failures", [])),
               "definitions":report["definitions"],
               "semantic_equal":report["semantic_equal"],
               "deprecated_blockers":len(deprecated),
@@ -164,18 +170,20 @@ jobs:
               json.dumps(summary,indent=2,sort_keys=True)+"\n"
           )
           print(json.dumps(summary,indent=2,sort_keys=True))
-          if bad:
+          if bad or report.get("parse_failures"):
               print(json.dumps({"unexpected_failures":bad},indent=2))
               raise SystemExit(1)
           PY
 
       - name: Build aggregate OVAL validation schema
+        if: ${{ !cancelled() && steps.roundtrip.outcome == 'success' }}
         run: |
           python scap-ng/tools/scap_ng_roundtrip_v003/build_full_oval_omni.py \
             --schemas oval-language/oval-schemas \
             --output oval-language/oval-schemas/roundtrip-full-omni.xsd
 
       - name: Validate regenerated standard OVAL with XSD
+        if: ${{ !cancelled() && steps.roundtrip.outcome == 'success' }}
         run: |
           set -euo pipefail
           while IFS= read -r -d '' xml; do
@@ -185,6 +193,7 @@ jobs:
           done < <(find "work/${{ matrix.key }}-roundtrip" -maxdepth 1 -name '*.oval.xml' -print0)
 
       - name: Compare Schematron findings to sources
+        if: ${{ !cancelled() && steps.roundtrip.outcome == 'success' }}
         run: |
           python scap-ng/tools/scap_ng_roundtrip_v003/compare_schematron_baseline.py \
             --schemas oval-language/oval-schemas \
