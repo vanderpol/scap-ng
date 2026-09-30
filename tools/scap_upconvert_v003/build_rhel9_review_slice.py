@@ -1035,6 +1035,13 @@ def lower_definition(oroot, definition_id, assessment_id):
         object_name = name[:-7] if name.endswith("_object") else name
         return f"{family}.{object_name}"
 
+    def capability_for_state(state):
+        name = local(state.tag)
+        ns_uri = state.tag.split("}", 1)[0].strip("{") if "}" in state.tag else ""
+        family = ns_uri.split("#")[-1].split("/")[-1] if ns_uri else "generic"
+        state_name = name[:-6] if name.endswith("_state") else name
+        return f"{family}.{state_name}"
+
     def ensure_variable(var_ref):
         if var_ref in variable_names:
             return variable_names[var_ref], None
@@ -1242,7 +1249,7 @@ def lower_definition(oroot, definition_id, assessment_id):
     def lower_state(state_ref):
         state = find_by_id(oroot, state_ref, "_state")
         if state is None:
-            return None, None, f"state_not_found:{state_ref}"
+            return None, None, None, f"state_not_found:{state_ref}"
         conditions = []
         for child in state:
             if local(child.tag) in ("notes",):
@@ -1281,14 +1288,14 @@ def lower_definition(oroot, definition_id, assessment_id):
             elif state_operator == "OR":
                 condition = {"any": conditions}
             else:
-                return None, node_title(state), f"unsupported_state_operator:{state_operator}"
-        return condition, node_title(state), None
+                return None, node_title(state), capability_for_state(state), f"unsupported_state_operator:{state_operator}"
+        return condition, node_title(state), capability_for_state(state), None
 
     def lower_filter(filter_node):
         state_ref = filter_node.get("state_ref") or text(filter_node)
         if not state_ref:
             return None, "filter_missing_state"
-        condition, state_title, error = lower_state(state_ref)
+        condition, state_title, state_capability, error = lower_state(state_ref)
         if error:
             return None, error
         item = {
@@ -1297,6 +1304,8 @@ def lower_definition(oroot, definition_id, assessment_id):
         }
         if state_title:
             item["state_title"] = state_title
+        if state_capability:
+            item["capability"] = state_capability
         return item, None
 
     def lower_set(set_node):
@@ -1451,19 +1460,19 @@ def lower_definition(oroot, definition_id, assessment_id):
         collection, error = lower_object(obj_ref)
         if error:
             return None, error
-        # The Test identifies the collector family authoritatively. Preserve the
-        # object's recursive structure but normalize the top-level capability to it.
-        collection["capability"] = capability
-
+        # Preserve Test, Object, and State capabilities independently. OVAL
+        # references can legally preserve distinct component families and a
+        # lossless converter must not retag the referenced Object.
         states = []
         for ref in state_refs:
-            condition, title, error = lower_state(ref)
+            condition, title, state_capability, error = lower_state(ref)
             if error:
                 return None, error
             if condition is not None:
                 states.append({
                     "state": condition,
                     "state_title": title,
+                    "capability": state_capability,
                 })
 
         check_id = unique_check_id(test_title, capability)
@@ -1482,6 +1491,8 @@ def lower_definition(oroot, definition_id, assessment_id):
                 assertion["state"] = states[0]["state"]
                 if states[0].get("state_title"):
                     assertion["state_title"] = states[0]["state_title"]
+                if states[0].get("capability"):
+                    assertion["state_capability"] = states[0]["capability"]
             else:
                 # Preserve Test-level state boundaries separately from the
                 # boolean operator inside each State. These are distinct OVAL
@@ -1491,6 +1502,7 @@ def lower_definition(oroot, definition_id, assessment_id):
 
         checks[check_id] = {
             "test_title": test_title,
+            "capability": capability,
             "collect": collection,
             "assert": assertion,
         }
