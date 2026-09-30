@@ -43,12 +43,16 @@ Review can proceed with *documented* nonblocking warnings; no blanket
   Warning categories: **468 OVAL_OBJECT_COMMENT_MISSING** and **268
   OVAL_STATE_COMMENT_MISSING**. These reflect absence of descriptive source
   comments; do not silently synthesize fictitious source labels.
-- Workflow `v003-rhel9-full.yml` successfully generated/validated output
-  on the observed failed run, but could not publish due to an unstaged
-  working tree before rebase. Publishing correction committed 2026-09-30.
-- Outstanding review work: confirm corrected workflow publication; check
-  exact published source pin and complete Rule/selector accounting; verify
-  policy/assessment authoring usability before handoff.
+- **Publishing correction verified:** `v003-rhel9-full.yml` run
+  [36716375732](https://github.com/vanderpol/scap-ng/actions/runs/36716375732)
+  completed successfully at source commit `314a02e` on 2026-09-30.
+  Committed `benchmark.yaml`, `diagnostics.json`, and package-summary evidence
+  are available. This establishes successful generation and publishing,
+  **not** final assessment-level losslessness or design-review readiness.
+- Outstanding review work: check exact published source pin and complete
+  Rule/selector accounting; sample the actual generated assessments against
+  OVAL source for human readability, applicability, manual inputs and
+  existence/variable/filter behaviors before handoff.
 
 ## Snapshot: Windows 11
 
