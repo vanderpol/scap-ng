@@ -19,6 +19,8 @@ def typed(el,suffix):
     ns,local=split(el.tag)
     if not local.endswith(suffix): raise ValueError(local)
     fam=FAMS.get(ns)
+    if not fam and ns.startswith(OD+"#"):
+        fam=ns.split("#",1)[1]
     if not fam: raise ValueError(f"unsupported namespace {ns}")
     return fam+"."+local[:-len(suffix)]
 def sval(v):
@@ -64,6 +66,20 @@ class Model:
             return ("unique",tuple(self.component(c) for c in e))
         if local=="split":
             return ("split",e.attrib["delimiter"],tuple(self.component(c) for c in e))
+        if local in ("begin","end"):
+            return (local,e.attrib["character"],self.component(list(e)[0]))
+        if local=="escape_regex":
+            return ("escape_regex",self.component(list(e)[0]))
+        if local=="substring":
+            return ("substring",e.attrib["substring_start"],e.attrib["substring_length"],self.component(list(e)[0]))
+        if local=="regex_capture":
+            return ("regex_capture",e.attrib.get("pattern"),self.component(list(e)[0]))
+        if local=="glob_to_regex":
+            return ("glob_to_regex",e.attrib.get("glob_noescape","false"),self.component(list(e)[0]))
+        if local=="time_difference":
+            return ("time_difference",e.attrib.get("format_1","year_month_day"),e.attrib.get("format_2","year_month_day"),tuple(self.component(c) for c in e))
+        if local=="merge":
+            return ("merge",e.attrib.get("delimiter",""),e.attrib.get("sort","document"),e.attrib.get("order","ascending"),tuple(self.component(c) for c in e))
         raise ValueError(f"unsupported component {local}")
 
     def variable(self,vid):
@@ -177,22 +193,23 @@ class Model:
     def variable_multiset(self):
         return collections.Counter(repr(self.variable(v)) for v in self.vars)
 
-def compare(a,b,source_root=None,regenerated_root=None):
+def compare(a,b,source_root=None,regenerated_root=None,root_only=False):
     am=Model(a); bm=Model(b)
     result={"equal":True}
-    for label, A, B in [
+    if not root_only:
+        for label, A, B in [
         ("test", am.test_multiset(), bm.test_multiset()),
         ("object", am.object_multiset(), bm.object_multiset()),
         ("state", am.state_multiset(), bm.state_multiset()),
-        ("variable", am.variable_multiset(), bm.variable_multiset()),
-    ]:
-        only_a=list((A-B).elements()); only_b=list((B-A).elements())
-        result[label+"_equal"]=not only_a and not only_b
-        result["only_source_"+label]=only_a
-        result["only_regenerated_"+label]=only_b
-        result["source_"+label+"_count"]=sum(A.values())
-        result["regenerated_"+label+"_count"]=sum(B.values())
-        result["equal"]=result["equal"] and result[label+"_equal"]
+            ("variable", am.variable_multiset(), bm.variable_multiset()),
+        ]:
+            only_a=list((A-B).elements()); only_b=list((B-A).elements())
+            result[label+"_equal"]=not only_a and not only_b
+            result["only_source_"+label]=only_a
+            result["only_regenerated_"+label]=only_b
+            result["source_"+label+"_count"]=sum(A.values())
+            result["regenerated_"+label+"_count"]=sum(B.values())
+            result["equal"]=result["equal"] and result[label+"_equal"]
     if source_root:
         if not regenerated_root:
             if len(bm.definitions)!=1:
@@ -209,9 +226,10 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("source",type=Path); ap.add_argument("regenerated",type=Path)
     ap.add_argument("--source-root"); ap.add_argument("--regenerated-root")
+    ap.add_argument("--root-only",action="store_true")
     ap.add_argument("--json",action="store_true")
     a=ap.parse_args()
-    r=compare(a.source,a.regenerated,a.source_root,a.regenerated_root)
+    r=compare(a.source,a.regenerated,a.source_root,a.regenerated_root,a.root_only)
     print(json.dumps(r,indent=2) if a.json else ("EQUAL" if r["equal"] else json.dumps(r,indent=2)))
     raise SystemExit(0 if r["equal"] else 1)
 if __name__=="__main__": main()
