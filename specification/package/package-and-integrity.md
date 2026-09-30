@@ -53,46 +53,38 @@ within the package.
 ## 5. Explicit source references versus compiled manifest resolution
 
 **Two different operations serve different users.** Authors need a direct and
-human-readable way to follow Rule → Policy → selected check → Assessment.
-Scanners need immutable, validated object lookup and package integrity without
-depending on the author's directory layout. The compiled package manifest
-serves this *runtime* need; it is **not** an additional author-maintained
-Assessment index.
+human-readable way to follow Benchmark → Rule → selected Assessment. Scanners
+need immutable, validated object lookup and package integrity without depending
+on the author's directory layout. The compiled package manifest serves this
+*runtime* need; it is **not** an additional author-maintained Assessment index.
 
 ### 5.1 Authoring and compilation
 
-For the iteration-003 file-backed authoring model, a Rule SHALL identify its
-Policy source file using an explicit relative path. Each Policy check selector
-SHALL identify its Assessment source file by an explicit relative path.
-These paths SHALL resolve relative to the **referring YAML file**, not to the
-process working directory or an implicitly chosen root.
+For the current file-backed authoring model, each Rule SHALL expose its named
+Assessment selections using explicit relative paths to Assessment YAML files.
+Those paths SHALL resolve relative to the **referring Rule file**, not to the
+process working directory or an implicitly chosen repository root.
 
 The compiler SHALL normalize paths, enforce the declared source boundary,
-verify referenced files exist and contain the expected object types, and read
-their actual logical identifiers and versions. It SHALL reject missing,
-ambiguous, incompatible, or boundary-escaping links. Neither a filename nor
-a parent-directory convention SHALL determine an object's semantic identity.
-An author SHALL NOT be required to maintain a second Assessment lookup index.
+verify referenced files exist and contain Assessment objects, and read their
+actual logical identities and versions. It SHALL reject missing, ambiguous,
+incompatible, or boundary-escaping links. Neither a filename nor a containing
+directory convention SHALL determine an Assessment's semantic identity.
+Authors SHALL NOT be required to maintain a separate Policy file or Assessment
+lookup index.
 
-Illustrative source (the exact source schema is still pre-alpha):
+Illustrative source (field names remain pre-alpha):
 
 ```yaml
 # rules/SV-257777.rule.yaml
 rule:
   id: SV-257777
-  policy: ../policies/SV-257777.policy.yaml
-```
-
-```yaml
-# policies/SV-257777.policy.yaml
-policy:
-  id: SV-257777.policy
-  default_check: automated
-  checks:
+  assessment_choices:
     automated:
       assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
     manual:
       assessment: ../assessments/manual/SV-257777.manual.assessment.yaml
+  default_assessment_choice: automated
 ```
 
 ### 5.2 Compilation output and runtime
@@ -104,25 +96,25 @@ to the object's declared type and exact immutable package member. The entry
 SHALL include sufficient integrity information, including a content digest,
 to detect modification or substitution. Content size SHOULD also be recorded.
 
-The compiler SHALL resolve the source paths and check selectors into logical
-object references and construct the manifest **automatically**. An author
-SHALL NOT create or synchronize a separate assessment index by hand.
+The compiler SHALL resolve Rule-owned source paths and named Assessment
+selections into logical object references and construct the manifest
+**automatically**. An author SHALL NOT create or synchronize a separate
+Assessment index by hand.
 
-On loading the package, a scanner SHALL validate the applicable package
-integrity and use the manifest to resolve logical Rule, Policy and Assessment
-references to exact packaged members. A scanner SHALL NOT discover objects
-by guessing filenames from IDs, searching directories, or reopening relative
-authoring paths. Missing references, conflicting identities, wrong types and
-digest mismatches SHALL cause a defined validation failure rather than
-fallback resolution.
+On loading the package, a scanner SHALL validate applicable package integrity
+and use the manifest to resolve logical Rule and Assessment references to exact
+packaged members. A scanner SHALL NOT discover objects by guessing filenames
+from IDs, searching directories, or reopening relative authoring paths.
+Missing references, conflicting identities, wrong types and digest mismatches
+SHALL cause a defined validation failure rather than fallback resolution.
 
 The manifest lookup is distinct from Benchmark membership: the Benchmark's
 Rule list says **which Rules belong** to the Benchmark; the manifest says
-**where a referenced packaged Rule/Policy/Assessment object lives** and how
-to verify it.
+**where referenced packaged Rule and Assessment objects live** and how to
+verify them.
 
-Multiple Policy check selectors MAY resolve to the same Assessment identity.
-The manifest need only bind that Assessment once; selected-check identity
+Multiple named Rule selections MAY resolve to the same Assessment identity.
+The manifest need only bind that Assessment once; selected-choice identity
 SHALL remain available for results and provenance.
 
 ### 5.3 Why this is useful
