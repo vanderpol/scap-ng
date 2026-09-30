@@ -1,0 +1,39 @@
+name: Audit complete upstream OVAL 5.12.3 XSD semantics
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/audit-upstream-oval-xsd-defaults.yml"
+      - "tools/scap_ng_roundtrip_v003/audit_oval_xsd_defaults.py"
+
+jobs:
+  xsd-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install parsing dependency
+        run: python -m pip install lxml
+      - name: Audit XSD defaults inheritance documentation and Schematron
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/audit_oval_xsd_defaults.py \
+            --schemas oval-language/oval-schemas \
+            --out work/oval-xsd-5.12.3-audit
+          cat work/oval-xsd-5.12.3-audit/summary.json
+      - name: Upload full XSD audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upstream-oval-5.12.3-xsd-audit
+          path: work/oval-xsd-5.12.3-audit/
