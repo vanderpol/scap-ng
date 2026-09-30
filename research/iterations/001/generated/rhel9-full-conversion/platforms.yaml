@@ -606,6 +606,18 @@ inventory_assessments:
     description: Product inventory for cpe:/o:redhat:enterprise_linux:9.0
     semantic_model: scap-ng-generic-assessment-graph-0.1
     collect:
+      oval:mil.disa.stig.linux:obj:110000004:
+        capability: scapng.collect.linux.rpminfo
+        source_object_id: oval:mil.disa.stig.linux:obj:110000004
+        source_type: rpminfo_object
+        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+        version: '13'
+        object_title: null
+        query:
+        - kind: element
+          name: name
+          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
+          value: redhat-release
       oval:mil.disa.stig.linux:obj:110000003:
         capability: scapng.collect.linux.rpminfo
         source_object_id: oval:mil.disa.stig.linux:obj:110000003
@@ -630,18 +642,6 @@ inventory_assessments:
           name: name
           namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
           value: toss-release
-      oval:mil.disa.stig.linux:obj:110000004:
-        capability: scapng.collect.linux.rpminfo
-        source_object_id: oval:mil.disa.stig.linux:obj:110000004
-        source_type: rpminfo_object
-        source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-        version: '13'
-        object_title: null
-        query:
-        - kind: element
-          name: name
-          namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          value: redhat-release
     derive: {}
     predicates:
       oval:mil.disa.stig.linux:ste:110000004:
@@ -666,18 +666,17 @@ inventory_assessments:
         state_title: null
     evaluate:
       tests:
-        oval:mil.disa.stig.linux:tst:110000006:
-          source_test_id: oval:mil.disa.stig.linux:tst:110000006
+        oval:mil.disa.stig.linux:tst:110000009:
+          source_test_id: oval:mil.disa.stig.linux:tst:110000009
           source_type: rpminfo_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: The redhat-release package is version 9.
+          test_title: The TOSS Package is not Installed
           check: all
-          check_existence: all_exist
+          check_existence: none_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.linux:obj:110000004
-          predicates:
-          - oval:mil.disa.stig.linux:ste:110000004
+          - oval:mil.disa.stig.linux:obj:110000002
+          predicates: []
           source_other: []
         oval:mil.disa.stig.linux:tst:110000010:
           source_test_id: oval:mil.disa.stig.linux:tst:110000010
@@ -691,17 +690,18 @@ inventory_assessments:
           - oval:mil.disa.stig.linux:obj:110000003
           predicates: []
           source_other: []
-        oval:mil.disa.stig.linux:tst:110000009:
-          source_test_id: oval:mil.disa.stig.linux:tst:110000009
+        oval:mil.disa.stig.linux:tst:110000006:
+          source_test_id: oval:mil.disa.stig.linux:tst:110000006
           source_type: rpminfo_test
           source_namespace: http://oval.mitre.org/XMLSchema/oval-definitions-5#linux
-          test_title: The TOSS Package is not Installed
+          test_title: The redhat-release package is version 9.
           check: all
-          check_existence: none_exist
+          check_existence: all_exist
           state_operator: AND
           collections:
-          - oval:mil.disa.stig.linux:obj:110000002
-          predicates: []
+          - oval:mil.disa.stig.linux:obj:110000004
+          predicates:
+          - oval:mil.disa.stig.linux:ste:110000004
           source_other: []
       definitions:
         oval:mil.disa.stig.rhel9os:def:101:
@@ -773,7 +773,7 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:redhat:enterprise_linux:9.0
-      semantic_ir_sha256: 19dd0476cddf2fad43a7b2c63ca9a8c62f446f8c8fc0db30ea753d317f50266c
+      semantic_ir_sha256: 2e74550f71262bd8ec9b2667de973575ee02433f7672b31fe9ae6b9e715f7b3d
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 1123d67ae0c5590b383143cac5ad6c08563af0cf9399b154d4e3edac244d0de1
     purpose: platform_inventory
@@ -929,7 +929,7 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:rocky:rocky:9
-      semantic_ir_sha256: 1d01080492bfacf3d3db05d24ac894f2592f9051bd3e696136165fba1f7a9dc0
+      semantic_ir_sha256: 937cc5a40cbd7f1e98f41db50249bf8227bd5e4abdb35b2b0266868e9ba2a946
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: 0c1bfdd0d4971fe09252f42370d8104d6df58e3a8b967a34cc803784bd7582fe
     purpose: platform_inventory
@@ -1085,7 +1085,7 @@ inventory_assessments:
       status: legacy_compatible
       source: SCAP 1.4 / OVAL 5.12.3
       source_rule: platform.inventory.cpe:/o:almalinux:almalinux:9
-      semantic_ir_sha256: 204ccbc516fec216b7541589b05f3b56cfcad34c7e9adee2da089844ba84f6f7
+      semantic_ir_sha256: 7953fd6a3382cfe8df572ff678f3698a73ef803e5172aa361d0e7e0251f1ce09
       note: Faithful generic assessment graph. Native collector/capability mappings remain subject to reviewed promotion.
     semantic_fingerprint_sha256: d064e87d9d953287f003551d7ff907d454eb2f08fdfffd7b35051654d805e0ef
     purpose: platform_inventory
