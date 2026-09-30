@@ -87,6 +87,21 @@ class StateEntityRoundTripTests(unittest.TestCase):
             self.assertEqual(list(item)[:3],
                              ["state_title", "capability", "state"])
 
+    def test_oval_definition_deprecation_stays_out_of_native_source(self):
+        source = ET.fromstring(SOURCE)
+        native, error = lower_definition(source, "oval:example:def:1", "active-definition")
+        self.assertIsNone(error, error)
+        self.assertNotIn("deprecated", native["assessment"])
+        source_def = source.find(f".//{{{OD}}}definition")
+        source_def.set("deprecated", "false")
+        explicit, error = lower_definition(source, "oval:example:def:1", "explicit-false")
+        self.assertIsNone(error, error)
+        self.assertNotIn("deprecated", explicit["assessment"])
+        source_def.set("deprecated", "true")
+        rejected, error = lower_definition(source, "oval:example:def:1", "obsolete")
+        self.assertIsNone(rejected)
+        self.assertEqual(error, "deprecated_oval_definition")
+
     def test_required_test_check_is_not_invented(self):
         source = ET.fromstring(SOURCE.replace('check="all" ', ''))
         native, error = lower_definition(source, "oval:example:def:1", "invalid-check")

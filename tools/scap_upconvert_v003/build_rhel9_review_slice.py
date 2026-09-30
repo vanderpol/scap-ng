@@ -375,6 +375,8 @@ def build_experimental_package(source_root, package_path):
     manifest = {
         "format": "scap-ng-package-manifest",
         "format_version": "0.0.3-experimental",
+        # Research placeholder until an authoritative NG JSON Schema exists.
+        "ng_schema_version": None,
         "benchmark": benchmark_id,
         "objects": manifest_objects,
     }
@@ -876,9 +878,26 @@ def oval_semantic_inventory(oroot):
             "variable_component",
         ):
             counts[name] = counts.get(name, 0) + 1
+    definition_flags = []
+    for node in oroot.iter():
+        if local(node.tag) != "definition":
+            continue
+        raw = node.get("deprecated")
+        if raw is not None or raw in ("true", "1"):
+            definition_flags.append({
+                "definition_id": node.get("id"),
+                "source_explicit_value": raw,
+                "effective_deprecated": (raw or "false").strip().lower() in ("true", "1"),
+            })
     return {
         "construct_counts": dict(sorted(counts.items())),
         "variable_kinds": dict(sorted(variable_kinds.items())),
+        "source_definition_deprecation_flags": definition_flags,
+        "definition_deprecation_default": {
+            "value": "false",
+            "provenance": "OVAL 5.12.3 DefinitionType XSD default",
+            "native_semantics": "none; deprecated OVAL source definitions are conversion blockers",
+        },
     }
 
 def unsupported_definition_features(oroot, definition_id):
@@ -1064,6 +1083,11 @@ def lower_definition(oroot, definition_id, assessment_id):
     )
     if definition is None:
         return None, "definition_not_found"
+    # OVAL Definition.deprecated is historical source metadata, not an
+    # SCAP-NG assessment runtime attribute. Deprecated source definitions
+    # cannot be emitted as ordinary executable NG assessments.
+    if (definition.get("deprecated") or "false").strip().lower() in ("true", "1"):
+        return None, "deprecated_oval_definition"
 
     assessment_title = oval_definition_title(definition)
     assessment_class = definition.get("class") or "miscellaneous"
@@ -1704,7 +1728,6 @@ def lower_definition(oroot, definition_id, assessment_id):
         "assessment_title": assessment_title,
         "mode": "automated",
         "class": assessment_class,
-        "deprecated": (definition.get("deprecated") or "false").lower() in ("true", "1"),
         "purpose": "assessment",
         "checks": checks,
         "evaluate": expression,
@@ -2089,6 +2112,8 @@ def main():
         benchmark_doc = {
             "benchmark": {
                 "id": "rhel9-stig-full" if FULL_MODE else "rhel9-stig-review-slice",
+                # Inherited from Benchmark root; no schema version assigned yet.
+                "ng_schema_version": None,
                 "use_case": "compliance",
                 "title": localized_texts(xr, "title"),
                 "description": localized_texts(xr, "description"),

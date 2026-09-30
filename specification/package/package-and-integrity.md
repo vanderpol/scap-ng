@@ -170,3 +170,22 @@ lineage.
 **Specification navigation:** [← Previous: Manual Assessment](../assessment/manual-assessment.md) · [Contents](../README.md) · [Next: Results and Evidence →](../results/results.md)
 
 <!-- spec-nav:end -->
+
+
+## Candidate: schema-contract propagation into scanner packages
+
+**Status: pre-schema research placeholder.**
+
+The Benchmark is the authority for the authoring schema contract. A compiler
+SHOULD validate the full closed reference graph using that contract, then stamp
+its *resolved* NG content schema identifier/version into the compiled package
+manifest. The manifest's own `format_version` describes the **manifest layout**;
+it is not interchangeable with `ng_schema_version` (the SCAP-NG content model).
+
+Iteration-003 uses `ng_schema_version: null` in both the Benchmark and its
+review package manifest because no published NG assessment/JSON Schema is
+available. Such packages remain research artifacts and SHALL NOT be accepted
+by a production scanner as version-compatible merely because their JSON is
+parseable. An implementation SHALL reject unsupported or unresolved schema
+versions and conflicting nested declarations. A normalized scanner package
+SHALL NOT rely on unspecified or silently inherited execution semantics.

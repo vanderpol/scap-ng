@@ -492,3 +492,30 @@ addressable in native source.
 A human-readable synthesized citation MAY be generated for display, but it
 SHALL NOT replace structured reference data when that structure was present in
 the source.
+
+
+## Candidate: NG schema contract at the Benchmark root (pending ratification)
+
+**Status: research placeholder; no numbered NG assessment JSON Schema has been adopted.**
+
+A Benchmark source SHOULD identify the schema contract used for validation of the
+Benchmark and its referenced Rule, Policy, Assessment, Applicability and other
+first-party NG objects. Referenced source files SHOULD inherit this version
+through their validated Benchmark source graph rather than each declaring a
+potentially contradictory value.
+
+The current iteration-003 review artifacts emit `ng_schema_version: null` near
+the top of the Benchmark because the NG schema is **unassigned**. The literal
+`null` SHALL NOT be interpreted as a valid specification, a compatibility
+wildcard, or an instruction to auto-detect an arbitrary schema. A future
+production validator SHALL reject an unassigned version for executable scanner
+packages. The actual property name, version range and schema identifiers remain
+to be settled before normative adoption.
+
+Benchmark `version` remains the Benchmark's **content revision**, independently
+of any future NG schema version. Likewise Assessment `version` is an Assessment
+revision, not a schema compatibility marker.
+
+Reused Assessment content is valid in a Benchmark only after compilation
+validates it against the effective schema contract; supporting independent
+versioned reusable libraries later may require an explicit dependency contract.
