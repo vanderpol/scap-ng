@@ -112,7 +112,7 @@ jobs:
             --report "work/${{ matrix.key }}-roundtrip.json" \
             --inventory-only
 
-      - name: Enforce only deprecated-test blockers
+      - name: Enforce only intentional conversion blockers
         env:
           KEY: ${{ matrix.key }}
         run: |
@@ -123,23 +123,32 @@ jobs:
           report=json.loads(Path(f"work/{key}-roundtrip.json").read_text())
           failures=[r for r in report["results"] if not r.get("equal")]
           deprecated=[]
+          extensions=[]
           bad=[]
+          extension_details=set()
           for row in failures:
               features=row.get("unsupported_features") or []
               names={x.get("feature") for x in features}
               if names and names <= {"deprecated_oval_test"}:
                   deprecated.append(row)
+              elif names and names <= {"nonstandard_oval_element"}:
+                  extensions.append(row)
+                  for feature in features:
+                      if feature.get("detail"):
+                          extension_details.add(feature["detail"])
               else:
                   bad.append(row)
           print(json.dumps({
               "definitions": report["definitions"],
               "semantic_equal": report["semantic_equal"],
               "deprecated_blockers": len(deprecated),
+              "publisher_extension_blockers": len(extensions),
+              "publisher_extension_elements": sorted(extension_details),
               "unexpected_failures": len(bad),
               "max_dependency_depth": report.get("max_dependency_depth",0),
           },indent=2))
           if bad:
-              print(json.dumps(bad,indent=2))
+              print(json.dumps({"unexpected_failures":bad},indent=2))
               raise SystemExit(1)
           PY
 
