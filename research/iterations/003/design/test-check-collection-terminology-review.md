@@ -64,3 +64,18 @@ An authoring editor MAY offer a presentation that *looks* less repetitive, but a
 A clean semantic model need not expose OVAL XML's **Object** type as a top-level native file. The term **collection** describes the acquisition operation more plainly. The native **Test** remains the smallest evaluation node, distinct from a Rule selecting a **check** through Policy.
 
 **Decision required later:** Confirm native words and whether the Test capability is mandatory in authored source, mandatory only in canonical compiled JSON, or safely derived through a proven capability contract. No normative change authorized here.
+
+
+## Pinned Test/Object/State evidence (2026-09-30)
+
+[Successful audit run](https://github.com/vanderpol/scap-ng/actions/runs/36747126738), using OVAL 5.12.3 upstream schemas and NIWC source pin `8c8e5dff860af6b1290ee9273a282db24278f8d5`, found across RHEL 9 and Windows 11:
+- 1,026 Tests; 1,026 direct Object references; 797 direct State references.
+- **Zero** mismatched Test/Object/State qualified types, missing direct reference targets or duplicate component IDs.
+- 251 of the inventory's 258 Test declarations have recognized explicit type-reference Schematron checks. Seven do not: `independent.unknown_test`, `junos.show_test`, `junos.version_test`, `junos.xml_show_test`, `windows.license_test`, `windows.peheader_test`, `windows.systemmetric_test`.
+- Upstream Junos `show_test`, `version_test`, and `xml_show_test` have required `object` and optional `state` references of generic reference types. Lack of typed-reference assertions is a candidate *validator coverage gap*, not a demonstrated permission to mix families.
+
+**Provisional inference:** user proposal to declare capability just once at Test level, with Collection and State inheriting their types, is consistent with every tested direct reference and with the typical upstream typed Schematron pattern. The independent unknown Test has no Object and requires a special native result capability, not a duplicate collection capability. This does not yet prove coverage for all 258 Test types, all 65 published source packages or nested set/filter paths.
+
+**Conformance tests needed before adopting as normative:** (1) capability mismatch must fail even if bare XML XSD accepts the references; (2) nested filters and sets must enforce compatible type constraints, potentially with typed collection ancestry beyond a single Test; (3) special no-Object Tests get explicit contracts; (4) reject legacy mismatched source graphs or report them as source defects instead of retagging. Until the tests pass, keep independent Test/Object/State types in Stage-1 conversion data and source provenance to avoid obscuring failures.
+
+The type-count inventory is empirical and *not* an OVAL Board vote. A clearly labeled non-voting Discussion can summarize it after the gap audit closes.
