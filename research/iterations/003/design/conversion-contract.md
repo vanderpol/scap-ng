@@ -288,3 +288,19 @@ Accordingly:
 This normalization is `represented_normalized`, not a loss of assessment
 semantics. Structural XML comparison SHALL classify the removal of
 `extend_definition` separately from unexplained differences.
+
+### Independent Test, Object, and State capability identity
+
+SCAP 1.4 OVAL references SHALL be followed as references rather than inferred
+from the referencing Test's family. The native conversion SHALL preserve the
+declared capability/type of the Test, each referenced Object, and each
+referenced State independently.
+
+The converter SHALL NOT retag an Object or State solely to make its capability
+match the Test. This requirement also applies recursively through sets,
+filters, variables, and `object_component` references.
+
+Reverse conversion SHALL serialize each Test, Object, and State using its own
+preserved capability identity. A cross-family reference that is permitted by
+the source graph therefore remains cross-family after round trip rather than
+being normalized to the Test family.
