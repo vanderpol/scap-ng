@@ -119,6 +119,39 @@ class EffectiveAttributeTests(unittest.TestCase):
             "at_least_one_exists",
         )
 
+    def test_deprecated_false_inherited_across_oval_base_types(self):
+        # Pinned OVAL 5.12.3 schema declares deprecated="false" on
+        # DefinitionType, TestType, ObjectType, StateType, VariableType.
+        for scope in ("definition", "test", "object", "state", "variable"):
+            with self.subTest(scope=scope):
+                omitted = ir.effective_attributes(element("<node/>"), scope)
+                explicit = ir.effective_attributes(
+                    element('<node deprecated="false"/>'), scope
+                )
+                enabled = ir.effective_attributes(
+                    element('<node deprecated="true"/>'), scope
+                )
+                self.assertEqual(omitted["deprecated"], {
+                    "value": "false", "origin": "xsd_default",
+                })
+                self.assertEqual(explicit["deprecated"], {
+                    "value": "false", "origin": "explicit",
+                })
+                self.assertEqual(enabled["deprecated"], {
+                    "value": "true", "origin": "explicit",
+                })
+
+    def test_parsed_base_components_retain_deprecated_provenance(self):
+        for parser in (ir.parse_definition, ir.parse_test, ir.parse_object,
+                       ir.parse_state, ir.parse_variable):
+            with self.subTest(parser=parser.__name__):
+                source = element("<node/>")
+                parsed = parser(source)
+                self.assertEqual(
+                    parsed["effective_attributes"]["deprecated"]["origin"],
+                    "xsd_default",
+                )
+
     def test_unknown_scope_fails_closed(self):
         with self.assertRaises(ValueError):
             ir.effective_attributes(element("<path/>"), "behavior")
