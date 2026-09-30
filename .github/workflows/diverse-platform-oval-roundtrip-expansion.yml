@@ -1,0 +1,155 @@
+name: Diverse platform OVAL round-trip expansion
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/diverse-platform-oval-roundtrip-expansion.yml"
+      - "tools/scap_upconvert_v003/**"
+      - "tools/scap_ng_roundtrip_v003/**"
+      - "tools/scap14_rule_splitter.py"
+
+jobs:
+  roundtrip:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - key: macos15
+            source: Current/U_Apple_macOS_15_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+          - key: ubuntu24
+            source: Current/U_CAN_Ubuntu_24-04_LTS_V1R5_STIG_SCAP_1-4_Benchmark-enhancedV7-signed.zip
+          - key: solaris11-x86
+            source: Current/U_SOL_11_X86_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - key: apache24-unix
+            source: Current/U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip
+          - key: tomcat9
+            source: Current/U_Apache_Tomcat_Application_Server_9_V3R4_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+          - key: iis10
+            source: Current/U_MS_IIS_10-0_Server_V3R6_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+          - key: sql2022-instance
+            source: Current/U_MS_SQL_Server_2022_Instance_V1R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+          - key: chrome
+            source: Current/U_Google_Chrome_V2R11_STIG_SCAP_1-4_Benchmark-enhancedV16-signed.zip
+          - key: kubernetes
+            source: Current/U_Kubernetes_V2R5_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+          - key: nginx
+            source: Current/U_F5_NGINX_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC SCAP 1.4 corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - name: Check out authoritative OVAL 5.12.3 schemas
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+          python -m pip install lxml pyyaml cryptography
+
+      - name: Split published SCAP into per-rule OVAL closures
+        run: |
+          python scap-ng/tools/scap14_rule_splitter.py \
+            "niwc/${{ matrix.source }}" \
+            --output-dir "work/${{ matrix.key }}-split" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+            --source-repository-path "${{ matrix.source }}" \
+            --benchmark-key "${{ matrix.key }}" \
+            --fail-on-unresolved
+
+      - name: Round-trip every OVAL definition
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
+            --corpus "work/${{ matrix.key }}-split" \
+            --include 'oval.xml' \
+            --out "work/${{ matrix.key }}-roundtrip" \
+            --report "work/${{ matrix.key }}-roundtrip.json" \
+            --inventory-only
+
+      - name: Enforce only deprecated-test blockers
+        env:
+          KEY: ${{ matrix.key }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          key=os.environ["KEY"]
+          report=json.loads(Path(f"work/{key}-roundtrip.json").read_text())
+          failures=[r for r in report["results"] if not r.get("equal")]
+          deprecated=[]
+          bad=[]
+          for row in failures:
+              features=row.get("unsupported_features") or []
+              names={x.get("feature") for x in features}
+              if names and names <= {"deprecated_oval_test"}:
+                  deprecated.append(row)
+              else:
+                  bad.append(row)
+          print(json.dumps({
+              "definitions": report["definitions"],
+              "semantic_equal": report["semantic_equal"],
+              "deprecated_blockers": len(deprecated),
+              "unexpected_failures": len(bad),
+              "max_dependency_depth": report.get("max_dependency_depth",0),
+          },indent=2))
+          if bad:
+              print(json.dumps(bad,indent=2))
+              raise SystemExit(1)
+          PY
+
+      - name: Build aggregate OVAL validation schema
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/build_full_oval_omni.py \
+            --schemas oval-language/oval-schemas \
+            --output oval-language/oval-schemas/roundtrip-full-omni.xsd
+
+      - name: Validate regenerated closures with XSD
+        run: |
+          set -euo pipefail
+          found=0
+          while IFS= read -r -d '' xml; do
+            found=1
+            xmllint --noout \
+              --schema oval-language/oval-schemas/roundtrip-full-omni.xsd \
+              "$xml"
+          done < <(find "work/${{ matrix.key }}-roundtrip" -maxdepth 1 -name '*.oval.xml' -print0)
+          echo "validated_generated_documents=$found"
+
+      - name: Compare Schematron findings to source closures
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/compare_schematron_baseline.py \
+            --schemas oval-language/oval-schemas \
+            --corpus "work/${{ matrix.key }}-split" \
+            --report "work/${{ matrix.key }}-roundtrip.json" \
+            --output "work/${{ matrix.key }}-schematron.json"
+
+      - name: Upload expansion evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.key }}-oval-roundtrip-expansion
+          path: |
+            work/${{ matrix.key }}-roundtrip.json
+            work/${{ matrix.key }}-schematron.json
