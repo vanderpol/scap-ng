@@ -19,6 +19,36 @@ SOURCE_URL = (
 ROOT = Path(__file__).resolve().parents[2]
 
 _DEPRECATED_TEST_TYPES = None
+_OVAL_DEFINITION_ELEMENTS = None
+
+def oval_definition_elements():
+    """Return concrete top-level OVAL Definition element QNames from 5.12.3 XSDs.
+
+    This provides a schema-derived vocabulary boundary. Publisher/custom
+    extensions SHALL be diagnosed explicitly instead of being silently treated
+    as standard OVAL merely because their local name ends in _test/_object/_state.
+    """
+    global _OVAL_DEFINITION_ELEMENTS
+    if _OVAL_DEFINITION_ELEMENTS is not None:
+        return _OVAL_DEFINITION_ELEMENTS
+
+    schema_root = ROOT / "third_party" / "scap-1.4-schemas" / "oval_5.12.3"
+    elements = set()
+    for path in sorted(schema_root.glob("*-definitions-schema.xsd")):
+        try:
+            xroot = ET.parse(path).getroot()
+        except Exception:
+            continue
+        target = xroot.get("targetNamespace") or ""
+        for child in list(xroot):
+            if local(child.tag) != "element" or not child.get("name"):
+                continue
+            name = child.get("name")
+            if name.endswith(("_test", "_object", "_state")):
+                elements.add((target, name))
+
+    _OVAL_DEFINITION_ELEMENTS = frozenset(elements)
+    return _OVAL_DEFINITION_ELEMENTS
 
 def deprecated_test_types():
     """Return effective deprecated OVAL test QNames from bundled 5.12.3 schemas.
@@ -906,6 +936,14 @@ def unsupported_definition_features(oroot, definition_id):
         if obj is None:
             add("object_not_found", obj_ref)
             return
+        obj_ns = obj.tag.split("}", 1)[0].strip("{") if "}" in obj.tag else ""
+        obj_name = local(obj.tag)
+        if (obj_ns, obj_name) not in oval_definition_elements():
+            add(
+                "nonstandard_oval_element",
+                obj_ref,
+                f"{obj_ns}#{obj_name}",
+            )
         for descendant in obj.iter():
             var_ref = descendant.get("var_ref")
             if var_ref:
@@ -936,6 +974,12 @@ def unsupported_definition_features(oroot, definition_id):
                     continue
                 test_ns = test.tag.split("}", 1)[0].strip("{") if "}" in test.tag else ""
                 test_name = local(test.tag)
+                if (test_ns, test_name) not in oval_definition_elements():
+                    add(
+                        "nonstandard_oval_element",
+                        test_ref,
+                        f"{test_ns}#{test_name}",
+                    )
                 if (test_ns, test_name) in deprecated_test_types():
                     add(
                         "deprecated_oval_test",
@@ -953,6 +997,14 @@ def unsupported_definition_features(oroot, definition_id):
                         if state is None:
                             add("state_not_found", part.get("state_ref"))
                         else:
+                            state_ns = state.tag.split("}", 1)[0].strip("{") if "}" in state.tag else ""
+                            state_name = local(state.tag)
+                            if (state_ns, state_name) not in oval_definition_elements():
+                                add(
+                                    "nonstandard_oval_element",
+                                    part.get("state_ref"),
+                                    f"{state_ns}#{state_name}",
+                                )
                             for descendant in state.iter():
                                 var_ref = descendant.get("var_ref")
                                 if var_ref:
