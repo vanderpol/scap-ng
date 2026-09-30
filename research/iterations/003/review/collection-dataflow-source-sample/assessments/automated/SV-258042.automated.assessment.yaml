@@ -6,93 +6,6 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  tests:
-    test-no-password-in-etc-shadow-has-maximum-password-age-0:
-      test_title: No password in /etc/shadow has a maximum password age of 0 or greater than 60
-      capability: unix.shadow
-      collection: etc-shadow-max-password-ages-non-system-users-collection
-      assertion:
-        existence: any_exist
-        item_quantifier: all
-        state_operator: AND
-        states:
-        - state_title: greater than zero
-          state:
-            field: chg_req
-            value: '0'
-            operation: greater than
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: less than or equal to sixty
-          state:
-            field: chg_req
-            value: '60'
-            operation: less than or equal
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-    test-root-password-in-etc-shadow-does-not-have-maximum-password:
-      test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
-      capability: unix.shadow
-      collection: etc-shadow-max-password-age-root-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_operator: AND
-        states:
-        - state_title: greater than zero
-          state:
-            field: chg_req
-            value: '0'
-            operation: greater than
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-        - state_title: less than or equal to sixty
-          state:
-            field: chg_req
-            value: '60'
-            operation: less than or equal
-            datatype: int
-            mask: false
-            entity_check: all
-            entity_existence: at_least_one_exists
-  evaluate:
-    all:
-    - test: test-no-password-in-etc-shadow-has-maximum-password-age-0
-    - test: test-root-password-in-etc-shadow-does-not-have-maximum-password
-  variables:
-    anonymous-uids-variable:
-      title: anonymous UIDs
-      kind: constant
-      datatype: int
-      expression:
-        literal:
-        - '65534'
-        - '65535'
-        - '4294967294'
-        - '4294967295'
-    pattern-match-lines-starting-usernames-system-users-variable:
-      title: Pattern to match lines starting with usernames of system users
-      kind: local
-      datatype: string
-      expression:
-        concat:
-        - literal:
-            value: ^
-            datatype: string
-        - values:
-            collection: interactive-non-anonymous-users-collection
-            field: username
-        - literal:
-            value: $
-            datatype: string
-      collection_capabilities:
-        interactive-non-anonymous-users-collection: unix.password
   collections:
     interactive-non-anonymous-users-collection:
       collection_title: interactive non-anonymous users
@@ -153,3 +66,90 @@ assessment:
           datatype: string
           mask: false
           value: root
+  variables:
+    anonymous-uids-variable:
+      title: anonymous UIDs
+      kind: constant
+      datatype: int
+      expression:
+        literal:
+        - '65534'
+        - '65535'
+        - '4294967294'
+        - '4294967295'
+    pattern-match-lines-starting-usernames-system-users-variable:
+      title: Pattern to match lines starting with usernames of system users
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: ^
+            datatype: string
+        - values:
+            collection: interactive-non-anonymous-users-collection
+            field: username
+        - literal:
+            value: $
+            datatype: string
+      collection_capabilities:
+        interactive-non-anonymous-users-collection: unix.password
+  tests:
+    test-no-password-in-etc-shadow-has-maximum-password-age-0:
+      test_title: No password in /etc/shadow has a maximum password age of 0 or greater than 60
+      capability: unix.shadow
+      collection: etc-shadow-max-password-ages-non-system-users-collection
+      assertion:
+        existence: any_exist
+        item_quantifier: all
+        state_operator: AND
+        states:
+        - state_title: greater than zero
+          state:
+            field: chg_req
+            value: '0'
+            operation: greater than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: less than or equal to sixty
+          state:
+            field: chg_req
+            value: '60'
+            operation: less than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+    test-root-password-in-etc-shadow-does-not-have-maximum-password:
+      test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
+      capability: unix.shadow
+      collection: etc-shadow-max-password-age-root-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_operator: AND
+        states:
+        - state_title: greater than zero
+          state:
+            field: chg_req
+            value: '0'
+            operation: greater than
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+        - state_title: less than or equal to sixty
+          state:
+            field: chg_req
+            value: '60'
+            operation: less than or equal
+            datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-no-password-in-etc-shadow-has-maximum-password-age-0
+    - test: test-root-password-in-etc-shadow-does-not-have-maximum-password

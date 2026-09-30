@@ -6,60 +6,6 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  tests:
-    test-there-separate-file-system-audit-data-directory:
-      test_title: There is a separate file system for audit data directory.
-      capability: linux.partition
-      collection: linux-partition-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state: null
-    test-audit-file-system-total-space-10gib:
-      test_title: Audit file system total space >= 10GiB
-      capability: independent.variable
-      collection: independent-variable-collection
-      assertion:
-        existence: all_exist
-        item_quantifier: all
-        state_title: 10GiB
-        state:
-          field: value
-          value: '10737418240'
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          entity_check: all
-          entity_existence: at_least_one_exists
-  evaluate:
-    all:
-    - test: test-there-separate-file-system-audit-data-directory
-    - test: test-audit-file-system-total-space-10gib
-  variables:
-    audit-data-directory-from-etc-audit-auditd-conf-variable:
-      title: audit data directory from /etc/audit/auditd.conf
-      kind: local
-      datatype: string
-      expression:
-        values:
-          collection: independent-textfilecontent54-collection
-          field: subexpression
-      collection_capabilities:
-        independent-textfilecontent54-collection: independent.textfilecontent54
-    audit-partition-total-size-in-bytes-variable:
-      title: audit partition total size in bytes
-      kind: local
-      datatype: string
-      expression:
-        arithmetic:
-          operation: multiply
-          operands:
-          - values:
-              collection: linux-partition-collection
-              field: block_size
-          - values:
-              collection: linux-partition-collection
-              field: total_space
   collections:
     independent-textfilecontent54-collection:
       collection_title: null
@@ -100,3 +46,57 @@ assessment:
           mask: false
           value:
             variable: audit-partition-total-size-in-bytes-variable
+  variables:
+    audit-data-directory-from-etc-audit-auditd-conf-variable:
+      title: audit data directory from /etc/audit/auditd.conf
+      kind: local
+      datatype: string
+      expression:
+        values:
+          collection: independent-textfilecontent54-collection
+          field: subexpression
+      collection_capabilities:
+        independent-textfilecontent54-collection: independent.textfilecontent54
+    audit-partition-total-size-in-bytes-variable:
+      title: audit partition total size in bytes
+      kind: local
+      datatype: string
+      expression:
+        arithmetic:
+          operation: multiply
+          operands:
+          - values:
+              collection: linux-partition-collection
+              field: block_size
+          - values:
+              collection: linux-partition-collection
+              field: total_space
+  tests:
+    test-there-separate-file-system-audit-data-directory:
+      test_title: There is a separate file system for audit data directory.
+      capability: linux.partition
+      collection: linux-partition-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state: null
+    test-audit-file-system-total-space-10gib:
+      test_title: Audit file system total space >= 10GiB
+      capability: independent.variable
+      collection: independent-variable-collection
+      assertion:
+        existence: all_exist
+        item_quantifier: all
+        state_title: 10GiB
+        state:
+          field: value
+          value: '10737418240'
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
+  evaluate:
+    all:
+    - test: test-there-separate-file-system-audit-data-directory
+    - test: test-audit-file-system-total-space-10gib

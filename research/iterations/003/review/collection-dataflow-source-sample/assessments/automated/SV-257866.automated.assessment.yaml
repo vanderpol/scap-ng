@@ -5,6 +5,54 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
+  collections:
+    linux-partition-collection:
+      collection_title: null
+      select:
+        mount_point:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /tmp
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/fstab
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*[^#\s]+\s+/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+        instance:
+          operation: equals
+          datatype: int
+          mask: false
+          value: '1'
+    independent-variable-collection:
+      collection_title: null
+      select:
+        var_ref:
+          operation: equals
+          datatype: string
+          mask: false
+          value:
+            variable: mount-options-tmp-in-etc-fstab-variable
+  variables:
+    mount-options-tmp-in-etc-fstab-variable:
+      title: Mount options for /tmp in /etc/fstab
+      kind: local
+      datatype: string
+      expression:
+        split:
+          value:
+            values:
+              collection: independent-textfilecontent54-collection
+              field: subexpression
+          delimiter: ','
   tests:
     test-tmp-mounted-nodev-option:
       test_title: /tmp is mounted with the nodev option
@@ -51,51 +99,3 @@ assessment:
     - test: test-tmp-mounted-nodev-option
     - test: test-tmp-configured-nodev-option-in-etc-fstab
     - test: test-tmp-configured-in-etc-fstab
-  variables:
-    mount-options-tmp-in-etc-fstab-variable:
-      title: Mount options for /tmp in /etc/fstab
-      kind: local
-      datatype: string
-      expression:
-        split:
-          value:
-            values:
-              collection: independent-textfilecontent54-collection
-              field: subexpression
-          delimiter: ','
-  collections:
-    linux-partition-collection:
-      collection_title: null
-      select:
-        mount_point:
-          operation: equals
-          datatype: string
-          mask: false
-          value: /tmp
-    independent-textfilecontent54-collection:
-      collection_title: null
-      select:
-        filepath:
-          operation: equals
-          datatype: string
-          mask: false
-          value: /etc/fstab
-        pattern:
-          operation: pattern match
-          datatype: string
-          mask: false
-          value: ^\s*[^#\s]+\s+/tmp\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
-        instance:
-          operation: equals
-          datatype: int
-          mask: false
-          value: '1'
-    independent-variable-collection:
-      collection_title: null
-      select:
-        var_ref:
-          operation: equals
-          datatype: string
-          mask: false
-          value:
-            variable: mount-options-tmp-in-etc-fstab-variable

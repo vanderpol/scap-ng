@@ -5,6 +5,30 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
+  collections:
+    independent-textfilecontent54-collection:
+      collection_title: null
+      select:
+        path:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc
+        filename:
+          operation: equals
+          datatype: string
+          mask: false
+          value: redhat-release
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*Red Hat Enterprise Linux release 9\.(\d+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
   tests:
     test-rhel-9-minor-version-supported:
       test_title: The RHEL 9 minor version is supported.
@@ -53,27 +77,3 @@ assessment:
             entity_existence: at_least_one_exists
   evaluate:
     test: test-rhel-9-minor-version-supported
-  collections:
-    independent-textfilecontent54-collection:
-      collection_title: null
-      select:
-        path:
-          operation: equals
-          datatype: string
-          mask: false
-          value: /etc
-        filename:
-          operation: equals
-          datatype: string
-          mask: false
-          value: redhat-release
-        pattern:
-          operation: pattern match
-          datatype: string
-          mask: false
-          value: ^\s*Red Hat Enterprise Linux release 9\.(\d+)
-        instance:
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          value: '1'

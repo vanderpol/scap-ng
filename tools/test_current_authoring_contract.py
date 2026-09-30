@@ -2,6 +2,13 @@ import unittest
 from check_current_authoring_contract import violations
 
 class CurrentDesignGuards(unittest.TestCase):
+    def test_assessment_presentation_order_with_optional_sections(self):
+        self.assertFalse(violations({'assessment':{
+            'collections':{}, 'variables':{}, 'tests':{}, 'evaluate':{}}}))
+        self.assertFalse(violations({'assessment':{'tests':{}, 'evaluate':{}}}))
+        self.assertTrue(violations({'assessment':{
+            'tests':{}, 'evaluate':{}, 'variables':{}, 'collections':{}}}))
+
     def test_rejects_superseded_policy_and_deprecated_false(self):
         self.assertTrue(violations({'rule':{'policy':'p.yaml'}}))
         self.assertTrue(violations({'policy':{'id':'p'}}))

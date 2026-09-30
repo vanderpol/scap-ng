@@ -7,21 +7,37 @@
 An Assessment Method defines how a fact, applicability condition, Platform
 identity, or Rule compliance condition is evaluated.
 
-Policy and Assessment implementation SHALL remain separate concepts.
+Rule requirements and Assessment implementation SHALL remain separate concepts.
 
 ## 2. Rule binding
 
-A Rule SHALL explicitly reference its governing Policy binding.
-That Policy SHALL expose named check selectors which each resolve to an
-Assessment Method or other permitted assessment implementation.
+A Rule SHALL expose named Assessment selections and identify its default
+selection when appropriate. Authored selections SHALL resolve through explicit
+Assessment YAML paths relative to the referring Rule.
 
-The authoritative binding chain is Rule → Policy → selected check →
-Assessment. A Rule SHALL NOT bypass Policy and directly choose an Assessment.
+The authoritative binding chain is Benchmark → Rule → selected Assessment.
+There is no separate Policy object or file in the current working design.
 
 An Assessment Method SHALL NOT require authors to maintain a hand-edited
 reverse `used_by` list.
 
 Tooling SHOULD generate reverse usage indexes when useful.
+
+## Source presentation order
+
+Assessment source SHOULD present metadata first, followed by `collections`,
+`variables`, `tests`, and `evaluate`, omitting sections that are absent.
+This recommendation supports consistent reading and review.
+
+Mapping key order SHALL NOT affect Assessment semantics or reference resolution.
+An implementation SHALL permit references to named Collections and Variables
+regardless of whether their definitions appear before or after the reference.
+An otherwise valid Assessment SHALL NOT be rejected solely for differing from
+the recommended presentation order. Sequence order SHALL retain its defined
+meaning, including the position of function arguments.
+
+Project generation checks enforce the recommended presentation order for our
+generated artifacts; that check is not a language-validity requirement.
 
 ## 3. Modality
 

@@ -6,6 +6,7 @@ from pathlib import Path
 import yaml
 
 OLD_KEYS={'collect','object_title','object_values','state_capability'}
+ASSESSMENT_SECTION_ORDER=('collections','variables','tests','evaluate')
 
 def violations(document):
     errors=[]
@@ -21,6 +22,10 @@ def violations(document):
     rule=document.get('rule',{})
     if 'policy' in rule: errors.append('rule.policy: superseded Policy linkage')
     a=document.get('assessment',{})
+    sections=[key for key in a if key in ASSESSMENT_SECTION_ORDER]
+    expected=[key for key in ASSESSMENT_SECTION_ORDER if key in a]
+    if sections != expected:
+        errors.append('assessment: presentation order must be collections, variables, tests, evaluate (omit absent sections)')
     if 'deprecated' in a: errors.append('assessment.deprecated: forbidden native attribute')
     if 'checks' in a: errors.append('assessment.checks: use Tests')
     for name in a.get('tests',{}):

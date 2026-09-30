@@ -1751,6 +1751,12 @@ def lower_definition(oroot, definition_id, assessment_id, *, collection_graph=Fa
             return None, "conversion_resource_limit:python_recursion"
         except ValueError as exc:
             return None, "collection_graph_type_binding:" + str(exc)
+        # Presentation only: reference resolution is independent of YAML key order.
+        from check_current_authoring_contract import ASSESSMENT_SECTION_ORDER
+        assessment = {**{k: v for k, v in assessment.items()
+                         if k not in ASSESSMENT_SECTION_ORDER},
+                      **{k: assessment[k] for k in ASSESSMENT_SECTION_ORDER
+                         if k in assessment}}
     if provenance is not None:
         provenance.update({"source_definition": definition_id,
                            "source_collection_bindings": dict(collection_names),

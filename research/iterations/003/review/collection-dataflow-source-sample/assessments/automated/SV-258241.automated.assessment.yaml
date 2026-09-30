@@ -5,6 +5,90 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
+  collections:
+    retrieve-system-wide-crypto-policy-ies-collection:
+      collection_title: Retrieve system wide crypto policy(ies).
+      select:
+        shell:
+          operation: equals
+          datatype: string
+          mask: false
+          value: bash
+        command:
+          operation: equals
+          datatype: string
+          mask: false
+          value: update-crypto-policies --show
+    retrieve-current-minimum-crypto-policy-configuration-collection:
+      collection_title: Retrieve the current minimum crypto-policy configuration.
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/crypto-policies/state/CURRENT.pol
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^hash\s*=\s*.*$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    retrieve-current-minimum-crypto-policy-configuration-hash-values-subexpression-collection:
+      collection_title: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/crypto-policies/state/CURRENT.pol
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^hash\s*=\s*([^#\n]+)$
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+    retrieve-current-minimum-rsa-size-collection:
+      collection_title: Retrieve the current minimum rsa size.
+      select:
+        filepath:
+          operation: equals
+          datatype: string
+          mask: false
+          value: /etc/crypto-policies/state/CURRENT.pol
+        pattern:
+          operation: pattern match
+          datatype: string
+          mask: false
+          value: ^\s*min_rsa_size\s*=\s*(\d+)
+        instance:
+          operation: greater than or equal
+          datatype: int
+          mask: false
+          value: '1'
+  variables:
+    allowed-fips-algorithms-variable:
+      title: Allowed FIPS algorithms.
+      kind: constant
+      datatype: string
+      expression:
+        literal:
+        - SHA2-256
+        - SHA2-384
+        - SHA2-512
+        - SHA2-224
+        - SHA3-256
+        - SHA3-384
+        - SHA3-384
+        - SHA3-512
+        - SHAKE-256
   tests:
     test-verify-rhel-9-set-use-fips-140-3-compliant-systemwide:
       test_title: Verify RHEL 9 is set to use a FIPS 140-3-compliant systemwide cryptographic policy.
@@ -105,87 +189,3 @@ assessment:
     - not:
         test: test-verify-minimum-hash-values-224
     - test: test-verify-minimum-rsa-size-2048
-  variables:
-    allowed-fips-algorithms-variable:
-      title: Allowed FIPS algorithms.
-      kind: constant
-      datatype: string
-      expression:
-        literal:
-        - SHA2-256
-        - SHA2-384
-        - SHA2-512
-        - SHA2-224
-        - SHA3-256
-        - SHA3-384
-        - SHA3-384
-        - SHA3-512
-        - SHAKE-256
-  collections:
-    retrieve-system-wide-crypto-policy-ies-collection:
-      collection_title: Retrieve system wide crypto policy(ies).
-      select:
-        shell:
-          operation: equals
-          datatype: string
-          mask: false
-          value: bash
-        command:
-          operation: equals
-          datatype: string
-          mask: false
-          value: update-crypto-policies --show
-    retrieve-current-minimum-crypto-policy-configuration-collection:
-      collection_title: Retrieve the current minimum crypto-policy configuration.
-      select:
-        filepath:
-          operation: equals
-          datatype: string
-          mask: false
-          value: /etc/crypto-policies/state/CURRENT.pol
-        pattern:
-          operation: pattern match
-          datatype: string
-          mask: false
-          value: ^hash\s*=\s*.*$
-        instance:
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          value: '1'
-    retrieve-current-minimum-crypto-policy-configuration-hash-values-subexpression-collection:
-      collection_title: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
-      select:
-        filepath:
-          operation: equals
-          datatype: string
-          mask: false
-          value: /etc/crypto-policies/state/CURRENT.pol
-        pattern:
-          operation: pattern match
-          datatype: string
-          mask: false
-          value: ^hash\s*=\s*([^#\n]+)$
-        instance:
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          value: '1'
-    retrieve-current-minimum-rsa-size-collection:
-      collection_title: Retrieve the current minimum rsa size.
-      select:
-        filepath:
-          operation: equals
-          datatype: string
-          mask: false
-          value: /etc/crypto-policies/state/CURRENT.pol
-        pattern:
-          operation: pattern match
-          datatype: string
-          mask: false
-          value: ^\s*min_rsa_size\s*=\s*(\d+)
-        instance:
-          operation: greater than or equal
-          datatype: int
-          mask: false
-          value: '1'

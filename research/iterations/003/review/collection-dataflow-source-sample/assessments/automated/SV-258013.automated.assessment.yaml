@@ -6,43 +6,6 @@ assessment:
   mode: automated
   class: compliance
   purpose: assessment
-  tests:
-    test-dconf-user-database-s-exist:
-      test_title: dconf user database(s) exist
-      capability: independent.textfilecontent54
-      collection: dconf-user-databases-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
-    test-org-gnome-login-screen-banner-message-enable-in-dconf-user:
-      test_title: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
-      capability: independent.textfilecontent54
-      collection: org-gnome-login-screen-banner-message-enable-in-dconf-user-collection
-      assertion:
-        existence: at_least_one_exists
-        item_quantifier: all
-        state: null
-  evaluate:
-    all:
-    - test: test-dconf-user-database-s-exist
-    - test: test-org-gnome-login-screen-banner-message-enable-in-dconf-user
-  variables:
-    dconf-user-database-locks-directories-variable:
-      title: dconf user database locks directories
-      kind: local
-      datatype: string
-      expression:
-        concat:
-        - literal:
-            value: /etc/dconf/db/
-            datatype: string
-        - values:
-            collection: dconf-user-databases-collection
-            field: subexpression
-        - literal:
-            value: .d/locks
-            datatype: string
   collections:
     dconf-user-databases-collection:
       collection_title: dconf user databases
@@ -87,3 +50,40 @@ assessment:
           datatype: int
           mask: false
           value: '1'
+  variables:
+    dconf-user-database-locks-directories-variable:
+      title: dconf user database locks directories
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            value: /etc/dconf/db/
+            datatype: string
+        - values:
+            collection: dconf-user-databases-collection
+            field: subexpression
+        - literal:
+            value: .d/locks
+            datatype: string
+  tests:
+    test-dconf-user-database-s-exist:
+      test_title: dconf user database(s) exist
+      capability: independent.textfilecontent54
+      collection: dconf-user-databases-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+    test-org-gnome-login-screen-banner-message-enable-in-dconf-user:
+      test_title: /org/gnome/login-screen/banner-message-enable in dconf user database locks directories exists
+      capability: independent.textfilecontent54
+      collection: org-gnome-login-screen-banner-message-enable-in-dconf-user-collection
+      assertion:
+        existence: at_least_one_exists
+        item_quantifier: all
+        state: null
+  evaluate:
+    all:
+    - test: test-dconf-user-database-s-exist
+    - test: test-org-gnome-login-screen-banner-message-enable-in-dconf-user

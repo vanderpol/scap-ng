@@ -199,3 +199,13 @@ See `research/iterations/003/design/native-source-layout.md`.
 Native Assessments SHALL NOT contain a `deprecated` attribute. Effective
 deprecated source tests remain conversion blockers; historical deprecation
 metadata belongs in provenance, never a native runtime flag.
+
+## Assessment presentation order
+
+For current native output, put metadata first, then `collections`, `variables`,
+`tests`, `evaluate`; omit absent sections. This is presentation, not execution
+order. Resolve forward references independently of mapping key order, and retain
+semantically significant sequence order (for example, function arguments).
+Run `tools/check_current_authoring_contract.py` on generated review source; keep
+the presentation-order guard in the converter and CI. See `CURRENT-DESIGN.md`
+under `research/iterations/003/design/` for the authoritative contract.
