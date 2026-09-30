@@ -76,6 +76,8 @@ def attrs_for_entity(spec, ids):
             attrs["datatype"] = str(spec["datatype"])
         if "operation" in spec:
             attrs["operation"] = str(spec["operation"])
+        if "entity_check" in spec:
+            attrs["entity_check"] = str(spec["entity_check"])
         if "variable" in spec:
             attrs["var_ref"] = ids.get("var", spec["variable"])
             if "var_check" in spec:
@@ -215,6 +217,8 @@ def build(data):
                 "check": chk["check"],
                 "comment": chk["id"],
             }
+            if "state_operator" in chk:
+                attrs["state_operator"] = str(chk["state_operator"])
             t = ET.SubElement(tests, q(ns, name + "_test"), attrs)
             ET.SubElement(t, q(ns, "object"), {
                 "object_ref": ids.get("obj", chk["collection"])
@@ -259,11 +263,14 @@ def build(data):
         for state in states:
             family, name = split_type(state["type"])
             ns = NS[family]
-            se = ET.SubElement(sts, q(ns, name + "_state"), {
+            state_attrs = {
                 "id": ids.get("ste", state["id"]),
                 "version": "1",
                 "comment": state["id"],
-            })
+            }
+            if "operator" in state:
+                state_attrs["operator"] = str(state["operator"])
+            se = ET.SubElement(sts, q(ns, name + "_state"), state_attrs)
             for field, spec in state.get("predicates", {}).items():
                 add_entity(se, ns, field, spec, ids)
 
