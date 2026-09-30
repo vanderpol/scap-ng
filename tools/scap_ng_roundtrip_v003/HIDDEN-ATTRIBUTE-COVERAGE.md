@@ -14,6 +14,29 @@ This is a working conformance ledger, **not** a claim of full OVAL 5.12.3 equiva
 
 **Important:** State entity existence is not Test existence. In particular, the two must never share an implementation key or have their attributes conflated. Object selector fields do not accept State `entity_check` or `check_existence`; malformed fixtures fail closed. The structural diff classifier cannot by itself prove semantic fidelity.
 
+## 2026-09-30 implementation update
+
+The v003 forward lowerer now maps explicit state entity OVAL `check_existence`
+to native `entity_existence`, independent of the Test's `assert.existence`.
+The reverse generator maps it back to a state entity attribute. The dedicated
+`tools/test_state_entity_roundtrip.py` fixture covers `none_exist` and
+omitted/default cases; the round-trip smoke workflow executes it.
+
+The reusable forward OVAL semantic IR now adds `effective_attributes` with
+per-attribute `value` and `origin` for the scoped Test, State, and State
+entity contracts. Origin is `explicit`, `xsd_default`, or
+`documented_implicit` (notably `var_check` with `var_ref`).
+Raw parsed XML attributes are retained separately and not mutated.
+
+**Observed regression evidence:** The September 30 diverse-platform corpus CI
+at commit `6cbeff6` reported 29 semantic failures for Solaris 11 x86,
+10 for macOS 15, and further failures for Apache 2.4 UNIX. At least one
+Solaris example differed specifically because state entity `none_exist`
+became `at_least_one_exists` after regeneration. This motivated the
+native `entity_existence` correction. A fresh corpus run must confirm
+remaining differences; do not mark these corpus failures resolved on the
+basis of the focused regression alone.
+
 ## Outstanding work (not yet certified)
 
 1. Resolve all inherited attributes and attribute groups across the **complete** pinned 5.12.3 XSD corpus, including platform-family behavior types.
