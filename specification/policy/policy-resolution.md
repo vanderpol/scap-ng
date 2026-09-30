@@ -113,51 +113,48 @@ mutable current source.
 
 ## 9. Check selection
 
-A Rule's policy binding MAY expose one or more named **check selectors**. Each
-selector SHALL resolve to an Assessment Method or other assessment
-implementation permitted by this specification.
+A Rule MAY expose one or more named **Assessment selections**. Each selection
+SHALL resolve to an Assessment Method or other assessment implementation
+permitted by this specification.
 
-The Benchmark Rule SHALL remain bound to policy rather than directly to a
-particular executable Assessment implementation.
+When more than one selection is exposed, the Rule MAY identify a default
+selection. Selection names are extensible identifiers; implementations SHALL
+NOT assume that only `automated` and `manual` are valid names.
 
-When more than one check is exposed, the policy MAY identify a default check.
-Selector names are extensible identifiers; implementations SHALL NOT assume
-that only `automated` and `manual` are valid names.
-
-A Profile or Tailoring layer MAY select an exposed check selector when the
-governing policy permits check selection. Check selection changes which
-published assessment alternative evaluates the Rule; it SHALL NOT rewrite the
-selected Assessment implementation.
+A Profile or Tailoring layer MAY select an exposed Rule Assessment selection
+when the governing policy permits that choice. Selection changes which
+published Assessment evaluates the Rule; it SHALL NOT rewrite the referenced
+Assessment implementation.
 
 Effective resolution is therefore:
 
-    Benchmark Rule -> Policy -> selected check -> Assessment
+    Benchmark -> Rule -> selected Assessment
 
-Check selection SHALL be resolved and frozen with the effective policy before
-applicability and compliance execution.
+Assessment selection SHALL be resolved and frozen with the effective policy
+before applicability and compliance execution.
 
-Different selector identifiers MAY resolve to the same Assessment Method when
-the policy intentionally exposes multiple selector names for equivalent
-technical behavior. Shared implementation SHALL NOT erase selector identity;
-results SHALL still record the effective selector.
+Different selection identifiers MAY resolve to the same Assessment Method when
+the Rule intentionally exposes multiple names for equivalent technical
+behavior. Shared implementation SHALL NOT erase selection identity; results
+SHALL still record the effective selection.
 
-If an explicitly requested selector does not exist for the Rule's applicable
-policy, resolution SHALL fail. A processor SHALL NOT silently substitute the
-default check or another available check.
+If an explicitly requested selection does not exist for the Rule, resolution
+SHALL fail. A processor SHALL NOT silently substitute the default selection or
+another available choice.
 
-Results SHALL identify the effective check selector and Assessment Method used
-when check alternatives exist.
+Results SHALL identify the effective Rule Assessment selection and Assessment
+Method used when alternatives exist.
 
 ### Authoring links versus scanner resolution
 
-In human-authored source, a Rule's Policy reference and each Policy check's
-Assessment reference are explicit **relative paths**. These are resolved and
+In human-authored source, each Rule-owned Assessment selection is an explicit
+**relative path** to an Assessment YAML file. These paths are resolved and
 validated during compilation; authors are not required to maintain a separate
-Assessment index. In the compiled package, logical IDs and selected-check
-bindings are resolved to exact package members using the automatically
-constructed **package manifest**. A scanner SHALL NOT infer filenames or use
-authoring paths at runtime. See [Source, Compilation, Packaging, and
-Integrity](../package/package-and-integrity.md#5-explicit-source-references-versus-compiled-manifest-resolution)
+Policy file or Assessment index. In the compiled package, logical IDs and
+selected-Assessment bindings are resolved to exact package members using the
+automatically constructed **package manifest**. A scanner SHALL NOT infer
+filenames or use authoring paths at runtime. See [Source, Compilation,
+Packaging, and Integrity](../package/package-and-integrity.md#5-explicit-source-references-versus-compiled-manifest-resolution)
 for the normative source-resolution, integrity and failure contract.
 
 
