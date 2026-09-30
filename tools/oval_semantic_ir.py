@@ -533,6 +533,11 @@ KNOWN_ATTRIBUTE_DEFAULTS = {
     "state_entity": {
         "check_existence": ("at_least_one_exists", "xsd_default"),
         "entity_check": ("all", "xsd_default"),
+        # Inherited from EntityAttributeGroup through
+        # EntitySimpleBaseType / EntityComplexBaseType.
+        "datatype": ("string", "xsd_default"),
+        "operation": ("equals", "xsd_default"),
+        "mask": ("false", "xsd_default"),
     },
 }
 
