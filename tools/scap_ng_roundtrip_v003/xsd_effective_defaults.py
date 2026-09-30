@@ -194,6 +194,11 @@ def inventory(folder):
             "resolved_types": sum(t["status"] == "resolved" for t in types),
             "incomplete_types": sum(t["status"] != "resolved" for t in types),
             "types_with_defaults": sum(bool(t["defaults"]) for t in types),
+            "incomplete_type_details": [
+                {"namespace": t["namespace"], "type": t["type"],
+                 "blockers": t["blockers"]} for t in types
+                if t["status"] == "incomplete"
+            ],
             "blockers_by_reason": dict(sorted(collections.Counter(
                 b["reason"] for t in types for b in t["blockers"]
             ).items())),
