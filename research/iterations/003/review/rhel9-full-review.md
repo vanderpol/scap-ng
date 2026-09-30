@@ -4,6 +4,31 @@
 **Audience:** SCAP-NG model and authoring review before reference-scanner implementation.  
 **Generated from:** NIWC enhanced RHEL 9 STIG 002.009.013 / SCAP 1.4 ZIP, source archive SHA-256 `70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5`. Source archive provenance is in `../evidence/rhel9-full/source-package.json`.
 
+## Complete split-policy review variant — now available
+
+The **recommended architecture review** is the complete
+[split-Benchmark/Rule/Policy/Assessment source](../source/split-policy-assessment/rhel9-full/benchmark.yaml).
+
+- [Rule showing Policy reference](../source/split-policy-assessment/rhel9-full/rules/SV-257777.rule.yaml)
+- [Matching Policy with named checks/default](../source/split-policy-assessment/rhel9-full/policies/SV-257777.policy.yaml)
+- [Matching automated Assessment](../source/split-policy-assessment/rhel9-full/assessments/automated/SV-257777.automated.assessment.yaml)
+- [Manual-only Rule](../source/split-policy-assessment/rhel9-full/rules/SV-257778.rule.yaml)
+- [Manual-only Policy](../source/split-policy-assessment/rhel9-full/policies/SV-257778.policy.yaml)
+- [Review validation evidence](../evidence/rhel9-split-policy-review.json)
+- [Passing review-generation workflow](https://github.com/vanderpol/scap-ng/actions/workflows/v003-rhel9-split-policy-review.yml)
+
+The validator checked all 445 Rules and 445 Policies, including Group membership,
+11 Profiles, selector→Assessment resolution, applicability references and
+byte-for-byte preservation of **879** source Assessment files. There were zero
+reported reference issues. There are **418** Rules with both automated and
+manual check choices and **27** manual-only Rules; these are the review
+source's classification and do not alone establish executable compatibility.
+
+**Critical boundaries:** these Policy files are one per Rule for this first
+complete representation; cross-OS reuse has not been claimed. The split-policy
+content is source for architecture review, **not** a compiled scanner package,
+and passing structural validation is **not** runtime equivalence.
+
 ## Start here
 
 This is a **complete 445-Rule native benchmark**, not a small example. It is the first review of the end-to-end authoring model:
@@ -82,4 +107,4 @@ When reviewing, note each specific change under one of these categories:
 
 ## Next production milestone
 
-Prepare a **complete 445-Rule split-Benchmark/Policy/Assessment review candidate**, with an automatically verified rule→policy→check→assessment reference graph and clear coverage accounting. Preserve this first Rule/Assessment artifact as a comparison baseline.
+The complete 445-Rule split-policy source and reference validation are now available (see above). Next: review Policy ownership and authoring clarity, then implement a compiled self-contained split-policy package and prove its semantic parity with the original Rule/Assessment baseline. Keep both source forms for comparison.
