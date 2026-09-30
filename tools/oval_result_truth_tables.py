@@ -134,3 +134,74 @@ def aggregate_existence(mode, *, exists=0, does_not_exist=0, error=0, not_collec
         return TRUE if exists == 1 else FALSE
 
     raise ValueError(f"unsupported ExistenceEnumeration: {mode}")
+
+
+def evaluate_collected_object_test(
+    flag,
+    *,
+    existence,
+    check="all",
+    item_results=None,
+    has_state=True,
+    exists=0,
+    does_not_exist=0,
+    error=0,
+    not_collected=0,
+):
+    """Evaluate OVAL Test control flow for a present collected_object record.
+
+    This implements the generic rules stated in the pinned OVAL 5.12.3
+    oval-results-schema.xsd TestType documentation. Per-item State evaluation
+    is supplied as item_results; this helper does not evaluate entity values.
+    """
+    if flag == "error":
+        return ERROR
+    if flag == "not collected":
+        return UNKNOWN
+    if flag == "not applicable":
+        return NOT_APPLICABLE
+    if flag == "does not exist":
+        return TRUE if existence in {"none_exist", "any_exist"} else FALSE
+
+    if flag not in {"complete", "incomplete"}:
+        raise ValueError(f"unsupported collected_object flag: {flag}")
+
+    existence_result = aggregate_existence(
+        existence,
+        exists=exists,
+        does_not_exist=does_not_exist,
+        error=error,
+        not_collected=not_collected,
+    )
+
+    if flag == "complete":
+        if existence_result != TRUE:
+            return existence_result
+        if not has_state:
+            return TRUE
+        if item_results is None:
+            raise ValueError("complete Test with State requires item_results")
+        return aggregate_check(check, item_results)
+
+    # OVAL 5.12.3 says an incomplete collection is unknown except where
+    # sufficient evidence already determines the Test result.
+    if existence == "none_exist" and exists >= 1:
+        return FALSE
+    if existence == "only_one_exists" and exists > 1:
+        return FALSE
+
+    if has_state:
+        if item_results is None:
+            raise ValueError("incomplete Test with State requires item_results")
+        check_result = aggregate_check(check, item_results)
+        if check_result == FALSE:
+            return FALSE
+        if check == "at least one" and check_result == TRUE:
+            return TRUE
+
+    return UNKNOWN
+
+
+def evaluate_missing_collected_object_record():
+    """OVAL Test result when collected_objects exists but matching object does not."""
+    return UNKNOWN
