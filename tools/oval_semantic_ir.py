@@ -512,7 +512,46 @@ def set_node(e):
     return out
 
 
-def semantic_child(e):
+# Scoped known OVAL 5.12.3 effective defaults. This is intentionally not a
+# generic XML-schema default resolver: inherited platform behavior types still
+# require a separate complete-schema audit.
+KNOWN_ATTRIBUTE_DEFAULTS = {
+    "test": {
+        "check_existence": ("at_least_one_exists", "xsd_default"),
+        "state_operator": ("AND", "xsd_default"),
+    },
+    "state": {"operator": ("AND", "xsd_default")},
+    "state_entity": {
+        "check_existence": ("at_least_one_exists", "xsd_default"),
+        "entity_check": ("all", "xsd_default"),
+    },
+}
+
+
+def effective_attributes(e, scope):
+    """Report effective known values and their origin without changing raw XML.
+
+    The output is supplementary IR metadata, not a replacement for the
+    original attributes. Unknown/platform-specific defaults remain unresolved.
+    The var_check omission rule is documented implicit behavior (not an XSD
+    default) and applies only when the state entity references a variable.
+    """
+    if scope not in KNOWN_ATTRIBUTE_DEFAULTS:
+        raise ValueError(f"unknown default resolution scope: {scope}")
+    defaults = dict(KNOWN_ATTRIBUTE_DEFAULTS[scope])
+    if scope == "state_entity" and e.get("var_ref") is not None:
+        defaults["var_check"] = ("all", "documented_implicit")
+    result = {}
+    for name, (default_value, provenance) in defaults.items():
+        explicit = name in e.attrib
+        result[name] = {
+            "value": e.get(name) if explicit else default_value,
+            "origin": "explicit" if explicit else provenance,
+        }
+    return result
+
+
+def semantic_child(e, *, context=None):
     n = local(e.tag)
     if n == "set":
         return set_node(e)
@@ -525,6 +564,8 @@ def semantic_child(e):
     attrs = {etree.QName(k).localname: v for k, v in e.attrib.items()}
     if attrs:
         out["attributes"] = attrs
+    if context == "state_entity" and n != "notes":
+        out["effective_attributes"] = effective_attributes(e, "state_entity")
     val = text_value(e)
     if val is not None:
         out["value"] = val
@@ -581,6 +622,7 @@ def parse_test(e):
         "check": e.get("check", "all"),
         "check_existence": e.get("check_existence", "at_least_one_exists"),
         "state_operator": e.get("state_operator", "AND"),
+        "effective_attributes": effective_attributes(e, "test"),
         "objects": objects,
         "states": states,
         "other": other,
@@ -607,7 +649,8 @@ def parse_state(e):
         "version": e.get("version"),
         "comment": e.get("comment"),
         "operator": e.get("operator", "AND"),
-        "entities": [semantic_child(c) for c in e if isinstance(c.tag, str)],
+        "effective_attributes": effective_attributes(e, "state"),
+        "entities": [semantic_child(c, context="state_entity") for c in e if isinstance(c.tag, str)],
     }
 
 
