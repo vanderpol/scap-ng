@@ -101,13 +101,16 @@ def main():
         regen_findings=validate_tree(regen_tree,validator_for(regen_families))
 
         source_set=set(source_findings)
+        regen_set=set(regen_findings)
         new=[item for item in regen_findings if item not in source_set]
+        removed=[item for item in source_findings if item not in regen_set]
         item={
             "file":source_rel,
             "definition_id":row["definition_id"],
             "source_findings":len(source_findings),
             "regenerated_findings":len(regen_findings),
             "introduced_findings":new,
+            "source_only_findings":removed,
         }
         rows.append(item)
         if new:
