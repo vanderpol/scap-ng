@@ -18,9 +18,10 @@ from validate_embedded_schematron import build_schema, findings
 
 OVAL_ID_RE = re.compile(r"oval:[A-Za-z0-9_.-]+:(?:def|tst|obj|ste|var):[A-Za-z0-9_.-]+")
 QNAME_PREFIX_RE = re.compile(r"\b[A-Za-z_][A-Za-z0-9_.-]*:([A-Za-z_][A-Za-z0-9_.-]*)\b")
+DEPRECATED_QNAME_RE = re.compile(r"(DEPRECATED\\s+(?:TEST|OBJECT|STATE):\\s+)(?:[A-Za-z_][A-Za-z0-9_.-]*:)?([A-Za-z_][A-Za-z0-9_.-]*)")
 
 def normalize(row):
-    message = OVAL_ID_RE.sub("<oval-id>", row.get("message") or "")
+    message = OVAL_ID_RE.sub("<oval-id>", row.get("message") or "")\n    message = DEPRECATED_QNAME_RE.sub(r"\\1<ns>:\\2", message)
     # Schematron diagnostics often render QName prefixes chosen by the XML
     # serializer (for example win-def:wmi_object vs ns3:wmi_object). Prefixes
     # are lexical aliases, not semantic differences, so normalize them.
