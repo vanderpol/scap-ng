@@ -1516,6 +1516,7 @@ def lower_definition(oroot, definition_id, assessment_id):
         "assessment_title": assessment_title,
         "mode": "automated",
         "class": assessment_class,
+        "deprecated": (definition.get("deprecated") or "false").lower() in ("true", "1"),
         "purpose": "assessment",
         "checks": checks,
         "evaluate": expression,
