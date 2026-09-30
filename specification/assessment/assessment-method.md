@@ -444,9 +444,42 @@ collection error prevents that conclusion.
 The project's reference truth-table fixture is
 `tools/oval_result_truth_tables.py` with conformance tests in
 `tools/test_oval_result_truth_tables.py`. This helper is test evidence, not
-the reference scanner itself. Full collected-object flag handling,
-State/entity/variable result propagation, and evaluator differential testing
-remain separate conformance work.
+the reference scanner itself.
+
+### Collected-object flag control flow
+
+For OVAL-compatible migrated assessments, the collected-object status/flag
+SHALL affect Test result evaluation according to the pinned OVAL 5.12.3
+Results schema:
+
+- `error` produces Test `error`;
+- `not collected` produces Test `unknown`;
+- `not applicable` produces Test `not applicable`;
+- `does not exist` is resolved solely from the Test existence mode:
+  `none_exist` and `any_exist` produce true, while `all_exist`,
+  `at_least_one_exists`, and `only_one_exists` produce false;
+- `complete` evaluates existence first and evaluates item/State satisfaction
+  only when existence is true;
+- `incomplete` normally produces `unknown`, but a decisive false or true
+  SHALL be preserved when the OVAL 5.12.3 rules establish the outcome despite
+  incomplete collection.
+
+In particular, incomplete collection SHALL produce false when
+`none_exist` already has one or more existing items, when
+`only_one_exists` already has more than one existing item, or when the item
+check has already become decisively false. For an AT-LEAST-ONE item check,
+one known satisfying item MAY produce true despite the incomplete collection.
+Implementations SHALL NOT collapse all incomplete collections to `unknown`.
+
+When a collected-objects section is present but no collected-object record
+matches the referenced Object, the Test result SHALL be `unknown`. The
+separate OVAL behavior for a System Characteristics document that omits the
+entire collected-objects section requires item matching against system data and
+remains a distinct evaluator conformance case.
+
+State/entity/variable result propagation, item comparison, omitted
+collected-objects-section behavior, early-termination completeness and
+differential evaluator testing remain separate conformance work.
 
 ### Structural compatibility versus execution equivalence
 
