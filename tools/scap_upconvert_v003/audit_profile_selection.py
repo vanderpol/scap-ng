@@ -160,6 +160,18 @@ def audit(source_zip: Path, native_benchmark: Path):
             issues.append({"code": "BASELINE_SELECTED_MISMATCH", "rule": rid,
                            "xccdf": baseline[rid], "native": native_baseline[rid]})
     comparison = []
+    profile_cache={}
+    def resolve_native(pid, active=()):
+        if pid in profile_cache: return profile_cache[pid]
+        if pid in active: raise ValueError('Native Profile inheritance cycle')
+        row=native_profiles.get(pid)
+        if row is None: raise ValueError('Unknown native parent Profile: '+pid)
+        parent=row.get('extends')
+        selection=dict(resolve_native(parent,active+(pid,)) if parent else native_baseline)
+        for rid in row.get('disabled_rules') or []: selection[rid]=False
+        for rid in row.get('enabled_rules') or []: selection[rid]=True
+        profile_cache[pid]=selection
+        return selection
     for pid in sorted(set(native_profiles)&set(resolved)):
         row = native_profiles[pid]
         unknown = (set(row.get("disabled_rules") or []) |
@@ -173,9 +185,10 @@ def audit(source_zip: Path, native_benchmark: Path):
                            "rules": sorted(enabled & disabled)})
         expected = resolved[pid]
         issues.extend(expected["problems"])
+        observed_selection=resolve_native(pid)
         diff = []
         for rid in sorted(source_rule_ids):
-            observed = True if rid in enabled else False if rid in disabled else native_baseline[rid]
+            observed = observed_selection[rid]
             if observed != expected["enabled"][rid]:
                 diff.append({"rule": rid, "xccdf": expected["enabled"][rid],
                              "native": observed})

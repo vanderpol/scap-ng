@@ -5,6 +5,7 @@ Owner reconfirmation: 2026-09-30. Read this file before selecting a generator, p
 ## Settled owner direction
 
 - Architecture: **Benchmark → Rule → Assessment** for compliance and vulnerability content. There is no separate Policy object/file. Rule owns requirement/assertion metadata and named Assessment selections/defaults; Assessment owns the evaluation method.
+- Benchmark membership enables every Rule. Publisher Profiles are subtractive only: they MAY disable Rules and SHALL NOT expose `enabled_rules` or re-enable ancestor-disabled Rules. A Profile with no selection changes omits Rule-selection state. External Tailoring MAY enable/disable existing Benchmark Rules. See `specification/policy/profiles-and-tailoring.md`; source Profile XML description wrappers SHALL NOT appear in native descriptions.
 - Authored Assessment selections use explicit YAML paths relative to the referring Rule. Preserve selector identity, aliases and default-versus-explicit provenance. Compiled resolution uses explicit manifest bindings; never guess filenames.
 - Native automated evaluation nodes are **Tests**. Use `tests`, `test_title`, `test-` IDs and explicit Test references.
 - Native acquisition nodes are **Collections**, corresponding to OVAL Objects. Use Collection terminology in native output; retain OVAL Object terminology only in source parsing/provenance. Named/reusable Collections remain first-class.

@@ -22,6 +22,13 @@ def violations(document):
     rule=document.get('rule',{})
     if 'policy' in rule: errors.append('rule.policy: superseded Policy linkage')
     a=document.get('assessment',{})
+    for profile in document.get('benchmark',{}).get('profiles',[]):
+        if 'enabled_rules' in profile:
+            errors.append('benchmark.profiles: publisher Profiles are subtractive; enabled_rules belongs to Tailoring')
+        if 'disabled_rules' in profile and not profile['disabled_rules']:
+            errors.append('benchmark.profiles: omit empty Rule-selection state')
+        if '<ProfileDescription' in (profile.get('description') or ''):
+            errors.append('benchmark.profiles: remove source XML description wrapper')
     sections=[key for key in a if key in ASSESSMENT_SECTION_ORDER]
     expected=[key for key in ASSESSMENT_SECTION_ORDER if key in a]
     if sections != expected:

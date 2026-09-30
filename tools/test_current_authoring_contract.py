@@ -2,6 +2,11 @@ import unittest
 from check_current_authoring_contract import violations
 
 class CurrentDesignGuards(unittest.TestCase):
+    def test_publisher_profile_selection_contract(self):
+        self.assertTrue(violations({'benchmark':{'profiles':[{'enabled_rules':[]}]}}))
+        self.assertTrue(violations({'benchmark':{'profiles':[{'disabled_rules':[]}]}}))
+        self.assertFalse(violations({'benchmark':{'profiles':[{'disabled_rules':['SV-1']}]}}))
+        self.assertFalse(violations({'tailoring':{'enabled_rules':['SV-1']}}))
     def test_assessment_presentation_order_with_optional_sections(self):
         self.assertFalse(violations({'assessment':{
             'collections':{}, 'variables':{}, 'tests':{}, 'evaluate':{}}}))

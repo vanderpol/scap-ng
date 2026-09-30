@@ -2,6 +2,7 @@
 import unittest
 import xml.etree.ElementTree as ET
 from scap_upconvert_v003.convert_collection_review import manual_procedure, NS
+from scap_upconvert_v003.convert_full_review import render_profiles, profile_description
 X=NS['x']
 
 class ManualBinding(unittest.TestCase):
@@ -29,5 +30,46 @@ class ManualBinding(unittest.TestCase):
         a=self.check('default','First procedure.');b=self.check('manual','Different procedure.')
         with self.assertRaisesRegex(ValueError,'conflicting procedures'):
             manual_procedure({'id':'SV-1','checks':[a,b]},a)
+
+class ProfileRendering(unittest.TestCase):
+    def fixture(self):
+        root=ET.Element('{'+X+'}Benchmark')
+        for pid in ('parent','child'):
+            p=ET.SubElement(root,'{'+X+'}Profile',id='xccdf_profile_'+pid)
+            ET.SubElement(p,'{'+X+'}description').text='<ProfileDescription></ProfileDescription>'
+        baseline={'SV-1':True,'SV-2':True}
+        resolved=[{'id':'xccdf_profile_parent','effective_actions':[]},
+                  {'id':'xccdf_profile_child','extends':'xccdf_profile_parent','effective_actions':[]}]
+        expected={pid:{'enabled':dict(baseline),'problems':[]} for pid in ('parent','child')}
+        return root,resolved,baseline,expected
+
+    def test_unchanged_profile_has_no_selection_state_or_xml_wrapper(self):
+        root,resolved,baseline,expected=self.fixture()
+        p=render_profiles(root,resolved,baseline,expected)[0]
+        self.assertNotIn('enabled_rules',p);self.assertNotIn('disabled_rules',p)
+        self.assertIsNone(p['description'])
+
+    def test_subtractive_child_preserves_inheritance_and_only_additional_disables(self):
+        root,resolved,baseline,expected=self.fixture()
+        expected['parent']['enabled']['SV-1']=False
+        expected['child']['enabled']={'SV-1':False,'SV-2':False}
+        child=render_profiles(root,resolved,baseline,expected)[1]
+        self.assertEqual(child['extends'],'parent');self.assertEqual(child['disabled_rules'],['SV-2'])
+
+    def test_reenabling_ancestor_disabled_rule_is_blocked(self):
+        root,resolved,baseline,expected=self.fixture()
+        expected['parent']['enabled']['SV-1']=False
+        with self.assertRaisesRegex(ValueError,'re-enables'):
+            render_profiles(root,resolved,baseline,expected)
+
+    def test_disabled_source_baseline_is_not_silently_changed(self):
+        root,resolved,baseline,expected=self.fixture();baseline['SV-1']=False
+        with self.assertRaisesRegex(ValueError,'Source baseline disables'):
+            render_profiles(root,resolved,baseline,expected)
+
+    def test_description_keeps_meaningful_text(self):
+        e=ET.Element('description');e.text='<ProfileDescription>Review <p>these Rules.</p></ProfileDescription>'
+        self.assertEqual(profile_description(e),'Review these Rules.')
+        e.text='A plain description.';self.assertEqual(profile_description(e),e.text)
 
 if __name__=='__main__':unittest.main()

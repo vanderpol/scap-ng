@@ -32,6 +32,39 @@ def write_json(path, value):
     path.write_text(json.dumps(value, indent=2)+'\n', encoding='utf-8')
 
 
+def profile_description(element):
+    value=source.text(element)
+    if value and value.startswith('<ProfileDescription'):
+        wrapper=ET.fromstring(value)
+        if source.local(wrapper.tag)!='ProfileDescription': raise ValueError('Unexpected Profile description wrapper')
+        return source.text(wrapper)
+    return value
+
+
+def render_profiles(xr, resolved, baseline, expected):
+    if not all(baseline.values()):
+        raise ValueError('Source baseline disables Rules; native Benchmark membership enables every Rule')
+    originals={p.get('id'):p for p in xr.findall('x:Profile',source.NS)}
+    profiles=[]
+    for profile in resolved:
+        pid=native_profile_id(profile['id']);effective=expected[pid]
+        if effective['problems'] or profile.get('unresolved_targets'): raise ValueError('Unresolved Profile: '+pid)
+        if any(a['kind']!='select' for a in profile['effective_actions']): raise ValueError('Unsupported Profile action: '+pid)
+        original=originals[profile['id']]
+        if original.findall('x:platform',source.NS): raise ValueError('Profile-specific applicability needs representation')
+        parent_id=native_profile_id(profile['extends']) if profile.get('extends') else None
+        inherited=expected[parent_id]['enabled'] if parent_id else baseline
+        if any(value and not inherited[rid] for rid,value in effective['enabled'].items()):
+            raise ValueError('Profile re-enables an ancestor-disabled Rule: '+pid)
+        row={'id':pid,'title':source.text(original.find('x:title',source.NS)),
+             'description':profile_description(original.find('x:description',source.NS))}
+        if parent_id: row['extends']=parent_id
+        disabled=sorted(rid for rid,value in effective['enabled'].items() if not value and inherited[rid])
+        if disabled: row['disabled_rules']=disabled
+        profiles.append(row)
+    return profiles
+
+
 def platform_sources(package):
     predicates={}; dictionary={}
     with zipfile.ZipFile(package) as archive:
@@ -117,19 +150,10 @@ def main(argv=None):
         if xr.findall('.//x:'+name,source.NS): raise ValueError('Full review does not yet support '+name)
     sr,sg,ancestry,resolved=extract_selection(args.input)
     baseline,expected=expected_selections(sr,sg,ancestry,resolved)
-    if len(set(baseline.values()))!=1: raise ValueError('Mixed baseline selection needs explicit native representation')
-    profiles=[]; selection_evidence=[]
-    original_profiles={p.get('id'):p for p in xr.findall('x:Profile',source.NS)}
+    profiles=render_profiles(xr,resolved,baseline,expected)
+    selection_evidence=[]
     for profile in resolved:
         pid=native_profile_id(profile['id']); effective=expected[pid]
-        if effective['problems'] or profile.get('unresolved_targets'): raise ValueError('Unresolved Profile: '+pid)
-        if any(a['kind']!='select' for a in profile['effective_actions']): raise ValueError('Unsupported Profile action: '+pid)
-        original=original_profiles[profile['id']]
-        if original.findall('x:platform',source.NS): raise ValueError('Profile-specific applicability needs representation')
-        profiles.append({'id':pid,'title':source.text(original.find('x:title',source.NS)),
-                         'description':source.text(original.find('x:description',source.NS)),
-                         'disabled_rules':sorted(rid for rid,v in effective['enabled'].items() if not v and baseline[rid]),
-                         'enabled_rules':sorted(rid for rid,v in effective['enabled'].items() if v and not baseline[rid])})
         selection_evidence.append({'profile':pid, 'source':deepcopy(profile),
                                    'effective_selection':effective['enabled']})
     with tempfile.TemporaryDirectory() as temporary:
