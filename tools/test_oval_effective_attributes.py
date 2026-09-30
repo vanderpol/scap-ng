@@ -70,6 +70,27 @@ class EffectiveAttributeTests(unittest.TestCase):
         )
         self.assertEqual(explicit["mask"], {"value": "true", "origin": "explicit"})
 
+    def test_object_entities_inherit_common_values_without_state_existence(self):
+        obj = element(
+            f'<unix:file_object xmlns:unix="{UNIX}" '
+            'id="oval:example:obj:1" version="1">'
+            '<unix:path var_ref="oval:example:var:1"/>'
+            '</unix:file_object>'
+        )
+        parsed = ir.parse_object(obj)
+        entity = parsed["children"][0]
+        defaults = entity["effective_attributes"]
+        self.assertEqual(defaults["datatype"]["value"], "string")
+        self.assertEqual(defaults["operation"]["value"], "equals")
+        self.assertEqual(defaults["mask"]["value"], "false")
+        self.assertEqual(
+            defaults["var_check"],
+            {"value": "all", "origin": "documented_implicit"},
+        )
+        self.assertNotIn("check_existence", defaults)
+        self.assertNotIn("entity_check", defaults)
+        self.assertEqual(entity["attributes"], {"var_ref": "oval:example:var:1"})
+
     def test_documented_variable_default_only_with_reference(self):
         no_variable = ir.effective_attributes(element("<path/>"), "state_entity")
         with_variable = ir.effective_attributes(
