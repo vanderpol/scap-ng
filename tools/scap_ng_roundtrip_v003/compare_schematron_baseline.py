@@ -26,8 +26,20 @@ def normalize(row):
         message,
     )
 
-def validate(path, validator):
-    tree = E.parse(str(path))
+OD="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+
+def document_families(path):
+    tree=E.parse(str(path))
+    families=set()
+    for el in tree.getroot().iter():
+        if not isinstance(el.tag,str) or not el.tag.startswith("{"):
+            continue
+        ns=E.QName(el).namespace or ""
+        if ns.startswith(OD+"#"):
+            families.add(ns)
+    return tree,frozenset(families)
+
+def validate_tree(tree, validator):
     validator.validate(tree)
     return [normalize(x) for x in findings(validator)]
 
@@ -39,16 +51,28 @@ def main():
     ap.add_argument("--output",type=Path,required=True)
     args=ap.parse_args()
 
-    schema_paths=[
+    core_paths=[
         args.schemas/"oval-common-schema.xsd",
         args.schemas/"oval-definitions-schema.xsd",
     ]
-    schema_paths += sorted(
-        p for p in args.schemas.glob("*-definitions-schema.xsd")
-        if p.name != "oval-definitions-schema.xsd"
-    )
-    schema=build_schema(schema_paths)
-    validator=isoschematron.Schematron(schema,store_report=True)
+    schema_by_namespace={}
+    for path in sorted(args.schemas.glob("*-definitions-schema.xsd")):
+        if path.name=="oval-definitions-schema.xsd":
+            continue
+        root=E.parse(str(path)).getroot()
+        ns=root.get("targetNamespace")
+        if ns:
+            schema_by_namespace[ns]=path
+    validator_cache={}
+
+    def validator_for(families):
+        if families not in validator_cache:
+            paths=list(core_paths)
+            paths += [schema_by_namespace[ns] for ns in sorted(families) if ns in schema_by_namespace]
+            validator_cache[families]=isoschematron.Schematron(
+                build_schema(paths),store_report=True
+            )
+        return validator_cache[families]
 
     report=json.loads(args.report.read_text(encoding="utf-8"))
     source_cache={}
@@ -62,9 +86,14 @@ def main():
         source_rel=row["file"]
         source=args.corpus/source_rel
         if source_rel not in source_cache:
-            source_cache[source_rel]=validate(source,validator)
-        source_findings=source_cache[source_rel]
-        regen_findings=validate(Path(regen),validator)
+            source_tree,source_families=document_families(source)
+            source_cache[source_rel]=(
+                source_families,
+                validate_tree(source_tree,validator_for(source_families)),
+            )
+        source_families,source_findings=source_cache[source_rel]
+        regen_tree,regen_families=document_families(Path(regen))
+        regen_findings=validate_tree(regen_tree,validator_for(regen_families))
 
         source_set=set(source_findings)
         new=[item for item in regen_findings if item not in source_set]
