@@ -73,9 +73,13 @@ def main():
         detail[kind]=duplicate_groups
         after[kind]=before[kind]-sum(len(x["duplicates"]) for x in duplicate_groups)
 
-    # Rewrite all exact OVAL-ID references before deleting duplicate nodes.
+    # Rewrite references, but never rewrite the defining @id itself.
+    # Duplicate nodes must retain their original IDs until they are removed;
+    # otherwise multiple nodes acquire the canonical ID and violate OVAL keys.
     for node in root.iter():
         for attr,value in list(node.attrib.items()):
+            if attr == "id":
+                continue
             if value in remap:
                 node.set(attr,remap[value])
         if node.text:
