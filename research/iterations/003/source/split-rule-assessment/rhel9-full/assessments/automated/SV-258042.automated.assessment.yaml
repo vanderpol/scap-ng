@@ -28,19 +28,23 @@ assessment:
             datatype: string
           state_title: Lines starting with usernames of system users
       assert:
-        state_title: greater than zero / less than or equal to sixty
         existence: any_exist
         check: all
-        state:
-          all:
-          - field: chg_req
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: chg_req
             operation: greater than
             value: '0'
             datatype: int
-          - field: chg_req
+          state_title: greater than zero
+        - state:
+            field: chg_req
             operation: less than or equal
             value: '60'
             datatype: int
+          state_title: less than or equal to sixty
     root-password-in-etc-shadow-does-not-have-maximum-password:
       test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than
         60
@@ -52,19 +56,23 @@ assessment:
             datatype: string
             value: root
       assert:
-        state_title: greater than zero / less than or equal to sixty
         existence: all_exist
         check: all
-        state:
-          all:
-          - field: chg_req
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: chg_req
             operation: greater than
             value: '0'
             datatype: int
-          - field: chg_req
+          state_title: greater than zero
+        - state:
+            field: chg_req
             operation: less than or equal
             value: '60'
             datatype: int
+          state_title: less than or equal to sixty
   evaluate:
     all:
     - check: no-password-in-etc-shadow-has-maximum-password-age-0

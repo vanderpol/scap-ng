@@ -15,7 +15,6 @@ assessment:
         select:
           mount_point: /sys/fs/selinux
       assert:
-        state_title: null
         existence: at_least_one_exists
         check: all
         state:
@@ -37,7 +36,6 @@ assessment:
             datatype: int
             value: '1'
       assert:
-        state_title: /sys/fs/selinux/enforce != 0
         existence: only_one_exists
         check: all
         state:
@@ -45,6 +43,7 @@ assessment:
           operation: not equal
           value: '0'
           datatype: int
+        state_title: /sys/fs/selinux/enforce != 0
     etc-selinux-config-selinux-enforcing:
       test_title: /etc/selinux/config:SELINUX=enforcing
       collect:
@@ -60,7 +59,6 @@ assessment:
             datatype: int
             value: '1'
       assert:
-        state_title: /etc/selinux/config:SELINUX=enforcing
         existence: only_one_exists
         check: all
         state:
@@ -68,6 +66,7 @@ assessment:
           operation: equals
           value: enforcing
           datatype: string
+        state_title: /etc/selinux/config:SELINUX=enforcing
   evaluate:
     all:
     - check: selinux-active

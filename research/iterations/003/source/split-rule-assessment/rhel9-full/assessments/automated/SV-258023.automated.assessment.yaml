@@ -18,12 +18,13 @@ assessment:
             operation: pattern match
             value: uint32\s+(\d+)
       assert:
-        state_title: idle-delay must not be equal to zero / idle-delay must be less than or equal to 600
         existence: at_least_one_exists
         check: all
-        state:
-          all:
-          - all:
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            all:
             - field: exit_status
               operation: equals
               value: '0'
@@ -32,7 +33,9 @@ assessment:
               operation: not equal
               value: '0'
               datatype: int
-          - all:
+          state_title: idle-delay must not be equal to zero
+        - state:
+            all:
             - field: exit_status
               operation: equals
               value: '0'
@@ -41,5 +44,6 @@ assessment:
               operation: less than or equal
               value: '600'
               datatype: int
+          state_title: idle-delay must be less than or equal to 600
   evaluate:
     check: gnome-idle-delay-not-set-0-or-greater-than-600

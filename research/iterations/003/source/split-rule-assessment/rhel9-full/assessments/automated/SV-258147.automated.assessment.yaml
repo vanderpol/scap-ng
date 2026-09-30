@@ -49,7 +49,6 @@ assessment:
               behaviors:
                 ignore_case: 'true'
       assert:
-        state_title: null
         existence: at_least_one_exists
         check: all
         state:
@@ -99,19 +98,23 @@ assessment:
               behaviors:
                 ignore_case: 'true'
       assert:
-        state_title: null
         existence: at_least_one_exists
         check: at least one
-        state:
-          all:
-          - field: subexpression
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: subexpression
             operation: pattern match
             value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
             datatype: string
-          - field: subexpression
+          state_title: null
+        - state:
+            field: subexpression
             operation: pattern match
             value: (?i)(?:^|\n)[^#]*\bStreamDriver\.?Mode\s*=\s*"1"
             datatype: string
+          state_title: null
     streamdrivermode-not-set-in-module-block-advanced-syntax:
       test_title: StreamDriverMode is not set in a module block (advanced syntax)
       collect:
@@ -154,7 +157,6 @@ assessment:
               behaviors:
                 ignore_case: 'true'
       assert:
-        state_title: null
         existence: any_exist
         check: none satisfy
         state:

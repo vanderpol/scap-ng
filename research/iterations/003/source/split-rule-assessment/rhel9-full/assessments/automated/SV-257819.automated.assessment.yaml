@@ -16,13 +16,13 @@ assessment:
           command: rpm -q --queryformat "%{SUMMARY}\n" gpg-pubkey | grep -i "red hat"
           pattern: release key
       assert:
-        state_title: Confirm correct release key.
         existence: at_least_one_exists
         check: at least one
         state:
           field: stdout_line
           operation: pattern match
           value: release key 2
+        state_title: Confirm correct release key.
     confirm-red-hat-package-signing-key-auxillary-installed-on-system:
       test_title: Confirm Red Hat package-signing key (auxillary) is installed on the system.
       collect:
@@ -33,13 +33,13 @@ assessment:
           command: rpm -q --queryformat "%{SUMMARY}\n" gpg-pubkey | grep -i "red hat"
           pattern: auxiliary key
       assert:
-        state_title: Confirm correct auxilary key.
         existence: at_least_one_exists
         check: at least one
         state:
           field: stdout_line
           operation: pattern match
           value: auxiliary key 3
+        state_title: Confirm correct auxilary key.
     confirm-red-hat-package-signing-release-key-fingerprint-matches-vendor:
       test_title: Confirm Red Hat package-signing 'release' key fingerprint matches vendor values.
       collect:
@@ -53,13 +53,13 @@ assessment:
             operation: pattern match
             value: Key fingerprint\s*=\s*(.*)
       assert:
-        state_title: Confirm 'release' key finger print.
         existence: at_least_one_exists
         check: at least one
         state:
           field: subexpression
           operation: pattern match
           value: ^567E\s+347A\s+D004\s+4ADE\s+55BA\s+8A5F\s+199E\s+2F91\s+FD43\s+1D51$
+        state_title: Confirm 'release' key finger print.
     confirm-red-hat-package-signing-auxiliary-key-fingerprint-matches-vendor:
       test_title: Confirm Red Hat package-signing 'auxiliary' key fingerprint matches vendor values.
       collect:
@@ -73,13 +73,13 @@ assessment:
             operation: pattern match
             value: Key fingerprint\s*=\s*(.*)
       assert:
-        state_title: Confirm 'auxiliary' key fingerprint.
         existence: at_least_one_exists
         check: at least one
         state:
           field: subexpression
           operation: pattern match
           value: ^7E46\s+2425\s+8C40\s+6535\s+D56D\s+6F13\s+5054\s+E4A4\s+5A63\s+40B3$
+        state_title: Confirm 'auxiliary' key fingerprint.
   evaluate:
     all:
     - check: confirm-red-hat-package-signing-key-release-installed-on-system
