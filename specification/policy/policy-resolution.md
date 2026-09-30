@@ -148,6 +148,19 @@ default check or another available check.
 Results SHALL identify the effective check selector and Assessment Method used
 when check alternatives exist.
 
+### Authoring links versus scanner resolution
+
+In human-authored source, a Rule's Policy reference and each Policy check's
+Assessment reference are explicit **relative paths**. These are resolved and
+validated during compilation; authors are not required to maintain a separate
+Assessment index. In the compiled package, logical IDs and selected-check
+bindings are resolved to exact package members using the automatically
+constructed **package manifest**. A scanner SHALL NOT infer filenames or use
+authoring paths at runtime. See [Source, Compilation, Packaging, and
+Integrity](../package/package-and-integrity.md#5-explicit-source-references-versus-compiled-manifest-resolution)
+for the normative source-resolution, integrity and failure contract.
+
+
 <!-- spec-nav:start -->
 
 ---
