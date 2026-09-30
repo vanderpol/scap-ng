@@ -96,7 +96,7 @@ class Model:
         if local=="constant_variable":
             out=head+(tuple(sval(x.text) for x in e.findall(f"{{{OD}}}value")),)
         elif local=="local_variable":
-            kids=list(e)
+            kids=[x for x in e if split(x.tag)[1]!="notes"]
             if len(kids)!=1: raise ValueError(f"{vid}: expected one expression")
             out=head+(self.component(kids[0]),)
         elif local=="external_variable":
@@ -104,13 +104,26 @@ class Model:
         else: raise ValueError(f"unsupported variable {local}")
         self.memo[key]=out; return out
 
+    def _bool(self,op,terms):
+        op=op.upper()
+        flat=[]
+        for term in terms:
+            if isinstance(term,tuple) and len(term)==3 and term[0]=="bool" and term[1]==op:
+                flat.extend(term[2])
+            else:
+                flat.append(term)
+        if len(flat)==1:
+            return flat[0]
+        return ("bool",op,tuple(sorted(flat,key=repr)))
+
     def state(self,sid):
         key=("state",sid)
         if key in self.memo:return self.memo[key]
         e=self.states[sid]
         self.memo[key]=("recursion-state",sid)
-        out=("state",typed(e,"_state"),e.attrib.get("operator","AND"),
-             tuple(self.entity(c) for c in e))
+        terms=[self.entity(c) for c in e if split(c.tag)[1]!="notes"]
+        expr=self._bool(e.attrib.get("operator","AND"),terms) if terms else ("empty-state",)
+        out=("state",typed(e,"_state"),expr)
         self.memo[key]=out; return out
 
     def setexpr(self,e):
@@ -138,6 +151,8 @@ class Model:
         body=[]
         for c in e:
             ns,local=split(c.tag)
+            if local=="notes":
+                continue
             if ns==OD and local=="set":
                 body.append(self.setexpr(c))
             elif ns==OD and local=="filter":
@@ -146,23 +161,33 @@ class Model:
                 body.append(("behaviors",tuple(sorted(c.attrib.items()))))
             else:
                 body.append(self.entity(c))
-        out=("object",typed(e,"_object"),tuple(body))
+        out=("object",typed(e,"_object"),tuple(sorted(body,key=repr)))
         self.memo[key]=out; return out
 
     def test(self,tid):
         e=self.tests[tid]
-        body=[]
+        obj=None
+        states=[]
         for c in e:
             _,local=split(c.tag)
+            if local=="notes":
+                continue
             if local=="object":
-                body.append(("object",self.obj(c.attrib["object_ref"])))
+                obj=self.obj(c.attrib["object_ref"])
             elif local=="state":
-                body.append(("state",self.state(c.attrib["state_ref"])))
+                states.append(self.state(c.attrib["state_ref"]))
             else:
                 raise ValueError(f"unsupported test child {local}")
+        state_expr=None
+        if states:
+            types={s[1] for s in states}
+            if len(types)!=1:
+                raise ValueError(f"{tid}: mixed state types {types}")
+            pieces=[s[2] for s in states]
+            state_expr=("state",next(iter(types)),self._bool(e.attrib.get("state_operator","AND"),pieces))
         return ("test",typed(e,"_test"),
                 e.attrib.get("check_existence","at_least_one_exists"),
-                e.attrib["check"],e.attrib.get("state_operator","AND"),tuple(body))
+                e.attrib["check"],("object",obj) if obj is not None else None,state_expr)
 
     def criteria(self,e):
         op=e.attrib.get("operator","AND")
