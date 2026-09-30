@@ -1,0 +1,57 @@
+assessment:
+  id: SV-258007.automated
+  version: 1
+  assessment_title: RHEL-09-255155 - RHEL 9 SSH daemon must disable remote X connections for interactive
+    users.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-ssh-sshd-config-or-etc-ssh-sshd-config-d:
+      test_title: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/*:X11Forwarding == no
+      capability: independent.textfilecontent54
+      collect:
+        object_title: X11Forwarding in /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/ssh/sshd_config
+                pattern:
+                  operation: pattern match
+                  value: ^\s*(?i)X11Forwarding[ \t]+([^\s#]*)[ \t]*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/ssh/sshd_config.d
+                filename:
+                  operation: pattern match
+                  value: .+
+                pattern:
+                  operation: pattern match
+                  value: ^\s*(?i)X11Forwarding[ \t]+([^\s#]*)[ \t]*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^(no|"no")$
+          datatype: string
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: etc-ssh-sshd-config-or-etc-ssh-sshd-config-d

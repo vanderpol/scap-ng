@@ -1,0 +1,79 @@
+assessment:
+  id: SV-257949.automated
+  version: 1
+  assessment_title: RHEL-09-252040 - RHEL 9 must configure a DNS processing mode set be Network Manager.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    dns-setting-exists-in-networkmanager-conf-default-none-or-systemd:
+      test_title: DNS setting exists in NetworkManager.conf and is default, none or systemd-resolved
+      capability: independent.textfilecontent54
+      collect:
+        object_title: NetworkManager.conf dns setting
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/NetworkManager/NetworkManager.conf
+          pattern:
+            operation: pattern match
+            value: ^dns=(\S*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: OR
+        states:
+        - state:
+            field: subexpression
+            operation: equals
+            value: none
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: equals
+            value: default
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: equals
+            value: systemd-resolved
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+    dns-setting-exists-in-networkmanager-conf-main-section:
+      test_title: DNS setting exists in NetworkManager.conf main section
+      capability: independent.textfilecontent54
+      collect:
+        object_title: NetworkManager.conf main section
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/NetworkManager/NetworkManager.conf
+          pattern:
+            operation: pattern match
+            value: ^\[main\]((?:\r?\n(?:[^[\r\n].*)?)*)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: \ndns=
+          datatype: string
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - check: dns-setting-exists-in-networkmanager-conf-default-none-or-systemd
+    - check: dns-setting-exists-in-networkmanager-conf-main-section

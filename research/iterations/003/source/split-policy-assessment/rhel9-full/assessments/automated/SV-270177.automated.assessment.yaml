@@ -1,0 +1,48 @@
+assessment:
+  id: SV-270177.automated
+  version: 1
+  assessment_title: RHEL-09-255064 - The RHEL 9 SSH client must be configured to use only DOD-approved
+    encryption ciphers employing FIPS 140-3 validated cryptographic hash algorithms to protect the confidentiality
+    of SSH client connections.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    openssh-config-ciphers-correct:
+      test_title: openssh.config ciphers correct
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/crypto-policies/back-ends/openssh.config
+          pattern:
+            operation: pattern match
+            value: ^\s*(?i)Ciphers(?-i)[ \t]+(\S+)[\s]*(?:|(?:#.*))?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: OR
+        states:
+        - state:
+            field: subexpression
+            operation: equals
+            value: aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: equals
+            value: '"aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr"'
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: openssh-config-ciphers-correct

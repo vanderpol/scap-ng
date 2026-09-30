@@ -1,0 +1,64 @@
+assessment:
+  id: SV-258116.automated
+  version: 1
+  assessment_title: RHEL-09-611135 - RHEL 9 must be configured so that user and group account administration
+    utilities are configured to store only encrypted representations of passwords.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    libuser-conf-defaults-crypt-style-exists:
+      test_title: libuser.conf, defaults/crypt_style exists
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/libuser.conf defaults section with crypt_style
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/libuser.conf
+          pattern:
+            operation: pattern match
+            value: ^\[defaults]((?:\r?\n(?:[^[\r\n].*)?)*)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: pattern match
+          value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
+          datatype: string
+        state_title: defaults/crypt_style
+        state_capability: independent.textfilecontent54
+    libuser-conf-crypt-style-sha512:
+      test_title: libuser.conf, crypt_style = sha512
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/libuser.conf defaults section with crypt_style
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/libuser.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*crypt_style\s*=\s*(\S+)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: sha512
+          datatype: string
+        state_title: sha512
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - check: libuser-conf-defaults-crypt-style-exists
+    - check: libuser-conf-crypt-style-sha512

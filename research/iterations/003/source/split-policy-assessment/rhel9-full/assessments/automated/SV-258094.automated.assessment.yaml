@@ -1,0 +1,51 @@
+assessment:
+  id: SV-258094.automated
+  version: 1
+  assessment_title: RHEL-09-611025 - RHEL 9 must not allow blank or null passwords.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    there-no-instances-nullok-in-etc-pam-d-system-auth:
+      test_title: There are no instances of nullok in /etc/pam.d/system-auth.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/pam.d/system-auth
+          pattern:
+            operation: pattern match
+            value: \bnullok\b
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+    there-no-instances-nullok-in-etc-pam-d-password-auth:
+      test_title: There are no instances of nullok in /etc/pam.d/password-auth.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/pam.d/password-auth
+          pattern:
+            operation: pattern match
+            value: \bnullok\b
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: there-no-instances-nullok-in-etc-pam-d-system-auth
+    - check: there-no-instances-nullok-in-etc-pam-d-password-auth

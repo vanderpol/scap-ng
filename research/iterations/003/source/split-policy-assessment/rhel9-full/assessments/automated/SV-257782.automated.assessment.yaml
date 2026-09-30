@@ -1,0 +1,29 @@
+assessment:
+  id: SV-257782.automated
+  version: 2
+  assessment_title: RHEL-09-211035 - RHEL 9 must enable the hardware random number generator entropy gatherer
+    service.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    rngd-service-active:
+      test_title: rngd.service is active
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: rngd.service
+          property: ActiveState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: active
+        state_capability: linux.systemdunitproperty
+  evaluate:
+    check: rngd-service-active

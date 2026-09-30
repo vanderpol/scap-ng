@@ -1,0 +1,47 @@
+assessment:
+  id: SV-258152.automated
+  version: 2
+  assessment_title: RHEL-09-653015 - RHEL 9 audit service must be enabled.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    auditd-service-active:
+      test_title: auditd.service is active
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: auditd.service
+          property: ActiveState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: active
+        state_capability: linux.systemdunitproperty
+    auditd-service-running:
+      test_title: auditd.service is running
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: auditd.service
+          property: SubState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: running
+        state_capability: linux.systemdunitproperty
+  evaluate:
+    all:
+    - check: auditd-service-active
+    - check: auditd-service-running

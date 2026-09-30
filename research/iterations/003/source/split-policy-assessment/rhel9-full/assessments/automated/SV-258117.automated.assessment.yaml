@@ -1,0 +1,36 @@
+assessment:
+  id: SV-258117.automated
+  version: 1
+  assessment_title: RHEL-09-611140 - RHEL 9 must be configured to use the shadow file to store only encrypted
+    representations of passwords.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-login-defs-encrypt-method-sha512:
+      test_title: /etc/login.defs:ENCRYPT_METHOD >= SHA512
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/login.defs:ENCRYPT_METHOD
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/login.defs
+          pattern:
+            operation: pattern match
+            value: ^\s*ENCRYPT_METHOD\s+([^#\r\n]*)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: SHA512
+          datatype: string
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: etc-login-defs-encrypt-method-sha512

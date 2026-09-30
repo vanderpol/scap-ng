@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257781.automated
+  version: 1
+  assessment_title: RHEL-09-211030 - The graphical display manager must not be the default target on RHEL
+    9 unless approved.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    default-target-symlinked-multi-user-target:
+      test_title: default.target is symlinked to multi-user.target
+      capability: unix.symlink
+      collect:
+        object_title: null
+        capability: unix.symlink
+        select:
+          filepath: /etc/systemd/system/default.target
+      assert:
+        existence: all_exist
+        check: all
+        state:
+          field: canonical_path
+          operation: pattern match
+          value: '[\S]*\/multi\-user\.target$'
+        state_capability: unix.symlink
+  evaluate:
+    check: default-target-symlinked-multi-user-target

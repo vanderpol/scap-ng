@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257800.automated
+  version: 2
+  assessment_title: RHEL-09-213025 - RHEL 9 must restrict exposed kernel pointer addresses access.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    kernel-kptr-restrict-set-1:
+      test_title: kernel.kptr_restrict is set to 1
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: kernel.kptr_restrict
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '1'
+          datatype: int
+        state_capability: unix.sysctl
+  evaluate:
+    check: kernel-kptr-restrict-set-1

@@ -1,0 +1,113 @@
+assessment:
+  id: linux.ipv6-enabled.assessment
+  version: 1
+  assessment_title: Linux IPv6 Enabled
+  mode: automated
+  class: inventory
+  deprecated: false
+  purpose: applicability
+  checks:
+    net-ipv6-conf-all-disable-ipv6-setting-in-kernel-set:
+      test_title: net.ipv6.conf.all.disable_ipv6 setting in kernel is set to 1
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: net.ipv6.conf.all.disable_ipv6
+      assert:
+        existence: all_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '1'
+          datatype: int
+        state_capability: unix.sysctl
+    net-ipv6-conf-all-disable-ipv6-setting-in-sysctl-configuration:
+      test_title: net.ipv6.conf.all.disable_ipv6 setting in sysctl configuration files is set to 1, and
+        nothing else
+      capability: independent.textfilecontent54
+      collect:
+        object_title: all sysctl configuration files
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: /etc/sysctl.conf
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/sysctl.conf
+                pattern:
+                  operation: pattern match
+                  value: (?:^|\.*\n)\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*(\d+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: other sysctl configuration files
+              capability: independent.textfilecontent54
+              select:
+                path:
+                  variable_check: at least one
+                  value:
+                    variable: directories-containing-sysctl-configuration-files
+                filename:
+                  operation: pattern match
+                  value: \.conf$
+                pattern:
+                  operation: pattern match
+                  value: (?:^|\.*\n)\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*(\d+)\s*$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '1'
+          datatype: int
+        state_capability: independent.textfilecontent54
+    ipv6-disable-1-in-kernel-cmdline:
+      test_title: ipv6.disable=1 in the kernel cmdline
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /proc/cmdline contains ipv6.disable=1
+        capability: independent.textfilecontent54
+        select:
+          filepath: /proc/cmdline
+          pattern:
+            operation: pattern match
+            value: \bipv6\.disable=1\b
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    not:
+      any:
+      - all:
+        - check: net-ipv6-conf-all-disable-ipv6-setting-in-kernel-set
+        - check: net-ipv6-conf-all-disable-ipv6-setting-in-sysctl-configuration
+      - check: ipv6-disable-1-in-kernel-cmdline
+  variables:
+    directories-containing-sysctl-configuration-files:
+      title: Directories containing sysctl configuration files
+      datatype: string
+      kind: constant
+      expression:
+        literal:
+        - /etc/sysctl.d
+        - /run/sysctl.d
+        - /lib/sysctl.d
+        - /usr/lib/sysctl.d
+        - /usr/local/lib/sysctl.d

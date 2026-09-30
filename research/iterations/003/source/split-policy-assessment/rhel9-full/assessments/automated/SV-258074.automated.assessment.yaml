@@ -1,0 +1,36 @@
+assessment:
+  id: SV-258074.automated
+  version: 1
+  assessment_title: RHEL-09-412065 - RHEL 9 must define default permissions for all authenticated users
+    in such a way that the user can only read and modify their own files.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-login-defs-umask-077:
+      test_title: /etc/login.defs:UMASK == 077
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/login.defs
+          pattern:
+            operation: pattern match
+            value: ^\s*UMASK\s+([^#\s]+)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '077'
+          datatype: string
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: etc-login-defs-umask-077

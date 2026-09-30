@@ -1,0 +1,30 @@
+assessment:
+  id: SV-258088.automated
+  version: 1
+  assessment_title: RHEL-09-432035 - RHEL 9 must restrict the use of the "su" command.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    users-members-wheel-group-run-su-command:
+      test_title: Users must be members of the wheel group to run the su command.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/pam.d/su
+          pattern:
+            operation: pattern match
+            value: ^\s*auth\s+(?:required|requisite)\s+pam_wheel\.so(?:\s|$)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    check: users-members-wheel-group-run-su-command

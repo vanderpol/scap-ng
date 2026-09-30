@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257939.automated
+  version: 1
+  assessment_title: RHEL-09-251030 - RHEL 9 must protect against or limit the effects of denial-of-service
+    (DoS) attacks by ensuring rate-limiting measures on impacted network interfaces are implemented.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    firewallbackend-set-nftables-in-etc-firewalld-firewalld-conf:
+      test_title: FirewallBackend is set to nftables in /etc/firewalld/firewalld.conf.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/firewalld/firewalld.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*FirewallBackend\s*=\s*(\w+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: nftables
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: firewallbackend-set-nftables-in-etc-firewalld-firewalld-conf

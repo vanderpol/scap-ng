@@ -1,0 +1,39 @@
+assessment:
+  id: SV-258057.automated
+  version: 1
+  assessment_title: RHEL-09-411090 - RHEL 9 must maintain an account lock until the locked account is
+    released by an administrator.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    unlock-time-set-0-in-etc-security-faillock-conf:
+      test_title: unlock_time is set to 0 in /etc/security/faillock.conf
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            datatype: string
+            value: /etc/security/faillock.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            value: ^\s*unlock_time\s*=\s*([\d]+)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '0'
+          datatype: int
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: unlock-time-set-0-in-etc-security-faillock-conf

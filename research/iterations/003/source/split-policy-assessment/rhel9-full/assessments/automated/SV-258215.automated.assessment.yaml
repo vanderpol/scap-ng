@@ -1,0 +1,31 @@
+assessment:
+  id: SV-258215.automated
+  version: 1
+  assessment_title: RHEL-09-654205 - Successful/unsuccessful uses of the umount system call in RHEL 9
+    must generate an audit record.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    audit-32-bit-invocations-umount-syscall:
+      test_title: Audit 32-bit invocations of umount syscall
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 32-bit umount syscall
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            value: ^\s*-a\s+(always,exit|exit,always)\s+-F\s+arch=b32\s+(?:.*(-S\s+umount\s+|(\s+|,)umount(\s+|,))).*-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)[-\w]+)*\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+  evaluate:
+    check: audit-32-bit-invocations-umount-syscall

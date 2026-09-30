@@ -1,0 +1,45 @@
+rule:
+  id: SV-258052
+  version: r1184315
+  title: All RHEL 9 local interactive user home directories defined in the /etc/passwd file must exist.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: If a local interactive user has a home directory defined that does not exist, the user may be given
+    access to the / directory as the current working directory upon logon. This could create a denial of service
+    because the user would not be able to access their logon configuration files, and it may give them visibility
+    to system files they normally would not be able to access.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-411065
+  - scheme: disa-vulnerability-id
+    value: V-258052
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Create home directories to all local interactive users that currently do not have a home directory
+      assigned. Use the following commands to create the user home directory assigned in "/etc/ passwd": Note: The
+      example will be for the user disauser, who has a home directory of "/home/disauser", a user identifier (UID)
+      of "disauser", and a group identifier (GID) of "users assigned" in "/etc/passwd". $ sudo mkdir /home/disauser
+      $ sudo chown disauser /home/disauser $ sudo chgrp users /home/disauser $ sudo chmod 0750 /home/disauser'
+  policy: policies/SV-258052.policy.yaml

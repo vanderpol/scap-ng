@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257783.automated
+  version: 1
+  assessment_title: RHEL-09-211040 - RHEL 9 systemd-journald service must be enabled.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    systemd-journald-service-active:
+      test_title: The systemd-journald service is active.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: systemd-journald.service
+          property: ActiveState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: active
+        state_capability: linux.systemdunitproperty
+  evaluate:
+    check: systemd-journald-service-active

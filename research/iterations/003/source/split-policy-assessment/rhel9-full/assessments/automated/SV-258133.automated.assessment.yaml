@@ -1,0 +1,107 @@
+assessment:
+  id: SV-258133.automated
+  version: 1
+  assessment_title: RHEL-09-631020 - RHEL 9 must prohibit the use of cached authenticators after one day.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-sssd-sssd-conf-cache-credentials-false:
+      test_title: /etc/sssd/sssd.conf:cache_credentials = false
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/sssd/sssd.conf
+                pattern:
+                  operation: pattern match
+                  value: ^\s*cache_credentials\s*=\s*true\b$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/sssd/conf.d
+                filename:
+                  operation: pattern match
+                  value: ^.+\.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^\s*cache_credentials\s*=\s*true\b$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+                max_depth: '-1'
+                recurse_direction: down
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+    etc-sssd-sssd-conf-offline-credentials-expiration-1:
+      test_title: /etc/sssd/sssd.conf:offline_credentials_expiration = 1
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/sssd/sssd.conf
+                pattern:
+                  operation: pattern match
+                  value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/sssd/conf.d
+                filename:
+                  operation: pattern match
+                  value: ^.+\.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+              behaviors:
+                max_depth: '-1'
+                recurse_direction: down
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: '1'
+          datatype: int
+        state_capability: independent.textfilecontent54
+  evaluate:
+    any:
+    - check: etc-sssd-sssd-conf-cache-credentials-false
+    - check: etc-sssd-sssd-conf-offline-credentials-expiration-1

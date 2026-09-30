@@ -1,0 +1,47 @@
+assessment:
+  id: SV-258160.automated
+  version: 1
+  assessment_title: RHEL-09-653055 - RHEL 9 audit system must take appropriate action when the audit files
+    have reached maximum size.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-max-log-file-action-rotate-or:
+      test_title: '/etc/audit/auditd.conf: max_log_file_action is ROTATE or SINGLE'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*max_log_file_action\s*=\s*(\S+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: OR
+        states:
+        - state:
+            field: subexpression
+            operation: case insensitive equals
+            value: ROTATE
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: case insensitive equals
+            value: SINGLE
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: etc-audit-auditd-conf-max-log-file-action-rotate-or

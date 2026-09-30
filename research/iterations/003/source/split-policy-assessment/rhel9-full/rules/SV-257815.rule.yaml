@@ -1,0 +1,42 @@
+rule:
+  id: SV-257815
+  version: r1134903
+  title: RHEL 9 must disable acquiring, saving, and processing core dumps.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: A core dump includes a memory image taken at the time the operating system terminates an application.
+    The memory image could contain sensitive data and is generally useful only for developers trying to debug problems.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-213100
+  - scheme: disa-vulnerability-id
+    value: V-257815
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - linux.kernel-dumps-enabled
+  parameters: {}
+  remediation:
+    guidance: 'Configure the system to disable the systemd-coredump.socket with the following command: $ sudo systemctl
+      mask --now systemd-coredump.socket Created symlink /etc/systemd/system/systemd-coredump.socket -> /dev/null
+      Reload the daemon for this change to take effect. $ sudo systemctl daemon-reload'
+  policy: policies/SV-257815.policy.yaml

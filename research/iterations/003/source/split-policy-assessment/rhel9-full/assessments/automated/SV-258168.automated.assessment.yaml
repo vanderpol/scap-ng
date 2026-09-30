@@ -1,0 +1,47 @@
+assessment:
+  id: SV-258168.automated
+  version: 1
+  assessment_title: RHEL-09-653095 - RHEL 9 must periodically flush audit records to disk to prevent the
+    loss of audit records.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-freq-1-100:
+      test_title: '/etc/audit/auditd.conf: freq = 1-100'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*freq\s*=\s*(\S+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: subexpression
+            operation: greater than or equal
+            value: '1'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: less than or equal
+            value: '100'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: etc-audit-auditd-conf-freq-1-100

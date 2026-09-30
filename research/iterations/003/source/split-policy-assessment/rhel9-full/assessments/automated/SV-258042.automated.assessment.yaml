@@ -1,0 +1,138 @@
+assessment:
+  id: SV-258042.automated
+  version: 2
+  assessment_title: RHEL-09-411015 - RHEL 9 user account passwords must have a 60-day maximum password
+    lifetime restriction.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    no-password-in-etc-shadow-has-maximum-password-age-0:
+      test_title: No password in /etc/shadow has a maximum password age of 0 or greater than 60
+      capability: unix.shadow
+      collect:
+        object_title: /etc/shadow max password ages for non-system users
+        capability: unix.shadow
+        select:
+          username:
+            operation: pattern match
+            datatype: string
+            value: .+
+        filters:
+        - action: include
+          match:
+            field: username
+            operation: pattern match
+            value:
+              variable: pattern-match-lines-starting-usernames-system-users
+            variable_check: at least one
+            datatype: string
+          state_title: Lines starting with usernames of system users
+          capability: unix.shadow
+      assert:
+        existence: any_exist
+        check: all
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: chg_req
+            operation: greater than
+            value: '0'
+            datatype: int
+          state_title: greater than zero
+          capability: unix.shadow
+        - state:
+            field: chg_req
+            operation: less than or equal
+            value: '60'
+            datatype: int
+          state_title: less than or equal to sixty
+          capability: unix.shadow
+    root-password-in-etc-shadow-does-not-have-maximum-password:
+      test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than
+        60
+      capability: unix.shadow
+      collect:
+        object_title: /etc/shadow max password age for root
+        capability: unix.shadow
+        select:
+          username:
+            datatype: string
+            value: root
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: chg_req
+            operation: greater than
+            value: '0'
+            datatype: int
+          state_title: greater than zero
+          capability: unix.shadow
+        - state:
+            field: chg_req
+            operation: less than or equal
+            value: '60'
+            datatype: int
+          state_title: less than or equal to sixty
+          capability: unix.shadow
+  evaluate:
+    all:
+    - check: no-password-in-etc-shadow-has-maximum-password-age-0
+    - check: root-password-in-etc-shadow-does-not-have-maximum-password
+  variables:
+    anonymous-uids:
+      title: anonymous UIDs
+      datatype: int
+      kind: constant
+      expression:
+        literal:
+        - '65534'
+        - '65535'
+        - '4294967294'
+        - '4294967295'
+    pattern-match-lines-starting-usernames-system-users:
+      title: Pattern to match lines starting with usernames of system users
+      datatype: string
+      kind: local
+      expression:
+        concat:
+        - literal:
+            value: ^
+            datatype: string
+        - object_values:
+            collect:
+              object_title: interactive non-anonymous users
+              capability: unix.password
+              select:
+                username:
+                  operation: pattern match
+                  datatype: string
+                  value: .*
+              filters:
+              - action: include
+                match:
+                  field: user_id
+                  operation: greater than or equal
+                  value: '1000'
+                  datatype: int
+                capability: unix.password
+              - action: include
+                match:
+                  field: user_id
+                  operation: not equal
+                  value:
+                    variable: anonymous-uids
+                  variable_check: all
+                  datatype: int
+                state_title: anonymous users
+                capability: unix.password
+            field: username
+        - literal:
+            value: $
+            datatype: string

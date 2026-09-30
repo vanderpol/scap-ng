@@ -1,0 +1,88 @@
+assessment:
+  id: SV-258232.automated
+  version: 1
+  assessment_title: RHEL-09-671020 - RHEL 9 IP tunnels must use FIPS 140-2/140-3 approved cryptographic
+    algorithms.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    ipsec-conf-includes-crypto-policy:
+      test_title: ipsec.conf includes crypto-policy
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/ipsec.conf includes
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/ipsec.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: equals
+          value: /etc/crypto-policies/back-ends/libreswan.config
+        state_capability: independent.textfilecontent54
+    ipsec-conf-includes-etc-ipsec-d-conf:
+      test_title: ipsec.conf includes /etc/ipsec.d/*.conf
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/ipsec.conf includes
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/ipsec.conf
+          pattern:
+            operation: pattern match
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: equals
+          value: /etc/ipsec.d/*.conf
+        state_capability: independent.textfilecontent54
+    etc-ipsec-d-conf-includes-crypto-policy:
+      test_title: /etc/ipsec.d/*.conf includes crypto-policy
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/ipsec.d/*.conf includes
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/ipsec.d
+          filename:
+            operation: pattern match
+            value: ^.*\.conf$
+          pattern:
+            operation: pattern match
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: equals
+          value: /etc/crypto-policies/back-ends/libreswan.config
+        state_capability: independent.textfilecontent54
+  evaluate:
+    any:
+    - check: ipsec-conf-includes-crypto-policy
+    - all:
+      - check: ipsec-conf-includes-etc-ipsec-d-conf
+      - check: etc-ipsec-d-conf-includes-crypto-policy

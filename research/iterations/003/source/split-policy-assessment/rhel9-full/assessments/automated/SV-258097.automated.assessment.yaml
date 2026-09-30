@@ -1,0 +1,31 @@
+assessment:
+  id: SV-258097.automated
+  version: 1
+  assessment_title: RHEL-09-611040 - RHEL 9 must ensure the password complexity module is enabled in the
+    password-auth file.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    pam-pwquality-module-included-in-password-auth:
+      test_title: The pam_pwquality module is included in password-auth.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/pam.d/password-auth
+          pattern:
+            operation: pattern match
+            value: ^\s*password\s+(?:required|requisite)\s+pam_pwquality\.so\b
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    check: pam-pwquality-module-included-in-password-auth

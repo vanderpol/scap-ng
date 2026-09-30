@@ -1,0 +1,127 @@
+assessment:
+  id: SV-258149.automated
+  version: 2
+  assessment_title: RHEL-09-652055 - RHEL 9 must be configured to forward audit records via TCP to a different
+    system or media from the system being audited via rsyslog.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    remote-tcp-logging:
+      test_title: remote TCP logging
+      capability: independent.textfilecontent54
+      collect:
+        object_title: remote TCP logging
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: 'rsyslog.conf: remote TCP logging'
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  datatype: string
+                  value: /etc/rsyslog.conf
+                pattern:
+                  operation: pattern match
+                  value: ^\*\.\*\s+@@(\S+)
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+          - collect:
+              object_title: 'rsyslog.d/*.conf: remote TCP logging'
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/rsyslog.d
+                filename:
+                  operation: pattern match
+                  value: ^.*\.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^\*\.\*\s+@@(\S+)
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^.+$
+          datatype: string
+        state_capability: independent.textfilecontent54
+    remote-tcp-logging-advanced-syntax:
+      test_title: remote TCP logging (advanced syntax)
+      capability: independent.textfilecontent54
+      collect:
+        object_title: 'rsyslog: action for all messages'
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: 'rsyslog.conf: action for all messages'
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  datatype: string
+                  value: /etc/rsyslog.conf
+                pattern:
+                  operation: pattern match
+                  value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+          - collect:
+              object_title: 'rsyslog.d/*.conf: action for all messages'
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/rsyslog.d
+                filename:
+                  operation: pattern match
+                  value: ^.*\.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+              behaviors:
+                ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: subexpression
+            operation: pattern match
+            value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: pattern match
+            value: (?i)(?:^|\n)[^#]*\bprotocol\s*=\s*"tcp"
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    any:
+    - check: remote-tcp-logging
+    - check: remote-tcp-logging-advanced-syntax

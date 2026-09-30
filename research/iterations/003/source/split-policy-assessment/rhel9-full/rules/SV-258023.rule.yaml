@@ -1,0 +1,49 @@
+rule:
+  id: SV-258023
+  version: r1155656
+  title: RHEL 9 must automatically lock graphical user sessions after 10 minutes of inactivity.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'A session time-out lock is a temporary action taken when a user stops work and moves away from the
+    immediate physical vicinity of the information system but does not logout because of the temporary nature of
+    the absence. Rather than relying on the user to manually lock their operating system session prior to vacating
+    the vicinity, the GNOME desktop can be configured to identify when a user''s session has idled and take action
+    to initiate a session lock. Satisfies: SRG-OS-000029-GPOS-00010, SRG-OS-000031-GPOS-00012'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000057
+  - scheme: cci
+    value: CCI-000060
+  - scheme: disa-stig-id
+    value: RHEL-09-271065
+  - scheme: disa-vulnerability-id
+    value: V-258023
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - linux.gnome-installed
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to initiate a screensaver after a 10-minute period of inactivity for graphical user
+      interfaces. Create a database to contain the systemwide screensaver settings (if it does not already exist)
+      with the following command: $ sudo touch /etc/dconf/db/local.d/00-screensaver Edit /etc/dconf/db/local.d/00-screensaver
+      and add or update the following lines: [org/gnome/desktop/session] # Set the lock time out to 600 seconds
+      before the session is considered idle idle-delay=uint32 600 Update the system databases: $ sudo dconf update'
+  policy: policies/SV-258023.policy.yaml

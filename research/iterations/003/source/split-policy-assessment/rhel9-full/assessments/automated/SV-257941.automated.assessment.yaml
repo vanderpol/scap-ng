@@ -1,0 +1,31 @@
+assessment:
+  id: SV-257941.automated
+  version: 1
+  assessment_title: RHEL-09-251040 - RHEL 9 network interfaces must not be in promiscuous mode.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    no-network-interfaces-in-promiscuous-mode:
+      test_title: no network interfaces are in promiscuous mode
+      capability: unix.interface
+      collect:
+        object_title: All Interfaces
+        capability: unix.interface
+        select:
+          name:
+            operation: pattern match
+            value: .*
+      assert:
+        existence: any_exist
+        check: all
+        state:
+          field: flag
+          operation: pattern match
+          value: (^|\s)PROMISC(\s|$)
+          entity_check: none satisfy
+        state_title: Interface is not in PROMISC mode
+        state_capability: unix.interface
+  evaluate:
+    check: no-network-interfaces-in-promiscuous-mode

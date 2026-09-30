@@ -1,0 +1,30 @@
+assessment:
+  id: SV-258228.automated
+  version: 1
+  assessment_title: RHEL-09-654270 - RHEL 9 audit system must protect logon UIDs from unauthorized change.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-audit-audit-rules-loginuid-immutable-option-present:
+      test_title: '/etc/audit/audit.rules: --loginuid-immutable option is present'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            value: ^--loginuid-immutable$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    check: etc-audit-audit-rules-loginuid-immutable-option-present

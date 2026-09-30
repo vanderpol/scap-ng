@@ -1,0 +1,28 @@
+assessment:
+  id: SV-258142.automated
+  version: 2
+  assessment_title: RHEL-09-652020 - The rsyslog service on RHEL 9 must be active.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    rsyslog-service-active:
+      test_title: rsyslog.service is active
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: rsyslog.service
+          property: ActiveState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: active
+        state_capability: linux.systemdunitproperty
+  evaluate:
+    check: rsyslog-service-active

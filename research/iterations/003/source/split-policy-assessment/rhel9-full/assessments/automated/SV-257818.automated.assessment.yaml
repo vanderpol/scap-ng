@@ -1,0 +1,65 @@
+assessment:
+  id: SV-257818.automated
+  version: 1
+  assessment_title: RHEL-09-213115 - The kdump service on RHEL 9 must be disabled.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    kdump-service-loadstate-masked-if-it-exists:
+      test_title: kdump.service LoadState is masked if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: kdump.service
+          property: LoadState
+      assert:
+        existence: any_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: masked
+        state_capability: linux.systemdunitproperty
+    kdump-service-unitfilestate-masked-if-it-exists:
+      test_title: kdump.service UnitFileState is masked if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: kdump.service
+          property: UnitFileState
+      assert:
+        existence: any_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: masked
+        state_capability: linux.systemdunitproperty
+    kdump-service-activestate-inactive-if-it-exists:
+      test_title: kdump.service ActiveState is inactive if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: kdump.service
+          property: ActiveState
+      assert:
+        existence: any_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: inactive
+        state_capability: linux.systemdunitproperty
+  evaluate:
+    all:
+    - check: kdump-service-loadstate-masked-if-it-exists
+    - check: kdump-service-unitfilestate-masked-if-it-exists
+    - check: kdump-service-activestate-inactive-if-it-exists

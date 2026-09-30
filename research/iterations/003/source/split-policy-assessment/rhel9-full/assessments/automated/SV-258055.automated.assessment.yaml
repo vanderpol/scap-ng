@@ -1,0 +1,35 @@
+assessment:
+  id: SV-258055.automated
+  version: 1
+  assessment_title: RHEL-09-411080 - RHEL 9 must automatically lock the root account until the root account
+    is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time
+    period.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    check-etc-security-faillock-conf-even-deny-root-setting:
+      test_title: check /etc/security/faillock.conf for the even_deny_root setting
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            datatype: string
+            value: /etc/security/faillock.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            value: ^\s*even_deny_root\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+  evaluate:
+    check: check-etc-security-faillock-conf-even-deny-root-setting

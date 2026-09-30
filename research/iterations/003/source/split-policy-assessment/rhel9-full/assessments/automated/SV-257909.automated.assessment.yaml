@@ -1,0 +1,29 @@
+assessment:
+  id: SV-257909.automated
+  version: 1
+  assessment_title: RHEL-09-232145 - RHEL 9 /etc/passwd- file must be group-owned by root.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-passwd-file-group-owned-by-root:
+      test_title: /etc/passwd- file is group-owned by root
+      capability: unix.file
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          filepath: /etc/passwd-
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: group_id
+          operation: equals
+          value: '0'
+          datatype: int
+        state_title: group-owned by root
+        state_capability: unix.file
+  evaluate:
+    check: etc-passwd-file-group-owned-by-root

@@ -1,0 +1,48 @@
+assessment:
+  id: SV-257929.automated
+  version: 13
+  assessment_title: A sticky bit must be set on all RHEL 9 public directories.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    check-that-all-world-writable-directories-have-sticky-bit-set:
+      test_title: Check that all world-writable directories have the sticky bit set.
+      capability: unix.file
+      collect:
+        object_title: Check to see that all world-writable directories have the sticky bit set. Gather
+          world-writable directories.
+        capability: unix.file
+        select:
+          path: /
+          filename:
+            nil: true
+            value: ''
+        filters:
+        - action: exclude
+          match:
+            field: owrite
+            operation: equals
+            value: '0'
+            datatype: boolean
+          state_title: Filter exclude directories that are not world writable.
+          capability: unix.file
+        - action: exclude
+          match:
+            field: sticky
+            operation: equals
+            value: '1'
+            datatype: boolean
+          state_title: Filter exclude any with sticky bit.
+          capability: unix.file
+        behaviors:
+          recurse_direction: down
+          recurse: directories
+          max_depth: '-1'
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    check: check-that-all-world-writable-directories-have-sticky-bit-set

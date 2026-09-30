@@ -1,0 +1,46 @@
+rule:
+  id: SV-258088
+  version: r1155643
+  title: RHEL 9 must restrict the use of the "su" command.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'The "su" program allows to run commands with a substitute user and group ID. It is commonly used
+    to run commands as the root user. Limiting access to such commands is considered a good security practice. Satisfies:
+    SRG-OS-000373-GPOS-00156, SRG-OS-000312-GPOS-00123'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-004895
+  - scheme: cci
+    value: CCI-002165
+  - scheme: cci
+    value: CCI-002038
+  - scheme: disa-stig-id
+    value: RHEL-09-432035
+  - scheme: disa-vulnerability-id
+    value: V-258088
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to require users to be in the "wheel" group to run "su" command. In file "/etc/pam.d/su",
+      uncomment the following line: "#auth required pam_wheel.so use_uid" $ sed ''/^[[:space:]]*#[[:space:]]*auth[[:space:]]\+required[[:space:]]\+pam_wheel\.so[[:space:]]\+use_uid$/s/^[[:space:]]*#//''
+      -i /etc/pam.d/su If necessary, create a "wheel" group and add administrative users to the group.'
+  policy: policies/SV-258088.policy.yaml

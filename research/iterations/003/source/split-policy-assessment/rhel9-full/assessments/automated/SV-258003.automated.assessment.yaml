@@ -1,0 +1,98 @@
+assessment:
+  id: SV-258003.automated
+  version: 1
+  assessment_title: RHEL-09-255135 - RHEL 9 SSH daemon must not allow GSSAPI authentication.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    sshd-config-includes-sshd-config-d:
+      test_title: sshd_config includes sshd_config.d
+      capability: independent.textfilecontent54
+      collect:
+        object_title: sshd_config includes
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            datatype: string
+            value: /etc/ssh/sshd_config
+          pattern:
+            operation: pattern match
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: equals
+          value: /etc/ssh/sshd_config.d/*.conf
+          datatype: string
+        state_capability: independent.textfilecontent54
+    etc-ssh-sshd-config-d-gssapiauthentication-set-no:
+      test_title: '/etc/ssh/sshd_config.d: GSSAPIAuthentication is set to no'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/ssh/sshd_config.d
+          filename:
+            operation: pattern match
+            value: ^.+\.conf$
+          pattern:
+            operation: pattern match
+            value: ^\s*(?i)GSSAPIAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^(no|"no")$
+          datatype: string
+        state_capability: independent.textfilecontent54
+    etc-ssh-sshd-config-gssapiauthentication-set-no:
+      test_title: '/etc/ssh/sshd_config: GSSAPIAuthentication is set to no'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/ssh/sshd_config
+          pattern:
+            operation: pattern match
+            value: ^\s*(?i)GSSAPIAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^(no|"no")$
+          datatype: string
+        state_capability: independent.textfilecontent54
+  evaluate:
+    any:
+    - all:
+      - check: sshd-config-includes-sshd-config-d
+      - check: etc-ssh-sshd-config-d-gssapiauthentication-set-no
+    - check: etc-ssh-sshd-config-gssapiauthentication-set-no

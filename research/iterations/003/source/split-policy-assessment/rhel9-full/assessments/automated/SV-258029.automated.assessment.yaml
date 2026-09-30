@@ -1,0 +1,71 @@
+assessment:
+  id: SV-258029.automated
+  version: 1
+  assessment_title: RHEL-09-271095 - RHEL 9 must disable the ability of a user to restart the system from
+    the login screen.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    dconf-disable-restart-buttons-true:
+      test_title: dconf disable-restart-buttons true
+      capability: independent.textfilecontent54
+      collect:
+        object_title: dconf org/gnome/login-screen sections
+        capability: independent.textfilecontent54
+        select:
+          path:
+            variable_check: at least one
+            datatype: string
+            value:
+              variable: dconf-database-directories
+          filename:
+            operation: pattern match
+            datatype: string
+            value: .*
+          pattern:
+            operation: pattern match
+            value: ^\[org/gnome/login-screen](?:\r?\n(?:[^[\r\n].*)?)*
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: text
+          operation: pattern match
+          value: \ndisable-restart-buttons=(true|'true')\s*(\n|$)
+          datatype: string
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: dconf-disable-restart-buttons-true
+  variables:
+    dconf-database-directories:
+      title: dconf database directories
+      datatype: string
+      kind: local
+      expression:
+        object_values:
+          collect:
+            object_title: dconf database directories
+            capability: unix.file
+            select:
+              path: /etc/dconf/db
+              filename:
+                nil: true
+                value: ''
+            filters:
+            - action: include
+              match:
+                field: path
+                operation: pattern match
+                value: ^/etc/dconf/db/.*\.d$
+              state_title: dconf database directories
+              capability: unix.file
+            behaviors:
+              max_depth: '1'
+              recurse_direction: down
+          field: path

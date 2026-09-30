@@ -1,0 +1,52 @@
+rule:
+  id: SV-258241
+  version: r1184293
+  title: RHEL 9 must implement a FIPS 140-3-compliant systemwide cryptographic policy.
+  severity: high
+  role: null
+  weight: 10.0
+  discussion: 'Centralized cryptographic policies simplify applying secure ciphers across an operating system and
+    the applications that run on that operating system. Use of weak or untested encryption algorithms undermines
+    the purposes of using encryption to protect data. Satisfies: SRG-OS-000396-GPOS-00176, SRG-OS-000393-GPOS-00173,
+    SRG-OS-000394-GPOS-00174'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-002450
+  - scheme: cci
+    value: CCI-002890
+  - scheme: cci
+    value: CCI-003123
+  - scheme: disa-stig-id
+    value: RHEL-09-215105
+  - scheme: disa-vulnerability-id
+    value: V-258241
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to use a FIPS 140-3-compliant systemwide cryptographic policy. Create a subpolicy
+      for enhancements to the base systemwide crypto-policy by creating the file /etc/crypto-policies/policies/modules/STIG.pmod
+      with the following content: # Define ciphers and MACs for OpenSSH and libssh cipher@SSH=AES-256-GCM AES-256-CTR
+      AES-128-GCM AES-128-CTR mac@SSH=HMAC-SHA2-512 HMAC-SHA2-256 Apply the policy enhancements to the FIPS systemwide
+      cryptographic policy level with the following command: $ sudo update-crypto-policies --set FIPS:STIG Note:
+      If additional subpolicies are being employed, they must be added to the update-crypto-policies command. To
+      make the cryptographic settings effective for already running services and applications, restart the system:
+      $ sudo reboot'
+  policy: policies/SV-258241.policy.yaml

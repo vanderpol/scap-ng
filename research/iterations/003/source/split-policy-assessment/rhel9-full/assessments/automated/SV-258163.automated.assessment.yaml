@@ -1,0 +1,35 @@
+assessment:
+  id: SV-258163.automated
+  version: 1
+  assessment_title: RHEL-09-653070 - RHEL 9 System Administrator (SA) and/or information system security
+    officer (ISSO) (at a minimum) must be alerted of an audit processing failure event.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-action-mail-acct-root:
+      test_title: '/etc/audit/auditd.conf: action_mail_acct = root'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*action_mail_acct\s*=\s*(\w+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (?i)^root$
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: etc-audit-auditd-conf-action-mail-acct-root

@@ -1,0 +1,36 @@
+assessment:
+  id: SV-258071.automated
+  version: 1
+  assessment_title: RHEL-09-412050 - RHEL 9 must enforce a delay of at least four seconds between logon
+    prompts following a failed logon attempt.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-login-defs-fail-delay-4-or-greater:
+      test_title: '/etc/login.defs: FAIL_DELAY = 4 or greater'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/login.defs
+          pattern:
+            operation: pattern match
+            value: ^\s*FAIL_DELAY\s+(\d+)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: greater than or equal
+          value: '4'
+          datatype: int
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: etc-login-defs-fail-delay-4-or-greater

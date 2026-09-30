@@ -1,0 +1,51 @@
+assessment:
+  id: SV-258161.automated
+  version: 1
+  assessment_title: RHEL-09-653060 - RHEL 9 must label all offloaded audit logs before sending them to
+    the central log server.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-name-format-hostname-fqd-or-numeric:
+      test_title: '/etc/audit/auditd.conf: name_format = hostname, fqd or numeric'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*name_format\s*=\s*(\w+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: OR
+        states:
+        - state:
+            field: subexpression
+            operation: pattern match
+            value: (?i)^hostname$
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: pattern match
+            value: (?i)^fqd$
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: pattern match
+            value: (?i)^numeric$
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: etc-audit-auditd-conf-name-format-hostname-fqd-or-numeric

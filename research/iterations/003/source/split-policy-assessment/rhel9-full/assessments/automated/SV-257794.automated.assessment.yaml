@@ -1,0 +1,63 @@
+assessment:
+  id: SV-257794.automated
+  version: 2
+  assessment_title: RHEL-09-212045 - RHEL 9 must clear memory when it is freed to prevent use-after-free
+    attacks.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    bls-options-contain-init-on-free-1:
+      test_title: BLS options contain init_on_free=1
+      capability: independent.textfilecontent54
+      collect:
+        object_title: BLS options
+        capability: independent.textfilecontent54
+        select:
+          path: /boot/loader/entries
+          filename:
+            operation: pattern match
+            value: ^.*\.conf$
+          pattern:
+            operation: pattern match
+            value: ^options\s+(.*)$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)init_on_free=1(\s|$)
+        state_capability: independent.textfilecontent54
+    grub-cmdline-linux-arguments-in-etc-default-grub-contain-init:
+      test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain init_on_free=1
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/default/grub GRUB_CMDLINE_LINUX
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/default/grub
+          pattern:
+            operation: pattern match
+            value: ^GRUB_CMDLINE_LINUX="(.*)"
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)init_on_free=1(\s|$)
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - check: bls-options-contain-init-on-free-1
+    - check: grub-cmdline-linux-arguments-in-etc-default-grub-contain-init

@@ -1,0 +1,31 @@
+assessment:
+  id: SV-257851.automated
+  version: 1
+  assessment_title: RHEL-09-231050 - RHEL 9 must prevent files with the setuid and setgid bit set from
+    being executed on file systems that contain user home directories.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    home-mounted-nosuid-option:
+      test_title: /home is mounted with the nosuid option.
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: pattern match
+            value: .*\/home
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: nosuid
+          entity_check: at least one
+        state_capability: linux.partition
+  evaluate:
+    check: home-mounted-nosuid-option

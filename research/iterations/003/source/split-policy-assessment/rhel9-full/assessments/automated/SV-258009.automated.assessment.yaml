@@ -1,0 +1,97 @@
+assessment:
+  id: SV-258009.automated
+  version: 2
+  assessment_title: RHEL-09-255165 - RHEL 9 SSH daemon must display the date and time of the last successful
+    account logon upon an SSH logon.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    sshd-config-includes-sshd-config-d:
+      test_title: sshd_config includes sshd_config.d
+      capability: independent.textfilecontent54
+      collect:
+        object_title: sshd_config includes
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            datatype: string
+            value: /etc/ssh/sshd_config
+          pattern:
+            operation: pattern match
+            value: ^\s*include\s+(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: subexpression
+          operation: equals
+          value: /etc/ssh/sshd_config.d/*.conf
+          datatype: string
+        state_capability: independent.textfilecontent54
+    etc-ssh-sshd-config-d-printlastlog-set-yes:
+      test_title: '/etc/ssh/sshd_config.d: PrintLastLog is set to yes'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/ssh/sshd_config.d
+          filename:
+            operation: pattern match
+            value: ^.+\.conf$
+          pattern:
+            operation: pattern match
+            value: ^\s*(?i)PrintLastLog(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^(yes|"yes")$
+          datatype: string
+        state_capability: independent.textfilecontent54
+    etc-ssh-sshd-config-printlastlog-yes:
+      test_title: /etc/ssh/sshd_config:PrintLastLog == yes
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/ssh/sshd_config
+          pattern:
+            operation: pattern match
+            value: ^\s*(?i)PrintLastLog(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^(yes|"yes")$
+          datatype: string
+        state_capability: independent.textfilecontent54
+  evaluate:
+    any:
+    - all:
+      - check: sshd-config-includes-sshd-config-d
+      - check: etc-ssh-sshd-config-d-printlastlog-set-yes
+    - check: etc-ssh-sshd-config-printlastlog-yes

@@ -1,0 +1,47 @@
+assessment:
+  id: SV-257989.automated
+  version: 1
+  assessment_title: RHEL-09-255065 - RHEL 9 must implement DOD-approved encryption ciphers to protect
+    the confidentiality of SSH server connections.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    openssh-config-ciphers-correct:
+      test_title: openssh.config ciphers correct
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/crypto-policies/back-ends/opensshserver.config
+          pattern:
+            operation: pattern match
+            value: ^\s*(?i)Ciphers(?-i)[ \t]+(\S+)[\s]*(?:|(?:#.*))?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: OR
+        states:
+        - state:
+            field: subexpression
+            operation: equals
+            value: aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: equals
+            value: '"aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr"'
+            datatype: string
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: openssh-config-ciphers-correct

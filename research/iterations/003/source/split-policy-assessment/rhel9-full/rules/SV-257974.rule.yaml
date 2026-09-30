@@ -1,0 +1,49 @@
+rule:
+  id: SV-257974
+  version: r1155763
+  title: RHEL 9 must not enable IPv6 packet forwarding unless the system is a router.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: Routing protocol daemons are typically used on routers to exchange network topology information with
+    other routers. If this software is used when not required, system network information may be unnecessarily transmitted
+    across the network. The sysctl --system command will load settings from all system configuration files. All
+    configuration files are sorted by their filename in lexicographical order, regardless of the directories in
+    which they reside. If multiple files specify the same option, the entry in the file with the lexicographically
+    latest name will take precedence. Files are read from directories in the following list from top to bottom.
+    Once a file of a given filename is loaded, any file of the same name in subsequent directories is ignored. /etc/sysctl.d/*.conf
+    /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-254025
+  - scheme: disa-vulnerability-id
+    value: V-257974
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - linux.ipv6-enabled
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to not allow IPv6 packet forwarding, unless the system is a router. Create a configuration
+      file if it does not already exist: $ sudo vi /etc/sysctl.d/ipv6_forwarding.conf Add the following line to
+      the file: net.ipv6.conf.all.forwarding = 0 Reload settings from all system configuration files with the following
+      command: $ sudo sysctl --system'
+  policy: policies/SV-257974.policy.yaml

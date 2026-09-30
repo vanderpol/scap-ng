@@ -1,0 +1,89 @@
+assessment:
+  id: SV-257870.automated
+  version: 1
+  assessment_title: RHEL-09-231145 - RHEL 9 must mount /var/log with the nodev option.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    var-log-mounted-nodev-option:
+      test_title: /var/log is mounted with the nodev option
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /var/log
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: nodev
+          entity_check: at least one
+        state_capability: linux.partition
+    var-log-configured-nodev-option-in-etc-fstab:
+      test_title: /var/log is configured with the nodev option in /etc/fstab
+      capability: independent.variable
+      collect:
+        object_title: null
+        capability: independent.variable
+        select:
+          var_ref:
+            variable: mount-options-var-log-in-etc-fstab
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: nodev
+          entity_check: at least one
+        state_capability: independent.variable
+    var-log-configured-in-etc-fstab:
+      test_title: /var/log is configured in /etc/fstab
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance:
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: var-log-mounted-nodev-option
+    - check: var-log-configured-nodev-option-in-etc-fstab
+    - check: var-log-configured-in-etc-fstab
+  variables:
+    mount-options-var-log-in-etc-fstab:
+      title: Mount options for /var/log in /etc/fstab
+      datatype: string
+      kind: local
+      expression:
+        split:
+          value:
+            object_values:
+              collect:
+                object_title: null
+                capability: independent.textfilecontent54
+                select:
+                  filepath: /etc/fstab
+                  pattern:
+                    operation: pattern match
+                    value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+                  instance:
+                    datatype: int
+                    value: '1'
+              field: subexpression
+          delimiter: ','

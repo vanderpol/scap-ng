@@ -1,0 +1,51 @@
+rule:
+  id: SV-258216
+  version: r1155613
+  title: Successful/unsuccessful uses of the umount2 system call in RHEL 9 must generate an audit record.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'The changing of file permissions could indicate that a user is attempting to gain access to information
+    that would otherwise be disallowed. Auditing DAC modifications can facilitate the identification of patterns
+    of abuse among both authorized and unauthorized users. Satisfies: SRG-OS-000037-GPOS-00015, SRG-OS-000062-GPOS-00031,
+    SRG-OS-000392-GPOS-00172, SRG-OS-000462-GPOS-00206, SRG-OS-000471-GPOS-00215'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000130
+  - scheme: cci
+    value: CCI-000169
+  - scheme: cci
+    value: CCI-000172
+  - scheme: cci
+    value: CCI-002884
+  - scheme: disa-stig-id
+    value: RHEL-09-654210
+  - scheme: disa-vulnerability-id
+    value: V-258216
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the audit system to generate an audit event for any successful/unsuccessful use of the
+      "umount2" system call by adding or updating the following rules in a file in "/etc/audit/rules.d". -a always,exit
+      -F arch=b32 -S umount2 -F auid>=1000 -F auid!=unset -k privileged-umount -a always,exit -F arch=b64 -S umount2
+      -F auid>=1000 -F auid!=unset -k privileged-umount To load the rules to the kernel immediately, use the following
+      command: $ sudo augenrules --load'
+  policy: policies/SV-258216.policy.yaml

@@ -1,0 +1,36 @@
+assessment:
+  id: SV-258014.automated
+  version: 1
+  assessment_title: RHEL-09-271020 - RHEL 9 must disable the graphical user interface automount function
+    unless required.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    system-disables-gui-automount-feature:
+      test_title: The system disables the GUI automount feature.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/dconf/db/local.d
+          filename: 00-security-settings
+          pattern:
+            operation: pattern match
+            value: ^\s*\[org\/gnome\/desktop\/media-handling]\s*\n+[^\[]*automount-open\s*=\s*(\w+)$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: 'false'
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: system-disables-gui-automount-feature

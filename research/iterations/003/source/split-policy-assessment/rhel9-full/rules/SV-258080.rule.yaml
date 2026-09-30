@@ -1,0 +1,46 @@
+rule:
+  id: SV-258080
+  version: r1045162
+  title: RHEL 9 must configure SELinux context type to allow the use of a nondefault faillock tally directory.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: Not having the correct SELinux context on the faillock directory may lead to unauthorized access to
+    the directory.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000044
+  - scheme: disa-stig-id
+    value: RHEL-09-431020
+  - scheme: disa-vulnerability-id
+    value: V-258080
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to allow the use of a nondefault faillock tally directory while SELinux enforces
+      a targeted policy. First enable the feature using the following command: $ sudo authselect enable-feature
+      with-faillock Create a nondefault faillock tally directory (if it does not already exist) with the following
+      example: $ sudo mkdir /var/log/faillock Then add/modify the "/etc/security/faillock.conf" file to match the
+      following line: dir = /var/log/faillock Update the /etc/selinux/targeted/contexts/files/file_contexts.local
+      with "faillog_t" context type for the nondefault faillock tally directory with the following command: $ sudo
+      semanage fcontext -a -t faillog_t "/var/log/faillock(/.*)?" Next, update the context type of the nondefault
+      faillock directory/subdirectories and files with the following command: $ sudo restorecon -R -v /var/log/faillock'
+  policy: policies/SV-258080.policy.yaml

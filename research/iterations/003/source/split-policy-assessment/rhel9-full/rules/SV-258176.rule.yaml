@@ -1,0 +1,49 @@
+rule:
+  id: SV-258176
+  version: r1155595
+  title: RHEL 9 must audit uses of the "execve" system call.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'Misuse of privileged functions, either intentionally or unintentionally by authorized users, or by
+    unauthorized external entities that have compromised information system accounts, is a serious and ongoing concern
+    and can have significant adverse impacts on organizations. Auditing the use of privileged functions is one way
+    to detect such misuse and identify the risk from insider threats and the advanced persistent threat. Satisfies:
+    SRG-OS-000326-GPOS-00126, SRG-OS-000327-GPOS-00127'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-002233
+  - scheme: cci
+    value: CCI-002234
+  - scheme: disa-stig-id
+    value: RHEL-09-654010
+  - scheme: disa-vulnerability-id
+    value: V-258176
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to audit the execution of the "execve" system call. Add or update the following
+      file system rules to "/etc/audit/rules.d/audit.rules": -a always,exit -F arch=b32 -S execve -C uid!=euid -F
+      euid=0 -k execpriv -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv -a always,exit
+      -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv -a always,exit -F arch=b64 -S execve -C gid!=egid
+      -F egid=0 -k execpriv To load the rules to the kernel immediately, use the following command: $ sudo augenrules
+      --load'
+  policy: policies/SV-258176.policy.yaml

@@ -1,0 +1,29 @@
+assessment:
+  id: SV-257791.automated
+  version: 1
+  assessment_title: RHEL-09-212030 - RHEL 9 /boot/grub2/grub.cfg file must be owned by root.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    boot-grub2-grub-cfg-file-owned-by-root:
+      test_title: /boot/grub2/grub.cfg file is owned by root
+      capability: unix.file
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          filepath: /boot/grub2/grub.cfg
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: user_id
+          operation: equals
+          value: '0'
+          datatype: int
+        state_title: owned by root
+        state_capability: unix.file
+  evaluate:
+    check: boot-grub2-grub-cfg-file-owned-by-root

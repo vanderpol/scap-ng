@@ -1,0 +1,50 @@
+assessment:
+  id: SV-257817.automated
+  version: 13
+  assessment_title: RHEL 9 must implement nonexecutable data to protect its memory from unauthorized code
+    execution.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    check-flags-in-proc-cpuinfo:
+      test_title: Check flags in /proc/cpuinfo.
+      capability: independent.shellcommand
+      collect:
+        object_title: Check flags in /proc/cpuinfo.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: grep ^flags /proc/cpuinfo | grep -Ev '([^[:alnum:]])(nx)([^[:alnum:]]|$)'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: stdout_line
+          operation: equals
+          value: ''
+        state_title: Confirm no output produced by command.
+        state_capability: independent.shellcommand
+    verify-execshield-enabled-in-grub:
+      test_title: Verify execshield is enabled in grub.
+      capability: independent.shellcommand
+      collect:
+        object_title: Verify execshield is enabled in grub.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: grubby --info=ALL | grep args | grep -E '([^[:alnum:]])(noexec)([^[:alnum:]])'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: stdout_line
+          operation: equals
+          value: ''
+        state_title: Confirm no output produced by command.
+        state_capability: independent.shellcommand
+  evaluate:
+    all:
+    - check: check-flags-in-proc-cpuinfo
+    - check: verify-execshield-enabled-in-grub

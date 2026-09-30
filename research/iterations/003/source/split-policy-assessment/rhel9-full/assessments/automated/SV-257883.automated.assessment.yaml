@@ -1,0 +1,108 @@
+assessment:
+  id: SV-257883.automated
+  version: 13
+  assessment_title: RHEL 9 library directories must have mode 755 or less permissive.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    system-library-directories-have-mode-755-or-less-permissive-gwrite:
+      test_title: System Library directories have mode 755 or less permissive.(gwrite should be = false.)
+      capability: unix.file
+      collect:
+        object_title: All system-wide Library Directories have 755 or better (gwrite should be = false.)
+        capability: unix.file
+        select:
+          path:
+            variable_check: only one
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            nil: true
+            value: ''
+        filters:
+        - action: exclude
+          match:
+            field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          state_title: Mode 755 or less permissive (gwrite should be = false.)
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: symbolic link
+          state_title: symbolic links
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: file
+          capability: unix.file
+        behaviors:
+          recurse_direction: down
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+    system-library-directories-have-mode-755-or-less-permissive-owrite:
+      test_title: System Library directories have mode 755 or less permissive (owrite should be = false.)
+      capability: unix.file
+      collect:
+        object_title: All system-wide Library Directories have 755 or better (owrite should be = false.)
+        capability: unix.file
+        select:
+          path:
+            variable_check: only one
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            nil: true
+            value: ''
+        filters:
+        - action: exclude
+          match:
+            field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          state_title: Mode 755 or less permissive (owrite should be = false.)
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: symbolic link
+          state_title: symbolic links
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: file
+          capability: unix.file
+        behaviors:
+          recurse_direction: down
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: system-library-directories-have-mode-755-or-less-permissive-gwrite
+    - check: system-library-directories-have-mode-755-or-less-permissive-owrite
+  variables:
+    system-wide-shared-library-files-directories:
+      title: system-wide shared library files directories
+      datatype: string
+      kind: constant
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64

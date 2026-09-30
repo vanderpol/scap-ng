@@ -1,0 +1,29 @@
+assessment:
+  id: hardware.bare-metal.assessment
+  version: 13
+  assessment_title: Host appears to be bare metal, not virtual.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: applicability
+  checks:
+    query-lscpu-indication-hypervisor-vendor:
+      test_title: Query lscpu for indication of a hypervisor vendor.
+      capability: independent.shellcommand
+      collect:
+        object_title: Retrieve usbguard rules list.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: lscpu | grep -P '(?i)hypervisor\s+vendor:\s+\S'
+      assert:
+        existence: at_least_one_exists
+        check: at least one
+        state:
+          field: stdout_line
+          operation: equals
+          value: ''
+        state_title: Confirm the existence of hypervisor line.
+        state_capability: independent.shellcommand
+  evaluate:
+    check: query-lscpu-indication-hypervisor-vendor

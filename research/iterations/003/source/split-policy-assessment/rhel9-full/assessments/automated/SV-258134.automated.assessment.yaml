@@ -1,0 +1,99 @@
+assessment:
+  id: SV-258134.automated
+  version: 13
+  assessment_title: RHEL 9 must have the AIDE package installed.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    confirm-aide-file-integrity-tool-package-installed:
+      test_title: Confirm the aide file integrity tool package is installed.
+      capability: linux.rpminfo
+      collect:
+        object_title: Confirm the aide file integrity tool package is installed.
+        capability: linux.rpminfo
+        select:
+          name: aide
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    verify-working-db-file-configured-in-aide-conf-file-exists:
+      test_title: Verify the working DB file configured in the 'aide.conf file' exists.
+      capability: unix.file
+      collect:
+        object_title: Retrieve details of the working DB file.
+        capability: unix.file
+        select:
+          filepath:
+            variable: retrieve-location-working-aide-database-file
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: filepath
+          operation: pattern match
+          value: .*
+        state_title: Confirm existence of DB file.
+        state_capability: unix.file
+  evaluate:
+    all:
+    - check: confirm-aide-file-integrity-tool-package-installed
+    - check: verify-working-db-file-configured-in-aide-conf-file-exists
+  variables:
+    retrieve-location-aide-conf-file:
+      title: Retrieve location of the aide.conf file.
+      datatype: string
+      kind: local
+      expression:
+        object_values:
+          collect:
+            object_title: Find the aide.conf file.
+            capability: unix.file
+            select:
+              path: /
+              filename: aide.conf
+            behaviors:
+              recurse_direction: down
+              recurse: directories
+              max_depth: '-1'
+              recurse_file_system: local
+          field: filepath
+    retrieve-location-working-aide-database-file:
+      title: Retrieve location of the working aide database file.
+      datatype: string
+      kind: local
+      expression:
+        concat:
+        - object_values:
+            collect:
+              object_title: Retrieve path to the working DB file.
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  variable: retrieve-location-aide-conf-file
+                pattern:
+                  operation: pattern match
+                  value: ^\@\@define\s+DBDIR\s+(\S+)
+                instance:
+                  datatype: int
+                  value: '1'
+            field: subexpression
+        - literal:
+            value: /
+            datatype: string
+        - object_values:
+            collect:
+              object_title: Retrieve filename of the working DB file.
+              capability: independent.textfilecontent54
+              select:
+                filepath:
+                  variable: retrieve-location-aide-conf-file
+                pattern:
+                  operation: pattern match
+                  value: ^database=file:\@\@\{DBDIR\}/(\S+)
+                instance:
+                  datatype: int
+                  value: '1'
+            field: subexpression

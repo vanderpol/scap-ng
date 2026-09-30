@@ -1,0 +1,49 @@
+rule:
+  id: SV-257967
+  version: r1155745
+  title: RHEL 9 must limit the number of bogus Internet Control Message Protocol (ICMP) response errors logs.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: Some routers will send responses to broadcast frames that violate RFC-1122, which fills up a log file
+    system with many useless error messages. An attacker may take advantage of this and attempt to flood the logs
+    with bogus error logs. Ignoring bogus ICMP error responses reduces log size, although some activity would not
+    be logged. The sysctl --system command will load settings from all system configuration files. All configuration
+    files are sorted by their filename in lexicographical order, regardless of the directories in which they reside.
+    If multiple files specify the same option, the entry in the file with the lexicographically latest name will
+    take precedence. Files are read from directories in the following list from top to bottom. Once a file of a
+    given filename is loaded, any file of the same name in subsequent directories is ignored. /etc/sysctl.d/*.conf
+    /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-253060
+  - scheme: disa-vulnerability-id
+    value: V-257967
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to not log bogus ICMP errors: Create a configuration file if it does not already
+      exist: $ sudo vi /etc/sysctl.d/ipv4_icmp_ignore_bogus_error_responses.conf Add the following line to the file:
+      net.ipv4.icmp_ignore_bogus_error_responses = 1 Reload settings from all system configuration files with the
+      following command: $ sudo sysctl --system'
+  policy: policies/SV-257967.policy.yaml

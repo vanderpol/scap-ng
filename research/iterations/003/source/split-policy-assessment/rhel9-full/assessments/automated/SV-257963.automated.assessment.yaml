@@ -1,0 +1,29 @@
+assessment:
+  id: SV-257963.automated
+  version: 2
+  assessment_title: RHEL-09-253040 - RHEL 9 must prevent IPv4 Internet Control Message Protocol (ICMP)
+    redirect messages from being accepted.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    net-ipv4-conf-default-accept-redirects-setting-in-kernel-set:
+      test_title: net.ipv4.conf.default.accept_redirects setting in kernel is set to 0
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: net.ipv4.conf.default.accept_redirects
+      assert:
+        existence: all_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '0'
+          datatype: int
+        state_capability: unix.sysctl
+  evaluate:
+    check: net-ipv4-conf-default-accept-redirects-setting-in-kernel-set

@@ -1,0 +1,112 @@
+assessment:
+  id: SV-258105.automated
+  version: 1
+  assessment_title: RHEL-09-611080 - RHEL 9 passwords must have a 24 hours minimum password lifetime restriction
+    in /etc/shadow.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    root-does-not-have-minimum-password-age-0-or-blank:
+      test_title: Root does not have a minimum password age of 0 or blank
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            datatype: string
+            value: /etc/shadow
+          pattern:
+            operation: pattern match
+            value: '^root:[^:]*:[^:]*:0*:'
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+    non-system-users-do-not-have-minimum-password-age-0:
+      test_title: Non-system users do not have a minimum password age of 0 or blank
+      capability: unix.password
+      collect:
+        object_title: Users with a password age of zero minus system users
+        capability: unix.password
+        select:
+          username:
+            operation: equals
+            variable_check: at least one
+            datatype: string
+            value:
+              variable: usernames-users-minimum-password-age-0-or-blank
+        filters:
+        - action: exclude
+          match:
+            field: user_id
+            operation: less than
+            value: '1000'
+            datatype: int
+          capability: unix.password
+        - action: exclude
+          match:
+            field: user_id
+            operation: equals
+            value:
+              variable: uid-user-nobody
+            variable_check: all
+            datatype: int
+          capability: unix.password
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: root-does-not-have-minimum-password-age-0-or-blank
+    - check: non-system-users-do-not-have-minimum-password-age-0
+  variables:
+    usernames-users-minimum-password-age-0-or-blank:
+      title: Usernames of users with a minimum password age of 0 or blank
+      datatype: string
+      kind: local
+      expression:
+        object_values:
+          collect:
+            object_title: null
+            capability: independent.textfilecontent54
+            select:
+              filepath:
+                datatype: string
+                value: /etc/shadow
+              pattern:
+                operation: pattern match
+                value: '^([^:]*):[^:]*:[^:]*:0*:'
+              instance:
+                operation: greater than or equal
+                datatype: int
+                value: '1'
+          field: subexpression
+    uid-user-nobody:
+      title: UID for user nobody
+      datatype: int
+      kind: local
+      expression:
+        object_values:
+          collect:
+            object_title: null
+            capability: independent.textfilecontent54
+            select:
+              filepath:
+                datatype: string
+                value: /etc/passwd
+              pattern:
+                operation: pattern match
+                datatype: string
+                value: '^nobody:[^:]*:([0-9]+):'
+              instance:
+                datatype: int
+                value: '1'
+          field: subexpression

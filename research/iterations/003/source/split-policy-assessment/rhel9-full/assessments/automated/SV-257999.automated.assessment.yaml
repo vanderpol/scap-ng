@@ -1,0 +1,33 @@
+assessment:
+  id: SV-257999.automated
+  version: 13
+  assessment_title: RHEL 9 SSH server configuration files' permissions must not be modified.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    ssh-server-configuration-files-permissions-not-modified:
+      test_title: SSH server configuration files' permissions must not be modified.
+      capability: independent.shellcommand
+      collect:
+        object_title: Verify the permissions of the /etc/ssh/sshd_config file
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: rpm --verify openssh-server | awk '! ($2 == "c" && $1 ~ /^.\..\.\.\.\..\./) {print
+            $0}'
+          pattern:
+            operation: pattern match
+            value: .+
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: stdout_line
+          operation: equals
+          value: ''
+        state_title: If the command returns any output, this is a finding.
+        state_capability: independent.shellcommand
+  evaluate:
+    check: ssh-server-configuration-files-permissions-not-modified

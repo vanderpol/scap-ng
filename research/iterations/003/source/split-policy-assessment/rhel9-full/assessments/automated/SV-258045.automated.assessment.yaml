@@ -1,0 +1,81 @@
+assessment:
+  id: SV-258045.automated
+  version: 2
+  assessment_title: RHEL-09-411030 - RHEL 9 duplicate User IDs (UIDs) must not exist for interactive users.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    uids-unique:
+      test_title: UIDs are unique
+      capability: independent.variable
+      collect:
+        object_title: count of passwd entries
+        capability: independent.variable
+        select:
+          var_ref:
+            variable: count-passwd-entries
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value:
+            variable: count-unique-uids
+          datatype: int
+        state_title: count of passwd UIDs
+        state_capability: independent.variable
+  evaluate:
+    check: uids-unique
+  variables:
+    count-passwd-entries:
+      title: count of passwd entries
+      datatype: int
+      kind: local
+      expression:
+        count:
+          object_values:
+            collect:
+              object_title: Interactive Users
+              capability: unix.password
+              select:
+                username:
+                  operation: pattern match
+                  value: .*
+              filters:
+              - action: include
+                match:
+                  field: user_id
+                  operation: greater than or equal
+                  value: '1000'
+                  datatype: int
+                state_title: Interactive Users
+                capability: unix.password
+            field: user_id
+    count-unique-uids:
+      title: count of unique UIDs
+      datatype: int
+      kind: local
+      expression:
+        count:
+          unique:
+            object_values:
+              collect:
+                object_title: Interactive Users
+                capability: unix.password
+                select:
+                  username:
+                    operation: pattern match
+                    value: .*
+                filters:
+                - action: include
+                  match:
+                    field: user_id
+                    operation: greater than or equal
+                    value: '1000'
+                    datatype: int
+                  state_title: Interactive Users
+                  capability: unix.password
+              field: user_id

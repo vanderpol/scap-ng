@@ -1,0 +1,29 @@
+assessment:
+  id: SV-257967.automated
+  version: 2
+  assessment_title: RHEL-09-253060 - RHEL 9 must limit the number of bogus Internet Control Message Protocol
+    (ICMP) response errors logs.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    net-ipv4-icmp-ignore-bogus-error-responses-setting-in-kernel:
+      test_title: net.ipv4.icmp_ignore_bogus_error_responses setting in kernel is set to 1
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: net.ipv4.icmp_ignore_bogus_error_responses
+      assert:
+        existence: all_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '1'
+          datatype: int
+        state_capability: unix.sysctl
+  evaluate:
+    check: net-ipv4-icmp-ignore-bogus-error-responses-setting-in-kernel

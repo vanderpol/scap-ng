@@ -1,0 +1,30 @@
+assessment:
+  id: SV-258184.automated
+  version: 1
+  assessment_title: RHEL-09-654050 - RHEL 9 must audit all uses of the semanage command.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    audit-invocations-usr-sbin-semanage:
+      test_title: Audit invocations of /usr/sbin/semanage
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/audit.rules
+          pattern:
+            operation: pattern match
+            value: ^\s*-a\s+(always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/sbin/semanage\s+(-F\s+perm=([rwa]*x[rwa]*)\s+)?-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state: null
+  evaluate:
+    check: audit-invocations-usr-sbin-semanage

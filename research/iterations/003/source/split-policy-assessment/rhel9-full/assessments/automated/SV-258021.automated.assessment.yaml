@@ -1,0 +1,31 @@
+assessment:
+  id: SV-258021.automated
+  version: 13
+  assessment_title: RHEL 9 must enable a user session lock until that user re-establishes access using
+    established identification and authentication procedures for graphical user sessions.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    verify-operating-system-enables-user-s-session-lock-until-that:
+      test_title: Verify the operating system enables a user's session lock until that user re-establishes
+        access using established identification and authentication procedures.
+      capability: independent.shellcommand
+      collect:
+        object_title: Retrieve org.gnome.desktop.screensaver lock-enabled setting.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: gsettings get org.gnome.desktop.screensaver lock-enabled
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: stdout_line
+          operation: equals
+          value: 'true'
+        state_title: Check value of org.gnome.desktop.screensaver lock-enabled setting.
+        state_capability: independent.shellcommand
+  evaluate:
+    check: verify-operating-system-enables-user-s-session-lock-until-that

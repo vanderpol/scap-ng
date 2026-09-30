@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257936.automated
+  version: 2
+  assessment_title: RHEL-09-251015 - The firewalld service on RHEL 9 must be active.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    check-if-firewalld-in-active-state:
+      test_title: Check if firewalld is in 'active' state
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: firewalld.service ActiveState
+        capability: linux.systemdunitproperty
+        select:
+          unit: firewalld.service
+          property: ActiveState
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: active
+        state_capability: linux.systemdunitproperty
+  evaluate:
+    check: check-if-firewalld-in-active-state

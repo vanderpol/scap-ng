@@ -1,0 +1,65 @@
+assessment:
+  id: SV-257921.automated
+  version: 13
+  assessment_title: RHEL 9 library files must be group-owned by root or a system account.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    system-library-files-owned-by-root-group:
+      test_title: System Library files are owned by root group
+      capability: unix.file
+      collect:
+        object_title: All system-library files not owned by root-group
+        capability: unix.file
+        select:
+          path:
+            variable_check: only one
+            value:
+              variable: system-wide-shared-library-files-directories
+          filename:
+            operation: pattern match
+            datatype: string
+            value: .*
+        filters:
+        - action: exclude
+          match:
+            field: group_id
+            operation: equals
+            value: '0'
+            datatype: int
+          state_title: owned by root-group
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: symbolic link
+          state_title: symbolic links
+          capability: unix.file
+        - action: exclude
+          match:
+            field: type
+            operation: equals
+            value: directory
+          capability: unix.file
+        behaviors:
+          recurse_direction: down
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    check: system-library-files-owned-by-root-group
+  variables:
+    system-wide-shared-library-files-directories:
+      title: system-wide shared library files directories
+      datatype: string
+      kind: constant
+      expression:
+        literal:
+        - /lib
+        - /lib64
+        - /usr/lib
+        - /usr/lib64

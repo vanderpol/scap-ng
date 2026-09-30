@@ -1,0 +1,81 @@
+assessment:
+  id: SV-258078.automated
+  version: 1
+  assessment_title: RHEL-09-431010 - RHEL 9 must use a Linux Security Module configured to enforce limits
+    on system services.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    selinux-active:
+      test_title: selinux is active
+      capability: linux.partition
+      collect:
+        object_title: /sys/fs/selinux
+        capability: linux.partition
+        select:
+          mount_point: /sys/fs/selinux
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: fs_type
+          operation: equals
+          value: selinuxfs
+        state_capability: linux.partition
+    selinux-enforcing:
+      test_title: selinux is enforcing
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /sys/fs/selinux/enforce value
+        capability: independent.textfilecontent54
+        select:
+          filepath: /sys/fs/selinux/enforce
+          pattern:
+            operation: pattern match
+            value: ^(\d+)$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: only_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: not equal
+          value: '0'
+          datatype: int
+        state_title: /sys/fs/selinux/enforce != 0
+        state_capability: independent.textfilecontent54
+    etc-selinux-config-selinux-enforcing:
+      test_title: /etc/selinux/config:SELINUX=enforcing
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/selinux/config:SELINUX value
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/selinux/config
+          pattern:
+            operation: pattern match
+            value: ^SELINUX=(.*)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: only_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: enforcing
+          datatype: string
+        state_title: /etc/selinux/config:SELINUX=enforcing
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - check: selinux-active
+    - check: selinux-enforcing
+    - check: etc-selinux-config-selinux-enforcing

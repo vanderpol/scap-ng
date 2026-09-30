@@ -1,0 +1,47 @@
+assessment:
+  id: SV-258041.automated
+  version: 1
+  assessment_title: RHEL-09-411010 - RHEL 9 user account passwords for new users or password changes must
+    have a 60-day maximum password lifetime restriction in /etc/login.defs.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    pass-max-days-less-than-or-equal-60-but-greater:
+      test_title: PASS_MAX_DAYS is less than or equal to 60 but greater than 0.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/login.defs
+          pattern:
+            operation: pattern match
+            value: ^\s*PASS_MAX_DAYS\s+(\d+)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: subexpression
+            operation: greater than
+            value: '0'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: less than or equal
+            value: '60'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: pass-max-days-less-than-or-equal-60-but-greater

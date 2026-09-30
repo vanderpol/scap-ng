@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257877.automated
+  version: 1
+  assessment_title: RHEL-09-231180 - RHEL 9 must mount /var/tmp with the noexec option.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    var-tmp-mounted-noexec-option:
+      test_title: /var/tmp is mounted with the noexec option
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /var/tmp
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: noexec
+          entity_check: at least one
+        state_capability: linux.partition
+  evaluate:
+    check: var-tmp-mounted-noexec-option

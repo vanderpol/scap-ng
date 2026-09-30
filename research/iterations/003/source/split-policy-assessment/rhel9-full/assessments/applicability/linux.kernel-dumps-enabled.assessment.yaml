@@ -1,0 +1,29 @@
+assessment:
+  id: linux.kernel-dumps-enabled.assessment
+  version: 3
+  assessment_title: Kernel dumps are enabled
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: applicability
+  checks:
+    kernel-core-pattern-setting-in-kernel-set-bin-false:
+      test_title: kernel.core_pattern setting in kernel is set to |/bin/false
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: kernel.core_pattern
+      assert:
+        existence: all_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '|/bin/false'
+          datatype: string
+        state_capability: unix.sysctl
+  evaluate:
+    not:
+      check: kernel-core-pattern-setting-in-kernel-set-bin-false

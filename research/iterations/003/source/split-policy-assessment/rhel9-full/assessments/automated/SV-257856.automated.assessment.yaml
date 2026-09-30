@@ -1,0 +1,35 @@
+assessment:
+  id: SV-257856.automated
+  version: 1
+  assessment_title: RHEL-09-231075 - RHEL 9 must prevent files with the setuid and setgid bit set from
+    being executed on file systems that are imported via Network File System (NFS).
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    nfs-mounts-mounted-nosuid:
+      test_title: NFS mounts are mounted with nosuid
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/fstab, uncommented, nfs, capturing options
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|,)nosuid(,|$)
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: nfs-mounts-mounted-nosuid

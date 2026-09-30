@@ -1,0 +1,34 @@
+assessment:
+  id: SV-258121.automated
+  version: 1
+  assessment_title: RHEL-09-611160 - RHEL 9 must use the CAC smart card driver.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-opensc-conf-card-drivers-cac:
+      test_title: '/etc/opensc.conf: card_drivers = cac'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/opensc.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*card_drivers\s*=(.*);
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (?i)\bcac\b
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: etc-opensc-conf-card-drivers-cac

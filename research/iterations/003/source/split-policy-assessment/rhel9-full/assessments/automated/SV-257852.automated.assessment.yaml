@@ -1,0 +1,31 @@
+assessment:
+  id: SV-257852.automated
+  version: 2
+  assessment_title: RHEL-09-231055 - RHEL 9 must prevent code from being executed on file systems that
+    contain user home directories.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    home-has-noexec-option:
+      test_title: /home has noexec option
+      capability: linux.partition
+      collect:
+        object_title: /home
+        capability: linux.partition
+        select:
+          mount_point:
+            operation: pattern match
+            value: .*\/home
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: noexec
+          entity_check: at least one
+        state_capability: linux.partition
+  evaluate:
+    check: home-has-noexec-option

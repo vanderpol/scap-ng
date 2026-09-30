@@ -1,0 +1,43 @@
+rule:
+  id: SV-258007
+  version: r1045073
+  title: RHEL 9 SSH daemon must disable remote X connections for interactive users.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: When X11 forwarding is enabled, there may be additional exposure to the server and client displays
+    if the sshd proxy display is configured to listen on the wildcard address. By default, sshd binds the forwarding
+    server to the loopback address and sets the hostname part of the DISPLAY environment variable to localhost.
+    This prevents remote hosts from connecting to the proxy display.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-255155
+  - scheme: disa-vulnerability-id
+    value: V-258007
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the SSH daemon to not allow X11 forwarding. Add the following line to "/etc/ssh/sshd_config"
+      or to a file in "/etc/ssh/sshd_config.d", or uncomment the line and set the value to "no": X11forwarding no
+      The SSH service must be restarted for changes to take effect: $ sudo systemctl restart sshd.service'
+  policy: policies/SV-258007.policy.yaml

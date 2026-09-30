@@ -1,0 +1,58 @@
+rule:
+  id: SV-258135
+  version: r1045267
+  title: RHEL 9 must routinely check the baseline configuration for unauthorized changes and notify the system administrator
+    when anomalies in the operation of any security functions are discovered.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'Unauthorized changes to the baseline configuration could make the system vulnerable to various attacks
+    or allow unauthorized access to the operating system. Changes to operating system configurations can have unintended
+    side effects, some of which may be relevant to security. Detecting such changes and providing an automated response
+    can help avoid unintended, negative consequences that could ultimately affect the security state of the operating
+    system. The operating system''s information management officer (IMO)/information system security officer (ISSO)
+    and system administrators (SAs) must be notified via email and/or monitoring system trap when there is an unauthorized
+    modification of a configuration item. Notifications provided by information systems include messages to local
+    computer consoles, and/or hardware indications, such as lights. This capability must take into account operational
+    requirements for availability for selecting an appropriate response. The organization may choose to shut down
+    or restart the information system upon security function anomaly detection. Satisfies: SRG-OS-000363-GPOS-00150,
+    SRG-OS-000446-GPOS-00200, SRG-OS-000447-GPOS-00201'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-001744
+  - scheme: cci
+    value: CCI-002699
+  - scheme: cci
+    value: CCI-002702
+  - scheme: disa-stig-id
+    value: RHEL-09-651015
+  - scheme: disa-vulnerability-id
+    value: V-258135
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the file integrity tool to run automatically on the system at least weekly and to notify
+      designated personnel if baseline configurations are changed in an unauthorized manner. The AIDE tool can be
+      configured to email designated personnel with the use of the cron system. The following example output is
+      generic. It will set cron to run AIDE daily and to send email at the completion of the analysis $ sudo more
+      /etc/cron.daily/aide #!/bin/bash /usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check
+      run" root@sysname.mil'
+  policy: policies/SV-258135.policy.yaml

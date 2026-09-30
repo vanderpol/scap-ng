@@ -1,0 +1,34 @@
+assessment:
+  id: SV-258027.automated
+  version: 13
+  assessment_title: RHEL 9 must conceal, via the session lock, information previously visible on the display
+    with a publicly viewable image.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    ensure-screensaver-configured-blank:
+      test_title: Ensure the screensaver is configured to be blank.
+      capability: independent.shellcommand
+      collect:
+        object_title: Retrieve picture-uri 'writable' configuration from org.gnome.dekstop.screensaver.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: gsettings writable org.gnome.desktop.screensaver picture-uri
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: stdout_line
+            operation: not equal
+            value: 'true'
+          - field: stderr_line
+            operation: equals
+            value: ''
+        state_title: Confirm configuration does not show 'true' and no STDERR is produced.
+        state_capability: independent.shellcommand
+  evaluate:
+    check: ensure-screensaver-configured-blank

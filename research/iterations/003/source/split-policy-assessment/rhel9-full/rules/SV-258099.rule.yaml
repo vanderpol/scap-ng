@@ -1,0 +1,48 @@
+rule:
+  id: SV-258099
+  version: r1045198
+  title: RHEL 9 password-auth must be configured to use a sufficient number of hashing rounds.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'Passwords need to be protected at all times, and encryption is the standard method for protecting
+    passwords. If passwords are not encrypted, they can be plainly read (i.e., clear text) and easily compromised.
+    Passwords that are encrypted with a weak algorithm are no more protected than if they are kept in plain text.
+    Using more hashing rounds makes password cracking attacks more difficult. Satisfies: SRG-OS-000073-GPOS-00041,
+    SRG-OS-000120-GPOS-00061'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-004062
+  - scheme: cci
+    value: CCI-000803
+  - scheme: cci
+    value: CCI-000196
+  - scheme: disa-stig-id
+    value: RHEL-09-611050
+  - scheme: disa-vulnerability-id
+    value: V-258099
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to use 100000 hashing rounds for hashing passwords. Add or modify the following
+      line in "/etc/pam.d/password-auth" and set "rounds" to "100000". password sufficient pam_unix.so sha512 rounds=100000
+      Note: Running authselect will overwrite this value unless a custom authselect policy is created.'
+  policy: policies/SV-258099.policy.yaml

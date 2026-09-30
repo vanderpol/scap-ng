@@ -1,0 +1,49 @@
+rule:
+  id: SV-258165
+  version: r958434
+  title: RHEL 9 audit logs must be group-owned by root or by a restricted logging group to prevent unauthorized
+    read access.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'Unauthorized disclosure of audit records can reveal system and configuration data to attackers, thus
+    compromising its confidentiality. Satisfies: SRG-OS-000057-GPOS-00027, SRG-OS-000058-GPOS-00028, SRG-OS-000059-GPOS-00029,
+    SRG-OS-000206-GPOS-00084'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000162
+  - scheme: cci
+    value: CCI-000163
+  - scheme: cci
+    value: CCI-000164
+  - scheme: cci
+    value: CCI-001314
+  - scheme: disa-stig-id
+    value: RHEL-09-653080
+  - scheme: disa-vulnerability-id
+    value: V-258165
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Change the group of the directory of "/var/log/audit" to be owned by a correct group. Identify the
+      group that is configured to own audit log: $ sudo grep -P ''^[ ]*log_group[ ]+=.*$'' /etc/audit/auditd.conf
+      Change the ownership to that group: $ sudo chgrp ${GROUP} /var/log/audit'
+  policy: policies/SV-258165.policy.yaml

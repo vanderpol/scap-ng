@@ -1,0 +1,52 @@
+assessment:
+  id: SV-258079.automated
+  version: 1
+  assessment_title: RHEL-09-431015 - RHEL 9 must enable the SELinux targeted policy.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    selinux-active:
+      test_title: selinux is active
+      capability: linux.partition
+      collect:
+        object_title: /sys/fs/selinux
+        capability: linux.partition
+        select:
+          mount_point: /sys/fs/selinux
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: fs_type
+          operation: equals
+          value: selinuxfs
+        state_capability: linux.partition
+    etc-selinux-config-selinuxtype-targeted:
+      test_title: '/etc/selinux/config: SELINUXTYPE=targeted'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/selinux/config
+          pattern:
+            operation: pattern match
+            value: ^\s*SELINUXTYPE\s*=\s*(\w+)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: equals
+          value: targeted
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - check: selinux-active
+    - check: etc-selinux-config-selinuxtype-targeted

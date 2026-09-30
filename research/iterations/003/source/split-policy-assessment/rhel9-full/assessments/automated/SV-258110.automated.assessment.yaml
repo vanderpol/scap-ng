@@ -1,0 +1,56 @@
+assessment:
+  id: SV-258110.automated
+  version: 1
+  assessment_title: RHEL-09-611105 - RHEL 9 must prevent the use of dictionary words for passwords.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    passwords-not-dictionary-words:
+      test_title: passwords must not be dictionary words
+      capability: independent.textfilecontent54
+      collect:
+        object_title: all pwquality configuration files
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/security/pwquality.conf
+                pattern:
+                  operation: pattern match
+                  value: ^\s*dictcheck\s*=\s*([-\d]+)\s*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/security/pwquality.conf.d
+                filename:
+                  operation: pattern match
+                  value: \.conf$
+                pattern:
+                  operation: pattern match
+                  value: ^\s*dictcheck\s*=\s*([-\d]+)\s*(?:#.*)?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: not equal
+          value: '0'
+          datatype: int
+        state_capability: independent.textfilecontent54
+  evaluate:
+    check: passwords-not-dictionary-words

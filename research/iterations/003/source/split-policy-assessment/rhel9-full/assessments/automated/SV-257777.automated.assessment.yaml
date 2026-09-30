@@ -1,0 +1,61 @@
+assessment:
+  id: SV-257777.automated
+  version: 1
+  assessment_title: RHEL-09-211010 - RHEL 9 must be a vendor-supported release.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    rhel-9-minor-version-supported:
+      test_title: The RHEL 9 minor version is supported.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc
+          filename: redhat-release
+          pattern:
+            operation: pattern match
+            value: ^\s*Red Hat Enterprise Linux release 9\.(\d+)
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: OR
+        states:
+        - state:
+            field: subexpression
+            operation: equals
+            value: '7'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: equals
+            value: '8'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: equals
+            value: '9'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: equals
+            value: '10'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: rhel-9-minor-version-supported

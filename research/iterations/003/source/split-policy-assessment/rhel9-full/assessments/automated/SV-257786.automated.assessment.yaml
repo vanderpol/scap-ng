@@ -1,0 +1,47 @@
+assessment:
+  id: SV-257786.automated
+  version: 1
+  assessment_title: RHEL-09-211055 - RHEL 9 debug-shell systemd service must be disabled.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    debug-shell-service-loadstate-masked-if-it-exists:
+      test_title: debug-shell.service LoadState is masked if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: debug-shell.service
+          property: LoadState
+      assert:
+        existence: any_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: masked
+        state_capability: linux.systemdunitproperty
+    debug-shell-service-unitfilestate-masked-if-it-exists:
+      test_title: debug-shell.service UnitFileState is masked if it exists.
+      capability: linux.systemdunitproperty
+      collect:
+        object_title: null
+        capability: linux.systemdunitproperty
+        select:
+          unit: debug-shell.service
+          property: UnitFileState
+      assert:
+        existence: any_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: masked
+        state_capability: linux.systemdunitproperty
+  evaluate:
+    all:
+    - check: debug-shell-service-loadstate-masked-if-it-exists
+    - check: debug-shell-service-unitfilestate-masked-if-it-exists

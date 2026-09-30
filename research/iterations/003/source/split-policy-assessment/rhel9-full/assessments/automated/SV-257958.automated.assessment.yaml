@@ -1,0 +1,29 @@
+assessment:
+  id: SV-257958.automated
+  version: 3
+  assessment_title: RHEL-09-253015 - RHEL 9 must ignore Internet Protocol version 4 (IPv4) Internet Control
+    Message Protocol (ICMP) redirect messages.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    net-ipv4-conf-all-accept-redirects-set-0-in-kernel:
+      test_title: net.ipv4.conf.all.accept_redirects is set to 0 in kernel
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: net.ipv4.conf.all.accept_redirects
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '0'
+          datatype: int
+        state_capability: unix.sysctl
+  evaluate:
+    check: net-ipv4-conf-all-accept-redirects-set-0-in-kernel

@@ -1,0 +1,57 @@
+assessment:
+  id: SV-258039.automated
+  version: 1
+  assessment_title: RHEL-09-291035 - RHEL 9 Bluetooth must be disabled.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-modprobe-d-contains-file-that-contains-install-bluetooth-bin:
+      test_title: /etc/modprobe.d contains a file that contains 'install bluetooth /bin/false'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/modprobe.d
+          filename:
+            operation: pattern match
+            value: .*
+          pattern:
+            operation: pattern match
+            value: ^[ \t]*install[ \t]+bluetooth[ \t]+/bin/false[ \t]*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+    etc-modprobe-d-contains-file-that-contains-blacklist-bluetooth:
+      test_title: /etc/modprobe.d contains a file that contains 'blacklist bluetooth'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/modprobe.d
+          filename:
+            operation: pattern match
+            value: .*
+          pattern:
+            operation: pattern match
+            value: ^[ \t]*blacklist[ \t]+bluetooth[ \t]*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: etc-modprobe-d-contains-file-that-contains-install-bluetooth-bin
+    - check: etc-modprobe-d-contains-file-that-contains-blacklist-bluetooth

@@ -1,0 +1,59 @@
+assessment:
+  id: SV-258106.automated
+  version: 1
+  assessment_title: RHEL-09-611085 - RHEL 9 must require users to provide a password for privilege escalation.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    nopasswd-does-not-exist-in-etc-sudoers:
+      test_title: '''NOPASSWD'' does not exist in /etc/sudoers'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/sudoers
+          pattern:
+            operation: pattern match
+            value: ^(?!#).*\s+NOPASSWD.*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+    nopasswd-does-not-exist-in-etc-sudoers-d:
+      test_title: '''NOPASSWD'' does not exist in /etc/sudoers.d'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/sudoers.d
+          filename:
+            operation: pattern match
+            value: ^.*$
+          pattern:
+            operation: pattern match
+            value: ^(?!#).*\s+NOPASSWD.*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+          recurse_direction: down
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: nopasswd-does-not-exist-in-etc-sudoers
+    - check: nopasswd-does-not-exist-in-etc-sudoers-d

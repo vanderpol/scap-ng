@@ -1,0 +1,41 @@
+rule:
+  id: SV-258214
+  version: r1045427
+  title: Successful/unsuccessful uses of the shutdown command in RHEL 9 must generate an audit record.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: Misuse of the shutdown command may cause availability issues for the system.
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000172
+  - scheme: disa-stig-id
+    value: RHEL-09-654200
+  - scheme: disa-vulnerability-id
+    value: V-258214
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: 'Configure the audit system to generate an audit event for any successful/unsuccessful uses of the
+      "shutdown" command by adding or updating the following rule in the "/etc/audit/rules.d/audit.rules" file:
+      -a always,exit -F path=/usr/sbin/shutdown -F perm=x -F auid>=1000 -F auid!=unset -k privileged-shutdown To
+      load the rules to the kernel immediately, use the following command: $ sudo augenrules --load'
+  policy: policies/SV-258214.policy.yaml

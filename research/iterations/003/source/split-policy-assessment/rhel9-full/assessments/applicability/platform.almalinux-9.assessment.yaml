@@ -1,0 +1,28 @@
+assessment:
+  id: platform.almalinux-9.assessment
+  assessment_title: AlmaLinux 9
+  mode: automated
+  class: inventory
+  purpose: applicability
+  checks:
+    operating-system-identity:
+      test_title: AlmaLinux 9
+      collect:
+        object_title: Operating system identity
+        capability: linux.os-release
+        select: {}
+      assert:
+        state_title: AlmaLinux 9
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - any:
+            - field: id
+              operation: equals
+              value: almalinux
+          - field: version_id
+            operation: pattern match
+            value: ^9(?:\.|$)
+  evaluate:
+    check: operating-system-identity

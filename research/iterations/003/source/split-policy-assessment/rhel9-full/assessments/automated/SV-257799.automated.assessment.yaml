@@ -1,0 +1,28 @@
+assessment:
+  id: SV-257799.automated
+  version: 2
+  assessment_title: RHEL-09-213020 - RHEL 9 must prevent the loading of a new kernel for later execution.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    kernel-kexec-load-disabled-setting-in-kernel-set-1:
+      test_title: kernel.kexec_load_disabled setting in kernel is set to 1
+      capability: unix.sysctl
+      collect:
+        object_title: null
+        capability: unix.sysctl
+        select:
+          name: kernel.kexec_load_disabled
+      assert:
+        existence: all_exist
+        check: all
+        state:
+          field: value
+          operation: equals
+          value: '1'
+          datatype: int
+        state_capability: unix.sysctl
+  evaluate:
+    check: kernel-kexec-load-disabled-setting-in-kernel-set-1

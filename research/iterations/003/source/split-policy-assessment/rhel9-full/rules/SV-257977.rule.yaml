@@ -1,0 +1,52 @@
+rule:
+  id: SV-257977
+  version: r1155772
+  title: RHEL 9 must not forward IPv6 source-routed packets by default.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: Source-routed packets allow the source of the packet to suggest that routers forward the packet along
+    a different path than configured on the router, which can be used to bypass network security measures. This
+    requirement applies only to the forwarding of source-routed traffic, such as when forwarding is enabled and
+    the system is functioning as a router. Accepting source-routed packets in the IPv6 protocol has few legitimate
+    uses. It must be disabled unless it is absolutely required. The sysctl --system command will load settings from
+    all system configuration files. All configuration files are sorted by their filename in lexicographical order,
+    regardless of the directories in which they reside. If multiple files specify the same option, the entry in
+    the file with the lexicographically latest name will take precedence. Files are read from directories in the
+    following list from top to bottom. Once a file of a given filename is loaded, any file of the same name in subsequent
+    directories is ignored. /etc/sysctl.d/*.conf /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf
+    /lib/sysctl.d/*.conf /etc/sysctl.conf
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-000366
+  - scheme: disa-stig-id
+    value: RHEL-09-254040
+  - scheme: disa-vulnerability-id
+    value: V-257977
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability:
+  - linux.ipv6-enabled
+  parameters: {}
+  remediation:
+    guidance: 'Configure RHEL 9 to not accept IPv6 source-routed packets by default. Create a configuration file
+      if it does not already exist: $ sudo vi /etc/sysctl.d/ipv6_accept_source_route.conf Add the following line
+      to the file: net.ipv6.conf.default.accept_source_route = 0 Reload settings from all system configuration files
+      with the following command: $ sudo sysctl --system'
+  policy: policies/SV-257977.policy.yaml

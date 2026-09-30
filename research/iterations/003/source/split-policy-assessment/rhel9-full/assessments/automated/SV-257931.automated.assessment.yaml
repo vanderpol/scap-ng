@@ -1,0 +1,39 @@
+assessment:
+  id: SV-257931.automated
+  version: 13
+  assessment_title: All RHEL 9 local files and directories must have a valid owner.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    verify-all-local-files-directories-on-rhel-8-have-valid:
+      test_title: Verify all local files and directories on RHEL 8 have a valid owner.
+      capability: independent.shellcommand
+      collect:
+        object_title: Verify all local files and directories on RHEL 8 have a valid owner.  Limit results
+          to the first 100 failures found.
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser
+            -print | head -n 100
+          pattern:
+            operation: pattern match
+            value: .*
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: exit_status
+            operation: equals
+            value: '0'
+            datatype: int
+          - field: stdout_line
+            operation: equals
+            value: ''
+        state_title: Verify that no files/directories are found to be non-compliant to the STIG
+        state_capability: independent.shellcommand
+  evaluate:
+    check: verify-all-local-files-directories-on-rhel-8-have-valid

@@ -1,0 +1,57 @@
+assessment:
+  id: SV-258087.automated
+  version: 2
+  assessment_title: RHEL-09-432030 - RHEL 9 must restrict privilege elevation to authorized personnel.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    all-does-not-exist-etc-sudoers:
+      test_title: ALL does not exist /etc/sudoers
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/sudoers
+          pattern:
+            operation: pattern match
+            value: ^\s*ALL\s+ALL\=\(ALL(?:|\:ALL)\)\s+ALL\s*$
+          instance:
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+    all-does-not-exist-in-etc-sudoers-d:
+      test_title: ALL does not exist in /etc/sudoers.d
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/sudoers.d
+          filename:
+            operation: pattern match
+            value: ^.*$
+          pattern:
+            operation: pattern match
+            value: ^\s*ALL\s+ALL\=\(ALL(?:|\:ALL)\)\s+ALL\s*$
+          instance:
+            datatype: int
+            value: '1'
+        behaviors:
+          ignore_case: 'true'
+          recurse_direction: down
+      assert:
+        existence: none_exist
+        check: all
+        state: null
+  evaluate:
+    all:
+    - check: all-does-not-exist-etc-sudoers
+    - check: all-does-not-exist-in-etc-sudoers-d

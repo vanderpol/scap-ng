@@ -1,0 +1,56 @@
+rule:
+  id: SV-258137
+  version: r1102081
+  title: RHEL 9 must use cryptographic mechanisms to protect the integrity of audit tools.
+  severity: medium
+  role: null
+  weight: 10.0
+  discussion: 'Protecting the integrity of the tools used for auditing purposes is a critical step toward ensuring
+    the integrity of audit information. Audit information includes all information (e.g., audit records, audit settings,
+    and audit reports) needed to successfully audit information system activity. Audit tools include, but are not
+    limited to, vendor-provided and open-source audit tools needed to successfully view and manipulate audit information
+    system activity and records. Audit tools include custom queries and report generators. It is not uncommon for
+    attackers to replace the audit tools or inject code into the existing tools to provide the capability to hide
+    or erase system activity from the audit logs. To address this risk, audit tools must be cryptographically signed
+    to provide the capability to identify when the audit tools have been modified, manipulated, or replaced. An
+    example is a checksum hash of the file or files. Satisfies: SRG-OS-000256-GPOS-00097, SRG-OS-000257-GPOS-00098,
+    SRG-OS-000258-GPOS-00099, SRG-OS-000278-GPOS-00108'
+  rationale: null
+  extensions:
+    disa_stig:
+      documentable: false
+      false_positives: null
+      false_negatives: null
+      mitigations: null
+      potential_impacts: null
+      responsibility: null
+  warnings: []
+  identifiers:
+  - scheme: cci
+    value: CCI-001493
+  - scheme: cci
+    value: CCI-001494
+  - scheme: cci
+    value: CCI-001495
+  - scheme: cci
+    value: CCI-001496
+  - scheme: disa-stig-id
+    value: RHEL-09-651025
+  - scheme: disa-vulnerability-id
+    value: V-258137
+  references:
+  - title: DPMS Target Red Hat Enterprise Linux 9
+    publisher: DISA
+    type: DPMS Target
+    subject: Red Hat Enterprise Linux 9
+    identifier: '5551'
+  requires: []
+  conflicts: []
+  applicability: []
+  parameters: {}
+  remediation:
+    guidance: Add or update the following lines to "/etc/aide.conf", to protect the integrity of the audit tools.
+      /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512 /usr/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512 /usr/sbin/ausearch
+      p+i+n+u+g+s+b+acl+xattrs+sha512 /usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512 /usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512
+      /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
+  policy: policies/SV-258137.policy.yaml

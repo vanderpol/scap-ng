@@ -1,0 +1,50 @@
+assessment:
+  id: SV-258054.automated
+  version: 2
+  assessment_title: RHEL-09-411075 - RHEL 9 must automatically lock an account when three unsuccessful
+    logon attempts occur.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    deny-set-3-or-less-but-not-0-in-etc:
+      test_title: deny is set to 3 or less but not 0 in /etc/security/faillock.conf
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath:
+            datatype: string
+            value: /etc/security/faillock.conf
+          pattern:
+            operation: pattern match
+            datatype: string
+            value: ^\s*deny\s*=\s*([\d]+)\s*$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: subexpression
+            operation: less than or equal
+            value: '3'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: greater than
+            value: '0'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: deny-set-3-or-less-but-not-0-in-etc

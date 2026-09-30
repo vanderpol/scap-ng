@@ -1,0 +1,65 @@
+assessment:
+  id: SV-257788.automated
+  version: 1
+  assessment_title: RHEL-09-212015 - RHEL 9 must disable the ability of systemd to spawn an interactive
+    boot process.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    bls-options-contain-systemd-confirm-spawn:
+      test_title: BLS options contain systemd.confirm_spawn
+      capability: independent.textfilecontent54
+      collect:
+        object_title: BLS options
+        capability: independent.textfilecontent54
+        select:
+          path: /boot/loader/entries
+          filename:
+            operation: pattern match
+            value: ^.*\.conf$
+          pattern:
+            operation: pattern match
+            value: ^options\s+(.*)$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)systemd\.confirm_spawn(\s|$)
+        state_capability: independent.textfilecontent54
+    grub-cmdline-linux-arguments-in-etc-default-grub-contain-systemd:
+      test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain systemd.confirm_spawn
+      capability: independent.textfilecontent54
+      collect:
+        object_title: /etc/default/grub GRUB_CMDLINE_LINUX
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/default/grub
+          pattern:
+            operation: pattern match
+            value: ^GRUB_CMDLINE_LINUX="(.*)"
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: (^|\s)systemd\.confirm_spawn(\s|$)
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - not:
+        check: bls-options-contain-systemd-confirm-spawn
+    - not:
+        check: grub-cmdline-linux-arguments-in-etc-default-grub-contain-systemd

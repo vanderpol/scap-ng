@@ -1,0 +1,62 @@
+assessment:
+  id: SV-258156.automated
+  version: 1
+  assessment_title: RHEL-09-653035 - RHEL 9 must take action when allocated audit record storage volume
+    reaches 75 percent of the repository maximum audit record storage capacity.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-space-left-greater-than-or-equal:
+      test_title: '/etc/audit/auditd.conf: space_left greater than or equal to 25%'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*space_left\s*=\s*([\d]+)%\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: greater than or equal
+          value: '25'
+          datatype: int
+        state_capability: independent.textfilecontent54
+    etc-audit-auditd-conf-space-left-less-than-100:
+      test_title: '/etc/audit/auditd.conf: space_left less than 100%'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*space_left\s*=\s*([\d]+)%\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: less than
+          value: '100'
+          datatype: int
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - check: etc-audit-auditd-conf-space-left-greater-than-or-equal
+    - check: etc-audit-auditd-conf-space-left-less-than-100

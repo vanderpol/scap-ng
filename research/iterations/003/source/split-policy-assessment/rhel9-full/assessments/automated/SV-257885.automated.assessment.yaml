@@ -1,0 +1,49 @@
+assessment:
+  id: SV-257885.automated
+  version: 1
+  assessment_title: RHEL-09-232025 - RHEL 9 /var/log directory must have mode 0755 or less permissive.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    var-log-directory-has-mode-0755-or-less-permissive:
+      test_title: /var/log directory has mode 0755 or less permissive.
+      capability: unix.file
+      collect:
+        object_title: null
+        capability: unix.file
+        select:
+          path: /var/log
+          filename:
+            nil: true
+            value: ''
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: suid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sgid
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: sticky
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: gwrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+          - field: owrite
+            operation: equals
+            value: 'false'
+            datatype: boolean
+        state_title: mode 0755 or less permissive
+        state_capability: unix.file
+  evaluate:
+    check: var-log-directory-has-mode-0755-or-less-permissive

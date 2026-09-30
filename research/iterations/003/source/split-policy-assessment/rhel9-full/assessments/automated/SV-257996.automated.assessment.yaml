@@ -1,0 +1,68 @@
+assessment:
+  id: SV-257996.automated
+  version: 2
+  assessment_title: RHEL-09-255100 - RHEL 9 must be configured so that all network connections associated
+    with SSH traffic are terminated after 10 minutes of becoming unresponsive.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-ssh-sshd-config-or-etc-ssh-sshd-config-d:
+      test_title: /etc/ssh/sshd_config or /etc/ssh/sshd_config.d/.*:ClientAliveInterval == 600
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        set:
+          operator: union
+          members:
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                filepath: /etc/ssh/sshd_config
+                pattern:
+                  operation: pattern match
+                  value: ^\s*(?i)ClientAliveInterval(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+          - collect:
+              object_title: null
+              capability: independent.textfilecontent54
+              select:
+                path: /etc/ssh/sshd_config.d
+                filename:
+                  operation: pattern match
+                  value: .+
+                pattern:
+                  operation: pattern match
+                  value: ^\s*(?i)ClientAliveInterval(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
+                instance:
+                  operation: greater than or equal
+                  datatype: int
+                  value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: AND
+        states:
+        - state:
+            field: subexpression
+            operation: less than or equal
+            value: '600'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: greater than
+            value: '0'
+            datatype: int
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: etc-ssh-sshd-config-or-etc-ssh-sshd-config-d

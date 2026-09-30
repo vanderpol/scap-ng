@@ -1,0 +1,52 @@
+assessment:
+  id: SV-257874.automated
+  version: 1
+  assessment_title: RHEL-09-231165 - RHEL 9 must mount /var/log/audit with the noexec option.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    var-log-audit-mounted-noexec-option:
+      test_title: /var/log/audit is mounted with the noexec option
+      capability: linux.partition
+      collect:
+        object_title: null
+        capability: linux.partition
+        select:
+          mount_point: /var/log/audit
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: mount_options
+          operation: equals
+          value: noexec
+          entity_check: at least one
+        state_capability: linux.partition
+    var-log-audit-configured-noexec-option-in-etc-fstab:
+      test_title: /var/log/audit is configured with the noexec option in /etc/fstab
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/fstab
+          pattern:
+            operation: pattern match
+            value: ^\s*[^#\s]+\s+/var/log/audit\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
+          instance:
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          field: subexpression
+          operation: pattern match
+          value: ^.*noexec.*$
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - check: var-log-audit-mounted-noexec-option
+    - check: var-log-audit-configured-noexec-option-in-etc-fstab

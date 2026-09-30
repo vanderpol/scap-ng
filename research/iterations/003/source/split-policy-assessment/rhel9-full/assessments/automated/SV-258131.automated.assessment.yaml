@@ -1,0 +1,68 @@
+assessment:
+  id: SV-258131.automated
+  version: 13
+  assessment_title: RHEL 9, for PKI-based authentication, must validate certificates by constructing a
+    certification path (which includes status information) to an accepted trust anchor.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    pki-based-authentication-os-validate-certificates-by-constructing-certification-path:
+      test_title: For PKI-based authentication, the OS must validate certificates by constructing a certification
+        path (which includes status information) to an accepted trust anchor.
+      capability: independent.shellcommand
+      collect:
+        object_title: Check that the system has a valid DOD root CA installed
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem
+          pattern:
+            operation: pattern match
+            value: 'Issuer:'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: exit_status
+            operation: equals
+            value: '0'
+            datatype: int
+          - field: stdout_line
+            operation: pattern match
+            value: CN\s*=\s*DoD\s+Root\s+CA
+        state_title: Verify that the Issuer is a DOD Root CA
+        state_capability: independent.shellcommand
+    pki-based-authentication-os-validate-certificates-by-constructing-certification-path-2:
+      test_title: For PKI-based authentication, the OS must validate certificates by constructing a certification
+        path (which includes status information) to an accepted trust anchor.
+      capability: independent.shellcommand
+      collect:
+        object_title: Check that the root certicate is date/time valid
+        capability: independent.shellcommand
+        select:
+          shell: bash
+          command: openssl x509 -in /etc/sssd/pki/sssd_auth_ca_db.pem -checkend 0
+          pattern:
+            operation: pattern match
+            value: expire
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state:
+          all:
+          - field: exit_status
+            operation: equals
+            value: '0'
+            datatype: int
+          - field: stdout_line
+            operation: pattern match
+            value: Certificate will not expire
+        state_title: Verify that the root cert is date/time valid
+        state_capability: independent.shellcommand
+  evaluate:
+    all:
+    - check: pki-based-authentication-os-validate-certificates-by-constructing-certification-path
+    - check: pki-based-authentication-os-validate-certificates-by-constructing-certification-path-2

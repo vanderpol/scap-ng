@@ -1,0 +1,68 @@
+assessment:
+  id: SV-257822.automated
+  version: 1
+  assessment_title: RHEL-09-214025 - RHEL 9 must have GPG signature verification enabled for all software
+    repositories.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    every-etc-yum-repos-d-repo-reponame-has-gpgcheck-set:
+      test_title: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 1.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/yum.repos.d
+          filename:
+            operation: pattern match
+            value: \.repo$
+          pattern:
+            operation: pattern match
+            value: ^\s*\[[^]]+\]\s*\n(?:[^[]*\n)*
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: all_exist
+        check: all
+        state:
+          field: text
+          operation: pattern match
+          value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
+          datatype: string
+        state_capability: independent.textfilecontent54
+    no-etc-yum-repos-d-repo-reponame-has-gpgcheck-set:
+      test_title: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 0.
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          path: /etc/yum.repos.d
+          filename:
+            operation: pattern match
+            value: \.repo$
+          pattern:
+            operation: pattern match
+            value: ^\s*\[[^]]+\]\s*\n(?:[^[]*\n)*
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: all_exist
+        check: none satisfy
+        state:
+          field: text
+          operation: pattern match
+          value: \n\s*gpgcheck\s*=\s*(False|0|no)\s*(\n|$)
+          datatype: string
+        state_capability: independent.textfilecontent54
+  evaluate:
+    all:
+    - check: every-etc-yum-repos-d-repo-reponame-has-gpgcheck-set
+    - check: no-etc-yum-repos-d-repo-reponame-has-gpgcheck-set

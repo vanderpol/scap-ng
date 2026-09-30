@@ -1,0 +1,51 @@
+assessment:
+  id: SV-258162.automated
+  version: 1
+  assessment_title: RHEL-09-653065 - RHEL 9 must take appropriate action when the internal event queue
+    is full.
+  mode: automated
+  class: compliance
+  deprecated: false
+  purpose: assessment
+  checks:
+    etc-audit-auditd-conf-overflow-action-syslog-single-or-halt:
+      test_title: '/etc/audit/auditd.conf: overflow_action = syslog, single or halt'
+      capability: independent.textfilecontent54
+      collect:
+        object_title: null
+        capability: independent.textfilecontent54
+        select:
+          filepath: /etc/audit/auditd.conf
+          pattern:
+            operation: pattern match
+            value: (?i)^\s*overflow_action\s*=\s*(\w+)\s*(?:#.*)?$
+          instance:
+            operation: greater than or equal
+            datatype: int
+            value: '1'
+      assert:
+        existence: at_least_one_exists
+        check: all
+        state: null
+        state_operator: OR
+        states:
+        - state:
+            field: subexpression
+            operation: pattern match
+            value: (?i)^syslog$
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: pattern match
+            value: (?i)^single$
+          state_title: null
+          capability: independent.textfilecontent54
+        - state:
+            field: subexpression
+            operation: pattern match
+            value: (?i)^halt$
+          state_title: null
+          capability: independent.textfilecontent54
+  evaluate:
+    check: etc-audit-auditd-conf-overflow-action-syslog-single-or-halt
