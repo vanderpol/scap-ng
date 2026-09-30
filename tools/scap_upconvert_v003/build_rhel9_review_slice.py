@@ -1125,13 +1125,17 @@ def lower_definition(oroot, definition_id, assessment_id):
         if var_ref in active_variables:
             return None, f"variable_cycle:{var_ref}"
 
+        # VariableType.datatype is REQUIRED by OVAL 5.12.3. There is
+        # no default here (unlike entity datatypes).
+        if variable.get("datatype") is None:
+            return None, "invalid_oval_missing_required_variable_datatype"
         native_id = unique_variable_id(variable)
         variable_names[var_ref] = native_id
         active_variables.add(var_ref)
         kind = local(variable.tag)
         entry = {
             "title": node_title(variable),
-            "datatype": variable.get("datatype") or "string",
+            "datatype": variable.get("datatype"),
             "kind": kind.replace("_variable", ""),
         }
 
@@ -1198,9 +1202,11 @@ def lower_definition(oroot, definition_id, assessment_id):
 
         if name == "literal_component":
             value = oval_value_text(node)
-            if node.get("datatype"):
-                return {"literal": {"value": value, "datatype": node.get("datatype")}}, None
-            return {"literal": value}, None
+            # LiteralComponentType.datatype has an XSD default of "string".
+            return {"literal": {
+                "value": value,
+                "datatype": node.get("datatype") or "string",
+            }}, None
 
         if name == "variable_component":
             var_ref = node.get("var_ref")
@@ -1303,6 +1309,30 @@ def lower_definition(oroot, definition_id, assessment_id):
             }, None
         return None, f"unsupported_variable_component:{name}"
 
+    def effective_entity_attributes(node, *, state=False, record_field=False):
+        """Materialize pinned OVAL 5.12.3 entity defaults in native source.
+
+        EntityAttributeGroup supplies datatype/operation/mask to ordinary
+        Object and State entities and to record fields. Record fields also
+        inherit entity_check=all. State entities additionally inherit
+        check_existence=at_least_one_exists. var_check=all is a documented
+        conditional semantic default ONLY when var_ref is present.
+        """
+        attrs = {
+            "operation": node.get("operation") or "equals",
+            "datatype": node.get("datatype") or "string",
+            "mask": (node.get("mask") or "false").lower() == "true",
+        }
+        if node.get("var_ref"):
+            attrs["variable_check"] = node.get("var_check") or "all"
+        if state or record_field:
+            attrs["entity_check"] = node.get("entity_check") or "all"
+        if state:
+            attrs["entity_existence"] = (
+                node.get("check_existence") or "at_least_one_exists"
+            )
+        return attrs
+
     def lower_entity_value(node):
         children = [child for child in node if local(child.tag) == "field"]
         if children:
@@ -1320,21 +1350,8 @@ def lower_definition(oroot, definition_id, assessment_id):
                 item = {
                     "name": child.get("name"),
                     "value": value,
+                    **effective_entity_attributes(child, record_field=True),
                 }
-                for source, target in (
-                    ("operation", "operation"),
-                    ("datatype", "datatype"),
-                    ("var_check", "variable_check"),
-                    ("entity_check", "entity_check"),
-                    ("mask", "mask"),
-                ):
-                    if child.get(source) is not None:
-                        raw_attr = child.get(source)
-                        item[target] = (
-                            raw_attr.lower() == "true"
-                            if source == "mask"
-                            else raw_attr
-                        )
                 fields.append(item)
             return {"record": fields}, None
 
@@ -1357,27 +1374,19 @@ def lower_definition(oroot, definition_id, assessment_id):
         for child in state:
             if local(child.tag) in ("notes",):
                 continue
+            # Record entities require datatype="record" by the OVAL
+            # record-type Schematron; "string" is NOT a safe default.
+            if any(local(n.tag) == "field" for n in child):
+                if child.get("datatype") != "record":
+                    return None, None, None, "invalid_oval_record_datatype"
             value, error = lower_entity_value(child)
             if error:
-                return None, None, error
+                return None, None, None, error
             item = {
                 "field": local(child.tag),
-                "operation": child.get("operation") or "equals",
                 "value": value,
+                **effective_entity_attributes(child, state=True),
             }
-            if child.get("entity_check"):
-                item["entity_check"] = child.get("entity_check")
-            # State entity existence is independent of Test check_existence.
-            # Only preserve explicit source values; the semantic comparator
-            # resolves documented omission defaults independently.
-            if child.get("check_existence") is not None:
-                item["entity_existence"] = child.get("check_existence")
-            if child.get("var_check"):
-                item["variable_check"] = child.get("var_check")
-            if child.get("datatype"):
-                item["datatype"] = child.get("datatype")
-            if child.get("mask"):
-                item["mask"] = child.get("mask").lower() == "true"
             nil_value = next(
                 (value for key, value in child.attrib.items() if local(key) == "nil"),
                 None,
@@ -1487,6 +1496,10 @@ def lower_definition(oroot, definition_id, assessment_id):
                     return None, error
                 continue
 
+            if any(local(n.tag) == "field" for n in child):
+                if child.get("datatype") != "record":
+                    active_objects.remove(obj_ref)
+                    return None, "invalid_oval_record_datatype"
             value, error = lower_entity_value(child)
             if error:
                 active_objects.remove(obj_ref)
@@ -1494,17 +1507,11 @@ def lower_definition(oroot, definition_id, assessment_id):
             if value is None:
                 continue
             item = value
-            attrs = {}
-            if child.get("operation"):
-                attrs["operation"] = child.get("operation")
-            if child.get("var_check"):
-                attrs["variable_check"] = child.get("var_check")
-            if child.get("entity_check"):
+            attrs = effective_entity_attributes(child)
+            # Preserve explicitly authored record-related entity_check if
+            # present; do not invent it for ordinary Object entities.
+            if child.get("entity_check") is not None:
                 attrs["entity_check"] = child.get("entity_check")
-            if child.get("datatype"):
-                attrs["datatype"] = child.get("datatype")
-            if child.get("mask"):
-                attrs["mask"] = child.get("mask").lower() == "true"
             nil_value = next(
                 (value for key, value in child.attrib.items() if local(key) == "nil"),
                 None,

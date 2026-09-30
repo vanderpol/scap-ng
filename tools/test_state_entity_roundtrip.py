@@ -63,12 +63,63 @@ class StateEntityRoundTripTests(unittest.TestCase):
         self.assertIsNone(native)
         self.assertEqual(error, "invalid_oval_missing_required_test_check")
 
-    def test_default_absence_remains_unmaterialized_in_native(self):
+    def test_state_entity_default_is_explicit_in_native(self):
         source = ET.fromstring(SOURCE.replace(' check_existence="none_exist"', ""))
         native, error = lower_definition(source, "oval:example:def:1", "default-cardinality")
         self.assertIsNone(error, error)
         predicate = next(iter(native["assessment"]["checks"].values()))["assert"]["state"]
-        self.assertNotIn("entity_existence", predicate)
+        self.assertEqual(predicate["entity_existence"], "at_least_one_exists")
+        self.assertEqual(predicate["entity_check"], "all")
+        self.assertEqual(predicate["datatype"], "string")
+        self.assertEqual(predicate["operation"], "equals")
+        self.assertIs(predicate["mask"], False)
+
+    def test_variable_reference_defaults_are_explicit_in_object_and_state(self):
+        variable = (
+            '<variables><constant_variable id="oval:example:var:1" '
+            'version="1" datatype="string" comment="test">'
+            '<value>demo</value></constant_variable></variables>'
+        )
+        source = ET.fromstring(
+            SOURCE.replace(
+                '<unix:filename>demo</unix:filename>',
+                '<unix:filename var_ref="oval:example:var:1"/>',
+            ).replace(
+                '<unix:filename operation="equals" check_existence="none_exist">demo</unix:filename>',
+                '<unix:filename var_ref="oval:example:var:1"/>',
+            ).replace('</oval_definitions>', variable + '</oval_definitions>')
+        )
+        native, error = lower_definition(source, "oval:example:def:1", "variable-defaults")
+        self.assertIsNone(error, error)
+        assessment = native["assessment"]
+        check = next(iter(assessment["checks"].values()))
+        selection = check["collect"]["select"]["filename"]
+        self.assertEqual(selection["variable_check"], "all")
+        self.assertEqual(selection["datatype"], "string")
+        self.assertEqual(selection["operation"], "equals")
+        self.assertIs(selection["mask"], False)
+        self.assertNotIn("entity_existence", selection)
+        state = check["assert"]["state"]
+        self.assertEqual(state["variable_check"], "all")
+        self.assertEqual(state["entity_existence"], "at_least_one_exists")
+        self.assertEqual(state["entity_check"], "all")
+        self.assertEqual(state["datatype"], "string")
+
+    def test_invalid_source_variable_datatype_is_not_invented(self):
+        source = ET.fromstring(
+            SOURCE.replace(
+                '<unix:path>/tmp</unix:path>',
+                '<unix:path var_ref="oval:example:var:1"/>',
+            ).replace(
+                '</oval_definitions>',
+                '<variables><constant_variable id="oval:example:var:1" '
+                'version="1" comment="test"><value>/tmp</value>'
+                '</constant_variable></variables></oval_definitions>',
+            )
+        )
+        native, error = lower_definition(source, "oval:example:def:1", "invalid-var")
+        self.assertIsNone(native)
+        self.assertEqual(error, "invalid_oval_missing_required_variable_datatype")
 
 
 if __name__ == "__main__":
