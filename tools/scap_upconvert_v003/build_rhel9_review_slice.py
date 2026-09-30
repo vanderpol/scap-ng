@@ -1848,6 +1848,10 @@ def benchmark_platform_assessment(platform_id, title, distro_ids):
         conditions.append({
             "field": "id",
             "operation": "equals",
+            "datatype": "string",
+            "mask": False,
+            "entity_check": "all",
+            "entity_existence": "at_least_one_exists",
             "value": distro_id,
         })
     return {
@@ -1875,6 +1879,10 @@ def benchmark_platform_assessment(platform_id, title, distro_ids):
                                 {
                                     "field": "version_id",
                                     "operation": "pattern match",
+                                    "datatype": "string",
+                                    "mask": False,
+                                    "entity_check": "all",
+                                    "entity_existence": "at_least_one_exists",
                                     "value": r"^9(?:\.|$)",
                                 },
                             ]

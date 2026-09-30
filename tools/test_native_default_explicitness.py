@@ -31,6 +31,17 @@ class ExplicitDefaultsTests(unittest.TestCase):
         issues, _ = audit_doc(doc)
         self.assertIn("HIDDEN_STATE_DEFAULT_ENTITY_EXISTENCE",
                       [r["code"] for r in issues])
+    def test_independent_variable_object_selector_is_not_var_check(self):
+        doc = self.fixture()
+        check = doc["assessment"]["checks"]["x"]
+        check["collect"]["capability"] = "independent.variable"
+        check["collect"]["select"] = {"var_ref": {
+            "operation": "equals", "datatype": "string", "mask": False,
+            "value": {"variable": "v"}}}
+        issues, counts = audit_doc(doc)
+        self.assertFalse(issues, issues)
+        self.assertEqual(counts["independent_variable_id_selectors"], 1)
+
     def test_record_fields(self):
         doc = self.fixture()
         record = {"name": "key", "value": "value", "operation": "equals",

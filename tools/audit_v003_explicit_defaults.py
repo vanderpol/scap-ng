@@ -28,7 +28,7 @@ def audit_doc(document, source="<memory>"):
     def issue(code, location):
         errors.append({"code": code, "source": source, "location": location})
 
-    def common_entity(item, path):
+    def common_entity(item, path, *, variable_id_selector=False):
         totals["entities"] += 1
         if not isinstance(item, dict) or "value" not in item:
             issue("UNNORMALIZED_ENTITY", path)
@@ -38,7 +38,9 @@ def audit_doc(document, source="<memory>"):
                 issue("HIDDEN_ENTITY_DEFAULT_"+field.upper(), path)
         if has_variable(item.get("value")):
             totals["variable_references"] += 1
-            if "variable_check" not in item:
+            if variable_id_selector:
+                totals["independent_variable_id_selectors"] += 1
+            elif "variable_check" not in item:
                 issue("HIDDEN_VARIABLE_CHECK", path)
 
     def inspect(value, path):
@@ -52,7 +54,8 @@ def audit_doc(document, source="<memory>"):
         # nested inside set expressions and variable object_values.
         if isinstance(value.get("select"), dict):
             for key, ent in value["select"].items():
-                common_entity(ent, f"{path}.select.{key}")
+                is_id = value.get("capability") == "independent.variable" and key == "var_ref"
+                common_entity(ent, f"{path}.select.{key}", variable_id_selector=is_id)
         # State predicates are distinguished by having BOTH field and value.
         if "field" in value and "value" in value:
             totals["state_entities"] += 1
