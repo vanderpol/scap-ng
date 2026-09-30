@@ -32,6 +32,13 @@ def text(node):
     if node is None: return None
     s = " ".join("".join(node.itertext()).split())
     return s or None
+
+def oval_value_text(node):
+    """Return OVAL simple-content text without whitespace normalization."""
+    if node is None:
+        return None
+    value = "".join(node.itertext())
+    return value
 def safe_id(s): return re.sub(r"[^A-Za-z0-9_.-]+", "-", s.strip()).strip("-")
 def semantic_id(value, fallback):
     slug = re.sub(r"[^a-z0-9]+", "-", (value or "").lower()).strip("-")
@@ -996,7 +1003,7 @@ def lower_definition(oroot, definition_id, assessment_id):
         }
 
         if kind == "constant_variable":
-            values = [text(child) for child in variable if local(child.tag) == "value" and text(child) is not None]
+            values = [oval_value_text(child) for child in variable if local(child.tag) == "value"]
             entry["expression"] = {"literal": values[0] if len(values) == 1 else values}
         elif kind == "external_variable":
             entry["input"] = {
@@ -1025,7 +1032,7 @@ def lower_definition(oroot, definition_id, assessment_id):
         name = local(node.tag)
 
         if name == "literal_component":
-            value = text(node)
+            value = oval_value_text(node)
             if node.get("datatype"):
                 return {"literal": {"value": value, "datatype": node.get("datatype")}}, None
             return {"literal": value}, None
@@ -1140,7 +1147,8 @@ def lower_definition(oroot, definition_id, assessment_id):
             if error:
                 return None, error
             return {"variable": native_id}, None
-        return text(node), None
+        value = oval_value_text(node)
+        return ("" if value is None else value), None
 
     def lower_state(state_ref):
         state = find_by_id(oroot, state_ref, "_state")
