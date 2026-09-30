@@ -24,13 +24,24 @@ def summarize(folder: Path, expected_sources: list[str]) -> dict:
         by_source[name] = row
     expected = set(expected_sources)
     actual = set(by_source)
+    if not expected:
+        raise ValueError('Empty NIWC corpus matrix; cannot claim coverage')
     totals = Counter()
     extensions = set()
+    unaccounted = []
     for row in by_source.values():
         for field in ("definitions", "semantic_equal", "deprecated_blockers",
                       "publisher_extension_blockers", "unexpected_failures"):
             totals[field] += int(row.get(field, 0))
         extensions.update(row.get("publisher_extension_elements") or [])
+        classified = sum(int(row.get(k, 0)) for k in (
+            "semantic_equal", "deprecated_blockers",
+            "publisher_extension_blockers", "unexpected_failures"
+        ))
+        if classified != int(row.get("definitions", 0)):
+            unaccounted.append({"source": row.get("source"),
+                                "definitions": row.get("definitions"),
+                                "classified": classified})
     total = totals["definitions"]
     return {
         "comparison_scope": "ID-independent OVAL XML semantic comparator; not differential evaluator execution",
@@ -40,6 +51,7 @@ def summarize(folder: Path, expected_sources: list[str]) -> dict:
         "missing_sources": sorted(expected - actual),
         "unexpected_sources": sorted(actual - expected),
         "duplicate_sources": sorted(duplicates),
+        "unaccounted_packages": unaccounted,
         "totals": dict(sorted(totals.items())),
         "semantic_equal_percent_of_all_definitions": (
             round(100 * totals["semantic_equal"] / total, 4) if total else None
@@ -82,7 +94,7 @@ def render_markdown(report: dict) -> str:
                 row.get("unexpected_failures", 0),
             )
         )
-    for key in ("missing_sources", "duplicate_sources", "unexpected_sources"):
+    for key in ("missing_sources", "duplicate_sources", "unexpected_sources", "unaccounted_packages"):
         if report[key]:
             lines.extend(["", f"## {key}", ""])
             lines.extend(f"- `{value}`" for value in report[key])
@@ -105,7 +117,8 @@ def main() -> int:
     (args.output / "README.md").write_text(render_markdown(report), encoding="utf-8")
     print(render_markdown(report))
     if (report["missing_sources"] or report["duplicate_sources"]
-            or report["unexpected_sources"] or report["totals"].get("unexpected_failures", 0)):
+            or report["unexpected_sources"] or report["unaccounted_packages"]
+            or report["totals"].get("unexpected_failures", 0)):
         return 1
     return 0
 
