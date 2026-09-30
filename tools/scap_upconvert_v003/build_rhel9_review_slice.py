@@ -935,6 +935,12 @@ def unsupported_definition_features(oroot, definition_id):
             nested_ref = descendant.get("var_ref")
             if nested_ref:
                 inspect_variable(nested_ref)
+            # Object-component dependencies are part of the variable graph.
+            # Follow them during feature accounting so a standard-looking
+            # Definition cannot hide a non-standard Object behind
+            # Object -> Variable -> Object chains.
+            if name == "object_component" and descendant.get("object_ref"):
+                inspect_object(descendant.get("object_ref"))
 
     def inspect_object(obj_ref):
         obj = find_by_id(oroot, obj_ref, "_object")
