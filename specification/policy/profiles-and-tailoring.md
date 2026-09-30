@@ -152,6 +152,17 @@ organization is Organizational Input, not Tailoring.
 Tailoring and Organizational Input SHALL remain distinguishable in source and
 results.
 
+### Named Assessment selection
+
+Tailoring MAY choose among the named Assessment selections already exposed by
+a Rule, for example `automated` or `manual`. Selection SHALL preserve the Rule's
+declared bindings and SHALL NOT create a new selection or replace an Assessment
+path, capability, or implementation. An unknown selection SHALL be rejected.
+
+Choosing an existing named selection is distinct from modifying the Assessment
+references or implementations prohibited below. Organizational Input SHALL NOT
+select Assessments or alter which Tests run.
+
 ## 9. Tailoring boundary
 
 Tailoring SHALL NOT modify:
