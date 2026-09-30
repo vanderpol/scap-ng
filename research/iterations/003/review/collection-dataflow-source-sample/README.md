@@ -26,10 +26,12 @@ This sample was converted directly from the pinned original RHEL 9 source ZIP. I
 ## Validation actually performed
 
 - 13 new source-identity/dataflow regressions passed, including an embedded private Collection, distinct source Objects with identical payloads, shared references, depth-32 Variable chains, sets, filter-hidden dependencies, cycles and contradictory types.
-- The existing 16-test Variable/filter/set depth suite passed unchanged. Effective-attribute, State-entity and explicit-semantics suites also passed (26 tests). Total executed focused regressions: 55.
+- The existing 16-test Variable/filter/set depth suite passed with its original assertions retained; schema-import paths were made portable for Windows. Effective-attribute, State-entity and explicit-semantics suites also passed (26 tests). Total executed focused regressions: 55.
 - All 42 Variable-bearing RHEL 9 cases compared equal after source → named graph → regenerated OVAL, with root-scoped ID-independent semantic comparison.
 - All 23 automated Assessments in this selected sample compared equal and regenerated OVAL validated against the pinned omni-schema. The native vocabulary guard reported no violations across 48 Assessment YAML files.
-- No target execution, complete language conformance, full Benchmark regeneration, Windows execution or finalized JSON schema validation is claimed.
+- The 13 new graph/local-ZIP regressions and 16 retained depth/filter/set tests passed on both Windows and Linux in [CI run 36775088506](https://github.com/vanderpol/scap-ng/actions/runs/36775088506). The ZIP CLI test runs from another working directory using a synthetic package.
+- No target execution, complete language conformance, full Benchmark regeneration, full real-package conversion on Windows or finalized JSON schema validation is claimed.
+- Broader CI passed the OVAL smoke, Linux expansion, Windows expansion and Self-Assertion checks. Diverse-platform expansion still reports the NGINX source capability mismatch `unix.file!=independent.shellcommand`; that blocker is retained, not bypassed.
 
 ## Reproduce locally
 
@@ -43,7 +45,7 @@ python tools/scap_upconvert_v003/convert_collection_review.py `
   --output work/collection-review
 ```
 
-This is a portable research entry point; the command has been executed on Linux, not yet on Windows. It produces the focused Assessment review, not the promised future full converter handoff. The source checksum is verified before parsing. The script invokes the maintained source lowerer with `collection_graph=True`; no historical authoring generator main function is run.
+This is a portable research entry point; the real RHEL 9 sample command has been executed on Linux. Windows CI passed the local-ZIP command regression with a synthetic package; the full real-package Windows run remains pending. It produces the focused Assessment review, not the promised future full converter handoff. The source checksum is verified before parsing. The script invokes the maintained source lowerer with `collection_graph=True`; no historical authoring generator main function is run.
 
 Observed dependency versions: PyYAML 6.0.3; lxml 6.1.1.
 
