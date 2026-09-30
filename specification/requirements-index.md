@@ -97,6 +97,18 @@ this index:
 <!-- spec-nav:end -->
 
 
+## Open blocker: OVAL Object behavior defaults
+
+Before certifying the v003 Assessment model as fully OVAL-compatible, the
+project SHALL inventory and verify all Object `behaviors` types and
+their XSD/Schematron constraints; derive and expose effective defaults where
+normatively established; and execution-test behavior variants.
+
+The current converter copies explicit behavior attributes but does not fully
+normalize inherited/implicit defaults or prove behavior execution. This is
+**not** resolved merely by green document round-trip CI. See
+[behavior audit](../research/iterations/003/design/oval-object-behaviors-audit.md).
+
 ## OVAL schema-to-assessor specification program
 
 The OVAL 5.12.3 XSD/Schematron semantics extraction starts during iteration
