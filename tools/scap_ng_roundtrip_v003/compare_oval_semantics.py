@@ -212,6 +212,19 @@ class Model:
                 e.attrib.get("check_existence","at_least_one_exists"),
                 e.attrib["check"],("object",obj) if obj is not None else None,state_expr)
 
+    def edge(self,node,neg=False,app=False):
+        # Adjacent pure-negation edges are semantically composable. This is
+        # particularly important when an extend_definition edge is negated and
+        # the referenced Definition's root criteria is also negated.
+        if isinstance(node,tuple) and len(node)==4 and node[0]=="edge":
+            inner_neg,inner_app,inner=node[1],node[2],node[3]
+            if not app and not inner_app:
+                combined=bool(neg) ^ bool(inner_neg)
+                return ("edge",True,False,inner) if combined else inner
+        if neg or app:
+            return ("edge",bool(neg),bool(app),node)
+        return node
+
     def criteria(self,e):
         op=e.attrib.get("operator","AND")
         neg=e.attrib.get("negate","false")=="true"
@@ -229,17 +242,14 @@ class Model:
                 node=self.definition(child.attrib["definition_ref"])
             else:
                 raise ValueError(f"unsupported criteria child {local}")
-            if cneg or capp:
-                node=("edge",cneg,capp,node)
+            node=self.edge(node,cneg,capp)
             kids.append(node)
         # A one-child criteria node has the same truth value for AND, OR,
         # ONE, and XOR. Normalize its flags as an edge on that child so native
         # lowering may collapse the transparent wrapper without creating a diff.
         if len(kids)==1:
             node=kids[0]
-            if neg or app:
-                node=("edge",neg,app,node)
-            return node
+            return self.edge(node,neg,app)
         return ("criteria",op,neg,app,tuple(sorted(kids,key=repr)))
 
     def definition(self,did):
