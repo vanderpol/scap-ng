@@ -8,6 +8,8 @@ on:
       - ".github/workflows/audit-upstream-oval-xsd-defaults.yml"
       - "tools/scap_ng_roundtrip_v003/audit_oval_xsd_defaults.py"
       - "tools/scap_ng_roundtrip_v003/xsd_effective_defaults.py"
+      - "tools/scap_ng_roundtrip_v003/verify_ir_defaults_against_xsd.py"
+      - "tools/oval_semantic_ir.py"
       - "tools/scap_ng_roundtrip_v003/test_oval_xsd_audit.py"
 
 jobs:
@@ -35,6 +37,12 @@ jobs:
             --schemas oval-language/oval-schemas \
             --out work/oval-xsd-5.12.3-audit
           cat work/oval-xsd-5.12.3-audit/summary.json
+      - name: Assert importer defaults match seven generic XSD base types
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/verify_ir_defaults_against_xsd.py \
+            --schemas oval-language/oval-schemas \
+            --importer scap-ng/tools/oval_semantic_ir.py \
+            --output work/oval-xsd-5.12.3-audit/importer-default-crosswalk.json
       - name: Upload full XSD audit evidence
         if: always()
         uses: actions/upload-artifact@v4
