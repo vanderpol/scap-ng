@@ -113,3 +113,24 @@ sharing limitations). General Board cycle policy remains pending in
 Do not change original source, upstream schemas or native architecture to mask
 these findings. Resource limits and incomplete/error propagation need explicit
 conformance contracts before reference-scanner implementation.
+
+## Corrected main CI verification
+
+Bundled-input correction: `57bb9e1a5ed6ac6762fc0f626b31f7460af7a3ee`.
+Successful GitHub Actions runs: [review slice](https://github.com/vanderpol/scap-ng/actions/runs/36762966690),
+[full RHEL9](https://github.com/vanderpol/scap-ng/actions/runs/36762966827),
+[smoke](https://github.com/vanderpol/scap-ng/actions/runs/36762966707),
+[Self-Assertion](https://github.com/vanderpol/scap-ng/actions/runs/36762966741),
+[Linux expansion](https://github.com/vanderpol/scap-ng/actions/runs/36762966728),
+and [pairing audit](https://github.com/vanderpol/scap-ng/actions/runs/36762966720).
+Full RHEL9 regeneration reports zero error/fatal diagnostics and 736 warnings;
+its regenerated evidence replaces the initial failed-generation output on main.
+
+[Diverse expansion](https://github.com/vanderpol/scap-ng/actions/runs/36762966768)
+passes ten targets but fails NGINX on definition
+`oval:navy.navwar.niwcatlantic.scc.nginx:def:278400`, with
+`test_collection_capability_mismatch:unix.file!=independent.shellcommand`
+(22/23 comparisons equal). The rejecting guard already exists in base
+`ad8b4c12`; this mismatch is separate from bundled-input indexing and must not
+be silently repaired or exempted to make CI green. [Windows expansion](https://github.com/vanderpol/scap-ng/actions/runs/36762966817)
+also passed. The full NIWC census remained queued at this evidence checkpoint.
