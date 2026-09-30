@@ -136,3 +136,30 @@ report an explicit conversion blocker rather than substitute another condition.
 **Specification navigation:** [← Previous: SCAP-NG Requirements Index](../requirements-index.md) · [Contents](../README.md) · [Next: Benchmark, Rule, and Group Model →](../policy/benchmark.md)
 
 <!-- spec-nav:end -->
+
+
+## 8. Schema-derived assessor semantic checks
+
+Beyond syntax and schema conformance, a SCAP-NG semantic validator SHALL:
+
+- validate independently typed Test/Collection/State capability interfaces and
+  reject incompatible links rather than coerce component families;
+- traverse all reachable nested references, including Object→Variable→Object,
+  set members and filter States, to detect missing dependencies, unsupported
+  features and cycles;
+- enforce typed Variable/Parameter allowed values and restrictions before
+  binding them to assessments;
+- preserve distinct Test-level State combiners, State/entity operators and
+  variable-value quantifiers; and
+- distinguish deprecated standard capability blockers from non-standard
+  publisher extensions and genuinely unsupported standard language constructs.
+
+A scanner SHALL NOT claim executable content correctness solely because XSD
+and Schematron validations pass. Negative conformance fixtures SHOULD include
+the known nginx Test/Object/State family mismatch, a nested publisher extension,
+a malformed dependency cycle, and invalid external-variable restrictions.
+
+The pinned upstream OVAL 5.12.3 schemas, not a locally modified or augmented
+copy, define standard OVAL vocabulary during migration. The SCC/NIWC
+`sqlext` family is intentionally outside the standard-Oval conversion
+profile for this iteration.
