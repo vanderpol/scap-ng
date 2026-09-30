@@ -13,10 +13,12 @@ A full native benchmark becomes a candidate for project-owner review when:
    automated/manual checks, Profiles, Values/Parameters, Groups, fixes,
    applicability, and exceptions are accounted for. Any unconverted Rule or
    unsupported construct has a source-specific diagnostic.
-2. **Native design:** benchmark owns Profiles/Groups/Parameters, Rules
-   reference Policy checks/selectors and applicability IDs, and policy
-   assessment bindings resolve. No XCCDF/OVAL/CPE XML serialization leaks
-   into executable native source; lineage remains in evidence.
+2. **Native design:** Benchmark owns Profiles/Groups/Parameters. Each Rule is
+   the policy/assertion object and exposes named Assessment selections using
+   explicit relative Assessment paths plus applicability IDs. Those source
+   references resolve without filename guessing. No separate Policy object is
+   required. No XCCDF/OVAL/CPE XML serialization leaks into executable native
+   source; lineage remains in evidence.
 3. **Faithfulness:** supported assessments retain Test and State distinct
    existence semantics, variables, filtering, behaviors, sets, result
    propagation, applicability, and platform capabilities. No silent
@@ -33,16 +35,19 @@ A full native benchmark becomes a candidate for project-owner review when:
 Review can proceed with *documented* nonblocking warnings; no blanket
 "100% lossless" claim is warranted without the relevant conformance proof.
 
-## Reviewer feedback 2026-09-30 — blocking issues
+## Reviewer feedback 2026-09-30 — current blockers and resolved items
 
-- [#30 Profile selection and inherited defaults](https://github.com/vanderpol/scap-ng/issues/30): current generated Benchmark uses compact `disabled_rules` lists rather than enumerating enabled rules, but we have not yet verified inherited XCCDF Group/Rule `selected` values and Profile `extends` semantics. **Compact profiles are the intended approach**; validate actual effective selections before marking them correct.
-- [#31 Explicit Rule → Policy → Assessment linkage](https://github.com/vanderpol/scap-ng/issues/31): current native Rule's `checks` map stores assessment IDs; files with those IDs exist and follow a directory convention, but a separate Policy artifact and explicit stable reference resolution layer are still missing. Current `rhel9-full` does **not** yet satisfy the accepted split architecture. Fix the converter and regenerate rather than editing hundreds of output files.
-- [Source README](../source/split-rule-assessment/README.md) now labels what is current generated evidence versus the intended reviewed native representation. Passing schema, package or OVAL regression checks alone SHALL NOT override these review blockers.
+- [#30 Profile selection and inherited defaults](https://github.com/vanderpol/scap-ng/issues/30): compact publisher Profiles remain the intended representation. Current RHEL 9 full-review generation performs an independent effective-selection audit across Benchmark/Group/Rule defaults, Profile actions and `extends`; any mismatch blocks generation. This is no longer a known RHEL 9 handoff blocker when the current full-review workflow is green.
+- [#31](https://github.com/vanderpol/scap-ng/issues/31) is **superseded and closed**. The project intentionally replaced the intermediate Policy object with Rule-owned policy/assertion semantics. The authoritative chain is Benchmark → Rule → selected Assessment. RHEL 9 current review source uses explicit relative Rule → Assessment paths and validates them.
+- Remaining handoff blockers are benchmark-specific conversion/semantic blockers, unresolved source constructs, or failed readiness checks—not absence of a separate Policy layer.
+- [Source README](../source/split-rule-assessment/README.md) documents the current Rule-owned source model. Passing schema/package/round-trip checks still does not establish target execution equivalence.
 
 ## Snapshot: RHEL 9
 
-- Current native source path:
-  `research/iterations/003/source/split-rule-assessment/rhel9-full/`
+- Current reviewer source path:
+  `research/iterations/003/review/rhel9-current-full/`
+- Historical generated conversion evidence also remains under
+  `research/iterations/003/source/split-rule-assessment/rhel9-full/`.
 - Pinned converted benchmark shows **445 Rules**. Committed package summary
   shows **879 assessment objects**, **1326 logical objects**, and 1327 members.
 - Current diagnostics summary: **0 ERROR, 0 FATAL**, **736 WARN**.
@@ -55,10 +60,13 @@ Review can proceed with *documented* nonblocking warnings; no blanket
   Committed `benchmark.yaml`, `diagnostics.json`, and package-summary evidence
   are available. This establishes successful generation and publishing,
   **not** final assessment-level losslessness or design-review readiness.
-- Outstanding review work: check exact published source pin and complete
-  Rule/selector accounting; sample the actual generated assessments against
-  OVAL source for human readability, applicability, manual inputs and
-  existence/variable/filter behaviors before handoff.
+- Current full-review generation pins the source revision/checksum, accounts
+  for all 445 Rules, verifies Rule Assessment selections, Profiles, grouping,
+  applicability references, source metadata, native cleanliness, relative
+  references, reverse OVAL schema validity and semantic round-trip parity.
+- Remaining limitation: these are source/representation handoff gates, not
+  target-runtime execution equivalence. That limitation SHALL be stated to
+  reviewers rather than used to delay useful source review indefinitely.
 
 ## Snapshot: Windows 11
 
