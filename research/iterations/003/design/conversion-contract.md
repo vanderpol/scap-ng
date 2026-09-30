@@ -201,6 +201,29 @@ NOT map it to native `rule.version`.
 The generic SCAP 1.4 conversion profile SHALL NOT apply this publisher-specific
 interpretation.
 
+### Non-standard OVAL probe extensions
+
+The generic SCAP 1.4 / OVAL converter SHALL derive the set of standard OVAL
+Tests, Objects, and States from the pinned authoritative OVAL schemas.
+
+If source content contains a Test, Object, or State element that is not declared
+by those schemas, the generic converter SHALL classify it as a non-standard
+OVAL extension and SHALL NOT silently reinterpret it as a standard OVAL
+capability.
+
+A publisher conversion profile MAY lower such an extension only when:
+
+1. the extension owner and semantics are known;
+2. the source extension can be mapped to an explicitly namespaced SCAP-NG
+   capability or extension construct;
+3. the mapping preserves execution and result semantics; and
+4. reverse conversion uses the corresponding extension vocabulary rather than
+   emitting schema-invalid standard OVAL.
+
+Until such a publisher mapping exists, conversion of the affected Definition
+SHALL stop with an explicit diagnostic while unrelated standard Definitions MAY
+continue converting.
+
 
 ## Structural fidelity for OVAL-to-NG conversion
 
