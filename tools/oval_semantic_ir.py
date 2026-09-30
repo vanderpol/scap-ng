@@ -516,11 +516,20 @@ def set_node(e):
 # generic XML-schema default resolver: inherited platform behavior types still
 # require a separate complete-schema audit.
 KNOWN_ATTRIBUTE_DEFAULTS = {
+    # OVAL 5.12.3 oval-definitions-schema.xsd base types; this is a
+    # scoped, source-backed catalog, NOT a guess for platform behaviors.
+    "definition": {"deprecated": ("false", "xsd_default")},
     "test": {
         "check_existence": ("at_least_one_exists", "xsd_default"),
         "state_operator": ("AND", "xsd_default"),
+        "deprecated": ("false", "xsd_default"),
     },
-    "state": {"operator": ("AND", "xsd_default")},
+    "object": {"deprecated": ("false", "xsd_default")},
+    "state": {
+        "operator": ("AND", "xsd_default"),
+        "deprecated": ("false", "xsd_default"),
+    },
+    "variable": {"deprecated": ("false", "xsd_default")},
     "state_entity": {
         "check_existence": ("at_least_one_exists", "xsd_default"),
         "entity_check": ("all", "xsd_default"),
@@ -590,6 +599,7 @@ def parse_definition(e):
         "version": e.get("version"),
         "class": e.get("class"),
         "deprecated": e.get("deprecated"),
+        "effective_attributes": effective_attributes(e, "definition"),
         "metadata": metadata,
         "criteria": criteria,
     }
@@ -642,6 +652,7 @@ def parse_object(e):
         "namespace": ns(e.tag),
         "version": e.get("version"),
         "comment": e.get("comment"),
+        "effective_attributes": effective_attributes(e, "object"),
         "children": children,
     }
 
@@ -757,6 +768,7 @@ def parse_variable(e):
         "namespace": ns(e.tag),
         "version": e.get("version"),
         "comment": e.get("comment"),
+        "effective_attributes": effective_attributes(e, "variable"),
         "datatype": e.get("datatype"),
         "body": body,
         "semantic_ast": variable_ast(e),
