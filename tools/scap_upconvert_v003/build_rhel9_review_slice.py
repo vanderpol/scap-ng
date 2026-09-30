@@ -992,6 +992,7 @@ def lower_definition(oroot, definition_id, assessment_id):
         entry = {
             "title": node_title(variable),
             "datatype": variable.get("datatype") or "string",
+            "kind": kind.replace("_variable", ""),
         }
 
         if kind == "constant_variable":
@@ -1325,6 +1326,7 @@ def lower_definition(oroot, definition_id, assessment_id):
             test_to_check[test_ref] = check_id
             checks[check_id] = {
                 "test_title": test_title,
+                "capability": capability,
                 "result": "unknown",
             }
             return {"check": check_id}, None
