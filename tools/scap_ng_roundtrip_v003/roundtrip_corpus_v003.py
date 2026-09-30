@@ -47,6 +47,11 @@ def main():
     ap.add_argument("--out",type=Path,required=True)
     ap.add_argument("--report",type=Path,required=True)
     ap.add_argument("--inventory-only",action="store_true")
+    ap.add_argument(
+        "--include",
+        default="*.xml",
+        help="Filename glob applied recursively (default: *.xml).",
+    )
     args=ap.parse_args()
 
     args.out.mkdir(parents=True,exist_ok=True)
@@ -55,7 +60,8 @@ def main():
     total=0
     equal=0
 
-    for source in sorted(args.corpus.rglob("*.xml")):
+    sources=sorted(args.corpus.rglob(args.include))
+    for source in sources:
         rel=source.relative_to(args.corpus).as_posix()
         try:
             root=ET.parse(source).getroot()
@@ -137,7 +143,7 @@ def main():
         by_stage[row.get("stage","unknown")]=by_stage.get(row.get("stage","unknown"),0)+1
 
     report={
-        "files":len(list(args.corpus.rglob("*.xml"))),
+        "files":len(sources),
         "definitions":total,
         "semantic_equal":equal,
         "failures":len(failures),
