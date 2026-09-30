@@ -1533,6 +1533,10 @@ def lower_definition(oroot, definition_id, assessment_id):
         )
         if test is None:
             return None, "test_not_found"
+        # OVAL 5.12.3 TestType declares check as required, NOT defaulted.
+        # A missing value is invalid source; never silently evaluate as "all".
+        if test.get("check") is None:
+            return None, "invalid_oval_missing_required_test_check"
 
         test_name = local(test.tag)
         ns_uri = test.tag.split("}", 1)[0].strip("{")
@@ -1584,7 +1588,7 @@ def lower_definition(oroot, definition_id, assessment_id):
 
         assertion = {
             "existence": test.get("check_existence") or "at_least_one_exists",
-            "check": test.get("check") or "all",
+            "check": test.get("check"),
             "state": None,
         }
         if states:
