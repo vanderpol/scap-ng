@@ -162,6 +162,8 @@ class Builder:
             attrs = {"operation": str(pred.get("operation") or "equals")}
             if pred.get("entity_check") is not None:
                 attrs["entity_check"] = scalar(pred["entity_check"])
+            if pred.get("entity_existence") is not None:
+                attrs["check_existence"] = scalar(pred["entity_existence"])
             if pred.get("variable_check") is not None:
                 attrs["var_check"] = scalar(pred["variable_check"])
             if pred.get("datatype") is not None:
