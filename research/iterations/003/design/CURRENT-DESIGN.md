@@ -17,6 +17,8 @@ Owner reconfirmation: 2026-09-30. Read this file before selecting a generator, p
 - Capability is declared at Test level for its directly used Collection/State contract; mismatches fail. Do not silently mix types. For a Collection used only by Variables, the owner selected capability declaration on the Variable as the working prototype direction (2026-09-30). Exact grammar and formal Board ratification remain pending; do not treat this as an approved standard or infer type from filenames/IDs.
 - Pre-alpha: publish completed, appropriately tested work directly to `main` without routine permission requests. The owner authorized current-design full RHEL9 review generation on 2026-09-30. Historical publishing workflows remain held; use the new source-driven full review entry point.
 
+Owner direction, 2026-09-30: run a complete round-trip regression of the pinned content corpus after the element-name and behavior changes. Production NIWC Current migration evidence and OVAL Self-Assertion language evidence remain separate. The broad corpus runner now defaults to the current named Collection/Test graph; historical mode requires an explicit switch. Do not use an older-layout green run as current-design validation.
+
 ## Converter delivery and stability requirement
 
 Owner direction, 2026-09-30: once conversion reaches stability, provide the exact
