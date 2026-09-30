@@ -6,6 +6,7 @@ from oval_result_truth_tables import (
     TRUE, FALSE, ERROR, UNKNOWN, NOT_EVALUATED, NOT_APPLICABLE,
     aggregate_check, aggregate_operator, aggregate_existence,
     evaluate_collected_object_test, evaluate_missing_collected_object_record,
+    aggregate_many_to_many, aggregate_state, aggregate_item_states,
 )
 
 
@@ -212,6 +213,98 @@ class CollectedObjectControlFlow(unittest.TestCase):
     def test_invalid_flag_rejected(self):
         with self.assertRaises(ValueError):
             evaluate_collected_object_test("mystery", existence="at_least_one_exists")
+
+
+class StateEntityAggregationOrder(unittest.TestCase):
+    def test_var_check_applies_before_entity_check(self):
+        rows = [
+            [TRUE, FALSE],
+            [FALSE, FALSE],
+        ]
+        self.assertEqual(
+            aggregate_many_to_many(
+                var_check="at least one",
+                entity_check="all",
+                comparison_rows=rows,
+            ),
+            FALSE,
+        )
+        self.assertEqual(
+            aggregate_many_to_many(
+                var_check="at least one",
+                entity_check="at least one",
+                comparison_rows=rows,
+            ),
+            TRUE,
+        )
+
+    def test_entity_and_variable_quantifiers_are_not_interchangeable(self):
+        rows = [
+            [TRUE, FALSE],
+            [TRUE, FALSE],
+        ]
+        self.assertEqual(
+            aggregate_many_to_many(
+                var_check="all",
+                entity_check="at least one",
+                comparison_rows=rows,
+            ),
+            FALSE,
+        )
+        self.assertEqual(
+            aggregate_many_to_many(
+                var_check="at least one",
+                entity_check="all",
+                comparison_rows=rows,
+            ),
+            TRUE,
+        )
+
+    def test_error_precedence_is_applied_at_each_scope(self):
+        rows = [
+            [TRUE, ERROR],
+            [FALSE, FALSE],
+        ]
+        self.assertEqual(
+            aggregate_many_to_many(
+                var_check="all",
+                entity_check="all",
+                comparison_rows=rows,
+            ),
+            FALSE,
+        )
+        self.assertEqual(
+            aggregate_many_to_many(
+                var_check="all",
+                entity_check="at least one",
+                comparison_rows=rows,
+            ),
+            ERROR,
+        )
+
+    def test_state_operator_combines_predicates_after_entity_evaluation(self):
+        self.assertEqual(aggregate_state("AND", [TRUE, FALSE, ERROR]), FALSE)
+        self.assertEqual(aggregate_state("OR", [FALSE, TRUE, ERROR]), TRUE)
+        self.assertEqual(aggregate_state("ONE", [TRUE, FALSE, FALSE]), TRUE)
+
+    def test_test_state_operator_combines_states_per_item(self):
+        self.assertEqual(aggregate_item_states("AND", [TRUE, FALSE]), FALSE)
+        self.assertEqual(aggregate_item_states("OR", [FALSE, TRUE]), TRUE)
+        self.assertEqual(aggregate_item_states("XOR", [TRUE, TRUE]), FALSE)
+
+    def test_rejects_empty_many_to_many_shape(self):
+        with self.assertRaises(ValueError):
+            aggregate_many_to_many(
+                var_check="all",
+                entity_check="all",
+                comparison_rows=[],
+            )
+        with self.assertRaises(ValueError):
+            aggregate_many_to_many(
+                var_check="all",
+                entity_check="all",
+                comparison_rows=[[]],
+            )
 
 
 if __name__ == "__main__":
