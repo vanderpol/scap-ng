@@ -37,8 +37,6 @@ def main():
         imp.set("namespace",ns)
         imp.set("schemaLocation",path.name)
 
-    ref=E.SubElement(root,f"{{{XS}}}element")
-    ref.set("ref","oval-def:oval_definitions")
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_bytes(E.tostring(root,xml_declaration=True,encoding="UTF-8",pretty_print=True))
 
