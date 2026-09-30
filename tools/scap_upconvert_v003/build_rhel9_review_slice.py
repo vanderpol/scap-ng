@@ -32,7 +32,12 @@ def oval_definition_elements():
     if _OVAL_DEFINITION_ELEMENTS is not None:
         return _OVAL_DEFINITION_ELEMENTS
 
-    schema_root = ROOT / "third_party" / "scap-1.4-schemas" / "oval_5.12.3"
+    schema_override = os.environ.get("SCAP_NG_OVAL_SCHEMA_ROOT")
+    schema_root = (
+        Path(schema_override)
+        if schema_override
+        else ROOT / "third_party" / "scap-1.4-schemas" / "oval_5.12.3"
+    )
     elements = set()
     for path in sorted(schema_root.glob("*-definitions-schema.xsd")):
         try:
