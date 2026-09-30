@@ -194,3 +194,40 @@ jobs:
             work/${{ matrix.key }}-summary.json
             work/${{ matrix.key }}-roundtrip.json
             work/${{ matrix.key }}-schematron.json
+
+  aggregate:
+    name: Publish complete NIWC corpus statistics
+    needs: [matrix, roundtrip]
+    if: ${{ always() && needs.matrix.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all per-package evidence
+        uses: actions/download-artifact@v4
+        with:
+          pattern: current-*-oval-census
+          path: work/census-packages
+          merge-multiple: true
+      - name: Record expected pinned package matrix
+        env:
+          EXPECTED_MATRIX: ${{ needs.matrix.outputs.include }}
+        run: |
+          printf '%s' "$EXPECTED_MATRIX" > work/expected-packages.json
+      - name: Aggregate all round-trip outcomes and verify package coverage
+        run: |
+          python tools/scap_ng_roundtrip_v003/summarize_niwc_census.py \
+            --directory work/census-packages \
+            --expected-matrix work/expected-packages.json \
+            --output work/census-summary
+      - name: Upload aggregate report even if coverage fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-current-niwc-oval-summary
+          path: work/census-summary/
+      - name: Publish run summary
+        if: always()
+        run: |
+          if [ -f work/census-summary/README.md ]; then
+            cat work/census-summary/README.md >> "$GITHUB_STEP_SUMMARY"
+          fi
