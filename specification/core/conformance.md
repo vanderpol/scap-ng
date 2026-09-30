@@ -138,6 +138,24 @@ report an explicit conversion blocker rather than substitute another condition.
 <!-- spec-nav:end -->
 
 
+## Behavior conformance gate
+
+A conforming assessment compiler/validator SHALL verify that every
+Collection's behavior settings are supported by the selected capability,
+have valid types and values, and satisfy cross-field applicability rules.
+It SHALL NOT silently ignore behavior settings it cannot execute.
+
+A capability claiming OVAL migration support SHALL document per-behavior
+coverage for explicit settings, effective defaults, optional parent-element
+omission, and relevant error/existence side effects. Runtime conformance
+SHALL be demonstrated with controlled collection fixtures; an XSD-valid
+round trip does not establish such behavioral conformance.
+
+**Current limitation:** iteration 003 copies explicit OVAL behavior
+attributes but has not established a schema-wide effective-default resolver
+or complete runtime behavior verification. This SHALL remain an open gate
+before any blanket claim of full OVAL behavior compatibility.
+
 ## 8. Schema-derived assessor semantic checks
 
 Beyond syntax and schema conformance, a SCAP-NG semantic validator SHALL:
