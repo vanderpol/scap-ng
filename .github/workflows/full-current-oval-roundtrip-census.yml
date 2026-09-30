@@ -1,0 +1,183 @@
+name: Full NIWC Current OVAL round-trip census
+
+on:
+  workflow_dispatch:
+
+env:
+  SCAP_NG_OVAL_SCHEMA_ROOT: oval-language/oval-schemas
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      include: ${{ steps.build.outputs.include }}
+    steps:
+      - name: Check out pinned NIWC SCAP 1.4 corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+      - id: build
+        name: Build Current corpus matrix
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          files=sorted(
+              p.as_posix()
+              for p in Path("niwc/Current").glob("*SCAP_1-4_Benchmark*.zip")
+              if "Consolidated" not in p.name
+          )
+          include=[
+              {"key":f"{i:03d}", "source":str(Path(p).relative_to("niwc"))}
+              for i,p in enumerate(files,1)
+          ]
+          print(f"current_packages={len(include)}")
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as out:
+              out.write("include="+json.dumps(include,separators=(",",":"))+"\n")
+          PY
+
+  roundtrip:
+    needs: matrix
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        include: ${{ fromJSON(needs.matrix.outputs.include) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+
+      - name: Check out pinned NIWC SCAP 1.4 corpus
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+
+      - name: Check out authoritative OVAL 5.12.3 schemas
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+          python -m pip install lxml pyyaml cryptography
+
+      - name: Split package into OVAL closures
+        run: |
+          python scap-ng/tools/scap14_rule_splitter.py \
+            "niwc/${{ matrix.source }}" \
+            --output-dir "work/${{ matrix.key }}-split" \
+            --schema scap-ng/third_party/scap-1.4-schemas/omni-schema.xsd \
+            --source-revision 8c8e5dff860af6b1290ee9273a282db24278f8d5 \
+            --source-repository-path "${{ matrix.source }}" \
+            --benchmark-key "current-${{ matrix.key }}" \
+            --fail-on-unresolved
+
+      - name: Round-trip all standard definitions
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
+            --corpus "work/${{ matrix.key }}-split" \
+            --include 'oval.xml' \
+            --out "work/${{ matrix.key }}-roundtrip" \
+            --report "work/${{ matrix.key }}-roundtrip.json" \
+            --inventory-only
+
+      - name: Classify conversion blockers
+        env:
+          KEY: ${{ matrix.key }}
+          SOURCE: ${{ matrix.source }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          key=os.environ["KEY"]
+          report=json.loads(Path(f"work/{key}-roundtrip.json").read_text())
+          deprecated=[]
+          extensions=[]
+          bad=[]
+          extension_details=set()
+          for row in report["results"]:
+              if row.get("equal"):
+                  continue
+              features=row.get("unsupported_features") or []
+              names={x.get("feature") for x in features}
+              if names and names <= {"deprecated_oval_test"}:
+                  deprecated.append(row)
+              elif names and names <= {"nonstandard_oval_element"}:
+                  extensions.append(row)
+                  extension_details.update(
+                      x["detail"] for x in features if x.get("detail")
+                  )
+              elif names and names <= {"deprecated_oval_test","nonstandard_oval_element"}:
+                  extensions.append(row)
+                  extension_details.update(
+                      x["detail"] for x in features
+                      if x.get("feature")=="nonstandard_oval_element" and x.get("detail")
+                  )
+              else:
+                  bad.append(row)
+          summary={
+              "source":os.environ["SOURCE"],
+              "definitions":report["definitions"],
+              "semantic_equal":report["semantic_equal"],
+              "deprecated_blockers":len(deprecated),
+              "publisher_extension_blockers":len(extensions),
+              "publisher_extension_elements":sorted(extension_details),
+              "unexpected_failures":len(bad),
+              "max_dependency_depth":report.get("max_dependency_depth",0),
+          }
+          Path(f"work/{key}-summary.json").write_text(
+              json.dumps(summary,indent=2,sort_keys=True)+"\n"
+          )
+          print(json.dumps(summary,indent=2,sort_keys=True))
+          if bad:
+              print(json.dumps({"unexpected_failures":bad},indent=2))
+              raise SystemExit(1)
+          PY
+
+      - name: Build aggregate OVAL validation schema
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/build_full_oval_omni.py \
+            --schemas oval-language/oval-schemas \
+            --output oval-language/oval-schemas/roundtrip-full-omni.xsd
+
+      - name: Validate regenerated standard OVAL with XSD
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' xml; do
+            xmllint --noout \
+              --schema oval-language/oval-schemas/roundtrip-full-omni.xsd \
+              "$xml"
+          done < <(find "work/${{ matrix.key }}-roundtrip" -maxdepth 1 -name '*.oval.xml' -print0)
+
+      - name: Compare Schematron findings to sources
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/compare_schematron_baseline.py \
+            --schemas oval-language/oval-schemas \
+            --corpus "work/${{ matrix.key }}-split" \
+            --report "work/${{ matrix.key }}-roundtrip.json" \
+            --output "work/${{ matrix.key }}-schematron.json"
+
+      - name: Upload package evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: current-${{ matrix.key }}-oval-census
+          path: |
+            work/${{ matrix.key }}-summary.json
+            work/${{ matrix.key }}-roundtrip.json
+            work/${{ matrix.key }}-schematron.json
