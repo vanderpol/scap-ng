@@ -239,7 +239,10 @@ class Model:
             elif local=="criterion":
                 node=("test",self.test(child.attrib["test_ref"]))
             elif local=="extend_definition":
-                node=self.definition(child.attrib["definition_ref"])
+                # SCAP-NG intentionally dereferences extended definitions.
+                # Compare the referenced criteria semantics, not nested
+                # definition metadata that does not survive flattening.
+                node=self.definition(child.attrib["definition_ref"], include_metadata=False)
             else:
                 raise ValueError(f"unsupported criteria child {local}")
             node=self.edge(node,cneg,capp)
@@ -252,20 +255,24 @@ class Model:
             return self.edge(node,neg,app)
         return ("criteria",op,neg,app,tuple(sorted(kids,key=repr)))
 
-    def definition(self,did):
-        key=("definition",did)
+    def definition(self,did,include_metadata=True):
+        key=("definition",did,include_metadata)
         if key in self.memo:return self.memo[key]
         e=self.definitions[did]
         self.memo[key]=("recursion-definition",did)
         crit=e.find(f"{{{OD}}}criteria")
         if crit is None: raise ValueError(f"{did}: definition has no criteria")
-        out=(
-            "definition",
-            e.attrib.get("class"),
-            e.attrib.get("version"),
-            e.attrib.get("deprecated","false") in ("true","1"),
-            self.criteria(crit),
-        )
+        semantics=self.criteria(crit)
+        if include_metadata:
+            out=(
+                "definition",
+                e.attrib.get("class"),
+                e.attrib.get("version"),
+                e.attrib.get("deprecated","false") in ("true","1"),
+                semantics,
+            )
+        else:
+            out=semantics
         self.memo[key]=out; return out
 
     def test_multiset(self):
