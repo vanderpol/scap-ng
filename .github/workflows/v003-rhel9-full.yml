@@ -7,7 +7,6 @@ on:
     paths:
       - ".github/workflows/v003-rhel9-full.yml"
       - "tools/scap_upconvert_v003/**"
-      - "tools/scap_upconvert_v003/**"
 
 permissions:
   contents: write
@@ -124,6 +123,11 @@ jobs:
             echo "Full RHEL9 output already matches."
           else
             git commit -m "Generate full RHEL9 SCAP-NG 003 benchmark"
+            # Generation also modifies non-evidence paths; they are not part
+            # of this publishing commit. Stash them before rebasing, rather
+            # than allowing dirty checkout state to abort evidence publishing.
+            git status --short
+            git stash push --include-untracked -m "rhel9-full-uncommitted-generation"
             git fetch origin main
             git rebase origin/main
             git push
