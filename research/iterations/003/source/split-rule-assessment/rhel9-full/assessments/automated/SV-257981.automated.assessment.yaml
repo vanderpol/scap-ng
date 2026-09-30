@@ -21,37 +21,56 @@ assessment:
               object_title: Pull value of /etc/ssh/sshd_config:banner
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/ssh/sshd_config
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/ssh/sshd_config
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*(?i)banner(?-i)[ \t\"]+([\w\/]+)[\"\s]*(?:|(?:#.*))?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: Pull value of /etc/ssh/sshd_config.d:banner
               capability: independent.textfilecontent54
               select:
-                path: /etc/ssh/sshd_config.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/ssh/sshd_config.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: .+
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*(?i)banner(?-i)[ \t\"]+([\w\/]+)[\"\s]*(?:|(?:#.*))?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: ^\/.+$
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: banner value is set to /etc/issue
         state_capability: independent.textfilecontent54
     etc-ssh-sshd-config-banner-none:
@@ -67,28 +86,44 @@ assessment:
               object_title: Pull value of /etc/ssh/sshd_config:banner
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/ssh/sshd_config
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/ssh/sshd_config
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*(?i)banner(?-i)[ \t]*(?:none[\s]*|(?:#.*))?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: Pull value of /etc/ssh/sshd_config.d:banner
               capability: independent.textfilecontent54
               select:
-                path: /etc/ssh/sshd_config.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/ssh/sshd_config.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: .+
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*(?i)banner(?-i)[ \t]*(?:none[\s]*|(?:#.*))?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: none_exist

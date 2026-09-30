@@ -16,15 +16,19 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /etc/security/faillock.conf
           pattern:
             operation: pattern match
             datatype: string
+            mask: false
             value: ^\s*fail_interval\s*=\s*([\d]+)\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -34,16 +38,22 @@ assessment:
         states:
         - state:
             field: subexpression
-            operation: less than or equal
             value: '900'
+            operation: less than or equal
             datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
         - state:
             field: subexpression
-            operation: not equal
             value: '0'
+            operation: not equal
             datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
   evaluate:

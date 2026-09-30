@@ -16,10 +16,20 @@ assessment:
         object_title: Retrieve the gnome screensaver lock-delay setting.
         capability: independent.shellcommand
         select:
-          shell: bash
-          command: gsettings get org.gnome.desktop.screensaver lock-delay
+          shell:
+            operation: equals
+            datatype: string
+            mask: false
+            value: bash
+          command:
+            operation: equals
+            datatype: string
+            mask: false
+            value: gsettings get org.gnome.desktop.screensaver lock-delay
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: uint32\s(\d+)$
       assert:
         existence: at_least_one_exists
@@ -27,13 +37,19 @@ assessment:
         state:
           all:
           - field: exit_status
-            operation: equals
             value: '0'
+            operation: equals
             datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: subexpression
-            operation: less than or equal
             value: '5'
+            operation: less than or equal
             datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
         state_title: Confirm value is set to 5 or greater.
         state_capability: independent.shellcommand
   evaluate:

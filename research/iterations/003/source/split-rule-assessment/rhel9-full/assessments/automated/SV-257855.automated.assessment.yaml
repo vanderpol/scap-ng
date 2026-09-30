@@ -15,21 +15,32 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/fstab
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)
           instance:
             operation: not equal
             datatype: int
+            mask: false
             value: '0'
       assert:
         existence: any_exist
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (^|,)noexec(,|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: all-nfs-entries-in-etc-fstab-have-noexec

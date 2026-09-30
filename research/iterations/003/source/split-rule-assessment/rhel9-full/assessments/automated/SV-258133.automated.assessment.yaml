@@ -20,13 +20,20 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/sssd/sssd.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sssd/sssd.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*cache_credentials\s*=\s*true\b$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -34,16 +41,25 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/sssd/conf.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sssd/conf.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^.+\.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*cache_credentials\s*=\s*true\b$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -66,28 +82,44 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/sssd/sssd.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sssd/sssd.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/sssd/conf.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sssd/conf.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^.+\.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*offline_credentials_expiration\s*=\s*(\d*)\s*(?:#.*)?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 max_depth: '-1'
@@ -97,9 +129,12 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     any:

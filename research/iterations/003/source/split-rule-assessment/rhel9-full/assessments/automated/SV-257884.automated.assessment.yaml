@@ -15,35 +15,49 @@ assessment:
         capability: unix.file
         select:
           path:
-            variable_check: only one
+            operation: equals
             datatype: string
+            mask: false
+            variable_check: only one
             value:
               variable: system-wide-shared-library-files-directories
           filename:
             operation: pattern match
             datatype: string
+            mask: false
             value: .*
         filters:
         - action: exclude
           match:
             field: gwrite
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: Mode 755 or less permissive (gwrite should be = false)
           capability: unix.file
         - action: exclude
           match:
             field: type
-            operation: equals
             value: symbolic link
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: symbolic links
           capability: unix.file
         - action: exclude
           match:
             field: type
-            operation: equals
             value: directory
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: unix.file
       assert:
         existence: none_exist
@@ -57,35 +71,49 @@ assessment:
         capability: unix.file
         select:
           path:
-            variable_check: only one
+            operation: equals
             datatype: string
+            mask: false
+            variable_check: only one
             value:
               variable: system-wide-shared-library-files-directories
           filename:
             operation: pattern match
             datatype: string
+            mask: false
             value: .*
         filters:
         - action: exclude
           match:
             field: owrite
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: Mode 755 or less permissive (owrite should be = false)
           capability: unix.file
         - action: exclude
           match:
             field: type
-            operation: equals
             value: symbolic link
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: symbolic links
           capability: unix.file
         - action: exclude
           match:
             field: type
-            operation: equals
             value: directory
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: unix.file
       assert:
         existence: none_exist

@@ -15,13 +15,20 @@ assessment:
         object_title: dconf user databases
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/dconf/profile/user
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/dconf/profile/user
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^system-db:(\S+)\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -35,18 +42,26 @@ assessment:
         capability: independent.textfilecontent54
         select:
           path:
+            operation: equals
+            datatype: string
+            mask: false
             variable_check: at least one
             value:
               variable: dconf-user-database-locks-directories
           filename:
             operation: pattern match
+            datatype: string
+            mask: false
             value: .*
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^/org/gnome/desktop/screensaver/lock-delay$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -63,19 +78,30 @@ assessment:
       kind: local
       expression:
         concat:
-        - literal: /etc/dconf/db/
+        - literal:
+            value: /etc/dconf/db/
+            datatype: string
         - object_values:
             collect:
               object_title: dconf user databases
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/dconf/profile/user
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/dconf/profile/user
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^system-db:(\S+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
             field: subexpression
-        - literal: .d/locks
+        - literal:
+            value: .d/locks
+            datatype: string

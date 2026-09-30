@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: kernel.core_pattern
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kernel.core_pattern
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: equals
           value: '|/bin/false'
+          operation: equals
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     not:

@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: linux.partition
         select:
-          mount_point: /var/log
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /var/log
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: mount_options
-          operation: equals
           value: noexec
+          operation: equals
+          datatype: string
+          mask: false
           entity_check: at least one
+          entity_existence: at_least_one_exists
         state_capability: linux.partition
     var-log-configured-noexec-option-in-etc-fstab:
       test_title: /var/log is configured with the noexec option in /etc/fstab
@@ -32,15 +39,22 @@ assessment:
         capability: independent.variable
         select:
           var_ref:
-            variable: mount-options-var-log-in-etc-fstab
+            operation: equals
+            datatype: string
+            mask: false
+            value:
+              variable: mount-options-var-log-in-etc-fstab
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: value
-          operation: equals
           value: noexec
+          operation: equals
+          datatype: string
+          mask: false
           entity_check: at least one
+          entity_existence: at_least_one_exists
         state_capability: independent.variable
     var-log-configured-in-etc-fstab:
       test_title: /var/log is configured in /etc/fstab
@@ -49,12 +63,20 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/fstab
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
           instance:
+            operation: equals
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -78,12 +100,20 @@ assessment:
                 object_title: null
                 capability: independent.textfilecontent54
                 select:
-                  filepath: /etc/fstab
+                  filepath:
+                    operation: equals
+                    datatype: string
+                    mask: false
+                    value: /etc/fstab
                   pattern:
                     operation: pattern match
+                    datatype: string
+                    mask: false
                     value: ^\s*[^#\s]+\s+/var/log\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
                   instance:
+                    operation: equals
                     datatype: int
+                    mask: false
                     value: '1'
               field: subexpression
           delimiter: ','

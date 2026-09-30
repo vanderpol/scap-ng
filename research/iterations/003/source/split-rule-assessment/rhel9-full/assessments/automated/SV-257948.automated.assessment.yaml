@@ -15,21 +15,32 @@ assessment:
         object_title: /etc/nsswitch.conf hosts entry
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/nsswitch.conf
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/nsswitch.conf
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*hosts:\s*(.*)$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (^|\s)dns(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: hosts entry contains dns
         state_capability: independent.textfilecontent54
     etc-resolv-conf-contains-at-least-one-nameserver-entry:
@@ -39,13 +50,20 @@ assessment:
         object_title: /etc/resolv.conf nameserver entries
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/resolv.conf
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/resolv.conf
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^nameserver\s+(.*)$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -59,15 +77,22 @@ assessment:
         capability: independent.variable
         select:
           var_ref:
-            variable: count-unique-name-servers
+            operation: equals
+            datatype: string
+            mask: false
+            value:
+              variable: count-unique-name-servers
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: value
-          operation: greater than or equal
           value: '2'
+          operation: greater than or equal
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: /etc/resolv.conf is configured with at least two name servers
         state_capability: independent.variable
   evaluate:
@@ -91,12 +116,19 @@ assessment:
                 object_title: /etc/resolv.conf nameserver entries
                 capability: independent.textfilecontent54
                 select:
-                  filepath: /etc/resolv.conf
+                  filepath:
+                    operation: equals
+                    datatype: string
+                    mask: false
+                    value: /etc/resolv.conf
                   pattern:
                     operation: pattern match
+                    datatype: string
+                    mask: false
                     value: ^nameserver\s+(.*)$
                   instance:
                     operation: greater than or equal
                     datatype: int
+                    mask: false
                     value: '1'
               field: subexpression

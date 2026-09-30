@@ -15,13 +15,20 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/audit/audit.rules
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/audit.rules
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*-a\s+(always,exit|exit,always)(?:\s+-S\s+all)?\s+-F\s+path=/usr/sbin/poweroff\s+(-F\s+perm=([rwa]*x[rwa]*)\s+)?-F\s+auid>=1000\s+-F\s+auid!=(4294967295|-1|unset)(\s+(-k\s+|-F\s+key=)\S+)?\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists

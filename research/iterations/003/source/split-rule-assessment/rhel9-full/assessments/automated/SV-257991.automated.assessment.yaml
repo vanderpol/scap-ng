@@ -16,13 +16,20 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/crypto-policies/back-ends/opensshserver.config
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/crypto-policies/back-ends/opensshserver.config
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*MACs\s+(\S+)\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -32,14 +39,22 @@ assessment:
         states:
         - state:
             field: subexpression
-            operation: equals
             value: hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
         - state:
             field: subexpression
-            operation: equals
             value: '"hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha2-512"'
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
   evaluate:

@@ -14,14 +14,22 @@ assessment:
         object_title: /sys/fs/selinux
         capability: linux.partition
         select:
-          mount_point: /sys/fs/selinux
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /sys/fs/selinux
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: fs_type
-          operation: equals
           value: selinuxfs
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: linux.partition
     etc-selinux-config-selinuxtype-targeted:
       test_title: '/etc/selinux/config: SELINUXTYPE=targeted'
@@ -30,21 +38,32 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/selinux/config
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/selinux/config
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*SELINUXTYPE\s*=\s*(\w+)\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: equals
           value: targeted
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     all:

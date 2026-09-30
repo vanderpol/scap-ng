@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: kernel.yama.ptrace_scope
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kernel.yama.ptrace_scope
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: kernel-yama-ptrace-scope-setting-in-kernel-set-1

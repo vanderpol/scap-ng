@@ -15,22 +15,37 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          path: /etc/dconf/db/local.d
-          filename: 00-security-settings
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/dconf/db/local.d
+          filename:
+            operation: equals
+            datatype: string
+            mask: false
+            value: 00-security-settings
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*\[org\/gnome\/desktop\/media-handling]\s*\n+[^\[]*automount-open\s*=\s*(\w+)$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: equals
           value: 'false'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: system-disables-gui-automount-feature

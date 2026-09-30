@@ -16,29 +16,38 @@ assessment:
         capability: independent.textfilecontent54
         select:
           path:
-            variable_check: at least one
+            operation: equals
             datatype: string
+            mask: false
+            variable_check: at least one
             value:
               variable: dconf-database-directories
           filename:
             operation: pattern match
             datatype: string
+            mask: false
             value: .*
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\[org/gnome/settings-daemon/peripherals/smartcard](?:\r?\n(?:[^[\r\n].*)?)*
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: at least one
         state:
           field: text
-          operation: pattern match
           value: \nremoval-action='lock-screen'\s*(\n|$)
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: dconf-smartcard-removal-action-lock-screen
@@ -53,16 +62,27 @@ assessment:
             object_title: dconf database directories
             capability: unix.file
             select:
-              path: /etc/dconf/db
+              path:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/dconf/db
               filename:
+                operation: equals
+                datatype: string
+                mask: false
                 nil: true
                 value: ''
             filters:
             - action: include
               match:
                 field: path
-                operation: pattern match
                 value: ^/etc/dconf/db/.*\.d$
+                operation: pattern match
+                datatype: string
+                mask: false
+                entity_check: all
+                entity_existence: at_least_one_exists
               state_title: dconf database directories
               capability: unix.file
             behaviors:

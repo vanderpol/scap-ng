@@ -15,18 +15,32 @@ assessment:
         object_title: Retrieve GNOME desktop logout setting.
         capability: independent.shellcommand
         select:
-          shell: bash
-          command: gsettings get org.gnome.settings-daemon.plugins.media-keys logout
+          shell:
+            operation: equals
+            datatype: string
+            mask: false
+            value: bash
+          command:
+            operation: equals
+            datatype: string
+            mask: false
+            value: gsettings get org.gnome.settings-daemon.plugins.media-keys logout
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: .*
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: stdout_line
-          operation: equals
           value: '['''']'
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: Confirm GNOME desktop logout setting is [''].
         state_capability: independent.shellcommand
   evaluate:

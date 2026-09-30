@@ -14,24 +14,37 @@ assessment:
         object_title: BLS options
         capability: independent.textfilecontent54
         select:
-          path: /boot/loader/entries
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /boot/loader/entries
           filename:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^.*\.conf$
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^options\s+(.*)$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (^|\s)vsyscall=none(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     grub-cmdline-linux-arguments-in-etc-default-grub-contain-vsyscall:
       test_title: The GRUB_CMDLINE_LINUX arguments in /etc/default/grub contain vsyscall=none
@@ -40,21 +53,32 @@ assessment:
         object_title: /etc/default/grub GRUB_CMDLINE_LINUX
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/default/grub
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/default/grub
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^GRUB_CMDLINE_LINUX="(.*)"
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (^|\s)vsyscall=none(\s|$)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     all:

@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: unix.file
         select:
-          filepath: /etc/shadow
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/shadow
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: group_id
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: group-owned by root
         state_capability: unix.file
   evaluate:

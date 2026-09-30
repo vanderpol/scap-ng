@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: net.ipv6.conf.all.disable_ipv6
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: net.ipv6.conf.all.disable_ipv6
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
     net-ipv6-conf-all-disable-ipv6-setting-in-sysctl-configuration:
       test_title: net.ipv6.conf.all.disable_ipv6 setting in sysctl configuration files is set to 1, and
@@ -38,40 +45,58 @@ assessment:
               object_title: /etc/sysctl.conf
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/sysctl.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sysctl.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: (?:^|\.*\n)\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*(\d+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: other sysctl configuration files
               capability: independent.textfilecontent54
               select:
                 path:
+                  operation: equals
+                  datatype: string
+                  mask: false
                   variable_check: at least one
                   value:
                     variable: directories-containing-sysctl-configuration-files
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: \.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: (?:^|\.*\n)\s*net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*(\d+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     ipv6-disable-1-in-kernel-cmdline:
       test_title: ipv6.disable=1 in the kernel cmdline
@@ -80,13 +105,20 @@ assessment:
         object_title: /proc/cmdline contains ipv6.disable=1
         capability: independent.textfilecontent54
         select:
-          filepath: /proc/cmdline
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /proc/cmdline
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: \bipv6\.disable=1\b
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists

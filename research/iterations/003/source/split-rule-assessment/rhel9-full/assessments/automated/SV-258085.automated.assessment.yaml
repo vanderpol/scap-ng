@@ -16,14 +16,19 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /etc/sudoers
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*Defaults\s+!targetpw\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -37,14 +42,19 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /etc/sudoers
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*Defaults\s+!rootpw\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -58,14 +68,19 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /etc/sudoers
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*Defaults\s+!runaspw\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -79,23 +94,31 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /etc/sudoers
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*[#@]includedir\s+(\S+)\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: at least one
         state:
           field: subexpression
-          operation: equals
           value: /etc/sudoers.d
+          operation: equals
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     defaults-targetpw-in-etc-sudoers-d:
       test_title: Defaults !targetpw in /etc/sudoers.d
@@ -105,15 +128,21 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
+            datatype: string
+            mask: false
             variable_check: at least one
             value:
               variable: sudoers-d-config-files
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*Defaults\s+!targetpw\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -127,15 +156,21 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
+            datatype: string
+            mask: false
             variable_check: at least one
             value:
               variable: sudoers-d-config-files
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*Defaults\s+!rootpw\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -149,15 +184,21 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
+            datatype: string
+            mask: false
             variable_check: at least one
             value:
               variable: sudoers-d-config-files
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*Defaults\s+!runaspw\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -185,8 +226,14 @@ assessment:
             object_title: /etc/sudoers.d config files, excluding files ending with ~ or containing .
             capability: unix.file
             select:
-              path: /etc/sudoers.d
+              path:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/sudoers.d
               filename:
                 operation: pattern match
+                datatype: string
+                mask: false
                 value: ^[^.]*[^.~]$
           field: filepath

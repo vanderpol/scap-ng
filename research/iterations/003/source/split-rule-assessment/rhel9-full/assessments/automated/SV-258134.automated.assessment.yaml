@@ -14,7 +14,11 @@ assessment:
         object_title: Confirm the aide file integrity tool package is installed.
         capability: linux.rpminfo
         select:
-          name: aide
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: aide
       assert:
         existence: at_least_one_exists
         check: all
@@ -27,14 +31,23 @@ assessment:
         capability: unix.file
         select:
           filepath:
-            variable: retrieve-location-working-aide-database-file
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: retrieve-location-working-aide-database-file
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: filepath
-          operation: pattern match
           value: .*
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: Confirm existence of DB file.
         state_capability: unix.file
   evaluate:
@@ -52,8 +65,16 @@ assessment:
             object_title: Find the aide.conf file.
             capability: unix.file
             select:
-              path: /
-              filename: aide.conf
+              path:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /
+              filename:
+                operation: equals
+                datatype: string
+                mask: false
+                value: aide.conf
             behaviors:
               recurse_direction: down
               recurse: directories
@@ -72,12 +93,21 @@ assessment:
               capability: independent.textfilecontent54
               select:
                 filepath:
-                  variable: retrieve-location-aide-conf-file
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  variable_check: all
+                  value:
+                    variable: retrieve-location-aide-conf-file
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\@\@define\s+DBDIR\s+(\S+)
                 instance:
+                  operation: equals
                   datatype: int
+                  mask: false
                   value: '1'
             field: subexpression
         - literal:
@@ -89,11 +119,20 @@ assessment:
               capability: independent.textfilecontent54
               select:
                 filepath:
-                  variable: retrieve-location-aide-conf-file
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  variable_check: all
+                  value:
+                    variable: retrieve-location-aide-conf-file
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^database=file:\@\@\{DBDIR\}/(\S+)
                 instance:
+                  operation: equals
                   datatype: int
+                  mask: false
                   value: '1'
             field: subexpression

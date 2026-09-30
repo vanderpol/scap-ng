@@ -16,35 +16,49 @@ assessment:
         capability: unix.file
         select:
           path:
-            variable_check: only one
+            operation: equals
             datatype: string
+            mask: false
+            variable_check: only one
             value:
               variable: system-command-directories
           filename:
             operation: pattern match
             datatype: string
+            mask: false
             value: .*
         filters:
         - action: exclude
           match:
             field: group_id
-            operation: less than
             value: '1000'
+            operation: less than
             datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: owned by root-group or system-group ( gid less than 1000)
           capability: unix.file
         - action: exclude
           match:
             field: type
-            operation: equals
             value: symbolic link
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: symbolic links
           capability: unix.file
         - action: exclude
           match:
             field: type
-            operation: equals
             value: directory
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: unix.file
         behaviors:
           recurse_direction: down

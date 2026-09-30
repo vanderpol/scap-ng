@@ -20,37 +20,56 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/security/pwquality.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/pwquality.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*dictcheck\s*=\s*([-\d]+)\s*(?:#.*)?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/security/pwquality.conf.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/pwquality.conf.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: \.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*dictcheck\s*=\s*([-\d]+)\s*(?:#.*)?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: not equal
           value: '0'
+          operation: not equal
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: passwords-not-dictionary-words

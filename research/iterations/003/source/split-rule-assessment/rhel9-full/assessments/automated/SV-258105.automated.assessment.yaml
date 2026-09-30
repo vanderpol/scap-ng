@@ -16,14 +16,19 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /etc/shadow
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: '^root:[^:]*:[^:]*:0*:'
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: none_exist
@@ -38,26 +43,33 @@ assessment:
         select:
           username:
             operation: equals
-            variable_check: at least one
             datatype: string
+            mask: false
+            variable_check: at least one
             value:
               variable: usernames-users-minimum-password-age-0-or-blank
         filters:
         - action: exclude
           match:
             field: user_id
-            operation: less than
             value: '1000'
+            operation: less than
             datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: unix.password
         - action: exclude
           match:
             field: user_id
-            operation: equals
             value:
               variable: uid-user-nobody
-            variable_check: all
+            operation: equals
             datatype: int
+            mask: false
+            variable_check: all
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: unix.password
       assert:
         existence: none_exist
@@ -79,14 +91,19 @@ assessment:
             capability: independent.textfilecontent54
             select:
               filepath:
+                operation: equals
                 datatype: string
+                mask: false
                 value: /etc/shadow
               pattern:
                 operation: pattern match
+                datatype: string
+                mask: false
                 value: '^([^:]*):[^:]*:[^:]*:0*:'
               instance:
                 operation: greater than or equal
                 datatype: int
+                mask: false
                 value: '1'
           field: subexpression
     uid-user-nobody:
@@ -100,13 +117,18 @@ assessment:
             capability: independent.textfilecontent54
             select:
               filepath:
+                operation: equals
                 datatype: string
+                mask: false
                 value: /etc/passwd
               pattern:
                 operation: pattern match
                 datatype: string
+                mask: false
                 value: '^nobody:[^:]*:([0-9]+):'
               instance:
+                operation: equals
                 datatype: int
+                mask: false
                 value: '1'
           field: subexpression

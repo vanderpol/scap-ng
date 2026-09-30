@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: kernel.kptr_restrict
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kernel.kptr_restrict
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: value
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: kernel-kptr-restrict-set-1

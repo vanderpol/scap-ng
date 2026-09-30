@@ -22,14 +22,19 @@ assessment:
               capability: independent.textfilecontent54
               select:
                 filepath:
+                  operation: equals
                   datatype: string
+                  mask: false
                   value: /etc/rsyslog.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\*\.\*\s+@@(\S+)
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -37,16 +42,25 @@ assessment:
               object_title: 'rsyslog.d/*.conf: remote TCP logging'
               capability: independent.textfilecontent54
               select:
-                path: /etc/rsyslog.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^.*\.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\*\.\*\s+@@(\S+)
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -55,9 +69,12 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: ^.+$
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     remote-tcp-logging-advanced-syntax:
       test_title: remote TCP logging (advanced syntax)
@@ -73,14 +90,19 @@ assessment:
               capability: independent.textfilecontent54
               select:
                 filepath:
+                  operation: equals
                   datatype: string
+                  mask: false
                   value: /etc/rsyslog.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -88,16 +110,25 @@ assessment:
               object_title: 'rsyslog.d/*.conf: action for all messages'
               capability: independent.textfilecontent54
               select:
-                path: /etc/rsyslog.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/rsyslog.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^.*\.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\*\.\*\s+action\((\s*(?:[^#\)]*(?:#.*$)?\n)*[^#\)]*)\)
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -109,16 +140,22 @@ assessment:
         states:
         - state:
             field: subexpression
-            operation: pattern match
             value: (?i)(?:^|\n)[^#]*\btype\s*=\s*"omfwd"
+            operation: pattern match
             datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
         - state:
             field: subexpression
-            operation: pattern match
             value: (?i)(?:^|\n)[^#]*\bprotocol\s*=\s*"tcp"
+            operation: pattern match
             datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
   evaluate:

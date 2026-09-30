@@ -16,22 +16,31 @@ assessment:
         select:
           mount_point:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^/\S+$
         filters:
         - action: include
           match:
             field: device
-            operation: pattern match
             value: ^/dev\S*$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: linux.partition
       assert:
         existence: any_exist
         check: all
         state:
           field: mount_options
-          operation: equals
           value: nodev
+          operation: equals
+          datatype: string
+          mask: false
           entity_check: at least one
+          entity_existence: at_least_one_exists
         state_capability: linux.partition
     device-files-configured-in-etc-fstab-use-nodev-option-mounts:
       test_title: Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are
@@ -41,21 +50,32 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/fstab
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*/dev\S*\s+/\S+\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: any_exist
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     all:

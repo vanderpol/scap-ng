@@ -15,15 +15,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: net.ipv4.conf.all.forwarding
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: net.ipv4.conf.all.forwarding
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: net-ipv4-conf-all-forwarding-setting-in-kernel-set-0

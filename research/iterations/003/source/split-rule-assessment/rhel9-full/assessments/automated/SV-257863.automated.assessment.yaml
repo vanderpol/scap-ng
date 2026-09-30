@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: linux.partition
         select:
-          mount_point: /dev/shm
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /dev/shm
       assert:
         existence: any_exist
         check: all
         state:
           field: mount_options
-          operation: equals
           value: nodev
+          operation: equals
+          datatype: string
+          mask: false
           entity_check: at least one
+          entity_existence: at_least_one_exists
         state_capability: linux.partition
     if-dev-shm-configured-in-etc-fstab-it-configured-nodev:
       test_title: If /dev/shm is configured in /etc/fstab, it is configured with the nodev option.
@@ -31,20 +38,32 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/fstab
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*[^#\s]+\s+/dev/shm\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
           instance:
+            operation: equals
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: any_exist
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (?:^nodev$|^nodev,|,nodev$|,nodev,)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     all:

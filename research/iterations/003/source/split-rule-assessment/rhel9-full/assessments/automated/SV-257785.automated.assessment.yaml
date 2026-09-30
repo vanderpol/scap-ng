@@ -14,14 +14,22 @@ assessment:
         object_title: null
         capability: unix.symlink
         select:
-          filepath: /etc/systemd/system/ctrl-alt-del.target
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/systemd/system/ctrl-alt-del.target
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: canonical_path
-          operation: equals
           value: /dev/null
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.symlink
   evaluate:
     check: ctrl-alt-del-target-unit-masked

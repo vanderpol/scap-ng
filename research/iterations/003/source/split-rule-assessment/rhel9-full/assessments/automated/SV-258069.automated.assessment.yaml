@@ -21,37 +21,56 @@ assessment:
               object_title: default maxlogins in /etc/security/limits.conf
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/security/limits.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/limits.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: default maxlogins in /etc/security/limits.d/*.conf
               capability: independent.textfilecontent54
               select:
-                path: /etc/security/limits.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/limits.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: .*\.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*\*\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: less than or equal
           value: '10'
+          operation: less than or equal
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     limits-conf-limits-d-conf-maxlogins-set-10-or-less-2:
       test_title: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains
@@ -66,37 +85,56 @@ assessment:
               object_title: non-default maxlogins in /etc/security/limits.conf
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/security/limits.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/limits.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: non-default maxlogins in /etc/security/limits.d/*.conf
               capability: independent.textfilecontent54
               select:
-                path: /etc/security/limits.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/limits.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: .*\.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*[^#*\s]+\s+(?:(?:hard)|(?:-))\s+maxlogins\s+(\d+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: any_exist
         check: all
         state:
           field: subexpression
-          operation: less than or equal
           value: '10'
+          operation: less than or equal
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     all:

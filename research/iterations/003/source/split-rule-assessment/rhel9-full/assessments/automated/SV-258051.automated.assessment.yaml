@@ -24,15 +24,18 @@ assessment:
                 username:
                   operation: pattern match
                   datatype: string
+                  mask: false
                   value: '[\w]+'
           filters:
           - action: exclude
             match:
               field: user_id
-              operation: less than
               value: '1000'
-              entity_check: all
+              operation: less than
               datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
             state_title: only uids < 1000
             capability: unix.password
       assert:
@@ -40,9 +43,12 @@ assessment:
         check: all
         state:
           field: home_dir
-          operation: pattern match
           value: .+
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: only users with the home directory defined
         state_capability: unix.password
     check-if-root-s-home-directory-not-defined:
@@ -61,15 +67,18 @@ assessment:
                 username:
                   operation: pattern match
                   datatype: string
+                  mask: false
                   value: '[\w]+'
           filters:
           - action: exclude
             match:
               field: user_id
-              operation: greater than
               value: '0'
-              entity_check: all
+              operation: greater than
               datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
             state_title: only uids > 0
             capability: unix.password
       assert:
@@ -77,9 +86,12 @@ assessment:
         check: all
         state:
           field: home_dir
-          operation: pattern match
           value: .+
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: only users with the home directory defined
         state_capability: unix.password
   evaluate:

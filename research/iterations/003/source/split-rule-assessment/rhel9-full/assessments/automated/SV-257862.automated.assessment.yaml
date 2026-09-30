@@ -15,15 +15,22 @@ assessment:
         object_title: null
         capability: linux.partition
         select:
-          mount_point: /boot/efi
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /boot/efi
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: mount_options
-          operation: equals
           value: nosuid
+          operation: equals
+          datatype: string
+          mask: false
           entity_check: at least one
+          entity_existence: at_least_one_exists
         state_capability: linux.partition
     if-boot-efi-configured-in-etc-fstab-it-configured-nosuid:
       test_title: If /boot/efi is configured in /etc/fstab, it is configured with the nosuid option
@@ -32,20 +39,32 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/fstab
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*[^#\s]+\s+/boot/efi\s+\S+\s+(\S+)\s+\S+\s+\S+\s*$
           instance:
+            operation: equals
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (?:^nosuid$|^nosuid,|,nosuid$|,nosuid,)
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     all:

@@ -16,18 +16,27 @@ assessment:
         capability: unix.file
         select:
           path:
+            operation: equals
+            datatype: string
+            mask: false
             variable_check: at least one
             value:
               variable: home-directories-non-system-users
           filename:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\.[^\s\.]+
         filters:
         - action: exclude
           match:
             field: type
-            operation: equals
             value: directory
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: unix.file
         behaviors:
           max_depth: '1'
@@ -39,37 +48,61 @@ assessment:
         state:
           all:
           - field: suid
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: sgid
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: sticky
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: gwrite
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: gexec
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: oread
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: owrite
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: oexec
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
         state_title: mode 0740 or less permissive
         state_capability: unix.file
     local-initialization-files-root-have-mode-0740-or-less-permissive:
@@ -80,18 +113,27 @@ assessment:
         capability: unix.file
         select:
           path:
+            operation: equals
+            datatype: string
+            mask: false
             variable_check: at least one
             value:
               variable: home-directory-root-user
           filename:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\.[^\s\.]+
         filters:
         - action: exclude
           match:
             field: type
-            operation: equals
             value: directory
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: unix.file
         behaviors:
           max_depth: '1'
@@ -103,37 +145,61 @@ assessment:
         state:
           all:
           - field: suid
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: sgid
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: sticky
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: gwrite
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: gexec
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: oread
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: owrite
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: oexec
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
         state_title: mode 0740 or less permissive
         state_capability: unix.file
   evaluate:
@@ -160,22 +226,29 @@ assessment:
                     username:
                       operation: pattern match
                       datatype: string
+                      mask: false
                       value: '[\w]+'
               filters:
               - action: exclude
                 match:
                   field: user_id
-                  operation: less than
                   value: '1000'
-                  entity_check: all
+                  operation: less than
                   datatype: int
+                  mask: false
+                  entity_check: all
+                  entity_existence: at_least_one_exists
                 state_title: only uids < 1000
                 capability: unix.password
               - action: exclude
                 match:
                   field: home_dir
-                  operation: equals
                   value: /
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  entity_check: all
+                  entity_existence: at_least_one_exists
                 state_title: root directory
                 capability: unix.password
           field: home_dir
@@ -198,22 +271,29 @@ assessment:
                     username:
                       operation: pattern match
                       datatype: string
+                      mask: false
                       value: '[\w]+'
               filters:
               - action: exclude
                 match:
                   field: user_id
-                  operation: greater than
                   value: '0'
-                  entity_check: all
+                  operation: greater than
                   datatype: int
+                  mask: false
+                  entity_check: all
+                  entity_existence: at_least_one_exists
                 state_title: only uids > 0
                 capability: unix.password
               - action: exclude
                 match:
                   field: home_dir
-                  operation: equals
                   value: /
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  entity_check: all
+                  entity_existence: at_least_one_exists
                 state_title: root directory
                 capability: unix.password
           field: home_dir

@@ -15,32 +15,49 @@ assessment:
         capability: unix.file
         select:
           path:
+            operation: equals
+            datatype: string
+            mask: false
             variable_check: only one
             value:
               variable: system-wide-shared-library-files-directories
           filename:
+            operation: equals
+            datatype: string
+            mask: false
             nil: true
             value: ''
         filters:
         - action: exclude
           match:
             field: group_id
-            operation: less than
             value: '1000'
+            operation: less than
             datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: Group Owned by root or System group (gid less than 1000)
           capability: unix.file
         - action: exclude
           match:
             field: type
-            operation: equals
             value: file
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           capability: unix.file
         - action: exclude
           match:
             field: type
-            operation: equals
             value: symbolic link
+            operation: equals
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: symbolic links
           capability: unix.file
         behaviors:

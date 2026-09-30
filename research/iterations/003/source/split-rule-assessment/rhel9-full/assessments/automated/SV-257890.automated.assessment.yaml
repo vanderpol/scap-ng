@@ -16,10 +16,16 @@ assessment:
         capability: unix.file
         select:
           path:
+            operation: equals
+            datatype: string
+            mask: false
             variable_check: at least one
             value:
               variable: home-directories-local-interactive-users-without-nologin
           filename:
+            operation: equals
+            datatype: string
+            mask: false
             nil: true
             value: ''
       assert:
@@ -28,33 +34,54 @@ assessment:
         state:
           all:
           - field: suid
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: sgid
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: sticky
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: gwrite
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: oread
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: owrite
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: oexec
-            operation: equals
             value: 'false'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
         state_title: mode 0750 or less permissive
         state_capability: unix.file
   evaluate:
@@ -72,29 +99,41 @@ assessment:
             select:
               username:
                 operation: pattern match
+                datatype: string
+                mask: false
                 value: .*
             filters:
             - action: exclude
               match:
                 field: login_shell
-                operation: pattern match
                 value: ^.*nologin.*$
+                operation: pattern match
+                datatype: string
+                mask: false
+                entity_check: all
+                entity_existence: at_least_one_exists
               state_title: nologin shell
               capability: unix.password
             - action: exclude
               match:
                 field: user_id
-                operation: less than
                 value: '1000'
+                operation: less than
                 datatype: int
+                mask: false
+                entity_check: all
+                entity_existence: at_least_one_exists
               state_title: uid < 1000
               capability: unix.password
             - action: exclude
               match:
                 field: user_id
-                operation: equals
                 value: '65534'
+                operation: equals
                 datatype: int
+                mask: false
+                entity_check: all
+                entity_existence: at_least_one_exists
               state_title: uid = 65534 (nobody)
               capability: unix.password
           field: home_dir

@@ -15,19 +15,32 @@ assessment:
           to the first 100 failures found.
         capability: independent.shellcommand
         select:
-          shell: bash
-          command: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup
-            -print | head -n 100
+          shell:
+            operation: equals
+            datatype: string
+            mask: false
+            value: bash
+          command:
+            operation: equals
+            datatype: string
+            mask: false
+            value: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup
+              -print | head -n 100
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: .*
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: stdout_line
-          operation: equals
           value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
           entity_existence: none_exist
         state_title: Confirm no files or directories with invalid group are found.
         state_capability: independent.shellcommand

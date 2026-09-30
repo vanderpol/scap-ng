@@ -21,32 +21,43 @@ assessment:
               capability: independent.textfilecontent54
               select:
                 filepath:
+                  operation: equals
                   datatype: string
+                  mask: false
                   value: /etc/sssd/sssd.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*pam_cert_auth\s*=\s*(.*)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: '/etc/sssd/conf.d: pam_cert_auth'
               capability: independent.textfilecontent54
               select:
                 path:
+                  operation: equals
                   datatype: string
+                  mask: false
                   value: /etc/sssd/conf.d
                 filename:
                   operation: pattern match
                   datatype: string
+                  mask: false
                   value: .+
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*pam_cert_auth\s*=\s*(.*)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 recurse_direction: down
@@ -55,9 +66,12 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: case insensitive equals
           value: 'true'
+          operation: case insensitive equals
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: sssd-conf-pam-cert-auth-true

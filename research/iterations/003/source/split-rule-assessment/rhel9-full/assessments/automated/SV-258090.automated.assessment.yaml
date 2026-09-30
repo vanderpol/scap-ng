@@ -14,15 +14,27 @@ assessment:
         object_title: fapolicyd.service ActiveState
         capability: linux.systemdunitproperty
         select:
-          unit: fapolicyd.service
-          property: ActiveState
+          unit:
+            operation: equals
+            datatype: string
+            mask: false
+            value: fapolicyd.service
+          property:
+            operation: equals
+            datatype: string
+            mask: false
+            value: ActiveState
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: value
-          operation: equals
           value: active
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: linux.systemdunitproperty
   evaluate:
     check: fapolicyd-service-active

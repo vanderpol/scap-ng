@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: kernel.dmesg_restrict
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kernel.dmesg_restrict
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: kernel-dmesg-restrict-setting-in-kernel-set-1

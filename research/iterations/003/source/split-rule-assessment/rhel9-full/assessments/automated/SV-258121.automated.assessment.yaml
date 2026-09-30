@@ -14,21 +14,32 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/opensc.conf
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/opensc.conf
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: (?i)^\s*card_drivers\s*=(.*);
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (?i)\bcac\b
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: etc-opensc-conf-card-drivers-cac

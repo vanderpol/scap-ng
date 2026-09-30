@@ -14,15 +14,27 @@ assessment:
         object_title: null
         capability: linux.systemdunitproperty
         select:
-          unit: autofs.service
-          property: ActiveState
+          unit:
+            operation: equals
+            datatype: string
+            mask: false
+            value: autofs.service
+          property:
+            operation: equals
+            datatype: string
+            mask: false
+            value: ActiveState
       assert:
         existence: any_exist
         check: all
         state:
           field: value
-          operation: equals
           value: inactive
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: linux.systemdunitproperty
   evaluate:
     check: autofs-service-activestate-inactive-if-it-exists

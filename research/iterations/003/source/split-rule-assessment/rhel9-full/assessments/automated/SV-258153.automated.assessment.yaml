@@ -15,13 +15,20 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/audit/auditd.conf
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/audit/auditd.conf
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: (?i)^\s*disk_error_action\s*=\s*(\w+)\s*(?:#.*)?$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -31,20 +38,32 @@ assessment:
         states:
         - state:
             field: subexpression
-            operation: pattern match
             value: (?i)^syslog$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
         - state:
             field: subexpression
-            operation: pattern match
             value: (?i)^single$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
         - state:
             field: subexpression
-            operation: pattern match
             value: (?i)^halt$
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
   evaluate:

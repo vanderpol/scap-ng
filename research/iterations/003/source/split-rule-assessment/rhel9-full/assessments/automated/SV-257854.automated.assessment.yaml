@@ -15,22 +15,32 @@ assessment:
         object_title: /etc/fstab, uncommented, nfs, capturing options
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/fstab
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*[^#\s][^\s]*\s+[^\s]+\s+nfs[^\s]*\s+([^\s]+)
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: (^|,)nodev(,|$)
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: nodev option
         state_capability: independent.textfilecontent54
   evaluate:

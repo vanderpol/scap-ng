@@ -15,22 +15,31 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /usr/lib/systemd/system/emergency.service
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^ExecStart=(.*)$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: all_exist
         check: all
         state:
           field: subexpression
-          operation: equals
           value: -/usr/lib/systemd/systemd-sulogin-shell emergency
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: emergency.service ExecStart
         state_capability: independent.textfilecontent54
   evaluate:

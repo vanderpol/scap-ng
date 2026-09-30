@@ -15,25 +15,37 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          path: /etc/yum.repos.d
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/yum.repos.d
           filename:
             operation: pattern match
+            datatype: string
+            mask: false
             value: \.repo$
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*\[[^]]+\]\s*\n(?:[^[]*\n)*
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: all_exist
         check: all
         state:
           field: text
-          operation: pattern match
           value: \n\s*gpgcheck\s*=\s*(True|1|yes)\s*(\n|$)
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     no-etc-yum-repos-d-repo-reponame-has-gpgcheck-set:
       test_title: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 0.
@@ -42,25 +54,37 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          path: /etc/yum.repos.d
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/yum.repos.d
           filename:
             operation: pattern match
+            datatype: string
+            mask: false
             value: \.repo$
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*\[[^]]+\]\s*\n(?:[^[]*\n)*
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: all_exist
         check: none satisfy
         state:
           field: text
-          operation: pattern match
           value: \n\s*gpgcheck\s*=\s*(False|0|no)\s*(\n|$)
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     all:

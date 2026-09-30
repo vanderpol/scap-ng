@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: kernel.perf_event_paranoid
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kernel.perf_event_paranoid
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: equals
           value: '2'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: kernel-perf-event-paranoid-setting-in-kernel-set-2

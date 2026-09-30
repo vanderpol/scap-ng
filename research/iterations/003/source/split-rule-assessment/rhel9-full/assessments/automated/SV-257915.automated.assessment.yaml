@@ -14,8 +14,15 @@ assessment:
         object_title: /var/log directory
         capability: unix.file
         select:
-          path: /var/log
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /var/log
           filename:
+            operation: equals
+            datatype: string
+            mask: false
             nil: true
             value: ''
       assert:
@@ -23,9 +30,12 @@ assessment:
         check: all
         state:
           field: group_id
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: group-owned by root
         state_capability: unix.file
   evaluate:

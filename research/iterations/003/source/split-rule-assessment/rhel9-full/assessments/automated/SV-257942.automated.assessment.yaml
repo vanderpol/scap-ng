@@ -15,15 +15,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: net.core.bpf_jit_harden
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: net.core.bpf_jit_harden
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: value
-          operation: equals
           value: '2'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: net-core-bpf-jit-harden-set-2-in-kernel

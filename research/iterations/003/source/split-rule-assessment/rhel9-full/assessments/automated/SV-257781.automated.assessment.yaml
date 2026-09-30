@@ -15,14 +15,22 @@ assessment:
         object_title: null
         capability: unix.symlink
         select:
-          filepath: /etc/systemd/system/default.target
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/systemd/system/default.target
       assert:
         existence: all_exist
         check: all
         state:
           field: canonical_path
-          operation: pattern match
           value: '[\S]*\/multi\-user\.target$'
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.symlink
   evaluate:
     check: default-target-symlinked-multi-user-target

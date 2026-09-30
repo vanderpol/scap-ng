@@ -22,40 +22,55 @@ assessment:
               capability: independent.textfilecontent54
               select:
                 filepath:
+                  operation: equals
                   datatype: string
+                  mask: false
                   value: /etc/systemd/system.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
                 path:
+                  operation: equals
                   datatype: string
+                  mask: false
                   value: /etc/systemd/system.conf.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^.+\.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*CtrlAltDelBurstAction\s*=\s*(\S+)\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: equals
           value: none
+          operation: equals
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: etc-systemd-system-conf-ctrlaltdelburstaction-set-none

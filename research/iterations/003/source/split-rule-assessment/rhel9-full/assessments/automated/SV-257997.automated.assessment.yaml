@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: unix.file
         select:
-          filepath: /etc/ssh/sshd_config
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ssh/sshd_config
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: group_id
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: group-owned by root
         state_capability: unix.file
     etc-ssh-sshd-config-d-directory-sub-directories-group-owned:
@@ -32,8 +39,15 @@ assessment:
         object_title: null
         capability: unix.file
         select:
-          path: /etc/ssh/sshd_config.d
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ssh/sshd_config.d
           filename:
+            operation: equals
+            datatype: string
+            mask: false
             nil: true
             value: ''
         behaviors:
@@ -44,9 +58,12 @@ assessment:
         check: all
         state:
           field: group_id
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: group-owned by root
         state_capability: unix.file
     etc-ssh-sshd-config-d-files-group-owned-by-root:
@@ -56,9 +73,15 @@ assessment:
         object_title: null
         capability: unix.file
         select:
-          path: /etc/ssh/sshd_config.d
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ssh/sshd_config.d
           filename:
             operation: pattern match
+            datatype: string
+            mask: false
             value: .*
         behaviors:
           recurse: directories
@@ -68,9 +91,12 @@ assessment:
         check: all
         state:
           field: group_id
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: group-owned by root
         state_capability: unix.file
   evaluate:

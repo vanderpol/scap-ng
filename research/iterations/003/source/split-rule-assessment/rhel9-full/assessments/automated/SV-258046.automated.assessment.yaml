@@ -22,30 +22,41 @@ assessment:
               select:
                 username:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: .+
           filters:
           - action: exclude
             match:
               field: user_id
-              operation: greater than or equal
               value: '1000'
+              operation: greater than or equal
               datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
             capability: unix.password
           - action: exclude
             match:
               field: user_id
-              operation: equals
               value: '0'
+              operation: equals
               datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
             capability: unix.password
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: login_shell
-          operation: pattern match
           value: /sbin/nologin|/usr/sbin/nologin
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.password
   evaluate:
     check: system-accounts-in-etc-passwd-use-sbin-nologin

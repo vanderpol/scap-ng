@@ -14,16 +14,27 @@ assessment:
         object_title: /etc/shadow- file
         capability: unix.file
         select:
-          path: /etc
-          filename: shadow-
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc
+          filename:
+            operation: equals
+            datatype: string
+            mask: false
+            value: shadow-
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: user_id
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: owned by root
         state_capability: unix.file
   evaluate:

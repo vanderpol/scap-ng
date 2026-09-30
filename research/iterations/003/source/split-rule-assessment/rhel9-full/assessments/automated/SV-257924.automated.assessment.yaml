@@ -15,8 +15,10 @@ assessment:
         capability: unix.file
         select:
           filepath:
-            variable_check: at least one
+            operation: equals
             datatype: string
+            mask: false
+            variable_check: at least one
             value:
               variable: audit-tools
       assert:
@@ -24,9 +26,12 @@ assessment:
         check: all
         state:
           field: user_id
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: owned by root
         state_capability: unix.file
   evaluate:

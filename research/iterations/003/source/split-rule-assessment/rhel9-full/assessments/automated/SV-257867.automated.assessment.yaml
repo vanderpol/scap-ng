@@ -14,15 +14,22 @@ assessment:
         object_title: null
         capability: linux.partition
         select:
-          mount_point: /tmp
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /tmp
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: mount_options
-          operation: equals
           value: noexec
+          operation: equals
+          datatype: string
+          mask: false
           entity_check: at least one
+          entity_existence: at_least_one_exists
         state_capability: linux.partition
   evaluate:
     check: tmp-mounted-noexec-option

@@ -14,15 +14,22 @@ assessment:
         object_title: /boot
         capability: linux.partition
         select:
-          mount_point: /boot
+          mount_point:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /boot
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: mount_options
-          operation: equals
           value: nodev
+          operation: equals
+          datatype: string
+          mask: false
           entity_check: at least one
+          entity_existence: at_least_one_exists
         state_capability: linux.partition
   evaluate:
     check: boot-has-nodev-option

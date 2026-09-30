@@ -14,20 +14,35 @@ assessment:
         object_title: Retrieve system wide crypto policy(ies).
         capability: independent.shellcommand
         select:
-          shell: bash
-          command: update-crypto-policies --show
+          shell:
+            operation: equals
+            datatype: string
+            mask: false
+            value: bash
+          command:
+            operation: equals
+            datatype: string
+            mask: false
+            value: update-crypto-policies --show
       assert:
         existence: at_least_one_exists
         check: all
         state:
           all:
           - field: exit_status
-            operation: equals
             value: '0'
+            operation: equals
             datatype: int
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           - field: stdout_line
-            operation: pattern match
             value: ^FIPS:*
+            operation: pattern match
+            datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
         state_title: Confirm system wide crypto policy(ies) are correct.
         state_capability: independent.shellcommand
     verify-current-minimum-crypto-policy-configuration:
@@ -37,23 +52,34 @@ assessment:
         object_title: Retrieve the current minimum crypto-policy configuration.
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/crypto-policies/state/CURRENT.pol
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/crypto-policies/state/CURRENT.pol
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^hash\s*=\s*.*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: text
-          operation: pattern match
           value:
             variable: allowed-fips-algorithms
+          operation: pattern match
+          datatype: string
+          mask: false
           variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: Confirm correct algorithms.
         state_capability: independent.textfilecontent54
     verify-no-sha1-algorithms-employed:
@@ -63,21 +89,32 @@ assessment:
         object_title: Retrieve the current minimum crypto-policy configuration.
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/crypto-policies/state/CURRENT.pol
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/crypto-policies/state/CURRENT.pol
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^hash\s*=\s*.*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: any_exist
         check: all
         state:
           field: text
-          operation: pattern match
           value: SHA1-\d
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: Check for existence of SHA1 algorithms (negated at criterion level).
         state_capability: independent.textfilecontent54
     verify-minimum-hash-values-224:
@@ -87,21 +124,32 @@ assessment:
         object_title: Retrieve the current minimum crypto-policy configuration with hash values subexpression.
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/crypto-policies/state/CURRENT.pol
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/crypto-policies/state/CURRENT.pol
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^hash\s*=\s*([^#\n]+)$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: any_exist
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: \b[A-Z]+\d*-((\d{1,2}\b)|(1\d\d\b)|(21\d\b)|(22[1-3]\b))
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: Confirm minimum hash values of 224.
         state_capability: independent.textfilecontent54
     verify-minimum-rsa-size-2048:
@@ -111,22 +159,32 @@ assessment:
         object_title: Retrieve the current minimum rsa size.
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/crypto-policies/state/CURRENT.pol
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/crypto-policies/state/CURRENT.pol
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*min_rsa_size\s*=\s*(\d+)
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: greater than or equal
           value: '2048'
+          operation: greater than or equal
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: Confirm minimum rsa size of 2048.
         state_capability: independent.textfilecontent54
   evaluate:

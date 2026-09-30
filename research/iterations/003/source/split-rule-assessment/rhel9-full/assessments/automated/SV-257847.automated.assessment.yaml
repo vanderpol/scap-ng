@@ -16,8 +16,10 @@ assessment:
         capability: linux.partition
         select:
           mount_point:
-            variable_check: at least one
+            operation: equals
             datatype: string
+            mask: false
+            variable_check: at least one
             value:
               variable: audit-data-directory-from-etc-audit-auditd-conf
       assert:
@@ -31,16 +33,22 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/fstab
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/fstab
           pattern:
             operation: pattern match
-            variable_check: at least one
             datatype: string
+            mask: false
+            variable_check: at least one
             value:
               variable: regex-find-audit-data-partition-in-etc-fstab
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: all_exist
@@ -61,14 +69,20 @@ assessment:
             object_title: null
             capability: independent.textfilecontent54
             select:
-              filepath: /etc/audit/auditd.conf
+              filepath:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/audit/auditd.conf
               pattern:
                 operation: pattern match
                 datatype: string
+                mask: false
                 value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
               instance:
                 operation: greater than or equal
                 datatype: int
+                mask: false
                 value: '1'
             behaviors:
               ignore_case: 'true'
@@ -79,22 +93,32 @@ assessment:
       kind: local
       expression:
         concat:
-        - literal: ^[^# \t]+\s+
+        - literal:
+            value: ^[^# \t]+\s+
+            datatype: string
         - object_values:
             collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/audit/auditd.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/audit/auditd.conf
                 pattern:
                   operation: pattern match
                   datatype: string
+                  mask: false
                   value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
             field: subexpression
-        - literal: \s+
+        - literal:
+            value: \s+
+            datatype: string

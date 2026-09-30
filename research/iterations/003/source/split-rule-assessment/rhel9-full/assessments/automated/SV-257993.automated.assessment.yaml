@@ -20,28 +20,44 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/ssh/sshd_config
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/ssh/sshd_config
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^(?i)\s*PermitUserEnvironment\s+(\w+)$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/ssh/sshd_config.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/ssh/sshd_config.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^.+\.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^(?i)\s*PermitUserEnvironment\s+(\w+)$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 max_depth: '-1'
@@ -51,9 +67,12 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: ^(no|"no")$
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: permituserenvironment-option-not-set-yes-in-etc-ssh-sshd-config

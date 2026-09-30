@@ -16,8 +16,16 @@ assessment:
         capability: linux.selinuxsecuritycontext
         select:
           path:
-            variable: faillock-directory
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: faillock-directory
           filename:
+            operation: equals
+            datatype: string
+            mask: false
             nil: true
             value: ''
       assert:
@@ -25,8 +33,12 @@ assessment:
         check: all
         state:
           field: type
-          operation: equals
           value: faillog_t
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: configured faillock directory selinux context correct
         state_capability: linux.selinuxsecuritycontext
     etc-security-faillock-conf-dir-option-exists:
@@ -36,13 +48,20 @@ assessment:
         object_title: /etc/security/faillock.conf dir
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/security/faillock.conf
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/security/faillock.conf
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*dir\s*=\s*(.*)\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -63,12 +82,19 @@ assessment:
             object_title: /etc/security/faillock.conf dir
             capability: independent.textfilecontent54
             select:
-              filepath: /etc/security/faillock.conf
+              filepath:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/security/faillock.conf
               pattern:
                 operation: pattern match
+                datatype: string
+                mask: false
                 value: ^\s*dir\s*=\s*(.*)\s*$
               instance:
                 operation: greater than or equal
                 datatype: int
+                mask: false
                 value: '1'
           field: subexpression

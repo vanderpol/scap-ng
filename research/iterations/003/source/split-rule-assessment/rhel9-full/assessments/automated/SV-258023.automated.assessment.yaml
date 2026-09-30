@@ -14,10 +14,20 @@ assessment:
         object_title: Gather gsettings get org.gnome.desktop.session idle-delay
         capability: independent.shellcommand
         select:
-          shell: bash
-          command: gsettings get org.gnome.desktop.session idle-delay
+          shell:
+            operation: equals
+            datatype: string
+            mask: false
+            value: bash
+          command:
+            operation: equals
+            datatype: string
+            mask: false
+            value: gsettings get org.gnome.desktop.session idle-delay
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: uint32\s+(\d+)
       assert:
         existence: at_least_one_exists
@@ -28,25 +38,37 @@ assessment:
         - state:
             all:
             - field: exit_status
+              value: '0'
               operation: equals
-              value: '0'
               datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
             - field: subexpression
-              operation: not equal
               value: '0'
+              operation: not equal
               datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
           state_title: idle-delay must not be equal to zero
           capability: independent.shellcommand
         - state:
             all:
             - field: exit_status
-              operation: equals
               value: '0'
+              operation: equals
               datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
             - field: subexpression
-              operation: less than or equal
               value: '600'
+              operation: less than or equal
               datatype: int
+              mask: false
+              entity_check: all
+              entity_existence: at_least_one_exists
           state_title: idle-delay must be less than or equal to 600
           capability: independent.shellcommand
   evaluate:

@@ -15,15 +15,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: kernel.randomize_va_space
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: kernel.randomize_va_space
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: equals
           value: '2'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: kernel-randomize-va-space-setting-in-kernel-set-2

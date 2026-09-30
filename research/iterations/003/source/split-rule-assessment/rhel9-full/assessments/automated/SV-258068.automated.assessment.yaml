@@ -21,26 +21,44 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/profile
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/profile
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^[^#]*\s*TMOUT=(\d+)\s*$
                 instance:
+                  operation: equals
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/profile.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/profile.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^.+\.sh$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^[^#]*\s*TMOUT=(\d+)\s*$
                 instance:
+                  operation: equals
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 max_depth: '-1'
@@ -50,9 +68,12 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: less than or equal
           value: '600'
+          operation: less than or equal
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: tmout-option-set-600-or-less-in-etc-profile-etc

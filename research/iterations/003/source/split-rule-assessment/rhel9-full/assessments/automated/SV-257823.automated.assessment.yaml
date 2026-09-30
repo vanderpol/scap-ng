@@ -17,15 +17,26 @@ assessment:
           match vendor values.
         capability: independent.shellcommand
         select:
-          shell: bash
-          command: rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
+          shell:
+            operation: equals
+            datatype: string
+            mask: false
+            value: bash
+          command:
+            operation: equals
+            datatype: string
+            mask: false
+            value: rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: stdout_line
-          operation: equals
           value: ''
+          operation: equals
+          datatype: string
+          mask: false
+          entity_check: all
           entity_existence: none_exist
         state_title: Confirm no files are identified.
         state_capability: independent.shellcommand

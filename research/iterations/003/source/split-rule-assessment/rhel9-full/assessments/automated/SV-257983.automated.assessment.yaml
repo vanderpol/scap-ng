@@ -15,14 +15,19 @@ assessment:
         capability: independent.textfilecontent54
         select:
           filepath:
+            operation: equals
             datatype: string
+            mask: false
             value: /etc/ssh/sshd_config
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*include\s+(.*)\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
         behaviors:
           ignore_case: 'true'
@@ -31,9 +36,12 @@ assessment:
         check: at least one
         state:
           field: subexpression
-          operation: equals
           value: /etc/ssh/sshd_config.d/*.conf
+          operation: equals
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     etc-ssh-sshd-config-d-pubkeyauthentication-set-yes:
       test_title: '/etc/ssh/sshd_config.d: PubkeyAuthentication is set to yes'
@@ -42,16 +50,25 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          path: /etc/ssh/sshd_config.d
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ssh/sshd_config.d
           filename:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^.+\.conf$
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*(?i)PubkeyAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
         behaviors:
           ignore_case: 'true'
@@ -60,9 +77,12 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: ^(yes|"yes")$
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     etc-ssh-sshd-config-pubkeyauthentication-set-yes:
       test_title: '/etc/ssh/sshd_config: PubkeyAuthentication is set to yes'
@@ -71,13 +91,20 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/ssh/sshd_config
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/ssh/sshd_config
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*(?i)PubkeyAuthentication(?-i)[ \t]+([\w\"]+)[\s]*(?:|(?:#.*))?$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
         behaviors:
           ignore_case: 'true'
@@ -86,9 +113,12 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: ^(yes|"yes")$
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     any:

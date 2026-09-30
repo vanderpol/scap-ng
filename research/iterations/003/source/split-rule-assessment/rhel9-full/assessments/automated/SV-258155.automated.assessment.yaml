@@ -16,8 +16,10 @@ assessment:
         capability: linux.partition
         select:
           mount_point:
-            variable_check: at least one
+            operation: equals
             datatype: string
+            mask: false
+            variable_check: at least one
             value:
               variable: audit-data-directory-from-etc-audit-auditd-conf
       assert:
@@ -32,15 +34,22 @@ assessment:
         capability: independent.variable
         select:
           var_ref:
-            variable: audit-partition-total-size-in-bytes
+            operation: equals
+            datatype: string
+            mask: false
+            value:
+              variable: audit-partition-total-size-in-bytes
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: greater than or equal
           value: '10737418240'
+          operation: greater than or equal
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: 10GiB
         state_capability: independent.variable
   evaluate:
@@ -58,14 +67,20 @@ assessment:
             object_title: null
             capability: independent.textfilecontent54
             select:
-              filepath: /etc/audit/auditd.conf
+              filepath:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/audit/auditd.conf
               pattern:
                 operation: pattern match
                 datatype: string
+                mask: false
                 value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
               instance:
                 operation: greater than or equal
                 datatype: int
+                mask: false
                 value: '1'
             behaviors:
               ignore_case: 'true'
@@ -84,8 +99,10 @@ assessment:
                 capability: linux.partition
                 select:
                   mount_point:
-                    variable_check: at least one
+                    operation: equals
                     datatype: string
+                    mask: false
+                    variable_check: at least one
                     value:
                       variable: audit-data-directory-from-etc-audit-auditd-conf
               field: block_size
@@ -95,8 +112,10 @@ assessment:
                 capability: linux.partition
                 select:
                   mount_point:
-                    variable_check: at least one
+                    operation: equals
                     datatype: string
+                    mask: false
+                    variable_check: at least one
                     value:
                       variable: audit-data-directory-from-etc-audit-auditd-conf
               field: total_space

@@ -15,15 +15,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: fs.protected_symlinks
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: fs.protected_symlinks
       assert:
         existence: all_exist
         check: all
         state:
           field: value
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: fs-protected-symlinks-setting-in-kernel-set-1

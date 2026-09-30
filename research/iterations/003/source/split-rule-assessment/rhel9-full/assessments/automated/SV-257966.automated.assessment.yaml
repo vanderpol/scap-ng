@@ -15,15 +15,22 @@ assessment:
         object_title: null
         capability: unix.sysctl
         select:
-          name: net.ipv4.icmp_echo_ignore_broadcasts
+          name:
+            operation: equals
+            datatype: string
+            mask: false
+            value: net.ipv4.icmp_echo_ignore_broadcasts
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: value
-          operation: equals
           value: '1'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: unix.sysctl
   evaluate:
     check: net-ipv4-icmp-echo-ignore-broadcasts-set-1-in-kernel

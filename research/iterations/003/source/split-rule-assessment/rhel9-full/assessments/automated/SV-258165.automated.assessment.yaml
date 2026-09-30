@@ -16,15 +16,23 @@ assessment:
         capability: unix.file
         select:
           filepath:
-            variable: audit-data-directory-from-etc-audit-auditd-conf
+            operation: equals
+            datatype: string
+            mask: false
+            variable_check: all
+            value:
+              variable: audit-data-directory-from-etc-audit-auditd-conf
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: group_id
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: group-owned by root
         state_capability: unix.file
   evaluate:
@@ -40,12 +48,19 @@ assessment:
             object_title: null
             capability: independent.textfilecontent54
             select:
-              filepath: /etc/audit/auditd.conf
+              filepath:
+                operation: equals
+                datatype: string
+                mask: false
+                value: /etc/audit/auditd.conf
               pattern:
                 operation: pattern match
+                datatype: string
+                mask: false
                 value: ^\s*log_file\s*=\s*(\S+)\s*(?:#.*)?$
               instance:
                 operation: greater than or equal
                 datatype: int
+                mask: false
                 value: '1'
           field: subexpression

@@ -20,37 +20,56 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/security/limits.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/limits.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/security/limits.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/limits.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: \.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^[ \t]*\*[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
     if-core-set-any-specific-domains-it-set-0:
       test_title: If core is set for any specific domains, it is set to 0.
@@ -65,37 +84,56 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/security/limits.conf
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/limits.conf
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^[ \t]*[^#*\s]+[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/security/limits.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/security/limits.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: \.conf$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^[ \t]*[^#*\s]+[ \t]+(?:hard|soft|-)[ \t]+core[ \t]+(\d+)[ \t]*(?:#.*)?$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
       assert:
         existence: any_exist
         check: all
         state:
           field: subexpression
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     all:

@@ -15,22 +15,32 @@ assessment:
         object_title: /etc/libuser.conf defaults section with crypt_style
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/libuser.conf
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/libuser.conf
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\[defaults]((?:\r?\n(?:[^[\r\n].*)?)*)
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: at least one
         state:
           field: subexpression
-          operation: pattern match
           value: \n\s*crypt_style\s*=\s*(\S*)\s*(\n|$)
+          operation: pattern match
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: defaults/crypt_style
         state_capability: independent.textfilecontent54
     libuser-conf-crypt-style-sha512:
@@ -40,22 +50,32 @@ assessment:
         object_title: /etc/libuser.conf defaults section with crypt_style
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/libuser.conf
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/libuser.conf
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*crypt_style\s*=\s*(\S+)\s*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: equals
           value: sha512
+          operation: equals
           datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: sha512
         state_capability: independent.textfilecontent54
   evaluate:

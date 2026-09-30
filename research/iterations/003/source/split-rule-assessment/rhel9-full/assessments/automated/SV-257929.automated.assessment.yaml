@@ -15,25 +15,38 @@ assessment:
           world-writable directories.
         capability: unix.file
         select:
-          path: /
+          path:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /
           filename:
+            operation: equals
+            datatype: string
+            mask: false
             nil: true
             value: ''
         filters:
         - action: exclude
           match:
             field: owrite
-            operation: equals
             value: '0'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: Filter exclude directories that are not world writable.
           capability: unix.file
         - action: exclude
           match:
             field: sticky
-            operation: equals
             value: '1'
+            operation: equals
             datatype: boolean
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: Filter exclude any with sticky bit.
           capability: unix.file
         behaviors:

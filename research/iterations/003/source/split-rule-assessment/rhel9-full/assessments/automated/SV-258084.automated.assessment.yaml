@@ -20,12 +20,20 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/sudoers
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sudoers
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*Defaults\s+timestamp_timeout\s*=\s*([-\d]+)\s*$
                 instance:
+                  operation: equals
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -33,15 +41,25 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/sudoers.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sudoers.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^.*$
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^\s*Defaults\s+timestamp_timeout\s*=\s*([-\d]+)\s*$
                 instance:
+                  operation: equals
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -52,9 +70,12 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: defaults-timestamp-timeout-configured-0-in-etc-sudoers-or-etc

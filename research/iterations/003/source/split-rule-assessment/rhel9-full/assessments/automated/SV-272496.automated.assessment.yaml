@@ -21,28 +21,44 @@ assessment:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/sudoers
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sudoers
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^(.*\bsysadm_r\b.*)$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
           - collect:
               object_title: null
               capability: independent.textfilecontent54
               select:
-                path: /etc/sudoers.d
+                path:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/sudoers.d
                 filename:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: .*
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: ^(.*\bsysadm_r\b.*)$
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
               behaviors:
                 ignore_case: 'true'
@@ -53,9 +69,13 @@ assessment:
         check: all
         state:
           field: subexpression
-          operation: pattern match
           value: ^[ \t]*%[a-zA-Z0-9_-]+[ \t]+ALL=\(ALL\)[ \t]+TYPE=sysadm_t[ \t]+ROLE=sysadm_r[ \t]+ALL[
             \t]*$
+          operation: pattern match
+          datatype: string
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: elevate-selinux-context-when-administrator-calls-sudo-command

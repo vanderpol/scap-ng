@@ -15,16 +15,24 @@ assessment:
         capability: independent.variable
         select:
           var_ref:
-            variable: count-group-entries
+            operation: equals
+            datatype: string
+            mask: false
+            value:
+              variable: count-group-entries
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: value
-          operation: equals
           value:
             variable: count-unique-gids
+          operation: equals
           datatype: int
+          mask: false
+          variable_check: all
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_title: count of unique GIDs
         state_capability: independent.variable
   evaluate:
@@ -41,13 +49,20 @@ assessment:
               object_title: /etc/group GIDs
               capability: independent.textfilecontent54
               select:
-                filepath: /etc/group
+                filepath:
+                  operation: equals
+                  datatype: string
+                  mask: false
+                  value: /etc/group
                 pattern:
                   operation: pattern match
+                  datatype: string
+                  mask: false
                   value: '^[^:]*:[^:]*:([^:]+):'
                 instance:
                   operation: greater than or equal
                   datatype: int
+                  mask: false
                   value: '1'
             field: subexpression
     count-unique-gids:
@@ -62,12 +77,19 @@ assessment:
                 object_title: /etc/group GIDs
                 capability: independent.textfilecontent54
                 select:
-                  filepath: /etc/group
+                  filepath:
+                    operation: equals
+                    datatype: string
+                    mask: false
+                    value: /etc/group
                   pattern:
                     operation: pattern match
+                    datatype: string
+                    mask: false
                     value: '^[^:]*:[^:]*:([^:]+):'
                   instance:
                     operation: greater than or equal
                     datatype: int
+                    mask: false
                     value: '1'
               field: subexpression

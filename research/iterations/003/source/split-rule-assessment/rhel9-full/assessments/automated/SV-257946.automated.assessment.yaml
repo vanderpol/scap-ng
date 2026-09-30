@@ -14,22 +14,32 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/chrony.conf
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/chrony.conf
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^[ \t]*port[ \t]+(\d+)[ \t]*$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
         check: all
         state:
           field: subexpression
-          operation: equals
           value: '0'
+          operation: equals
           datatype: int
+          mask: false
+          entity_check: all
+          entity_existence: at_least_one_exists
         state_capability: independent.textfilecontent54
   evaluate:
     check: chrony-daemon-disabled-from-acting-as-server

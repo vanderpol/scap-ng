@@ -16,13 +16,20 @@ assessment:
         object_title: null
         capability: independent.textfilecontent54
         select:
-          filepath: /etc/crypto-policies/back-ends/openssh.config
+          filepath:
+            operation: equals
+            datatype: string
+            mask: false
+            value: /etc/crypto-policies/back-ends/openssh.config
           pattern:
             operation: pattern match
+            datatype: string
+            mask: false
             value: ^\s*(?i)Ciphers(?-i)[ \t]+(\S+)[\s]*(?:|(?:#.*))?$
           instance:
             operation: greater than or equal
             datatype: int
+            mask: false
             value: '1'
       assert:
         existence: at_least_one_exists
@@ -32,16 +39,22 @@ assessment:
         states:
         - state:
             field: subexpression
-            operation: equals
             value: aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr
+            operation: equals
             datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
         - state:
             field: subexpression
-            operation: equals
             value: '"aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr"'
+            operation: equals
             datatype: string
+            mask: false
+            entity_check: all
+            entity_existence: at_least_one_exists
           state_title: null
           capability: independent.textfilecontent54
   evaluate:
