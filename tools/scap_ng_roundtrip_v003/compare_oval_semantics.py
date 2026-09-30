@@ -184,9 +184,14 @@ class Model:
             if cneg or capp:
                 node=("edge",cneg,capp,node)
             kids.append(node)
-        # Common source wrappers containing one child do not change truth semantics.
-        if op=="AND" and not neg and not app and len(kids)==1:
-            return kids[0]
+        # A one-child criteria node has the same truth value for AND, OR,
+        # ONE, and XOR. Normalize its flags as an edge on that child so native
+        # lowering may collapse the transparent wrapper without creating a diff.
+        if len(kids)==1:
+            node=kids[0]
+            if neg or app:
+                node=("edge",neg,app,node)
+            return node
         return ("criteria",op,neg,app,tuple(sorted(kids,key=repr)))
 
     def definition(self,did):
