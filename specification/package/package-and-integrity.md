@@ -50,40 +50,101 @@ can diverge from the policy package after compilation.
 Reusable Assessments MAY be embedded once and referenced by stable identity
 within the package.
 
-## 5. Package manifest and object resolution
+## 5. Explicit source references versus compiled manifest resolution
 
-A compiled package SHOULD contain one manifest that provides both package
-integrity metadata and deterministic logical-object resolution.
+**Two different operations serve different users.** Authors need a direct and
+human-readable way to follow Rule → Policy → selected check → Assessment.
+Scanners need immutable, validated object lookup and package integrity without
+depending on the author's directory layout. The compiled package manifest
+serves this *runtime* need; it is **not** an additional author-maintained
+Assessment index.
 
-The manifest SHOULD map each stable logical object identity to:
+### 5.1 Authoring and compilation
 
-- object type;
-- package path;
-- content digest;
-- content size.
+For the iteration-003 file-backed authoring model, a Rule SHALL identify its
+Policy source file using an explicit relative path. Each Policy check selector
+SHALL identify its Assessment source file by an explicit relative path.
+These paths SHALL resolve relative to the **referring YAML file**, not to the
+process working directory or an implicitly chosen root.
 
-This mapping is distinct from Benchmark membership. For example, a Benchmark
-Rule list identifies which Rule IDs belong to the Benchmark, while the package
-manifest identifies where those Rule objects are located in the immutable
-package.
+The compiler SHALL normalize paths, enforce the declared source boundary,
+verify referenced files exist and contain the expected object types, and read
+their actual logical identifiers and versions. It SHALL reject missing,
+ambiguous, incompatible, or boundary-escaping links. Neither a filename nor
+a parent-directory convention SHALL determine an object's semantic identity.
+An author SHALL NOT be required to maintain a second Assessment lookup index.
 
-A processor SHOULD be able to resolve packaged objects without relying on
-filename conventions or directory scanning.
+Illustrative source (the exact source schema is still pre-alpha):
 
-Package integrity SHOULD be computable from the canonical manifest and the
-digests it contains.
+```yaml
+# rules/SV-257777.rule.yaml
+rule:
+  id: SV-257777
+  policy: ../policies/SV-257777.policy.yaml
+```
 
-The package identity SHOULD be immutable and content-derived, for example from
-the canonical manifest digest.
+```yaml
+# policies/SV-257777.policy.yaml
+policy:
+  id: SV-257777.policy
+  default_check: automated
+  checks:
+    automated:
+      assessment: ../assessments/automated/SV-257777.automated.assessment.yaml
+    manual:
+      assessment: ../assessments/manual/SV-257777.manual.assessment.yaml
+```
 
-Results SHOULD reference the immutable package identity rather than duplicate
-the complete source package.
+### 5.2 Compilation output and runtime
+
+A compiled package SHALL contain an authoritative **object-resolution
+manifest** that also carries package-integrity metadata. It SHALL map each
+packaged logical object identity (and version when required to disambiguate)
+to the object's declared type and exact immutable package member. The entry
+SHALL include sufficient integrity information, including a content digest,
+to detect modification or substitution. Content size SHOULD also be recorded.
+
+The compiler SHALL resolve the source paths and check selectors into logical
+object references and construct the manifest **automatically**. An author
+SHALL NOT create or synchronize a separate assessment index by hand.
+
+On loading the package, a scanner SHALL validate the applicable package
+integrity and use the manifest to resolve logical Rule, Policy and Assessment
+references to exact packaged members. A scanner SHALL NOT discover objects
+by guessing filenames from IDs, searching directories, or reopening relative
+authoring paths. Missing references, conflicting identities, wrong types and
+digest mismatches SHALL cause a defined validation failure rather than
+fallback resolution.
+
+The manifest lookup is distinct from Benchmark membership: the Benchmark's
+Rule list says **which Rules belong** to the Benchmark; the manifest says
+**where a referenced packaged Rule/Policy/Assessment object lives** and how
+to verify it.
+
+Multiple Policy check selectors MAY resolve to the same Assessment identity.
+The manifest need only bind that Assessment once; selected-check identity
+SHALL remain available for results and provenance.
+
+### 5.3 Why this is useful
+
+The separation permits a source Assessment file to be moved or renamed
+without changing its logical identity; authoring references must be updated,
+but existing immutable packages continue to resolve their own contents.
+Packages need not preserve source directory layouts, and result records can
+refer to immutable package and Assessment identities instead of copying the
+complete source.
+
+The package identity SHOULD be immutable and content-derived (for example,
+from a canonical manifest digest), and results SHOULD reference that immutable
+identity. Package-signature specifics and the final manifest serialization
+remain under design; the deterministic resolution and integrity requirements
+above are the intended behavior.
 
 Iteration 003 previously experimented with separate `index.json` and
 `manifest.json` files. Because both repeated package path and digest
 information, that design was consolidated into one `manifest.json`.
-This experimental manifest shape is evidence for package design and is not yet
-the final normative serialization.
+The current experimental shape is implementation evidence, **not** an
+already-ratified final JSON schema.
 
 ## 6. Signing
 
